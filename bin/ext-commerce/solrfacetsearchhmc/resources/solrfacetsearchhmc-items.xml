@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<itemtypes>
+    <itemtype code="SolrIndexerOperationWizard" extends="WizardBusinessItem" autocreate="true" generate="true" 
+       jaloclass="de.hybris.platform.solrfacetsearch.hmc.SolrIndexerOperationWizard">
+       <attributes>
+        <attribute qualifier="indexerOperation" type="IndexerOperationValues">
+         <defaultvalue>
+          em().getEnumerationValue("IndexerOperationValues","full")
+         </defaultvalue>
+         <modifiers read="true" write="true" optional="false" />
+         <persistence type="jalo" />
+        </attribute>
+        <attribute type="SolrFacetSearchConfig" qualifier="facetSearchConfig">
+         <modifiers read="true" write="true" optional="false" />
+         <persistence type="jalo" />
+        </attribute>
+       </attributes>
+      </itemtype>
+      
+      <itemtype code="SolrIndexerHotUpdateWizard" extends="WizardBusinessItem" autocreate="true" generate="true" 
+       jaloclass="de.hybris.platform.solrfacetsearch.hmc.SolrIndexerHotUpdateWizard">
+       <attributes>
+        <attribute type="SolrFacetSearchConfig" qualifier="solrFacetSearchConfig">
+         <modifiers read="true" write="true" optional="true" search="false"/>
+         <persistence type="jalo" />
+        </attribute>
+        <attribute qualifier="possibleIndexTypes" type="ComposedIndexedTypesCollection">
+         <modifiers read="true" write="true" optional="true" search="false" partof="true" />
+         <persistence type="jalo" />
+        </attribute>
+        <attribute qualifier="indexType" type="ComposedIndexedType" isSelectionOf="possibleIndexTypes">
+         <modifiers read="true" write="true" optional="true" search="false"  />
+         <persistence type="jalo" />
+        </attribute>
+        <attribute qualifier="updateOperation" type="boolean">
+         <modifiers read="true" write="true" initial="true" optional="false"/>
+         <persistence type="jalo"/>
+        </attribute>
+        <attribute qualifier="itemsToIndex" type="ItemCollection">
+         <modifiers read="true" write="true" optional="true" search="false"/>
+         <persistence type="jalo" />
+        </attribute>
+        <attribute qualifier="composedTypeAttribute" type="ComposedType">
+         <modifiers read="true" write="true" optional="true" search="false"/>
+         <persistence type="jalo"/>
+        </attribute>
+        <attribute qualifier="itemsToIndexDescription" type="java.lang.String">
+         <modifiers read="true" write="true" optional="true" search="false"/>
+         <persistence type="jalo"/>
+        </attribute>    
+       </attributes>
+       </itemtype>
+	</itemtypes>
+</items>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<wizard-config showPrefilledValues="false" selectMode="false" createMode="true" activateAfterCreate="false" createWithinPopup="false" createWithinEditor="false">
+	<displayed-properties>
+		<group qualifier="General" visible="true" initially-opened="false">
+			<label key="cockpit.config.label.General" />
+			<property qualifier="CMSSite.name"/>
+			<property qualifier="CMSSite.active"/>
+		</group> 
+	</displayed-properties>
+	<after-done-wizard-script language="beanshell">
+		<content>
+			<![CDATA[
+			import de.hybris.platform.cms2.model.site.CMSSiteModel;
+			import java.lang.Class;
+			import java.util.Map;
+			import de.hybris.platform.servicelayer.model.ModelService;
+			import java.util.Collection;
+			import java.lang.String;
+			import de.hybris.platform.catalog.model.CatalogModel;
+			import de.hybris.platform.catalog.model.classification.ClassificationSystemModel;
+			import de.hybris.platform.category.model.CategoryModel;
+			import de.hybris.platform.core.model.product.ProductModel;
+			import de.hybris.platform.catalog.model.CatalogVersionModel;
+			import de.hybris.platform.catalog.jalo.CatalogVersion;
+			import de.hybris.platform.core.model.security.PrincipalModel;
+			import de.hybris.platform.core.model.user.UserModel;
+			import de.hybris.platform.cockpit.session.UISessionUtils;
+			import java.util.ArrayList;
+			import java.util.List;
+			import de.hybris.platform.core.Registry;
+			import de.hybris.platform.catalog.CatalogService;
+			import de.hybris.platform.cms2.model.pages.PageTemplateModel;
+			import de.hybris.platform.cms2.model.contents.ContentCatalogModel;
+			import de.hybris.platform.cmscockpit.services.GenericRandomNameProducer;
+			import de.hybris.platform.cms2.constants.Cms2Constants;
+			import de.hybris.platform.cms2.model.pages.ContentPageModel;
+			import org.apache.commons.lang.StringUtils;
+			import de.hybris.platform.cms2.servicelayer.services.admin.CMSAdminPageService;
+			import de.hybris.platform.cmscockpit.wizard.cmssite.util.CMSSiteUtils;
+			import de.hybris.platform.catalog.model.synchronization.CatalogVersionSyncJobModel;			
+
+
+			
+			CMSSiteModel item = (CMSSiteModel)((Map)context).get("item");
+			ModelService modelService = (ModelService)((Map)context).get("modelservice");
+			UserModel user = (UserModel)((Map)context).get("user");
+			CMSAdminPageService adminPageService = (CMSAdminPageService)Registry.getApplicationContext().getBean("cmsAdminPageService");
+			CatalogService catalogService = (CatalogService)Registry.getApplicationContext().getBean("catalogService");
+			GenericRandomNameProducer uidGenerator = (GenericRandomNameProducer)Registry.getApplicationContext().getBean("genericRandomNameProducer");
+			List templates = (List)((Map)context).get("templates");
+			String contentCatalogName =(String)((Map)context).get("contentcatalogname");
+			List selectedContentCatalogs =(List)((Map)context).get("selectedcontentcatalogs");
+			
+			item.setPreviewURL("/mobile?site="+item.getUid());
+			item.setUrlPatterns(Collections.singletonList("https?://[^/]*/mobile.*?site="+item.getUid()+".*"));
+			
+			CatalogModel cat = null;
+			for(CatalogModel catalog : item.getStores().iterator().next().getCatalogs()){
+				
+				if(!(catalog instanceof ClassificationSystemModel)){
+					cat = catalog;
+					break;
+				}
+			
+			}
+			
+			if(cat!=null){
+			item.setDefaultCatalog(cat);
+			item.setDefaultPreviewCatalog(cat);
+			CategoryModel category = cat.getRootCategories().isEmpty()?null:cat.getRootCategories().iterator().next();
+			if(category!=null){
+				item.setDefaultPreviewCategory(category);
+				
+				ProductModel product=category.getProducts().isEmpty()?null:category.getProducts().iterator().next();
+				if(product!=null){
+					item.setDefaultPreviewProduct(product);		
+				}
+			}
+			}
+						
+			CatalogVersionModel catVerOnline=null;
+			CatalogVersionModel catVerStaged=null;
+			CatalogVersionSyncJobModel catalogVersionSyncJob=null;
+			
+			//we have to create a new content catalog
+			ContentCatalogModel contentCatalog = null;
+			if(StringUtils.isNotBlank(contentCatalogName)){
+			    
+			    contentCatalog = modelService.create("ContentCatalog");
+				contentCatalog.setId(uidGenerator.generateSequence("ContentCatalog","content_catalog"));
+				contentCatalog.setName(contentCatalogName);
+				
+				Set versions = new HashSet();
+				
+				catVerOnline = modelService.create("CatalogVersion");
+				catVerOnline.setVersion("online");
+				catVerOnline.setCatalog(contentCatalog);	
+				catVerOnline.setActive(Boolean.TRUE);
+					
+					List principals = new ArrayList();
+					if(catVerOnline.getWritePrincipals()!=null){
+						principals.addAll(catVerOnline.getWritePrincipals());
+					}
+					principals.add(user);
+					catVerOnline.setWritePrincipals(principals);
+					versions.add(catVerOnline);
+					
+					catVerStaged = modelService.create("CatalogVersion");
+					catVerStaged.setVersion("staged");
+					catVerStaged.setCatalog(contentCatalog);	
+					catVerStaged.setWritePrincipals(principals);
+					versions.add(catVerStaged);
+					
+					String syncJobCode = contentCatalogName+":"+catVerStaged.getVersion()+"->"+contentCatalogName+":"+catVerOnline.getVersion();
+					catalogVersionSyncJob = CMSSiteUtils.createDefaultSyncJob(syncJobCode, catVerStaged, catVerOnline);
+					
+					catVerStaged.setSynchronizations(Collections.singletonList(catalogVersionSyncJob));
+					
+					contentCatalog.setCatalogVersions(versions);
+					
+					modelService.save(contentCatalog);
+					
+					Set sessionCatalogVersions = new HashSet();
+					if(!catalogService.getSessionCatalogVersions().isEmpty()){
+						
+						sessionCatalogVersions.addAll(catalogService.getSessionCatalogVersions());
+						
+					}
+					sessionCatalogVersions.addAll(versions);
+					catalogService.setSessionCatalogVersions(sessionCatalogVersions);
+					
+					//clone templates
+					item.setContentCatalogs(Collections.singletonList(contentCatalog));
+					
+					Set catalogVersions = new HashSet();
+					catalogVersions.add(catVerStaged);
+					CMSSiteUtils.populateCmsSite(templates,catalogVersions,contentCatalog,item, "Homepage", "homepage");
+					
+			}else if (!selectedContentCatalogs.isEmpty()){
+				item.setContentCatalogs(selectedContentCatalogs);
+				List activeCatalogVersions = new ArrayList();
+				for(CatalogModel selectedCatalogModel:selectedContentCatalogs){
+					activeCatalogVersions.add(selectedCatalogModel.getActiveCatalogVersion());
+				}
+				List pages = adminPageService.getContentPages(activeCatalogVersions, "homepage");
+				if(!pages.isEmpty()){
+					item.setStartingPage(pages.iterator().next());
+				}
+			}			
+			modelService.save(item);
+			
+			if(catalogVersionSyncJob!=null){
+				CMSSiteUtils.synchronizeCatVersions(catalogVersionSyncJob, modelService);
+			}
+			return item;
+			]]>
+		</content>
+	</after-done-wizard-script>
+</wizard-config>
+
+
+	 

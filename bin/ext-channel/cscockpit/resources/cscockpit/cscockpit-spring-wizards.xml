@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="abstractNewItemWizardPage" abstract="true" class="de.hybris.platform.cscockpit.wizards.generic.AbstractNewItemWizardPage">
+		<property name="modelService" ref="modelService"/>
+		<property name="systemService" ref="systemService"/>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+	</bean>
+	<bean id="abstractNewItemsWizardPageController" abstract="true" class="de.hybris.platform.cscockpit.wizards.generic.NewItemsWizardPageController">
+		<property name="modelService" ref="modelService"/>
+		<property name="systemService" ref="systemService"/>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="newItemService" ref="newItemService"/>
+	</bean>
+
+	<!-- WIZARDS -->
+
+	<!-- Base bean definition for ticket wizards -->
+	<alias alias="csBaseTicketWizard" name="defaultCsBaseTicketWizard" />
+	<bean id="defaultCsBaseTicketWizard" class="de.hybris.platform.cscockpit.wizards.ticket.TicketWizard" scope="prototype" abstract="true">
+		<property name="componentURI" value="cscockpit/templates/wizards/csTicketWizardFrame.zul"/>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="systemService" ref="systemService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+
+	<alias alias="newTicketWizard" name="defaultCsNewTicketWizard"/>
+	<bean id="defaultCsNewTicketWizard" parent="csBaseTicketWizard" scope="prototype">
+		<property name="title" value="cscockpit.wizard.newTicket"/>
+		<property name="forceShowDone" value="true"/>
+		<property name="defaultController">
+			<bean class="de.hybris.platform.cscockpit.wizards.ticket.newticket.NewTicketWizardPageController" parent="abstractNewItemsWizardPageController">
+				<property name="callContextController" ref="csCallContextController"/>
+				<property name="itemAppender">
+					<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.TicketAppender"
+						  parent="csBaseAppender"/>
+				</property>
+				<property name="ticketBusinessService" ref="ticketBusinessService"/>
+			</bean>
+		</property>
+
+		<property name="objectTemplates">
+			<list>
+				<value>CsTicket</value>
+				<value>CsCustomerEvent</value>
+			</list>
+		</property>
+
+		<property name="pages">
+			<list>
+				<bean class="de.hybris.platform.cscockpit.wizards.ticket.TicketWizardPage">
+					<property name="id" value="page1"/>
+					<property name="title" value="cscockpit.wizard.newTicket.page1"/>
+					<property name="wizardConfigurationType" value="CsTicket"/>
+					<property name="wizardConfigurationCode" value="createTicketPage1"/>
+					<property name="modelService" ref="modelService"/>
+					<property name="systemService" ref="systemService"/>
+					<property name="cockpitTypeService" ref="cockpitTypeService"/>
+				</bean>
+
+				<bean class="de.hybris.platform.cscockpit.wizards.ticket.TicketWizardPage" parent="abstractNewItemWizardPage">
+					<property name="id" value="page2"/>
+					<property name="title" value="cscockpit.wizard.newTicket.page2"/>
+					<property name="wizardConfigurationType" value="CsTicket"/>
+					<property name="wizardConfigurationCode" value="createTicketPage2"/>
+				</bean>
+
+				<bean class="de.hybris.platform.cscockpit.wizards.ticket.newticket.NewTicketAssignAgentPage" parent="abstractNewItemWizardPage">
+					<property name="id" value="page3"/>
+					<property name="title" value="cscockpit.wizard.newTicket.page3"/>
+					<property name="wizardConfigurationType" value="CsTicket"/>
+					<property name="wizardConfigurationCode" value="createTicketPage3"/>
+					<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+
+	<alias alias="updateTicketWizard" name="defaultCsUpdateTicketWizard"/>
+	<bean id="defaultCsUpdateTicketWizard" parent="csBaseTicketWizard" scope="prototype">
+		<property name="title" value="cscockpit.wizard.updateTicket"/>
+		<property name="defaultController">
+			<bean class="de.hybris.platform.cscockpit.wizards.ticket.events.UpdateTicketWizardPageController" parent="abstractNewItemsWizardPageController">
+				<property name="ticketController" ref="csTicketController"/>
+				<property name="ticketBusinessService" ref="ticketBusinessService"/>
+			</bean>
+		</property>
+
+		<property name="objectTemplates">
+			<list>
+				<!--value>CsTicket</value-->
+				<value>CsTicketEvent</value>
+			</list>
+		</property>
+
+		<property name="pages">
+			<list>
+				<bean class="de.hybris.platform.cscockpit.wizards.ticket.TicketWizardPage" parent="abstractNewItemWizardPage">
+					<property name="id" value="page1"/>
+					<property name="title" value="cscockpit.wizard.updateTicket.page1"/>
+					<property name="wizardConfigurationType" value="CsTicket"/>
+					<property name="wizardConfigurationCode" value="updateTicketPage1"/>
+					<property name="disableAutoPersist" value="true"/>
+				</bean>
+
+				<bean class="de.hybris.platform.cscockpit.wizards.ticket.TicketWizardPage" parent="abstractNewItemWizardPage">
+					<property name="id" value="page2"/>
+					<property name="title" value="cscockpit.wizard.updateTicket.page2"/>
+					<property name="wizardConfigurationType" value="CsTicket"/>
+					<property name="wizardConfigurationCode" value="updateTicketPage2"/>
+					<property name="disableAutoPersist" value="true"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+
+	<alias alias="setTicketStateWizard" name="defaultCsSetTicketStateWizard"/>
+	<bean id="defaultCsSetTicketStateWizard" parent="csBaseTicketWizard" scope="prototype">
+		<property name="title" value="cscockpit.wizard.setTicketStateTicket"/>
+		<property name="defaultController">
+			<bean class="de.hybris.platform.cscockpit.wizards.ticket.events.SetTicketStateWizardPageController" parent="abstractNewItemsWizardPageController">
+				<property name="ticketController" ref="csTicketController"/>
+				<property name="ticketBusinessService" ref="ticketBusinessService"/>
+			</bean>
+		</property>
+
+		<property name="objectTemplates">
+			<list>
+				<value>CsTicket</value>
+				<value>CsTicketEvent</value>
+			</list>
+		</property>
+
+		<property name="pages">
+			<list>
+				<bean class="de.hybris.platform.cscockpit.wizards.ticket.TicketWizardPage" parent="abstractNewItemWizardPage">
+					<property name="id" value="page1"/>
+					<property name="title" value="cscockpit.wizard.setTicketStateTicket.page1"/>
+					<property name="wizardConfigurationType" value="CsTicket"/>
+					<property name="wizardConfigurationCode" value="setTicketStatePage1"/>
+					<property name="disableAutoPersist" value="true"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+
+	<alias alias="resolveTicketWizard" name="defaultCsResolveTicketWizard"/>
+	<bean id="defaultCsResolveTicketWizard" parent="csBaseTicketWizard" scope="prototype">
+		<property name="title" value="cscockpit.wizard.resolveTicket"/>
+		<property name="defaultController">
+			<bean class="de.hybris.platform.cscockpit.wizards.ticket.events.ResolveTicketWizardPageController" parent="abstractNewItemsWizardPageController">
+				<property name="ticketController" ref="csTicketController"/>
+				<property name="ticketBusinessService" ref="ticketBusinessService"/>
+			</bean>
+		</property>
+
+		<property name="objectTemplates">
+			<list>
+				<value>CsTicketResolutionEvent</value>
+			</list>
+		</property>
+
+		<property name="pages">
+			<list>
+				<bean class="de.hybris.platform.cscockpit.wizards.ticket.TicketWizardPage" parent="abstractNewItemWizardPage">
+					<property name="id" value="page"/>
+					<property name="title" value="cscockpit.wizard.resolveTicket.page"/>
+					<property name="wizardConfigurationType" value="CsTicketResolutionEvent"/>
+					<property name="wizardConfigurationCode" value="resolveTicketPage"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+
+	<alias alias="addNoteToTicketWizard" name="defaultCsAddNoteToTicketWizard"/>
+	<bean id="defaultCsAddNoteToTicketWizard" parent="csBaseTicketWizard" scope="prototype">
+		<property name="title" value="cscockpit.wizard.addNoteToTicket"/>
+		<property name="forceShowDone" value="true"/>
+		<property name="defaultController">
+			<bean class="de.hybris.platform.cscockpit.wizards.ticket.events.AddNoteToTicketWizardPageController" parent="abstractNewItemsWizardPageController">
+				<property name="ticketController" ref="csTicketController"/>
+				<property name="ticketBusinessService" ref="ticketBusinessService"/>
+			</bean>
+		</property>
+
+		<property name="objectTemplates">
+			<list>
+				<value>CsCustomerEvent</value>
+			</list>
+		</property>
+
+		<property name="pages">
+			<list>
+				<bean class="de.hybris.platform.cscockpit.wizards.ticket.TicketWizardPage" parent="abstractNewItemWizardPage">
+					<property name="id" value="page"/>
+					<property name="title" value="cscockpit.wizard.addNoteToTicket.page"/>
+					<property name="wizardConfigurationType" value="CsCustomerEvent"/>
+					<property name="wizardConfigurationCode" value="addNoteToTicketPage"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.wizards.ticket.events.UploadAttachmentPage" parent="abstractNewItemWizardPage">
+					<property name="title" value="cockpit.wizard.createwidget.uploadpage.title"/>
+					<property name="id" value="uploadMediaPage"/>
+					<property name="mediaService" ref="mediaService"/>
+					<property name="flexibleSearchService" ref="flexibleSearchService"/>
+					<property name="catalogId" value="Default"/>
+					<property name="catalogVersionName" value="Online"/>
+					<property name="catalogVersionService" ref="catalogVersionService"/>
+				</bean> 
+			</list>
+		</property>
+	</bean>
+
+
+	<alias alias="unResolveTicketWizard" name="defaultCsUnResolveTicketWizard"/>
+	<bean id="defaultCsUnResolveTicketWizard" parent="csBaseTicketWizard" scope="prototype">
+		<property name="title" value="cscockpit.wizard.unResolveTicket"/>
+		<property name="defaultController">
+			<bean class="de.hybris.platform.cscockpit.wizards.ticket.events.UnResolveTicketWizardPageController" parent="abstractNewItemsWizardPageController">
+				<property name="ticketController" ref="csTicketController"/>
+				<property name="ticketBusinessService" ref="ticketBusinessService"/>
+			</bean>
+		</property>
+
+		<property name="objectTemplates">
+			<list>
+				<value>CsCustomerEvent</value>
+			</list>
+		</property>
+
+		<property name="pages">
+			<list>
+				<bean class="de.hybris.platform.cscockpit.wizards.ticket.TicketWizardPage" parent="abstractNewItemWizardPage">
+					<property name="id" value="page"/>
+					<property name="title" value="cscockpit.wizard.unResolveTicket.page"/>
+					<property name="wizardConfigurationType" value="CsCustomerEvent"/>
+					<property name="wizardConfigurationCode" value="unresolveTicketPage"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+
+	<alias alias="newCustomerEmailWizard" name="defaultCsNewCustomerEmailWizard"/>
+	<bean id="defaultCsNewCustomerEmailWizard" parent="csBaseTicketWizard" scope="prototype">
+		<property name="title" value="cscockpit.wizard.newCustomerEmail"/>
+		<property name="forceShowDone" value="true"/>
+		<property name="defaultController">
+			<bean class="de.hybris.platform.cscockpit.wizards.ticket.events.CustomerEmailWizardPageController" parent="abstractNewItemsWizardPageController">
+				<property name="ticketController" ref="csTicketController"/>
+				<property name="ticketBusinessService" ref="ticketBusinessService"/>
+			</bean>
+		</property>
+
+		<property name="objectTemplates">
+			<list>
+				<value>CsCustomerEvent</value>
+			</list>
+		</property>
+
+		<property name="pages">
+			<list>
+				<bean class="de.hybris.platform.cscockpit.wizards.ticket.events.CustomerEmailWizardPage" parent="abstractNewItemWizardPage">
+					<property name="id" value="page"/>
+					<property name="title" value="cscockpit.wizard.newCustomerEmail.page"/>
+					<property name="wizardConfigurationType" value="CsCustomerEvent"/>
+					<property name="wizardConfigurationCode" value="createCustomerEmailPage"/>
+					<property name="csCustomerService" ref="csCustomerService"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.wizards.ticket.events.UploadAttachmentPage" parent="abstractNewItemWizardPage">
+					<property name="title" value="cockpit.wizard.createwidget.uploadpage.title"/>
+					<property name="id" value="uploadMediaPage"/>
+					<property name="mediaService" ref="mediaService"/>
+					<property name="flexibleSearchService" ref="flexibleSearchService"/>
+					<property name="catalogId" value="Default"/>
+					<property name="catalogVersionName" value="Online"/>
+					<property name="catalogVersionService" ref="catalogVersionService"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+
+	<alias alias="ticketWizardCommentTypeResolver" name="defaultTicketWizardCommentTypeResolver"/>
+	<bean id="defaultTicketWizardCommentTypeResolver" class="de.hybris.platform.cscockpit.wizards.valueresolvers.CommentTypeResolver" scope="tenant">
+		<property name="ticketService" ref="ticketService"/>
+	</bean>
+
+	<alias alias="enumValueResolver" name="defaultEnumValueResolver"/>
+	<bean id="defaultEnumValueResolver" class="de.hybris.platform.cscockpit.wizards.valueresolvers.EnumValueResolver" scope="tenant">
+		<property name="typeService" ref="typeService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+</beans>

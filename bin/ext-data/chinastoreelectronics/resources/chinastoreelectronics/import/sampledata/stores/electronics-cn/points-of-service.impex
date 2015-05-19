@@ -1,0 +1,508 @@
+# ImpEx for Electronics CN Store
+#% impex.setLocale( Locale.GERMAN ); 
+
+$storeUid=electronics-cn
+$productCatalog=electronics-cnProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$storeImage=storeImage(qualifier, $catalogVersion)
+
+$standardHours=electronics-cn-china-standard-hours
+$weekendHours=electronics-cn-china-weekend-hours
+
+INSERT_UPDATE OpeningSchedule;code[unique=true];
+;$standardHours;
+;$weekendHours;
+
+INSERT_UPDATE WeekdayOpeningDay;openingSchedule(code)[unique=true];dayOfWeek(code)[unique=true];openingTime[dateformat=hh:mm];closingTime[dateformat=hh:mm];
+;$standardHours;MONDAY   ; 09:00; 20:00
+;$standardHours;TUESDAY  ; 09:00; 20:00
+;$standardHours;WEDNESDAY; 09:00; 20:00
+;$standardHours;THURSDAY ; 09:00; 20:00
+;$standardHours;FRIDAY   ; 09:00; 20:00
+;$standardHours;SATURDAY ; 10:00; 20:00
+
+;$weekendHours;MONDAY   ; 09:00; 20:00
+;$weekendHours;TUESDAY  ; 09:00; 20:00
+;$weekendHours;WEDNESDAY; 09:00; 20:00
+;$weekendHours;THURSDAY ; 09:00; 20:00
+;$weekendHours;FRIDAY   ; 09:00; 20:00
+;$weekendHours;SATURDAY ; 10:00; 20:00
+;$weekendHours;SUNDAY   ; 10:00; 16:00
+
+
+INSERT_UPDATE SpecialOpeningDay;openingSchedule(code)[unique=true];date[unique=true,dateformat=dd.MM.yyyy];closed;openingTime[dateformat=hh:mm];closingTime[dateformat=hh:mm]
+;$standardHours; 01.01.2013 ;true
+;$standardHours; 14.01.2013 ;true
+;$standardHours; 11.02.2013 ;true
+;$standardHours; 20.03.2013 ;true
+;$standardHours; 29.04.2013 ;true
+;$standardHours; 03.05.2013 ;true
+;$standardHours; 04.05.2013 ;true
+;$standardHours; 05.05.2013 ;true
+;$standardHours; 15.07.2013 ;true
+;$standardHours; 16.09.2013 ;true
+;$standardHours; 23.09.2013 ;true
+;$standardHours; 14.10.2013 ;true
+;$standardHours; 03.11.2013 ;true
+;$standardHours; 23.11.2013 ;true
+;$standardHours; 23.12.2013 ;true
+
+;$weekendHours; 01.01.2013 ;true
+;$weekendHours; 14.01.2013 ;true
+;$weekendHours; 11.02.2013 ;true
+;$weekendHours; 20.03.2013 ;true
+;$weekendHours; 29.04.2013 ;true
+;$weekendHours; 03.05.2013 ;true
+;$weekendHours; 04.05.2013 ;true
+;$weekendHours; 05.05.2013 ;true
+;$weekendHours; 15.07.2013 ;true
+;$weekendHours; 16.09.2013 ;true
+;$weekendHours; 23.09.2013 ;true
+;$weekendHours; 14.10.2013 ;true
+;$weekendHours; 03.11.2013 ;true
+;$weekendHours; 23.11.2013 ;true
+;$weekendHours; 23.12.2013 ;true
+
+
+INSERT_UPDATE PointOfService;name[unique=true];type(code);address(&addrID);latitude;longitude;geocodeTimestamp[dateformat=dd-MM-yyyy];$storeImage;openingSchedule(code);basestore(uid)[default=$storeUid];features(code)
+;亿达数码（上海旗舰店）;STORE;addr800;31,225028219962;121,42993533453;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（苗圃路店）;STORE;addr801;31,249195360666;121,55289197917;29-05-2025;electronics_store_02;$standardHours;;
+;亿达数码（沪太路店）;STORE;addr802;31,275530611775;121,4448425348;29-05-2025;;$standardHours;;
+;亿达数码（一二八纪念路店）;STORE;addr803;31,333470020234;121,46897829708;29-05-2025;electronics_store_01;$weekendHours;;
+;亿达数码（静安寺店）;STORE;addr804;31,231424202336;121,45433793845;29-05-2025;;$standardHours;;
+;亿达数码（海宁路店）;STORE;addr805;31,251454460917;121,48193503654;29-05-2025;electronics_store_03;$weekendHours;;
+;亿达数码（人民广场店）;STORE;addr806;31,231579132661;121,48757798215;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（武夷路店）;STORE;addr807;31,220483095127;121,43427477895;29-05-2025;electronics_store_02;$weekendHours;;
+;亿达数码（徐家汇店）;STORE;addr808;31,195162913388;121,44863931287;29-05-2025;electronics_store_03;$standardHours;;
+;亿达数码（杨浦店）;STORE;addr809;31,308771267064;121,5198540093;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（崇明店）;STORE;addr810;31,641317402834;121,43700859211;29-05-2025;electronics_store_02;$standardHours;;
+;亿达数码（金山店）;STORE;addr811;30,738758944557;121,35386125445;29-05-2025;;$standardHours;;
+;亿达数码（北京旗舰店）;STORE;addr812;39,905397727881;116,37875940955;29-05-2025;electronics_store_01;$weekendHours;;
+;亿达数码（清华东路店）;STORE;addr813;40,00843266471;116,35322076356;29-05-2025;;$standardHours;;
+;亿达数码（五棵松店）;STORE;addr814;39,924035480458;116,27057090749;29-05-2025;electronics_store_03;$weekendHours;;
+;亿达数码（崇文门店）;STORE;addr815;39,906428380582;116,42751574958;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（王府井店）;STORE;addr816;39,916884986013;116,41318463262;29-05-2025;electronics_store_02;$weekendHours;;
+;亿达数码（朝阳区店）;STORE;addr817;40,003118554919;116,47259460651;29-05-2025;electronics_store_03;$standardHours;;
+;亿达数码（平安里店）;STORE;addr818;39,939702028833;116,38313523535;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（石榴庄店）;STORE;addr819;39,848702097196;116,42388641565;29-05-2025;electronics_store_02;$standardHours;;
+;亿达数码（金顶街店）;STORE;addr820;39,936116739407;116,17545661331;29-05-2025;;$standardHours;;
+;亿达数码（昌平店）;STORE;addr821;40,132901512591;116,27450147319;29-05-2025;electronics_store_01;$weekendHours;;
+;亿达数码（越秀店）;STORE;addr822;23,133785066866;113,2730754232;29-05-2025;;$standardHours;;
+;亿达数码（乐嘉路店）;STORE;addr823;23,17428100566;113,2660556148;29-05-2025;electronics_store_03;$weekendHours;;
+;亿达数码（番禺店）;STORE;addr824;22,826186219333;113,43375218565;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（海珠店）;STORE;addr825;23,097876825617;113,30645852205;29-05-2025;electronics_store_02;$weekendHours;;
+;亿达数码（沙太路店）;STORE;addr826;23,173900433649;113,33243437332;29-05-2025;electronics_store_03;$standardHours;;
+;亿达数码（长河店）;STORE;addr827;23,186375349521;113,35876110272;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（荔湾店）;STORE;addr828;23,118477076399;113,21944514699;29-05-2025;electronics_store_02;$standardHours;;
+;亿达数码（广园西路店）;STORE;addr829;23,156561651613;113,25658136625;29-05-2025;;$standardHours;;
+;亿达数码（天河店）;STORE;addr830;23,130099272839;113,38872480164;29-05-2025;electronics_store_01;$weekendHours;;
+;亿达数码（文心店）;STORE;addr831;22,523094952265;113,94217819226;29-05-2025;;$standardHours;;
+;亿达数码（龙岗店）;STORE;addr832;22,724892583612;114,26149247382;29-05-2025;electronics_store_03;$weekendHours;;
+;亿达数码（南山大道店）;STORE;addr833;22,53479438326;113,93090355981;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（福田店）;STORE;addr834;22,529053037627;114,06109030614;29-05-2025;electronics_store_02;$weekendHours;;
+;亿达数码（罗湖店）;STORE;addr835;22,579366028325;114,1494380242;29-05-2025;electronics_store_03;$standardHours;;
+;亿达数码（江北店）;STORE;addr836;29,580646320383;106,53524817153;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（巴南店）;STORE;addr837;29,428353017851;106,58532502064;29-05-2025;electronics_store_02;$standardHours;;
+;亿达数码（渝北店）;STORE;addr838;29,594694526216;106,5459721427;29-05-2025;;$standardHours;;
+;亿达数码（南岸店）;STORE;addr839;29,528676147201;106,57523758875;29-05-2025;electronics_store_01;$weekendHours;;
+;亿达数码（北碚店）;STORE;addr840;29,822037293407;106,42954447237;29-05-2025;;$standardHours;;
+;亿达数码（南开店）;STORE;addr841;39,092984239982;117,18661345976;29-05-2025;electronics_store_03;$weekendHours;;
+;亿达数码（河东店）;STORE;addr842;39,151191603151;117,25029927804;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（和平店）;STORE;addr843;39,132266065394;117,19993152764;29-05-2025;electronics_store_02;$weekendHours;;
+;亿达数码（光荣道店）;STORE;addr844;39,18323853405;117,18275649522;29-05-2025;electronics_store_03;$standardHours;;
+;亿达数码（汉阳店）;STORE;addr845;30,544081763863;114,27355897741;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（武昌店）;STORE;addr846;30,557364236023;114,35356170681;29-05-2025;electronics_store_02;$standardHours;;
+;亿达数码（硚口店）;STORE;addr847;30,591756721893;114,25193766209;29-05-2025;;$standardHours;;
+;亿达数码（洪山店）;STORE;addr848;30,515206337634;114,40128059909;29-05-2025;electronics_store_01;$weekendHours;;
+;亿达数码（东湖店）;STORE;addr849;28,695051734659;115,92591747811;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（洪城店）;STORE;addr850;28,661202405782;115,89752159179;29-05-2025;electronics_store_02;$standardHours;;
+;亿达数码（新建店）;STORE;addr851;28,696116410192;115,83320745374;29-05-2025;;$standardHours;;
+;亿达数码（开福店）;STORE;addr852;28,21973931232;112,98623560447;29-05-2025;electronics_store_01;$weekendHours;;
+;亿达数码（天心店）;STORE;addr853;28,221270826407;112,99381562613;29-05-2025;;$standardHours;;
+;亿达数码（芙蓉店）;STORE;addr854;28,203163610868;113,00691612442;29-05-2025;electronics_store_03;$weekendHours;;
+;亿达数码（道外店）;STORE;addr855;45,775446787542;126,64240218379;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（理工大学店）;STORE;addr856;45,719247067179;126,62591755904;29-05-2025;electronics_store_02;$weekendHours;;
+;亿达数码（香坊店）;STORE;addr857;45,723755892681;126,67968231161;29-05-2025;electronics_store_03;$standardHours;;
+;亿达数码（新城店）;STORE;addr858;40,831125898317;111,70821044101;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（锡林郭勒店）;STORE;addr859;40,816399094644;111,679680797;29-05-2025;electronics_store_02;$standardHours;;
+;亿达数码（回民店）;STORE;addr860;40,81523139782;111,6660863804;29-05-2025;;$standardHours;;
+;亿达数码（宇拓店）;STORE;addr861;29,655799353562;91,135903859886;29-05-2025;electronics_store_01;$weekendHours;;
+;亿达数码（德吉店）;STORE;addr862;29,663025704841;91,115396533236;29-05-2025;;$standardHours;;
+;亿达数码（天山店）;STORE;addr863;43,779781922508;87,622808612554;29-05-2025;electronics_store_03;$weekendHours;;
+;亿达数码（水磨沟店）;STORE;addr864;43,835645776769;87,619819411139;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（沙依巴克店）;STORE;addr865;43,823741939782;87,597333207275;29-05-2025;electronics_store_02;$weekendHours;;
+;亿达数码（海口旗舰店）;STORE;addr866;20,0430906096;110,34496821605;29-05-2025;electronics_store_03;$standardHours;;
+;亿达数码（美兰店）;STORE;addr867;20,037973836476;110,35157722935;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（三亚店）;STORE;addr868;18,264786138883;109,50796217605;29-05-2025;electronics_store_02;$standardHours;;
+;亿达数码（平江店）;STORE;addr869;31,314411389536;120,63053613578;29-05-2025;;$standardHours;;
+;亿达数码（金阊店）;STORE;addr870;31,316960308173;120,60777711653;29-05-2025;electronics_store_01;$weekendHours;;
+;亿达数码（沧浪店）;STORE;addr871;31,296571988981;120,63097870844;29-05-2025;;$standardHours;;
+;亿达数码（下城店）;STORE;addr872;30,274101220595;120,17018564328;29-05-2025;electronics_store_03;$weekendHours;;
+;亿达数码（上城店）;STORE;addr873;30,257627018258;120,1718714034;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（湖里店）;STORE;addr874;24,511076433663;118,10363910148;29-05-2025;electronics_store_02;$weekendHours;;
+;亿达数码（思明店）;STORE;addr875;24,462136113289;118,08227964222;29-05-2025;electronics_store_03;$standardHours;;
+;亿达数码（台江店）;STORE;addr876;26,061236094862;119,3138209231;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（郑州国贸店）;STORE;addr877;34,7907494509;113,68805853754;29-05-2025;electronics_store_02;$standardHours;;
+;亿达数码（中原店）;STORE;addr878;34,753213941323;113,60938469222;29-05-2025;;$standardHours;;
+;亿达数码（大连中南店）;STORE;addr879;38,91784292444;121,66833986772;29-05-2025;electronics_store_01;$weekendHours;;
+;亿达数码（凯德店）;STORE;addr880;38,902004710887;121,5948187719;29-05-2025;;$standardHours;;
+;亿达数码（青泥洼店）;STORE;addr881;38,921964801317;121,64159758218;29-05-2025;electronics_store_03;$weekendHours;;
+;亿达数码（历山店）;STORE;addr882;36,672786813838;117,04941669651;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（济南店）;STORE;addr883;36,668562734378;117,00730287657;29-05-2025;electronics_store_02;$weekendHours;;
+;亿达数码（青岛店）;STORE;addr884;36,095372094364;120,37423457208;29-05-2025;electronics_store_03;$standardHours;;
+;亿达数码（蜀山店）;STORE;addr885;31,851345077612;117,2784550473;29-05-2025;electronics_store_01;$standardHours;;
+;亿达数码（包和店）;STORE;addr886;31,86169746795;117,30924554662;29-05-2025;electronics_store_02;$standardHours;;
+;亿达数码（白下店）;STORE;addr887;32,043553565244;118,79254341487;29-05-2025;;$standardHours;;
+;亿达数码（玄武店）;STORE;addr888;32,060423591593;118,79468749047;29-05-2025;electronics_store_01;$weekendHours;;
+;亿达数码（鼓楼店）;STORE;addr889;32,073157465071;118,78089311105;29-05-2025;;$standardHours;;
+;亿达数码（江宁店）;STORE;addr890;31,959472661107;118,86594665301;29-05-2025;electronics_store_03;$weekendHours;;
+
+INSERT_UPDATE City;&cityID;code[unique=true,allownull=false];;latitude;longitude;
+;city1;CN-46-1;三亚;18,257775914897;109,52277128136;
+;city2;CN-31-1;上海;31,249161710015;121,48789948569;
+;city3;CN-65-1;乌鲁木齐;43,840380347218;87,564987741116;
+;city4;CN-11-1;北京;39,92998577808;116,39564503788;
+;city5;CN-32-1;南京;32,057235501806;118,77807440803;
+;city6;CN-36-3;南昌;28,689578000141;115,89352754584;
+;city7;CN-35-3;厦门;24,489230612469;118,10388604566;
+;city8;CN-34-3;合肥;31,866942260687;117,28269909168;
+;city9;CN-15-6;呼和浩特;40,828318873082;111,66035052005;
+;city10;CN-23-5;哈尔滨;45,773224633239;126,65771685545;
+;city11;CN-21-2;大连;38,948709938304;121,59347778144;
+;city12;CN-12-1;天津;39,14392990331;117,21081309155;
+;city13;CN-44-5;广州;23,120049102076;113,30764967515;
+;city14;CN-54-2;拉萨;29,662557062057;91,111890895984;
+;city15;CN-33-5;杭州;30,259244461536;120,21937541572;
+;city16;CN-42-6;武汉;30,581084126921;114,31620010268;
+;city17;CN-37-8;济南;36,682784727161;117,02496706629;
+;city18;CN-46-2;海口;20,022071276952;110,33080184834;
+;city19;CN-44-13;深圳;22,546053546205;114,02597365732;
+;city20;CN-35-7;福州;26,047125496573;119,33022110713;
+;city21;CN-32-11;苏州;31,317987367952;120,61990711549;
+;city22;CN-41-15;郑州;34,75661006414;113,64964384986;
+;city23;CN-50-1;重庆;29,544606108886;106,53063501341;
+;city24;CN-43-14;长沙;28,213478230853;112,97935278765;
+;city25;CN-37-17;青岛;36,105214901274;120,38442818368;
+;city26;TEMP_CODE_FOR_NOW_26;city1NoStore;
+;city27;TEMP_CODE_FOR_NOW_27;city2NoStore;
+;city28;TEMP_CODE_FOR_NOW_28;city3NoStore;
+
+
+UPDATE City;code[unique=true,allownull=false];;sortOrder[default=0];
+;CN-46-1;三亚;7000
+;CN-31-1;上海;6900
+;CN-65-1;乌鲁木齐;6800
+;CN-11-1;北京;6700
+;CN-32-1;南京;6600
+;CN-36-3;南昌;6500
+;CN-35-3;厦门;6400
+;CN-34-3;合肥;6300
+;CN-15-6;呼和浩特;6200
+;CN-23-5;哈尔滨;6100
+;CN-21-2;大连;6000
+;CN-12-1;天津;5900
+;CN-44-5;广州;5800
+;CN-54-2;拉萨;5700
+;CN-33-5;杭州;5600
+;CN-42-6;武汉;5500
+;CN-37-8;济南;5400
+;CN-46-2;海口;5300
+;CN-44-13;深圳;5200
+;CN-35-7;福州;5100
+# default rank 0
+;CN-32-11;苏州;
+;CN-41-15;郑州;
+;CN-50-1;重庆;
+;CN-43-14;长沙;
+;CN-37-17;青岛;
+;TEMP_CODE_FOR_NOW_26;city1NoStore;
+;TEMP_CODE_FOR_NOW_27;city2NoStore;
+;TEMP_CODE_FOR_NOW_28;city3NoStore;
+
+
+INSERT_UPDATE Address;&addrID;streetname;streetnumber;postalcode[unique=true];city(&cityID);district[unique=true];remarks;country(isocode);region(isocode);phone1;owner(PointOfService.name)[unique=true]
+;addr800;愚园路;1357号;;city2;长宁区;;CN;;22456580;亿达数码（上海旗舰店）
+;addr801;苗圃路;151号;;city2;浦东新区;;CN;;22456581;亿达数码（苗圃路店）
+;addr802;沪太路;857号;;city2;普陀区;;CN;;22456582;亿达数码（沪太路店）
+;addr803;一二八纪念路;215号;;city2;宝山区;;CN;;22456583;亿达数码（一二八纪念路店）
+;addr804;常德路;224号;;city2;静安区;;CN;;22456584;亿达数码（静安寺店）
+;addr805;海宁路;971号;;city2;虹口区;;CN;;22456585;亿达数码（海宁路店）
+;addr806;淮海东路;99号5楼;;city2;黄浦区;近西藏南路;CN;;22456586;亿达数码（人民广场店）
+;addr807;武夷路;155号9楼;;city2;长宁区;;CN;;22456587;亿达数码（武夷路店）
+;addr808;天钥桥路;323号2楼;;city2;徐汇区;近徐家汇;CN;;22456588;亿达数码（徐家汇店）
+;addr809;政通路;218号4楼;;city2;杨浦区;;CN;;22456589;亿达数码（杨浦店）
+;addr810;团城公路;7218号;;city2;崇明县;;CN;;22456590;亿达数码（崇明店）
+;addr811;卫清西路;168弄99号;;city2;金山区;百联金山购物中心1楼;CN;;22456591;亿达数码（金山店）
+;addr812;宣武门西大街;2号东;;city4;西城区;;CN;;42456570;亿达数码（北京旗舰店）
+;addr813;清华东路;35号;;city4;海淀区;;CN;;42456571;亿达数码（清华东路店）
+;addr814;金沟河路;15号院15号;;city4;海淀区;;CN;;42456572;亿达数码（五棵松店）
+;addr815;东大街;甲22号;;city4;东城区;;CN;;42456573;亿达数码（崇文门店）
+;addr816;右外南河沿;35号;;city4;东城区;;CN;;42456574;亿达数码（王府井店）
+;addr817;南湖渠湖光中街;9号;;city4;朝阳区;;CN;;42456575;亿达数码（朝阳区店）
+;addr818;地安门西大街;179号;;city4;东城区;;CN;;42456576;亿达数码（平安里店）
+;addr819;石榴庄西街甲;2号;;city4;丰台区;;CN;;42456577;亿达数码（石榴庄店）
+;addr820;金顶街南路;12号;;city4;石景山区;;CN;;42456578;亿达数码（金顶街店）
+;addr821;巩华城大街;67号;;city4;昌平区;;CN;;42456579;亿达数码（昌平店）
+;addr822;广卫路;18号1楼;;city13;越秀区;西部假期大楼;CN;;13456560;亿达数码（越秀店）
+;addr823;乐嘉路;1号;;city13;白云区;;CN;;13456561;亿达数码（乐嘉路店）
+;addr824;灵山镇广珠东路;550号;;city13;番禺区;;CN;;13456562;亿达数码（番禺店）
+;addr825;新港西路;155号;;city13;海珠区;;CN;;13456563;亿达数码（海珠店）
+;addr826;兴华街沙太路;125号;;city13;天河区;;CN;;13456564;亿达数码（沙太路店）
+;addr827;天源路;702号;;city13;天河区;;CN;;13456565;亿达数码（长河店）
+;addr828;芳村大道西;279号;;city13;荔湾区;;CN;;13456566;亿达数码（荔湾店）
+;addr829;广园西路;66号;;city13;越秀区;;CN;;13456567;亿达数码（广园西路店）
+;addr830;科新路;16-21号;;city13;天河区;近棠下加油站;CN;;13456568;亿达数码（天河店）
+;addr831;文心五路;33号;;city19;南山区;;CN;;19456521;亿达数码（文心店）
+;addr832;龙河路;19号1楼;;city19;龙岗区;东方明珠城;CN;;19456522;亿达数码（龙岗店）
+;addr833;南山大道;2103号;;city19;南山区;;CN;;19456523;亿达数码（南山大道店）
+;addr834;福民路;192号;;city19;福田区;;CN;;19456524;亿达数码（福田店）
+;addr835;布心路;1008号;;city19;罗湖区;;CN;;19456525;亿达数码（罗湖店）
+;addr836;观音桥西环路;2号;;city21;江北区;;CN;;21456510;亿达数码（江北店）
+;addr837;南泉路;6号;;city21;巴南区;;CN;;21456512;亿达数码（巴南店）
+;addr838;红黄路;389号;;city21;渝北区;;CN;;21456513;亿达数码（渝北店）
+;addr839;珊瑚村;36号;;city21;南岸区;;CN;;21456514;亿达数码（南岸店）
+;addr840;天生路;122号;;city21;北碚区;;CN;;21456515;亿达数码（北碚店）
+;addr841;卫津南路;68号;;city12;南开区;;CN;;21256583;亿达数码（南开店）
+;addr842;靖江路;18号;;city12;河东区;;CN;;21256584;亿达数码（河东店）
+;addr843;河北路;41号;;city12;和平区;;CN;;21256585;亿达数码（和平店）
+;addr844;光荣道;8号;;city12;红桥区;;CN;;21256586;亿达数码（光荣道店）
+;addr845;鹦鹉大道;171号;;city16;汉阳区;;CN;;21656503;亿达数码（汉阳店）
+;addr846;白鹭街;96号;;city16;武昌区;;CN;;21656513;亿达数码（武昌店）
+;addr847;建设大道;248号;;city16;硚口区;;CN;;21656523;亿达数码（硚口店）
+;addr848;珞喻路;737号;;city16;洪山区;;CN;;21656533;亿达数码（洪山店）
+;addr849;二七北路;451号;;city6;东湖区;;CN;;62456581;亿达数码（东湖店）
+;addr850;洪城路;826号;;city6;西湖区;;CN;;62456582;亿达数码（洪城店）
+;addr851;建设路;49号;;city6;新建县;;CN;;62456583;亿达数码（新建店）
+;addr852;湘雅路;212号;;city22;开福区;;CN;;32226580;亿达数码（开福店）
+;addr853;芙蓉中路;195号;;city22;天心区;;CN;;32226581;亿达数码（天心店）
+;addr854;八一路;245号;;city22;芙蓉区;;CN;;32226582;亿达数码（芙蓉店）
+;addr855;南极街;128号;;city10;道外区;;CN;;10656521;亿达数码（道外店）
+;addr856;学府三道街;33号;;city10;南岗区;;CN;;10656522;亿达数码（理工大学店）
+;addr857;旭升街;306号;;city10;香坊区;;CN;;10656523;亿达数码（香坊店）
+;addr858;新城东街;75号;;city9;新城区;;CN;;39456083;亿达数码（新城店）
+;addr859;锡林郭勒南路;5号;;city9;回民区;;CN;;39456183;亿达数码（锡林郭勒店）
+;addr860;中山西路;39号;;city9;回民区;;CN;;39456283;亿达数码（回民店）
+;addr861;宇拓路;30号;;city14;城关区;;CN;;14456589;亿达数码（宇拓店）
+;addr862;德吉北路;28号;;city14;城关区;;CN;;14456588;亿达数码（德吉店）
+;addr863;胜利路二巷;31号;;city3;天山区;;CN;;33356573;亿达数码（天山店）
+;addr864;南湖北路;80号;;city3;水磨沟区;;CN;;33356583;亿达数码（水磨沟店）
+;addr865;明园路;1号2楼;;city3;沙依巴克区;;CN;;33356593;亿达数码（沙依巴克店）
+;addr866;大同路;2号;;city18;龙华区;;CN;;18456563;亿达数码（海口旗舰店）
+;addr867;海秀东路;2号;;city18;美兰区;;CN;;18456573;亿达数码（美兰店）
+;addr868;吉祥街;118号;;city1;;;CN;;31156511;亿达数码（三亚店）
+;addr869;富仁坊巷;45-55号1楼;;city20;平江区;观凤商城;CN;;20456513;亿达数码（平江店）
+;addr870;金门路;158号;;city20;金阊区;;CN;;20456523;亿达数码（金阊店）
+;addr871;人民路;385号;;city20;沧浪区;;CN;;20456533;亿达数码（沧浪店）
+;addr872;延安路;530号;;city15;下城区;;CN;;31556588;亿达数码（下城店）
+;addr873;吴山路;62号;;city15;上城区;;CN;;31556589;亿达数码（上城店）
+;addr874;海天路;47号;;city7;湖里区;;CN;;32776588;亿达数码（湖里店）
+;addr875;大同路;64号;;city7;思明区;;CN;;32776589;亿达数码（思明店）
+;addr876;八一七中路;888号;;city20;台江区;;CN;;32056583;亿达数码（台江店）
+;addr877;花园路;39号;;city22;金水区;;CN;;22456586;亿达数码（郑州国贸店）
+;addr878;中原路;171号;;city22;中原区;;CN;;22456587;亿达数码（中原店）
+;addr879;中南路;6号;;city11;中山区;;CN;;11456511;亿达数码（大连中南店）
+;addr880;高尔基路;695号;;city11;沙河口区;;CN;;11456512;亿达数码（凯德店）
+;addr881;青泥街;57号;;city11;中山区;;CN;;11456513;亿达数码（青泥洼店）
+;addr882;历山路;92号;;city17;历城区;;CN;;17456570;亿达数码（历山店）
+;addr883;经四路;5号;;city17;市中区;;CN;;17456572;亿达数码（济南店）
+;addr884;镇江北路;23号;;city25;市北区;;CN;;25456543;亿达数码（青岛店）
+;addr885;金寨路;162号;;city8;蜀山区;;CN;;82456577;亿达数码（蜀山店）
+;addr886;马鞍山路;130号;;city8;包河区;;CN;;82456573;亿达数码（包和店）
+;addr887;淮海路;68号;;city5;白下区;;CN;;52456563;亿达数码（白下店）
+;addr888;大石桥街;28号;;city5;玄武区;;CN;;52456573;亿达数码（玄武店）
+;addr889;中山北路;105号;;city5;鼓楼区;;CN;;52456593;亿达数码（鼓楼店）
+;addr890;金箔路;12号;;city5;江宁区;;CN;;52456503;亿达数码（江宁店）
+
+
+INSERT_UPDATE StoreLocatorFeature;code[unique=true]
+;wheelchair
+;creche
+;sundayWorkshops
+
+
+UPDATE PointOfService;name[unique=true];features(code);
+;亿达数码（上海旗舰店）;wheelchair,creche
+;亿达数码（苗圃路店）;wheelchair,creche
+;亿达数码（沪太路店）;wheelchair,creche
+;亿达数码（一二八纪念路店）;wheelchair
+;亿达数码（静安寺店）;creche,sundayWorkshops
+;亿达数码（海宁路店）;wheelchair
+;亿达数码（人民广场店）;creche,sundayWorkshops
+;亿达数码（武夷路店）;wheelchair
+;亿达数码（徐家汇店）;creche,sundayWorkshops
+;亿达数码（杨浦店）;wheelchair,creche
+;亿达数码（崇明店）;wheelchair,creche
+;亿达数码（金山店）;wheelchair,creche
+;亿达数码（北京旗舰店）;wheelchair
+;亿达数码（清华东路店）;creche,sundayWorkshops
+;亿达数码（五棵松店）;wheelchair
+;亿达数码（崇文门店）;creche,sundayWorkshops
+;亿达数码（王府井店）;wheelchair
+;亿达数码（朝阳区店）;creche,sundayWorkshops
+;亿达数码（平安里店）;wheelchair,creche
+;亿达数码（石榴庄店）;wheelchair,creche
+;亿达数码（金顶街店）;wheelchair,creche
+;亿达数码（昌平店）;wheelchair
+;亿达数码（越秀店）;creche,sundayWorkshops
+;亿达数码（乐嘉路店）;wheelchair
+;亿达数码（番禺店）;creche,sundayWorkshops
+;亿达数码（海珠店）;wheelchair
+;亿达数码（沙太路店）;creche,sundayWorkshops
+;亿达数码（长河店）;wheelchair,creche
+;亿达数码（荔湾店）;wheelchair,creche
+;亿达数码（广园西路店）;wheelchair,creche
+;亿达数码（天河店）;wheelchair
+;亿达数码（文心店）;creche,sundayWorkshops
+;亿达数码（龙岗店）;wheelchair
+;亿达数码（南山大道店）;creche,sundayWorkshops
+;亿达数码（福田店）;wheelchair
+;亿达数码（罗湖店）;creche,sundayWorkshops
+;亿达数码（江北店）;wheelchair,creche
+;亿达数码（巴南店）;wheelchair,creche
+;亿达数码（渝北店）;wheelchair,creche
+;亿达数码（南岸店）;wheelchair
+;亿达数码（北碚店）;creche,sundayWorkshops
+;亿达数码（南开店）;wheelchair
+;亿达数码（河东店）;creche,sundayWorkshops
+;亿达数码（和平店）;wheelchair
+;亿达数码（光荣道店）;creche,sundayWorkshops
+;亿达数码（汉阳店）;wheelchair,creche
+;亿达数码（武昌店）;wheelchair,creche
+;亿达数码（硚口店）;wheelchair,creche
+;亿达数码（洪山店）;wheelchair
+;亿达数码（东湖店）;wheelchair,creche
+;亿达数码（洪城店）;wheelchair,creche
+;亿达数码（新建店）;wheelchair,creche
+;亿达数码（开福店）;wheelchair
+;亿达数码（天心店）;creche,sundayWorkshops
+;亿达数码（芙蓉店）;wheelchair
+;亿达数码（道外店）;creche,sundayWorkshops
+;亿达数码（理工大学店）;wheelchair
+;亿达数码（香坊店）;creche,sundayWorkshops
+;亿达数码（新城店）;wheelchair,creche
+;亿达数码（锡林郭勒店）;wheelchair,creche
+;亿达数码（回民店）;wheelchair,creche
+;亿达数码（宇拓店）;wheelchair
+;亿达数码（德吉店）;creche,sundayWorkshops
+;亿达数码（天山店）;wheelchair
+;亿达数码（水磨沟店）;creche,sundayWorkshops
+;亿达数码（沙依巴克店）;wheelchair
+;亿达数码（海口旗舰店）;creche,sundayWorkshops
+;亿达数码（美兰店）;wheelchair,creche
+;亿达数码（三亚店）;wheelchair,creche
+;亿达数码（平江店）;wheelchair,creche
+;亿达数码（金阊店）;wheelchair
+;亿达数码（沧浪店）;creche,sundayWorkshops
+;亿达数码（下城店）;wheelchair
+;亿达数码（上城店）;creche,sundayWorkshops
+;亿达数码（湖里店）;wheelchair
+;亿达数码（思明店）;creche,sundayWorkshops
+;亿达数码（台江店）;wheelchair,creche
+;亿达数码（郑州国贸店）;wheelchair,creche
+;亿达数码（中原店）;wheelchair,creche
+;亿达数码（大连中南店）;wheelchair
+;亿达数码（凯德店）;creche,sundayWorkshops
+;亿达数码（青泥洼店）;wheelchair
+;亿达数码（历山店）;creche,sundayWorkshops
+;亿达数码（济南店）;wheelchair
+;亿达数码（青岛店）;creche,sundayWorkshops
+;亿达数码（蜀山店）;wheelchair,creche
+;亿达数码（包和店）;wheelchair,creche
+;亿达数码（白下店）;wheelchair,creche
+;亿达数码（玄武店）;wheelchair
+;亿达数码（鼓楼店）;creche,sundayWorkshops
+;亿达数码（江宁店）;wheelchair
+
+
+INSERT_UPDATE PoS2WarehouseRel;source(name)[unique=true];target(code)[unique=true]
+;亿达数码（上海旗舰店）;亿达数码（上海旗舰店）
+;亿达数码（苗圃路店）;亿达数码（苗圃路店）
+;亿达数码（沪太路店）;亿达数码（沪太路店）
+;亿达数码（一二八纪念路店）;亿达数码（一二八纪念路店）
+;亿达数码（静安寺店）;亿达数码（静安寺店）
+;亿达数码（海宁路店）;亿达数码（海宁路店）
+;亿达数码（人民广场店）;亿达数码（人民广场店）
+;亿达数码（武夷路店）;亿达数码（武夷路店）
+;亿达数码（徐家汇店）;亿达数码（徐家汇店）
+;亿达数码（杨浦店）;亿达数码（杨浦店）
+;亿达数码（崇明店）;亿达数码（崇明店）
+;亿达数码（金山店）;亿达数码（金山店）
+;亿达数码（北京旗舰店）;亿达数码（北京旗舰店）
+;亿达数码（清华东路店）;亿达数码（清华东路店）
+;亿达数码（五棵松店）;亿达数码（五棵松店）
+;亿达数码（崇文门店）;亿达数码（崇文门店）
+;亿达数码（王府井店）;亿达数码（王府井店）
+;亿达数码（朝阳区店）;亿达数码（朝阳区店）
+;亿达数码（平安里店）;亿达数码（平安里店）
+;亿达数码（石榴庄店）;亿达数码（石榴庄店）
+;亿达数码（金顶街店）;亿达数码（金顶街店）
+;亿达数码（昌平店）;亿达数码（昌平店）
+;亿达数码（越秀店）;亿达数码（越秀店）
+;亿达数码（乐嘉路店）;亿达数码（乐嘉路店）
+;亿达数码（番禺店）;亿达数码（番禺店）
+;亿达数码（海珠店）;亿达数码（海珠店）
+;亿达数码（沙太路店）;亿达数码（沙太路店）
+;亿达数码（长河店）;亿达数码（长河店）
+;亿达数码（荔湾店）;亿达数码（荔湾店）
+;亿达数码（广园西路店）;亿达数码（广园西路店）
+;亿达数码（天河店）;亿达数码（天河店）
+;亿达数码（文心店）;亿达数码（文心店）
+;亿达数码（龙岗店）;亿达数码（龙岗店）
+;亿达数码（南山大道店）;亿达数码（南山大道店）
+;亿达数码（福田店）;亿达数码（福田店）
+;亿达数码（罗湖店）;亿达数码（罗湖店）
+;亿达数码（江北店）;亿达数码（江北店）
+;亿达数码（巴南店）;亿达数码（巴南店）
+;亿达数码（渝北店）;亿达数码（渝北店）
+;亿达数码（南岸店）;亿达数码（南岸店）
+;亿达数码（北碚店）;亿达数码（北碚店）
+;亿达数码（南开店）;亿达数码（南开店）
+;亿达数码（河东店）;亿达数码（河东店）
+;亿达数码（和平店）;亿达数码（和平店）
+;亿达数码（光荣道店）;亿达数码（光荣道店）
+;亿达数码（汉阳店）;亿达数码（汉阳店）
+;亿达数码（武昌店）;亿达数码（武昌店）
+;亿达数码（硚口店）;亿达数码（硚口店）
+;亿达数码（洪山店）;亿达数码（洪山店）
+;亿达数码（东湖店）;亿达数码（东湖店）
+;亿达数码（洪城店）;亿达数码（洪城店）
+;亿达数码（新建店）;亿达数码（新建店）
+;亿达数码（开福店）;亿达数码（开福店）
+;亿达数码（天心店）;亿达数码（天心店）
+;亿达数码（芙蓉店）;亿达数码（芙蓉店）
+;亿达数码（道外店）;亿达数码（道外店）
+;亿达数码（理工大学店）;亿达数码（理工大学店）
+;亿达数码（香坊店）;亿达数码（香坊店）
+;亿达数码（新城店）;亿达数码（新城店）
+;亿达数码（锡林郭勒店）;亿达数码（锡林郭勒店）
+;亿达数码（回民店）;亿达数码（回民店）
+;亿达数码（宇拓店）;亿达数码（宇拓店）
+;亿达数码（德吉店）;亿达数码（德吉店）
+;亿达数码（天山店）;亿达数码（天山店）
+;亿达数码（水磨沟店）;亿达数码（水磨沟店）
+;亿达数码（沙依巴克店）;亿达数码（沙依巴克店）
+;亿达数码（海口旗舰店）;亿达数码（海口旗舰店）
+;亿达数码（美兰店）;亿达数码（美兰店）
+;亿达数码（三亚店）;亿达数码（三亚店）
+;亿达数码（平江店）;亿达数码（平江店）
+;亿达数码（金阊店）;亿达数码（金阊店）
+;亿达数码（沧浪店）;亿达数码（沧浪店）
+;亿达数码（下城店）;亿达数码（下城店）
+;亿达数码（上城店）;亿达数码（上城店）
+;亿达数码（湖里店）;亿达数码（湖里店）
+;亿达数码（思明店）;亿达数码（思明店）
+;亿达数码（台江店）;亿达数码（台江店）
+;亿达数码（郑州国贸店）;亿达数码（郑州国贸店）
+;亿达数码（中原店）;亿达数码（中原店）
+;亿达数码（大连中南店）;亿达数码（大连中南店）
+;亿达数码（凯德店）;亿达数码（凯德店）
+;亿达数码（青泥洼店）;亿达数码（青泥洼店）
+;亿达数码（历山店）;亿达数码（历山店）
+;亿达数码（济南店）;亿达数码（济南店）
+;亿达数码（青岛店）;亿达数码（青岛店）
+;亿达数码（蜀山店）;亿达数码（蜀山店）
+;亿达数码（包和店）;亿达数码（包和店）
+;亿达数码（白下店）;亿达数码（白下店）
+;亿达数码（玄武店）;亿达数码（玄武店）
+;亿达数码（鼓楼店）;亿达数码（鼓楼店）
+;亿达数码（江宁店）;亿达数码（江宁店）

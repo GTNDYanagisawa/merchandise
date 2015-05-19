@@ -1,0 +1,33 @@
+${utility.initializeCharStyle($node)}
+#set($counter=0)
+#set($node.attributes.openTag="true")
+#set($node.attributes.closeTagKey="<cTypeface:>")
+#if($node.parentNode.nodeName=="italic")
+<cTypeface:$BoldStyle $ItalicStyle>
+#set($node.attributes.openTagKey="<cTypeface:${BoldStyle} ${ItalicStyle}>")
+#else
+<cTypeface:$BoldStyle>
+#set($node.attributes.openTagKey="<cTypeface:${BoldStyle}>")
+#end
+#foreach($child in $node.getChildNodes())
+#set($counter=$counter+1)
+#if(($child.nodeName=="textNode" || $child.nodeName=="entity") && $node.attributes.openTag=="false")
+#set($node.attributes.openTag="true")
+#if($child.parentNode.nodeName=="italic" )
+<cTypeface:$BoldStyle $ItalicStyle>
+#else
+<cTypeface:$BoldStyle>
+#end
+#end
+#if(($child.nodeName=="bold" || $child.nodeName=="italic") && $node.attributes.openTag=="true")
+#set($node.attributes.openTag="false")
+<cTypeface:>
+#end
+$translator.renderTextFromNode($child)
+#end
+#if($counter==0)
+$node.nodeText
+#end
+#if($node.attributes.openTag=="true")
+<cTypeface:>
+#end

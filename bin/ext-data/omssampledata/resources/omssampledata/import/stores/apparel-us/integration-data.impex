@@ -1,0 +1,22 @@
+$siteUid=apparel-us
+$paymentProvider=cisCybersource
+
+INSERT_UPDATE BaseStore                         ; uid[unique=true]             ; submitorderprocesscode                          ;
+                                                ; $siteUid                     ; oms-submitorder-process                         ;
+
+
+INSERT_UPDATE OndemandBaseStorePreference		; baseStore(uid)[unique=true]  ; atsFormula     ; omsProductAttributes ;
+                                                ; $siteUid                     ; ON_HAND        ; name,style,size      ;
+
+
+#
+# Delivery Modes
+#
+$usCurrency=USD
+
+#
+# Export Data Jobs
+#
+INSERT_UPDATE ExportDataCronJob                 ; code[unique=true]            ; job(code)                                       ; baseStore(uid) ; cmsSite(uid)         ; language(isocode) ; currency(isocode) ; user(uid) ; thirdPartyHost ; thirdPartyUsername ; thirdPartyPassword ; dataGenerationPipeline     ; sessionLanguage(isocode)
+                                                ; onboardingLocations-$siteUid ; exportDataJobPerformable                        ; $siteUid       ; $siteUid             ; en                ; USD               ; anonymous ; a              ; a                  ; a                  ; exportOMSLocationPipeline  ; en
+                                                ; onboardingInventory-$siteUid ; exportDataJobPerformable                        ; $siteUid       ; $siteUid             ; en                ; USD               ; anonymous ; a              ; a                  ; a                  ; exportOmsInventoryPipeline ; en

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<bean id="sapCustomerAddressConsistencyInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="sapCustomerAddressConsistencyInterceptor" />
+		<property name="typeCode" value="Address" />
+		<property name="order" value="5000" />
+	</bean>
+
+	<alias alias="sapCustomerAddressConsistencyInterceptor" name="defaultSAPCustomerAddressConsistencyInterceptor" />
+	<bean id="defaultSAPCustomerAddressConsistencyInterceptor" class="com.sap.hybris.sapcustomerb2b.inbound.DefaultSAPCustomerAddressConsistencyInterceptor"
+		autowire="byName">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<alias alias="b2bUnitService" name="defaultSAPB2BUnitService" />
+	<bean id="defaultSAPB2BUnitService" class="com.sap.hybris.sapcustomerb2b.inbound.DefaultSAPB2BUnitService" parent="defaultB2BUnitService">
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<alias alias="b2bDeliveryAddressesLookupStrategy" name="defaultSAPB2BDeliveryAddressesLookupStrategy" />
+	<bean name="defaultSAPB2BDeliveryAddressesLookupStrategy" class="com.sap.hybris.sapcustomerb2b.inbound.DefaultSAPB2BDeliveryAddressesLookupStrategy"
+		parent="defaultB2BDeliveryAddressesLookupStrategy">
+		<property name="b2bUnitService" ref="defaultSAPB2BUnitService" />
+	</bean>
+
+	<!-- register the customer interceptor to trigger the sap B2B customer export -->
+	<!--  <bean id="sapB2BCustomerExportInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="b2bCustomerInterceptor" />
+		<property name="typeCode" value="B2BCustomer" />
+		<property name="order" value="5000" />
+	</bean> -->
+
+	<!-- interceptor to trigger the export after changing customer data -->
+	<!-- <alias alias="b2bCustomerInterceptor" name="defaultB2BCustomerInterceptor" />
+	<bean id="defaultB2BCustomerInterceptor" class="com.sap.hybris.sapcustomerb2b.outbound.DefaultB2BCustomerInterceptor"
+		autowire="byName">
+		<property name="b2bCustomerExportService" ref="b2bCustomerExportService" />
+	</bean> -->
+	
+	<!-- register the customer address interceptor to trigger the sap B2B customer export -->
+	<!-- <bean id="sapB2BCustomerAddressExportInterceptor" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="b2bCustomerAddressInterceptor" />
+		<property name="typeCode" value="Address" />
+		<property name="order" value="5000" />
+	</bean> -->
+	
+	<!-- interceptor to trigger the export after changing the default address -->
+	<!-- <alias alias="b2bCustomerAddressInterceptor" name="defaultB2BCustomerAddressInterceptor" />
+	<bean id="defaultB2BCustomerAddressInterceptor" class="com.sap.hybris.sapcustomerb2b.outbound.DefaultB2BCustomerAddressInterceptor"
+		autowire="byName">
+		<property name="b2bCustomerExportService" ref="b2bCustomerExportService" />
+	</bean> -->
+
+	<!-- B2B Customer Export -->
+	<!-- <alias alias="b2bCustomerExportService" name="defaultB2BCustomerExportService" />
+	<bean id="defaultB2BCustomerExportService" class="com.sap.hybris.sapcustomerb2b.outbound.B2BCustomerExportService">
+		<property name="dataHubOutboundService" ref="dataHubOutboundService" />
+		<property name="customerNameStrategy" ref="customerNameStrategy" />
+		<property name="b2bUnitService" ref="defaultSAPB2BUnitService" />
+		<property name="feed" value="${sapcustomerexchange.customer.outbound.datahub.feed}" />
+	</bean> -->
+	
+	<!-- B2BUnit address deletion -->
+	<alias alias="b2bUnitAddressDeletionService" name="defaultB2BUnitAddressDeletionService" />
+	<bean id="defaultB2BUnitAddressDeletionService" class="com.sap.hybris.sapcustomerb2b.inbound.B2BUnitAddressDeletionService">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+</beans>

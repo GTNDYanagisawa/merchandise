@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+
+<!-- 
+  WARNING: This is the Spring WEB configuration file. If you want to replace
+  items or managers you have to do this from the extensions core configuration 
+  file (cmscockpit/resources/cmscockpit-application-context.xml) 
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+
+	<!-- CMSSite Wizard -->
+	<alias alias="cmsSiteWizard" name="defaultCmsSiteWizard" />
+	<bean id="defaultCmsSiteWizard" parent="genericWizard" scope="prototype" class="de.hybris.platform.cmscockpit.wizard.cmssite.CmsSiteWizard">
+		<property name="currentStringType" value="CMSSite"/>
+		<property name="title" value="cockpit.wizard.cmssite.title"/>
+		<property name="pages">
+				<list>
+				<ref bean="typeSelectorPage"/>
+				<ref bean="mandatoryPage"/> 
+				<ref bean="baseStoresPage"/>
+				<ref bean="templatesForCmsSitePage"/>	
+				<ref bean="cmsSiteDecisionPage"/>
+				<ref bean="createContentCatalogPage"/>
+				<ref bean="advancedSearchPage"/>
+				<ref bean="cmsSummaryPage"/>
+				</list>
+		</property>
+	</bean>
+	<alias alias="typeSelectorPage" name="defaultTypeSelectorPage" />
+	<bean id="defaultTypeSelectorPage" class="de.hybris.platform.cockpit.wizards.generic.GenericTypeSelectorPage" scope="prototype">
+		<property name="id" value="typeSelectorPage"/>
+		<property name="title" value="cockpit.wizard.cmssite.page.typeSelector" />
+		<property name="excludeCreateTypes">
+			<list value-type="java.lang.String">
+				<value>CMSSite</value>
+			</list>
+		</property>		
+	</bean>
+	<alias alias="mandatoryPage" name="defaultMandatoryPage" />
+	<bean id="defaultMandatoryPage" class="de.hybris.platform.cockpit.wizards.generic.GenericItemMandatoryPage" scope="prototype">
+		<property name="id" value="mandatoryPage"/>
+		<property name="title" value="cockpit.wizard.cmssite.page.mandatory" />
+		<property name="controller">
+			<bean class="de.hybris.platform.cmscockpit.wizard.cmssite.controllers.CmsSiteMandatoryPageController"/>
+		</property>
+	</bean>
+	<alias alias="baseStoresPage" name="defaultBaseStoresPage" />
+	<bean id="defaultBaseStoresPage" class="de.hybris.platform.cmscockpit.wizard.cmssite.pages.BaseStoreForCmsSitePage" scope="prototype">
+		<property name="id" value="baseStore"/>
+		<property name="title" value="cockpit.wizard.cmssite.page.baseStores" />	
+	</bean>
+	
+	<alias alias="templatesForCmsSitePage" name="defaultTemplatesForCmsSitePage" />
+	<bean id="defaultTemplatesForCmsSitePage" class="de.hybris.platform.cmscockpit.wizard.cmssite.pages.TemplatesForCmsSitePage" scope="prototype">
+		<property name="id" value="templatesPage"/>
+		<property name="title" value="cockpit.wizard.cmssite.page.templates" />
+	</bean>
+	
+	<alias alias="cmsSiteDecisionPage" name="defaultCmsSiteDecisionPage" />
+	<bean id="defaultCmsSiteDecisionPage" class="de.hybris.platform.cmscockpit.wizard.cmssite.pages.CMSSiteDecisionPage" scope="prototype">
+		<property name="id" value="decisionPage"/>
+		<property name="title" value="cockpit.wizard.cmssite.page.decision" />	
+	</bean>
+	
+	<alias alias="createContentCatalogPage" name="defaultCreateContentCatalogPage" />
+	<bean id="defaultCreateContentCatalogPage" class="de.hybris.platform.cmscockpit.wizard.cmssite.pages.CreateContentCatalogPage" scope="prototype">
+		<property name="id" value="provideName"/>
+		<property name="title" value="cockpit.wizard.cmssite.page.provideName" />
+		<property name="nextPageWizardId" value="cmsSummaryPage"/>
+	</bean>
+	
+	<alias alias="advancedSearchPage" name="defaultAdvancedSearchPage" />
+	<bean id="defaultAdvancedSearchPage" class="de.hybris.platform.cockpit.wizards.generic.AdvancedSearchPage" scope="prototype">
+		<property name="title" value="cockpit.wizard.cmssite.page.advancedSearch" />
+		<property name="id" value="advancedSearchPage"/>
+		<property name="width" value="600px"/>
+		<property name="height" value="490px"/>
+		<property name="multiple" value="true"/>
+		<property name="rootSearchStringType" value="ContentCatalog"/>
+		<property name="controller">
+			<bean class="de.hybris.platform.cmscockpit.wizard.cmssite.controllers.ContentCatalogCreatePageController" />
+		</property>
+	</bean>
+	
+	<alias alias="cmsSummaryPage" name="defaultCmsSummaryPage" />
+	<bean id="defaultCmsSummaryPage" class="de.hybris.platform.cmscockpit.wizard.cmssite.pages.CmsSiteSummaryPage" scope="prototype">
+		<property name="id" value="cmsSummaryPage"/>
+		<property name="title" value="cockpit.wizard.cmssite.page.summary" />	
+	</bean>
+
+	<alias alias="cmsPageSelectorPage" name="defaultCmsPageSelectorPage" />
+	<bean id="defaultCmsPageSelectorPage" class="de.hybris.platform.cmscockpit.wizard.page.TypeSelectorPage" scope="prototype">
+		<property name="id" value="typeSelector"/>
+		<property name="title" value="wizard.page.typeSelector" />
+		<property name="controller">
+			<bean class="de.hybris.platform.cmscockpit.wizard.controller.CmsTypePageController" />
+		</property>
+	</bean>
+	<alias alias="cmsPageSelectorPageFactory" name="defaultCmsPageSelectorPageFactory" />
+	<bean id="defaultCmsPageSelectorPageFactory" class="de.hybris.platform.cmscockpit.wizard.page.CmsPageSelectorPageFactory" scope="singleton">
+		<lookup-method name="createCmsPageSelectorPage" bean="cmsPageSelectorPage"/>
+	</bean>
+
+	<alias alias="cmsComponentSelectorPage" name="defaultCmsComponentSelectorPage" />
+	<bean id="defaultCmsComponentSelectorPage" class="de.hybris.platform.cmscockpit.wizard.page.TypeSelectorPage" scope="prototype">
+		<property name="id" value="typeSelector"/>
+		<property name="title" value="wizard.page.typeSelector" />
+		<property name="controller">
+			<bean class="de.hybris.platform.cmscockpit.wizard.controller.CmsTypePageController" />
+		</property>
+		<property name="contentSlotObjectTypesFilter" ref="objectTemplates4ContentSlotFilter"/>
+	</bean>
+
+	<alias alias="cmsComponentSelectorPageFactory" name="defaultCmsComponentSelectorPageFactory" />
+	<bean id="defaultCmsComponentSelectorPageFactory" class="de.hybris.platform.cmscockpit.wizard.page.CmsComponentSelectorPageFactory" scope="singleton">
+		<lookup-method name="createCmsComponentSelectorPage" bean="cmsComponentSelectorPage"/>
+	</bean>
+	
+	<alias alias="cmsItemPredefinedValuesStrategy" name="defaultCmsItemPredefinedValuesStrategy"/>
+	<bean id="defaultCmsItemPredefinedValuesStrategy" class="de.hybris.platform.cmscockpit.wizard.strategies.DefaultCmsItemPredefinedValuesStrategy" scope="tenant">
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService"/>
+		<property name="genericRandomNameProducer" ref="genericRandomNameProducer"/>
+	</bean>	
+</beans>

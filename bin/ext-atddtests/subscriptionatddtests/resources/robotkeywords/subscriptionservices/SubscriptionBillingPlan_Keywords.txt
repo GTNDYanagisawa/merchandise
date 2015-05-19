@@ -1,0 +1,12 @@
+*** Settings ***
+Library         de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Resource		impex/Impex_Keywords.txt
+
+*** Keywords ***
+create billing plan "${billingPlanId}" with billing frequency "${billingFrequency}" and billing cycle type "${billingCycleType}" and billing cycle day "${billingCycleDay}"
+    [Documentation]    ${billingFrequency}=monthly/quarterly/yearly
+    ...                ${billingCycleType}=subscription_start/day_of_month/end_of_month
+    @{binding}    create list    billingPlanId    "${billingPlanId}"    billingFrequency    "${billingFrequency}"    billingCycleType    "${billingCycleType}"    billingCycleDay    "${billingCycleDay}"
+    ${templateName}=    Set Variable    impex-templates/subscription-billingplan/billingplan-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"

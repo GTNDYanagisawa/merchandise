@@ -1,0 +1,1583 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ hybris Promotions Engine
+
+ Copyright (c) 2007 Neoworks Limited
+ All rights reserved.
+-->
+<items
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+        <collectiontypes>
+            <collectiontype code="PromotionRestrictionsCollection" elementtype="AbstractPromotionRestriction" autocreate="true" generate="false" />
+            <collectiontype code="PromotionPriceRowCollectionType" elementtype="PromotionPriceRow" autocreate="true" generate="false"/>
+            <collectiontype code="PromotionQuantityAndPricesRowCollectionType" elementtype="PromotionQuantityAndPricesRow" autocreate="true" generate="false"/>
+            <collectiontype code="PromotionActionCollectionType" elementtype="AbstractPromotionAction" autocreate="true" generate="false"/>
+            <collectiontype code="PromotionOrderEntryConsumedCollectionType" elementtype="PromotionOrderEntryConsumed" autocreate="true" generate="false"/>
+            
+			<!-- CACHING START -->
+            <collectiontype code="CachedPromotionActionCollection" elementtype="AbstractPromotionAction" autocreate="true" generate="false"/>
+            <collectiontype code="CachedPromotionOrderEntryConsumedCollection" elementtype="CachedPromotionOrderEntryConsumed" autocreate="true" generate="false"/>
+            <!-- CACHING FINISH -->
+        </collectiontypes>
+
+	<relations>
+		<relation code="ProductPromotionRelation"
+			autocreate="true"
+			generate="true"
+			localized="false">
+			<deployment table="ProdPromRelations" typecode="5018"/>
+			<sourceElement qualifier="products" type="Product" cardinality="many">
+				<description>Products</description>
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</sourceElement>
+			
+			<targetElement qualifier="promotions" type="ProductPromotion" cardinality="many">
+				<description>Promotions</description>
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</targetElement>
+			
+		</relation>
+
+		<relation code="CategoryPromotionRelation"
+			autocreate="true"
+			generate="true"
+			localized="false">
+			<deployment table="CatPromRelations" typecode="5019"/>
+			<sourceElement qualifier="categories" type="Category" cardinality="many">
+				<description>Categories</description>
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</sourceElement>
+			
+			<targetElement qualifier="promotions" type="ProductPromotion" cardinality="many">
+				<description>Promotions</description>
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</targetElement>
+			
+		</relation>
+
+		<relation code="PromotionGroupPromotionsRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement qualifier="PromotionGroup" type="PromotionGroup" cardinality="one" >
+				<modifiers read="true" write="true" initial="false" optional="true" search="true"/>
+			</sourceElement>
+			<targetElement qualifier="Promotions" type="AbstractPromotion" cardinality="many" collectiontype="collection">
+				<modifiers read="true" write="true" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+
+		<!-- PRO-66: since PromotionResult has a qualifier named "actions", the new relation qualifier is named "allPromotionResults",
+						 and to keep it consistently, AbstractOrder has the qualifier "allPromotionResults" as well.
+		 -->
+		<!-- PromotionResult is partof AbstractOrder -->
+		<relation code="Order2PromotionResultsRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement type="AbstractOrder" qualifier="order" cardinality="one">
+				<modifiers read="true" write="true" initial="true" optional="true" search="true"/>
+			</sourceElement>
+			<targetElement type="PromotionResult" qualifier="allPromotionResults" cardinality="many" ordered="false" collectiontype="set">
+				<modifiers read="true" write="true" optional="true" search="true" partof="true"/>
+			</targetElement>
+		</relation>
+
+		<!-- AbstractPromotionAction is partof PromotionResult -->
+		<relation code="PromotionResult2PromotionActionsRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement type="PromotionResult" qualifier="promotionResult" cardinality="one">
+				<modifiers read="true" write="true" initial="true" optional="true" search="true" unique="true"/>
+			</sourceElement>
+			<targetElement type="AbstractPromotionAction" qualifier="allPromotionActions" cardinality="many" ordered="false" collectiontype="set">
+				<modifiers read="true" write="true" optional="true" search="true" partof="true"/>
+			</targetElement>
+		</relation>
+
+	</relations>
+
+	<itemtypes>
+
+		<itemtype code="PromotionResult"
+			extends="GenericItem"
+			jaloclass="de.hybris.platform.promotions.jalo.PromotionResult"
+			autocreate="true"
+			generate="true">
+			<deployment table="PromotionResult" typecode="5013"/>
+			<attributes>
+
+				<attribute
+					qualifier="actions"
+					autocreate="true"
+					type="PromotionActionCollectionType">
+					<description>List of actions</description>
+					<persistence type="jalo" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+				<attribute
+					qualifier="consumedEntries"
+					autocreate="true"
+					type="PromotionOrderEntryConsumedCollectionType">
+					<description>List of consumed entries</description>
+					<persistence type="jalo" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+				<attribute
+					qualifier="promotion"
+					autocreate="true"
+					type="AbstractPromotion">
+					<description>The promotion</description>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="certainty"
+					autocreate="true"
+					type="java.lang.Float">
+					<defaultvalue>Float.valueOf(0.0F)</defaultvalue>
+					<description>Certainty</description>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="custom"
+					autocreate="true"
+					type="java.lang.String">
+					<description>Custom data stored on this promotion result by the promotion.</description>
+					<modifiers read="true" write="true" />
+					<persistence type="property"/>
+				</attribute>
+
+			</attributes>
+
+			<indexes>
+				<index name="orderIDX" unique="false">
+					<key attribute="order"/>
+				</index>
+				<index name="promotionIDX" unique="false">
+					<key attribute="promotion"/>
+				</index>
+			</indexes>
+
+		</itemtype>
+
+		<!-- *** PROMOTION ACTIONS *** -->
+
+		<itemtype code="AbstractPromotionAction"
+			extends="GenericItem"
+			jaloclass="de.hybris.platform.promotions.jalo.AbstractPromotionAction"
+			autocreate="true"
+			generate="true">
+			<deployment table="PromotionAction" typecode="5015"/>
+			<attributes>
+
+				<attribute
+					qualifier="markedApplied"
+					autocreate="true"
+					type="java.lang.Boolean">
+					<description>Flag to indicate that this promotion is applied.</description>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="false" />
+				</attribute>
+
+				<attribute
+					qualifier="guid"
+					autocreate="true"
+					type="java.lang.String">
+					<description>The unique identifier for this action.</description>
+					<modifiers read="true" write="true" />
+					<persistence type="property"/>
+				</attribute>
+
+			</attributes>
+
+			<indexes>
+				<index name="promotionResultIDX" unique="false">
+					<key attribute="promotionResult"/>
+				</index>
+			</indexes>
+
+		</itemtype>
+
+		<itemtype code="PromotionNullAction"
+			extends="AbstractPromotionAction"
+			jaloclass="de.hybris.platform.promotions.jalo.PromotionNullAction"
+			autocreate="true"
+			generate="true">
+		</itemtype>
+
+		<itemtype code="PromotionOrderAdjustTotalAction"
+			extends="AbstractPromotionAction"
+			jaloclass="de.hybris.platform.promotions.jalo.PromotionOrderAdjustTotalAction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute
+					qualifier="amount"
+					autocreate="true"
+					type="java.lang.Double">
+					<defaultvalue>Double.valueOf(0.0D)</defaultvalue>
+					<description>The amount to adjust the cart total by.</description>
+					<modifiers read="true" write="true" />
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="PromotionOrderEntryAdjustAction"
+			extends="AbstractPromotionAction"
+			jaloclass="de.hybris.platform.promotions.jalo.PromotionOrderEntryAdjustAction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute
+					qualifier="amount"
+					autocreate="true"
+					type="java.lang.Double">
+					<defaultvalue>Double.valueOf(0.0D)</defaultvalue>
+					<description>The amount to adjust the order entry by.</description>
+					<modifiers read="true" write="true" />
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="orderEntryProduct"
+					autocreate="true"
+					type="Product">
+					<description>The product of the order entry to adjust</description>
+					<modifiers read="true" write="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute
+					qualifier="orderEntryQuantity"
+					autocreate="true"
+					type="java.lang.Long">
+					<description>The quantity of the order entry to adjust</description>
+					<modifiers read="true" write="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<!-- since 4.4, see PRO-75 -->
+				<attribute
+					qualifier="orderEntryNumber"
+					autocreate="true"
+					type="java.lang.Integer">
+					<description>The entry number in the order</description>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property" />
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="PromotionOrderAddFreeGiftAction"
+			extends="AbstractPromotionAction"
+			jaloclass="de.hybris.platform.promotions.jalo.PromotionOrderAddFreeGiftAction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute
+					qualifier="freeProduct"
+					autocreate="true"
+					type="Product">
+					<description>The product given away as a gift</description>
+					<modifiers read="true" write="true" search="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="PromotionOrderChangeDeliveryModeAction"
+			extends="AbstractPromotionAction"
+			jaloclass="de.hybris.platform.promotions.jalo.PromotionOrderChangeDeliveryModeAction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute
+					qualifier="deliveryMode"
+					autocreate="true"
+					type="DeliveryMode">
+					<description>The delivery mode to apply to the order</description>
+					<modifiers read="true" write="true" search="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- *** PROMOTION ORDER ENTRY CONSUMED *** -->
+
+		<itemtype code="PromotionOrderEntryConsumed"
+			extends="GenericItem"
+			jaloclass="de.hybris.platform.promotions.jalo.PromotionOrderEntryConsumed"
+			autocreate="true"
+			generate="true">
+			<deployment table="OrderEntryConsumed" typecode="5014"/>
+			<attributes>
+				<attribute
+					qualifier="code"
+					autocreate="true"
+					type="java.lang.String">
+					<description>The code for this consumed entry</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute
+					qualifier="promotionResult"
+					autocreate="true"
+					type="PromotionResult">
+					<description>The promotion result.</description>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="quantity"
+					autocreate="true"
+					type="java.lang.Long">
+					<description>The quantity.</description>
+					<defaultvalue>Long.valueOf(0)</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="adjustedUnitPrice"
+					autocreate="true"
+					type="java.lang.Double">
+					<description>The quantity.</description>
+					<defaultvalue>Long.valueOf(0)</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="orderEntry"
+					autocreate="true"
+					type="AbstractOrderEntry">
+					<description>The order entry.</description>
+					<persistence type="property"/>
+				</attribute>
+
+			</attributes>
+
+			<indexes>
+				<index name="promotionResultIDX" unique="false">
+					<key attribute="promotionResult"/>
+				</index>
+			</indexes>
+
+		</itemtype>
+
+		<!-- *** PROMOTION PRICE ROW *** -->
+
+		<itemtype code="PromotionPriceRow"
+			extends="GenericItem"
+			jaloclass="de.hybris.platform.promotions.jalo.PromotionPriceRow"
+			autocreate="true"
+			generate="true">
+			<deployment table="PromotionPriceRow" typecode="5012"/>
+			<attributes>
+				<attribute
+					qualifier="currency"
+					autocreate="true"
+					type="Currency">
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" optional="false" removable="false" initial="true" private="false" partof="false"/>
+				</attribute>
+
+				<attribute
+					qualifier="price"
+					autocreate="true"
+					type="java.lang.Double">
+					<defaultvalue>Double.valueOf(0.0D)</defaultvalue>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" optional="false" removable="false" initial="true" private="false" partof="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- *** PROMOTION QUANTITY PRICES ROW *** -->
+
+		<itemtype code="PromotionQuantityAndPricesRow"
+			extends="GenericItem"
+			jaloclass="de.hybris.platform.promotions.jalo.PromotionQuantityAndPricesRow"
+			autocreate="true"
+			generate="true">
+			<deployment table="QuantityAndPricesRow" typecode="5016"/>
+			<attributes>
+
+				<attribute
+					qualifier="quantity"
+					autocreate="true"
+					type="java.lang.Long">
+					<defaultvalue>Long.valueOf(0)</defaultvalue>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" optional="false" removable="false" initial="true" private="false" partof="false"/>
+				</attribute>
+
+				<attribute
+					qualifier="prices"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>Prices in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<!-- *** RESTRICTIONS *** -->
+
+		<itemtype code="AbstractPromotionRestriction"
+			extends="GenericItem"
+			jaloclass="de.hybris.platform.promotions.jalo.AbstractPromotionRestriction"
+			autocreate="true"
+			generate="true">
+			<deployment table="PromotionRestriction" typecode="5011"/>
+			<attributes>
+
+				<attribute
+					qualifier="restrictionType"
+					type="localized:java.lang.String">
+					<description>The type of this restriction.</description>
+					<modifiers write="false" search="false"/>
+					<persistence type="jalo"/>
+				</attribute>
+
+				<attribute
+					qualifier="descriptionPattern"
+					type="localized:java.lang.String">
+					<description>The description of the restriction (supports message pattern).</description>
+					<modifiers read="true" write="true" search="false" optional="true"/>
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute
+					qualifier="renderedDescription"
+					type="java.lang.String">
+					<description>The readonly rendered description of this restriction.</description>
+					<modifiers write="false" search="false"/>
+					<persistence type="jalo"/>
+				</attribute>
+
+				<attribute
+					qualifier="promotion"
+					autocreate="true"
+					type="AbstractPromotion">
+					<persistence type="property"/>
+					<description>The promotion that this restriction is part of</description>
+				</attribute>
+
+			</attributes>
+
+			<indexes>
+				<index name="promotionIDX" unique="false">
+					<key attribute="promotion"/>
+				</index>
+			</indexes>
+
+		</itemtype>
+
+		<itemtype code="PromotionProductRestriction"
+			extends="AbstractPromotionRestriction"
+			jaloclass="de.hybris.platform.promotions.jalo.PromotionProductRestriction"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+				<attribute
+					qualifier="descriptionPattern"
+					redeclare="true"
+					type="localized:java.lang.String">
+					<description>The description of the restriction (supports message pattern).</description>
+					<modifiers read="true" write="true" search="false" optional="true"/>
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute
+					qualifier="products"
+					autocreate="true"
+					generate="true"
+					type="ProductCollection">
+					<description>The products that the promotion should not be applied to</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="false" optional="true"/>
+				</attribute>
+			</attributes>
+
+		</itemtype>
+
+		<itemtype code="PromotionUserRestriction"
+			extends="AbstractPromotionRestriction"
+			jaloclass="de.hybris.platform.promotions.jalo.PromotionUserRestriction"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+				<attribute
+					qualifier="descriptionPattern"
+					redeclare="true"
+					type="localized:java.lang.String">
+					<description>The description of the restriction (supports message pattern).</description>
+					<modifiers read="true" write="true" search="false" optional="true"/>
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute
+					qualifier="positive"
+					type="java.lang.Boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<description>Specifies if this restriction is a positive (true) or negative (false) one.</description>
+					<persistence type="property"/>
+					<modifiers search="false" optional="false"/>
+				</attribute>
+
+				<attribute
+					qualifier="users"
+					autocreate="true"
+					generate="true"
+					type="PrincipalCollection">
+					<description>The principals the promotion is not applied for</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="false" optional="true"/>
+				</attribute>
+			</attributes>
+
+		</itemtype>
+
+		<!-- *** PROMOTIONS *** -->
+
+		<itemtype code="AbstractPromotion"
+			extends="GenericItem"
+			jaloclass="de.hybris.platform.promotions.jalo.AbstractPromotion"
+			autocreate="true"
+			abstract="true"
+			generate="true">
+			<deployment table="Promotion" typecode="5010"/>
+			<attributes>
+
+				<attribute
+					qualifier="promotionType"
+					type="localized:java.lang.String">
+					<description>The type of this promotion.</description>
+					<modifiers write="false" search="false"/>
+					<persistence type="jalo"/>
+				</attribute>
+
+				<attribute
+					qualifier="code"
+					autocreate="true"
+					type="java.lang.String">
+					<description>Identifier for this promotion</description>
+					<persistence type="property"/>
+					<modifiers optional="false" />
+				</attribute>
+
+				<attribute
+					qualifier="title"
+					autocreate="true"
+					type="java.lang.String">
+					<description>Title for this promotion</description>
+					<persistence type="property"/>
+				</attribute>
+				
+				<attribute 
+					qualifier="description" 
+					type="java.lang.String">
+					<description>Description of this promotion</description>
+
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>					
+					</persistence>
+				</attribute>
+				
+				<attribute
+					qualifier="startDate"
+					autocreate="true"
+					type="java.util.Date">
+					<description>Date on which this promotion becomes available, if not set the promotion will not be available.</description>
+					<defaultvalue>
+						de.hybris.platform.promotions.util.Helper.buildDateForYear(2000)
+					</defaultvalue>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="endDate"
+					autocreate="true"
+					type="java.util.Date">
+					<description>Date on which this promotion stops being available, if not set the promotion will not be available.</description>
+					<defaultvalue>
+						de.hybris.platform.promotions.util.Helper.buildDateForYear(2099)
+					</defaultvalue>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="detailsURL"
+					autocreate="true"
+					type="java.lang.String">
+					<description>URL to a content page with further details of this promotion</description>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="restrictions"
+					autocreate="true"
+					type="PromotionRestrictionsCollection">
+					<description>Collection of restrictions that are applied to this promotion</description>
+					<persistence type="jalo"/>
+					<modifiers partof="true" />
+				</attribute>
+
+				<attribute
+					qualifier="enabled"
+					autocreate="true"
+					type="java.lang.Boolean">
+					<description>Flag to indicate if this promotion is enabled.</description>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="false" />
+				</attribute>
+
+				<attribute
+					qualifier="priority"
+					autocreate="true"
+					type="java.lang.Integer">
+					<defaultvalue>Integer.valueOf(500)</defaultvalue>
+					<description>Value to indicate relative priority of promotions. The higher the value the higher the priority.</description>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="immutableKeyHash"
+					autocreate="true"
+					type="java.lang.String">
+					<description>The HASH of the immutableKey</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" search="true" />
+				</attribute>
+
+				<attribute
+					qualifier="immutableKey"
+					type="java.lang.String">
+					<description>The full immutable identifier for this promotion</description>
+
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>					
+					</persistence>
+				</attribute>
+
+			</attributes>
+
+			<indexes>
+				<index name="codeIDX" unique="false">
+					<key attribute="code"/>
+				</index>
+				<index name="enabledIDX" unique="false">
+					<key attribute="enabled"/>
+				</index>
+				<index name="immutableKeyHashIDX" unique="false">
+					<key attribute="immutableKeyHash"/>
+				</index>
+			</indexes>
+
+		</itemtype>
+
+		<itemtype code="ProductPromotion"
+			extends="AbstractPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.ProductPromotion"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+
+				<attribute
+					qualifier="productBanner"
+					autocreate="true"
+					type="Media">
+					<description>Media to display on the product page when this promotion is available.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" optional="true" />
+				</attribute>
+
+				<!--
+					Priority attribute redeclared to change the default priority for ProductPromotion to 1000
+					and therefore above (and higher priority than) OrderPromotions.
+                -->
+				<attribute
+					qualifier="priority"
+					redeclare="true"
+					autocreate="true"
+					type="java.lang.Integer">
+					<defaultvalue>Integer.valueOf(1000)</defaultvalue>
+					<description>Value to indicate relative priority of promotions. The higher the value the higher the priority.</description>
+					<persistence type="property"/>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="OrderPromotion"
+			extends="AbstractPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.OrderPromotion"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+
+			</attributes>
+		</itemtype>
+
+		<!-- *** PRODUCT PROMOTIONS *** -->
+
+		<itemtype code="ProductFixedPricePromotion"
+			extends="ProductPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.ProductFixedPricePromotion"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+
+				<attribute
+					qualifier="productFixedUnitPrice"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>Fixed price to sell the product at in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ProductPercentageDiscountPromotion"
+			extends="ProductPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.ProductPercentageDiscountPromotion"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+
+				<attribute
+					qualifier="percentageDiscount"
+					autocreate="true"
+					type="java.lang.Double">
+					<defaultvalue>Double.valueOf(10.0D)</defaultvalue>
+					<description>Percentage discount.</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ProductBOGOFPromotion"
+			extends="ProductPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.ProductBOGOFPromotion"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+
+				<attribute
+					qualifier="qualifyingCount"
+					autocreate="true"
+					type="java.lang.Integer">
+					<defaultvalue>Integer.valueOf(2)</defaultvalue>
+					<description>The number of products required in the cart to activate the promotion. (For standard BOGOF this is 2).</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="freeCount"
+					autocreate="true"
+					type="java.lang.Integer">
+					<defaultvalue>Integer.valueOf(1)</defaultvalue>
+					<description>The number of products within the cart to give away free. (For standard BOGOF this is 1).</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion could have potentially fire.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ProductMultiBuyPromotion"
+			extends="ProductPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.ProductMultiBuyPromotion"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+
+				<attribute
+					qualifier="qualifyingCount"
+					autocreate="true"
+					type="java.lang.Integer">
+					<defaultvalue>Integer.valueOf(3)</defaultvalue>
+					<description>The number of products required to qualify for the promotion.</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="bundlePrices"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>Fixed price for whole multi-buy bundle in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion could have potentially fire.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ProductSteppedMultiBuyPromotion"
+			extends="ProductPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.ProductSteppedMultiBuyPromotion"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+
+				<attribute
+					qualifier="qualifyingCountsAndBundlePrices"
+					autocreate="true"
+					type="PromotionQuantityAndPricesRowCollectionType">
+					<description>The qualifying count and prices for each step.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion could have potentially fire.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ProductBundlePromotion"
+			extends="ProductPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.ProductBundlePromotion"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+
+				<attribute
+					qualifier="bundlePrices"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>Fixed price for whole bundle in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion could have potentially fire.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ProductPerfectPartnerPromotion"
+			extends="ProductPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.ProductPerfectPartnerPromotion"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+
+				<attribute
+					qualifier="partnerProducts"
+					autocreate="true"
+					type="ProductCollection">
+					<description>The collections of products to discount if one of them is in the cart.</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="partnerPrices"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>Fixed price for a partner product in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion could have potentially fire.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ProductOneToOnePerfectPartnerPromotion"
+			extends="ProductPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.ProductOneToOnePerfectPartnerPromotion"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+
+				<attribute
+					qualifier="baseProduct"
+					autocreate="true"
+					type="Product">
+					<description>The base product.</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+
+				<attribute
+					qualifier="partnerProduct"
+					autocreate="true"
+					type="Product">
+					<description>The partner product.</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="bundlePrices"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>Fixed bundle price for both the products in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion could have potentially fire.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ProductPerfectPartnerBundlePromotion"
+			extends="ProductPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.ProductPerfectPartnerBundlePromotion"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+
+				<attribute
+					qualifier="baseProduct"
+					autocreate="true"
+					type="Product">
+					<description>The base product.</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+
+				<attribute
+					qualifier="partnerProducts"
+					autocreate="true"
+					type="ProductCollection">
+					<description>The collections of potential partner products.</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="qualifyingCount"
+					autocreate="true"
+					type="java.lang.Integer">
+					<defaultvalue>Integer.valueOf(3)</defaultvalue>
+					<description>The number of partner products required to qualify for the promotion.</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="bundlePrices"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>Fixed bundle price for the base product and selected partner products in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion could have potentially fire.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+
+		<!-- *** ORDER PROMOTIONS *** -->
+
+		<itemtype code="OrderThresholdPerfectPartnerPromotion"
+			extends="OrderPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.OrderThresholdPerfectPartnerPromotion"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+
+				<attribute
+					qualifier="thresholdTotals"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>The cart total value threshold in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+				<attribute
+					qualifier="discountProduct"
+					autocreate="true"
+					type="Product">
+					<description>The product to discount if it is in the cart.</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="productPrices"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>Fixed price for discounted product in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+				<attribute
+					qualifier="includeDiscountedPriceInThreshold"
+					autocreate="true"
+					type="java.lang.Boolean">
+					<description>Flag to indicate if the discounted price of the product is allowed to count towards the threshold, otherwise it does not count towards the threshold.</description>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="false" />
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion could have potentially fire.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageProductNoThreshold" type="localized:java.lang.String">
+					<description>The message to show when there is a partner product but the threshold has not been reached.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageThresholdNoProduct" type="localized:java.lang.String">
+					<description>The message to show when the threshold is reached, but there is no partner product.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="OrderThresholdDiscountPromotion"
+			extends="OrderPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.OrderThresholdDiscountPromotion"
+			autocreate="true"
+			generate="true">
+
+			<attributes>
+
+				<attribute
+					qualifier="thresholdTotals"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>The cart total value threshold in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+				<attribute
+					qualifier="discountPrices"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>Fixed price for discount in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion could have potentially fire.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="OrderThresholdFreeGiftPromotion"
+			extends="OrderPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.OrderThresholdFreeGiftPromotion"
+			autocreate="true"
+			generate="true">
+			<attributes>
+
+				<attribute
+					qualifier="thresholdTotals"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>The cart total value threshold in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true" />
+				</attribute>
+
+				<attribute
+					qualifier="giftProduct"
+					autocreate="true"
+					type="Product">
+					<description>The free gift product to add to the cart.</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion could have potentially fire.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="OrderThresholdFreeVoucherPromotion"
+			extends="OrderPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.OrderThresholdFreeVoucherPromotion"
+			autocreate="true"
+			generate="true">
+			<attributes>
+
+				<attribute
+					qualifier="thresholdTotals"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>The cart total value threshold in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true" />
+				</attribute>
+
+				<attribute
+					qualifier="freeVoucher"
+					autocreate="true"
+					type="Voucher">
+					<description>The voucher.</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion could have potentially fire.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="OrderThresholdChangeDeliveryModePromotion"
+			extends="OrderPromotion"
+			jaloclass="de.hybris.platform.promotions.jalo.OrderThresholdChangeDeliveryModePromotion"
+			autocreate="true"
+			generate="true">
+			<attributes>
+
+				<attribute
+					qualifier="thresholdTotals"
+					autocreate="true"
+					type="PromotionPriceRowCollectionType">
+					<description>The cart total value threshold in specific currencies.</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true" />
+				</attribute>
+
+				<attribute
+					qualifier="deliveryMode"
+					autocreate="true"
+					type="DeliveryMode">
+					<description>The delivery mode to apply once the threshold is reached.</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion has fired.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+				<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+					<description>The message to show when the promotion could have potentially fire.</description>
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<!-- *** PROMOTION GROUP *** -->
+
+		<itemtype code="PromotionGroup"
+			extends="GenericItem"
+			jaloclass="de.hybris.platform.promotions.jalo.PromotionGroup"
+			autocreate="true"
+			generate="true">
+			<deployment table="PromotionGroup" typecode="5017"/>
+			<attributes>
+				<attribute qualifier="Identifier" type="java.lang.String" autocreate="true">
+					<persistence type="property" />
+					<modifiers unique="true" optional="false" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="PromotionGroup_IdentifierIDX" unique="true">
+					<key attribute="Identifier" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<!-- *** ABSTRACT ORDER *** -->
+
+		<!-- Extend AbstractOrder by adding in the ability to store a previous delivery mode -->
+		<itemtype code="AbstractOrder"
+			autocreate="false"
+			generate="false">
+			<attributes>
+				<attribute qualifier="previousDeliveryMode" type="DeliveryMode">
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false" optional="true" initial="false" />
+					<description>The old delivery mode stored by the PromotionOrderChangeDeliveryModeAction.</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+        <!-- CACHING START -->
+
+        <itemtype code="CachedPromotionResult"
+                  extends="PromotionResult"
+                  jaloclass="de.hybris.platform.promotions.jalo.CachedPromotionResult"
+                  jaloonly="true"
+                  autocreate="true"
+                  generate="true">
+
+            <attributes>
+                <attribute
+                        qualifier="cachedActions"
+                        autocreate="true"
+                        type="CachedPromotionActionCollection">
+                    <description>Cached list of actions</description>
+                    <persistence type="jalo" />
+                    <modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+                </attribute>
+                <attribute
+                        qualifier="cachedConsumedEntries"
+                        autocreate="true"
+                        type="CachedPromotionOrderEntryConsumedCollection">
+                    <description>Cached list of consumed entries</description>
+                    <persistence type="jalo" />
+                    <modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="CachedPromotionOrderEntryConsumed"
+                  extends="PromotionOrderEntryConsumed"
+                  jaloclass="de.hybris.platform.promotions.jalo.CachedPromotionOrderEntryConsumed"
+                  jaloonly="true"
+                  autocreate="true"
+                  generate="true">
+            <attributes>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="CachedPromotionNullAction"
+                  extends="PromotionNullAction"
+                  jaloclass="de.hybris.platform.promotions.jalo.CachedPromotionNullAction"
+                  jaloonly="true"
+                  autocreate="true"
+                  generate="true">
+        </itemtype>
+
+        <itemtype code="CachedPromotionOrderAdjustTotalAction"
+                  extends="PromotionOrderAdjustTotalAction"
+                  jaloclass="de.hybris.platform.promotions.jalo.CachedPromotionOrderAdjustTotalAction"
+                  jaloonly="true"
+                  autocreate="true"
+                  generate="true">
+            <attributes>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="CachedPromotionOrderEntryAdjustAction"
+                  extends="PromotionOrderEntryAdjustAction"
+                  jaloclass="de.hybris.platform.promotions.jalo.CachedPromotionOrderEntryAdjustAction"
+                  jaloonly="true"
+                  autocreate="true"
+                  generate="true">
+            <attributes>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="CachedPromotionOrderAddFreeGiftAction"
+                  extends="PromotionOrderAddFreeGiftAction"
+                  jaloclass="de.hybris.platform.promotions.jalo.CachedPromotionOrderAddFreeGiftAction"
+                  jaloonly="true"
+                  autocreate="true"
+                  generate="true">
+            <attributes>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="CachedPromotionOrderChangeDeliveryModeAction"
+                  extends="PromotionOrderChangeDeliveryModeAction"
+                  jaloclass="de.hybris.platform.promotions.jalo.CachedPromotionOrderChangeDeliveryModeAction"
+                  jaloonly="true"
+                  autocreate="true"
+                  generate="true">
+            <attributes>
+            </attributes>
+        </itemtype>
+        
+		<!-- CACHING FINISH -->
+    </itemtypes>
+
+</items>

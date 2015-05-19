@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd"
+    default-autowire="byName">
+    
+    <import resource="btgcockpit-spring-restriction_action_wizard.xml"/>
+    <import resource="btgcockpit-spring-segment_restriction_wizard.xml"/>
+    <import resource="btgcockpit-spring-assigntogroup_action_wizard.xml"/>    
+   
+   <alias alias="createSegmentRestrictionWizardConfig" name="defaultCreateSegmentRestrictionWizardConfig" /> 
+	<bean id="defaultCreateSegmentRestrictionWizardConfig" class="de.hybris.platform.cockpit.wizards.generic.CreateWizardConfiguration" scope="tenant">
+		<property name="templateCode" value="BtgSegmentRestriction"/>
+		<property name="wizardBeanId" value="btgSegmentRestrictionWizard"/>
+<!--		<property name="restrictToPerspectives">-->
+<!--			<set>-->
+<!--				<value>cmscockpit.perspective.catalog</value>-->
+<!--				<value>cmscockpit.perspective.liveedit</value>-->
+<!--			</set>-->
+<!--		</property>-->
+<!--		<property name="restrictToProperties">-->
+<!--			<set>-->
+<!--				<value>AbstractPage.restrictions</value>-->
+<!--			</set>-->
+<!--		</property>-->
+		<property name="ignoreAtProperties">
+			<set>
+				<value>CmsRestrictionActionDefinition.segmentRestrictions</value>
+			</set>
+		</property>
+	</bean>
+    
+	
+</beans>

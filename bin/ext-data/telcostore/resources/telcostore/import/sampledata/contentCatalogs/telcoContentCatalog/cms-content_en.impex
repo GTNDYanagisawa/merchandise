@@ -1,0 +1,127 @@
+$contentCatalog=telcoContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$picture=media(code, $contentCV);
+$siteResource=jar:de.hybris.platform.telcostore.constants.TelcostoreConstants&/telcostore/import/sampledata/contentCatalogs/$contentCatalog
+
+# Language
+$lang=en
+
+# CMS Image Components
+UPDATE CMSImageComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+;;SiteLogoImage;/images/theme/logo-hybris.png
+
+# CMS Link Components
+UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];linkName[lang=$lang]
+;;HomepageNavLink;"Home"
+;;AboutAcceleratorLink;"About Multichannel Accelerator";;DocumentationLink;"Documentation";;AboutHybrisLink;"About hybris";;ContactUsLink;"Contact Us";;FacebookLink;"Facebook";;TwitterLink;"Twitter";;AgileCommerceBlogLink;"Agile Commerce Blog";;LinkedInLink;"Linked In"
+
+;;DeviceCategoryLink;"Devices"
+;;AccessoryCategoryLink;"Accessories"
+;;ServicePlanCategoryLink;"Service Plans"
+;;ServiceAddOnCategoryLink;"Service Add Ons"
+;;SmartphoneCategoryLink;"Smart phones"
+;;BasicphoneCategoryLink;"Basic phones"
+;;TabletCategoryLink;"Tablets"
+
+;;BlueToothAndWiredCategoryLink;"Headsets"
+;;ChargersAndDocksCategoryLink;"Chargers and Docks"
+;;CasesAndCoversCategoryLink;"Cases and Covers"
+;;BatteriesCategoryLink;"Batteries"
+;;MemoryCardsCategoryLink;"Memory cards"
+;;ScreenProtetctorsCategoryLink;"Screen protectors"
+
+;;PAYGPackageLink;"Pay as you go"
+;;SMARPackageLink;"Smartphone"
+;;TABLPackageLink;"Tablet"
+;;STARPackageLink;"Starter"
+;;SODPPackageLink;"Sim only data"
+;;SOVPPackageLink;"Sim only voice"
+
+;;ClassicsCategoryLink;"Classics"
+;;InternetCategoryLink;"Internet"
+;;EntertainmentCategoryLink;"Entertainment"
+;;TravellersCategoryLink;"Travellers"
+;;MobileTVCategoryLink;"MobileTV"
+
+# CMS Mini Cart Component
+UPDATE MiniCartComponent;$contentCV[unique=true];uid[unique=true];name;title[lang=$lang]
+;;MiniCart;Mini Cart;YOUR SHOPPING BASKET
+
+# CMS tabs components
+UPDATE CMSTabParagraphComponent;$contentCV[unique=true];uid[unique=true];title[lang=$lang];content[lang=$lang]
+;;deliveryTab;Delivery;"<table border=""0"" cellspacing=""0"" cellpadding=""10"" style=""border-collapse: collapse; empty-cells: show; font-size: 12px; padding: 0px; margin: 0px; border: 0px initial initial;"">  <tbody>    <tr style=""padding: 0px; margin: 0px;"">      <td colspan=""4"" style=""vertical-align: top; text-align: left; font-weight: normal; padding: 0px; margin: 0px;"">        <div style=""padding-top: 10px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #8edf75;  border-top-width: 1px; border-top-style: solid; border-top-color: #8edf75; margin: 0px;"">          <p align=""justify"">Lorem ipsum dolor sit amet, dolor sed, ut nam ut. Senectus mauris egestas a massa, enim placeat wisi congue purus fermentum. Ut aptent mauris dapibus congue in sit. Sed dolor varius amet feugiat volutpat dignissim, pede a rhoncus sodales aliquam adipiscing, dapibus massa fusce. Dui egestas ornare urna nibh facilisi, cras posuere.</p><p align=""justify"">Lorem aliquam accumsan eleifend sem libero lorem, aliquam sequi sed urna nec. Eget dolor quisque dolor, amet suspendisse ullamcorper minus elit lectus nunc, est mattis dui id eu et facilisis, conubia sit tristique. Ac fusce gravida condimentum iaculis neque, a platea curabitur accumsan porttitor vel justo. Amet potenti ac, eget amet ducimus sit nulla, ac porttitor rhoncus, justo proin tortor integer turpis nulla vitae. Egestas mollis litora nunc platea dui, eu semper mauris diam, erat quam, porta maecenas fusce libero non aliquet. Amet tellus taciti ligula sed sollicitudin, nonummy cursus enim, hendrerit nec, sed lacus sed at sit quis, semper a arcu mollis sapien nec pretium. Ante mauris eros nec, nonummy mauris, nulla lacinia vel. Volutpat luctus velit eu.</p>        </div>      </td>    </tr>  </tbody></table>"
+
+# CMS Footer Component
+UPDATE FooterComponent;$contentCV[unique=true];uid[unique=true];notice[lang=$lang]
+;;FooterComponent;© 2014 hybris software
+
+# CMS Paragraph Component (Contact information)
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=$lang]
+;;ContactInfo;"Call us: <span>+1 </span><span>302 </span><span>295 </span><span>5067</span>"
+
+# CMS ProductReferences Components
+UPDATE ProductReferencesComponent;$contentCV[unique=true];uid[unique=true];title[lang=$lang];;Others;Accessories;;Similar;You may also like...
+
+# CMS ProductReferencesAndClassifications ComponentsUPDATE ProductReferencesAndClassificationsComponent;$contentCV[unique=true];uid[unique=true];title[lang=$lang];;AccessoryContentComponent;Compatible Devices# CMS ProductReferencesAndClassificationsForDevices ComponentsUPDATE ProductReferencesAndClassificationsForDevicesComponent;$contentCV[unique=true];uid[unique=true];title[lang=$lang];;DeviceContentComponent;Compatible Accessories
+
+# Category Pages
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];title[lang=$lang]
+;;PlansCategoryPage;Plans
+
+# CMS Navigation Nodes
+UPDATE CMSNavigationNode;$contentCV[unique=true];uid[unique=true];title[lang=$lang]
+;;AcceleratorNavNode;Accelerator
+;;AccessoriesNavNode;Accessories
+;;FollowUsNavNode;Follow Us
+;;HybrisNavNode;Hybris
+;;SiteRootNode;SiteRoot
+
+# Telco Homepage 
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpg'];altText;&imageRef;folder(qualifier)[default='images',forceWrite=true]
+;;homepage_carousel_1.jpg;$siteResource/images/banners/homepage/homepage_carousel_1.jpg;;"iPhone 4S - It's the most amazing iPhone yet.";homepage_carousel_1.jpg
+;;homepage_carousel_2.jpg;$siteResource/images/banners/homepage/homepage_carousel_2.jpg;;"samson - The path ahead is rough, charge through it.";homepage_carousel_2.jpg
+;;homepage_carousel_3.jpg;$siteResource/images/banners/homepage/homepage_carousel_3.jpg;;"Getting you the Best Deal!";homepage_carousel_3.jpg
+;;homepage_carousel_4.jpg;$siteResource/images/banners/homepage/homepage_carousel_4.jpg;;"Your life to go - Toshiba portable electronics";homepage_carousel_4.jpg
+;;homepage_plans_SMAR.jpg;$siteResource/images/banners/homepage/homepage_plans_SMAR.jpg;;"Smartphone plans";homepage_plans_SMAR.jpg
+;;homepage_plans_STAR.jpg;$siteResource/images/banners/homepage/homepage_plans_STAR.jpg;;"Starter plans";homepage_plans_STAR.jpg
+;;homepage_plans_PAYG.jpg;$siteResource/images/banners/homepage/homepage_plans_PAYG.jpg;;"Pay as you go";homepage_plans_PAYG.jpg
+;;homepage_bottom.jpg;$siteResource/images/banners/homepage/homepage_bottom.jpg;;"Nokia Lumia 900";homepage_bottom.jpg
+
+INSERT_UPDATE BannerComponent;$contentCV[unique=true];uid[unique=true];headline[lang=$lang];$picture[lang=$lang];content[lang=$lang]
+;;CarouselIPhoneBanner;"iPhone 4S - It's the most amazing iPhone yet.";homepage_carousel_1.jpg;
+;;CarouselSamsonBanner;"samson - The path ahead is rough, charge through it.";homepage_carousel_2.jpg;
+;;CarouselGuidedSellingBanner;"Getting you the Best Deal!";homepage_carousel_3.jpg;
+;;CarouselToshibaBanner;"Your life to go - Toshiba portable electronics";homepage_carousel_4.jpg;
+;;SMAR_HomepageBanner;"Smartphone plans";homepage_plans_SMAR.jpg;
+;;STAR_HomepageBanner;"Starter plans";homepage_plans_STAR.jpg;
+;;PAYG_HomepageBanner;"Pay as you go";homepage_plans_PAYG.jpg;
+;;NokiaBanner;"Nokia Lumia 900";homepage_bottom.jpg;
+
+;;SMAR_Banner;"View Smartphone Plans";SMAR_PlanOverview
+;;STAR_Banner;"View Starter Plans";STAR_PlanOverview
+;;PAYG_Banner;"View Pay As You Go Plans";PAYG_PlanOverview
+;;TABL_Banner;"View Data Only Plans";TABL_PlanOverview
+;;SOVP_Banner;"View Sim Only Voice Plans";SOVP_PlanOverview
+;;SODP_Banner;"View Sim Only Data Plans";SODP_PlanOverview
+
+UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];title[lang=$lang]
+;;telcoHomepageProductCarouselComponent;"Our Bestselling Products";
+
+# Plans Landing Page
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];title[lang=$lang]
+;;PlansCategoryPage;
+
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=$lang]
+;;EmptyCartParagraphComponent;"<h2>Your shopping basket is empty</h2><p>Suggestions</p><ul><li>Browse our products by selecting a category above</li></ul>"
+;;NoSearchResultsParagraphComponent;"<h2>Sorry, we couldn't find any results for your search</h2><p>Suggestions</p><ul><li>You may have typed your word incorrectly - please check for misspellings</li><li>You may have been too specific - please broaden your search by using fewer keywords</li><li>Browse our products by selecting a category above</li></ul>"
+
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=$lang]
+;;EmptyCartParagraphComponent;"<h2>Your shopping basket is empty</h2><p>Suggestions</p><ul><li>Browse our products by selecting a category above</li></ul>"
+
+# CMS ProductReferencesAndClassifications Components
+UPDATE ProductReferencesAndClassificationsComponent;$contentCV[unique=true];uid[unique=true];title[lang=$lang]
+;;AccessoryContentComponent;Compatible Devices
+
+# CMS ProductReferencesAndClassificationsForDevices Components
+UPDATE ProductReferencesAndClassificationsForDevicesComponent;$contentCV[unique=true];uid[unique=true];title[lang=$lang]
+;;DeviceContentComponent;Compatible Accessories

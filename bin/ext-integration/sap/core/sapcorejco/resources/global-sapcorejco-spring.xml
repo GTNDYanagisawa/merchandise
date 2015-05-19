@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  [y] hybris Platform
+ 
+  Copyright (c) 2000-2014 hybris AG
+  All rights reserved.
+ 
+  This software is the confidential and proprietary information of hybris
+  ("Confidential Information"). You shall not disclose such Confidential
+  Information and shall use it only in accordance with the terms of the
+  license agreement you entered into with hybris.
+ 
+  
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans            http://www.springframework.org/schema/beans/spring-beans-3.1.xsd            http://www.springframework.org/schema/aop            http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<bean class="de.hybris.platform.sap.core.jco.runtime.SAPJCoReferenceProviderLifecycle" id="sapCoreDefaultJCoSessionReferenceProviderLifecycle" init-method="init" scope="singleton"/>
+
+	<!-- Cache Region for JCo -->
+	<bean name="sapCoreConnectionCacheRegion"
+		class="de.hybris.platform.regioncache.region.impl.EHCacheRegion">
+		<constructor-arg name="name" value="sapCoreConnectionCacheRegion" />
+		<constructor-arg name="maxEntries" value="1000" />
+		<constructor-arg name="evictionPolicy" value="LRU" />
+		<property name="handledTypes">
+			<array>
+				<value></value>
+			</array>
+		</property>
+	</bean>
+	<!-- Remove this comment to add the cache region to the list displayed in the hac
+	<bean
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetObject" ref="cacheRegionsList" />
+		<property name="targetMethod" value="add" />
+		<property name="arguments">
+			<ref bean="sapCoreConnectionCacheRegion" />
+		</property>
+	</bean>
+	-->
+
+</beans>

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2014 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias name="defaultCisFraudTransactionResultConverter" alias="cisFraudTransactionResultConverter"/>
+	<bean id="defaultCisFraudTransactionResultConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="transactionEntry"/>
+		<property name="populators">
+			<list>
+				<ref bean="cisFraudTransactionResultPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisFraudTransactionResultPopulator" alias="cisFraudTransactionResultPopulator"/>
+	<bean id="defaultCisFraudTransactionResultPopulator"
+	      class="de.hybris.platform.integration.cis.payment.populators.CisFraudTransactionResultPopulator"
+	      scope="tenant">
+	</bean>
+
+	<alias name="defaultCisPaymentService" alias="acceleratorPaymentService"/>
+	<bean id="defaultCisPaymentService" class="de.hybris.platform.integration.cis.payment.impl.DefaultCisPaymentService" parent="defaultCyberSourceAcceleratorPaymentService" scope="tenant">
+		<property name="transactionResultConverter" ref="cisFraudTransactionResultConverter"/>
+		<property name="fraudClient" ref="fraudClient"/>
+	</bean>
+
+	<alias alias="pspUrlStrategyCommandConfig" name="defaultPspUrlStrategyCommandConfig"/>
+	<bean id="defaultPspUrlStrategyCommandConfig" class="de.hybris.platform.integration.commons.hystrix.OndemandHystrixCommandConfiguration" scope="tenant">
+		<property name="groupKey" value="${cispayment.pspUrlStrategy.groupKey}"/>
+		<property name="threadTimeout" value="${cispayment.pspUrlStrategy.threadTimeout}"/>
+		<property name="threadPoolSize" value="${cispayment.pspUrlStrategy.threadPoolSize}"/>
+	</bean>
+
+	<alias name="cisPaymentFormActionUrlStrategy" alias="paymentFormActionUrlStrategy"/>
+	<bean id="cisPaymentFormActionUrlStrategy" class="de.hybris.platform.integration.cis.payment.strategies.impl.CisPaymentFormActionUrlStrategy" scope="tenant">
+		<property name="paymentClient" ref="paymentClient"/>
+		<property name="hystrixCommandConfig" ref="pspUrlStrategyCommandConfig"/>
+		<property name="paymentFormActionUrlStrategy" ref="defaultPaymentFormActionUrlStrategy"/>
+		<property name="ondemandHystrixCommandFactory" ref="ondemandHystrixCommandFactory"/>
+	</bean>
+
+	<alias alias="interpretationStrategyCommandConfig" name="defaultInterpretationStrategyCommandConfig"/>
+	<bean id="defaultInterpretationStrategyCommandConfig" class="de.hybris.platform.integration.commons.hystrix.OndemandHystrixCommandConfiguration" scope="tenant">
+		<property name="groupKey" value="${cispayment.interpretationStrategy.groupKey}"/>
+		<property name="threadTimeout" value="${cispayment.interpretationStrategy.threadTimeout}"/>
+		<property name="threadPoolSize" value="${cispayment.interpretationStrategy.threadPoolSize}"/>
+	</bean>
+
+	<alias name="cisPaymentResponseInterpretation" alias="paymentResponseInterpretationStrategy"/>
+	<bean id="cisPaymentResponseInterpretation" class="de.hybris.platform.integration.cis.payment.strategies.impl.CisPaymentResponseInterpretationStrategy" scope="tenant">
+		<property name="paymentClient" ref="paymentClient"/>
+		<property name="cisCreateSubscriptionResultConverter" ref="cisCreateSubscriptionResultConverter"/>
+		<property name="ondemandHystrixCommandFactory" ref="ondemandHystrixCommandFactory"/>
+		<property name="hystrixCommandConfig" ref="interpretationStrategyCommandConfig"/>
+		<property name="paymentResponseInterpretationStrategy" ref="defaultPaymentResponseInterpretationStrategy"/>
+	</bean>
+
+	<alias name="defaultCisSubscriptionAuthorizationRequestConverter" alias="cisSubscriptionAuthorizationRequestConverter"/>
+	<bean id="defaultCisSubscriptionAuthorizationRequestConverter" class="de.hybris.platform.integration.cis.payment.converter.SubscriptionAuthorizationRequestConverter" scope="tenant"/>
+
+	<alias name="defaultCisAuthorizationResultConverter" alias="cisAuthorizationResultConverter"/>
+	<bean id="defaultCisAuthorizationResultConverter" class="de.hybris.platform.integration.cis.payment.converter.CisAuthorizationResultConverter" scope="tenant"/>
+
+	<alias alias="subscriptionAuthorizationCommandConfig" name="defaultSubscriptionAuthorizationCommandConfig"/>
+	<bean id="defaultSubscriptionAuthorizationCommandConfig" class="de.hybris.platform.integration.commons.hystrix.OndemandHystrixCommandConfiguration" scope="tenant">
+		<property name="groupKey" value="${cispayment.subscriptionAuthorization.groupKey}"/>
+		<property name="threadTimeout" value="${cispayment.subscriptionAuthorization.threadTimeout}"/>
+		<property name="threadPoolSize" value="${cispayment.subscriptionAuthorization.threadPoolSize}"/>
+	</bean>
+
+	<bean name="cisCybersourceCommandFactory"
+	      class="de.hybris.platform.payment.commands.factory.impl.DefaultCommandFactoryImpl"
+	      scope="tenant">
+		<property name="paymentProvider" value="cisCybersource"/>
+		<property name="commands">
+			<map>
+
+				<entry>
+					<key>
+						<value type="java.lang.Class">
+							de.hybris.platform.payment.commands.SubscriptionAuthorizationCommand
+						</value>
+					</key>
+					<bean class="de.hybris.platform.integration.cis.payment.commands.DefaultCisSubscriptionAuthorizationCommand">
+						<property name="paymentClient" ref="paymentClient"/>
+						<property name="subscriptionAuthorizationRequestConverter" ref="cisSubscriptionAuthorizationRequestConverter"/>
+						<property name="cisAuthorizationResultConverter" ref="cisAuthorizationResultConverter"/>
+						<property name="hystrixCommandConfig" ref="subscriptionAuthorizationCommandConfig"/>
+						<property name="ondemandHystrixCommandFactory" ref="ondemandHystrixCommandFactory"/>
+
+					</bean>
+				</entry>
+
+				<entry>
+					<key>
+						<value type="java.lang.Class">de.hybris.platform.payment.commands.VoidCommand
+						</value>
+					</key>
+					<bean class="de.hybris.platform.integration.cis.payment.commands.DefaultCisVoidCommand"/>
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">de.hybris.platform.payment.commands.CaptureCommand</value>
+					</key>
+					<bean class="de.hybris.platform.payment.commands.impl.CaptureMockCommand"/>
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">de.hybris.platform.payment.commands.IsApplicableCommand</value>
+					</key>
+					<bean class="de.hybris.platform.payment.commands.impl.IsApplicableMockCommand" />
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">de.hybris.platform.payment.commands.AuthorizationCommand</value>
+					</key>
+					<bean class="de.hybris.platform.payment.commands.impl.AuthorizationMockCommand" />
+				</entry>
+
+				<entry>
+					<key>
+						<value type="java.lang.Class">de.hybris.platform.payment.commands.PartialCaptureCommand</value>
+					</key>
+					<bean class="de.hybris.platform.payment.commands.impl.PartialCaptureMockCommand" />
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">de.hybris.platform.payment.commands.EnrollmentCheckCommand</value>
+					</key>
+					<bean class="de.hybris.platform.payment.commands.impl.EnrollmentCheckMockCommand" />
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">de.hybris.platform.payment.commands.FollowOnRefundCommand</value>
+					</key>
+					<bean class="de.hybris.platform.payment.commands.impl.FollowOnRefundMockCommand" />
+				</entry>
+                <entry>
+					<key>
+                        <value type="java.lang.Class">de.hybris.platform.payment.commands.StandaloneRefundCommand</value>
+					</key>
+					<bean class="de.hybris.platform.payment.commands.impl.StandaloneRefundMockCommand" />
+				</entry>
+
+                <entry>
+					<key>
+                        <value type="java.lang.Class">de.hybris.platform.payment.commands.CreateSubscriptionCommand</value>
+					</key>
+					<bean class="de.hybris.platform.payment.commands.impl.CreateSubscriptionMockCommand" />
+				</entry>
+                <entry>
+					<key>
+                        <value type="java.lang.Class">de.hybris.platform.payment.commands.DeleteSubscriptionCommand</value>
+					</key>
+					<bean class="de.hybris.platform.payment.commands.impl.DeleteSubscriptionMockCommand" />
+				</entry>
+                <entry>
+					<key>
+                        <value type="java.lang.Class">de.hybris.platform.payment.commands.GetSubscriptionDataCommand</value>
+					</key>
+					<bean class="de.hybris.platform.payment.commands.impl.GetSubscriptionDataMockCommand" />
+				</entry>
+                <entry>
+					<key>
+                        <value type="java.lang.Class">de.hybris.platform.payment.commands.UpdateSubscriptionCommand</value>
+					</key>
+					<bean class="de.hybris.platform.payment.commands.impl.UpdateSubscriptionMockCommand" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<alias name="defaultCisCreateSubscriptionResultConverter" alias="cisCreateSubscriptionResultConverter"/>
+	<bean id="defaultCisCreateSubscriptionResultConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="createSubscriptionResult"/>
+		<property name="populators">
+			<list>
+				<ref bean="cisCreateSubscriptionResultPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisCreateSubscriptionResultPopulator" alias="cisCreateSubscriptionResultPopulator"/>
+	<bean id="defaultCisCreateSubscriptionResultPopulator" class="de.hybris.platform.integration.cis.payment.populators.CisCreateSubscriptionResultPopulator" scope="tenant"/>
+
+
+	<alias name="defaultCisFraudReportDao" alias="cisFraudReportDao"/>
+	<bean id="defaultCisFraudReportDao" class="de.hybris.platform.integration.cis.payment.impl.DefaultCisFraudReportDao" parent="abstractItemDao" scope="tenant"/>
+
+	<alias name="defaultCisOrderDao" alias="cisOrderDao"/>
+	<bean id="defaultCisOrderDao" class="de.hybris.platform.integration.cis.payment.impl.DefaultCisOrderDao" parent="defaultOrderDao" scope="tenant"/>
+
+
+	<!-- CronJobs -->
+
+	<alias alias="fraudReportCommandConfig" name="defaultFraudReportCommandConfig"/>
+	<bean id="defaultFraudReportCommandConfig" class="de.hybris.platform.integration.commons.hystrix.OndemandHystrixCommandConfiguration" scope="tenant">
+		<property name="groupKey" value="${cispayment.fraudReport.groupKey}"/>
+		<property name="threadTimeout" value="${cispayment.fraudReport.threadTimeout}"/>
+		<property name="threadPoolSize" value="${cispayment.fraudReport.threadPoolSize}"/>
+	</bean>
+
+	<alias name="defaultCisFraudReportJob" alias="cisFraudReportJob"/>
+	<bean id="defaultCisFraudReportJob" class="de.hybris.platform.integration.cis.payment.cronjob.DefaultCisFraudReportJob" parent="abstractJobPerformable" scope="tenant">
+		<property name="hystrixCommandConfig" ref="interpretationStrategyCommandConfig"/>
+		<property name="fraudClient" ref="fraudClient"/>
+		<property name="transactionResultConverter" ref="cisFraudTransactionResultConverter"/>
+		<property name="businessProcessService" ref="businessProcessService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="paymentService" ref="acceleratorPaymentService"/>
+		<property name="cisFraudReportDao" ref="cisFraudReportDao"/>
+		<property name="ondemandHystrixCommandFactory" ref="ondemandHystrixCommandFactory"/>
+
+	</bean>
+
+	<alias name="defaultCisNotifyCustomerInactiveOrdersJob" alias="cisNotifyCustomerInactiveOrdersJob"/>
+	<bean id="defaultCisNotifyCustomerInactiveOrdersJob" class="de.hybris.platform.integration.cis.payment.cronjob.DefaultCisNotifyCustomerInactiveOrdersJob" parent="abstractJobPerformable" scope="tenant">
+		<property name="ticketBusinessService" ref="ticketBusinessService"/>
+		<property name="cisOrderDao" ref="cisOrderDao"/>
+	</bean>
+
+	<alias name="cisGenerateMerchantTransactionCodeStrategy" alias="generateMerchantTransactionCodeStrategy"/>
+	<bean id="cisGenerateMerchantTransactionCodeStrategy" class="de.hybris.platform.integration.cis.payment.strategies.impl.CisGenerateMerchantTransactionCodeStrategy" scope="tenant"/>
+
+
+	<!-- Prototype Beans for Data POJOs -->
+
+	<bean id="transactionEntry" class="de.hybris.platform.payment.model.PaymentTransactionEntryModel" scope="prototype"/>
+
+</beans>

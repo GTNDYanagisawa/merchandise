@@ -1,0 +1,244 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+
+<project name="cockpit_buildcallbacks" >
+	
+	<property name="cockpit.base.extension.name" value="cockpit"/>
+	
+	<macrodef name="cockpit_before_build">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<and>
+							<equals arg1="${ext.@{extname}.webmodule.available}" arg2="available" />
+							<contains string="${required.extensions.for.@{extname}}" substring="${cockpit.base.extension.name}"/>
+							<not>
+								<uptodate>
+					            <srcfiles dir="${ext.cockpit.path}/web/webroot">
+										<include name="cockpit/**/**.*" />
+									</srcfiles>
+									<globmapper from="*" to="${ext.@{extname}.path}/web/webroot/*"/>
+					        	</uptodate>
+							</not>
+						</and>
+						<then>
+							<echo level="info" message="Start copying base cockpit files for extension @{extname}..."/>
+							<copy todir="${ext.@{extname}.path}/web/webroot">
+								<fileset dir="${ext.cockpit.path}/web/webroot">
+									<include name="cockpit/**/**.*" />
+								</fileset>
+							</copy>
+
+							<echo level="info" message="Start merging and copying base cockpit css files for extension @{extname}..."/>
+							<concat destfile="${ext.@{extname}.path}/web/webroot/cockpit/css/cockpit.css">
+								<fileset dir="${ext.cockpit.path}/web/webroot/">
+									<include name="cockpit/css/cockpit*.css" />
+								</fileset>
+							</concat>
+
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="cockpit_after_clean">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<and>
+							<equals arg1="${ext.@{extname}.webmodule.available}" arg2="available" />
+							<contains string="${required.extensions.for.@{extname}}" substring="${cockpit.base.extension.name}"/>
+						</and>
+						<then>
+							<echo level="info" message="Start cleaning up base cockpit files for extension @{extname}"/>
+							<delete quiet="true" dir="${ext.@{extname}.path}/web/webroot/cockpit"/>
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="extension_migrate_cockpit_config">
+			<attribute name="extname" />				
+			<attribute name="argNewPath" />
+			<attribute name="configFiles" />
+			<attribute name="fileDir" />
+			<sequential>
+				<for list="${configFiles}" param="argCsvPath" delimiter=";">	
+					<sequential>
+						<input addproperty="input@{argCsvPath}" defaultvalue="y" validargs="y,n">
+Do you want to create new configuration for file @{argCsvPath} ? Press [Enter] to use default value.
+						</input>
+						<if>
+							<and>
+								<equals arg1="${input@{argCsvPath}}" arg2="y"/>
+							</and>
+							<then>
+								<migrate_cockpit_config extname="${extname}" 
+														argOldPath="${ext.@{extname}.path}" 
+														argCsvPath="${fileDir}@{argCsvPath}" 
+														argNewPath="${argNewPath}">	
+								</migrate_cockpit_config>
+							</then>
+						</if>
+					</sequential>
+				</for>
+				<echo message="There are no more files consistent with input parameters."/>
+			</sequential>
+		</macrodef>
+	
+	<target name="migrate_cockpit_config" description="converts configuration from csv file into proper folder structure">
+
+		<taskdef name="migrate_cockpit_config" classname="de.hybris.ant.taskdefs.migration.MigrateCsvConfigurationTask">
+			<classpath>
+					<pathelement path="${platformhome}\bootstrap\bin/yant.jar" />
+			</classpath>
+		</taskdef>	
+		<if>
+			<isset property="p"/>
+			<then>
+				<property name="fileDir" value="${p}/"/> 
+			</then>
+			<else>
+				<property name="fileDir" value="./"/> 
+			</else>
+		</if>
+		<if>
+			<isset property="e"/>
+			<then>	<!--for file extension we have to add **\*. before every extension
+					\0 means input exp, \\\\ is a single backslash -->			
+				<propertyregex property="e1" input="${e}" regexp="^" replace="**\\\\*\.\0" casesensitive="false" />
+				<propertyregex property="e2" input="${e1}" regexp="," replace="\0**\\\\*\." casesensitive="false" />
+				<if>
+					<isset property="e2"/>
+					<then>
+						<fileset id="cfiles" dir="${fileDir}" includes="${e2}"></fileset>	
+					</then>	
+					<else>
+						<fileset id="cfiles" dir="${fileDir}" includes="${e1}"></fileset>
+					</else>
+				</if>	
+			</then>
+			<else>
+				<if>
+					<isset property="f"/>
+					<then><!--for file name we have to add **\ before each one -->
+				 		<propertyregex property="f1" input="${f}" regexp="^" replace="**\\\\\0" casesensitive="false" />
+					  	<propertyregex property="f2" input="${f1}" regexp="," replace="\0**\\\\" casesensitive="false" />
+						<if>
+							<isset property="f2"/>
+							<then>
+								<fileset id="cfiles" dir="${fileDir}" includes="${f2}"></fileset>
+							</then>
+					  		<else>
+					  			<fileset id="cfiles" dir="${fileDir}" includes="${f1}"></fileset>
+					  	    </else>
+						</if>		
+					</then>
+					<else>
+							<fileset id="cfiles" dir="${fileDir}" includes="**/*.csv"></fileset>	
+					</else>
+				</if>
+			</else>
+		</if>
+		<if>
+			<isset property="d"/>
+			<then>
+				<property name="argNewPath" value="${d}"/> 
+			</then>
+			<else>
+				<property name="argNewPath" value="./resources"/> 
+			</else>
+		</if>
+		<property name="configFiles" refid="cfiles"/>
+		<extension_migrate_cockpit_config extname="${extname}" argNewPath="${argNewPath}" configFiles="${configFiles}" fileDir="${fileDir}"/>
+	</target>
+						
+	<target name="generate-cockpit-jaxb-files">
+		<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+			<classpath>
+				<fileset dir="${platformhome}/resources/ant/lib" includes="*.jar" />
+			</classpath>
+		</taskdef>	
+		<echo>Generating JAXB files for list view configuration</echo>
+		<xjc 
+			destdir="${ext.cockpit.path}/src" 
+			schema="${ext.cockpit.path}/resources/list-view.xsd"
+			package="de.hybris.platform.cockpit.services.config.jaxb.listview">
+			<produces dir="${ext.cockpit.path}/src/de/hybris/platform/cockpit/services/config/jaxb/listview">
+				<include name="*.java"/>
+			</produces>
+			<depends file="${ext.cockpit.path}/resources/listview.xsd"/>
+		</xjc>
+		<echo>Generating JAXB files for editor configuration</echo>
+		<xjc 
+			destdir="${ext.cockpit.path}/src" 
+			schema="${ext.cockpit.path}/resources/editor.xsd"
+			package="de.hybris.platform.cockpit.services.config.jaxb.editor">
+			<produces dir="${ext.cockpit.path}/src/de/hybris/platform/cockpit/services/config/jaxb/editor">
+				<include name="*.java"/>
+			</produces>
+			<depends file="${ext.cockpit.path}/resources/editor.xsd"/>
+		</xjc>
+		<echo>Generating JAXB files for advanced search configuration</echo>
+		<xjc 
+			destdir="${ext.cockpit.path}/src" 
+			schema="${ext.cockpit.path}/resources/advanced-search.xsd"
+			package="de.hybris.platform.cockpit.services.config.jaxb.advancedsearch">
+			<produces dir="${ext.cockpit.path}/src/de/hybris/platform/cockpit/services/config/jaxb/advancedsearch">
+				<include name="*.java"/>
+			</produces>
+			<depends file="${ext.cockpit.path}/resources/advanced-search.xsd"/>
+		</xjc>
+		<echo>Generating JAXB files for base configuration</echo>
+		<xjc 
+			destdir="${ext.cockpit.path}/src" 
+			schema="${ext.cockpit.path}/resources/base.xsd"
+			package="de.hybris.platform.cockpit.services.config.jaxb.base">
+			<produces dir="${ext.cockpit.path}/src/de/hybris/platform/cockpit/services/config/jaxb/base">
+				<include name="*.java"/>
+			</produces>
+			<depends file="${ext.cockpit.path}/resources/base.xsd"/>
+		</xjc>
+		<echo>Generating JAXB files for grid view configuration</echo>
+		<xjc 
+			destdir="${ext.cockpit.path}/src" 
+			schema="${ext.cockpit.path}/resources/grid-view.xsd"
+			package="de.hybris.platform.cockpit.services.config.jaxb.gridview">
+			<produces dir="${ext.cockpit.path}/src/de/hybris/platform/cockpit/services/config/jaxb/gridview">
+				<include name="*.java"/>
+			</produces>
+			<depends file="${ext.cockpit.path}/resources/grid-view.xsd"/>
+		</xjc>
+		<echo>Generating JAXB files for widget dashboard configuration</echo>
+		<xjc 
+			destdir="${ext.cockpit.path}/src" 
+			schema="${ext.cockpit.path}/resources/widget-dashboard.xsd"
+			package="de.hybris.platform.cockpit.services.config.jaxb.dashboard">
+			<produces dir="${ext.cockpit.path}/src/de/hybris/platform/cockpit/services/config/jaxb/dashboard">
+				<include name="*.java"/>
+			</produces>
+			<depends file="${ext.cockpit.path}/resources/widget-dashboard.xsd"/>
+		</xjc>
+	</target>
+	
+
+</project>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Spring Integration -->
+	<import resource="classpath:/chinaacceleratorservices/integration/hot-folder-store-electronics-spring.xml"/>
+	<import resource="classpath:/chinaacceleratorservices/integration/hot-folder-common-spring.xml"/>
+
+	<!-- SystemSetup for the Chinaacceleratorservices -->
+	<bean id="chinaacceleratorCoreSystemSetup" class="de.hybris.platform.chinaaccelerator.services.setup.CoreSystemSetup"
+	       parent="abstractCoreSystemSetup"/>
+
+
+	<alias name="defaultcmscockpitSystemSetup" alias="cmscockpitSystemSetup"/>
+	<bean id="defaultcmscockpitSystemSetup" class="de.hybris.platform.chinaaccelerator.cmscockpit.systemsetup.CmscockpitSystemSetup">
+			<property name="importService" ref="importService" />
+	</bean>
+
+
+
+	<!-- Solr field value providers -->
+
+	<bean id="electronicsCategorySource" parent="abstractCategorySource">
+		<property name="rootCategory" value="1"/>
+		<!-- '1' is the root icecat category -->
+	</bean>
+	<bean id="electronicsBrandCategorySource" parent="abstractCategorySource">
+		<property name="rootCategory" value="brands"/>
+		<!-- 'brands' is the root of the brands hierarchy -->
+	</bean>
+
+
+	<!-- Spring Alipay orderservice -->
+	<alias alias="orderService" name="acceleratorDefaultOrderService"/>
+	<bean id="acceleratorDefaultOrderService" class="de.hybris.platform.chinaaccelerator.services.order.impl.ChinaOrderServiceImpl" parent="defaultOrderService" scope="tenant">
+		<property name="submitOrderStrategies">
+			<list>
+				<!-- implementation that sends SubmitOrderEvent -->
+				<ref bean="alipaySubmitOrderStrategy"/>
+			</list>
+		</property>
+		<property name="searchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<alias alias="regionService" name="defaultRegionService" />
+    <bean id="defaultRegionService" class="de.hybris.platform.chinaaccelerator.services.location.impl.DefaultRegionService">
+        <property name="regionDao" ref="regionDao"/>
+        <property name="countryDao" ref="countryDao"/>
+    </bean>
+
+	<bean id="cityDao" class="de.hybris.platform.chinaaccelerator.services.location.daos.impl.DefaultCityDao" >
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<alias alias="cityService" name="defaultCityService" />
+    <bean id="defaultCityService" class="de.hybris.platform.chinaaccelerator.services.location.impl.DefaultCityService">
+        <property name="cityDao" ref="cityDao"/>
+    </bean>
+
+	<bean id="districtDao" class="de.hybris.platform.chinaaccelerator.services.location.daos.impl.DefaultDistrictDao" >
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<alias alias="districtService" name="defaultDistrictService" />
+    <bean id="defaultDistrictService" class="de.hybris.platform.chinaaccelerator.services.location.impl.DefaultDistrictService">
+        <property name="districtDao" ref="districtDao"/>
+    </bean>
+
+    <alias alias="uiExperienceService" name="defaultChinaAccUiExperienceService" />
+	<bean id="defaultChinaAccUiExperienceService"
+		class="de.hybris.platform.chinaaccelerator.services.uiexperience.impl.ChinaUiExperienceService" parent="defaultUiExperienceService">
+	</bean>
+
+    <alias alias="findDeliveryCostStrategy" name="chinaFindDeliveryCostStrategy"/>
+    <bean id="chinaFindDeliveryCostStrategy" class="de.hybris.platform.chinaaccelerator.services.order.strategies.ChinaFindDeliveryCostStrategy" parent="abstractBusinessService">
+        <property name="chinaZoneDeliveryModeValueDao" ref="chinaZoneDeliveryModeValueDao"/>
+    </bean>
+
+    <alias alias="chinaZoneDeliveryModeValueDao" name="defaultChinaZoneDeliveryModeValueDao"/>
+    <bean id="defaultChinaZoneDeliveryModeValueDao" class="de.hybris.platform.chinaaccelerator.services.order.daos.impl.DefaultChinaZoneDeliveryModeValueDao"/>
+
+	<alias alias="customerDao" name="defaultCustomerDao"/>
+	<bean id="defaultCustomerDao" class="de.hybris.platform.chinaaccelerator.services.customer.daos.impl.DefaultCustomerDao" parent="abstractItemDao"/>
+	
+	<bean id="customerMobileNumberValidateInterceptor" class="de.hybris.platform.chinaaccelerator.services.customer.impl.CustomerMobileNumberValidateInterceptor" autowire="byName">
+		<property name="customerDao" ref="customerDao"/>
+	</bean>
+	
+	<bean id="customerMobileNumberValidateInterceptorMapping" 
+      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+    	<property name="interceptor" ref="customerMobileNumberValidateInterceptor"/>
+    	<property name="typeCode" value="customer"/>
+	</bean>
+	
+	<alias alias="customerAccountService" name="extendedCustomerAccountService" />
+	<bean id="extendedCustomerAccountService"
+		class="de.hybris.platform.chinaaccelerator.services.customer.impl.ExtendedCustomerAccountService" parent="defaultCustomerAccountService">
+	</bean>
+</beans>

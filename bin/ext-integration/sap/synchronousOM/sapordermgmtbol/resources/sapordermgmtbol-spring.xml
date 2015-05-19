@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd"
+	default-init-method="init">
+
+	<!-- Standard beans -->
+	<alias alias="sapOrdermgmtSalesdocHeader" name="sapOrdermgmtDefaultSalesdocHeader" />
+	<bean id="sapOrdermgmtDefaultSalesdocHeader" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.header.businessobject.impl.HeaderSalesDocument">
+		<property name="partnerList" ref="sapOrdermgmtPartnerList" />
+		<property name="genericFactory" ref="sapCoreGenericFactory" />					
+	</bean>
+	<alias alias="sapOrdermgmtPartnerListEntry" name="sapOrdermgmtDefaultPartnerListEntry" />
+	<bean id="sapOrdermgmtDefaultPartnerListEntry" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.order.businessobject.impl.PartnerListEntryImpl">
+	</bean>
+	<alias alias="sapOrdermgmtTransactionsFactory" name="sapOrdermgmtDefaultTransactionsFactory" />
+	<bean id="sapOrdermgmtDefaultTransactionsFactory" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.misc.businessobject.impl.SalesTransactionsFactoryImpl">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+	</bean>
+	<alias alias="sapOrdermgmtItemList" name="sapOrdermgmtDefaultItemList" />
+	<bean id="sapOrdermgmtDefaultItemList" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.item.businessobject.impl.ItemListImpl">
+	</bean>
+	<alias alias="sapOrdermgmtShippingStatus" name="sapOrdermgmtDefaultShippingStatus" />
+	<bean id="sapOrdermgmtDefaultShippingStatus" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.businessobject.impl.ShippingStatusImpl">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+	</bean>
+	<alias alias="sapOrdermgmtBillingHeaderStatus" name="sapOrdermgmtDefaultBillingHeaderStatus" />
+	<bean id="sapOrdermgmtDefaultBillingHeaderStatus" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.businessobject.impl.BillingHeaderStatusImpl">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+	</bean>
+
+	<alias alias="sapOrdermgmtConnectedDocument" name="sapOrdermgmtDefaultConnectedDocument" />
+	<bean id="sapOrdermgmtDefaultConnectedDocument" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.businessobject.impl.ConnectedDocumentImpl">
+	</bean>
+	
+	<alias alias="sapOrdermgmtItemBuffer" name="sapOrdermgmtDefaultItemBuffer" />
+	<bean id="sapOrdermgmtDefaultItemBuffer" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.ItemBufferImpl">
+	</bean>
+	
+	<alias alias="sapOrdermgmtReadStrategy" name="sapOrdermgmtDefaultReadStrategy" />
+	<bean id="sapOrdermgmtDefaultReadStrategy" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.strategy.GetAllStrategyERP605">
+		<property name="messageMapper" ref="sapOrdermgmtBackendMessageMapper" />
+		<property name="incompletionMapper" ref="sapOrdermgmtIncompletionMapper" />				
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+		<property name="custExit" ref="sapOrdermgmtERPCustExit" />
+	</bean>
+	
+	<alias alias="sapOrdermgmtActionsStrategy" name="sapOrdermgmtDefaultActionsStrategy" />
+	<bean id="sapOrdermgmtDefaultActionsStrategy" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.strategy.LrdActionsStrategyERP">
+		<property name="messageMapper" ref="sapOrdermgmtBackendMessageMapper" />
+		<property name="custExit" ref="sapOrdermgmtERPCustExit" />
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+		<property name="moduleConfigurationAccess" ref="sapOrdermgmtConfigurationAccess" />		
+	</bean>
+	
+	<alias alias="sapOrdermgmtCloseStrategy" name="sapOrdermgmtDefaultCloseStrategy" />
+	<bean id="sapOrdermgmtDefaultCloseStrategy" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.strategy.LrdCloseStrategyImpl">
+	</bean>
+	
+	<alias alias="sapOrdermgmtWriteStrategy" name="sapOrdermgmtDefaultWriteStrategy" />
+	<bean id="sapOrdermgmtDefaultWriteStrategy" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.strategy.SetStrategyERP">
+		<property name="messageMapper" ref="sapOrdermgmtBackendMessageMapper" />
+		<property name="custExit" ref="sapOrdermgmtERPCustExit" />
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+	</bean>
+
+
+	<!-- Back-end Mapping Classes -->
+	<alias alias="sapOrdermgmtPartnerMapper" name="sapOrdermgmtDefaultPartnerMapper" />
+	<bean id="sapOrdermgmtDefaultPartnerMapper" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.strategy.PartnerMapper">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+	</bean>
+	<alias alias="sapOrdermgmtIncompletionMapper" name="sapOrdermgmtDefaultIncompletionMapper" />
+	<bean id="sapOrdermgmtDefaultIncompletionMapper" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.strategy.IncompletionMapperImpl">		
+		<property name="backendUtil" ref="sapOrdermgmtBackendUtil" />
+	</bean>
+	<alias alias="sapOrdermgmtHeaderMapper" name="sapOrdermgmtDefaultHeaderMapper" />
+	<bean id="sapOrdermgmtDefaultHeaderMapper" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.strategy.HeaderMapper">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+		<property name="converter" ref="sapCommonConverter"></property>
+		<property name="commonI18NService" ref="commonI18NService" />		
+	</bean>
+	<alias alias="sapOrdermgmtItemMapper" name="sapOrdermgmtDefaultItemMapper" />
+	<bean id="sapOrdermgmtDefaultItemMapper" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.strategy.ItemMapper">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+		<property name="custExit" ref="sapOrdermgmtERPCustExit" />
+		<property name="converter" ref="sapCommonConverter"></property>
+	</bean>
+	<alias alias="sapOrdermgmtHeaderTextMapper" name="sapOrdermgmtDefaultHeaderTextMapper" />
+	<bean id="sapOrdermgmtDefaultHeaderTextMapper" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.strategy.HeadTextMapper">
+	</bean>
+	<alias alias="sapOrdermgmtItemTextMapper" name="sapOrdermgmtDefaultItemTextMapper" />
+	<bean id="sapOrdermgmtDefaultItemTextMapper" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.strategy.ItemTextMapper">
+	</bean>
+
+
+
+	<alias alias="sapOrdermgmtERPCustExit" name="sapOrdermgmtDefaultERPCustExit" />
+	<bean id="sapOrdermgmtDefaultERPCustExit" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.strategy.ERPLO_APICustomerExitsImpl">
+		<property name="messageMapper" ref="sapOrdermgmtBackendMessageMapper" />
+	</bean>
+	
+	<alias alias="sapOrdermgmtBackendUtil" name="sapOrdermgmtDefaultBackendUtil" />
+	<bean id="sapOrdermgmtDefaultBackendUtil" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.strategy.BackendUtilImpl">		 
+	</bean>
+
+	<alias alias="sapOrdermgmtConnectedDocumentItem" name="sapOrdermgmtDefaultConnectedDocumentItem" />
+	<bean id="sapOrdermgmtDefaultConnectedDocumentItem" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.businessobject.impl.ConnectedDocumentItemImpl">
+	</bean>
+
+	<alias alias="sapOrdermgmtPartnerList" name="sapOrdermgmtDefaultPartnerList" />
+	<bean id="sapOrdermgmtDefaultPartnerList" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.order.businessobject.impl.PartnerListImpl">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+	</bean>
+	
+	<alias alias="sapOrdermgmtSchedline" name="sapOrdermgmtDefaultSchedline" />
+	<bean id="sapOrdermgmtDefaultSchedline" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.businessobject.impl.SchedlineImpl">
+	</bean>
+
+	<alias alias="sapOrdermgmtText" name="sapOrdermgmtDefaultText" />
+	<bean id="sapOrdermgmtDefaultText" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.order.businessobject.impl.TextImpl">
+	</bean>
+
+	<alias alias="sapOrdermgmtAlternativeProductList" name="sapOrdermgmtDefaultAlternativeProductList" />
+	<bean id="sapOrdermgmtDefaultAlternativeProductList" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.item.businessobject.impl.AlternativeProductListImpl">
+	</bean>
+
+	<alias alias="sapOrdermgmtAlternativeProduct" name="sapOrdermgmtDefaultAlternativeProduct" />
+	<bean id="sapOrdermgmtDefaultAlternativeProduct" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.item.businessobject.impl.AlternativeProductImpl">
+	</bean>
+
+	<alias alias="sapOrdermgmtBillingItemStatus" name="sapOrdermgmtDefaultBillingItemStatus" />
+	<bean id="sapOrdermgmtDefaultBillingItemStatus" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.businessobject.impl.BillingItemStatusImpl">
+	</bean>
+
+	<alias alias="sapOrdermgmtOverallStatusOrder" name="sapOrdermgmtDefaultOverallStatusOrder" />
+	<bean id="sapOrdermgmtDefaultOverallStatusOrder" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.businessobject.impl.OverallStatusOrderImpl">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+	</bean>
+
+	<alias alias="sapOrdermgmtProcessingStatus" name="sapOrdermgmtDefaultProcessingStatus" />
+	<bean id="sapOrdermgmtDefaultProcessingStatus" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.businessobject.impl.ProcessingStatusImpl">
+	</bean>
+
+	<alias alias="sapOrdermgmtItem" name="sapOrdermgmtDefaultItem" />
+	<bean id="sapOrdermgmtDefaultItem" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.item.businessobject.impl.ItemSalesDoc">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+		<property name="partnerList" ref="sapOrdermgmtPartnerList" />
+	</bean>
+
+	<alias alias="sapOrdermgmtShipTo" name="sapOrdermgmtDefaultShipTo" />
+	<bean id="sapOrdermgmtDefaultShipTo" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.businessobject.impl.ShipToImpl">
+	</bean>
+
+	<alias alias="sapOrdermgmtBillTo" name="sapOrdermgmtDefaultBillTo" />
+	<bean id="sapOrdermgmtDefaultBillTo" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.businessobject.impl.BillToImpl">
+	</bean>
+
+	<alias alias="sapOrdermgmtMessageMappingRulesContainer" name="sapOrdermgmtDefaultMessageMappingRulesContainer" />
+	<bean id="sapOrdermgmtDefaultMessageMappingRulesContainer" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.messagemapping.MessageMappingRulesContainerImpl">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+		<property name="moduleConfigurationAccess" ref="sapOrdermgmtConfigurationAccess" />
+		<property name="messageMappingCallbackLoader" ref="sapOrdermgmtMessageMappingCallbackLoader" />
+	</bean>
+	
+	<alias alias="sapOrdermgmtMessageMappingRulesLoader" name="sapOrdermgmtDefaultMessageMappingRulesLoader" />
+	<bean id="sapOrdermgmtDefaultMessageMappingRulesLoader" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.messagemapping.MessageMappingRulesLoaderImpl">
+	</bean>
+
+	<alias alias="sapOrdermgmtSalesTransactionsUtil" name="sapOrdermgmtDefaultsapSalesTransactionsUtil" />
+	<bean id="sapOrdermgmtDefaultsapSalesTransactionsUtil" scope="sapSession"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.util.impl.SalesTransactionsUtilImpl">
+	</bean>
+
+	<alias alias="sapOrdermgmtBackendMessageMapper" name="sapOrdermgmtDefaultBackendMessageMapper" />
+	<bean id="sapOrdermgmtDefaultBackendMessageMapper" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.messagemapping.BackendMessageMapperImpl">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+	</bean>
+
+
+	<!-- InteractionObjects -->
+	<alias alias="sapOrdermgmtCreateOrderInteraction" name="sapOrdermgmtDefaultCreateOrderInteraction" />
+	<bean id="sapOrdermgmtDefaultCreateOrderInteraction" scope="sapSession"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.interactionobjects.impl.CreateOrderImpl">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+	</bean>
+
+	<alias alias="sapOrdermgmtCheckDocumentValid" name="sapOrdermgmtDefaultCheckDocumentValid" />
+	<bean id="sapOrdermgmtDefaultCheckDocumentValid" 
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.interactionobjects.impl.CheckDocumentValidImpl">
+	</bean>
+
+	<alias alias="sapOrdermgmtInitCartInteraction" name="sapOrdermgmtDefaultInitCartInteraction" />
+	<bean id="sapOrdermgmtDefaultInitCartInteraction" scope="sapSession"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.interactionobjects.impl.InitBasketImpl">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+	</bean>
+	
+	<alias alias="sapOrdermgmtAdditionalPricing" name="sapOrdermgmtDefaultAdditionalPricing" />
+	<bean id="sapOrdermgmtDefaultAdditionalPricing" scope="sapSession"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.AdditionalPricingImpl">
+		<property name="priceType" value="H" />
+		<property name="pricingCallCart" value="true" />		
+	</bean>
+
+	<alias alias="sapOrdermgmtSearchResultList" name="sapOrdermgmtDefaultSearchResultList" />
+	<bean id="sapOrdermgmtDefaultSearchResultList" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.search.impl.SearchResultListImpl">
+	</bean>
+	
+	<alias alias="sapOrdermgmtSearchResult" name="sapOrdermgmtDefaultSearchResult" />
+	<bean id="sapOrdermgmtDefaultSearchResult" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.search.impl.SearchResultImpl">
+	</bean>
+	
+	<alias alias="sapOrdermgmtProductConfigurationStrategy" name="sapOrdermgmtDefaultProductConfigurationStrategy" />
+	<bean id="sapOrdermgmtDefaultProductConfigurationStrategy" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.erp.strategy.ProductConfigurationStrategyImpl">
+		<property name="messageMapper" ref="sapOrdermgmtBackendMessageMapper" />		
+	</bean>
+	
+	<alias alias="sapOrdermgmtMessageMappingCallbackLoader" name="sapOrdermgmtDefaultMessageMappingCallbackLoader" />
+	<bean id="sapOrdermgmtDefaultMessageMappingCallbackLoader" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.backend.impl.messagemapping.MessageMappingCallbackLoader">
+	</bean>
+	
+
+
+</beans>

@@ -1,0 +1,23 @@
+#% impex.setLocale(Locale.ENGLISH);
+
+$storeUid=test
+
+########  Orders
+
+INSERT_UPDATE Order;code[unique=true];date[dateformat=dd.MM.yyyy HH:mm:ss];net;currency(isocode);calculated;user(uid);store(uid)[default=$storeUid];
+;testOrderCode;27.04.2010 00:00:00;true;USD;false;abrode;;;
+
+########Order Entries
+INSERT_UPDATE OrderEntry;order(Order.code)[unique=true];creationTime[dateformat=dd.MM.yyyy HH:mm:ss];product(code,catalogVersion(catalog(id),version))[unique=true];quantity;unit(code);entryNumber;
+;testOrderCode;27.04.2010 00:00:00;testProduct0:testCatalog:Online;1;pieces;1;
+;testOrderCode;27.04.2010 00:00:00;testProduct1:testCatalog:Online;3;pieces;2;
+
+########Recalculating orders
+UPDATE Order;code[unique=true];status(code)
+;testOrderCode;CREATED
+#%   impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getDefaultPaymentAddress());
+#%   impex.getLastImportedItem().setDeliveryAddress(impex.getLastImportedItem().getUser().getDefaultShipmentAddress());
+#%   impex.getLastImportedItem().setPaymentInfo(impex.getLastImportedItem().getUser().getPaymentInfos().get(0));
+#%   de.hybris.platform.payment.jalo.PaymentManager.getInstance().setBillingAddress(impex.getLastImportedItem().getPaymentInfo(), impex.getLastImportedItem().getUser().getDefaultPaymentAddress());
+#%   impex.getLastImportedItem().setDeliveryMode(de.hybris.platform.jalo.order.OrderManager.getInstance().getDeliveryModeByCode("premium-net"));
+#%   impex.getLastImportedItem().recalculate();

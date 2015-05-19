@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-3.1.xsd
+          ">
+    
+	<import resource="classpath:/hybris-cis-subscription-rest-client.xml"/>
+
+	<alias name="defaultCisSubscriptionOrderConverter" alias="cisSubscriptionOrderConverter" />
+	<bean id="defaultCisSubscriptionOrderConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cisSubscriptionOrder" />
+		<property name="populators">
+			<list>
+				<ref bean="cisSubscriptionOrderPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisSubscriptionItemConverter" alias="cisSubscriptionItemConverter" />
+	<bean id="defaultCisSubscriptionItemConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cisSubscriptionItem" />
+		<property name="populators">
+			<list>
+				<ref bean="cisSubscriptionItemPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisSubscriptionPlanConverter" alias="cisSubscriptionPlanConverter" />
+	<bean id="defaultCisSubscriptionPlanConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cisSubscriptionPlan" />
+		<property name="populators">
+			<list>
+				<ref bean="cisSubscriptionPlanPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisTermsOfServiceConverter" alias="cisTermsOfServiceConverter" />
+	<bean id="defaultCisTermsOfServiceConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cisTermsOfService" />
+		<property name="populators">
+			<list>
+				<ref bean="cisTermsOfServicePopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisChargeEntryConverter" alias="cisChargeEntryConverter" />
+	<bean id="defaultCisChargeEntryConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cisChargeEntry" />
+		<property name="populators">
+			<list>
+				<ref bean="cisChargeEntryPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+<alias name="defaultCisUsageChargeTierConverter" alias="cisUsageChargeTierConverter" />
+	<bean id="defaultCisUsageChargeTierConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cisUsageChargeTier" />
+		<property name="populators">
+			<list>
+				<ref bean="cisUsageChargeTierPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCisUsageChargeConverter" alias="cisUsageChargeConverter" />
+	<bean id="defaultCisUsageChargeConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cisUsageCharge" />
+		<property name="populators">
+			<list>
+				<ref bean="cisUsageChargePopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="cisSubscriptionOrder" class="com.hybris.cis.api.subscription.model.CisSubscriptionOrder" scope="prototype"/>
+	<bean id="cisSubscriptionItem" class="com.hybris.cis.api.subscription.model.CisSubscriptionItem" scope="prototype"/>
+	<bean id="cisSubscriptionPlan" class="com.hybris.cis.api.subscription.model.CisSubscriptionPlan" scope="prototype"/>
+	<bean id="cisTermsOfService" class="com.hybris.cis.api.subscription.model.CisTermsOfService" scope="prototype"/>
+	<bean id="cisChargeEntry" class="com.hybris.cis.api.subscription.model.CisChargeEntry" scope="prototype"/>
+	<bean id="cisUsageCharge" class="com.hybris.cis.api.subscription.model.CisUsageCharge" scope="prototype"/>
+	<bean id="cisUsageChargeTier" class="com.hybris.cis.api.subscription.model.CisUsageChargeTier" scope="prototype"/>
+	<bean id="cisAddress" class="com.hybris.cis.api.model.CisAddress" scope="prototype"/>
+	<bean id="cisLineItem" class="com.hybris.cis.api.model.CisLineItem" scope="prototype"/>
+	<bean id="subscriptionPaymentData" class="de.hybris.platform.subscriptionfacades.data.SubscriptionPaymentData" scope="prototype"/>
+	<bean id="subscriptionData" class="de.hybris.platform.subscriptionfacades.data.SubscriptionData" scope="prototype"/>
+	<util:list id="subscriptionBillingDataList" value-type="de.hybris.platform.subscriptionfacades.data.SubscriptionBillingData" scope="prototype"/>
+	<bean id="subscriptionBillingDetailFileStream" class="de.hybris.platform.subscriptionfacades.data.SubscriptionBillingDetailFileStream" scope="prototype"/>
+	
+	
+	<alias name="defaultCisSubscriptionOrderPopulator" alias="cisSubscriptionOrderPopulator" />
+	<bean name="defaultCisSubscriptionOrderPopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.CisSubscriptionOrderPopulator">
+		<property name="cisSubscriptionItemConverter" ref="cisSubscriptionItemConverter"/>
+	</bean>
+
+	<alias name="defaultCisSubscriptionItemPopulator" alias="cisSubscriptionItemPopulator" />
+	<bean name="defaultCisSubscriptionItemPopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.CisSubscriptionItemPopulator">
+		<property name="cisTermsOfServiceConverter" ref="cisTermsOfServiceConverter"/>
+		<property name="cisSubscriptionPlanConverter" ref="cisSubscriptionPlanConverter"/>
+	</bean>
+
+	<alias name="defaultCisSubscriptionPlanPopulator" alias="cisSubscriptionPlanPopulator" />
+	<bean name="defaultCisSubscriptionPlanPopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.CisSubscriptionPlanPopulator">
+		<property name="cisChargeEntryConverter" ref="cisChargeEntryConverter"/>
+		<property name="cisUsageChargeConverter" ref="cisUsageChargeConverter"/>
+	</bean>
+
+	<alias name="defaultCisTermsOfServicePopulator" alias="cisTermsOfServicePopulator" />
+	<bean name="defaultCisTermsOfServicePopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.CisTermsOfServicePopulator">
+	</bean>
+
+	<alias name="defaultCisChargeEntryPopulator" alias="cisChargeEntryPopulator" />
+	<bean name="defaultCisChargeEntryPopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.CisChargeEntryPopulator">
+	</bean>
+	
+	<alias name="defaultCisUsageChargeTierPopulator" alias="cisUsageChargeTierPopulator" />
+	<bean name="defaultCisUsageChargeTierPopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.CisUsageChargeTierPopulator">
+	</bean>
+	
+	<alias name="defaultCisUsageChargePopulator" alias="cisUsageChargePopulator" />
+	<bean name="defaultCisUsageChargePopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.CisUsageChargePopulator">
+		<property name="cisUsageChargeTierConverter" ref="cisUsageChargeTierConverter"/>
+	</bean>
+	
+	<alias name="defaultCcPaymentInfoDataConverter" alias="ccPaymentInfoDataConverter" />
+	<bean id="defaultCcPaymentInfoDataConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="ccPaymentInfoData" />
+		<property name="populators">
+			<list>
+				<ref bean="ccPaymentInfoDataPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCcPaymentInfoDataPopulator" alias="ccPaymentInfoDataPopulator" />
+	<bean name="defaultCcPaymentInfoDataPopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.DefaultCCPaymentInfoDataPopulator" />
+
+	<alias name="defaultCisAddressConverter" alias="cisAddressConverter" />
+	<bean id="defaultCisAddressConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cisAddress" />
+		<property name="populators">
+			<list>
+				<ref bean="cisAddressPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisAddressPopulator" alias="cisAddressPopulator" />
+	<bean name="defaultCisAddressPopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.CisAddressPopulator">
+	</bean>
+
+    <alias name="defaultCisPaymentConverter" alias="cisPaymentConverter" />
+    <bean id="defaultCisPaymentConverter" parent="abstractPopulatingConverter">
+        <lookup-method name="createTarget" bean="subscriptionPaymentData" />
+        <property name="populators">
+            <list>
+                <ref bean="cisSubscriptionPaymentPopulator" />
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultCisSubscriptionPaymentPopulator" alias="cisSubscriptionPaymentPopulator" />
+    <bean name="defaultCisSubscriptionPaymentPopulator"
+          class="de.hybris.platform.integration.cis.subscription.populators.CisSubscriptionPaymentPopulator">
+    </bean>
+
+    <alias name="defaultCisCCPaymentInfoDataConverter" alias="cisCCPaymentInfoDataConverter" />
+    <bean id="defaultCisCCPaymentInfoDataConverter" parent="abstractPopulatingConverter">
+        <lookup-method name="createTarget" bean="ccPaymentInfoData" />
+        <property name="populators">
+            <list>
+                <ref bean="cisCCPaymentInfoDataPopulator" />
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultCisCCPaymentInfoDataPopulator" alias="cisCCPaymentInfoDataPopulator" />
+    <bean name="defaultCisCCPaymentInfoDataPopulator"
+          class="de.hybris.platform.integration.cis.subscription.populators.CisCCPaymentInfoDataPopulator">
+    </bean>
+
+    <alias name="defaultCisSubscriptionConverter" alias="cisSubscriptionConverter" />
+	<bean id="defaultCisSubscriptionConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="subscriptionData" />
+		<property name="populators">
+			<list>
+				<ref bean="cisSubscriptionPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCisSubscriptionBillingActivityListPopulator" alias="cisSubscriptionBillingActivityListPopulator" />
+	<bean name="defaultCisSubscriptionBillingActivityListPopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.CisSubscriptionBillingActivityListPopulator">
+	</bean>
+
+	<alias name="defaultCisSubscriptionBillingActivityListConverter" alias="cisSubscriptionBillingActivityListConverter" />
+	<bean id="defaultCisSubscriptionBillingActivityListConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="subscriptionBillingDataList" />
+		<property name="populators">
+			<list>
+				<ref bean="cisSubscriptionBillingActivityListPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisFileStreamPopulator" alias="cisFileStreamPopulator" />
+	<bean name="defaultCisFileStreamPopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.CisFileStreamPopulator">
+	</bean>
+
+	<alias name="defaultCisFileStreamConverter" alias="cisFileStreamConverter" />
+	<bean id="defaultCisFileStreamConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="subscriptionBillingDetailFileStream" />
+		<property name="populators">
+			<list>
+				<ref bean="cisFileStreamPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisSubscriptionPopulator" alias="cisSubscriptionPopulator" />
+	<bean name="defaultCisSubscriptionPopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.CisSubscriptionPopulator">
+		<property name="productFacade" ref="productFacade" />
+		<property name="subscriptionFacade" ref="subscriptionFacade" />
+		<property name="subscriptionXStreamAliasConverter" ref="subscriptionXStreamAliasConverter" />
+	</bean>
+
+	<alias name="defaultCisSubscriptionService" alias="cisSubscriptionService" />
+	<bean id="defaultCisSubscriptionService"
+		class="de.hybris.platform.integration.cis.subscription.service.impl.DefaultCisSubscriptionService">
+		<property name="subscriptionClient" ref="subscriptionClient" />
+	</bean>
+
+	<alias name="defaultCisLineItemConverter" alias="cisLineItemConverter" />
+	<bean id="defaultCisLineItemConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cisLineItem" />
+		<property name="populators">
+			<list>
+				<ref bean="cisLineItemPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisLineItemPopulator" alias="cisLineItemPopulator" />
+	<bean name="defaultCisLineItemPopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.CisLineItemPopulator">
+	</bean>
+	
+	<alias name="defaultCisProductTimePopulator" alias="cisProductTimePopulator"/>
+	<bean name="defaultCisProductTimePopulator" 
+		class="de.hybris.platform.integration.cis.subscription.populators.CisProductTimePopulator">
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="productBasicPopulatorList"/>
+		<property name="add" ref="cisProductTimePopulator"/>
+	</bean>
+
+	<alias name="defaultCisOrderTimePopulator" alias="cisOrderTimePopulator"/>
+	<bean name="defaultCisOrderTimePopulator" 
+		class="de.hybris.platform.integration.cis.subscription.populators.CisOrderTimePopulator">
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="orderConverter"/>
+		<property name="add" ref="cisOrderTimePopulator"/>
+	</bean>
+	
+	<alias name="defaultCisUpgradePreviewBillingListPopulator" alias="cisUpgradePreviewBillingListPopulator" />
+	<bean name="defaultCisUpgradePreviewBillingListPopulator"
+		class="de.hybris.platform.integration.cis.subscription.populators.CisUpgradePreviewBillingPopulator">
+	</bean>
+	
+	<alias name="defaultCisUpgradePreviewBillingConverter" alias="cisUpgradePreviewBillingConverter"/>
+	<bean id="defaultCisUpgradePreviewBillingConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="subscriptionBillingDataList"/>
+		<property name="populators">
+			<list>
+				<ref bean="cisUpgradePreviewBillingListPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCisSubscriptionFacade" alias="subscriptionFacade" />
+	<bean id="defaultCisSubscriptionFacade" class="de.hybris.platform.integration.cis.subscription.facades.impl.DefaultCisSubscriptionFacade" parent="abstractSubscriptionFacade">
+		<property name="cisSubscriptionService" ref="cisSubscriptionService" />
+		<property name="customerResolutionService" ref="customerResolutionService"/>
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="cartService" ref="cartService" />
+		<property name="cisSubscriptionOrderConverter" ref="cisSubscriptionOrderConverter" />
+		<property name="cisAddressConverter" ref="cisAddressConverter" />
+		<property name="cisPaymentConverter" ref="cisPaymentConverter" />
+		<property name="cisSubscriptionConverter" ref="cisSubscriptionConverter" />
+		<property name="cisSubscriptionBillingActivityListConverter" ref="cisSubscriptionBillingActivityListConverter" />
+		<property name="cisFileStreamConverter" ref="cisFileStreamConverter" />
+		<property name="cisLineItemConverter" ref="cisLineItemConverter" />
+        <property name="cisCCPaymentInfoDataConverter" ref="cisCCPaymentInfoDataConverter" />
+        <property name="ccPaymentInfoDataConverter" ref="ccPaymentInfoDataConverter" />
+		<property name="creditCardPaymentInfoConverter" ref="creditCardPaymentInfoConverter"/>
+		<property name="customerConverter" ref="customerConverter"/>
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService" />
+		<property name="cisSubscriptionItemConverter" ref="cisSubscriptionItemConverter"/>
+		<property name="cisUpgradePreviewBillingConverter" ref="cisUpgradePreviewBillingConverter"/>
+	</bean>
+	
+	<bean id="compatibilityCisSubscriptionFacade" class="de.hybris.platform.integration.cis.subscription.facades.impl.CompatibilityCisSubscriptionFacade" parent="abstractSubscriptionFacade">
+		<property name="cisSubscriptionService" ref="cisSubscriptionService" />
+		<property name="cisSubscriptionOrderConverter" ref="cisSubscriptionOrderConverter" />
+		<property name="cisAddressConverter" ref="cisAddressConverter" />
+		<property name="cisPaymentConverter" ref="cisPaymentConverter" />
+		<property name="cisSubscriptionConverter" ref="cisSubscriptionConverter" />
+		<property name="cisLineItemConverter" ref="cisLineItemConverter" />
+        <property name="cisCCPaymentInfoDataConverter" ref="cisCCPaymentInfoDataConverter" />
+        <property name="ccPaymentInfoDataConverter" ref="ccPaymentInfoDataConverter" />
+		<property name="creditCardPaymentInfoConverter" ref="creditCardPaymentInfoConverter"/>
+		<property name="customerConverter" ref="customerConverter"/>
+		<property name="customerResolutionService" ref="customerResolutionService"/>
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService" />
+		<property name="cisSubscriptionItemConverter" ref="cisSubscriptionItemConverter"/>
+	</bean>
+	
+	<alias name="defaultCreditCardMappingService" alias="creditCardMappingService"/>
+	<bean id="defaultCreditCardMappingService" class="de.hybris.platform.integration.cis.subscription.service.impl.DefaultCreditCardMappingService"/>
+    
+    <!-- The client factory allows us switch between the subscription mock service implementation and custom
+    implementation, based on the property "cis.client.subscription.mock". -->
+    <bean id="subscriptionServiceMock" class="com.hybris.cis.api.subscription.mock.impl.SubscriptionServiceMockImpl">
+		<constructor-arg name="cacheConfigFile" value="sbgCacheConfig.xml" />
+		<constructor-arg name="mockPaymentMethodFile" value="mockPaymentMethods.xml" />
+		<constructor-arg name="mockBillingsFile" value="mockBillings.xml" />
+		<property name="hpfUrl" value="http://mockedsopurl"/>
+	</bean>
+	
+	<bean id="subscriptionClientFactory" parent="abstractMockFactory">
+		<property name="mockInterface" value="com.hybris.cis.client.rest.subscription.SubscriptionClient" />
+		<property name="mockMode" value="${cis.client.subscription.mock}" />
+		<lookup-method name="getDefaultObject" bean="defaultSubscriptionClient" />
+		<property name="customMock">
+			<bean class="com.hybris.cis.client.rest.subscription.mock.SubscriptionMockClientImpl" autowire-candidate="false">
+				<property name="subscriptionService" ref="subscriptionServiceMock" />
+			</bean>
+		</property>
+	</bean>
+   	<!-- alias to name expected by caller extension -->
+    <alias name="subscriptionClientFactory" alias="subscriptionClient"/>
+</beans>

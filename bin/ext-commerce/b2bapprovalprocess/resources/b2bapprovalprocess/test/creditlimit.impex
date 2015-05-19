@@ -1,0 +1,24 @@
+#Impex file for test data
+
+INSERT_UPDATE Usergroup;uid[unique=true];groups(uid);locname[lang=en];
+;cockpitgroup;employeegroup;
+
+insert_update Employee;UID[unique=true];password;groups(uid)[mode=append];hmcLoginDisabled;sessionLanguage(isocode);name
+;GC Acct Mgr;nimda;employeegroup,acctmgrgroup,cockpitgroup;false;en;Manfred Menescher
+
+insert_update B2BCreditLimit;&Item;active[allownull=true];amount[allownull=true];code[unique=true,allownull=true];currency(isocode)[allownull=true];datePeriod[dateformat=dd.MM.yyyy hh:mm:ss,allownull=true];dateRange(code,itemtype(code));owner(&Item);alertRateType(code,itemtype(code));alertThreshold[allownull=true]
+;;true;10000;CreditLimit 10000 EUR;EUR;;MONTH:B2BPeriodRange;;CURRENCY:B2BRateType;8000;
+;;true;20000;CreditLimit 20000 GBP;GBP;;MONTH:B2BPeriodRange;;CURRENCY:B2BRateType;15000;
+;;true;2000;CR5000UK SALES;GBP;;MONTH:B2BPeriodRange;;CURRENCY:B2BRateType;;
+
+
+#For attaching credit limit to Unit
+"update B2BUnit";"uid[unique=true,allownull=true]";CreditLimit(code)[forceWrite=true];accountManager(uid)[forceWrite=true]
+;"GC Sales DE";CreditLimit 10000 EUR;;
+;"GC Sales Edinburgh";CreditLimit 20000 GBP;;
+;"GC Sales London";CreditLimit 20000 GBP;;
+;"GC Sales UK";CR5000UK SALES;;
+
+"update B2BUnit";"uid[unique=true,allownull=true]";accountManager(uid)[forceWrite=true]
+;"GC";GC Acct Mgr
+

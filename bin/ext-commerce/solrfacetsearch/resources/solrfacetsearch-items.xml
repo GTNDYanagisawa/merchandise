@@ -1,0 +1,1026 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+	
+	<collectiontypes>
+		<collectiontype elementtype="ComposedIndexedType" code="ComposedIndexedTypesCollection" autocreate="true" type="collection"/>
+ 		<collectiontype elementtype="SolrSynonymConfig" code="SolrSynonymConfigCollection" autocreate="true" type="list"/>
+ 		<collectiontype elementtype="SolrFacetSearchKeywordRedirect" code="SolrFacetSearchKeywordRedirectCollection" autocreate="true" type="list"/>
+ 		<collectiontype elementtype="SolrStopWord" code="SolrStopWordCollection" autocreate="true" type="list"/>
+ 	</collectiontypes>
+	
+	<enumtypes>
+		<enumtype generate="true" code="IndexerOperationValues" autocreate="true" jaloclass="de.hybris.platform.jalo.enumeration.EnumerationValue">
+			<value code="full" />
+			<value code="update" />
+			<value code="delete" />
+		</enumtype>
+				
+		<enumtype generate="true" code="SolrServerModes" autocreate="true" jaloclass="de.hybris.platform.jalo.enumeration.EnumerationValue">
+			<value code="embedded" />
+			<value code="standalone" />
+            <value code="cloud" />
+			<value code="xml_export" />
+		</enumtype>
+		
+		<enumtype dynamic="true" generate="true" code="SolrPropertiesTypes" autocreate="true" jaloclass="de.hybris.platform.jalo.enumeration.EnumerationValue">
+			<value code="boolean" />
+			<value code="int" />
+			<value code="string" />
+			<value code="sortabletext" />
+			<value code="text" />
+			<value code="float" />
+			<value code="double" />
+			<value code="date" />
+		</enumtype>
+		
+		<enumtype  generate="true" code="IndexMode" autocreate="true" jaloclass="de.hybris.platform.jalo.enumeration.EnumerationValue">
+			<value code="DIRECT" />
+			<value code="TWO_PHASE" />
+		</enumtype>
+		
+		<enumtype code="SolrIndexedPropertyFacetType" generate="true"
+			autocreate="true">
+			<description>
+				This enumeration defines the type of solr facets. The facet type determines behaviour of the facet filer.
+				Refine: the typical drill down facet, where only one facet value can be selected within a facet.
+				Multi-select allows multiple facet values to be selected within a facet.
+				MultiSelectAnd: causes the multiple facet values to be ANDed together, where the product results must match
+				all of the selected values.
+				MultiSelectOr: causes the multiple facet values to be ORed together, where the product results must mach
+				any of the selected values.
+			</description>
+			<value code="Refine" />
+			<value code="MultiSelectAnd" />
+			<value code="MultiSelectOr" />
+		</enumtype>
+		
+		<enumtype generate="true" code="ConverterType" autocreate="true" dynamic="true">
+			<value code="DEFAULT"></value>
+			<value code="STOREFRONT"></value>
+			<value code="CUSTOMER_SERVICE"></value>
+			<value code="COCKPIT"></value>
+		</enumtype>
+		
+		<enumtype generate="true" code="KeywordRedirectMatchType" autocreate="true" jaloclass="de.hybris.platform.jalo.enumeration.EnumerationValue">
+			<value code="EXACT" />
+			<value code="STARTS_WITH" />
+			<value code="ENDS_WITH" />
+			<value code="CONTAINS" />
+			<value code="REGEX" />
+		</enumtype>
+		
+		<enumtype generate="true" code="IndexerOperationStatus" autocreate="true" jaloclass="de.hybris.platform.jalo.enumeration.EnumerationValue">
+			<value code="RUNNING" />
+			<value code="ABORTED" />
+			<value code="SUCCESS" />
+			<value code="FAILED" />
+		</enumtype>		
+				
+	</enumtypes>
+ 	
+ 	<maptypes>
+ 		<maptype argumenttype="Language" returntype="SolrSynonymConfigCollection" code="SolrSynonymLangMapping" autocreate="true"/>
+ 		<maptype argumenttype="Language" returntype="SolrFacetSearchKeywordRedirectCollection" code="SolrKeywordRedirectLangMapping" autocreate="true"/>
+ 		<maptype argumenttype="Language" returntype="SolrStopWordCollection" code="SolrStopWordLangMapping" autocreate="true"/>
+ 	</maptypes>
+ 		
+	<relations>
+		<relation code="SolrFacetSearchConfig2CatalogVersionRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="FacSearchConfCatVerRel" typecode="2201" />
+			<sourceElement qualifier="facetSearchConfigs" type="SolrFacetSearchConfig" cardinality="many"
+				collectiontype="list" ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="true"/>
+			</sourceElement>
+			<targetElement qualifier="catalogVersions" type="CatalogVersion" cardinality="many" collectiontype="list"
+				ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="SolrFacetSearchConfig2CurrencyRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="FacSearchConfCurrRel" typecode="2202" />
+			<sourceElement qualifier="facetSearchConfigs" type="SolrFacetSearchConfig" cardinality="many"
+				collectiontype="list" ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="true"/>
+			</sourceElement>
+			<targetElement qualifier="currencies" type="Currency" cardinality="many" collectiontype="list"
+				ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="SolrFacetSearchConfig2LanguageRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="FacSearchConfLangRel" typecode="2203" />
+			<sourceElement qualifier="facetSearchConfigs" type="SolrFacetSearchConfig" cardinality="many"
+				collectiontype="list" ordered="true">
+					<modifiers optional="true" read="true" write="true" search="true"/>
+			</sourceElement>
+			<targetElement qualifier="languages" type="Language" cardinality="many" collectiontype="list"
+				ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>	
+		
+		<relation code="SolrFacetSearchConfig2SolrValueRangeSetRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="SlrCnf2ValRngSetRel" typecode="2214" />
+			<sourceElement qualifier="facetSearchConfigs" type="SolrFacetSearchConfig" cardinality="many" collectiontype="list">
+					<modifiers optional="true" read="true" write="true" search="true"/>
+			</sourceElement>
+			<targetElement qualifier="solrValueRangeSets" type="SolrValueRangeSet" cardinality="many" collectiontype="list"
+				ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="SolrValueRangeSet2SolrValueRangeRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="solrValueRangeSet" type="SolrValueRangeSet" cardinality="one">
+					<modifiers optional="false" read="true" write="true" search="true" />
+			</sourceElement>
+			<targetElement qualifier="solrValueRanges" type="SolrValueRange" cardinality="many" collectiontype="list"
+				ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="true" partof="true"/>
+			</targetElement>
+		</relation>	
+			
+		<relation code="SolrFacetSearchConfig2SolrIndexerCronJob" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="facetSearchConfig" type="SolrFacetSearchConfig" cardinality="one">
+					<modifiers optional="false" read="true" write="true" search="true"/>
+			</sourceElement>
+			<targetElement qualifier="solrIndexerCronJob" type="SolrIndexerCronJob" cardinality="many" collectiontype="list"
+				ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="false"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="SolrIndexedType2SolrIndexerQuery" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="solrIndexedType" type="SolrIndexedType" cardinality="one">
+				<modifiers  optional="true" read="true" write="true" search="true" />
+			</sourceElement>
+			<targetElement qualifier="solrIndexerQueries" type="SolrIndexerQuery" cardinality="many" collectiontype="list"
+				ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="false" partof="true"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="SolrIndexedType2SolrIndexedProperty" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="solrIndexedType" type="SolrIndexedType" cardinality="one">
+				<modifiers optional="true" read="true" write="true" search="true"/>
+			</sourceElement>
+			<targetElement qualifier="solrIndexedProperties" type="SolrIndexedProperty" cardinality="many" collectiontype="list"
+				ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="false" partof="true"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="SolrIndexerQuery2SolrIndexerQueryParameter" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="solrIndexerQuery" type="SolrIndexerQuery" cardinality="one">
+					<modifiers optional="true" read="true" write="true" search="true" />
+			</sourceElement>
+			<targetElement qualifier="solrIndexerQueryParameters" type="SolrIndexerQueryParameter" cardinality="many" collectiontype="list"
+				ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="false" partof="true"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="SolrFacetSearchConfig2SolrIndexedType" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="solrFacetSearchConfig" type="SolrFacetSearchConfig" cardinality="one">
+					<modifiers optional="true" read="true" write="true" search="true" />
+			</sourceElement>
+			<targetElement qualifier="solrIndexedTypes" type="SolrIndexedType" cardinality="many" collectiontype="list"
+				ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="false"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="SolrServerConfig2SolrEndpointUrl" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="solrServerConfig" type="SolrServerConfig" cardinality="one">
+					<modifiers optional="true" read="true" write="true" search="true" />
+			</sourceElement>
+			<targetElement qualifier="solrEndpointUrls" type="SolrEndpointUrl" cardinality="many" collectiontype="list">
+				<modifiers optional="true" read="true" write="true" search="false"/>
+			</targetElement>
+		</relation>
+
+		<relation code="SolrIndexedProperty2SolrValueRangeSetRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="SlrIdPrp2ValRnStRel" typecode="2215" />
+			<sourceElement qualifier="indexedProperties" type="SolrIndexedProperty" cardinality="many" collectiontype="list">
+					<modifiers optional="true" read="true" write="true" search="true"/>
+			</sourceElement>
+			<targetElement qualifier="rangeSets" type="SolrValueRangeSet" cardinality="many" collectiontype="list"
+				ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+		
+		<relation generate="true" localized="false" code="SolrFacetSearchConfig2SolrFacetSearchKeywordRedirect" autocreate="true">
+			<sourceElement type="SolrFacetSearchConfig" cardinality="one" navigable="true" qualifier="facetSearchConfig"/>
+			<targetElement type="SolrFacetSearchKeywordRedirect" cardinality="many" navigable="true" qualifier="keywordRedirects"/>
+		</relation>
+		
+		<relation code="SolrFacetSearchConfig2SolrUpdateSynonymsCronJob" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="solrFacetSearchConfig" type="SolrFacetSearchConfig" cardinality="one">
+					<modifiers optional="false" read="true" write="true" search="true"/>
+			</sourceElement>
+			<targetElement qualifier="solrUpdateSynonymsCronJobs" type="SolrUpdateSynonymsCronJob" cardinality="many" collectiontype="list"
+				ordered="true" >
+				<modifiers optional="true"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="SolrFacetSearchConfig2SolrUpdateStopWordsCronJob" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="solrFacetSearchConfig" type="SolrFacetSearchConfig" cardinality="one">
+					<modifiers optional="false" read="true" write="true" search="true"/>
+			</sourceElement>
+			<targetElement qualifier="solrUpdateStopWordsCronJobs" type="SolrUpdateStopWordsCronJob" cardinality="many" collectiontype="list"
+				ordered="true" >
+				<modifiers optional="true"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="SolrSynonymConfig2Language" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="synonyms" type="SolrSynonymConfig" cardinality="many" collectiontype="list" ordered="true">
+			</sourceElement>
+			<targetElement qualifier="language" type="Language" cardinality="one">
+				<modifiers optional="false"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="SolrSynonymConfig2SolrFacetSearchConfig" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="synonyms" type="SolrSynonymConfig" cardinality="many" collectiontype="list" ordered="true">
+			</sourceElement>
+			<targetElement qualifier="facetSearchConfig" type="SolrFacetSearchConfig" cardinality="one">
+			</targetElement>
+		</relation>
+		
+		<relation code="SolrStopWord2Language" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="StopWords" type="SolrStopWord" cardinality="many" collectiontype="list" ordered="true">
+			</sourceElement>
+			<targetElement qualifier="language" type="Language" cardinality="one">
+				<modifiers optional="false"/>
+			</targetElement>
+		</relation>
+		
+		<relation code="SolrStopWord2SolrFacetSearchConfig" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="StopWords" type="SolrStopWord" cardinality="many" collectiontype="list" ordered="true">
+			</sourceElement>
+			<targetElement qualifier="facetSearchConfig" type="SolrFacetSearchConfig" cardinality="one">
+			</targetElement>
+		</relation>	
+		
+		<relation code="IndexCore2IndexOperationRecords" autocreate="true" generate="true" localized="false">
+			<sourceElement  qualifier="solrIndexCoreRecord" type="SolrIndexedCoresRecord" cardinality="one">
+				<modifiers optional="false"/>
+			</sourceElement>
+			<targetElement qualifier="indexOperations" type="SolrIndexOperationRecord" cardinality="many" ordered="true">
+				<modifiers partof="true"/>
+			</targetElement>
+		</relation>
+				
+	</relations>
+
+	<itemtypes>
+		<itemtype code="SolrIndexerCronJob" autocreate="true" generate="true" extends="CronJob"
+			jaloclass="de.hybris.platform.solrfacetsearch.jalo.indexer.cron.SolrIndexerCronJob">
+			<attributes>
+				<attribute qualifier="indexerOperation" type="IndexerOperationValues" >
+					<defaultvalue>
+						em().getEnumerationValue("IndexerOperationValues","full")
+					</defaultvalue>
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>			
+		</itemtype>
+		
+		<itemtype code="SolrIndexerHotUpdateCronJob" autocreate="true" generate="true" extends="SolrIndexerCronJob"
+			jaloclass="de.hybris.platform.solrfacetsearch.jalo.indexer.cron.SolrIndexerHotUpdateCronJob">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="indexTypeName">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="indexerOperation" type="IndexerOperationValues"  redeclare="true">
+					<defaultvalue>
+						em().getEnumerationValue("IndexerOperationValues","update")
+					</defaultvalue>
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="items" type="ItemCollection">
+					<modifiers read="true" write="true" optional="true" search="false"/>
+					<persistence type="property" />
+				</attribute>				
+			</attributes>			
+		</itemtype>
+		
+		<itemtype code="SolrFacetSearchConfig" jaloclass="de.hybris.platform.solrfacetsearch.jalo.config.SolrFacetSearchConfig"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="FacetSearchConf" typecode="2200" />
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+				<description>name of the Config</description>
+					<modifiers initial="true" read="true" write="false" optional="false" search="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="description" type="java.lang.String">
+				<description>description of the Config</description>
+					<modifiers read="true" write="true"	optional="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="document" type="Media">
+					<description>
+						non hmc-configurable part of FacetSearchConfig.
+					</description>
+					<modifiers read="true" write="true" search="false" optional="true" />
+					<persistence type="property" />
+					<model>
+						<getter name="document" deprecated="true" default="true"/>
+						<setter name="document" deprecated="true" default="true"/>
+					</model>
+				</attribute>
+				<attribute qualifier="solrSearchConfig" type="SolrSearchConfig">
+					<modifiers read="true" write="true" optional="false" search="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="solrIndexConfig" type="SolrIndexConfig">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="solrServerConfig" type="SolrServerConfig">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="indexNamePrefix" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute type="SolrSynonymLangMapping" qualifier="languageSynonymMapping">
+					<modifiers read="true" write="true"/>
+					<persistence type="jalo" />
+				</attribute>
+				<attribute type="SolrStopWordLangMapping" qualifier="languageStopWordMapping">
+					<modifiers read="true" write="true"/>
+					<persistence type="jalo" />
+				</attribute>
+				<attribute type="SolrKeywordRedirectLangMapping" qualifier="languageKeywordRedirectMapping">
+					<modifiers read="true" write="true"/>
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="enabledLanguageFallbackMechanism" type="boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SolrFacetSearchKeywordRedirect" autocreate="true" generate="true" jaloclass="de.hybris.platform.solrfacetsearch.jalo.redirect.SolrFacetSearchKeywordRedirect" extends="GenericItem">
+			<deployment table="SolrKeywRedirects" typecode="2223" />
+			<attributes>
+				<attribute type="Language" qualifier="language">
+					<modifiers read="true" write="true"	optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="keyword">
+					<modifiers read="true" write="true"	optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="KeywordRedirectMatchType" qualifier="matchType">
+					<defaultvalue>em().getEnumerationValue("KeywordRedirectMatchType","EXACT")</defaultvalue>
+					<modifiers read="true" write="true"	optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.Boolean" qualifier="ignoreCase">
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+					<modifiers read="true" write="true"	optional="false" search="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="SolrAbstractKeywordRedirect" qualifier="redirect">
+					<modifiers read="true" write="true"	optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SolrAbstractKeywordRedirect" abstract="true" autocreate="true" generate="true" jaloclass="de.hybris.platform.solrfacetsearch.jalo.redirect.SolrAbstractKeywordRedirect" extends="GenericItem">
+			<deployment table="SolrAbsKwrdRedir" typecode="2221"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="hmcLabel">
+					<modifiers write="false" read="true" search="true"/>
+					<persistence type="dynamic" attributeHandler="redirectHmcLabelProvider" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SolrURIRedirect" autocreate="true" generate="true" extends="SolrAbstractKeywordRedirect" jaloclass="de.hybris.platform.solrfacetsearch.jalo.redirect.SolrURIRedirect">
+			<attributes>
+				<attribute qualifier="url" type="java.lang.String">
+					<modifiers read="true" write="true"	optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+<!-- 		<itemtype code="SolrPageRedirect" autocreate="true" generate="true" extends="SolrAbstractKeywordRedirect" jaloclass="de.hybris.platform.solrfacetsearch.jalo.redirect.SolrPageRedirect">
+			<attributes>
+				<attribute qualifier="redirectItem" type="AbstractPage">
+					<modifiers read="true" write="true"	optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		 -->
+		<itemtype code="SolrProductRedirect" autocreate="true" generate="true" extends="SolrAbstractKeywordRedirect" jaloclass="de.hybris.platform.solrfacetsearch.jalo.redirect.SolrProductRedirect">
+			<attributes>
+				<attribute qualifier="redirectItem" type="Product">
+					<modifiers read="true" write="true"	optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SolrCategoryRedirect" autocreate="true" generate="true" extends="SolrAbstractKeywordRedirect" jaloclass="de.hybris.platform.solrfacetsearch.jalo.redirect.SolrCategoryRedirect">
+			<attributes>
+				<attribute qualifier="redirectItem" type="Category">
+					<modifiers read="true" write="true"	optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SolrSynonymConfig" jaloclass="de.hybris.platform.solrfacetsearch.jalo.config.SolrSynonymConfig" extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="SolrSynonymConfig" typecode="2218" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="synonymFrom">
+					<modifiers read="true" write="true"	optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="synonymTo">
+					<modifiers read="true" write="true"	optional="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>			
+		</itemtype>
+		
+		<itemtype code="SolrStopWord" jaloclass="de.hybris.platform.solrfacetsearch.jalo.config.SolrStopWord" extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="SolrStopWord" typecode="2222" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="StopWord">
+					<modifiers optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>			
+		</itemtype>
+		
+		<itemtype code="SolrValueRangeSet" jaloclass="de.hybris.platform.solrfacetsearch.jalo.config.SolrValueRangeSet"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="SolrValueRangeSet" typecode="2204" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="name">
+					<modifiers read="true" write="true"	optional="false" search="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="type">
+					<modifiers read="true" write="true"	optional="false" search="true"  />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="qualifier">
+					<modifiers read="true" write="true"	optional="true" search="true"  />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SolrValueRange" jaloclass="de.hybris.platform.solrfacetsearch.jalo.config.SolrValueRange"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="SolrValueRange" typecode="2205" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="name">
+					<modifiers read="true" write="true"	optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="from">
+					<modifiers read="true" write="true"	optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="to">
+					<modifiers read="true" write="true"	optional="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SolrSearchConfig" jaloclass="de.hybris.platform.solrfacetsearch.jalo.config.SolrSearchConfig"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="SolrSearchConfig" typecode="2206" />
+			<attributes>
+			 	<attribute type="java.lang.Integer" qualifier="pageSize">
+			 		<modifiers read="true" write="true"	optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="StringCollection" qualifier="defaultSortOrder">
+					<persistence type="property" />				 
+				</attribute>
+				<attribute type="java.lang.String" qualifier="description">
+			 		<modifiers read="true" write="true"	optional="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="SolrIndexedProperty" qualifier="groupingProperty">
+					<persistence type="property" />				 
+				</attribute>
+			</attributes>
+		</itemtype>
+	
+		<itemtype code="ComposedIndexedType" autocreate="true" generate="true" jaloclass="de.hybris.platform.solrfacetsearch.jalo.hmc.ComposedIndexedType">
+			<deployment table="ComposedIndexdTypes" typecode="2216" />
+			<attributes>
+			<attribute type="java.lang.String" qualifier="indexedType">
+				<model generate="false"/>
+				<modifiers optional="false" read="true" write="true" search="true" />
+				<persistence type="jalo"/>
+			</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SolrIndexedType" jaloclass="de.hybris.platform.solrfacetsearch.jalo.config.SolrIndexedType"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="SolrIndexedType" typecode="2207" />
+			<attributes>
+				<attribute qualifier="identifier" type="java.lang.String">
+				<description>name of the Indexed Type</description>
+					<modifiers initial="true" read="true" write="false" optional="false" search="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="type" type="ComposedType">
+				<description>enclosing type of the Indexed Type</description>
+					<modifiers read="true" write="true"	optional="false" search="true" removable="false"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="variant" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="identityProvider" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="modelLoader" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="valuesProvider" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="indexName" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true" search="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="solrResultConverter" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true" search="true"/>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SolrIndexedProperty" jaloclass="de.hybris.platform.solrfacetsearch.jalo.config.SolrIndexedProperty"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="SolrIndexedProperty" typecode="2208" />
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<description>name of the property</description>
+					<persistence type="property"/>
+					<modifiers initial="true" read="true" write="false" search="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="type" type="SolrPropertiesTypes">
+					<description>type of the property</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="sortableType" type="SolrPropertiesTypes">
+					<description>sortable type of the property</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+				</attribute>
+				<attribute qualifier="facet" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="localized" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="currency" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="multiValue" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="rangeSet" type="SolrValueRangeSet">
+					<description>range set used by this property</description>
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute qualifier="facetDisplayNameProvider" type="java.lang.String">
+					<description>facetDisplayNameProvider used by this property</description>
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute qualifier="facetType" type="SolrIndexedPropertyFacetType">
+						<description>The facet type, if this is a facet property.</description>
+						<persistence type="property" />
+				</attribute>
+				
+				<attribute qualifier="fieldValueProvider" type="java.lang.String">
+					<description>fieldValueProvider used by this property</description>
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute qualifier="valueProviderParameter" type="java.lang.String">
+					<description>Parameter for Field Value Provider (used e.g. by springELvalueProvider)</description>
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute qualifier="exportId" type="java.lang.String">
+					<description>exportId used by this property</description>
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute qualifier="useForSpellchecking" type="java.lang.Boolean">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+					<description>Determines if this property will be part of for solr's spell checking dictionary</description>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="useForAutocomplete" type="java.lang.Boolean">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+					<description>Determines if this property will be part of for solr's auto-complete dictionary</description>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="priority" type="int">
+					<description>The ordering of this property in the list of facets. Higher number ordered first.</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="customFacetSortProvider" type="java.lang.String">
+					<description>The custom sort provider for the facet values, only used if facetSort is set to Custom.</description>
+					<persistence type="property" />
+				</attribute>
+			
+			</attributes>
+		</itemtype>
+
+		<itemtype code="SolrIndexerQuery"
+			autocreate="true" generate="true"
+			jaloclass="de.hybris.platform.solrfacetsearch.jalo.config.SolrIndexerQuery"
+			extends="GenericItem">
+			<deployment table="SolrIndexerQuery" typecode="2209" />
+			<attributes>
+				<attribute qualifier="identifier" type="java.lang.String">
+					<description>id of the query</description>
+					<persistence type="property"/>
+					<modifiers initial="true" read="true" write="false" search="true" optional="false" unique="true"/>
+				</attribute>
+				<attribute qualifier="type" type="IndexerOperationValues">
+					<description>type of operation: full, update or delete</description>
+					<modifiers initial="true" read="true" write="false" optional="false" search="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="query" type="java.lang.String">
+					<persistence type="property" >
+     					<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>	
+					</persistence>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="injectLastIndexTime" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="injectCurrentTime" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="injectCurrentDate" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="user" type="User">
+					<persistence type="property" />
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute qualifier="parameterProvider" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		
+		<itemtype code="SolrIndexerQueryParameter" 
+			autocreate="true" 
+			generate="true" 
+			jaloclass="de.hybris.platform.solrfacetsearch.jalo.config.SolrIndexerQueryParameter"
+			extends="GenericItem">
+			<deployment table="SolrIndexerQueryParam" typecode="2210" />
+				<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<description>name of the parameter</description>
+					<modifiers read="true" write="true" optional="false" search="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="value" type="java.lang.String">
+					<description>value of the parameter</description>
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property" />
+				</attribute>
+			</attributes>			
+		</itemtype>
+		
+		<itemtype code="SolrIndexConfig" 
+			autocreate="true" 
+			generate="true" 
+			jaloclass="de.hybris.platform.solrfacetsearch.jalo.config.SolrIndexConfig"
+			extends="GenericItem">
+			<deployment table="SolrIndexConfig" typecode="2211" />
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<description>unique identifier of indexer configuration</description>
+					<modifiers initial="true" read="true" write="false" optional="false" search="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="batchSize" type="int">
+					<defaultvalue>Integer.valueOf(100)</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="exportPath" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="numberOfThreads" type="int">
+					<defaultvalue>Integer.valueOf(1)</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="indexMode" type="IndexMode">
+					<persistence type="property" />
+					<modifiers optional="true"/>
+					<defaultvalue>
+						em().getEnumerationValue("IndexMode","DIRECT")
+					</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SolrServerConfig" 
+			autocreate="true" 
+			generate="true" 
+			jaloclass="de.hybris.platform.solrfacetsearch.jalo.config.SolrServerConfig"
+			extends="GenericItem">
+			<deployment table="SolrServerConfig" typecode="2212" />
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<description>unique identifier of solr configuration</description>
+					<modifiers initial="true" read="true" write="false" optional="false" search="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="mode" type="SolrServerModes">
+					<description>operation mode of Solr server</description>
+					<modifiers initial="true" read="true" write="false" optional="false" search="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="embeddedMaster" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="aliveCheckInterval" type="java.lang.Integer">
+					<persistence type="property" />
+					<description>Time interval in miliseconds which is used to ping the dead servers to find if it is alive.</description>
+					<modifiers optional="true"/>
+					<defaultvalue>Integer.valueOf(5000)</defaultvalue>
+				</attribute>
+				<attribute qualifier="connectionTimeout" type="java.lang.Integer">
+					<persistence type="property" />
+					<description>Sets the timeout in miliseconds until a connection is etablished.</description>
+					<modifiers optional="true"/>
+					<defaultvalue>Integer.valueOf(8000)</defaultvalue>
+				</attribute>
+				<attribute qualifier="socketTimeout" type="java.lang.Integer">
+					<persistence type="property" />
+					<description>Sets the default socket timeout in milliseconds which is the timeout for waiting for data</description>
+					<modifiers optional="true"/>
+					<defaultvalue>Integer.valueOf(5000)</defaultvalue>
+				</attribute>
+				<attribute type="boolean" qualifier="tcpNoDelay">
+					<description>Setting to true disables TCP packet batching</description>
+					<modifiers read="true" write="true" search="true" optional="false" />
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="maxTotalConnections" type="java.lang.Integer">
+					<modifiers optional="true"/>
+					<defaultvalue>Integer.valueOf(100)</defaultvalue>
+					<persistence type="property" />
+					<description>Sets the maximum total connections allowed</description>
+				</attribute>
+				<attribute qualifier="maxTotalConnectionsPerHostConfig" type="java.lang.Integer">
+					<modifiers optional="true"/>
+					<defaultvalue>Integer.valueOf(50)</defaultvalue>
+					<persistence type="property" />
+					<description>Sets the maximum number of connections to be used for the given host config</description>
+				</attribute>				
+				<attribute qualifier="readTimeout" type="java.lang.Integer">
+					<persistence type="property" />
+					<modifiers optional="true"/>
+					<model>
+						<getter name="readTimeout" deprecated="true" default="true"/>
+						<setter name="readTimeout" deprecated="true" default="true"/>
+					</model>
+				</attribute>
+				<attribute qualifier="useMasterNodeExclusivelyForIndexing" type="boolean">
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" optional="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SolrEndpointUrl" 
+			autocreate="true" 
+			generate="true" 
+			jaloclass="de.hybris.platform.solrfacetsearch.jalo.config.SolrEndpointUrl"
+			extends="GenericItem">
+			<deployment table="SolrEndpointUrl" typecode="2213" />
+			<attributes>
+				<attribute qualifier="url" type="java.lang.String">
+					<modifiers  read="true" write="true" optional="false" search="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="master" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SolrIndexOptimizationCronJob" autocreate="true" generate="true" extends="CronJob"
+			jaloclass="de.hybris.platform.solrfacetsearch.jalo.indexer.cron.SolrIndexOptimizationCronJob">
+			<attributes>
+				<attribute qualifier="facetSearchConfig" type="SolrFacetSearchConfig">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>			
+		</itemtype>
+		
+		
+		<itemtype code="SolrIndexedCoresRecord" autocreate="true" generate="true" extends="GenericItem" jaloclass="de.hybris.platform.solrfacetsearch.jalo.indexer.SolrIndexedCoresRecord">
+			<deployment table="SolrIndexedCoresRecord" typecode="2217"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="coreName">
+					<modifiers unique="true" write="false" initial="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="indexName">
+					<modifiers write="false" initial="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="java.util.Date" qualifier="indexTime">
+					<persistence type="property"/>
+					<model>
+						<getter name="indexTime" deprecated="true" default="true"/>
+						<setter name="indexTime" deprecated="true" default="true"/>
+					</model>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="currentIndexDataSubDirectory">
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="SolrServerModes" qualifier="serverMode">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SolrIndexOperationRecord" autocreate="true" generate="true" extends="GenericItem">
+			<deployment table="SolrIndexOperationRecord" typecode="2224"/>
+			<attributes>
+				<attribute type="java.util.Date" qualifier="startTime">
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="java.util.Date" qualifier="finishTime">
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="IndexerOperationValues" qualifier="mode">
+					<persistence type="property"/>
+					<modifiers optional="false"/>					
+				</attribute>
+				<attribute type="IndexerOperationStatus" qualifier="status">
+					<persistence type="property"/>
+					<modifiers optional="false"/>					
+				</attribute>
+				<attribute type="java.lang.String" qualifier="threadId">
+					<persistence type="property"/>
+					<modifiers optional="false"/>					
+				</attribute>
+				<attribute type="int" qualifier="clusterId">
+					<persistence type="property"/>
+					<modifiers optional="false"/>					
+				</attribute>
+				<attribute type="java.lang.String" qualifier="failedReason">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="SolrIndexOperationRecord">
+					<key attribute="threadId"/>
+					<key attribute="clusterId"/>
+					<key attribute="mode"/>
+					<key attribute="status"/>
+					<key attribute="solrIndexCoreRecord"/>
+				</index>
+			</indexes>
+		</itemtype>
+		
+	<itemtype code="SolrQueryStatisticsCollectorCronJob" autocreate="true" generate="true" extends="CronJob"
+			jaloclass="de.hybris.platform.solrfacetsearch.jalo.cron.SolrQueryStatisticsCollectorCronJob">
+	</itemtype>
+	
+	<itemtype code="SolrQueryAggregatedStats" autocreate="true" generate="true" extends="GenericItem" jaloclass="de.hybris.platform.solrfacetsearch.jalo.reporting.SolrQueryAggregatedStats">
+			<deployment table="solrQueryAggregatedStats" typecode="2220"/>
+			<attributes>
+				<attribute type="java.util.Date" qualifier="time">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="SolrFacetSearchConfig" qualifier="indexConfig">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="Language" qualifier="language">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="query">
+					<persistence type="property"/>
+					<modifiers optional="false"/>					
+				</attribute>
+				<attribute type="long" qualifier="count">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="double" qualifier="avgNumberOfResults">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+	<itemtype code="SolrUpdateSynonymsCronJob" autocreate="true" generate="true" extends="CronJob"
+			jaloclass="de.hybris.platform.solrfacetsearch.jalo.cron.SolrUpdateSynonymsCronJob">
+		<attributes>
+				<attribute type="Language" qualifier="language">
+					<persistence type="property"/>
+				</attribute>
+		</attributes>
+	</itemtype>
+	
+	<itemtype code="SolrUpdateStopWordsCronJob" autocreate="true" generate="true" extends="CronJob"
+			jaloclass="de.hybris.platform.solrfacetsearch.jalo.cron.SolrUpdateStopWordsCronJob">
+		<attributes>
+				<attribute type="Language" qualifier="language">
+					<persistence type="property"/>
+				</attribute>
+		</attributes>
+	</itemtype>
+		
+	</itemtypes>
+</items>

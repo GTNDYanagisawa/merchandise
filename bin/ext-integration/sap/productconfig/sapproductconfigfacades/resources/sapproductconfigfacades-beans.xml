@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="beans.xsd">
+	
+	<enum class="de.hybris.platform.sap.productconfig.facades.UiType">
+		<value>STRING</value>
+		<value>NUMERIC</value>
+		<value>CHECK_BOX</value>
+		<value>CHECK_BOX_LIST</value>
+		<value>RADIO_BUTTON</value>
+		<value>RADIO_BUTTON_ADDITIONAL_INPUT</value>
+		<value>DROPDOWN</value>
+		<value>DROPDOWN_ADDITIONAL_INPUT</value>
+		<value>READ_ONLY</value>
+		<value>NOT_IMPLEMENTED</value>
+	</enum>
+	
+	<enum class="de.hybris.platform.sap.productconfig.facades.UiValidationType">
+		<value>NUMERIC</value>
+		<value>NONE</value>
+	</enum>
+
+	<enum class="de.hybris.platform.sap.productconfig.facades.GroupStatusType">
+		<value>DEFAULT</value>
+		<value>ERROR</value>
+		<value>WARNING</value>
+		<value>FLAG</value>
+		<value>FINISHED</value>
+	</enum>
+	
+	<enum class="de.hybris.platform.sap.productconfig.facades.CsticStatusType">
+		<value>DEFAULT</value>
+		<value>ERROR</value>
+		<value>WARNING</value>
+		<value>FINISHED</value>
+	</enum>
+
+	<enum class="de.hybris.platform.sap.productconfig.facades.GroupType">
+		<value>CSTIC_GROUP</value>
+		<value>INSTANCE</value>
+	</enum>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.ProductData">
+		<property name="configurable" type="java.lang.Boolean" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.facades.CsticData">
+		<property name="key" type="String"/>
+		<property name="value" type="String"/>
+		<property name="additionalValue" type="String"/>
+		<property name="lastValidValue" type="String"/>
+		<property name="name" type="String"/>
+		<property name="longText" type="String"/>
+		<property name="longTextHTMLFormat" type="boolean"/>
+		<property name="showFullLongText" type="boolean"/>
+		<property name="type" type="de.hybris.platform.sap.productconfig.facades.UiType"/>
+		<property name="validationType" type="de.hybris.platform.sap.productconfig.facades.UiValidationType"/>
+		<property name="visible" type="boolean"/>
+		<property name="required" type="boolean"/>
+		<property name="maxlength" type="int"/>
+		<property name="domainvalues" type="java.util.List&lt;CsticValueData&gt;"/>
+		<property name="langdepname" type="String"/>
+		<property name="typeLength" type="int"/>
+		<property name="numberScale" type="int"/>
+		<property name="entryFieldMask" type="String"/>
+		<property name="conflicts" type="java.util.List&lt;ConflictData&gt;"/>
+		<property name="position" type="int"/>
+		<property name="csticStatus" type="de.hybris.platform.sap.productconfig.facades.CsticStatusType"/>		
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.facades.CsticValueData">
+		<property name="key" type="String"/>
+		<property name="selected" type="boolean"/>
+		<property name="readonly" type="boolean"/>
+		<property name="name" type="String"/>
+		<property name="langdepname" type="String"/>
+		<property name="deltaPrice" type="de.hybris.platform.commercefacades.product.data.PriceData" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.productconfig.facades.ConflictData">
+    	<property name="text" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.facades.KBKeyData">
+		<property name="productCode" type="String"/>
+		<property name="kbName" type="String"/>
+		<property name="kbLogsys" type="String"/>
+		<property name="kbVersion" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.facades.UiGroupData">
+		<property name="id" type="String"/>
+		<property name="name" type="String"/>
+		<property name="description" type="String"/>
+		<property name="summaryText" type="String"/>
+		<property name="collapsed" type="boolean"/>
+		<property name="collapsedInSpecificationTree" type="boolean"/>
+		<property name="configurable" type="boolean"/>
+		<property name="groupType" type="de.hybris.platform.sap.productconfig.facades.GroupType"/>
+		<property name="groupStatus" type="de.hybris.platform.sap.productconfig.facades.GroupStatusType"/>
+		<property name="cstics" type="java.util.List&lt;de.hybris.platform.sap.productconfig.facades.CsticData&gt;"/>
+		<property name="subGroups" type="java.util.List&lt;de.hybris.platform.sap.productconfig.facades.UiGroupData&gt;"/>
+		<property name="oneConfigurableSubGroup" type="boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.facades.PricingData">
+		<property name="basePrice" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="selectedOptions" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="currentTotal" type="de.hybris.platform.commercefacades.product.data.PriceData"/>		
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.productconfig.facades.ConfigurationData">
+		<property name="kbKey" type="de.hybris.platform.sap.productconfig.facades.KBKeyData"/>
+		<property name="pricing" type="de.hybris.platform.sap.productconfig.facades.PricingData"/>
+		<property name="groups" type="java.util.List&lt;de.hybris.platform.sap.productconfig.facades.UiGroupData&gt;"/>
+		<property name="configId" type="String"/>
+		<property name="cartItemPK" type="String"/>	
+		<property name="selectedGroup" type="String"/>		
+		<property name="showLegend" type="boolean"/>
+		<property name="autoExpand" type="boolean"/>
+		<property name="focusId" type="String"/>
+		<property name="specificationTreeCollapsed" type="boolean"/>
+		<property name="priceSummaryCollapsed" type="boolean"/>
+	</bean>
+</beans>

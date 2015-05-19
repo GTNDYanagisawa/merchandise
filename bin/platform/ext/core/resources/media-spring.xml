@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias alias="mediaContainerDao" name="defaultMediaContainerDao" />
+	<bean id="defaultMediaContainerDao" class="de.hybris.platform.servicelayer.media.dao.impl.DefaultMediaContainerDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<alias alias="mediaContainerService" name="defaultMediaContainerService" />
+	<bean id="defaultMediaContainerService"
+		class="de.hybris.platform.servicelayer.media.impl.DefaultMediaContainerService"
+		parent="abstractBusinessService">
+		<property name="mediaContainerDao" ref="mediaContainerDao" />
+		<property name="mediaService" ref="mediaService" />
+	</bean>
+
+	<alias alias="mediaService" name="defaultMediaService" />
+	<bean id="defaultMediaService"
+		class="de.hybris.platform.servicelayer.media.impl.DefaultMediaService"
+		parent="abstractBusinessService">
+		<property name="mediaDao" ref="mediaDao" />
+		<property name="mimeService" ref="mimeService"/>
+	</bean>
+
+	<alias alias="mediaDao" name="defaultMediaDao" />
+	<bean id="defaultMediaDao" class="de.hybris.platform.servicelayer.media.impl.DefaultMediaDao">
+		 <property name="flexibleSearchService" ref="flexibleSearchService"/>
+		</bean>
+
+   <alias alias="mediaPermissionService" name="defaultMediaPermissionService" />
+   <bean id="defaultMediaPermissionService" class="de.hybris.platform.servicelayer.media.impl.DefaultMediaPermissionService">
+     <property name="permissionCheckingService" ref="permissionCheckingService"/>
+     <property name="permissionManagementService" ref="permissionManagementService"/>
+   </bean>
+
+   <bean id="dynamicAttributesMediaPermittedPrincipals" class="de.hybris.platform.servicelayer.media.DynamicAttributesMediaPermittedPrincipals">
+      <property name="mediaPermissionService" ref="mediaPermissionService"/>
+   </bean>
+
+    <bean id="dynamicAttributesMediaDeniedPrincipals" class="de.hybris.platform.servicelayer.media.DynamicAttributesMediaDeniedPrincipals">
+      <property name="mediaPermissionService" ref="mediaPermissionService"/>
+   </bean>
+
+	<bean id="Media_URLAttributeHandler" class="de.hybris.platform.servicelayer.media.DynamicAttributesMediaUrl" >
+		<property name="mediaService" ref="mediaService"/>
+	</bean>
+
+	<bean id="removeDataOnSetURLPrepareInterceptor" class="de.hybris.platform.media.interceptors.RemoveDataOnSetURLPrepareInterceptor" />
+
+	<bean id="removeDataOnSetURLMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="removeDataOnSetURLPrepareInterceptor"/>
+		<property name="typeCode" value="Media"/>
+	</bean>
+
+	<bean id="removeDataOnMediaModelRemoveInterceptor"
+			class="de.hybris.platform.media.interceptors.RemoveDataOnMediaModelRemoveInterceptor" />
+
+	<bean id="removeDataOnMediaModelRemoveMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="removeDataOnMediaModelRemoveInterceptor"/>
+		<property name="typeCode" value="Media"/>
+	</bean>
+
+</beans>

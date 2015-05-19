@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="de.hybris.platform.b2bpunchoutaddon.controllers" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+	
+	<alias name="cXMLJaxb2MessageConverter" alias="jaxbMessageConverter" />
+	<bean id="cXMLJaxb2MessageConverter" class="de.hybris.platform.b2bpunchoutaddon.converter.CXMLJaxb2MessageConverter"/>
+	
+	<bean id="listMergeBeanPostProcessor"
+		  class="de.hybris.platform.commerceservices.spring.config.ListMergeDirectiveBeanPostProcessor"/>
+		  
+	<bean id="listMergeDirective" class="de.hybris.platform.commerceservices.spring.config.ListMergeDirective"
+		  abstract="true"/>
+		  
+	<bean id="punchoutBeforeViewHandler" class="de.hybris.platform.b2bpunchoutaddon.interceptors.PunchOutBeforeViewHandler">
+		<property name="viewMap" ref="punchoutViewMap" />
+	</bean>
+	
+	<bean id="beforeViewHandlerAdapter" abstract="true" class="de.hybris.platform.addonsupport.interceptors.BeforeViewHandlerAdapter">
+   		<property name="proxyInterfaceName" value="de.hybris.platform.yb2bacceleratorstorefront.interceptors.BeforeViewHandler" />
+    </bean>
+    
+	<bean depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add">
+				<bean parent="beforeViewHandlerAdapter">
+					<property name="adaptee" ref="punchoutBeforeViewHandler" />
+				</bean>
+		</property>
+	</bean>	
+	
+	<util:map id="punchoutViewMap" key-type="java.lang.String" value-type="java.lang.Map">
+		<entry key="pages/cart/cartPage" value-ref="cartPageMap"/>
+		<entry key="pages/search/searchListPage" value-ref="searchListPageMap"/>
+		<entry key="pages/search/searchEmptyPage" value-ref="searchEmptyPageMap"/>
+		<entry key="pages/category/productListPage" value-ref="categoryPageMap"/>
+		<entry key="pages/search/searchAdvancedEmptyPage" value-ref="searchAdvancedEmptyPageMap"/>
+		<entry key="pages/product/productLayout1Page" value-ref="productLayout1PageMap"/>
+		<entry key="pages/product/productLayout2Page" value-ref="productLayout2PageMap"/>
+		<entry key="pages/product/productOrderFormPage" value-ref="productOrderFormPageMap"/>
+		<entry key="pages/layout/landingLayout1Page" value-ref="landingLayout1PageMap"/>
+	</util:map>
+	
+	<util:map id="cartPageMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="viewName" value="/pages/cart/cartPage" />
+	</util:map>
+	<util:map id="searchListPageMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="viewName" value="/pages/search/searchListPage" />
+	</util:map>
+	<util:map id="searchEmptyPageMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="viewName" value="/pages/search/searchEmptyPage" />
+	</util:map>
+	<util:map id="categoryPageMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="viewName" value="/pages/category/productListPage" />
+	</util:map>
+	<util:map id="searchAdvancedEmptyPageMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="viewName" value="/pages/search/searchAdvancedEmptyPage" />
+	</util:map>
+	<util:map id="productLayout1PageMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="viewName" value="/pages/product/productLayout1Page" />
+	</util:map>
+	<util:map id="productLayout2PageMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="viewName" value="/pages/product/productLayout2Page" />
+	</util:map>
+	<util:map id="productOrderFormPageMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="viewName" value="/pages/product/productOrderFormPage" />
+	</util:map>
+	<util:map id="landingLayout1PageMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="viewName" value="/pages/layout/landingLayout1Page" />
+	</util:map>
+</beans>

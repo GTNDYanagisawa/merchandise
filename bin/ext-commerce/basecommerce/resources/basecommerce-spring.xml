@@ -1,0 +1,1020 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	[y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights
+	reserved. This software is the confidential and proprietary
+	information of hybris ("Confidential Information"). You shall not
+	disclose such Confidential Information and shall use it only in
+	accordance with the terms of the license agreement you entered into
+	with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias alias="fraudService" name="defaultFraudService"/>
+	<bean id="defaultFraudService" class="de.hybris.platform.fraud.impl.DefaultFraudService"
+	      scope="tenant">
+		<property name="providers">
+			<list>
+				<ref bean="internalFraudServiceProvider"/>
+				<ref bean="commercialFraudServiceProvider"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="commercialFraudServiceProvider" name="mockFraudServiceProvider"/>
+	<bean id="mockFraudServiceProvider"
+	      class="de.hybris.platform.fraud.impl.mock.CommercialFraudMockService"
+	      scope="tenant">
+		<property name="providerName" value="Mockup_3rdPartyProvider"/>
+	</bean>
+
+	<alias alias="internalFraudServiceProvider" name="defaultHybrisFraudServiceProvider"/>
+	<bean id="defaultHybrisFraudServiceProvider"
+	      class="de.hybris.platform.fraud.impl.DefaultHybrisFraudServiceProvider"
+	      scope="tenant">
+		<property name="providerName" value="Hybris"/>
+		<property name="symptomList">
+			<list>
+				<ref bean="blackListSymptom"/>
+				<ref bean="whiteListSymptom"/>
+				<ref bean="firstTimeOrderSymptom"/>
+				<ref bean="orderThresholdSymptom"/>
+				<ref bean="differentAddressesSymptom"/>
+				<ref bean="orderEntriesSymptom"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="blackListSymptom" class="de.hybris.platform.fraud.symptom.impl.BlackListSymptom"
+	      scope="tenant">
+		<property name="symptomName" value="Black list"/>
+		<property name="increment" value="1000"/>
+		<property name="bannedEmails">
+			<list>
+				<value>bad.guy@gmail.com</value>
+				<value>badguy@gmail.com</value>
+				<value>badGuy@gmail.com</value>
+			</list>
+		</property>
+		<property name="bannedUserIDs">
+			<list>
+				<value>bad.guy</value>
+				<value>badguy</value>
+				<value>badGuy</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="whiteListSymptom" class="de.hybris.platform.fraud.symptom.impl.WhiteListSymptom"
+	      scope="tenant">
+		<property name="symptomName" value="White list"/>
+		<property name="increment" value="-500"/>
+		<property name="favoredEmails">
+			<list>
+				<value>goldMember@gmail.com</value>
+				<value>silverMember@gmail.com</value>
+			</list>
+		</property>
+		<property name="favoredUserIDs">
+			<list>
+				<value>goldmember</value>
+				<value>silvermember</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="orderThresholdSymptom"
+	      class="de.hybris.platform.fraud.symptom.impl.OrderThresholdSymptom"
+	      scope="tenant">
+		<property name="symptomName" value="Price threshold"/>
+		<property name="increment" value="50"/>
+		<property name="thresholdLimit" value="1000"/>
+		<property name="thresholdDelta" value="100"/>
+	</bean>
+
+	<bean id="differentAddressesSymptom"
+	      class="de.hybris.platform.fraud.symptom.impl.DifferentAddressesSymptom"
+	      scope="tenant">
+		<property name="symptomName" value="Address rules"/>
+		<property name="increment" value="50"/>
+		<property name="firstTimeOrderRule" value="false"/>
+		<property name="countryOnly" value="false"/>
+		<property name="firstOrderSymptomDetection" ref="firstTimeOrderSymptom"/>
+	</bean>
+
+	<bean id="firstTimeOrderSymptom"
+	      class="de.hybris.platform.fraud.symptom.impl.FirstTimeOrderSymptom"
+	      scope="tenant">
+		<property name="symptomName" value="User's first order"/>
+		<property name="increment" value="50"/>
+	</bean>
+
+	<bean id="orderEntriesSymptom"
+	      class="de.hybris.platform.fraud.symptom.impl.OrderEntriesSymptom"
+	      scope="tenant">
+		<property name="symptomName" value="Order entries constraints"/>
+		<property name="increment" value="50"/>
+	</bean>
+
+
+	<alias alias="orderHistoryService" name="defaultOrderHistoryService"/>
+	<bean id="defaultOrderHistoryService"
+	      class="de.hybris.platform.orderhistory.impl.DefaultOrderHistoryService"
+	      parent="abstractBusinessService" scope="tenant">
+		<property name="versionIDGenerator" ref="orderCodeGenerator"/>
+	</bean>
+
+	<alias name="defaultOrderSplittingService" alias="orderSplittingService"/>
+	<bean id="defaultOrderSplittingService"
+	      class="de.hybris.platform.ordersplitting.impl.DefaultOrderSplittingService"
+	      scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="consignmentService" ref="consignmentService"/>
+		<property name="strategiesList">
+			<list>
+				<ref bean="splitByAvailableCount"/>
+				<ref bean="splitByDeliveryMode"/>
+				<ref bean="splitByNamedDeliveryDate"/>
+				<ref bean="splitByWarehouse"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="splitByAvailableCount"
+	      class="de.hybris.platform.ordersplitting.strategy.impl.SplitByAvailableCount"
+	      scope="tenant">
+		<property name="stockService" ref="stockService"/>
+	</bean>
+	<bean id="splitByDeliveryMode"
+	      class="de.hybris.platform.ordersplitting.strategy.impl.SplitByDeliveryMode"
+	      scope="tenant"/>
+	<bean id="splitByNamedDeliveryDate"
+	      class="de.hybris.platform.ordersplitting.strategy.impl.SplitByNamedDeliveryDate"
+	      scope="tenant"/>
+	<bean id="splitByWarehouse"
+	      class="de.hybris.platform.ordersplitting.strategy.impl.SplitByWarehouse"
+	      scope="tenant">
+		<property name="warehouseService" ref="warehouseService"/>
+	</bean>
+
+	<alias name="defaultConsignmentService" alias="consignmentService"/>
+	<bean id="defaultConsignmentService"
+	      class="de.hybris.platform.ordersplitting.impl.DefaultConsignmentService"
+	      scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="warehouseService" ref="warehouseService"/>
+	</bean>
+
+	<alias name="defaultWarehouseService" alias="warehouseService"/>
+	<bean id="defaultWarehouseService"
+	      class="de.hybris.platform.ordersplitting.impl.DefaultWarehouseService"
+	      scope="tenant">
+		<property name="warehouseDao" ref="warehouseDao"/>
+	</bean>
+
+	<alias name="defaultWarehouseDao" alias="warehouseDao"/>
+	<bean id="defaultWarehouseDao" class="de.hybris.platform.ordersplitting.daos.impl.DefaultWarehouseDao" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<!--
+		This is a preliminary release of a new functionality. It is incomplete
+		and subject to change in future versions. Use at your own risk.
+	-->
+	<alias name="defaultScheduleOrderServiceImpl" alias="scheduleOrderService"/>
+	<bean id="defaultScheduleOrderServiceImpl"
+	      class="de.hybris.platform.orderscheduling.impl.DefaultScheduleOrderServiceImpl"
+	      scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="cronJobService" ref="cronJobService"/>
+	</bean>
+
+	<!--
+		This is a preliminary release of a new functionality. It is incomplete
+		and subject to change in future versions. Use at your own risk.
+	-->
+	<alias name="defaultOrderUtilityImpl" alias="orderUtility"/>
+	<bean id="defaultOrderUtilityImpl"
+	      class="de.hybris.platform.orderscheduling.impl.DefaultOrderUtilityImpl"
+	      scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="orderService" ref="orderService"/>
+	</bean>
+
+	<!--
+		This is a preliminary release of a new functionality. It is incomplete
+		and subject to change in future versions. Use at your own risk.
+	-->
+	<bean id="orderScheduleJob"
+	      class="de.hybris.platform.orderscheduling.impl.OrderScheduleJob"
+	      scope="tenant" parent="abstractJobPerformable">
+		<property name="orderUtility" ref="orderUtility"/>
+	</bean>
+
+	<bean id="orderTemplateToOrderJob" class="de.hybris.platform.orderscheduling.impl.OrderTemplateToOrderJob" scope="tenant" parent="abstractJobPerformable">
+		<property name="orderUtility" ref="orderUtility"/>
+	</bean>
+
+	<bean id="cartToOrderJob" class="de.hybris.platform.orderscheduling.impl.CartToOrderJob" scope="tenant" parent="abstractJobPerformable">
+		<property name="orderUtility" ref="orderUtility"/>
+	</bean>
+
+	<!--  Deeplink URL stuff -->
+	<alias name="deeplinkUrlDaoImpl" alias="deeplinUrlDao"/>
+	<!-- Legacy misspelling -->
+	<alias name="deeplinkUrlDaoImpl" alias="deeplinkUrlDao"/>
+	<bean id="deeplinkUrlDaoImpl" class="de.hybris.platform.deeplink.dao.impl.DeeplinkUrlDaoImpl"
+	      scope="tenant">
+		<property name="searchService" ref="flexibleSearchService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias name="defaultBarcodeUrlResolver" alias="barcodeUrlResolver"/>
+	<bean id="defaultBarcodeUrlResolver"
+	      class="de.hybris.platform.deeplink.resolvers.impl.DefaultBarcodeUrlResolver"
+	      scope="tenant">
+		<property name="deeplinkUrlDao" ref="deeplinkUrlDao"/>
+	</bean>
+
+	<alias name="deeplinkUrlServiceImpl" alias="deeplinkUrlService"/>
+	<bean id="deeplinkUrlServiceImpl"
+	      class="de.hybris.platform.deeplink.services.impl.DeeplinkUrlServiceImpl"
+	      scope="tenant">
+		<property name="resolver" ref="barcodeUrlResolver"/>
+		<property name="deeplinkUrlDao" ref="deeplinkUrlDao"/>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+
+	<bean id="deeplinkUrlValidateInterceptor"
+	      class="de.hybris.platform.deeplink.servicelayer.interceptors.DeeplinkUrlValidateInterceptor"
+	      scope="tenant">
+		<property name="deeplinkUrlDao" ref="deeplinkUrlDao"/>
+	</bean>
+
+	<bean id="deeplinkUrlValidateInterceptorMapping" scope="tenant"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="deeplinkUrlValidateInterceptor"/>
+		<property name="typeCode" value="DeeplinkUrl"/>
+	</bean>
+
+	<!--  base store beans -->
+	<alias alias="baseStoreService" name="defaultBaseStoreService"/>
+	<bean id="defaultBaseStoreService" class="de.hybris.platform.store.services.impl.DefaultBaseStoreService" scope="tenant">
+		<property name="baseStoreDao" ref="baseStoreDao"/>
+		<property name="baseStoreSelectorStrategies">
+			<list>
+				<ref bean="baseStoreSelectorStrategy"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="baseStoreDao" name="defaultBaseStoreDao"/>
+	<bean id="defaultBaseStoreDao" class="de.hybris.platform.store.daos.impl.DefaultBaseStoreDao" scope="tenant" parent="abstractItemDao"/>
+
+	<!-- storelocator beans -->
+	<alias alias="googleMapsGeoServiceWrapper" name="defaultGoogleMapsGeoServiceWrapper"/>
+	<bean id="defaultGoogleMapsGeoServiceWrapper"
+	      class="de.hybris.platform.storelocator.impl.GoogleMapsServiceWrapper"
+	      scope="tenant">
+		<property name="googleMapTools" ref="googleMapTools"/>
+	</bean>
+
+	<alias name="defaultGoogleMapTools" alias="googleMapTools"/>
+	<bean id="defaultGoogleMapTools" class="de.hybris.platform.storelocator.impl.GoogleMapTools" scope="prototype">
+		<property name="addressLocationParser" ref="firstPlacemarkWinsGoogleResponseParser"/>
+		<property name="routeDataParser" ref="routeDataGoogleResponseParser"/>
+		<property name="directionsUrlBuilder" ref="geolocationDirectionsUrlBuilder"/>
+	</bean>
+
+	<alias name="defaultFirstPlacemarkWinsGoogleResponseParser" alias="firstPlacemarkWinsGoogleResponseParser"/>
+	<bean id="defaultFirstPlacemarkWinsGoogleResponseParser" class="de.hybris.platform.storelocator.impl.FirstPlacemarkWinsGoogleResponseParser" scope="prototype"/>
+
+	<alias name="defaultRouteDataGoogleResponseParser" alias="routeDataGoogleResponseParser"/>
+	<bean id="defaultRouteDataGoogleResponseParser" class="de.hybris.platform.storelocator.impl.RouteDataGoogleResponseParser" scope="prototype"/>
+
+	<alias name="defaultGeolocationDirectionsUrlBuilder" alias="geolocationDirectionsUrlBuilder"/>
+	<bean id="defaultGeolocationDirectionsUrlBuilder" class="de.hybris.platform.storelocator.route.impl.DefaultGeolocationDirectionsUrlBuilder" scope="prototype">
+	</bean>
+
+	<alias alias="mapService" name="defaultMapService"/>
+	<bean id="defaultMapService"
+	      class="de.hybris.platform.storelocator.map.impl.DefaultMapService"
+	      scope="tenant">
+		<property name="routeService" ref="routeService"/>
+	</bean>
+
+	<alias alias="distanceAwareLocationService" name="defaultLocationService"/>
+	<alias alias="locationService" name="defaultLocationService"/>
+	<bean id="defaultLocationService"
+	      class="de.hybris.platform.storelocator.location.impl.DefaultLocationService"
+	      parent="abstractBusinessService" scope="tenant">
+		<property name="pointOfServiceDao" ref="pointOfServiceDao"/>
+		<property name="i18nService" ref="i18nService"/>
+		<property name="geoServiceWrapper" ref="geoServiceWrapper"/>
+		<property name="mapService" ref="mapService"/>
+		<property name="locationMapService" ref="locationMapService"/>
+	</bean>
+
+	<alias alias="locationMapService" name="defaultLocationMapService"/>
+	<bean id="defaultLocationMapService" class="de.hybris.platform.storelocator.location.impl.DefaultLocationMapService" parent="abstractBusinessService" scope="tenant">
+		<property name="locationService" ref="distanceAwareLocationService"/>
+		<property name="geoServiceWrapper" ref="geoServiceWrapper"/>
+		<property name="mapService" ref="mapService"/>
+		<property name="radiusMax" value="500"/>
+		<property name="radiusStep" value="50"/>
+	</bean>
+
+	<alias alias="pointOfServiceDao" name="defaultPointOfServiceDao"/>
+	<bean id="defaultPointOfServiceDao"
+	      class="de.hybris.platform.storelocator.impl.DefaultPointOfServiceDao"
+	      scope="tenant" parent="abstractItemDao"/>
+
+	<alias alias="routeService" name="defaultRouteService"/>
+	<bean id="defaultRouteService"
+	      class="de.hybris.platform.storelocator.route.impl.DefaultRouteService"
+	      scope="tenant">
+		<property name="geoServiceWrapper" ref="geoServiceWrapper"/>
+	</bean>
+
+	<bean id="geocodeAddressesJob" class="de.hybris.platform.storelocator.GeocodingJob"
+	      scope="tenant" parent="abstractJobPerformable">
+		<property name="pointOfServiceDao" ref="pointOfServiceDao"/>
+		<property name="geoServiceWrapper" ref="geoServiceWrapper"/>
+	</bean>
+
+	<!-- order cancel -->
+
+	<alias alias="orderCancelDao" name="defaultOrderCancelDao"/>
+	<bean id="defaultOrderCancelDao"
+	      class="de.hybris.platform.ordercancel.dao.impl.DefaultOrderCancelDao"
+	      parent="abstractItemDao" scope="tenant">
+	</bean>
+
+
+	<alias alias="orderCancelRecordsHandler" name="defaultOrderCancelRecordsHandler"/>
+	<bean id="defaultOrderCancelRecordsHandler"
+	      class="de.hybris.platform.ordercancel.impl.DefaultOrderCancelRecordsHandler"
+	      parent="abstractBusinessService" scope="tenant">
+		<property name="orderCancelDao" ref="orderCancelDao"/>
+		<property name="orderHistoryService" ref="orderHistoryService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<alias alias="orderCancelCallbackService" name="defaultOrderCancelService"/>
+	<alias alias="orderCancelService" name="defaultOrderCancelService"/>
+	<bean id="defaultOrderCancelService"
+	      class="de.hybris.platform.ordercancel.impl.DefaultOrderCancelService"
+	      scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="orderCancelDao" ref="orderCancelDao"/>
+		<property name="orderCancelRecordsHandler" ref="orderCancelRecordsHandler"/>
+		<property name="cancelDenialStrategies">
+			<list>
+				<ref bean="singleCancelRequestDenialStrategy"/>
+				<ref bean="defaultRequestOriginDenialStrategy"/>
+				<ref bean="partialCancelRulesViolationStrategy"/>
+				<ref bean="orderStateDenialStrategy"/>
+				<ref bean="sentToWarehouseDenialStrategy"/>
+				<ref bean="shippingDenialStrategy"/>
+			</list>
+		</property>
+		<property name="requestExecutorsMap">
+			<map>
+				<entry key="PENDINGORHOLDINGAREA" value-ref="immediateCancelRequestExecutor"/>
+				<entry key="SENTTOWAREHOUSE" value-ref="warehouseProcessingCancelRequestExecutor"/>
+				<entry key="SHIPPING" value-ref="warehouseProcessingCancelRequestExecutor"/>
+				<entry key="PARTIALLYSHIPPED" value-ref="warehouseProcessingCancelRequestExecutor"/>
+			</map>
+		</property>
+		<property name="responseExecutorsMap">
+			<map>
+				<entry key="SENTTOWAREHOUSE" value-ref="warehouseResponseExecutor"/>
+				<entry key="SHIPPING" value-ref="warehouseResponseExecutor"/>
+				<entry key="PARTIALLYSHIPPED" value-ref="warehouseResponseExecutor"/>
+			</map>
+		</property>
+		<property name="stateMappingStrategy" ref="defaultOrderCancelStateMappingStrategy"/>
+		<property name="cancelableEntriesStrategy" ref="defaultCancelableEntriesStrategy"/>
+	</bean>
+
+	<bean id="sendEventOrderCancelNotification" class="de.hybris.platform.ordercancel.impl.SendEventOrderCancelNotification" scope="tenant">
+		<property name="eventService" ref="eventService"/>
+	</bean>
+
+	<bean id="singleCancelRequestDenialStrategy"
+	      class="de.hybris.platform.ordercancel.impl.denialstrategies.SingleCancelRequestDenialStrategy"
+	      scope="prototype">
+		<property name="orderCancelRecordsHandler">
+			<ref bean="orderCancelRecordsHandler"/>
+		</property>
+
+		<!-- provide a reson for the denial strategy -->
+
+		<!-- exemplary reason -->
+		<property name="reason">
+			<bean class="de.hybris.platform.ordercancel.DefaultOrderCancelDenialReason">
+				<property name="code" value="0"/>
+				<property name="description"
+				          value="Order Cancel Request is already in progress. Only one cancel request at a time is allowed."/>
+			</bean>
+		</property>
+		<!-- exemplary reason -->
+	</bean>
+
+	<bean id="orderStateDenialStrategy"
+	      class="de.hybris.platform.ordercancel.impl.denialstrategies.OrderStateDenialStrategy"
+	      scope="prototype">
+		<property name="stateMappingStrategy" ref="defaultOrderCancelStateMappingStrategy"/>
+		<property name="fullCancelDeniedStates">
+			<list>
+				<value>CANCELIMPOSSIBLE</value>
+				<value>PARTIALLYSHIPPED</value>
+			</list>
+		</property>
+		<property name="partialCancelDeniedStates">
+			<list>
+				<value>CANCELIMPOSSIBLE</value>
+			</list>
+		</property>
+
+		<!-- provide a reson for the denial strategy -->
+
+		<!-- exemplary reason -->
+		<property name="reason">
+			<bean class="de.hybris.platform.ordercancel.DefaultOrderCancelDenialReason">
+				<property name="code" value="1"/>
+				<property name="description"
+				          value="Order cannot be cancelled because of it's current state"/>
+			</bean>
+		</property>
+		<!-- exemplary reason -->
+	</bean>
+
+	<bean id="shippingDenialStrategy"
+	      class="de.hybris.platform.ordercancel.impl.denialstrategies.ShippingDenialStrategy"
+	      scope="prototype">
+		<property name="stateMappingStrategy" ref="defaultOrderCancelStateMappingStrategy"/>
+		<property name="strategyInvolvedStates">
+			<list>
+				<value>SHIPPING</value>
+				<value>PARTIALLYSHIPPED</value>
+			</list>
+		</property>
+
+		<!-- provide a reson for the denial strategy -->
+		<!-- exemplary reason -->
+		<property name="reason">
+			<bean class="de.hybris.platform.ordercancel.DefaultOrderCancelDenialReason">
+				<property name="code" value="2"/>
+				<property name="description"
+				          value="Order shipping state disallows cancellation"/>
+			</bean>
+		</property>
+		<!-- exemplary reason -->
+	</bean>
+
+	<bean id="defaultRequestOriginDenialStrategy"
+	      class="de.hybris.platform.ordercancel.impl.denialstrategies.DefaultRequestOriginDenialStrategy"
+	      scope="prototype">
+		<property name="typeService">
+			<ref bean="typeService"/>
+		</property>
+
+		<!-- provide a reson for the denial strategy -->
+
+		<!-- exemplary reason -->
+		<property name="reason">
+			<bean class="de.hybris.platform.ordercancel.DefaultOrderCancelDenialReason">
+				<property name="code" value="3"/>
+				<property name="description"
+				          value="Order cannot be cancelled by end user because current configuration does not allow it"/>
+			</bean>
+		</property>
+		<!-- exemplary reason -->
+
+	</bean>
+
+	<bean id="partialCancelRulesViolationStrategy"
+	      class="de.hybris.platform.ordercancel.impl.denialstrategies.PartialCancelRulesViolationStrategy"
+	      scope="prototype">
+
+		<!-- provide a reson for the denial strategy -->
+
+	</bean>
+
+
+	<bean id="sentToWarehouseDenialStrategy"
+	      class="de.hybris.platform.ordercancel.impl.denialstrategies.SentToWarehouseDenialStrategy"
+	      scope="prototype">
+		<property name="stateMappingStrategy" ref="defaultOrderCancelStateMappingStrategy"/>
+		<property name="strategyInvolvedStates">
+			<list>
+				<value>SENTTOWAREHOUSE</value>
+			</list>
+		</property>
+
+		<!-- provide a reson for the denial strategy -->
+
+	</bean>
+
+	<alias name="defaultOrderCancelStateMappingStrategy" alias="orderCancelStateMappingStrategy"/>
+	<bean id="defaultOrderCancelStateMappingStrategy"
+	      class="de.hybris.platform.ordercancel.impl.DefaultOrderCancelStateMappingStrategy"
+	      scope="prototype"/>
+
+	<bean id="defaultCancelableEntriesStrategy"
+	      class="de.hybris.platform.ordercancel.impl.DefaultOrderCancelCancelableEntriesStrategy"
+	      scope="prototype"/>
+
+	<bean id="immediateCancelRequestExecutor"
+	      class="de.hybris.platform.ordercancel.impl.executors.ImmediateCancelRequestExecutor"
+	      scope="prototype">
+		<property name="modelService" ref="modelService"/>
+		<property name="orderCancelRecordsHandler" ref="orderCancelRecordsHandler"/>
+		<property name="completeCancelStatusChangeStrategy" ref="setCancellledStrategy"/>
+		<!--
+			<property name="partialCancelStatusChangeStrategy" ref=""/> Provide a
+			strategy here if Order's state should change when partially
+			cancelled.
+		-->
+		<!--
+			THESE DEPENDENCIES MUST BE PROVIDED BY USERS OF THE ORDER CANCEL
+			SERVICE <property name="paymentServiceAdapter"
+			ref="orderCancelPaymentServiceAdapter"/> <property
+			name="notificationServiceAdapter"
+			ref="orderCancelNotificationServiceAdapter"/>
+		-->
+	</bean>
+
+	<bean id="warehouseProcessingCancelRequestExecutor"
+	      class="de.hybris.platform.ordercancel.impl.executors.WarehouseProcessingCancelRequestExecutor"
+	      scope="prototype">
+		<property name="modelService" ref="modelService"/>
+		<property name="orderStatusChangeStrategy" ref="enterCancellingStrategy"/>
+		<property name="warehouseAdapter" ref="defaultWarehouseAdapterMock"/>
+		<!--
+			THESE DEPENDENCIES MUST BE PROVIDED BY USERS OF THE ORDER CANCEL
+			SERVICE <property name="notificationServiceAdapter"
+			ref="orderCancelNotificationServiceAdapter"/>
+		-->
+	</bean>
+
+	<bean id="warehouseResponseExecutor"
+	      class="de.hybris.platform.ordercancel.impl.executors.WarehouseResponseExecutor"
+	      scope="prototype">
+		<property name="modelService" ref="modelService"/>
+		<property name="orderCancelRecordsHandler" ref="orderCancelRecordsHandler"/>
+
+		<property name="completeCancelStatusChangeStrategy" ref="setCancellledStrategy"/>
+		<property name="partialCancelStatusChangeStrategy" ref="restorePreviousOrderStatusStrategy"/>
+		<property name="warehouseDenialStatusChangeStrategy" ref="restorePreviousOrderStatusStrategy"/>
+		<property name="warehouseErrorStatusChangeStrategy" ref="restorePreviousOrderStatusStrategy"/>
+
+		<!--
+			THESE DEPENDENCIES MUST BE PROVIDED BY USERS OF THE ORDER CANCEL
+			SERVICE <property name="paymentServiceAdapter"
+			ref="orderCancelPaymentServiceAdapter"/> <property
+			name="notificationServiceAdapter"
+			ref="orderCancelNotificationServiceAdapter"/>
+		-->
+	</bean>
+
+	<bean id="enterCancellingStrategy"
+	      class="de.hybris.platform.ordercancel.impl.orderstatechangingstrategies.EnterCancellingStrategy" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<bean id="setCancellledStrategy"
+	      class="de.hybris.platform.ordercancel.impl.orderstatechangingstrategies.SetCancellledStrategy" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<bean id="restorePreviousOrderStatusStrategy"
+	      class="de.hybris.platform.ordercancel.impl.orderstatechangingstrategies.RestorePreviousOrderStatusStrategy" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<bean id="PrepareOrderCancelRecordInterceptor"
+	      class="de.hybris.platform.ordercancel.impl.interceptor.PrepareOrderCancelRecordInterceptor"
+	      scope="tenant">
+		<property name="keyGenerator" ref="defaultOrderCancelRecordIdGenerator"/>
+	</bean>
+
+	<bean id="defaultOrderCancelRecordIdGenerator"
+	      class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+	      init-method="init" scope="tenant">
+		<property name="key" value="CANCELREC"/>
+		<property name="digits" value="8"/>
+		<property name="start" value="00000000"/>
+		<property name="numeric" value="true"/>
+	</bean>
+
+	<bean id="PrepareOrderCancelRecordInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+	      scope="tenant">
+		<property name="interceptor" ref="PrepareOrderCancelRecordInterceptor"/>
+		<property name="typeCode" value="OrderCancelRecord"/>
+	</bean>
+
+	<bean id="defaultWarehouseAdapterMock"
+	      class="de.hybris.platform.ordercancel.impl.DefaultWarehouseAdapterMock"
+	      scope="tenant"/>
+
+	<!-- order returns -->
+
+	<alias alias="returnService" name="defaultReturnService"/>
+	<bean id="defaultReturnService" class="de.hybris.platform.returns.impl.DefaultReturnService"
+	      parent="abstractBusinessService" scope="tenant">
+		<property name="generator" ref="defaultRMAGenerator"/>
+		<property name="refundService" ref="refundService"/>
+		<property name="modificationHandler" ref="orderReturnRecordsHandler"/>
+		<property name="returnableChecks">
+			<list>
+				<ref bean="defaultChecksExistingReturnEntry"/>
+				<ref bean="defaultConsignmentBasedReturnableCheck"/>
+			</list>
+		</property>
+		<!--
+			Here you can add some additional returns handling logic. For example
+			Consignment (Warehouse) related business logic
+		-->
+		<!--
+			See: de.hybris.platform.returns.processor.ReturnEntryProcessor;
+			de.hybris.platform.returns.processor.ReplacementOrderProcessor;
+			de.hybris.platform.returns.processor.RefundOrderProcessor
+		-->
+		<!--
+			<property name="returnEntryProcessor"
+			ref="YOUR_RETUNRS_ENTRY_PROCESSOR" /> <property
+			name="replacementOrderProcessor"
+			ref="YOUR_REPLACEMEMNT_ORDER_PROCESSOR" /> <property
+			name="refundOrderProcessor" ref="YOUR_REFUND_ORDER_PROCESSOR" />
+		-->
+		<property name="replacementOrderDao" ref="replacementOrderDao"/>
+		<property name="returnRequestDao" ref="returnRequestDao"/>
+	</bean>
+
+	<alias alias="refundService" name="defaultRefundService"/>
+	<bean id="defaultRefundService" class="de.hybris.platform.refund.impl.DefaultRefundService"
+	      parent="abstractBusinessService" scope="tenant">
+		<property name="modificationHandler" ref="orderReturnRecordsHandler"/>
+		<property name="refundDao" ref="refundDao"/>
+	</bean>
+
+	<bean id="defaultRMAGenerator" class="de.hybris.platform.returns.impl.DefaultRMAGenerator"
+	      scope="tenant">
+		<property name="keyGenerator" ref="defaultRMACodeGenerator"/>
+	</bean>
+
+	<bean id="defaultRMACodeGenerator"
+	      class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+	      init-method="init" scope="tenant">
+		<property name="key" value="RMA"/>
+		<property name="digits" value="8"/>
+		<property name="start" value="00000000"/>
+		<property name="numeric" value="true"/>
+	</bean>
+
+	<bean id="defaultReturnRequestCodeGenerator"
+	      class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+	      init-method="init" scope="tenant">
+		<property name="key" value="AUTH"/>
+		<property name="digits" value="8"/>
+		<property name="start" value="00000000"/>
+		<property name="numeric" value="true"/>
+	</bean>
+
+	<bean id="defaultReplacementOrderCodeGenerator"
+	      class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+	      init-method="init" scope="tenant">
+		<property name="key" value="REPORD"/>
+		<property name="digits" value="8"/>
+		<property name="start" value="00000000"/>
+		<property name="numeric" value="true"/>
+	</bean>
+
+	<bean id="defaultOrderModificationRecordCodeGenerator"
+	      class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+	      init-method="init" scope="tenant">
+		<property name="key" value="ORDMODREC"/>
+		<property name="digits" value="8"/>
+		<property name="start" value="00000000"/>
+		<property name="numeric" value="true"/>
+	</bean>
+
+	<bean id="PrepareReturnRequestInterceptor"
+	      class="de.hybris.platform.returns.impl.PrepareReturnRequestInterceptor"
+	      scope="tenant">
+		<property name="keyGenerator" ref="defaultReturnRequestCodeGenerator"/>
+	</bean>
+
+	<bean id="PrepareReplacementOrderInterceptor"
+	      class="de.hybris.platform.returns.impl.PrepareReplacementOrderInterceptor"
+	      scope="tenant">
+		<property name="keyGenerator" ref="defaultReplacementOrderCodeGenerator"/>
+	</bean>
+
+	<bean id="PrepareOrderModificationRecordInterceptor"
+	      class="de.hybris.platform.ordermodify.impl.PrepareOrderModificationRecordInterceptor"
+	      scope="tenant">
+		<property name="keyGenerator" ref="defaultOrderModificationRecordCodeGenerator"/>
+	</bean>
+
+	<bean id="PrepareOrderModificationRecordInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+	      scope="tenant">
+		<property name="interceptor" ref="PrepareOrderModificationRecordInterceptor"/>
+		<property name="typeCode" value="OrderModificationRecord"/>
+	</bean>
+
+	<bean id="PrepareReturnAuthorizationInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+	      scope="tenant">
+		<property name="interceptor" ref="PrepareReturnRequestInterceptor"/>
+		<property name="typeCode" value="ReturnRequest"/>
+	</bean>
+
+	<bean id="PrepareReturnOrderInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+	      scope="tenant">
+		<property name="interceptor" ref="PrepareReplacementOrderInterceptor"/>
+		<property name="typeCode" value="ReplacementOrder"/>
+	</bean>
+
+	<bean id="defaultConsignmentBasedReturnableCheck"
+	      class="de.hybris.platform.returns.strategy.impl.DefaultConsignmentBasedReturnableCheck"
+	      parent="abstractBusinessService" scope="tenant">
+	</bean>
+
+	<bean id="defaultChecksExistingReturnEntry"
+	      class="de.hybris.platform.returns.strategy.impl.DefaultReturnEntryBasedReturnableCheck"
+	      parent="abstractBusinessService" scope="tenant">
+	</bean>
+
+	<alias name="defaultReplacementOrderDao" alias="replacementOrderDao"/>
+	<bean id="defaultReplacementOrderDao"
+	      class="de.hybris.platform.returns.dao.impl.DefaultReplacementOrderDao"
+	      parent="abstractItemDao" scope="tenant">
+	</bean>
+
+	<alias name="defaultReturnRequestDao" alias="returnRequestDao"/>
+	<bean id="defaultReturnRequestDao"
+	      class="de.hybris.platform.returns.dao.impl.DefaultReturnRequestDao"
+	      parent="abstractItemDao" scope="tenant">
+	</bean>
+
+	<alias name="defaultRefundDao" alias="refundDao"/>
+	<bean id="defaultRefundDao" class="de.hybris.platform.refund.dao.impl.DefaultRefundDao"
+	      parent="abstractItemDao" scope="tenant">
+	</bean>
+
+	<alias alias="orderReturnDao" name="defaultOrderReturnDao"/>
+	<bean id="defaultOrderReturnDao"
+	      class="de.hybris.platform.returns.dao.impl.DefaultOrderReturnDao"
+	      parent="abstractItemDao" scope="tenant">
+	</bean>
+
+	<alias alias="orderReturnRecordsHandler" name="defaultOrderReturnRecordsHandler"/>
+	<bean id="defaultOrderReturnRecordsHandler"
+	      class="de.hybris.platform.returns.impl.DefaultOrderReturnRecordsHandler"
+	      parent="abstractBusinessService" scope="tenant">
+		<property name="orderReturnDao" ref="orderReturnDao"/>
+		<property name="orderHistoryService" ref="defaultOrderHistoryService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<!--  end of return  -->
+
+	<alias alias="orderFulfillmentProcessService" name="defaultOrderFulfillmentProcessService"/>
+	<bean id="defaultOrderFulfillmentProcessService"
+	      class="de.hybris.platform.orderprocessing.impl.DefaultOrderFulfillmentProcessService"
+	      scope="tenant" parent="abstractBusinessService">
+		<property name="businessProcessService" ref="businessProcessService"/>
+		<property name="fulfillmentProcessCodeGenerator" ref="fulfillmentProcessCodeGenerator"/>
+	</bean>
+
+	<bean id="fulfillmentProcessCodeGenerator"
+	      class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+	      init-method="init" scope="tenant">
+		<property name="key" value="ORDPROC"/>
+		<property name="digits" value="4"/>
+		<property name="start" value="0000"/>
+		<property name="numeric" value="true"/>
+	</bean>
+
+	<bean id="testProcessDefinitionResource"
+	      class="de.hybris.platform.processengine.definition.ProcessDefinitionResource"
+	      scope="tenant">
+		<property name="resource" value="classpath:/testsrc/testProcess.xml"/>
+	</bean>
+
+	<bean id="testActionNode" class="de.hybris.platform.orderprocessing.TestActionNode"
+	      scope="tenant"/>
+
+	<bean id="core.deliverycostsstrategy.default"
+	      class="de.hybris.platform.basecommerce.jalo.DefaultMultiAddressDeliveryCostsStrategy"
+	      scope="tenant">
+		<property name="cartFactory" ref="inMemoryCartFactory"/>
+	</bean>
+
+	<bean id="inMemoryCartFactory" class="de.hybris.platform.basecommerce.jalo.DefaultCartFactory"
+	      scope="tenant"/>
+
+	<alias alias="stockLevelDao" name="defaultStockLevelDao"/>
+	<bean id="defaultStockLevelDao" class="de.hybris.platform.stock.impl.DefaultStockLevelDao"
+	      parent="abstractItemDao" scope="tenant">
+		<property name="typeService" ref="typeService"/>
+		<property name="transactionTemplate">
+			<bean class="org.springframework.transaction.support.TransactionTemplate" scope="tenant">
+				<property name="transactionManager" ref="txManager"/>
+			</bean>
+		</property>
+		<property name="jdbcTemplate">
+			<bean class="org.springframework.jdbc.core.JdbcTemplate" scope="tenant">
+				<property name="dataSource" ref="dataSource"/>
+			</bean>
+		</property>
+	</bean>
+
+	<!--  Stock Service -->
+	<alias alias="stockService" name="defaultStockService"/>
+	<bean id="defaultStockService"
+	      class="de.hybris.platform.stock.impl.DefaultStockService"
+	      parent="abstractBusinessService" scope="tenant">
+		<property name="stockLevelStatusStrategy" ref="stockLevelStatusStrategy"/>
+		<property name="productAvailabilityStrategy" ref="productAvailabilityStrategy"/>
+		<property name="stockLevelProductStrategy" ref="stockLevelProductID"/>
+		<property name="stockLevelDao" ref="stockLevelDao"/>
+	</bean>
+
+	<alias alias="stockLevelStatusStrategy" name="defaultStockLevelStatusStrategy"/>
+	<bean id="defaultStockLevelStatusStrategy"
+	      class="de.hybris.platform.stock.strategy.impl.DefaultStockLevelStatusStrategy"
+	      parent="abstractBusinessService" scope="tenant">
+	</bean>
+
+	<alias alias="productAvailabilityStrategy" name="defaultProductAvailabilityStrategy"/>
+	<bean id="defaultProductAvailabilityStrategy"
+	      class="de.hybris.platform.stock.strategy.impl.DefaultProductAvailabilityStrategy" scope="tenant">
+		<property name="i18nService" ref="i18nService"/>
+		<property name="bestMatchStrategy" ref="bestMatchStrategy"/>
+		<property name="bundleProvider" ref="basecommerce.resourceBundleProvider"/>
+		<property name="stockLevelDao" ref="stockLevelDao"/>
+	</bean>
+
+	<alias alias="basecommerce.resourceBundleProvider" name="basecommerce.defaultResourceBundleProvider"/>
+	<bean id="basecommerce.defaultResourceBundleProvider"
+	      class="de.hybris.platform.basecommerce.messages.impl.DefaultResourceBundleProvider" scope="tenant">
+		<!-- hybris specific resource bundles: [extension]/resources/localization/[extension]/[resourceBundle]. -->
+		<property name="resourceBundle" value="BasecommerceMessages"/>
+	</bean>
+
+	<alias alias="stockLevelProductID" name="defaultStockLevelProductID"/>
+	<bean id="defaultStockLevelProductID"
+	      class="de.hybris.platform.stock.strategy.impl.DefaultStockLevelProductStrategy" scope="tenant">
+		<property name="qualifier" value="code"/>
+	</bean>
+
+	<alias alias="bestMatchStrategy" name="defaultBestMatchStrategy"/>
+	<bean id="defaultBestMatchStrategy"
+	      class="de.hybris.platform.stock.strategy.impl.DefaultBestMatchStrategy" scope="tenant">
+	</bean>
+
+	<!-- Order Status Display dynamic handlers -->
+
+	<alias alias="dynamicAttributesOrderStatusDisplay" name="dynamicAttributesOrderStatusDisplayByEnum"/>
+
+	<bean id="dynamicAttributesOrderStatusDisplayByEnum" class="de.hybris.platform.orderhandler.DynamicAttributesOrderStatusDisplayByEnum" scope="tenant">
+		<property name="enumerationService" ref="enumerationService"/>
+	</bean>
+
+	<bean id="dynamicAttributesOrderStatusDisplayByMap" class="de.hybris.platform.orderhandler.DynamicAttributesOrderStatusDisplayByMap" scope="tenant">
+		<property name="statusDisplayMap">
+			<map>
+				<entry key="CANCELLED" value="orderStatusDisplay.CANCELLED"/>
+				<entry key="CANCELLING" value="orderStatusDisplay.CANCELLING"/>
+				<entry key="COMPLETED" value="orderStatusDisplay.COMPLETED"/>
+				<entry key="CREATED" value="orderStatusDisplay.CREATED"/>
+				<entry key="ON_VALIDATION" value="orderStatusDisplay.ON_VALIDATION"/>
+			</map>
+		</property>
+		<property name="defaultStatus" value="orderStatusDisplay.default"/>
+	</bean>
+
+	<alias alias="pointOfServiceService" name="defaultPointOfServiceService"/>
+	<bean id="defaultPointOfServiceService" class="de.hybris.platform.storelocator.pos.impl.DefaultPointOfServiceService" scope="tenant">
+		<property name="pointOfServiceDao" ref="pointOfServiceDao"/>
+	</bean>
+
+	<!--  BaseSite -->
+	<bean id="baseSiteDao" class="de.hybris.platform.basecommerce.site.dao.impl.BaseSiteDaoImpl" parent="abstractItemDao" scope="tenant"/>
+
+	<alias alias="baseSiteService" name="defaultBaseSiteService"/>
+	<bean id="defaultBaseSiteService" class="de.hybris.platform.site.impl.DefaultBaseSiteService" parent="abstractBusinessService" scope="tenant">
+		<property name="baseSiteDao" ref="baseSiteDao"/>
+		<property name="activateBaseSiteInSessionStrategy" ref="activateBaseSiteInSessionStrategy"/>
+	</bean>
+
+	<alias alias="baseStoreSelectorStrategy" name="defaultBaseStoreSelectorStrategy"/>
+	<bean id="defaultBaseStoreSelectorStrategy"
+	      class="de.hybris.platform.basecommerce.strategies.impl.DefaultBaseStoreSelectorStrategy" scope="tenant">
+		<property name="baseSiteService" ref="baseSiteService"/>
+	</bean>
+
+	<alias alias="activateBaseSiteInSessionStrategy" name="baseCommerceActivateBaseSiteInSessionStrategy"/>
+	<bean id="baseCommerceActivateBaseSiteInSessionStrategy"
+	      class="de.hybris.platform.basecommerce.strategies.impl.DefaultActivateBaseSiteInSessionStrategy" scope="tenant">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+	</bean>
+
+	<bean id="addressLine1Attribute" class="de.hybris.platform.basecommerce.model.AddressLine1Attribute" scope="tenant"/>
+	<bean id="addressLine2Attribute" class="de.hybris.platform.basecommerce.model.AddressLine2Attribute" scope="tenant"/>
+
+	<bean id="defaultApplyExternalTaxesStrategy" class="de.hybris.platform.externaltax.impl.DefaultApplyExternalTaxesStrategy" scope="tenant"/>
+	<alias alias="applyExternalTaxesStrategy" name="defaultApplyExternalTaxesStrategy"/>
+
+	<bean id="productTaxCodeService" class="de.hybris.platform.externaltax.impl.DefaultProductTaxCodeService" scope="tenant">
+		<property name="productTaxCodeDao" ref="productTaxCodeDao"/>
+	</bean>
+
+	<bean id="defaultProductTaxCodeDao" class="de.hybris.platform.externaltax.impl.DefaultProductTaxCodeDao" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	<alias alias="productTaxCodeDao" name="defaultProductTaxCodeDao"/>
+
+
+	<alias alias="geoServiceWrapper" name="defaultCommerceMockGeoWebServiceWrapper"/>
+	<bean id="defaultCommerceMockGeoWebServiceWrapper" class="de.hybris.platform.storelocator.impl.CommerceMockGeoWebServiceWrapper">
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="countryIsoGPSLocationMap" ref="countryIsoGPSLocationMap"/>
+	</bean>
+
+	<alias alias="countryIsoGPSLocationMap" name="defaultCountryIsoGPSLocationMap"/>
+	<bean id="defaultCountryIsoGPSLocationMap" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="sourceMap">
+			<map merge="true" key-type="java.lang.String" value-type="de.hybris.platform.storelocator.GPS">
+				<entry key="DEFAULT">
+					<bean class="de.hybris.platform.storelocator.impl.DefaultGPS">
+						<constructor-arg value="0D"/>
+						<constructor-arg value="0D"/>
+					</bean>
+				</entry>
+				<entry key="CN">
+					<bean class="de.hybris.platform.storelocator.impl.DefaultGPS">
+						<constructor-arg value="35.0000D"/>
+						<constructor-arg value="103.0000D"/>
+					</bean>
+				</entry>
+				<entry key="JP">
+					<bean class="de.hybris.platform.storelocator.impl.DefaultGPS">
+						<constructor-arg value="35.7091D"/>
+						<constructor-arg value="139.6732D"/>
+					</bean>
+				</entry>
+				<entry key="US">
+					<bean class="de.hybris.platform.storelocator.impl.DefaultGPS">
+						<constructor-arg value="40.7127D"/>
+						<constructor-arg value="74.0059D"/>
+					</bean>
+				</entry>
+				<entry key="GB">
+					<bean class="de.hybris.platform.storelocator.impl.DefaultGPS">
+						<constructor-arg value="51.513779D"/>
+						<constructor-arg value="-0.1167D"/>
+					</bean>
+				</entry>
+				<entry key="GG">
+					<bean class="de.hybris.platform.storelocator.impl.DefaultGPS">
+						<constructor-arg value="55.8642D"/>
+						<constructor-arg value="-4.258D"/>
+					</bean>
+				</entry>
+				<entry key="IM">
+					<bean class="de.hybris.platform.storelocator.impl.DefaultGPS">
+						<constructor-arg value="54.181727D"/>
+						<constructor-arg value="-4.551086D"/>
+					</bean>
+				</entry>
+				<entry key="JE">
+					<bean class="de.hybris.platform.storelocator.impl.DefaultGPS">
+						<constructor-arg value="52.531917D"/>
+						<constructor-arg value="-0.47238D"/>
+					</bean>
+				</entry>
+				<entry key="DE">
+					<bean class="de.hybris.platform.storelocator.impl.DefaultGPS">
+						<constructor-arg value="52.514524D"/>
+						<constructor-arg value="13.35029D"/>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>
+

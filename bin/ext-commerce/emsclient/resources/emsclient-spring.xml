@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+           
+    <import resource="classpath:/META-INF/entitlement-rest-client-spring.xml"/>
+    
+        
+	<alias name="defaultEmsGrantGrantConverter" alias="emsGrantGrantConverter" />
+	<bean id="defaultEmsGrantGrantConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="grantData" />
+		<property name="populators">
+			<list>
+				<ref bean="emsGrantGrantPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultEmsGrantDataMeteredConditionPopulator" alias="emsGrantDataMeteredConditionPopulator" />
+	<bean name="defaultEmsGrantDataMeteredConditionPopulator"
+		class="de.hybris.platform.emsclient.populators.EmsGrantDataMeteredConditionPopulator">
+	</bean>
+	
+	<bean id="grantData" class="com.hybris.services.entitlements.api.GrantData" scope="prototype"/>
+	<bean id="conditionData" class="com.hybris.services.entitlements.condition.ConditionData" scope="prototype"/>
+	
+	
+	<alias name="defaultEmsGrantGrantPopulator" alias="emsGrantGrantPopulator" />
+	<bean name="defaultEmsGrantGrantPopulator"
+		class="de.hybris.platform.emsclient.populators.EmsGrantGrantPopulator">
+		<property name="conditionDataConverters">
+		<list merge="true">
+			<ref bean="emsGrantDataStringConditionConverter"/>
+			<ref bean="emsGrantDataMeteredConditionConverter"/>
+			<ref bean="emsGrantDataGeoConditionConverter"/>
+			<ref bean="emsGrantDataTimeConditionConverter"/>
+			<ref bean="emsGrantDataPathConditionConverter"/>
+		</list>	
+		</property>
+		<property name="dateTimeConverter" ref="dateTimeConverter" />			
+	</bean>
+	
+	<alias name="defaultEmsGrantDataStringConditionPopulator" alias="emsGrantDataStringConditionPopulator" />
+	<bean name="defaultEmsGrantDataStringConditionPopulator"
+		class="de.hybris.platform.emsclient.populators.EmsGrantDataStringConditionPopulator">
+	</bean>
+	
+	<alias name="defaultEmsGrantDataStringConditionConverter" alias="emsGrantDataStringConditionConverter" />
+	<bean id="defaultEmsGrantDataStringConditionConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="conditionData" />
+		<property name="populators">
+			<list>
+				<ref bean="emsGrantDataStringConditionPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultEmsGrantDataMeteredConditionConverter" alias="emsGrantDataMeteredConditionConverter" />
+	<bean id="defaultEmsGrantDataMeteredConditionConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="conditionData" />
+		<property name="populators">
+		<list>
+				<ref bean="emsGrantDataMeteredConditionPopulator" />
+			</list>
+		</property>
+	</bean>		
+	
+	
+	<alias name="defaultEmsGrantDataGeoConditionPopulator" alias="emsGrantDataGeoConditionPopulator" />
+	<bean name="defaultEmsGrantDataGeoConditionPopulator"
+		class="de.hybris.platform.emsclient.populators.EmsGrantDataGeoConditionPopulator"/>
+
+	<alias name="defaultEmsGrantDataGeoConditionConverter" alias="emsGrantDataGeoConditionConverter" />
+	<bean id="defaultEmsGrantDataGeoConditionConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="conditionData" />
+		<property name="populators">
+		<list>			
+				<ref bean="emsGrantDataGeoConditionPopulator" />
+		</list>
+		</property>
+	</bean>				
+
+	<alias name="defaultEmsGrantDataTimeConditionConverter" alias="emsGrantDataTimeConditionConverter" />
+	<bean id="defaultEmsGrantDataTimeConditionConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="conditionData" />
+		<property name="populators">
+		<list>				
+				<ref bean="emsGrantDataTimeConditionPopulator" />
+		</list>
+		</property>
+	</bean>
+				
+	<alias name="defaultEmsGrantDataTimeConditionPopulator" alias="emsGrantDataTimeConditionPopulator" />
+	<bean name="defaultEmsGrantDataTimeConditionPopulator"
+		class="de.hybris.platform.emsclient.populators.EmsGrantDataTimeConditionPopulator">
+		<property name="dateTimeConverter" ref="dateTimeConverter"/>
+	</bean>
+		
+	<alias name="defaultEmsGrantDataPathConditionConverter" alias="emsGrantDataPathConditionConverter" />
+	<bean id="defaultEmsGrantDataPathConditionConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="conditionData" />
+		<property name="populators">
+		<list>				
+				<ref bean="emsGrantDataPathConditionPopulator" />
+		</list>
+		</property>
+	</bean>		
+		
+	<alias name="defaultEmsGrantDataPathConditionPopulator" alias="emsGrantDataPathConditionPopulator" />
+	<bean name="defaultEmsGrantDataPathConditionPopulator"
+		class="de.hybris.platform.emsclient.populators.EmsGrantDataPathConditionPopulator">
+	</bean>	
+
+    <alias name="defaultEntitlementRestClient" alias="apiEntitlementFacade" />
+
+    <alias name="defaultEntitlementFacadeDecorator" alias="entitlementFacadeDecorator" />
+	<bean id="defaultEntitlementFacadeDecorator"
+		class="de.hybris.platform.emsclient.facades.impl.DefaultEMSEntitlementFacadeDecorator" >
+		<property name="emsGrantGrantConverter" ref="emsGrantGrantConverter" />
+		<property name="entitlementFacade" ref="entitlementFacade" />
+	</bean>
+</beans>

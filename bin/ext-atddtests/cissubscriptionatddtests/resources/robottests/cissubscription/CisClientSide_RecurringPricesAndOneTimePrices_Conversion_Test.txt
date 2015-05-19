@@ -1,0 +1,2075 @@
+*** Settings ***
+Resource          subscriptionservices/SubscriptionProduct_Keywords.txt
+Resource          subscriptionservices/SubscriptionPricePlan_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+Resource          commerce/SubscriptionCommerce_Keywords.txt
+Resource          cissubscription/CisSubscription_Keywords.txt
+Test Setup        import commercecart sampledata
+
+
+*** Test Cases ***
+# Onfirstbill
+
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_CycleFrom1To1
+    [Documentation]    1 subscription product with 1 recurring charge entry
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_CycleFrom1To_
+    [Documentation]    1 subscription product with 1 recurring charge entry
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"  
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "-1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>0</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+ 
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_CycleFrom1To1_From2To2
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2" and cycle end "2"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>30.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_CycleFrom1To1_From2To3
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2" and cycle end "3"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>30.99</chargePrice>
+																					<numberOfCycles>2</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_CycleFrom1To1_From2To12
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2" and cycle end "12"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>30.99</chargePrice>
+																					<numberOfCycles>11</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_CycleFrom1To3_From4To6
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "6"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_CycleFrom1To3_From4To4
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"	
+	    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_CycleFrom1To1_From2To_
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2" and cycle end "-1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>30.99</chargePrice>
+																					<numberOfCycles>0</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+ 
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_CycleFrom1To1_From2To2_From3To3
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "3" and cycle end "3"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_CycleFrom1To2_From3To5_From6To9
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "3" and cycle end "5"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "6" and cycle end "9"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>2</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>4</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+        
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_CycleFrom1To1_From2To2_From3To4
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "3" and cycle end "4"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>2</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+		    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_CycleFrom1To1_From2To2_From3To_
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "3" and cycle end "-1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>0</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"	
+    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_CycleFrom1To3_From4To4_From5To_
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "5" and cycle end "-1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>0</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+
+# Paynow
+
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Paynow_CycleFrom1To1
+    [Documentation]    1 subscription product with 1 recurring charge entry
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"  
+    for subscription priceplan "PP1" add "paynow" one time price of "7"   
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Paynow_CycleFrom1To_
+    [Documentation]    1 subscription product with 1 recurring charge entry
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"   
+    for subscription priceplan "PP1" add "paynow" one time price of "7"  
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "-1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>0</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+ 
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Paynow_CycleFrom1To1_From2To2
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"  
+    for subscription priceplan "PP1" add "paynow" one time price of "7"   
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2" and cycle end "2"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>30.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Paynow_CycleFrom1To1_From2To3
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2" and cycle end "3"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>30.99</chargePrice>
+																					<numberOfCycles>2</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Paynow_CycleFrom1To1_From2To12
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2" and cycle end "12"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>30.99</chargePrice>
+																					<numberOfCycles>11</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Paynow_CycleFrom1To3_From4To6
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "6"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Paynow_CycleFrom1To3_From4To4
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"	
+	    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Paynow_CycleFrom1To1_From2To_
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2" and cycle end "-1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>30.99</chargePrice>
+																					<numberOfCycles>0</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+ 
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Paynow_CycleFrom1To1_From2To2_From3To3
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "3" and cycle end "3"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Paynow_CycleFrom1To2_From3To5_From6To9
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "3" and cycle end "5"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "6" and cycle end "9"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>2</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>4</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+        
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Paynow_CycleFrom1To1_From2To2_From3To4
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "3" and cycle end "4"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>2</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+		    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Paynow_CycleFrom1To1_From2To2_From3To_
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "3" and cycle end "-1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>0</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"	
+    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Paynow_CycleFrom1To3_From4To4_From5To_
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "5" and cycle end "-1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>0</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+
+# Onfirstbill+Paynow
+
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_Paynow_CycleFrom1To1
+    [Documentation]    1 subscription product with 1 recurring charge entry
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_Paynow_CycleFrom1To_
+    [Documentation]    1 subscription product with 1 recurring charge entry
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "-1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>0</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+ 
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_Paynow_CycleFrom1To1_From2To2
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2" and cycle end "2"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>30.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_Paynow_CycleFrom1To1_From2To3
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2" and cycle end "3"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>30.99</chargePrice>
+																					<numberOfCycles>2</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_Paynow_CycleFrom1To1_From2To12
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2" and cycle end "12"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>30.99</chargePrice>
+																					<numberOfCycles>11</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_Paynow_CycleFrom1To3_From4To6
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "6"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_Paynow_CycleFrom1To3_From4To4
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"	
+	    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_Paynow_CycleFrom1To1_From2To_
+    [Documentation]    1 subscription product with 2 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2" and cycle end "-1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>30.99</chargePrice>
+																					<numberOfCycles>0</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+ 
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_Paynow_CycleFrom1To1_From2To2_From3To3
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "3" and cycle end "3"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_Paynow_CycleFrom1To2_From3To5_From6To9
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "3" and cycle end "5"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "6" and cycle end "9"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>2</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>4</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+        
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_Paynow_CycleFrom1To1_From2To2_From3To4
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "3" and cycle end "4"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>2</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+		    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_Paynow_CycleFrom1To1_From2To2_From3To_
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "3" and cycle end "-1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>0</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"	
+    
+Test_CisClientSide_RecurringPricesAndOneTimePrices_Conversion_Onfirstbill_Paynow_CycleFrom1To3_From4To4_From5To_
+    [Documentation]    1 subscription product with 3 recurring charge entries
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "5" and cycle end "-1"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>0</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"

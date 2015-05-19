@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+           
+	<bean id="instoreFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+		<constructor-arg>
+			<list>
+				<ref bean="log4jFilter"/>
+				<ref bean="tenantActivationFilter"/>				
+				<ref bean="instoreRedirectFilter"/>
+				<ref bean="sessionFilter"/>
+				<ref bean="instoreDataSourceSwitchingFilter"/>
+				<ref bean="instoreCatalogVersionActivationFilter"/>
+				<ref bean="instoreContextClassloaderFilter"/>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="instoreRedirectFilter" class="de.hybris.platform.servicelayer.web.RedirectWhenSystemIsNotInitializedFilter">
+		<constructor-arg>
+  			<value><!-- nothing - redirect to default maintenance page --></value>
+  		</constructor-arg>
+  		<property name="urlPaths">
+			<list>
+				<value>login</value>				
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="instoreContextClassloaderFilter" class="com.hybris.cockpitng.modules.spring.filter.ExternalModuleContextClassLoaderFilter">
+		<property name="componentDefinitionService" ref="moduleComponentDefinitionService"/>
+	</bean>
+	
+	<bean id="instoreDataSourceSwitchingFilter" class="de.hybris.platform.servicelayer.web.DataSourceSwitchingFilter">
+	</bean>
+	
+	 <bean id="instoreCatalogVersionActivationFilter" class="de.hybris.platform.servicelayer.web.DynamicCatalogVersionActivationFilter">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="catalogService" ref="catalogService"/>
+		<aop:scoped-proxy/>
+	</bean>
+</beans>

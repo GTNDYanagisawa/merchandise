@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="595" pageHeight="842" columnWidth="495" leftMargin="80" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="10"/>
+	<property name="ireport.y" value="0"/>
+	<style name="sectionTitleStyle" fill="Solid" hAlign="Left" vAlign="Middle" isBlankWhenNull="false" fontName="Arial Black" fontSize="12" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold"/>
+	<style name="attributeTitle" backcolor="#CCCCCC" hAlign="Left" vAlign="Top" fontName="Arial Black" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold">
+		<box topPadding="0" leftPadding="2" bottomPadding="0">
+			<pen lineWidth="0.25"/>
+			<topPen lineWidth="0.25"/>
+			<leftPen lineWidth="0.25"/>
+			<bottomPen lineWidth="0.25"/>
+			<rightPen lineWidth="0.25"/>
+		</box>
+	</style>
+	<subDataset name="dataset1">
+		<queryString language="xPath">
+			<![CDATA[/root/section/attribute]]>
+		</queryString>
+		<field name="type" class="java.lang.String">
+			<fieldDescription><![CDATA[@type]]></fieldDescription>
+		</field>
+		<field name="name" class="java.lang.String">
+			<fieldDescription><![CDATA[name]]></fieldDescription>
+		</field>
+		<field name="value" class="java.lang.String">
+			<fieldDescription><![CDATA[value]]></fieldDescription>
+		</field>
+	</subDataset>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SECTIONS_SUBREPORT" class="java.lang.Object" isForPrompting="false">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="ROWS_SUBREPORT" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="MEDIA_SUBREPORT" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="TABLE_SUBREPORT" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="TABLE_COLUMNS_TITLES_SUBREPORT" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="TABLE_ROWS_SUBREPORT" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="REFERENCE_TABLE_SUBREPORT" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="REFERENCE_TABLE_ROWS_SUBREPORT" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="CUSTOM_SECTION_SUBREPORT" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="CUSTOM_SECTION_DS_EXP" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="CUSTOM_ROW_SUBREPORT" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="CUSTOM_ROW_DS_EXP" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="MAIN_REPORT_TITLE" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Product specification"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LOCALIZED_ROW_DS_EXP" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="LOCALIZED_ROW_SUBREPORT" class="java.lang.Object" isForPrompting="false"/>
+	<parameter name="ATTRIBUTES_SUBREPORT" class="java.lang.Object" isForPrompting="false"/>
+	<queryString language="xPath">
+		<![CDATA[/root/section]]>
+	</queryString>
+	<field name="name" class="java.lang.String">
+		<fieldDescription><![CDATA[@name]]></fieldDescription>
+	</field>
+	<field name="type" class="java.lang.String">
+		<fieldDescription><![CDATA[@type]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="23" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="495" height="23" isPrintWhenDetailOverflows="true"/>
+				<box>
+					<pen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#FFFFFF"/>
+				</box>
+				<textElement>
+					<font fontName="Arial Black" size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{MAIN_REPORT_TITLE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="35" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement style="attributeTitle" mode="Opaque" x="0" y="10" width="480" height="12" backcolor="#CCCCCC"/>
+				<textElement>
+					<font fontName="Arial Black" size="9" isBold="false" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement x="0" y="22" width="555" height="12" isPrintWhenDetailOverflows="true">
+					<printWhenExpression><![CDATA[$F{type}.contains("simple")]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="CUSTOM_ROW_SUBREPORT">
+					<subreportParameterExpression><![CDATA[$P{CUSTOM_ROW_SUBREPORT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOCALIZED_ROW_SUBREPORT">
+					<subreportParameterExpression><![CDATA[$P{LOCALIZED_ROW_SUBREPORT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TABLE_SUBREPORT">
+					<subreportParameterExpression><![CDATA[$P{TABLE_SUBREPORT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="CUSTOM_ROW_DS_EXP">
+					<subreportParameterExpression><![CDATA[$P{CUSTOM_ROW_DS_EXP}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TABLE_COLUMNS_TITLES_SUBREPORT">
+					<subreportParameterExpression><![CDATA[$P{TABLE_COLUMNS_TITLES_SUBREPORT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LOCALIZED_ROW_DS_EXP">
+					<subreportParameterExpression><![CDATA[$P{LOCALIZED_ROW_DS_EXP}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ATTRIBUTES_SUBREPORT">
+					<subreportParameterExpression><![CDATA[$P{ATTRIBUTES_SUBREPORT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="REFERENCE_TABLE_ROWS_SUBREPORT">
+					<subreportParameterExpression><![CDATA[$P{REFERENCE_TABLE_ROWS_SUBREPORT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="TABLE_ROWS_SUBREPORT">
+					<subreportParameterExpression><![CDATA[$P{TABLE_ROWS_SUBREPORT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="MEDIA_SUBREPORT">
+					<subreportParameterExpression><![CDATA[$P{MEDIA_SUBREPORT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ROWS_SUBREPORT">
+					<subreportParameterExpression><![CDATA[$P{ROWS_SUBREPORT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="REFERENCE_TABLE_SUBREPORT">
+					<subreportParameterExpression><![CDATA[$P{REFERENCE_TABLE_SUBREPORT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[$P{REPORT_DATA_SOURCE}.subDataSource("/section/row")]]></dataSourceExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[(net.sf.jasperreports.engine.JasperReport)$P{SECTIONS_SUBREPORT}]]></subreportExpression>
+			</subreport>
+			<subreport>
+				<reportElement x="0" y="22" width="555" height="12" isPrintWhenDetailOverflows="true">
+					<printWhenExpression><![CDATA[$F{type}.contains("custom")]]></printWhenExpression>
+				</reportElement>
+				<subreportParameter name="CUSTOM_ROW_DS_EXP">
+					<subreportParameterExpression><![CDATA[$P{CUSTOM_ROW_DS_EXP}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="CUSTOM_ROW_SUBREPORT">
+					<subreportParameterExpression><![CDATA[$P{CUSTOM_ROW_SUBREPORT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[$P{REPORT_DATA_SOURCE}.subDataSource($P{CUSTOM_SECTION_DS_EXP})]]></dataSourceExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[(net.sf.jasperreports.engine.JasperReport)$P{CUSTOM_SECTION_SUBREPORT}]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

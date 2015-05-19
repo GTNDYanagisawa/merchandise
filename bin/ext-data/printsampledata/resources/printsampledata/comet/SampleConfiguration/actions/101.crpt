@@ -1,0 +1,48 @@
+/*
+	Script           :	101
+	Script Name      :	New Language Layer
+	Author           :	Gabriele Siegert
+	Description      :	Make new layer, which name is given by user, 
+						copy contents of english layer to it
+						and update all placeholders on new layer.
+*/
+
+#include "internal/types.h"
+#include "internal/text.h"
+
+int classID	= 3;
+char * masterLayer = "en.GB";
+char * defaultAnswer = "de.DE";
+
+int main ()
+{
+	int err = 0;
+	char * lang = alloc(300);
+	LinkList lli = linklist::alloc();
+
+	if (gRun == 1)
+	{
+		strcpy (lang, defaultAnswer);
+		if( askstring(lang, "New language", "Adding a new language layer", "okay", "cancel"))
+		{
+			if (layer::index(lang) >= 0)
+			{
+				showmessage ("Layer %s exists already, delete it first, please!", lang);
+			}
+			else
+			{
+				layer::add (lang, masterLayer);
+				err = layer::copy (masterLayer, lang);
+				if( err != 0 )
+				{
+					wlog ("","Error while copying layer: %d, %s \n", err, serror(err) );
+            	}
+
+				layer::select (lang);
+				linklist::load (lli, kDesignateActiveLayer);
+         }
+      }
+   }
+   
+	return 0;
+}

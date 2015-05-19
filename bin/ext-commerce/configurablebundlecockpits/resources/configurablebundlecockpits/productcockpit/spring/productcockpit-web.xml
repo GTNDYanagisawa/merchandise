@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+	default-autowire="byName">
+
+
+	<bean id="themeConfig" class="de.hybris.platform.cockpit.util.CockpitThemeConfig" scope="singleton">
+		<property name="keepZKCss" value="false"/>
+		<property name="uris">
+			<list>
+				<value>/cockpit/css/zk_essential.css</value>
+				<value>/cockpit/css/zk_recommended.css</value>
+				<value>/cockpit/css/cockpit_essential.css</value>
+				<value>/cockpit/css/cockpit_comments.css</value>
+				<value>/cockpit/css/cockpit_compare.css</value>
+				<value>/cockpit/css/cockpit_login.css</value>
+				<value>/cockpit/css/cockpit_navsections.css</value>
+				<value>/cockpit/css/cockpit_refeditor.css</value>
+				<value>/cockpit/css/cockpit_sectionbrowser.css</value>
+				<value>/cockpit/css/cockpit_widgets.css</value>
+				<value>/cockpit/css/cockpit_wizard.css</value>
+				<value>/cockpit/css/cockpit_workflow.css</value>
+				
+				<value>/productcockpit/css/bundleproductcockpit.css</value>
+				<value>/productcockpit/css/productcockpit.css</value>
+				<value>/productcockpit/css/defaultstyles.css</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ProductBundlePerspectivePluginList" class="de.hybris.platform.cockpit.session.PerspectivePluginList" scope="session">
+		<property name="additionalPerspectives">
+			<list>
+				<ref bean="BundlePerspective" />
+			</list>
+		</property>
+	</bean>
+
+
+
+	<bean id="ProductPerspective" class="de.hybris.platform.productcockpit.session.impl.ProductPerspective" scope="session"
+		parent="BasePerspective">
+		<property name="uid" value="productcockpit.perspective.product" />
+		<property name="label" value="perspective.product" />
+		<property name="customCsaURI" value="/productcockpit/productCSA.zul" />
+		<property name="infoBoxTimeout" value="2000" />
+
+		<property name="navigationArea">
+			<ref bean="ProductNavigationArea" />
+		</property>
+		<property name="browserArea">
+			<bean class="de.hybris.platform.productcockpit.session.impl.BrowserArea">
+				<property name="viewURI" value="/productcockpit/productBrowser.zul" />
+				<property name="multiSelectActions">
+					<ref bean="ProductContentBrowserActionColumn" />
+				</property>
+				<property name="defaultBrowserViewMapping">
+					<map>
+						<entry key="cockpitgroup" value="GRID" />
+						<entry key="productmanagergroup" value="GRID" />
+					</map>
+				</property>
+				<property name="inspectorRenderer" ref="coverageInspectorRenderer"/>
+    			<property name="openInspectorOnSelect" value="true"/>
+			</bean>
+		</property>
+		<property name="editorArea">
+			<bean id="ProductEditorAreaModel" parent="BaseEditorAreaModel">
+				<property name="editorAreaController">
+					<ref bean="ProductEditorAreaController" />
+				</property>
+<!--				<property name="width" value="300px"/>-->
+			</bean>
+		</property>
+		<property name="popupEditorArea">
+			<bean id="ProductPopupEditor" parent="BasePopupEditor">
+				<property name="editorAreaController">
+					<ref bean="PopupEditorAreaController" />
+				</property>
+			</bean>
+		</property>
+		<property name="editorAreaTypes">
+			<set>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="Product" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="MediaContainer" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+			</set>
+		</property>
+	</bean>
+	
+
+
+	<bean id="bundleComponentInspectorRenderer" class="de.hybris.platform.configurablebundlecockpits.productcockpit.components.inspector.impl.DefaultBundleInspectorRenderer" parent="coverageInspectorRenderer" scope="session">
+        <property name="showOnlyVisibleRows" value="true"/>
+	</bean>
+	
+	<bean id="BundlePerspective" class="de.hybris.platform.configurablebundlecockpits.productcockpit.session.impl.BundleCatalogPerspective" scope="session"
+		parent="BasePerspective">
+		<property name="uid" value="configurablebundlecockpits.perspective.bundling" />
+		<property name="customCsaURI" value="/productcockpit/catalogCSA.zul" />
+		<property name="label" value="configurablebundlecockpits.perspective.bundling" />
+		<property name="navigationArea">
+			<ref bean="BundleCatalogNavigationArea" />
+		</property>
+		<property name="browserArea">
+			<!-- 
+			<bean class="de.hybris.platform.productcockpit.session.impl.CatalogBrowserArea">
+				<property name="viewURI" value="/productcockpit/catalogBrowser.zul" />
+			</bean>
+			-->
+			<bean class="de.hybris.platform.configurablebundlecockpits.productcockpit.session.impl.BundleNavigationNodeBrowserArea">
+				<!-- <property name="rootSearchTypeCode" value="AbstractPage" />  todo change to navigationNode -->
+				<property name="viewURI" value="/productcockpit/bundleNavigationNodesBrowser.zul" />
+				<property name="defaultBrowserClass" value="de.hybris.platform.configurablebundlecockpits.productcockpit.session.impl.BundleNavigationNodeBrowserModel"/>
+				<property name="defaultBrowserViewMapping">
+					<map>
+						<entry key="cockpitgroup" value="GRID" />
+						<entry key="cmsmanagergroup" value="GRID" />
+					</map>
+				</property>
+	            
+	            <property name="inspectorRenderer" ref="bundleComponentInspectorRenderer"/>
+	            <property name="openInspectorOnSelect" value="true"/>				
+	           
+			</bean>
+			
+		</property>
+		<property name="editorArea">
+			<bean id="CatalogEditorAreaModel" parent="BaseEditorAreaModel">
+				<property name="editorAreaController">
+					<ref bean="CatalogEditorAreaController" />
+				</property>
+			</bean>
+		</property>
+		<property name="popupEditorArea">
+			<bean id="CatalogPopupEditor" parent="BasePopupEditor">
+				<property name="editorAreaController">
+					<ref bean="PopupEditorAreaController" />
+				</property>
+			</bean>
+		</property>
+		<property name="editorAreaTypes">
+			<set>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="Product" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="Category" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="ClassAttributeAssignment" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="BundleTemplate" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="AbstractBundleRule" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+			</set>
+		</property>
+	</bean>
+	<bean id="EditorSectionRowRenderer" class="de.hybris.platform.configurablebundlecockpits.productcockpit.session.impl.AdditionalInfoEditorRowRenderer" scope="session">
+        <property name="editorFactory">
+            <ref bean="EditorFactory"/>
+        </property>
+    </bean>
+
+	<!-- Catalog perspective: Navigation area -->
+	<bean id="BundleCatalogNavigationArea" class="de.hybris.platform.configurablebundlecockpits.productcockpit.session.impl.BundleCatalogNavigationArea" scope="session"
+		parent="BaseNavigationArea">
+		<property name="sectionModel">
+			<ref bean="BundleCatalogNavigationAreaModel" />
+		</property>
+		<property name="sections">
+			<list>
+				<ref bean="BundleCatalogCatalogSelectorSection" />
+				<ref bean="ProductUndoSection" />
+				<ref bean="ProductWorkflowSection"/>
+			</list>
+		</property>
+		<property name="infoSlotAttachmentTypes">
+			<ref bean="WorkflowAttachmentData"/>
+		</property>
+	</bean>
+
+	<bean id="BundleCatalogNavigationAreaModel" class="de.hybris.platform.productcockpit.components.navigationarea.CatalogNavigationAreaModel"
+		scope="session">
+	</bean>
+
+	<!-- navigation area sections -->
+	<bean id="BundleCatalogCatalogSelectorSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection"
+		scope="session">
+		<property name="localizedLabel" value="navigationarea.catalog" />
+		<property name="visible" value="true" />
+		<property name="renderer" ref="bundleCatalogSectionRenderer"/>
+	</bean>
+
+	<alias alias="bundleNavigationService" name="defaultBundleNavigationService" />
+	<bean id="defaultBundleNavigationService" class="de.hybris.platform.configurablebundlecockpits.servicelayer.services.impl.DefaultBundleNavigationService" parent="abstractBusinessService">
+		<property name="bundleTemplateService" ref="bundleTemplateService" />
+	</bean>
+	
+	<bean id="bundleRelatedItemListController" class="de.hybris.platform.configurablebundlecockpits.productcockpit.navigationnode.browserarea.list.BundleRelatedItemListController" scope="session">
+		<property name="bundleNavigationService" ref="bundleNavigationService"/>
+	</bean>
+	<bean id="bundleNavigationNodeRenderer" class="de.hybris.platform.configurablebundlecockpits.productcockpit.navigationnode.browserarea.tree.BundleNavigationNodeRenderer" >
+		<property name="labelService" ref="labelService"/>
+		<property name="cloneIdGenerator" ref="cloneIdGenerator"/>
+	</bean>
+	
+	<bean id="cloneIdGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" >
+        <property name="key" value="cloneIDGenerator"/>
+        <property name="digits" value="8"/>
+        <property name="start" value="00000000"/>
+        <property name="numeric" value="false"/>
+    </bean>
+    
+	<bean id="bundleNavigationNodeController" class="de.hybris.platform.configurablebundlecockpits.productcockpit.navigationnode.browserarea.tree.BundleNavigationNodeController"
+		scope="session">
+		<property name="typeService" ref="cockpitTypeService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="bundleNavigationService" ref="bundleNavigationService"/>
+		<property name="navigationNodeWizardId" value="bundleNavigationItemsWizard"/>
+		<property name="relatedResourceWizardId" value="bundleNavigationItemsWizard"/>
+		<property name="bundleTemplateService" ref="bundleTemplateService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<alias alias="navigationNodeInnerWizard" name="defaultNavigationNodeInnerWizard"/>
+	<bean id="defaultNavigationNodeInnerWizard" class="de.hybris.platform.cockpit.wizards.generic.GenericItemWizard" scope="prototype">
+		<property name="componentURI" value="/cockpit/wizards/defaultWizardFrame.zul"/>
+		<property name="pages">
+			<list>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- browser models and their mappings -->
+    <bean id="AbstractPageableBrowserModel" class="de.hybris.platform.cockpit.session.impl.AbstractPageableBrowserModel" scope="prototype" abstract="true">
+		<property name="pageSizes">
+			<list>
+				<value type="java.lang.Integer">4</value>
+				<value type="java.lang.Integer">12</value>
+				<value type="java.lang.Integer">30</value>
+				<value type="java.lang.Integer">60</value>
+				<value type="java.lang.Integer">100</value>
+<!--				<value type="java.lang.Integer">250</value>-->
+			</list>
+		</property>	
+		<property name="pageSize" value="30"/>
+		<property name="maxPageSize" value="250"/>
+	</bean>
+	
+    
+	<alias alias="BundleProductSearchBrowserModel" name="bundleProductSearchBrowserModel" />
+ 	<bean id="bundleProductSearchBrowserModel" class="de.hybris.platform.configurablebundlecockpits.productcockpit.session.impl.BundleProductSearchBrowserModel"
+		scope="prototype" parent="AbstractPageableBrowserModel">
+		<property name="productCockpitCatalogService" ref="defaultProductCockpitCatalogService" />
+	</bean>
+	
+	<alias alias="BundleDisabledRuleSearchBrowserModel" name="bundleDisabledRuleSearchBrowserModel" />
+ 	<bean id="bundleDisabledRuleSearchBrowserModel" class="de.hybris.platform.configurablebundlecockpits.productcockpit.session.impl.BundleRulesSearchBrowserModel"
+		scope="prototype" parent="AbstractPageableBrowserModel">
+		<constructor-arg value="DisableProductBundleRule"/>
+		<property name="productCockpitCatalogService" ref="defaultProductCockpitCatalogService" />
+	</bean>
+	
+	<alias alias="BundlePriceSearchBrowserModel" name="bundlePriceSearchBrowserModel" />
+ 	<bean id="bundlePriceSearchBrowserModel" class="de.hybris.platform.configurablebundlecockpits.productcockpit.session.impl.BundleRulesSearchBrowserModel"
+		scope="prototype" parent="AbstractPageableBrowserModel">
+		<constructor-arg value="ChangeProductPriceBundleRule"/>
+		<property name="productCockpitCatalogService" ref="defaultProductCockpitCatalogService" />
+	</bean>
+		
+    <alias alias="bundleCatalogSectionRenderer" name="defaultBundleCatalogSectionRenderer" />
+    <bean id="defaultBundleCatalogSectionRenderer" class="de.hybris.platform.configurablebundlecockpits.productcockpit.components.navigationarea.renderer.BundleCatalogSectionRenderer"  >
+        <property name="productCockpitCatalogService" ref="defaultProductCockpitCatalogService" />
+        <property name="synchronizationService" ref="synchronizationService" />
+        <property name="commonI18NService" ref="commonI18NService" />
+    </bean>	
+
+	<alias alias="allowedProductTypesList" name="bundleAllowedProductTypesList" />
+	<bean id="bundleAllowedProductTypesList" class="java.util.ArrayList" >
+    	<constructor-arg>
+        	<list>
+            	<value type="java.lang.String">Product</value>               
+        	</list>
+    	</constructor-arg>
+	</bean>
+
+	<alias alias="uiAccessRightService" name="bundleUIAccessRightService" />
+	<bean id="bundleUIAccessRightService" class="de.hybris.platform.configurablebundlecockpits.admincockpit.services.security.impl.BundleUIAccessRightService">
+		<property name="cockpitUIComponentAccessRightDao" ref="cockpitUIComponentAccessRightDao"/>
+		<property name="userService" ref="userService"/>
+		<property name="dependencies">
+		    <list>
+		        <bean class="de.hybris.platform.configurablebundlecockpits.admincockpit.services.security.data.UIAccessRightDependency">
+		            <property name="typeCode" value="BundleTemplate" />
+		            <property name="attributeName" value="status" />
+		            <property name="dependentOnAttributeName" value="parentTemplate" />
+		            <property name="isNull" value="true" />
+		        </bean>
+		        <bean class="de.hybris.platform.configurablebundlecockpits.admincockpit.services.security.data.UIAccessRightDependency">
+		            <property name="typeCode" value="BundleTemplate" />
+		            <property name="attributeName" value="bundleSelectionCriteria" />
+		            <property name="dependentOnAttributeName" value="parentTemplate" />
+		            <property name="isNull" value="false" />
+		        </bean>
+		        <bean class="de.hybris.platform.configurablebundlecockpits.admincockpit.services.security.data.UIAccessRightDependency">
+		            <property name="typeCode" value="BundleTemplate" />
+		            <property name="attributeName" value="requiredBundleTemplates" />
+		            <property name="dependentOnAttributeName" value="parentTemplate" />
+		            <property name="isNull" value="false" />
+		        </bean>
+		        <bean class="de.hybris.platform.configurablebundlecockpits.admincockpit.services.security.data.UIAccessRightDependency">
+		            <property name="typeCode" value="BundleTemplate" />
+		            <property name="attributeName" value="childTemplates" />
+		            <property name="dependentOnAttributeName" value="parentTemplate" />
+		            <property name="isNull" value="true" />
+		        </bean>
+		    </list>
+		</property>
+	</bean>	
+
+
+	
+</beans>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2013 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- 1) Use the Rest Client to periodically poll changes from oms -->
+	<int:channel id="batchAtsHeader"/>
+	<int:inbound-channel-adapter
+			channel="batchAtsHeader"
+			ref="atsInboundChannelAdapter"
+			method="execute"
+			auto-startup="${hybris.omsats.importEnabled}">
+		<int:poller fixed-rate="${hybris.omsats.importPollRate}"/>
+	</int:inbound-channel-adapter>
+
+	<alias alias="stockLevelImportCommandConfig" name="defaultStockLevelImportCommandConfig"/>
+	<bean id="defaultStockLevelImportCommandConfig" class="de.hybris.platform.integration.commons.hystrix.OndemandHystrixCommandConfiguration" scope="tenant">
+		<property name="groupKey" value="${omsats.stockLevelImport.groupKey}"/>
+		<property name="threadTimeout" value="${omsats.stockLevelImport.threadTimeout}"/>
+		<property name="threadPoolSize" value="${omsats.stockLevelImport.threadPoolSize}"/>
+	</bean>
+
+	<bean id="atsInboundChannelAdapter"
+	      class="de.hybris.platform.integration.oms.ats.dataimport.adapter.AtsInboundChannelAdapter">
+		<property name="importLimit" value="${hybris.omsats.importLimit}"/>
+		<property name="importClusterId" value="${hybris.omsats.importClusterId}"/>
+		<property name="clusterService" ref="clusterService"/>
+		<property name="hystrixCommandConfig" ref="stockLevelImportCommandConfig"/>
+		<property name="ondemandHystrixCommandFactory" ref="ondemandHystrixCommandFactory"/>
+		<property name="atsExportFacade" ref="atsExportClient" />
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<!-- 2) Transform DTOs to Impex file -->
+	<int:service-activator
+			input-channel="batchAtsHeader"
+			output-channel="batchFilesTran"
+			ref="batchAtsTransformerTask"
+			method="execute"/>
+
+	<bean id="batchAtsTransformerTask"
+	      class="de.hybris.platform.integration.oms.ats.dataimport.task.impl.AtsImpexTransformerTask"
+	      parent="batchTransformerTask">
+		<property name="baseDirectory" ref="baseDirectory"/>
+		<property name="fileName" value="ats_stock"/>
+		<property name="atsImportConverter" ref="atsImportConverter"/>
+	</bean>
+
+	<alias name="defaultAtsImportPopulator" alias="atsImportPopulator"/>
+	<bean id="defaultAtsImportPopulator"
+	      class="de.hybris.platform.integration.oms.ats.dataimport.populator.AtsImportPopulator">
+		<property name="ondemandPreferenceSelectorService" ref="ondemandPreferenceSelectorService"/>
+	</bean>
+
+	<alias name="defaultAtsImportConverter" alias="atsImportConverter"/>
+	<bean id="defaultAtsImportConverter" parent="abstractPopulatingConverter" scope="prototype">
+		<lookup-method name="createTarget" bean="mapList"/>
+		<property name="populators">
+			<list>
+				<ref bean="atsImportPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<util:list id="mapList"
+	           value-type="java.util.Map&lt;Integer, String>"
+	           scope="prototype"/>
+
+	<bean id="batchAtsStockConverterMapping"
+	      class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping"
+	      p:mapping="ats_stock"
+	      p:converter-ref="batchAtsStockConverter"/>
+
+	<bean id="batchAtsStockConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{defaultImpexProductHeader}
+				# Update Stock
+				INSERT_UPDATE StockLevel;productCode[unique=true];warehouse(code)[unique=true];available;reserved;overSelling
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0};{+1};{+2};0;0</value>
+		</property>
+	</bean>
+
+	<!-- AOP -->
+	<aop:config proxy-target-class="true" expose-proxy="true">
+		<aop:pointcut id="atsTaskPointcut" expression="execution(* de.hybris.platform.integration.oms.ats.dataimport.adapter.AtsInboundChannelAdapter.execute*(..))"/>
+		<aop:aspect ref="tenantActivationAspect">
+			<aop:around pointcut-ref="atsTaskPointcut" method="execute"/>
+		</aop:aspect>
+	</aop:config>
+
+	<aop:config proxy-target-class="true" expose-proxy="true">
+		<aop:pointcut id="atsTaskXPointcut" expression="execution(* de.hybris.platform.integration.oms.ats.dataimport.task.impl.AtsImpexTransformerTask.execute*(..))"/>
+		<aop:aspect ref="tenantActivationAspect">
+			<aop:around pointcut-ref="atsTaskXPointcut" method="execute"/>
+		</aop:aspect>
+	</aop:config>
+</beans>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="defaultInStoreService" alias="inStoreService"/>
+	<bean id="defaultInStoreService" class="com.hybris.instore.impl.DefaultInStoreService">
+		<property name="userService" ref="userService"/>
+		<property name="siteSelectorStrategy" ref="inStoreSiteSelectorStrategy"/>
+	</bean>
+
+	<alias name="defaultInStoreSiteSelectorStrategy" alias="inStoreSiteSelectorStrategy"/>
+	<bean id="defaultInStoreSiteSelectorStrategy" class="com.hybris.instore.strategies.impl.DefaultInStoreSiteSelectorStrategy">
+		<property name="siteUidPrefix" value="instore-"/>
+	</bean>
+	
+	
+	<alias name="defaultLiveATSStoreFinderStockFacade" alias="liveATSStoreFinderStockFacade"/>
+	<bean id="defaultLiveATSStoreFinderStockFacade" parent="storeFinderStockFacade">
+		<property name="storeStockConverter" ref="liveATSStoreStockConverter" />
+	</bean> 	
+	
+	<alias name="defaultLiveATSStoreStockConverter" alias="liveATSStoreStockConverter"/>
+	<bean id="defaultLiveATSStoreStockConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="pointOfServiceStockData"/>
+		<property name="populators">
+			<list>
+				<ref bean="liveATSStoreStockPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	
+	<alias name="defaultLiveATSStoreStockPopulator" alias="liveATSStoreStockPopulator"/>
+	<bean id="defaultLiveATSStoreStockPopulator" parent="defaultStoreStockPopulator">
+		<property name="commerceStockService" >
+			<bean class="com.hybris.instore.spring.DefaultAtsCommerceStockServiceFactoryBean">
+				<property name="defaultCommerceStockService" ref="instoreCommerceStockService"/>
+				<property name="atsCommerceStockServiceBean" value="atsCommerceStockService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias name="alphaNumericCategoryHierarchyTreeComparator" alias="categoryHierarchyTreeComparator"/>
+	<bean id="alphaNumericCategoryHierarchyTreeComparator" class="com.hybris.instore.widgets.categorytree.AlphaNumericCategoryHierarchyTreeComparator"/>
+
+	<alias name="defaultInstoreAvailabilityCalculationStrategy" alias="instoreAvailabilityCalculationStrategy"/>
+	<bean id="defaultInstoreAvailabilityCalculationStrategy" class="com.hybris.instore.strategies.impl.InStoreAvailabilityCalculationStrategy"/>
+	
+	<alias alias="instoreCommerceStockService" name="defaultInstoreCommerceStockService" />
+	<bean id="defaultInstoreCommerceStockService" parent="defaultCommerceStockService">
+		<property name="commerceStockLevelCalculationStrategy" ref="instoreAvailabilityCalculationStrategy" />
+	</bean>
+	
+	<bean id="inStoreProductStoreStockValueProvider" class="de.hybris.instore.solrfacetsearch.provider.impl.InStoreProductAvailabilityProvider" parent="productStoreStockValueProvider">
+		<property name="commerceStockService" ref="instoreCommerceStockService" />
+	</bean>
+	
+	
+	
+	
+	
+	
+	
+		
+	<!--  Customizing of commercelayer beans, final aliases are in instore-web-spring.xml -->
+	
+	<!-- #################   BEGIN ProductSearchFacade used in instore #################    -->	
+	<alias alias="instoreSolrProductSearchFacade" name="instoreDefaultSolrProductSearchFacade"/>
+	<bean id="instoreDefaultSolrProductSearchFacade" parent="defaultSolrProductSearchFacade">
+		<property name="productCategorySearchPageConverter" ref="instoreProductCategorySearchPageConverter"/>
+	</bean>
+
+	<bean id="instoreProductCategorySearchPageConverter" parent="defaultProductCategorySearchPageConverter">
+		<property name="populators">
+			<list>
+				<ref bean="inStoreProductCategorySearchPagePopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="inStoreProductCategorySearchPagePopulator" parent="defaultProductCategorySearchPagePopulator">
+		<property name="searchResultProductConverter" ref="instoreCommerceSearchResultProductConverter"/>
+	</bean>
+		
+	<bean id="instoreCommerceSearchResultProductConverter" parent="defaultCommerceSearchResultProductConverter">
+		<property name="populators">
+			<list merge="true">
+				<ref bean="currentStoreProductAvailabilityStatusPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="currentStoreProductAvailabilityStatusPopulator" name="defaultCurrentStoreProductAvailabilityStatusPopulator"/>
+	<bean id="defaultCurrentStoreProductAvailabilityStatusPopulator" class="com.hybris.instore.search.converters.populators.CurrentStoreProductAvailabilityPopulator" >
+		<property name="inStoreService" ref="inStoreService"/>
+		<!-- The index property that is used to calculate product availability in stores -->
+		<property name="inStoreAvailability" value="inStoreAvailability"/>
+	</bean>
+	<!--  #################  END ProductSearchFacade used in instore  #################  -->	
+	
+	
+	<!--  #################  BEGIN StoreFinderStockFacade used in instore #################   -->	
+	<!-- The following alias makes sure that stock levels for instore ignore FORCEINSTOCK, FORCEOUTOFSTOCK flags -->
+	<alias alias="instoreStoreFinderStockFacade" name="instoreDefaultStoreFinderStockFacade"/>
+	<bean id="instoreDefaultStoreFinderStockFacade" parent="defaultStoreFinderStockFacade" >
+		<property name="storeStockConverter" ref="instoreStoreStockConverter" />
+	</bean>
+	
+	<bean id="instoreStoreStockConverter" parent="defaultStoreStockConverter">
+			<property name="populators">
+			<list merge="false">
+				<ref bean="instoreStoreStockPopulator"/>
+			</list>
+		</property>
+	</bean>
+	<bean id="instoreStoreStockPopulator" parent="defaultStoreStockPopulator" >
+		<property name="commerceStockService" ref="instoreCommerceStockService"/>
+	</bean>
+	
+	<!-- #################   END StoreFinderStockFacade used in instore #################   -->	
+
+	<bean id="inStoreProductFacade" parent="defaultProductFacade">
+		<property name="referenceProductConfiguredPopulator" ref="instoreProductConfiguredPopulator"/>
+	</bean>
+		
+	<bean id="instoreProductConfiguredPopulator" parent="defaultProductConfiguredPopulator">
+		<property name="populators">
+			<map key-type="de.hybris.platform.commercefacades.product.ProductOption" merge="true">
+				<entry key="CURRENT_STORE_AVAILABILITY" value-ref="inStoreProductAvailabilityPopulator"/>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="inStoreProductAvailabilityPopulator" class="com.hybris.instore.search.converters.populators.InStoreProductAvailabilityPopulator">
+		<property name="inStoreService" ref="inStoreService"/>
+		<property name="commerceStockService" ref="instoreCommerceStockService"/>
+	</bean>
+	
+</beans>

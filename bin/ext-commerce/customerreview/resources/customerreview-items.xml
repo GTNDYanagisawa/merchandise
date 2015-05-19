@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+	[y] hybris Platform
+
+	Copyright (c) 2000-2014 hybris AG
+	All rights reserved.
+
+	This software is the confidential and proprietary information of hybris
+	("Confidential Information"). You shall not disclose such Confidential
+	Information and shall use it only in accordance with the terms of the
+	license agreement you entered into with hybris.
+
+
+-->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+
+	<enumtypes>
+		<enumtype code="CustomerReviewApprovalType" generate="true" autocreate="true">
+			<description>
+				It represents approval status of the customer review. When it is set to approved, the review is visible to visitors.
+			</description>
+			<value code="approved" />
+			<value code="pending" />
+			<value code="rejected" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		<relation generate="true" localized="false" code="ReviewToUserRel" autocreate="true">
+			<sourceElement type="User" qualifier="user" cardinality="one">
+				<modifiers write="false" initial="true" optional="false" unique="true" />
+			</sourceElement>
+			<targetElement type="CustomerReview" qualifier="customerReviews" cardinality="many">
+				<modifiers write="false" initial="true" />
+			</targetElement>
+		</relation>
+		<relation generate="true" localized="false" code="ReviewToProductRel" autocreate="true">
+			<sourceElement type="Product" qualifier="product" cardinality="one">
+				<modifiers write="false" initial="true" optional="false" unique="true" />
+			</sourceElement>
+			<targetElement type="CustomerReview" qualifier="productReviews" cardinality="many">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+		<itemtype code="CustomerReview" autocreate="true" generate="true"
+			jaloclass="de.hybris.platform.customerreview.jalo.CustomerReview">
+			<deployment table="CustomerReviews" typecode="49" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="headline">
+					<description>
+						Headline for the customer review
+					</description>
+					<modifiers initial="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="comment">
+					<description>
+						Comment for the customer review
+					</description>
+					<modifiers initial="true" optional="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+				<attribute type="java.lang.Double" qualifier="rating">
+					<description>
+						The rating, between customerreview.minimalrating (lowest rating) and
+						customerreview.maximalrating (highest rating)
+					</description>
+					<modifiers initial="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.Boolean" qualifier="blocked">
+					<description>
+						This attribute can be set to true to indicate,
+						that the review should be blocked, eg when it is
+						offensive.
+					</description>
+					<modifiers initial="true" optional="false" />
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="alias" type="java.lang.String">
+					<persistence type="property" />
+					<description>It holds the alias of the customer who wrote the review.</description>
+				</attribute>
+				<attribute qualifier="approvalStatus" type="CustomerReviewApprovalType">
+					<persistence type="property" />
+					<modifiers initial="true" optional="false" />
+					<defaultvalue>em().getEnumerationValue("CustomerReviewApprovalType","pending")</defaultvalue>
+					<description>Its a review status type - when review is approved it is visible in the frontend.</description>
+				</attribute>
+				<attribute qualifier="language" type="Language">
+					<persistence type="property" />
+					<description>It holds the information about language that review was written with.</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Product" autocreate="false" generate="false">
+			<attributes>
+				<attribute type="java.lang.Integer" qualifier="numberOfReviews">
+					<description>
+						The number of reviews for the product.
+					</description>
+					<modifiers write="false" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute type="java.lang.Double" qualifier="averageRating">
+					<description>
+						The average rating of the product.
+					</description>
+					<modifiers write="false" />
+					<persistence type="jalo" />
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

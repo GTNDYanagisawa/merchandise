@@ -1,0 +1,32 @@
+# ImpEx for Importing Prices (English)
+
+# Macros / Replacement Parameter definitions
+$productCatalog=sbgProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default=Staged])[unique=true,default=$productCatalog:Staged]
+$lang=en
+
+UPDATE SubscriptionPricePlan;name[lang=$lang];product(code, $catalogVersion)[unique=true];$catalogVersion;currency(isocode)[default=USD,unique=true]
+;Price Plan for BASIC TV;BASIC_TV
+;Price Plan for BIG TV;BIG_TV
+;Price Plan for PREMIUM TV;PREMIUM_TV
+;Price Plan for DELUXE TV;DELUXE_TV
+
+UPDATE OneTimeChargeEntry;id[unique=true];name[lang=$lang];$catalogVersion
+;OCE_PN_BASIC_TV;Setup Fee
+;OCE_OFB_BIG_TV;Setup Fee
+;OCE_OFB_PREMIUM_TV;Setup Fee
+
+UPDATE PerUnitUsageCharge;id[unique=true];name[lang=$lang];$catalogVersion
+;documentary_on_demand_pricePlan_BASIC_TV;Documentary on demand
+;movie_on_demand_pricePlan_BASIC_TV;Movie on demand
+;blockbuster_on_demand_pricePlan_BASIC_TV;Blockbuster on demand
+;documentary_on_demand_pricePlan_BIG_TV;Documentary on demand
+;movie_on_demand_pricePlan_BIG_TV;Movie on demand
+;blockbuster_on_demand_pricePlan_BIG_TV;Blockbuster on demand
+;documentary_on_demand_pricePlan_PREMIUM_TV;Documentary on demand
+;movie_on_demand_pricePlan_PREMIUM_TV;Movie on demand
+;blockbuster_on_demand_pricePlan_PREMIUM_TV;Blockbuster on demand
+
+UPDATE VolumeUsageCharge;id[unique=true];name[lang=$lang];$catalogVersion
+;movie_on_demand_pricePlan_DELUXE_TV;Movie on demand
+;blockbuster_on_demand_pricePlan_DELUXE_TV;Blockbuster on demand

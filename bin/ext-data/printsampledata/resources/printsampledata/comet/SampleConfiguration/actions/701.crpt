@@ -1,0 +1,28 @@
+#include "internal/types.h"
+#include "internal/text.h"
+#include "internal/products.h"
+
+int main ()
+{
+	int id = 0;
+	int id2 = 0;
+	int id3 = 0;
+	char * str = alloc(50);
+	
+	// Fetch values from tags
+	sprintf(str, "%s", "<ID>");
+	id = val(str);
+	sprintf(str, "%s", "<ID2>");
+	id2 = val(str);
+	sprintf(str, "%s", "<ID3>");
+	id3 = val(str);
+
+	sprintf(str, "%s", "<StringID>");
+	// We need to remove quotes
+	strcpy(str, strsubstring(str, 1, (strlen(str) - 2)));
+	
+	document::setid(gDocument, id, id2, id3, str);
+
+	release( str );
+	return 0;
+}

@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<web-app id="mycockpitdemo" version="3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" 
+         metadata-complete="true">
+  <absolute-ordering />
+  
+	<display-name>InStore</display-name>
+	
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			WEB-INF/instore-web-spring.xml
+		</param-value>
+	</context-param>
+	
+    <servlet>
+        <description>ZK loader for ZUML pages</description>
+        <servlet-name>zkLoader</servlet-name>
+        <servlet-class>org.zkoss.zk.ui.http.DHtmlLayoutServlet</servlet-class>
+        <init-param>
+            <param-name>update-uri</param-name>
+            <param-value>/zkau</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+        <async-supported>true</async-supported>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>zkLoader</servlet-name>
+        <url-pattern>*.zul</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>zkLoader</servlet-name>
+        <url-pattern>*.zhtml</url-pattern>
+    </servlet-mapping>
+  
+    <servlet>
+        <description>The asynchronous update engine for ZK</description>
+        <servlet-name>auEngine</servlet-name>
+        <servlet-class>org.zkoss.zk.au.http.DHtmlUpdateServlet</servlet-class>
+        <async-supported>true</async-supported>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>auEngine</servlet-name>
+        <url-pattern>/zkau/*</url-pattern>
+    </servlet-mapping>
+
+	<servlet>
+        <description>The widget library resource loader</description>
+        <servlet-name>widgetLibResourceLoader</servlet-name>
+        <servlet-class>com.hybris.cockpitng.util.ExtendedWidgetResourceLoader</servlet-class>
+        <init-param><param-name>cssCacheEnabled</param-name><param-value>true</param-value></init-param>
+        <init-param><param-name>applicationThemeCss</param-name><param-value>/cng/css/styles.css</param-value></init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>widgetLibResourceLoader</servlet-name>
+        <url-pattern>/widgetJarResource/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>widgetLibResourceLoader</servlet-name>
+        <url-pattern>/widgetClasspathResource/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>widgetLibResourceLoader</servlet-name>
+        <url-pattern>/cng/*</url-pattern>
+    </servlet-mapping>
+    
+	
+	<filter>
+		<filter-name>instoreFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	
+	<filter>
+		<filter-name>requestContextFilter</filter-name>
+		<filter-class>
+			org.springframework.web.filter.RequestContextFilter
+		</filter-class>
+	</filter>	
+	
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	
+	<filter>
+		<filter-name>gzipCompressionFilter</filter-name>
+		<filter-class>de.hybris.platform.util.GZIPServletFilter</filter-class>
+	</filter>
+
+	<filter>
+		<filter-name>XSSFilter</filter-name>
+		<filter-class>de.hybris.platform.servicelayer.web.XSSFilter</filter-class>
+		<async-supported>true</async-supported>	
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>XSSFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>	
+	
+	<filter-mapping><filter-name>gzipCompressionFilter</filter-name><url-pattern>*.css</url-pattern></filter-mapping>
+	<filter-mapping><filter-name>gzipCompressionFilter</filter-name><url-pattern>/cng/scripts/*</url-pattern></filter-mapping>
+			
+ 	<filter-mapping><filter-name>instoreFilterChain</filter-name><url-pattern>*.jsp</url-pattern></filter-mapping>
+	<filter-mapping><filter-name>instoreFilterChain</filter-name><url-pattern>*.zul</url-pattern></filter-mapping>
+	<filter-mapping><filter-name>instoreFilterChain</filter-name><url-pattern>*.zhtml</url-pattern></filter-mapping>
+	<filter-mapping><filter-name>instoreFilterChain</filter-name><url-pattern>/zkau/*</url-pattern></filter-mapping>
+	<filter-mapping><filter-name>instoreFilterChain</filter-name><url-pattern>/j_spring_security_check</url-pattern></filter-mapping>
+  	
+	<filter-mapping><filter-name>requestContextFilter</filter-name><url-pattern>*.zul</url-pattern></filter-mapping>
+	<filter-mapping><filter-name>requestContextFilter</filter-name><url-pattern>*.zhtml</url-pattern></filter-mapping>
+	<filter-mapping><filter-name>requestContextFilter</filter-name><url-pattern>/</url-pattern></filter-mapping>
+	<filter-mapping><filter-name>requestContextFilter</filter-name><url-pattern>/zkau/*</url-pattern></filter-mapping>
+	<filter-mapping><filter-name>requestContextFilter</filter-name><url-pattern>/j_spring_security_check</url-pattern></filter-mapping>
+	
+  	<filter-mapping><filter-name>springSecurityFilterChain</filter-name><url-pattern>/zkau/*</url-pattern></filter-mapping>
+	<filter-mapping><filter-name>springSecurityFilterChain</filter-name><url-pattern>/j_spring_security_check</url-pattern></filter-mapping>
+	<filter-mapping><filter-name>springSecurityFilterChain</filter-name><url-pattern>*.jsp</url-pattern></filter-mapping>
+	<filter-mapping><filter-name>springSecurityFilterChain</filter-name><url-pattern>*.zul</url-pattern></filter-mapping>
+	<filter-mapping><filter-name>springSecurityFilterChain</filter-name><url-pattern>*.zhtml</url-pattern></filter-mapping> 	
+	<filter-mapping><filter-name>springSecurityFilterChain</filter-name><url-pattern>/j_spring_security_logout</url-pattern></filter-mapping>
+	
+    <listener>
+ 	  	<listener-class>de.hybris.platform.spring.HybrisContextLoaderListener</listener-class>
+ 	</listener>
+	
+	
+	<listener>
+		<display-name>ZK Session Cleaner</display-name>
+		<listener-class>com.hybris.cockpitng.util.impl.CockpitHttpSessionListener</listener-class>
+	</listener>
+
+ 	<listener>
+		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
+    
+    
+ 
+ 	<mime-mapping>
+		<extension>css</extension>
+		<mime-type>text/css</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>gif</extension>
+		<mime-type>image/gif</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>html</extension>
+		<mime-type>text/html</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>htm</extension>
+		<mime-type>text/html</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>jad</extension>
+		<mime-type>text/vnd.sun.j2me.app-descriptor</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>jpeg</extension>
+		<mime-type>image/jpeg</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>jpg</extension>
+		<mime-type>image/jpeg</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>js</extension>
+		<mime-type>application/x-javascript</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>png</extension>
+		<mime-type>image/png</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>txt</extension>
+		<mime-type>text/plain</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>xml</extension>
+		<mime-type>text/xml</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>zhtml</extension>
+		<mime-type>text/html</mime-type>
+	</mime-mapping>
+	<mime-mapping>
+		<extension>zul</extension>
+		<mime-type>text/html</mime-type>
+	</mime-mapping>
+ 
+    <welcome-file-list>
+        <welcome-file>index.zul</welcome-file>
+        <welcome-file>cockpit.zul</welcome-file>
+        <welcome-file>index.zhtml</welcome-file>
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>index.htm</welcome-file>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+</web-app> 
+

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+
+
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+    <import resource="spring-security-config.xml"/>
+
+
+    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver"/>
+
+    <!--  hybris filter stack -->
+    <bean id="hacRedirectFilter" class="de.hybris.platform.servicelayer.web.RedirectWhenSystemIsNotInitializedFilter">
+        <constructor-arg>
+            <value>/platform/init</value>
+        </constructor-arg>
+        <property name="urlPaths">
+            <list>
+                <value>platform/dryrun</value>
+                <value>login</value>
+                <value>static</value>
+                <value>bamboo</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="springHacFilterChain" class="de.hybris.platform.servicelayer.web.BackOfficeFilterChain">
+        <constructor-arg>
+            <list>
+                <ref bean="log4jFilter"/>
+                <ref bean="hacRedirectFilter"/>
+                <ref bean="sessionFilter"/>
+                <ref bean="hacDataSourceSwitchingFilter"/>
+                <ref bean="hacSecureMediaFilter"/>
+            </list>
+        </constructor-arg>
+        <property name="excludedUrlPaths">
+            <list>
+                <value>initlog/log</value>
+                <value>static</value>
+                <value>favicon.ico</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="hacDataSourceSwitchingFilter" class="de.hybris.platform.servicelayer.web.DataSourceSwitchingFilter"/>
+
+    <bean id="hacSecureMediaFilter" class="de.hybris.platform.servicelayer.web.SecureMediaFilter">
+        <property name="mediaPermissionService" ref="mediaPermissionService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="userService" ref="userService"/>
+        <property name="mediaService" ref="mediaService"/>
+        <aop:scoped-proxy/>
+    </bean>
+
+</beans>

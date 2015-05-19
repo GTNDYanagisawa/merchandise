@@ -1,0 +1,62 @@
+# ImpEx for Promotions for Electronics CN Store
+#% impex.setLocale( Locale.GERMAN ); 
+
+$defaultPromoGrp=electronics-cnPromoGrp
+$favCustomers=favoriteCustomers
+$bigSpenders=bigSpenders
+$productCatalog=electronics-cnProductCatalog
+$catalogVersion=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$productCatalog]),CatalogVersion.version[default=Online])[default=$productCatalog:Online]
+$regulargroup=regulargroup
+
+#### Order Discount ####
+INSERT PromotionPriceRow;&tresholdId;Currency(isocode);price
+;2;USD;200
+;10;CNY;1000
+
+
+INSERT PromotionPriceRow;&priceId;Currency(isocode);price
+;8;USD;20
+;11;CNY;100
+
+
+INSERT_UPDATE OrderThresholdDiscountPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true,unique=true];code[unique=true];title;description;messageFired[lang=en];messageFired[lang=de];messageFired[lang=ja];messageFired[lang=zh];priority;thresholdTotals(&tresholdId);discountPrices(&priceId)
+;;;OrderThreshold15Discount;梯度折扣;梯度折扣;You saved {3} for spending over {1};Sie haben {3} gespart, weil Sie mehr als {1} ausgegeben haben;{1} 以上の購入で {3} の節約;您的一份订单超过 {1}，节省了 {3}。;500;2,10;8,11
+
+INSERT_UPDATE PromotionUserRestriction;positive;promotion(code)[unique=true];users(uid)
+;TRUE;OrderThreshold15Discount;$regulargroup
+
+INSERT PromotionPriceRow;&tresholdId;Currency(isocode);price
+;5;USD;300
+;12;CNY;1500
+
+#### 10% Discount on Canon EOS 450D ####
+INSERT_UPDATE ProductPercentageDiscountPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;percentageDiscount;priority;products(code,$catalogVersion)
+;;;10DiscountCanonEOS450D;EOS 450D9折 ;EOS 450D9折;10;500;1382080
+
+#### Multi-buy on films ####
+INSERT PromotionPriceRow;&priceId;Currency(isocode);price
+;1;USD;10
+;13;CNY;50
+
+INSERT_UPDATE AcceleratorProductMultiBuyPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;priority;categories(code,$catalogVersion);qualifyingCount;bundlePrices(&priceId)
+;;;MultiBuyElectronics;三卷10元;三卷10元;700;597,598;3;1,13
+
+#### Buy One Get One Free on Memory Cards ####
+INSERT_UPDATE AcceleratorProductBOGOFPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;priority;categories(code,$catalogVersion);qualifyingCount;freeCount
+;;;BOGOFElectronics ;二增一;二增一;700;902;3;1
+
+#### Perfect partner on Digital SLR Camera DSLR-A100H and InfoLITHIUM-Akku battery ####
+INSERT PromotionPriceRow;&priceId;Currency(isocode);price
+;3;USD;75
+;14;CNY;450
+
+INSERT_UPDATE ProductPerfectPartnerPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;priority;products(code,$catalogVersion);partnerProducts(code,$catalogVersion);partnerPrices(&priceId)
+;;;PerfectPartnerElectronics;买DSLR-A100H, 送InfoLITHIUM NP-FM55H;买DSLR-A100H, 送InfoLITHIUM NP-FM55H;800;816780;482105;3,14
+
+#### Product bundle on HDR-CX105E Red ####
+INSERT PromotionPriceRow;&priceId;Currency(isocode);price
+;5;USD;500
+;15;CNY;3000
+
+INSERT_UPDATE ProductBundlePromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true,unique=true];code[unique=true];title;description;priority;products(code,$catalogVersion);bundlePrices(&priceId)
+;;;ProductBundleElectronics;特别夏天! 相机， 三脚架  和 充电器 便宜啦!;特别夏天! 相机， 三脚架  和 充电器 便宜啦!;700;1934406,278688,1687508;5,15

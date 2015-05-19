@@ -1,0 +1,16 @@
+*** Settings ***
+Resource          EmsClient_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+
+
+*** Test Cases ***
+
+Test_XML_Grant_Mapping_XML_Verification_StringCondition
+	[Documentation]    Create entitlement test and verify XML - mapping testing
+	${entitlementData} =         build entitlement with id "entitlementId" and stringCondition "someStringCondition" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData><grantTime>2012-07-11T03:21:15Z</grantTime><userId/><grantSource/><grantSourceId/><entitlementType>entitlementId</entitlementType><status>ACTIVE</status><conditions><com.hybris.services.entitlements.condition.ConditionData><properties><entry><string>string</string><string>someStringCondition</string></entry></properties><type>string</type></com.hybris.services.entitlements.condition.ConditionData></conditions></com.hybris.services.entitlements.api.GrantData>"
+
+Test_XML_Grant_Mapping_XML_Verification_StringCondition_Empty_PASS
+	[Documentation]    Create entitlement with empty string condition and verify XML - mapping testing
+	${entitlementData} =         build entitlement with id "entitlementId" and stringCondition "" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData><grantTime>2012-07-11T03:21:15Z</grantTime><userId/><grantSource/><grantSourceId/><entitlementType>entitlementId</entitlementType><status>ACTIVE</status><conditions><com.hybris.services.entitlements.condition.ConditionData><properties><entry><string>string</string><string></string></entry></properties><type>string</type></com.hybris.services.entitlements.condition.ConditionData></conditions></com.hybris.services.entitlements.api.GrantData>"

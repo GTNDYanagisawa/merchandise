@@ -1,0 +1,57 @@
+*** Settings ***
+Resource          EmsClient_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+
+*** Test Cases ***
+
+Test_Grant_Mapping_XML_Verification_GrantTimeValidation_ValidGrantTime_No1_PASS
+	[Documentation]    Create entitlement test and verify XML - mapping testing
+	${entitlementData} =         build entitlement with id "entitlementId" granted at "9999-12-31T23:59:59Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData><grantTime>9999-12-31T23:59:59Z</grantTime><userId/><grantSource/><grantSourceId/><entitlementType>entitlementId</entitlementType><status>ACTIVE</status><conditions/></com.hybris.services.entitlements.api.GrantData>"
+
+Test_Grant_Mapping_XML_Verification_GrantTimeValidation_ValidGrantTime_No2_PASS
+	[Documentation]    Create entitlement test and verify XML - mapping testing
+	${entitlementData} =         build entitlement with id "entitlementId" granted at "10000-12-11T11:11:11Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData><grantTime>10000-12-11T11:11:11Z</grantTime><userId/><grantSource/><grantSourceId/><entitlementType>entitlementId</entitlementType><status>ACTIVE</status><conditions/></com.hybris.services.entitlements.api.GrantData>"
+
+Test_Grant_Mapping_XML_Verification_GrantTimeValidation_InvalidGrantTime_Month_FAIL
+	[Documentation]    Create entitlement test and verify XML - mapping testing
+	Run keyword and expect error
+	...                IllegalFieldValueException: Cannot parse "9999-13-12T11:11:11Z": Value 13 for monthOfYear must be in the range [1,12]
+	...                build entitlement with id "entitlementId" granted at "9999-13-12T11:11:11Z"
+
+Test_Grant_Mapping_XML_Verification_GrantTimeValidation_InvalidGrantTime_Day_FAIL
+	[Documentation]    Create entitlement test and verify XML - mapping testing
+	Run keyword and expect error
+	...                IllegalFieldValueException: Cannot parse "9999-12-32T11:11:11Z": Value 32 for dayOfMonth must be in the range [1,31]
+	...                build entitlement with id "entitlementId" granted at "9999-12-32T11:11:11Z"
+
+Test_Grant_Mapping_XML_Verification_GrantTimeValidation_InvalidGrantTime_Hour_FAIL
+	[Documentation]    Create entitlement test and verify XML - mapping testing
+	Run keyword and expect error
+	...                IllegalFieldValueException: Cannot parse "9999-12-12T25:11:11Z": Value 25 for hourOfDay must be in the range [0,23]
+	...                build entitlement with id "entitlementId" granted at "9999-12-12T25:11:11Z"
+
+Test_Grant_Mapping_XML_Verification_GrantTimeValidation_InvalidGrantTime_Minute_FAIL
+	[Documentation]    Create entitlement test and verify XML - mapping testing
+	Run keyword and expect error
+	...                IllegalFieldValueException: Cannot parse "9999-12-12T11:60:11Z": Value 60 for minuteOfHour must be in the range [0,59]
+	...                build entitlement with id "entitlementId" granted at "9999-12-12T11:60:11Z"
+
+Test_Grant_Mapping_XML_Verification_GrantTimeValidation_InvalidGrantTime_Second_FAIL
+	[Documentation]    Create entitlement test and verify XML - mapping testing
+	Run keyword and expect error
+	...                IllegalFieldValueException: Cannot parse "9999-12-12T11:11:60Z": Value 60 for secondOfMinute must be in the range [0,59]
+	...                build entitlement with id "entitlementId" granted at "9999-12-12T11:11:60Z"	
+
+Test_Grant_Mapping_XML_Verification_GrantTimeValidation_InvalidGrantTime_TimeZone_FAIL
+	[Documentation]    Create entitlement test and verify XML - mapping testing
+	Run keyword and expect error
+	...                IllegalArgumentException: Invalid format: "9999-12-12T11:11:11L" is malformed at "L"
+	...                build entitlement with id "entitlementId" granted at "9999-12-12T11:11:11L"
+
+Test_Grant_Mapping_XML_Verification_GrantTimeValidation_InvalidGrantTime_NonNumericValue_FAIL
+	[Documentation]    Create entitlement test and verify XML - mapping testing
+	Run keyword and expect error
+	...                IllegalArgumentException: Invalid format: "abcd-07-11T03:21:15Z"
+	...                build entitlement with id "entitlementId" granted at "abcd-07-11T03:21:15Z"

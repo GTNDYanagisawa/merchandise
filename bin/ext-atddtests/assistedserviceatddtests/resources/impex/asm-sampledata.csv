@@ -1,0 +1,68 @@
+#
+# Import Sample AMS Agent User
+# 
+$passwordEncoding=md5
+$defaultPassword=1234
+$setPassword=@password[translator=de.hybris.platform.impex.jalo.translators.ConvertPlaintextToEncodedUserPasswordTranslator][default='$passwordEncoding:$defaultPassword']
+$catalog-id=testCatalog
+$catalog-version=Online
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+
+INSERT_UPDATE Language;isocode[unique=true];active;
+;de;true;
+;en;true;
+
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];
+;de;Deutsch;German;
+;en;Englisch;English;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol;
+;EUR;Euro;Euro;true;true;1;2;E;
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$;
+
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid);
+;cockpitgroup;;
+;customergroup;;
+;customerservicegroup;employeegroup;
+;csagentgroup;cockpitgroup,customerservicegroup;
+;asagentgroup;csagentgroup,customergroup;
+ 
+INSERT_UPDATE Employee;UID[unique=true];$setPassword;description;name;groups(uid);sessionLanguage(isocode);sessionCurrency(isocode)
+;asagent;;Default ASM Agent;Default ASM Agent;asagentgroup;en;USD
+;notagent;;Not ASM Agent;Not ASM Agent;;en;USD
+;user1_asagentgroup;;Default ASM Agent1;Default ASM Agent1;asagentgroup;en;USD
+;user2_asagentgroup;;Default ASM Agent2;Default ASM Agent2;asagentgroup;en;USD
+;user_no_group;;Not ASM Agent;Not ASM Agent;;en;USD
+# employeegroup is a group that asagentgroup belongs to:
+;user_employeegroup;;Not ASM Agent;Not ASM Agent;employeegroup;en;USD
+# admingroup is a group that asagentgroup doesn't belong to:
+;user_admingroup;;Not ASM Agent;Not ASM Agent;admingroup;en;USD
+
+INSERT_UPDATE Customer;uid[unique=true];$setPassword;name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);
+;ascustomer;;AS Customer;;en;USD;customergroup;
+;test.customer@asm.com;;ASM Test Customer;;en;USD;customergroup;
+;anonymous;;Anja Hertz;;en;USD;customergroup;
+;brendan@hybris.net;;Brendan Johnson;;en;USD;customergroup;
+;john@hybris.net;;John Doe;;en;USD;customergroup;
+;uta@hybris.net;;John Stockton;;en;USD;customergroup;
+
+INSERT_UPDATE Cart;user(uid);code[unique=true];currency(isocode);date[dateformat=dd.MM.yyyy HH:mm:ss];net;calculated;site(uid)
+;ascustomer;ascustomerCart;EUR;27.04.2010 00:00:00;false;false;testSite;
+;anonymous;anonymousCart;EUR;27.04.2010 00:00:00;false;false;testSite;
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];defaultCatalog;;;;;;
+;$catalog-id;$catalog-id;true;;;;;;
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true];active;defaultCurrency(isocode);;;;;;
+;$catalog-id;$catalog-version;true;EUR;;;;;;
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=en];conversion;;;
+;pieces;pieces;pieces;1
+
+INSERT_UPDATE Product;code[unique=true];$catalogversion;name[lang=en];unit(code);$prices;approvalStatus(code);startLineNumber
+;HW1210-3422;;en;pieces;50 EUR;approved;0
+;HW1210-3423;;en;pieces;100 EUR;approved;0
+
+INSERT_UPDATE BaseSite;uid[unique=true];
+;testSite;

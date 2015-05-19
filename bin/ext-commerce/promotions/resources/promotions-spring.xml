@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<bean id="abstractPromotionsService" class="de.hybris.platform.promotions.impl.AbstractPromotionsService"
+		abstract="true" parent="abstractBusinessService" />
+
+	<alias alias="promotionsService" name="defaultPromotionsService" />
+	<bean id="defaultPromotionsService" class="de.hybris.platform.promotions.impl.DefaultPromotionsService"
+		parent="abstractPromotionsService" scope="tenant">
+	</bean>
+
+	<alias alias="promotionResultService" name="defaultPromotionResultService" />
+	<bean id="defaultPromotionResultService" class="de.hybris.platform.promotions.impl.DefaultPromotionResultService"
+		parent="abstractPromotionsService" scope="tenant" />
+
+    <!-- CACHING START -->
+	<!-- uncomment below beans for Promotions Performance Improvement -->
+	
+    <!-- Replace the Promotions Manager with a version that understands caching -->
+    <!--  
+    <bean id="promotions.manager" class="de.hybris.platform.promotions.jalo.CachingPromotionsManager" init-method="init" destroy-method="destroy" scope="tenant" >
+    	  <property name="cache" ref="promotionsCachingStrategy"/>
+	</bean>
+ 	-->
+ 	
+ 	<!--
+	<alias alias="promotionsCachingStrategy" name="defaultPromotionsCachingStrategy"/>
+	<bean id="defaultPromotionsCachingStrategy" class="de.hybris.platform.promotions.jalo.DefaultCachingStrategy" scope="tenant"/>
+	-->
+	
+    <!-- Override the Cart so that calls to get promotion results can be intercepted -->
+    <!--
+    <bean id="de.hybris.platform.jalo.order.Cart" class="de.hybris.platform.promotions.jalo.order.PromotionCart" scope="prototype" />
+	-->
+	
+    <!-- CACHING FINISH -->
+
+</beans>

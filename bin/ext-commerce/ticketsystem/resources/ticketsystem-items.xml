@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+-->
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype elementtype="CsTicketEvent" code="CsTicketEventList" type="list" autocreate="true"/>
+		<collectiontype elementtype="AttributeDescriptor" code="TicketsystemAttributeDescriptorList" type="set" autocreate="true"/>
+	</collectiontypes>
+	
+	<enumtypes>
+
+		<enumtype code="CsTicketPriority" autocreate="true" generate="true" dynamic="true">
+			<value code="Low" />
+			<value code="Medium" />
+			<value code="High" />
+		</enumtype>
+		
+		<enumtype code="CsTicketCategory" autocreate="true" generate="true" dynamic="true">
+			<value code="Problem" />
+			<value code="Incident" />
+			<value code="Complaint" />
+			<value code="Fraud" />
+			<value code="Note" />
+		</enumtype>
+	
+		<!-- CsTicketState changed to be dynamic = false due to issues with spring configuration of static Enum values -->
+		<enumtype code="CsTicketState" autocreate="true" generate="true" dynamic="true">
+			<value code="New" />
+			<value code="Open" />
+			<value code="Closed" />
+		</enumtype>
+		
+		<enumtype code="CsInterventionType" autocreate="true" generate="true" dynamic="true">
+			<value code="Email" />
+			<value code="Call" />
+			<value code="IM" />
+		</enumtype>
+		
+		<enumtype code="CsEventReason" autocreate="true" generate="true" dynamic="true">
+			<value code="Complaint" />
+			<value code="Update" />
+			<value code="FirstContact" />
+		</enumtype>
+
+		<enumtype code="CsResolutionType" autocreate="true" generate="true" dynamic="true">
+			<value code="Closed" />
+			<value code="ClosedDuplicate" />
+		</enumtype>
+		
+		<enumtype code="CsEmailRecipients" autocreate="true" generate="true" dynamic="false">
+			<value code="Customer" />
+			<value code="AssignedAgent" />
+			<value code="AssignedGroup" />
+		</enumtype>
+		
+	</enumtypes>
+	
+	<relations>
+
+		<relation generate="true" localized="false" code="CsTicketEvent2CsTicketEmail" autocreate="true">
+			<sourceElement type="CsTicketEvent" cardinality="one" qualifier="ticket" />
+			<targetElement type="CsTicketEmail" cardinality="many" qualifier="emails" ordered="true" collectiontype="list" />
+		</relation>
+
+		<relation generate="true" localized="false" code="CsTicketEvent2CsTicketChangeEntry" autocreate="true">
+			<sourceElement type="CsTicketEvent" cardinality="one" qualifier="event" />
+			<targetElement type="CsTicketChangeEventEntry" cardinality="many" qualifier="entries" collectiontype="set" />
+		</relation>
+
+		<relation generate="true" localized="false" code="Agent2BaseStore" autocreate="true">
+			<deployment table="Agent2BaseStore" typecode="9006" />
+			<sourceElement type="Employee" cardinality="many" qualifier="ticketemployees" collectiontype="list" ordered="true"/>
+			<targetElement type="BaseStore" cardinality="many" qualifier="ticketstores" collectiontype="list" />
+		</relation>
+
+		<relation generate="true" localized="false" code="CsAgentGroup2BaseStore" autocreate="true">
+			<deployment table="CsAgentGroup2BaseStore" typecode="9007" />
+			<sourceElement type="CsAgentGroup" cardinality="many" qualifier="ticketgroups" collectiontype="list" ordered="true" />
+			<targetElement type="BaseStore" cardinality="many" qualifier="ticketstores" collectiontype="list" />
+		</relation>
+
+	</relations>
+
+	
+	<itemtypes>
+		
+		<itemtype code="CsTicketEventEmailConfiguration" autocreate="true" generate="true"
+				  jaloclass="de.hybris.platform.ticket.jalo.CsTicketEventEmailConfiguration">
+			<deployment table="CsTicketEventEmailConfig" typecode="9005" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers unique="true" initial="true" optional="false" write="false"></modifiers>
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="plainTextTemplate" type="RendererTemplate">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="htmlTemplate" type="RendererTemplate">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="subject" type="java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="eventType" type="CommentType">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="alteredAttributes" type="TicketsystemAttributeDescriptorList">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="recipientType" type="CsEmailRecipients">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+	
+		<itemtype code="CsTicket" autocreate="true" generate="true" jaloclass="de.hybris.platform.ticket.jalo.CsTicket">
+			<deployment table="CsTickets" typecode="9001" />
+			<attributes>
+				<attribute qualifier="ticketID" type="java.lang.String">
+					<!--
+					  Modifier setting;
+					    optional=true as the ticketID is set in a PrepareInterceptor,
+					    write=false because the ticketID cannot be changed once it is set.
+					 -->
+					<modifiers unique="true" initial="true" optional="true" write="false" read="true"></modifiers>
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="customer" type="User">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="order" type="AbstractOrder">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="headline" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="category" type="CsTicketCategory">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="priority" type="CsTicketPriority">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="state" type="CsTicketState">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="assignedAgent" type="Employee">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="assignedGroup" type="CsAgentGroup">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="resolution" type="CsTicketResolutionEvent">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="events" type="CsTicketEventList">
+					<model>
+						<getter name="events" default="true" deprecated="true"/>
+					</model>
+					<modifiers write="false"/>
+					<persistence type="jalo"></persistence>
+				</attribute>
+			</attributes>
+
+			<indexes>
+				<index name="ticketIdIdx">
+					<key attribute="ticketID" />
+				</index>
+				<index name="ticketPoolIdx">
+					<key attribute="assignedAgent" />
+					<key attribute="assignedGroup" />
+					<key attribute="state" />
+				</index>
+			</indexes>			
+		</itemtype>
+		
+		<itemtype code="CsAgentGroup" autocreate="true" generate="true"
+			extends="UserGroup" jaloclass="de.hybris.platform.ticket.jalo.CsAgentGroup">
+			<attributes>
+				<attribute qualifier="emailDistributionList" type="java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="defaultAssignee" type="Employee">
+					<persistence type="property"/>
+				</attribute>				
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="CsTicketEvent" autocreate="true" generate="true" extends="Comment" jaloclass="de.hybris.platform.ticket.events.jalo.CsTicketEvent">
+			<attributes>
+				<attribute qualifier="startDateTime" type="java.util.Date">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="endDateTime" type="java.util.Date">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="ticket" type="CsTicket">
+					<persistence type="jalo"></persistence>
+					<modifiers write="true"/>
+					<model>
+						<getter name="ticket" default="true" deprecated="true"/>
+						<setter name="ticket" default="true" deprecated="true"/>
+					</model>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CsTicketChangeEventEntry" autocreate="true"
+			generate="true" jaloclass="de.hybris.platform.ticket.events.jalo.CsTicketChangeEventEntry" abstract="false">
+			<deployment table="CsChangeEventEntry" typecode="9004" />
+			<attributes>
+				<attribute qualifier="alteredAttribute" type="AttributeDescriptor">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="oldStringValue" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="newStringValue" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="oldBinaryValue" type="java.lang.Object">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="newBinaryValue" type="java.lang.Object">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CsTicketChangeEventStringEntry" autocreate="true"
+			generate="true" extends="CsTicketChangeEventEntry"
+			jaloclass="de.hybris.platform.ticket.events.jalo.CsTicketChangeEventStringEntry">
+			<attributes>
+				<attribute qualifier="oldValue" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="newValue" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CsTicketChangeEventCsTicketCategoryEntry" autocreate="true"
+			generate="true" extends="CsTicketChangeEventEntry"
+			jaloclass="de.hybris.platform.ticket.events.jalo.CsTicketChangeEventCsTicketCategoryEntry">
+			<attributes>
+				<attribute qualifier="oldValue" type="CsTicketCategory">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="newValue" type="CsTicketCategory">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CsTicketChangeEventCsTicketPriorityEntry" autocreate="true"
+			generate="true" extends="CsTicketChangeEventEntry"
+			jaloclass="de.hybris.platform.ticket.events.jalo.CsTicketChangeEventCsTicketPriorityEntry">
+			<attributes>
+				<attribute qualifier="oldValue" type="CsTicketPriority">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="newValue" type="CsTicketPriority">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CsTicketChangeEventCsTicketStateEntry" autocreate="true"
+			generate="true" extends="CsTicketChangeEventEntry"
+			jaloclass="de.hybris.platform.ticket.events.jalo.CsTicketChangeEventCsTicketStateEntry">
+			<attributes>
+				<attribute qualifier="oldValue" type="CsTicketState">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="newValue" type="CsTicketState">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CsTicketChangeEventEmployeeEntry" autocreate="true"
+			generate="true" extends="CsTicketChangeEventEntry"
+			jaloclass="de.hybris.platform.ticket.events.jalo.CsTicketChangeEventEmployeeEntry">
+			<attributes>
+				<attribute qualifier="oldValue" type="Employee">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="newValue" type="Employee">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CsTicketChangeEventCsAgentGroupEntry" autocreate="true"
+			generate="true" extends="CsTicketChangeEventEntry"
+			jaloclass="de.hybris.platform.ticket.events.jalo.CsTicketChangeEventCsAgentGroupEntry">
+			<attributes>
+				<attribute qualifier="oldValue" type="CsAgentGroup">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="newValue" type="CsAgentGroup">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CsCustomerEvent" autocreate="true"
+			generate="true" extends="CsTicketEvent" 
+			jaloclass="de.hybris.platform.ticket.events.jalo.CsCustomerEvent" abstract="false">
+			<attributes>
+				<attribute qualifier="interventionType" type="CsInterventionType">
+					<persistence type="property"></persistence>
+				</attribute>
+				
+				<attribute qualifier="reason" type="CsEventReason">
+					<persistence type="property"></persistence>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="CsTicketResolutionEvent" autocreate="true"
+			generate="true" extends="CsCustomerEvent" 
+			jaloclass="de.hybris.platform.ticket.events.jalo.CsTicketResolutionEvent">
+			<attributes>
+				<attribute qualifier="resolutionType" type="CsResolutionType">
+					<modifiers write="false" initial="true" optional="false" />
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="CsTicketEmail" autocreate="true"
+			generate="true" jaloclass="de.hybris.platform.ticket.events.jalo.CsTicketEmail">
+			<deployment table="CsTicketEmail" typecode="9003" />
+			<attributes>
+				<attribute qualifier="messageId" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="from" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="to" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="subject" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="body" type="java.lang.String">
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>					
+					</persistence>
+					<modifiers read="true" write="true" search="true"
+						optional="true" initial="false" unique="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

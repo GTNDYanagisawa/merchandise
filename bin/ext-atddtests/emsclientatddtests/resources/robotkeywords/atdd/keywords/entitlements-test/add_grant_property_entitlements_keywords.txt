@@ -1,0 +1,25 @@
+*** Settings ***
+Library         com.hybris.services.entitlements.atdd.keywords.EntitlementsAddGrantPropertyKeywordLibrary
+Library         com.hybris.services.entitlements.atdd.keywords.EntitlementsDetailsKeywordLibrary
+
+
+*** Keywords ***
+for grant "${grantId:[^"]+}" to property "${key:[^"]+}" add "${amountToAdd:[^"]+}"
+    [Documentation]    Add grant property
+    ${result}=    add grant property    ${grantId}    ${key}    ${amountToAdd}
+    [Return]    ${result}
+
+for grant "${grantId:[^"]+}" to property "${key:[^"]+}" add "${amountToAdd:[^"]+}" and expect exception "${exceptionType:[^"]+}" with message "${exceptionMessage:[^"]+}"
+    [Documentation]    Add grant property exception with message is expected
+    ${result}=    add grant property    ${grantId}    ${key}    ${amountToAdd}    ${exceptionType}    ${exceptionMessage}
+    [Return]    ${result}
+
+#for grant "${grantId:[^"]+}" to property "${key:[^"]+}" add "${amountToAdd:[^"]+}" exception "${exceptionType:[^"]+}" is expected
+#    [Documentation]    Add grant property exception is expected
+#     ${result}=    add grant property exception is expected   ${grantId}    ${key}    ${amountToAdd}  ${exceptionType}
+#    [Return]    ${result}
+
+assert for grant "${grantId:[^"]+}" to property "${key:[^"]+}" equals "${remainingQuantity:[^"]+}"
+    [Documentation]    Assert used quantity
+    ${result}=    assert grant property quantity    ${grantId}    ${key}    ${remainingQuantity}
+    [Return]    ${result}

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+
+	<!-- override deprecated workflow service with new one -->
+	<alias alias="workflowService" name="defaultWorkflowService"/>
+	
+	<alias alias="productCockpitCatalogService" name="defaultProductCockpitCatalogListService" />
+	<bean id="defaultProductCockpitCatalogListService" class="de.hybris.platform.productcockpit.services.catalog.impl.CatalogListServiceImpl" scope="tenant" />
+	<bean id="defaultProductCockpitCatalogService" class="de.hybris.platform.productcockpit.services.catalog.impl.CatalogServiceImpl" scope="tenant" />
+
+	<alias alias="productCockpitProductService" name="defaultProductCockpitProductService" />
+    <bean id="defaultProductCockpitProductService" class="de.hybris.platform.productcockpit.services.product.impl.ProductServiceImpl" scope="tenant">
+        <property name="typeService" ref="cockpitTypeService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="scriptEvaluationService" ref="scriptEvaluationService"/>
+        <property name="enumerationService" ref="enumerationService"/>
+    </bean>
+	
+	<alias alias="classificationSystemService" name="defaultClassificationSystemService" />
+	<bean id="defaultClassificationSystemService" class="de.hybris.platform.productcockpit.services.catalog.impl.ClassificationSystemServiceImpl" scope="tenant">
+		<property name="catalogService" ref="defaultCatalogService" />
+	</bean>
+	<!-- browser models and their mappings -->
+	<alias alias="DefaultProductSearchBrowserModel" name="defaultDefaultProductSearchBrowserModel" />
+ 	<bean id="defaultDefaultProductSearchBrowserModel" class="de.hybris.platform.productcockpit.session.impl.DefaultProductSearchBrowserModel"
+		scope="prototype" parent="AbstractPageableBrowserModel">
+	</bean>
+	
+	<!--  DAO -->
+	<alias alias="synchronizationServiceDao" name="defaultSynchronizationServiceDao" />
+	<bean id="defaultSynchronizationServiceDao" class="de.hybris.platform.cockpit.daos.impl.DefaultSynchronizationServiceDao" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<!--  Overridden from cockpit-spring-services.xml -->
+	<alias alias="savedQueryService" name="savedQueryServiceUserRights" />
+	<bean id="defaultSavedQueryService" class="de.hybris.platform.productcockpit.services.query.impl.ProductSavedQueryServiceImpl" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="searchService" ref="searchService"/>
+		<property name="enumerationService" ref="enumerationService" />
+		<property name="cockpitConfigurationService" ref="cockpitConfigurationService"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="userService" ref="userService"/>
+		<property name="loginService" ref="loginService"/>
+		<property name="listViewConfigurationPersistingStrategy" ref="listViewPersistingStrategy"/>
+	</bean>
+	<bean id="savedQueryServiceUserRights" class="de.hybris.platform.productcockpit.services.query.impl.SavedQueryUserRightsServiceImpl"
+    		parent="defaultSavedQueryService" scope="tenant" />
+	
+	<!--  Overridden from cockpit-spring-services.xml -->
+	<alias alias="dynamicQueryService" name="defaultDynamicQueryService" />
+	<bean id="defaultDynamicQueryService" class="de.hybris.platform.productcockpit.services.catalog.impl.DynamicQueryServiceImpl" scope="tenant" />
+	
+	<alias alias="connectedItemService" name="defaultConnectedItemService" />
+	<bean id="defaultConnectedItemService" class="de.hybris.platform.productcockpit.services.catalog.impl.ConnectedItemServiceImpl" scope="tenant" />
+	
+	<alias alias="favoriteCategoryService" name="defaultFavoriteCategoryService" />
+	<bean id="defaultFavoriteCategoryService" class="de.hybris.platform.productcockpit.services.catalog.impl.FavoriteCategoryServiceImpl" scope="tenant" />
+	
+	<alias alias="synchronizationService" name="defaultSynchronizationService" />
+	<bean id="defaultSynchronizationService" class="de.hybris.platform.cockpit.services.sync.impl.SynchronizationServiceImpl" scope="tenant">
+		<property name="synchronizationServiceDao" ref="synchronizationServiceDao" />
+	</bean>
+	
+	<!--  Overridden from cockpit-spring-services.xml -->
+	<alias alias="objectCollectionService" name="defaultObjectCollectionService" />
+	<bean id="defaultObjectCollectionService" class="de.hybris.platform.cockpit.services.impl.ObjectCollectionServiceImpl" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="objectTypeFilterList">
+			<list>
+				<value>Product:s</value>
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="productAwareAttributeComparator" name="defaultProductAwareAttributeComparator" />
+	<bean id="defaultProductAwareAttributeComparator" class="de.hybris.platform.productcockpit.services.impl.ProductAwareAttributeComparator" scope="tenant"/>
+	
+	<!--  Overridden from cockpit-spring-services.xml -->
+	<alias alias="objectCompareService" name="defaultObjectCompareService" />
+	<bean id="defaultObjectCompareService" class="de.hybris.platform.cockpit.services.values.impl.DefaultObjectCompareService" scope="tenant">
+		<property name="attributeComparator" ref="productAwareAttributeComparator"/>
+	</bean>
+	<alias alias="loginService" name="defaultLoginService" />
+	<bean id="defaultLoginService" class="de.hybris.platform.productcockpit.services.login.impl.LoginServiceImpl" scope="tenant"/>
+
+<!-- *************************************************************
+     *** Search                                                ***
+     *************************************************************
+-->
+
+	<!-- *** Providers ******************************************************************** -->
+	<alias alias="productSearchProvider" name="defaultProductSearchProvider" />
+	<bean id="defaultProductSearchProvider" class="de.hybris.platform.productcockpit.services.search.impl.ProductPerspectiveQueryProvider" scope="tenant">
+		<property name="maxCategoryCount" value="900"/>
+	</bean>
+	<alias alias="keyProvider" name="defaultKeyProvider" />
+	<bean id="defaultKeyProvider" class="de.hybris.platform.productcockpit.services.impl.DummyKeyProvider" scope="tenant" />
+</beans>

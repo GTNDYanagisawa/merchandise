@@ -1,0 +1,238 @@
+INSERT_UPDATE UserPriceGroup;code[unique=true];name[lang=en];
+;B2B_DEFAULT_PRICE_GROUP;A DEFAULT B2B USERPRICEGROUP;
+
+INSERT_UPDATE SearchRestriction;code[unique=true];name[lang=en];query;principal(UID);restrictedType(code);active;generate
+;b2busergroup_restriction;Restrict B2BUserGroup visibility;{item:Unit} IN (?session.branch) and  EXISTS ( {{ select {ug:PK} from {UserGroup as ug} where {ug:PK} IN (?session.user.groups) and {ug:uid} = 'b2badmingroup' }} );b2bgroup;B2BUserGroup;true;true
+;branch_restriction;branch_restriction;{item:pk} IN (?session.branch) and  ( {item:active} = 1 OR EXISTS ( {{ select {ug:PK} from {UserGroup as ug} where {ug:PK} IN (?session.user.groups) and {ug:uid} = 'b2badmingroup' }} ));b2bgroup;B2BUnit;true;true
+;employee_restriction;Restrict employees visibility;EXISTS ({{ SELECT {pk} FROM {PrincipalGroupRelation} WHERE {source}={item:pk} AND {target} IN ( ?session.branch ) }} ) AND ( {item:active} = 1 OR EXISTS ( {{ select {ug:PK} from {UserGroup as ug} where {ug:PK} IN (?session.user.groups) and {ug:uid} = 'b2badmingroup' }} ));b2bgroup;B2BCustomer;true;true
+;costcenter_restriction;Restrict CostCenter visibility;{item:Unit} IN (?session.branch) and  ( {item:active} = 1 OR EXISTS ( {{ select {ug:PK} from {UserGroup as ug} where {ug:PK} IN (?session.user.groups) and {ug:uid} = 'b2badmingroup' }} ));b2bgroup;B2BCostCenter;true;true
+;budget_restriction;Restrict Budget visibility;{item:Unit} IN (?session.branch) and  ( {item:active} = 1 OR EXISTS ( {{ select {ug:PK} from {UserGroup as ug} where {ug:PK} IN (?session.user.groups) and {ug:uid} = 'b2badmingroup' }} ));b2bgroup;B2BBudget;true;true
+;b2border_restriction;Restrict B2BUserGroup visibility for orders;({item:Unit} IN (?session.branch) OR ({item:Unit} is NULL AND {item:User}=?session.user));b2bgroup;Order;true;true;
+
+INSERT_UPDATE MinConstraint;active;descriptor(enclosingType(code),qualifier);id[unique=true,allownull=true];qualifier;target;type(code);value
+;true;B2BBudget:budget;budgetpositive;budget;de.hybris.platform.b2b.model.B2BBudgetModel;B2BBudget;0
+
+INSERT_UPDATE B2BCustomerEmailConstraint;id[unique=true];annotation[allownull=true];message[lang=de];message[lang=en];descriptor(enclosingType(code),qualifier);qualifier;severity(code,itemtype(code));target;type(code)
+;B2BCustomerValidEmail;org.hibernate.validator.constraints.Email;;;B2BCustomer:email;email;ERROR:Severity;de.hybris.platform.b2b.model.B2BCustomerModel;B2BCustomer
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;b2bapprovergroup;;;;;;;;
+;;;;WorkflowAction;+;+;+;+;-
+
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;b2bgroup;;;;;;;;
+;;;;B2BUnit.active;+;-;-;-;-
+;;;;B2BCustomer.active;+;-;-;-;-
+;;;;B2BCostCenter.active;+;-;-;-;-
+;;;;B2BBudget.active;+;-;-;-;-
+
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;b2badmingroup;;;;;;;;
+;;;;B2BUnit;+;+;+;-;-
+;;;;B2BCustomer;+;+;+;-;-
+;;;;B2BBudget;+;+;+;-;-
+;;;;B2BCostCenter;+;+;+;-;-
+;;;;B2BPermission;+;+;+;+;-
+;;;;AbstractOrder;+;+;+;+;-
+;;;;AbstractOrderEntry;+;+;+;+;-
+;;;;Language;+;+;+;+;-
+;;;;Currency;+;+;+;+;-
+;;;;B2BUserGroup;+;+;+;+;-
+;;;;UserGroup;+;-;-;-;-
+;;;;Country;+;+;+;+;-
+;;;;WorkflowTemplate;+;-;-;-;-;;
+;;;;Workflow;+;-;-;-;-;;
+;;;;AbstractWorkflowAction;+;-;-;-;-;;
+;;;;WorkflowActionTemplate;+;-;-;-;-;;
+;;;;WorkflowAction;+;+;-;-;-;;
+;;;;WorkflowAction.principalAssigned;+;-;-;-;-;;
+;;;;WorkflowAction.name;+;-;-;-;-;;
+;;;;WorkflowAction.activated;+;-;-;-;-;;
+;;;;WorkflowAction.actionType;+;-;-;-;-;;
+;;;;WorkflowAction.firstActivated;+;-;-;-;-;;
+;;;;WorkflowAction.sendEmail;+;-;-;-;-;;
+;;;;WorkflowAction.emailAddress;+;-;-;-;-;;
+;;;;WorkflowAction.description;+;-;-;-;-;;
+;;;;WorkflowAction.attachments;+;-;-;-;-;;
+;;;;WorkflowAction.predecessors;+;-;-;-;-;;
+;;;;WorkflowAction.successors;+;-;-;-;-;;
+;;;;WorkflowAction.status;+;-;-;-;-;;
+;;;;WorkflowAction.owner;+;-;-;-;-;;
+;;;;WorkflowAction.itemtype;+;-;-;-;-;;
+;;;;InboxView;+;-;-;-;-;;
+;;;;WorkflowItemAttachment;+;-;-;-;-;;
+;;;;WorkflowActionStatus;+;-;-;-;-;;
+;;;;WorkflowActionComment;+;+;+;-;-;;
+;;;;WorkflowDecision;+;-;-;-;-;;
+;;;;WorkflowActionLinkRelation;+;-;-;-;-;;
+;;;;B2BBookingLineEntry;+;-;-;-;-
+;;;;B2BBookingLineStatus;+;-;-;-;-
+
+
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;b2bcustomergroup;;;;;;;;
+;;;;B2BUnit;+;-;-;-;-
+;;;;B2BCustomer;+;-;-;-;-
+;;;;B2BBudget;-;-;-;-;-
+;;;;B2BCostCenter;+;-;-;-;-
+;;;;B2BPermission;-;-;-;-;-
+;;;;AbstractOrder;+;+;+;+;-
+;;;;AbstractOrderEntry;+;+;+;+;-
+;;;;Language;+;-;-;-;-
+;;;;Currency;+;-;-;-;-
+;;;;UserGroup;+;-;-;-;-
+;;;;B2BUserGroup;+;-;-;-;-
+;;;;Country;+;+;+;+;-
+;;;;WorkflowTemplate;+;-;-;-;-;;
+;;;;Workflow;+;-;-;-;-;;
+;;;;AbstractWorkflowAction;+;-;-;-;-;;
+;;;;WorkflowActionTemplate;+;-;-;-;-;;
+;;;;WorkflowAction;+;+;-;-;-;;
+;;;;WorkflowAction.principalAssigned;+;-;-;-;-;;
+;;;;WorkflowAction.name;+;-;-;-;-;;
+;;;;WorkflowAction.activated;+;-;-;-;-;;
+;;;;WorkflowAction.actionType;+;-;-;-;-;;
+;;;;WorkflowAction.firstActivated;+;-;-;-;-;;
+;;;;WorkflowAction.sendEmail;+;-;-;-;-;;
+;;;;WorkflowAction.emailAddress;+;-;-;-;-;;
+;;;;WorkflowAction.description;+;-;-;-;-;;
+;;;;WorkflowAction.attachments;+;-;-;-;-;;
+;;;;WorkflowAction.predecessors;+;-;-;-;-;;
+;;;;WorkflowAction.successors;+;-;-;-;-;;
+;;;;WorkflowAction.status;+;-;-;-;-;;
+;;;;WorkflowAction.owner;+;-;-;-;-;;
+;;;;WorkflowAction.itemtype;+;-;-;-;-;;
+;;;;InboxView;+;-;-;-;-;;
+;;;;WorkflowItemAttachment;+;-;-;-;-;;
+;;;;WorkflowActionStatus;+;-;-;-;-;;
+;;;;User;+;;;;;;
+;;;;UserGroup;+;;;;;;
+;;;;WorkflowActionComment;+;+;+;-;-;;
+;;;;WorkflowDecision;+;-;-;-;-;;
+;;;;WorkflowActionLinkRelation;+;-;-;-;-;;
+;;;;BusinessProcess;+;-;-;-;-
+
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;b2bmanagergroup;;;;;;;;
+;;;;B2BUnit;+;+;+;-;-
+;;;;B2BCustomer;+;+;+;-;-
+;;;;B2BBudget;+;+;+;-;-
+;;;;B2BCostCenter;+;+;+;-;-
+;;;;B2BPermission;+;+;+;+;-
+;;;;AbstractOrder;+;+;+;+;-
+;;;;AbstractOrderEntry;+;+;+;+;-
+;;;;Language;+;-;-;-;-
+;;;;Currency;+;-;-;+;-
+;;;;B2BUserGroup;+;-;-;-;-
+;;;;UserGroup;+;-;-;-;-
+;;;;Country;+;+;+;+;-
+;;;;WorkflowTemplate;+;-;-;-;-;;
+;;;;Workflow;+;-;-;-;-;;
+;;;;AbstractWorkflowAction;+;-;-;-;-;;
+;;;;WorkflowActionTemplate;+;-;-;-;-;;
+;;;;WorkflowAction;+;+;-;-;-;;
+;;;;WorkflowAction.principalAssigned;+;-;-;-;-;;
+;;;;WorkflowAction.name;+;-;-;-;-;;
+;;;;WorkflowAction.activated;+;-;-;-;-;;
+;;;;WorkflowAction.actionType;+;-;-;-;-;;
+;;;;WorkflowAction.firstActivated;+;-;-;-;-;;
+;;;;WorkflowAction.sendEmail;+;-;-;-;-;;
+;;;;WorkflowAction.emailAddress;+;-;-;-;-;;
+;;;;WorkflowAction.description;+;-;-;-;-;;
+;;;;WorkflowAction.attachments;+;-;-;-;-;;
+;;;;WorkflowAction.predecessors;+;-;-;-;-;;
+;;;;WorkflowAction.successors;+;-;-;-;-;;
+;;;;WorkflowAction.status;+;-;-;-;-;;
+;;;;WorkflowAction.owner;+;-;-;-;-;;
+;;;;WorkflowAction.itemtype;+;-;-;-;-;;
+;;;;InboxView;+;-;-;-;-;;
+;;;;WorkflowItemAttachment;+;-;-;-;-;;
+;;;;WorkflowActionStatus;+;-;-;-;-;;
+;;;;WorkflowActionComment;+;+;+;-;-;;
+;;;;WorkflowDecision;+;-;-;-;-;;
+;;;;WorkflowActionLinkRelation;+;-;-;-;-;;
+;;;;B2BBookingLineEntry;+;-;-;-;-;;
+;;;;B2BBookingLineStatus;+;-;-;-;-;;
+
+
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm;;
+UserGroup;b2bapprovergroup;;;;;;;;;;
+;;;;WorkflowTemplate;+;-;-;-;-;;
+;;;;Workflow;+;-;-;-;-;;
+;;;;AbstractWorkflowAction;+;-;-;-;-;;
+;;;;WorkflowActionTemplate;+;-;-;-;-;;
+;;;;WorkflowAction;+;+;-;-;-;;
+;;;;WorkflowAction.principalAssigned;+;-;-;-;-;;
+;;;;WorkflowAction.name;+;-;-;-;-;;
+;;;;WorkflowAction.activated;+;-;-;-;-;;
+;;;;WorkflowAction.actionType;+;-;-;-;-;;
+;;;;WorkflowAction.firstActivated;+;-;-;-;-;;
+;;;;WorkflowAction.sendEmail;+;-;-;-;-;;
+;;;;WorkflowAction.emailAddress;+;-;-;-;-;;
+;;;;WorkflowAction.description;+;-;-;-;-;;
+;;;;WorkflowAction.attachments;+;-;-;-;-;;
+;;;;WorkflowAction.predecessors;+;-;-;-;-;;
+;;;;WorkflowAction.successors;+;-;-;-;-;;
+;;;;WorkflowAction.status;+;-;-;-;-;;
+;;;;WorkflowAction.owner;+;-;-;-;-;;
+;;;;WorkflowAction.itemtype;+;-;-;-;-;;
+;;;;InboxView;+;-;-;-;-;;
+;;;;WorkflowItemAttachment;+;-;-;-;-;;
+;;;;WorkflowActionStatus;+;-;-;-;-;;
+;;;;User;+;;;;;;
+;;;;UserGroup;+;;;;;;
+;;;;WorkflowActionComment;+;+;+;-;-;;
+;;;;WorkflowDecision;+;-;-;-;-;;
+;;;;WorkflowActionLinkRelation;+;-;-;-;-;;
+;;;;AbstractOrder;+;+;+;+;-
+;;;;AbstractOrderEntry;+;+;+;+;-
+;;;;BusinessProcess;+;-;-;-;-
+;;;;B2BUnit;+;-;-;-;-
+$END_USERRIGHTS;;;;;;;;;
+
+INSERT_UPDATE UserGroup;UID[unique=true];hmcXML;
+;b2badmingroup;"<?xml version=""1.0"" encoding=""ISO-8859-1""?>
+<configuration xmlns=""hybris.de/schemas/hmc/generic""
+   xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance""
+   xsi:schemaLocation=""hybris.de/schemas/hmc/generic hmc.xsd""> 
+   <explorertree>
+    <group name=""user"" mode=""delete""/>
+    <group name=""c2l"" mode=""delete""/>
+</explorertree>
+</configuration>"
+;b2bmanagergroup;"<?xml version=""1.0"" encoding=""ISO-8859-1""?>
+<configuration xmlns=""hybris.de/schemas/hmc/generic""
+   xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance""
+   xsi:schemaLocation=""hybris.de/schemas/hmc/generic hmc.xsd""> 
+<explorertree>
+    <group name=""user"" mode=""delete""/>
+    <group name=""c2l"" mode=""delete""/>
+</explorertree>
+</configuration>"
+;b2bcustomergroup;"<?xml version=""1.0"" encoding=""ISO-8859-1""?>
+<configuration xmlns=""hybris.de/schemas/hmc/generic""
+   xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance""
+   xsi:schemaLocation=""hybris.de/schemas/hmc/generic hmc.xsd""> 
+<explorertree>
+    <group name=""user"" mode=""delete""/>
+</explorertree>
+ <type name=""B2BUnit"" mode=""append"" >
+      <organizer mode=""append"">
+      	<editor mode=""append"">
+            <tab name=""administration"" position=""0"" mode=""delete""/>
+            <tab name=""principal.security.tab"" position=""0"" mode=""delete""/>
+		</editor>               
+	</organizer>
+</type>
+ <type name=""B2BCustomer"" mode=""append"" >
+      <organizer mode=""append"">
+      	<editor mode=""append"">
+            <tab name=""administration"" position=""0"" mode=""delete""/>
+            <tab name=""principal.security.tab"" position=""0"" mode=""delete""/>
+		</editor>               
+	</organizer>
+</type>
+</configuration>"
+
+

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2014 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+		 xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	<import resource="classpath*:META-INF/cockpitcore-spring.xml"/>
+	<import resource="classpath*:META-INF/cockpitframework-spring.xml"/>
+
+	<context:property-placeholder location="classpath:test/backoffice-test-spring.properties"/>
+
+	<alias name="backofficeWidgetLibUtils" alias="widgetLibUtils"/>
+	<bean id="backofficeWidgetLibUtils" parent="defaultWidgetLibUtils">
+		<property name="rootDirectory" value="${user.home}/.cockpit/backoffice_spring_integration_test"/>
+	</bean>
+
+	<alias alias="widgetDefinitionService" name="wsComponentDefinitionService"/>
+	<alias alias="componentDefinitionService" name="wsComponentDefinitionService"/>
+	<alias alias="cockpitComponentDefinitionService" name="wsComponentDefinitionService"/>
+	<bean id="wsComponentDefinitionService" parent="frameworkDefaultComponentDefinitionService">
+		<property name="cockpitProperties">
+			<bean id="defaultCockpitProperties"
+					class="com.hybris.cockpitng.core.util.impl.DefaultPropertyResolverRegistry"/>
+		</property>
+		<property name="definitionLoaders">
+			<list merge="false">
+				<bean
+						class="com.hybris.cockpitng.testing.spring.core.ModuleTestWidgetDefinitionLoader">
+					<property name="basePath" value="${backoffice.project.location}source/backoffice/resources/cockpitng/widgets"/>
+					<property name="widgetLibUtils" ref="widgetLibUtils"/>
+				</bean>
+				<bean
+						class="com.hybris.cockpitng.testing.spring.core.ModuleTestWidgetDefinitionLoader">
+					<property name="basePath"
+								 value="${backoffice.project.location}source/backoffice/resources/cockpitng/widgets/actions"/>
+					<property name="widgetLibUtils" ref="widgetLibUtils"/>
+				</bean>
+			</list>
+		</property>
+		<property name="definitionFactories">
+			<map merge="false">
+				<entry key="widget">
+					<bean parent="defaultWidgetDefinitionFactory">
+						<property name="directoryURI" value="/"/>
+					</bean>
+				</entry>
+				<entry key="action" value-ref="defaultActionDefinitionFactory"/>
+				<entry key="editor" value-ref="defaultEditorDefinitionFactory"/>
+			</map>
+		</property>
+	</bean>
+</beans>

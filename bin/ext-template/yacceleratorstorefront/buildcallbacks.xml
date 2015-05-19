@@ -1,0 +1,216 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+-->
+<!--
+ All hybris buildcallbacks.xml macrodefinitions:
+
+ Build/Documentation
+
+	 before/after ant macro "clean"
+		 <macrodef name="yacceleratorstorefront_before_clean"/>
+		 <macrodef name="yacceleratorstorefront_after_clean"/>
+
+	 before/after ant macro "build"
+		 <macrodef name="yacceleratorstorefront_before_build"/>
+		 <macrodef name="yacceleratorstorefront_after_build"/>
+
+	 before/after ant macro "compile_core" - the core module of the extension
+		 <macrodef name="yacceleratorstorefront_before_compile_core">
+		 <macrodef name="yacceleratorstorefront_after_compile_core">
+
+	 before/after ant macro "compile_web" - the web module of the extension
+		 <macrodef name="yacceleratorstorefront_before_compile_web" />
+		 <macrodef name="yacceleratorstorefront_after_compile_web" />
+
+	 before/after ant macro "compile_hmc" - the hmc module of the extension
+		 <macrodef name="yacceleratorstorefront_before_compile_hmc" />
+		 <macrodef name="yacceleratorstorefront_after_compile_hmc" />
+
+ Preparing extension
+
+	 will be called in the beginning of the ant call and only once (also when using multiple 
+	 ant targets e.g. ant build yunittest)
+		 <macrodef name="yacceleratorstorefront_only_once_prepare"/>
+
+ Creating ear module/production
+
+	 before/after ant macro "ear"
+		 <macrodef name="yacceleratorstorefront_before_ear"/>
+		 <macrodef name="yacceleratorstorefront_after_ear"/>
+
+	 before/after ant macro "production" - for hybris server only
+		 <macrodef name="yacceleratorstorefront_before_production" />
+		 <macrodef name="yacceleratorstorefront_after_production" />
+
+ JUnit Test
+
+	 before/after ant macro "yunitinit" 
+		 <macrodef name="yacceleratorstorefront_before_yunitinit" />
+		 <macrodef name="yacceleratorstorefront_after_yunitinit" />
+
+	 before/after ant macro "yunit"
+		 <macrodef name="yacceleratorstorefront_before_yunit" />
+		 <macrodef name="yacceleratorstorefront_after_yunit" /> 
+
+ Distribution package
+
+	 before/after ant macro "dist" - internal target; only for use when platform is available in source code
+		 <macrodef name="yacceleratorstorefront_after_dist"/>
+		 <macrodef name="yacceleratorstorefront_before_dist"/>
+
+	 before/after ant macro "dist_copy" - internal target; only for use when platform is available in source code
+		 <macrodef name="yacceleratorstorefront_before_dist_copy"/>
+		 <macrodef name="yacceleratorstorefront_after_dist_copy"/>
+
+-->
+
+<project name="yacceleratorstorefront_buildcallbacks">
+	<property name="tool.less" location="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/lib/less-rhino-1.7.3.js" />
+	<property name="tool.lessc" location="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/lib/lessc-rhino-1.7.3.js" />
+	<property name="tool.rhino" location="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/lib/rhino1_7R4.jar" />
+
+
+	<macrodef name="lesscss">
+		<sequential>
+			<apply dir="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/themes/" executable="java" parallel="false" failonerror="true">
+				<!-- Give the input bundle of less files-->
+				<fileset dir="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/themes/">
+					<include name="**/style.less" />
+				</fileset>
+				<arg value="-jar" />
+				<arg path="${tool.rhino}" />
+				<arg value="-f" />
+				<arg path="${tool.less}" />
+				<arg path="${tool.lessc}" />
+				<srcfile />
+				<!-- Output the compiled css file with corresponding name -->
+				<mapper type="regexp" from="(.*)/less/(.*)\.less$$" to="${ext.yacceleratorstorefront.path}/web/webroot/_ui/responsive/theme-\1/css/\2.css" />
+				<targetfile />
+			</apply>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="movelibs">
+		<sequential>
+			<copy todir="${ext.yacceleratorstorefront.path}/web/webroot/_ui/responsive/common/bootstrap">
+				<fileset dir="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/lib/bootstrap-3.2.0" includes="**" />
+			</copy>
+			<copy todir="${ext.yacceleratorstorefront.path}/web/webroot/_ui/responsive/common/js">
+				<fileset dir="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/lib/ybase-0.1.0/js" includes="**" />
+			</copy>
+			<copy todir="${ext.yacceleratorstorefront.path}/web/webroot/_ui/responsive/">
+				<fileset dir="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/_ui-src/responsive/" includes="themes/**/fonts/*" />
+				<mapper type="regexp" from="themes/(.*)/fonts/(.*)" to="theme-\1/fonts/\2" />
+			</copy>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="generatevariables">
+		<sequential>
+			<uptodate property="updates" value="true" targetfile="${ext.yacceleratorstorefront.path}/resources/generateVariables.properties">
+				<srcfiles file="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/tags/shared/variables/generatedVariables.tag" />
+				<srcfiles file="${ext.yacceleratorstorefront.path}/web/webroot/_ui/shared/js/generatedVariables.js" />
+				<srcfiles file="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/_ui-src/shared/less/generatedVariables.less" />
+			</uptodate>
+			<if>
+				<equals arg1="${updates}" arg2="true" />
+				<then>
+					<concat destfile="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/tags/shared/variables/generatedVariables.tag" overwrite="no">
+						<string>&lt;%@ taglib prefix=&quot;c&quot; uri=&quot;http://java.sun.com/jsp/jstl/core&quot; %&gt;&#10;</string>
+						<filelist dir="${ext.yacceleratorstorefront.path}/resources" files="generateVariables.properties" />
+					</concat>
+
+					<replaceregexp file="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/tags/shared/variables/generatedVariables.tag" match="^(?!&lt;%@)(.*)=(.*)" replace="&lt;c:set var=&quot;\1&quot; value=&quot;\2&quot; scope=&quot;session&quot;/&gt;" byline="true" />
+
+					<concat destfile="${ext.yacceleratorstorefront.path}/web/webroot/_ui/shared/js/generatedVariables.js" overwrite="yes">
+						<filelist dir="${ext.yacceleratorstorefront.path}/resources" files="generateVariables.properties" />
+					</concat>
+
+					<replaceregexp file="${ext.yacceleratorstorefront.path}/web/webroot/_ui/shared/js/generatedVariables.js" match="(.*)=(.*)" replace="var \1=&quot;\2&quot;&#59;" byline="true" />
+
+					<concat destfile="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/_ui-src/shared/less/generatedVariables.less" overwrite="no">
+						<filelist dir="${ext.yacceleratorstorefront.path}/resources" files="generateVariables.properties" />
+					</concat>
+					
+					<replaceregexp file="${ext.yacceleratorstorefront.path}/web/webroot/WEB-INF/_ui-src/shared/less/generatedVariables.less" match="(.*)=(.*)" replace="@\1:\2&#59;" byline="true" />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="yacceleratorstorefront_after_build">
+		<sequential>
+			<echo message="yacceleratorstorefront_after_build" />
+			<impexGenerate extname="yacceleratorstorefront" />
+			<containsExact string="${extension.names}" substring="addonsupport" separator=";">
+				<do>
+					<foreachext>
+						<do>
+							<for list="${addon.folder}" param="addOnFile" delimiter=";">
+								<sequential>
+									<if>
+										<available file="${ext.@{extname}.path}/acceleratoraddon/@{addOnFile}" />
+										<then>
+											<copyAddOnToExtension addonextension="@{extname}" addonresource="@{addOnFile}" target="yacceleratorstorefront" />
+										</then>
+									</if>
+								</sequential>
+							</for>
+						</do>
+					</foreachext>
+				</do>
+			</containsExact>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="yacceleratorstorefront_before_build">
+		<sequential>
+			<echo message="yacceleratorstorefront_before_build" />
+			<generatevariables />
+			<foreachext>
+				<do>
+					<if>
+						<available file="${ext.@{extname}.path}/commonweb" />
+						<then>
+							<echo message="Found commonweb extension:  @{extname}" />
+							<copyCommonWebToExtension commonwebextension="@{extname}" commonwebresource="/src" target="yacceleratorstorefront" />
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+
+
+	</macrodef>
+
+
+	<!-- 
+		Called whenever 'ant ear' is used. this callback can be used to modify the content of the ear file
+
+		${ear.path}: 			path to ear
+	 -->
+	<macrodef name="yacceleratorstorefront_after_clean">
+		<sequential>
+			<!-- Addon folders in storefronts are always cleaned (even if there is no addonsupport on localextension list) -->
+			<addonclean />
+			<commonwebclean />
+		</sequential>
+	</macrodef>
+
+
+	<target name="compileuisrc" description="compile the _ui-src folder in _ui">
+		<lesscss />
+		<movelibs />
+	</target>
+</project>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="editorAreaReferenceTable" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="ListCell" mode="Opaque" backcolor="#E6E6E6" fontName="Arial Black" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold">
+		<box leftPadding="0">
+			<pen lineWidth="1.0"/>
+			<topPen lineWidth="1.0"/>
+			<leftPen lineWidth="1.0"/>
+			<bottomPen lineWidth="1.0"/>
+			<rightPen lineWidth="1.0"/>
+		</box>
+	</style>
+	<style name="referenceTableTitleStyle" fill="Solid" isBlankWhenNull="false" fontName="Arial" fontSize="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold">
+		<box leftPadding="2"/>
+	</style>
+	<subDataset name="dataset2">
+		<queryString language="xPath">
+			<![CDATA[/root/section/row/reference/columnsTitles]]>
+		</queryString>
+		<field name="value" class="java.lang.String">
+			<fieldDescription><![CDATA[@value]]></fieldDescription>
+		</field>
+	</subDataset>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Java\\workspace\\Jasper Sub Reports Xml World\\resources\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="REFERENCE_TABLE_ROWS_SUBREPORT" class="java.lang.Object" isForPrompting="false"/>
+	<queryString language="xPath">
+		<![CDATA[/root/section/row/reference]]>
+	</queryString>
+	<field name="name" class="java.lang.String">
+		<fieldDescription><![CDATA[@name]]></fieldDescription>
+	</field>
+	<field name="tableRow" class="java.lang.String">
+		<fieldDescription><![CDATA[rows/tableRow]]></fieldDescription>
+	</field>
+	<group name="ReferenceGroup">
+		<groupExpression><![CDATA[$F{name}]]></groupExpression>
+		<groupHeader>
+			<band height="22">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="false">
+					<reportElement style="referenceTableTitleStyle" x="0" y="10" width="368" height="12" isPrintWhenDetailOverflows="true"/>
+					<textElement>
+						<font fontName="Arial" size="9" isBold="false" pdfFontName="Times-Italic"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<printWhenExpression><![CDATA[$F{tableRow} != null]]></printWhenExpression>
+			<componentElement>
+				<reportElement x="0" y="0" width="555" height="10">
+					<printWhenExpression><![CDATA[$F{tableRow} != null]]></printWhenExpression>
+				</reportElement>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Horizontal">
+					<datasetRun subDataset="dataset2">
+						<dataSourceExpression><![CDATA[$P{REPORT_DATA_SOURCE}.subDataSource("/reference/columnsTitles/title")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="10" width="80">
+						<frame>
+							<reportElement style="ListCell" x="0" y="0" width="80" height="10"/>
+							<box>
+								<pen lineWidth="0.25"/>
+								<topPen lineWidth="0.25"/>
+								<leftPen lineWidth="0.25"/>
+								<bottomPen lineWidth="0.25"/>
+								<rightPen lineWidth="0.25"/>
+							</box>
+							<textField isStretchWithOverflow="true">
+								<reportElement x="0" y="0" width="80" height="10"/>
+								<textElement>
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$F{value}]]></textFieldExpression>
+							</textField>
+						</frame>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+			<subreport>
+				<reportElement x="0" y="10" width="555" height="10">
+					<printWhenExpression><![CDATA[$F{tableRow} != null]]></printWhenExpression>
+				</reportElement>
+				<dataSourceExpression><![CDATA[$P{REPORT_DATA_SOURCE}.subDataSource("/reference/rows/tableRow")]]></dataSourceExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[((net.sf.jasperreports.engine.JasperReport)$P{REFERENCE_TABLE_ROWS_SUBREPORT})]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

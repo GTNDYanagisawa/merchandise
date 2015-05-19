@@ -1,0 +1,20 @@
+#
+# Import the Solr CronJob Trigger configuration for the Electronics CN Product Catalog
+#
+
+$sessionCurrency=sessionCurrency(isocode)
+$sessionLanguage=sessionLanguage(isocode);
+INSERT_UPDATE CronJob; code[unique=true];$sessionCurrency;$sessionLanguage;
+;full-electronics-cnIndex-cronJob;CNY;zh;
+;update-electronics-cnIndex-cronJob;CNY;zh;
+
+
+
+
+INSERT_UPDATE Trigger;cronJob(code)[unique=true];second;minute;hour;day;month;year;relative;active;maxAcceptableDelay
+
+# Run the full-electronics-cnIndex-cronJob at 3:05 AM every day
+;full-electronics-cnIndex-cronJob;0;5;3;-1;-1;-1;false;false;-1
+
+# Run the update-electronics-cnIndex-cronJob every 1 minutes
+;update-electronics-cnIndex-cronJob;0;1;-1;-1;-1;-1;true;false;-1

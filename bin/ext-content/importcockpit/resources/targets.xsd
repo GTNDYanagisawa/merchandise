@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<xs:schema id="targets" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="targets">
+		<xs:annotation>
+			<xs:documentation>Defines which types and attributes are supported in
+				the mapping perspective.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="types-whitelist" type="targetType-list"
+					minOccurs="1" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>The list of supported types for the import.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="types-blacklist" type="targetType-list"
+					minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>The list of explicitly not supported types,
+							typically sub types of supported types that should be omitted.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="attributes-blacklist" type="attributes-list"
+					minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>The list of not supported target attributes.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="targetType-list">
+		<xs:sequence>
+			<xs:element name="type" type="targetType" minOccurs="1" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="targetType">
+		<xs:attribute name="code" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="attributes-list">
+		<xs:sequence>
+			<xs:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="property">
+		<xs:attribute name="qualifier" type="xs:string" use="required"/>
+	</xs:complexType>
+</xs:schema>

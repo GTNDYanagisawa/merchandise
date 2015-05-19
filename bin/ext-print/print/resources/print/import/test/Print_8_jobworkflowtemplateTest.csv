@@ -1,0 +1,30 @@
+# Comments
+$owner=admin
+$assignee=layouter
+
+# create workflow basic settings:
+INSERT_UPDATE WorkflowTemplate;&Item;code[unique=true];name;description;owner(User.uid[default=$owner])
+;Item1;PrintJob.Workflow;Correctionworkflow;Default print workflow;
+
+INSERT_UPDATE WorkflowActionTemplate;&Item;code[unique=true];name;principalAssigned(Principal.uid[default=$owner]);owner(User.uid[default=$owner]);workflow(&Item);actionType(code)
+;Item2;ToDo;To be done;$assignee;;Item1;start
+;Item3;Request;Question;;;Item1;normal
+;Item4;Okay;Okay;;;Item1;normal
+;Item5;Approved;Approved;;;Item1;end
+;Item6;Terminated;Terminated;;;Item1;end
+
+INSERT_UPDATE WorkflowDecisionTemplate;&Item;code[unique=true];name;actionTemplate(&Item)
+;Item7;Request2ToDo;To Do;Item3
+;Item8;ToDo2Request;Request;Item2
+;Item9;ToDo2Okay;Okay;Item2
+;Item10;Okay2ToDo;To Do;Item4
+;Item11;Okay2Approve;Approve;Item4
+;Item12;Request2Terminate;Terminate;Item3
+
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation;source(&Item)[unique=true];target(&Item)
+;Item7;Item2
+;Item8;Item3
+;Item9;Item4
+;Item10;Item2
+;Item11;Item5
+;Item12;Item6

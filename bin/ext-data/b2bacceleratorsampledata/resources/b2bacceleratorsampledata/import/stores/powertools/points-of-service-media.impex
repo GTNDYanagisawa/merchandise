@@ -1,0 +1,34 @@
+# ImpEx for Importing Medias into Powertools Store
+
+# Macros / Replacement Parameter definitions
+$productCatalog=powertoolsProductCatalog
+
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$media=@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator]
+$siteResource=jar:de.hybris.platform.b2bacceleratorsampledata.constants.B2BAcceleratorSampleDataConstants&/b2bacceleratorsampledata/import/stores/powertools
+$medias=medias(code, $catalogVersion)
+
+# Create medias
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];$media;mime[default='image/jpeg'];$catalogVersion;folder(qualifier)[default=images]
+;365Wx246H;/365Wx246H/powertools_store_01;$siteResource/images/storefinder/powertools_store_365x246_01.jpg
+;365Wx246H;/365Wx246H/powertools_store_02;$siteResource/images/storefinder/powertools_store_365x246_02.jpg
+;365Wx246H;/365Wx246H/powertools_store_03;$siteResource/images/storefinder/powertools_store_365x246_03.jpg
+;365Wx246H;/365Wx246H/powertools_store_04;$siteResource/images/storefinder/powertools_store_365x246_04.jpg
+;365Wx246H;/365Wx246H/powertools_store_05;$siteResource/images/storefinder/powertools_store_365x246_05.jpg
+;365Wx246H;/365Wx246H/powertools_store_06;$siteResource/images/storefinder/powertools_store_365x246_06.jpg
+;365Wx246H;/365Wx246H/powertools_store_07;$siteResource/images/storefinder/powertools_store_365x246_07.jpg
+;65Wx65H;/65Wx65H/powertools_store_01;$siteResource/images/storefinder/powertools_store_65x65_01.jpg
+;65Wx65H;/65Wx65H/powertools_store_02;$siteResource/images/storefinder/powertools_store_65x65_02.jpg
+;65Wx65H;/65Wx65H/powertools_store_03;$siteResource/images/storefinder/powertools_store_65x65_03.jpg
+;65Wx65H;/65Wx65H/powertools_store_04;$siteResource/images/storefinder/powertools_store_65x65_04.jpg
+;65Wx65H;/65Wx65H/powertools_store_05;$siteResource/images/storefinder/powertools_store_65x65_05.jpg
+;65Wx65H;/65Wx65H/powertools_store_06;$siteResource/images/storefinder/powertools_store_65x65_06.jpg
+;65Wx65H;/65Wx65H/powertools_store_07;$siteResource/images/storefinder/powertools_store_65x65_07.jpg
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$catalogVersion
+;powertools_store_01;/365Wx246H/powertools_store_01,/65Wx65H/powertools_store_01
+;powertools_store_02;/365Wx246H/powertools_store_02,/65Wx65H/powertools_store_02
+;powertools_store_03;/365Wx246H/powertools_store_03,/65Wx65H/powertools_store_03
+;powertools_store_04;/365Wx246H/powertools_store_04,/65Wx65H/powertools_store_04
+;powertools_store_05;/365Wx246H/powertools_store_05,/65Wx65H/powertools_store_05
+;powertools_store_06;/365Wx246H/powertools_store_06,/65Wx65H/powertools_store_06

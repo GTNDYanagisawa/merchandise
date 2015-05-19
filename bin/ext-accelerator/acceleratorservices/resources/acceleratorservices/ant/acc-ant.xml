@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<project name="acc.ant">
+
+	<!-- Load the separate ant scripts -->
+	<import file="acc-ant-localize-impex.xml"/>
+	<import file="acc-ant-commonweb.xml"/>
+	<import file="acc-ant-sonar.xml"/>
+
+	<containsExact string="${extension.names}" substring="addonsupport" separator=";">
+		<do>
+			<import file="${ext.addonsupport.path}/resources/addonsupport/ant/acc-ant-addons.xml"/>
+		</do>
+	</containsExact>
+
+	<!-- Addon folders in storefronts are always cleaned (even if there is no addonsupport on localextension list) -->
+	<macrodef name="addonclean">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<or>
+						<available file="${ext.@{extname}.path}/web/addonsrc" type="dir" />
+						<available file="${ext.@{extname}.path}/web/webroot/_ui/addons" type="dir" />
+						</or>
+							<then>
+								<echo message="Deleting addons directories from: ${ext.@{extname}.path}/web/webroot" />
+								<echo message="Deleting addonsrc directory from: ${ext.@{extname}.path}/web/" />
+								<echo message="Deleting addons web libs from: ${ext.@{extname}.path}/web/webroot/WEB-INF/lib" />
+
+								<delete includeEmptyDirs="true" failonerror="false">
+									<fileset dir="${ext.@{extname}.path}/web/webroot/" includes="**/addons/"/>
+								    <fileset dir="${ext.@{extname}.path}/web" includes="**/addonsrc/"/>
+									<fileset dir="${ext.@{extname}.path}/web/webroot/WEB-INF/lib" includes="addon-**.jar"/>
+								</delete>
+							</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="commonwebclean">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<or>
+						<available file="${ext.@{extname}.path}/web/commonwebsrc" type="dir" />
+						</or>
+							<then>
+								<echo message="Deleting commonwebsrc directory from: ${ext.@{extname}.path}/web/" />
+								<delete includeEmptyDirs="true" failonerror="false">
+								   <fileset dir="${ext.@{extname}.path}/web" includes="**/commonwebsrc/"/>
+								</delete>
+							</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	
+	<target name="addonclean" description="Clean addons">
+		<addonclean />
+	</target>
+
+	<target name="commonwebclean" description="Clean common web sources">
+		<commonwebclean />
+	</target>
+	
+</project>

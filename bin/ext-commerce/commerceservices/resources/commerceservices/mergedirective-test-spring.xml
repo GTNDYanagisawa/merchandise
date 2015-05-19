@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<bean id="listMergeBeanPostProcessor" class="de.hybris.platform.commerceservices.spring.config.ListMergeDirectiveBeanPostProcessor" />
+	<bean id="listMergeDirective" class="de.hybris.platform.commerceservices.spring.config.ListMergeDirective" abstract="true" />
+
+	<bean id="mapMergeBeanPostProcessor" class="de.hybris.platform.commerceservices.spring.config.MapMergeDirectiveBeanPostProcessor" />
+	<bean id="mapMergeDirective" class="de.hybris.platform.commerceservices.spring.config.MapMergeDirective" abstract="true" />
+
+	<bean id="mergeBean" class="de.hybris.platform.commerceservices.spring.config.MergeTestBean">
+		<property name="name" value="merge" />
+	</bean>
+
+	<bean id="insertBeforeBean" class="de.hybris.platform.commerceservices.spring.config.InsertBeforeMergeTestBean">
+		<property name="name" value="insertBefore" />
+	</bean>
+
+	<bean id="insertAfterBean" class="de.hybris.platform.commerceservices.spring.config.InsertAfterMergeTestBean">
+		<property name="name" value="insertAfter" />
+	</bean>
+
+	<bean id="firstBean" class="de.hybris.platform.commerceservices.spring.config.MergeTestBean">
+		<property name="name" value="first" />
+	</bean>
+
+	<bean id="lastBean" class="de.hybris.platform.commerceservices.spring.config.MergeTestBean">
+		<property name="name" value="last" />
+	</bean>
+
+	<bean id="addToEndListBean" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<value>one</value>
+				<value>two</value>
+				<value>three</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="addFourListMergeDirective" depends-on="addToEndListBean" parent="listMergeDirective">
+		<property name="add" value="four" />
+	</bean>
+
+	<bean id="multipleListBean" class="de.hybris.platform.commerceservices.spring.config.MultipleListMergeBean">
+		<property name="propertyList">
+			<list>
+				<ref bean="mergeBean"/>
+				<ref bean="mergeBean"/>
+				<ref bean="mergeBean"/>
+				<ref bean="mergeBean"/>
+			</list>
+		</property>
+		<property name="fieldList">
+			<list>
+				<ref bean="mergeBean"/>
+				<ref bean="mergeBean"/>
+				<ref bean="mergeBean"/>
+				<ref bean="mergeBean"/>
+			</list>
+		</property>
+	</bean>
+
+	
+	<bean id="addToEndOfPropertyListMergeDirective" depends-on="multipleListBean" parent="listMergeDirective">
+		<property name="add" ref="lastBean" />
+		<property name="listPropertyDescriptor" value="propertyList" />
+	</bean>
+
+	<bean id="addToEndOfFieldListMergeDirective" depends-on="multipleListBean" parent="listMergeDirective">
+		<property name="add" ref="lastBean" />
+		<property name="fieldName" value="fieldList" />
+	</bean>
+
+	<bean id="insertBeforeClassListBean" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<ref bean="insertBeforeBean" />
+				<ref bean="mergeBean" />
+				<ref bean="mergeBean" />
+				<ref bean="lastBean" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="insertBeforeListMergeDirective" depends-on="insertBeforeClassListBean" parent="listMergeDirective">
+		<property name="add" ref="firstBean" />
+		<property name="beforeClasses">
+			<list value-type="java.lang.Class">
+				<value>de.hybris.platform.commerceservices.spring.config.InsertBeforeMergeTestBean</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="insertBeforeNameListBean" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<ref bean="firstBean" />
+				<ref bean="insertBeforeBean" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="insertBeforeNameListMergeDirective" depends-on="insertBeforeNameListBean" parent="listMergeDirective">
+		<property name="add" ref="lastBean" />
+		<property name="beforeBeanNames">
+			<list value-type="java.lang.String">
+				<value>insertBeforeBean</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="insertAfterClassListBean" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<ref bean="firstBean" />
+				<ref bean="mergeBean" />
+				<ref bean="insertAfterBean" />
+				<ref bean="mergeBean" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="insertAfterListMergeDirective" depends-on="insertAfterClassListBean" parent="listMergeDirective">
+		<property name="add" ref="lastBean" />
+		<property name="afterClasses">
+			<list value-type="java.lang.Class">
+				<value>de.hybris.platform.commerceservices.spring.config.InsertAfterMergeTestBean</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="insertAfterNameListBean" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<ref bean="firstBean" />
+				<ref bean="insertBeforeBean" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="insertAfterNameListMergeDirective" depends-on="insertAfterNameListBean" parent="listMergeDirective">
+		<property name="add" ref="lastBean" />
+		<property name="afterBeanNames">
+			<list value-type="java.lang.String">
+				<value>firstBean</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<bean id="insertBeforeMultipleListBean" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<ref bean="insertAfterBean" />
+				<ref bean="insertBeforeBean" />
+				<ref bean="mergeBean" />
+				<ref bean="lastBean" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="insertBeforeMulitpleListMergeDirective" depends-on="insertBeforeMultipleListBean" parent="listMergeDirective">
+		<property name="add" ref="firstBean" />
+		<property name="beforeBeanNames">
+			<list value-type="java.lang.String">
+				<value>lastBean</value>
+				<value>insertBeforeBean</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="insertBetweenListBean" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<ref bean="firstBean"/>
+				<ref bean="insertAfterBean" />
+				<ref bean="insertBeforeBean" />
+				<ref bean="lastBean" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="insertBetweenListMergeDirective" depends-on="insertBetweenListBean" parent="listMergeDirective">
+		<property name="add" ref="mergeBean" />
+		<property name="afterClasses">
+			<list value-type="java.lang.Class">
+				<value>de.hybris.platform.commerceservices.spring.config.InsertAfterMergeTestBean</value>
+			</list>
+		</property>
+		<property name="beforeClasses">
+			<list value-type="java.lang.Class">
+				<value>de.hybris.platform.commerceservices.spring.config.InsertBeforeMergeTestBean</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="addToMapMergeBean" class="java.util.HashMap">
+		<constructor-arg>
+			<map>
+				<entry key="red" value="green" />
+				<entry key="orange" value="blue" />
+				<entry key="yellow" value="purple" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="multipleMapMergeBean" class="de.hybris.platform.commerceservices.spring.config.MultipleMapMergeBean">
+		<property name="propertyMap">
+			<map>
+				<entry key="up" value="down" />
+				<entry key="bottom" value="top" />
+				<entry key="strange" value="charm" />
+			</map>
+		</property>
+		<property name="fieldMap">
+			<map>
+				<entry key="three" value="six" />
+				<entry key="four" value="eight" />
+				<entry key="five" value="ten" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="addToMapMergeDirective" depends-on="addToMapMergeBean" parent="mapMergeDirective">
+		<property name="key" value="black" />
+		<property name="value" value="white" />
+	</bean>
+
+	<bean id="multipleMapPropertyMergeBeanDirective" depends-on="multipleMapMergeBean" parent="mapMergeDirective">
+		<property name="key" value="quark" />
+		<property name="value" value="antiquark" />
+		<property name="mapPropertyDescriptor" value="propertyMap" />
+	</bean>
+
+	<bean id="multipleMapFieldMergeBeanDirective" depends-on="multipleMapMergeBean" parent="mapMergeDirective">
+		<property name="key" value="seven" />
+		<property name="value" value="fourteen" />
+		<property name="fieldName" value="fieldMap" />
+	</bean>
+
+</beans>

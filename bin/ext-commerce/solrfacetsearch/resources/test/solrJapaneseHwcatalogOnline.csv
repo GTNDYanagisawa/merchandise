@@ -1,0 +1,30 @@
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator];;;;;;;;;;;;;;;;;;;;;;;
+$catalogversion=catalogversion(catalog(id[default='jhwcatalog']),version[default='Online'])[unique=true,default='jhwcatalog:Online'];;;;;;;;;;;;;;;;;;;;;;;
+$supercategories=supercategories(code,catalogversion(catalog(id[default='jhwcatalog']),version[default='Online']));;;;;;;;;;;;;;;;;;;;;;;
+$normal=normal(code,catalogversion(catalog(id[default='jhwcatalog']),version[default='Online']));;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Language;isocode[unique=true];active
+;ja;true
+;en;true
+
+;;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];name[lang=ja];supplier(uid);defaultCatalog;;;;;;;;;;;;;;;;;;
+;jhwcatalog;J Computer hardware;コンピュータ ハードウェア;hybris;false;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];languages(isocode);inclAssurance;inclDuty;inclFreight;inclPacking;active;;;;;;;;;;;;;;;
+;jhwcatalog;Online;en,ja;true;true;true;false;true;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE category;code[unique=true];$catalogversion;name[lang=en];name[lang=ja];$supercategories;;description[lang=ja];description[lang=en];order;;;;;;;;;;;;;
+;JHW1000;;Peripheral equipment_Online_en;周辺機器_Online_ja;;JHW1000-24;コンピュータ周辺機器;products around the computer;0;;;;;;;;;;;;;
+;JHW1200;;Photography_Online_en;写真_Online_ja;JHW1000;JHW1200-22;写真向けデジタルカメラ; miscellaneous digital cameras;1;;;;;;;;;;;;;
+;JHW1230;;Sony_Online_en;ソニー_Online_ja;JHW1200;JHW1230-14;ソニー製品;products by Sony;2;;;;;;;;;;;;;
+
+#% impex.setLocale( Locale.ENGLISH );;;;;;;;;;;;;;;;;;;;;;;
+################################################Online CATALOG##################################;;;;;;;;;;;;;;;;;;;;;;;
+
+INSERT_UPDATE product;code[unique=true];$catalogversion;name[lang=en];name[lang=ja];unit(code);$supercategories;description[lang=en];description[lang=ja];$prices;approvalStatus(code);ean;manufacturerName;deliveryTime;$normal
+################## digital cameras #########################;;;;;;;;;;;;;;;;;;;;;;;
+;JHW1230-7777;;Sony DSC-P200 CYBER-SHOT silber_Online_en;ソニーの最新版デジタルカメラ製品 サイバーショット silber_online_ja;pieces;JHW1230;"<b>Memory:</b> 32 MB<br/><b>Please note: <br/>For returns please see our T&amp;C's </b>_online_en";"<b>ソニーの最新版デジタルカメラ製品<br/><b>メモリー:</b> 32 MB<br/><b>注: <br/>返品につきましては、弊社の保証内容をご確認ください。 </b>_online_ja";269 EUR;approved;ean1;Sony;3;
+;JHW1230-8888;;Sony DSLR-A700_Online_en;ソニーの最新版デジイチ製品 DSLR-A700_Online_ja;pieces;JHW1230;"<b>Please note: <br/>For returns please see our T&amp;C's </b>_online_en";"<b>ソニーの最新版デジイチ製品<br/><b>注: <br/>返品につきましては、弊社の保証内容をご確認ください。 </b>_online_ja";769 EUR;approved;ean2;Sony;3;

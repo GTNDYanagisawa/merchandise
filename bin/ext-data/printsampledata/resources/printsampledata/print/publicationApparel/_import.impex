@@ -1,0 +1,79 @@
+﻿"#% import de.hybris.platform.printsampledata.jalo.PrintsampledataManager";
+"#% impex.enableExternalImpExSyntaxParsing( true )";
+"#% impex.enableExternalDataCodeExecution( true )";
+"#% impex.setDumpingAllowed( false )";
+
+
+
+##############################################################################################################################
+### Import settings for the Print Sample data import
+
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/importparameters.csv""), ""utf-8"", 0, 0 );";
+
+$publicationID=apparel$publicationYear;
+$catalogID=apparelProductCatalog;
+$catalogVersionID=Online;
+
+
+
+##############################################################################################################################
+### Macros for the CometConfiguration import
+
+$catalogversion=catalogversion(catalog(id[default='$catalogID']),version[default='$catalogVersionID']);
+$categories=categories(code,$catalogversion);
+
+$publication=publication(code[default='$publicationID']);
+$cometConfig=cometConfig(code[default='$cometConfigID']);
+$layoutTemplate=layoutTemplate(code, cometConfig(code[default='$cometConfigID']));
+$placeholderTemplate=placeholderTemplate(code, cometConfig(code[default='$cometConfigID']));
+
+$media=media(code,$catalogversion);
+$product=item(Product.code,Product.$catalogversion);
+$contentblock=item(ContentBlock.code,ContentBlock.$catalogversion);
+$tableAsItem=item(TableBlock.code,TableBlock.$catalogversion);
+
+$chapter=chapter(code,$publication);
+$superchapter=superChapter(code,$publication);
+$page=page(code,$publication);
+
+$table=table(TableBlock.code,TableBlock.$catalogversion);
+$column=column($table, tablePOS);
+$row=row($table, tablePOS);
+$cell=cell($column, $row);
+$columnAxis=axis(ColumnEntry.$table, ColumnEntry.tablePOS);
+$rowAxis=axis(RowEntry.$table, RowEntry.tablePOS);
+
+$pageAsItem=item(Page.code,Page.publication(code[default='$publicationID']));
+$attributeDescriptorAsItem=item(AttributeDescriptor.enclosingType(code), AttributeDescriptor.qualifier);
+
+
+
+"#% impex.info(""Apparel publication import: Create Tables...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/tabletemplate_PagePlacementsTable.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/tabletemplate_ProductVariantsTable.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/placeholders.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""Apparel publication import: Creating publication...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/publication.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/publication_de.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/publication_en.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""Apparel publication import: Creating layout templates...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/layouttemplates.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""Apparel publication import: Creating master pages...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/masterpages.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""Apparel publication import: Creating chapter structure...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/chapters.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/chapters_de.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/chapters_en.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""Apparel publication import: Creating pages...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/pages.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/pages_de.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/pages_en.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""Apparel publication import: Place content...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationApparel/placements.csv""), ""utf-8"", 0, 0 );";
+

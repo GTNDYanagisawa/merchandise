@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<project name="genDoc" basedir="." default="gen_docu">
+	<property file="platformhome.properties" />
+
+	<!-- next line is only for eclipse to get rid of warnings -->
+	<property name="platformhome" location="../../platform" />
+	<property name="groovyLibLocation" value="../../platform/ext/core/lib/groovy-all-2.1.1.jar"/>
+	<property name="junitLibLocation" value="../../platform/ext/core/lib/junit-4.9.jar" />
+	
+	<property name="haltOnFailure" value="yes" />
+	<property name="testReportsDir" value="." />
+	<property name="junitFormatterType" value="plain" />
+	<property name="testSuite" value="DocumentationSuite" />
+	<property name="testReportsSubDir" value="groovyResults" />
+	
+	<import file="${platformhome}/resources/ant/antmacros.xml" />
+	
+	<taskdef name="groovyc"
+         classname="org.codehaus.groovy.ant.Groovyc"
+         classpath="${groovyLibLocation}"/>
+		
+	<target name="gen_docu" description="Run DocumentationSuite and generate output">
+		
+		<groovyc srcdir="web/testsrc" destdir="web/testclasses"
+				classpath="${junitLibLocation}:./web/testclasses/"/>
+		
+		<available property="groovyLibAvailable" value="true" file="${groovyLibLocation}"/>		
+		<if>
+			<not>
+				<available property="groovyLibAvailable" value="true" file="${groovyLibLocation}"/>
+			</not>
+			<then>
+				<fail message="Cannot find groovy library"/>
+			</then>
+		</if>
+
+		<echo message="Note: Running hybris server is required to run ycommercewebservice tests" />
+		
+		 <junit fork="yes" haltonfailure="${haltOnFailure}" showoutput="false" printsummary="yes" >
+			 <test name="com.hybris.datahub.core.test.groovy.webservicetests.${testSuite}" />
+			 <formatter type="${junitFormatterType}" usefile="true" />
+			<classpath>
+				<pathelement path="./web/testclasses/"/>
+				<pathelement location="${groovyLibLocation}"/>
+				<pathelement location="${junitLibLocation}"/>
+			</classpath>
+		</junit>
+				
+		<if>
+			<equals arg1="${junitFormatterType}" arg2="xml" />
+			<then>
+				<junitreport todir="${testReportsDir}">
+					<fileset dir="${testReportsDir}">
+						<include name="TEST-*.xml" />
+					</fileset>
+					<report todir="${testReportsDir}/${testReportsSubDir}" />
+				</junitreport>
+				<echo>JUnit Report: ${testReportsDir}/${testReportsSubDir}/index.html</echo>
+			</then>
+		</if>
+		
+	</target>
+
+</project>
+

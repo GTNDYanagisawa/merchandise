@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+
+	<alias alias="sapPricingConfigurationAccess" name="defaultSapPricingConfigurationAccess" />
+	<bean id="defaultSapPricingConfigurationAccess" parent="sapCoreModuleConfigurationAccess">
+	<property name="moduleId" value="sappricingbol" />
+	<property name="properties">
+			<map>
+				<entry key="sapcommon_referenceCustomer" value="JV01" />
+				<entry key="sapcommon_transactionType" value="TA" />
+				<entry key="sapcommon_salesOrganization" value="1000" />
+				<entry key="sapcommon_distributionChannel" value="10" />
+				<entry key="sapcommon_division" value="00" />
+
+            <entry key="sappricingbol_cachePrice"  value="#{false}" />
+				<entry key="sappricingbol_priceSub" value="KZWI1" />
+				<entry key="sappricingbol_discountSub" value="KZWI2" />
+				<entry key="sappricingbol_taxesSub" value="KZWI4" />
+				<entry key="sappricingbol_deliverySub" value="KZWI3" />
+				<entry key="sappricingbol_paymentSub" value="KZWI5" />
+				
+			</map>
+		</property>
+		
+		<property name="propertyAccessCollections">
+			<map>
+				<entry key="sapDeliveryModes">
+					<list>
+						<ref bean="deliveryMode1" />
+						<ref bean="deliveryMode2" />
+					</list>
+				</entry>
+				<entry key="sapPaymentModes">
+					<list>
+						<ref bean="paymentMode1" />
+						<ref bean="paymentMode2" />
+					</list>
+				</entry>
+			</map>
+		</property>
+		
+	</bean>
+	
+	<!-- delivery Mode -->
+	<bean id="deliveryMode1" parent="sapCoreDefaultConfigurationPropertyAccess">
+		<property name="properties">
+			<map>
+				<entry key="deliveryName" value="VSBED" />
+				<entry key="deliveryValue" value="01" />
+			</map>
+		</property>
+		<property name="propertyAccesses">
+			<map>
+				<entry key="deliveryMode" value-ref="deliveryModeAccess1" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="deliveryMode2" parent="sapCoreDefaultConfigurationPropertyAccess">
+		<property name="properties">
+			<map>
+				<entry key="deliveryName" value="VSBED" />
+				<entry key="deliveryValue" value="01" />
+			</map>
+		</property>
+		<property name="propertyAccesses">
+			<map>
+				<entry key="deliveryMode" value-ref="deliveryModeAccess2" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="deliveryModeAccess1" parent="sapCoreDefaultConfigurationPropertyAccess">
+		<property name="properties">
+			<map>
+				<entry key="code" value="premium-net" />
+			</map>
+		</property>
+	</bean>
+	<bean id="deliveryModeAccess2" parent="sapCoreDefaultConfigurationPropertyAccess">
+		<property name="properties">
+			<map>
+				<entry key="code" value="premium-gross" />
+			</map>
+		</property>
+	</bean>
+	
+	<!-- payment access -->
+	<bean id="paymentMode1" parent="sapCoreDefaultConfigurationPropertyAccess">
+		<property name="properties">
+			<map>
+				<entry key="paymentName" value="ZTERM" />
+				<entry key="paymentValue" value="0001" />
+			</map>
+		</property>
+		<property name="propertyAccesses">
+			<map>
+				<entry key="paymentMode" value-ref="paymentModeAccess1" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="paymentMode2" parent="sapCoreDefaultConfigurationPropertyAccess">
+		<property name="properties">
+			<map>
+				<entry key="paymentName" value="ZTERM" />
+				<entry key="paymentValue" value="0002" />
+			</map>
+		</property>
+		<property name="propertyAccesses">
+			<map>
+				<entry key="paymentMode" value-ref="paymentModeAccess2" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="paymentModeAccess1" parent="sapCoreDefaultConfigurationPropertyAccess">
+		<property name="properties">
+			<map>
+				<entry key="code" value="invoice" />
+			</map>
+		</property>
+	</bean>
+	<bean id="paymentModeAccess2" parent="sapCoreDefaultConfigurationPropertyAccess">
+		<property name="properties">
+			<map>
+				<entry key="code" value="creditcard" />
+			</map>
+		</property>
+	</bean>
+	
+	
+	
+
+</beans>

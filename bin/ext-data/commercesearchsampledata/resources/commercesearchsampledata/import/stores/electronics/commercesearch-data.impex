@@ -1,0 +1,60 @@
+$storeUid=electronics
+$productCatalog=electronicsProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Online'])[unique=true,default=$productCatalog:Online]
+$solrIndexedTypeIdentifier=electronicsProductType
+$solrIndexedType=solrIndexedType(identifier[default=$solrIndexedTypeIdentifier])
+
+INSERT_UPDATE CategorySolrSearchProfile;categoryCode[unique=true];code;indexedType(identifier)[unique=true];
+;578;digitalslr-srch-profile;$solrIndexedTypeIdentifier;
+;576;digitalcompacts-srch-profile;$solrIndexedTypeIdentifier;
+;brand_5;sonybrand-srch-profile;$solrIndexedTypeIdentifier;
+
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);sortableType(code);currency[default=false];localized[default=false];multiValue[default=false];useForSpellchecking[default=false];useForAutocomplete[default=false];fieldValueProvider;valueProviderParameter
+;electronicsProductType; creationTime             ;date ;            ;    ;    ;    ;    ;    ;dateValueProvider;
+
+INSERT_UPDATE SolrFacetReconfiguration;facet(name,$solrIndexedType)[unique=true];priority;visible;solrSearchProfiles(code)[unique=true];
+;brand;100000;true;digitalslr-srch-profile
+;Megapixel, 63;90000;true;digitalslr-srch-profile
+;price;80000;true;digitalslr-srch-profile
+
+;price;100000;true;digitalcompacts-srch-profile
+;brand;80000;true;digitalcompacts-srch-profile
+;Megapixel, 63;70000;true;digitalcompacts-srch-profile
+
+;Colour of product, 1766;;false;sonybrand-srch-profile
+
+INSERT_UPDATE CategorySolrSearchProfile;categoryCode[unique=true];code;indexedType(identifier)[unique=true];
+;571;cameras-srch-profile;$solrIndexedTypeIdentifier;
+;574;filmcameras-srch-profile;$solrIndexedTypeIdentifier;
+;575;digitalcameras-srch-profile;$solrIndexedTypeIdentifier;
+;902;flashmemory-srch-profile;$solrIndexedTypeIdentifier;
+;587;tripods-srch-profile;$solrIndexedTypeIdentifier;
+;814;rechargeable-srch-profile;$solrIndexedTypeIdentifier;
+;827;power-adapters-srch-profile;$solrIndexedTypeIdentifier;
+;576;digitalcompacts-srch-profile;$solrIndexedTypeIdentifier;
+;578;digitalslr-srch-profile;$solrIndexedTypeIdentifier;
+
+INSERT_UPDATE SolrBoostRule;solrIndexedProperty(name, $solrIndexedType)[unique=true];operator(code)[unique=true];propertyValue[unique=true];boostFactor;solrSearchProfiles(code)[unique=true]
+;inStockFlag;EQUAL_TO;true;100;cameras-srch-profile
+;inStockFlag;EQUAL_TO;true;100;filmcameras-srch-profile
+#;code;EQUAL_TO;779841;70;cameras-srch-profile
+#;code;EQUAL_TO;898503;80;filmcameras-srch-profile
+;inStockFlag;EQUAL_TO;true;100;digitalcameras-srch-profile
+;brand;EQUAL_TO;brand_10;20;digitalcameras-srch-profile
+;primaryPromotionCode;EQUAL_TO;BOGOFElectronics;50;flashmemory-srch-profile
+;Mounting, 1867;CONTAINS;floor;100;tripods-srch-profile
+;reviewAvgRating;GREATER_THAN;4.2;100;rechargeable-srch-profile
+;reviewAvgRating;LESS_THAN;4.2;100;power-adapters-srch-profile
+;reviewAvgRating;GREATER_THAN_OR_EQUAL_TO;4.2;100;digitalcompacts-srch-profile
+;reviewAvgRating;LESS_THAN_OR_EQUAL_TO;2.375;100;digitalslr-srch-profile
+;availableInStores;CONTAINS;Hotel;90;digitalcameras-srch-profile
+
+INSERT_UPDATE GlobalSolrSearchProfile;code;indexedType(identifier)[unique=true];
+;globalcatalog-srch-profile;$solrIndexedTypeIdentifier;
+
+INSERT_UPDATE SolrFacetReconfiguration;facet(name,$solrIndexedType)[unique=true];priority;visible;solrSearchProfiles(code)[unique=true];
+;brand;100000;true;globalcatalog-srch-profile
+;price;90000;true;globalcatalog-srch-profile
+
+INSERT_UPDATE SolrBoostRule;solrIndexedProperty(name, $solrIndexedType)[unique=true];operator(code)[unique=true];propertyValue[unique=true];boostFactor;solrSearchProfiles(code)[unique=true]
+;inStockFlag;EQUAL_TO;true;50;globalcatalog-srch-profile

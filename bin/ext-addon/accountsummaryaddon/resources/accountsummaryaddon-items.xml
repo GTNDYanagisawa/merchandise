@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+<!-- ATTENTION: This is just an example file. You have to edit it according to your needs. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype elementtype="DocumentStatus" code="DocumentStatusList" autocreate="true" type="list" />
+		<collectiontype elementtype="B2BDocumentType" code="DocumentTypeList" autocreate="true" type="list" />
+	</collectiontypes>
+
+	<enumtypes>
+		<enumtype code="DocumentStatus" autocreate="true" generate="true" dynamic="false">
+			<value code="open" />
+			<value code="closed" />
+		</enumtype>
+		<enumtype code="DocumentSort" autocreate="true" generate="true" dynamic="false">
+			<value code="documentNumber" />
+			<value code="documentType" />
+			<value code="status" />
+			<value code="date" />
+			<value code="dueDate" />
+			<value code="amount" />
+			<value code="openAmount" />
+		</enumtype>
+
+		<enumtype code="DocumentPayableOrUsable" autocreate="true" generate="true" dynamic="false">
+			<value code="PAY" />
+			<value code="USE" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		<relation code="B2BDocumentB2BDocumenTypeRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement type="B2BDocument" qualifier="document" cardinality="many" />
+			<targetElement type="B2BDocumentType" qualifier="documentType" cardinality="one">
+				<modifiers read="true" search="true" optional="false" unique="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="B2BUnit2B2BDocument" localized="false" generate="true" autocreate="true">
+			<sourceElement type="B2BUnit" qualifier="unit" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement type="B2BDocument" cardinality="many" qualifier="document">
+				<modifiers read="true" write="true" search="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="B2BDocument2AbstractOrder" localized="false" generate="true" autocreate="true">
+			<sourceElement type="B2BDocument" qualifier="document" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="AbstractOrder" cardinality="one" qualifier="order">
+				<modifiers read="true" write="true" search="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="B2BDocument2B2BDocumentPayInfo" localized="false" generate="true" autocreate="true">
+			<sourceElement type="B2BDocument" qualifier="payDocument" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement type="B2BDocumentPaymentInfo" qualifier="documentPaymentInfo" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		<relation code="B2BDocument2B2BDocumentUseInfo" localized="false" generate="true" autocreate="true">
+			<sourceElement type="B2BDocument" qualifier="useDocument" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="B2BDocumentPaymentInfo" qualifier="documentPaymentInfo" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+	</relations>
+
+
+
+
+	<itemtypes>
+		<itemtype code="B2BDocument" generate="true" autocreate="true">
+			<deployment table="B2BDocument" typecode="11100" />
+			<custom-properties>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"documentNumber,documentType"</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="documentNumber" type="java.lang.String">
+					<modifiers read="true" search="true" optional="false" unique="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="status" type="DocumentStatus">
+					<modifiers read="true" write="true" search="true" optional="false" />
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("DocumentStatus","open")</defaultvalue>
+				</attribute>
+				<attribute qualifier="date" type="java.util.Date">
+					<description>date</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="dueDate" type="java.util.Date">
+					<description>dueDate</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="amount" type="java.math.BigDecimal">
+				    <modifiers read="true" write="true" optional="false" />
+					<description>amount</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="openAmount" type="java.math.BigDecimal">
+					<description>openAmount</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="currency" type="Currency">
+					<modifiers read="true" write="true" search="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="documentMedia" type="DocumentMedia">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="B2BDocumentType" generate="true" autocreate="true">
+			<deployment table="B2BDocumentType" typecode="11101" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="code">
+					<modifiers read="true" write="true" search="true" optional="false" unique="true" />
+					<description>code</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="includeInOpenBalance" type="java.lang.Boolean">
+					<modifiers read="true" write="true" search="true" optional="false" />
+					<description>includeInOpenBalance</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="displayInAllList" type="java.lang.Boolean">
+					<modifiers read="true" write="true" search="true" optional="false" />
+					<description>displayInAllList</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<description>name</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="payableOrUsable" type="DocumentPayableOrUsable">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<description>payableOrUsable</description>
+					<persistence type="property" />					
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="DocumentMedia" generate="true" autocreate="true" extends="Media">
+			<deployment table="DocumentMedia" typecode="11102" />
+			<attributes>
+				<attribute qualifier="catalog" type="Catalog" redeclare="true">
+					<modifiers read="false" write="false" search="true" optional="true" private="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion" redeclare="true">
+					<modifiers read="false" write="false" search="true" optional="true" unique="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AccountSummaryUnitTreeComponent" extends="SimpleCMSComponent" generate="true" autocreate="true"
+			jaloclass="de.hybris.platform.accountsummaryaddon.jalo.AccountSummaryUnitTreeComponent">
+		</itemtype>
+
+		<itemtype code="AccountSummaryAccountStatusComponent" extends="SimpleCMSComponent" generate="true" autocreate="true"
+			jaloclass="de.hybris.platform.accountsummaryaddon.jalo.AccountSummaryAccountStatusComponent">
+			<attributes>
+				<attribute type="java.lang.Integer" qualifier="listViewPageSize">
+					<modifiers read="true" write="true" search="true" optional="false" unique="true" />
+					<description>code</description>
+					<persistence type="property" />
+					<defaultvalue>Integer.valueOf(10)</defaultvalue>
+				</attribute>
+				<attribute type="java.lang.Integer" qualifier="gridViewPageSize">
+					<modifiers read="true" write="true" search="true" optional="false" unique="true" />
+					<description>code</description>
+					<persistence type="property" />
+					<defaultvalue>Integer.valueOf(6)</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="DeleteDocumentFileCronJob" extends="CronJob" autocreate="true" generate="true"
+			jaloclass="de.hybris.platform.accountsummaryaddon.cronjob.DeleteDocumentFileCronJob">
+			<attributes>
+				<attribute type="java.lang.Integer" qualifier="numberOfDay">
+					<modifiers read="true" write="true" search="true" optional="false" unique="true" />
+					<description>number of day to keep files</description>
+					<persistence type="property" />
+					<defaultvalue>Integer.valueOf(730)</defaultvalue>
+				</attribute>
+				<attribute type="DocumentStatusList" qualifier="documentStatusList">
+					<modifiers read="true" write="true" search="true" optional="false" />
+					<persistence type="property" />
+					<defaultvalue>Collections.EMPTY_LIST</defaultvalue>
+				</attribute>
+				<attribute type="DocumentTypeList" qualifier="documentTypeList">
+					<modifiers read="true" write="true" search="true" optional="false" />
+					<persistence type="property" />
+					<defaultvalue>Collections.EMPTY_LIST</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="B2BDocumentPaymentInfo" generate="true" autocreate="true">
+			<deployment table="B2BDocumentPaymentInfo" typecode="11103" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="external">
+					<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="amount" type="java.math.BigDecimal">
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<description>amount</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="date" type="java.util.Date">
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<description>date</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="ccTransactionNumber" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="paymentMethod" type="java.lang.String">
+     				<description>Payment Method of the use document</description>
+     				<persistence type="dynamic" attributeHandler="b2bPaymentMethodDynamicAttributeHandler" />
+                    <modifiers read="true" write="false" optional="false" />
+    			</attribute>
+				<attribute qualifier="referenceNumber" type="java.lang.String">
+     				<description>The use document reference number</description>
+     				<persistence type="dynamic" attributeHandler="b2bUseDocumentReferenceDynamicAttributeHandler" />
+                    <modifiers read="true" write="false" optional="false" />
+    			</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

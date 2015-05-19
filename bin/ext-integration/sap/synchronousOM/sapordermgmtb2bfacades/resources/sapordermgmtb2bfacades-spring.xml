@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+           
+	<alias name="sapOrdermgmtDefaultStandardOrderEntryPopulator" alias="orderEntryPopulator"/>
+	<bean id="sapOrdermgmtDefaultStandardOrderEntryPopulator" parent="defaultOrderEntryPopulator"
+	      class="de.hybris.platform.sap.sapordermgmtb2bfacades.cart.populator.DefaultStandardOrderEntryPopulator">
+		<property name="productConfigurationService" ref="sapOrdermgmtProductConfigurationService" />		
+	</bean>          
+
+   <alias name="sapOrdermgmtDefaultCartFacade" alias="cartFacade" />              
+	<bean id="sapOrdermgmtDefaultCartFacade" class="de.hybris.platform.sap.sapordermgmtb2bfacades.cart.impl.DefaultCartFacade">
+		<property name="cartService" ref="sapOrdermgmtCartService" />
+		<property name="productImageHelper" ref="sapOrdermgmtProductImageHelper" />
+		<property name="backendAvailabilityService" ref="sapOrdermgmtBackendAvailabilityService" />
+		<property name="cartRestorationFacade" ref="sapOrdermgmtCartRestorationFacade" />
+		<property name="userService" ref="userService" />
+		<property name="standardFacade" ref="defaultCartFacade" />
+		<property name="configurationProviderFactory" ref="sapProductConfigConfigurationProviderFactory"/>	
+		<property name="productConfigurationService" ref="sapOrdermgmtProductConfigurationService" />			      
+	</bean>
+	
+	<alias name="sapOrdermgmtDefaultCartRestorationFacade" alias="sapOrdermgmtCartRestorationFacade" />
+   <bean id="sapOrdermgmtDefaultCartRestorationFacade" class="de.hybris.platform.sap.sapordermgmtb2bfacades.cart.impl.DefaultCartRestorationFacade" >
+	  <property name="commerceCartService" ref="commerceCartService"/>
+	  <property name="cartRestorationService" ref="sapOrdermgmtCartRestorationService" />
+      <property name="productConfigurationService" ref="sapOrdermgmtProductConfigurationService" />			      
+	  <property name="cartService" ref="sapOrdermgmtCartService" />
+	  <property name="productService" ref="productService"/>
+	  <property name="baseSiteService" ref="baseSiteService"/>
+	  <property name="modelService" ref="modelService"/>
+	</bean>
+	
+	
+	<alias name="sapOrdermgmtDefaultProductImageHelper" alias="sapOrdermgmtProductImageHelper" />
+	<bean id="sapOrdermgmtDefaultProductImageHelper" class="de.hybris.platform.sap.sapordermgmtb2bfacades.impl.DefaultProductImageHelper">
+		<property name="productPrimaryImagePopulator" ref="productPrimaryImagePopulator"/>
+		<property name="productUrlPopulator" ref="productUrlPopulator"/>
+		<property name="productService" ref="productService" />		
+	</bean>
+		
+	<alias name="sapOrdermgmtDefaultB2BCheckoutFacade" alias="b2bCheckoutFacade" />
+	<bean id="sapOrdermgmtDefaultB2BCheckoutFacade" class="de.hybris.platform.sap.sapordermgmtb2bfacades.checkout.impl.DefaultB2BCheckoutFacade">
+		<property name="cartService" ref="sapOrdermgmtCartService" />		
+		<property name="checkoutService" ref="sapOrdermgmtCheckoutService" />		
+		<property name="b2bCheckoutFacade" ref="defaultB2BCheckoutFacade" />		
+		<property name="addressConverter" ref="addressConverter" />		
+		<property name="sapPartnerService" ref="sapOrdermgmtPartnerService" />
+		<property name="productImageHelper" ref="sapOrdermgmtProductImageHelper" />		
+		<property name="backendAvailabilityService" ref="sapOrdermgmtBackendAvailabilityService" />
+	</bean>
+	
+
+	
+	<alias name="sapOrdermgmtDefaultB2BOrderFacade" alias="b2bOrderFacade"/>
+	<bean id="sapOrdermgmtDefaultB2BOrderFacade" class="de.hybris.platform.sap.sapordermgmtb2bfacades.order.impl.DefaultB2BOrderFacade"  >
+		<property name="orderService" ref="sapOrdermgmtOrderService"/>
+		<property name="productImageHelper" ref="sapOrdermgmtProductImageHelper" />		
+		<property name="backendAvailabilityService" ref="sapOrdermgmtBackendAvailabilityService" />
+	</bean>	
+	
+
+	
+			
+</beans>

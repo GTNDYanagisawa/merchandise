@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+	default-autowire="byName">
+
+	<bean id="abstractSubscriptionProductCustomColumn" abstract="true"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.services.config.impl.AbstractSubscriptionProductCustomColumn">
+		<property name="typeService" ref="typeService" />
+		<property name="cockpitTypeService" ref="cockpitTypeService" />
+		<property name="commercePriceService" ref="subscriptionCommercePriceService" />
+	</bean>
+
+	<bean id="subscriptionProductFeaturesColumn" class="de.hybris.platform.subscriptioncockpits.cscockpit.services.config.impl.SubscriptionProductFeaturesColumn" />
+	
+	<bean id="subscriptionProductNameColumn" class="de.hybris.platform.subscriptioncockpits.cscockpit.services.config.impl.SubscriptionProductNameColumn" />
+	
+	<bean id="subscriptionProductTermOfServiceFrequencyColumn"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.services.config.impl.SubscriptionProductTermOfServiceFrequencyColumn"
+		parent="abstractSubscriptionProductCustomColumn" />
+		
+	<bean id="subscriptionProductTermOfServiceRenewalColumn"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.services.config.impl.SubscriptionProductTermOfServiceRenewalColumn"
+		parent="abstractSubscriptionProductCustomColumn" />
+
+	<bean id="subscriptionProductRecurringChargesColumn" class="de.hybris.platform.subscriptioncockpits.cscockpit.services.config.impl.SubscriptionProductRecurringChargesColumn"
+		parent="abstractSubscriptionProductCustomColumn">
+		<property name="recurringChargeLabelProvider" ref="recurringChargeEntryLabelProvider" />
+	</bean>
+
+	<bean id="subscriptionProductOneTimeChargesColumn" class="de.hybris.platform.subscriptioncockpits.cscockpit.services.config.impl.SubscriptionProductOneTimeChargesColumn"
+		parent="abstractSubscriptionProductCustomColumn">
+		<property name="oneTimeChargeLabelProvider" ref="oneTimeChargeEntryLabelProvider" />
+	</bean>
+
+	<bean id="subscriptionProductUsageChargesColumn" class="de.hybris.platform.subscriptioncockpits.cscockpit.services.config.impl.SubscriptionProductUsageChargesColumn"
+		parent="abstractSubscriptionProductCustomColumn">
+		<property name="tierUsageChargeLabelProvider" ref="tierUsageChargeEntryLabelProvider" />
+		<property name="overageUsageChargeLabelProvider" ref="overageUsageChargeEntryLabelProvider" />
+	</bean>
+
+	<alias alias="csOrderSearchQueryBuilder" name="defaultCsSubscriptionOrderSearchQueryBuilder" />
+	<bean id="defaultCsSubscriptionOrderSearchQueryBuilder" parent="defaultCsOrderSearchQueryBuilder"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.services.search.generic.query.DefaultSubscriptionOrderSearchQueryBuilder" />
+	
+	<alias name="defaultCsCustomerResolutionService" alias="csCustomerResolutionService" />
+	<bean id="defaultCsCustomerResolutionService" class="de.hybris.platform.subscriptioncockpits.cscockpit.services.subscription.impl.DefaultCsCustomerResolutionService"
+		parent="defaultCustomerResolutionService" scope="session">
+		<property name="callContextController" ref="csCallContextController" />
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+	
+	<alias name="defaultSubscriptionCsCheckoutService" alias="csCheckoutService" />
+	<bean id="defaultSubscriptionCsCheckoutService" class="de.hybris.platform.subscriptioncockpits.cscockpit.services.checkout.impl.DefaultSubscriptionCsCheckoutService"
+		parent="defaultCsCheckoutService" />
+		
+	<alias alias="csCardPaymentService" name="defaultSubscriptionCsCardPaymentService" />
+	<bean name="defaultSubscriptionCsCardPaymentService" class="de.hybris.platform.subscriptioncockpits.cscockpit.services.payment.impl.DefaultSubscriptionCsCardPaymentService"
+	      parent="defaultCsCardPaymentService" scope="tenant" />
+</beans>

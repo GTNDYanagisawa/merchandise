@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+	
+	<alias alias="btgCockpitService" name="defaultBtgCockpitService" />
+	<bean id="defaultBtgCockpitService" class="de.hybris.platform.btgcockpit.service.impl.DefaultBTGCockpitService" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="genericRandomNameProducer" ref="genericRandomNameProducer"/>
+		<property name="cmsCockpitService" ref="cmsCockpitService"/>
+		<property name="cmsSiteService" ref="cmsSiteService"/>
+		<property name="btgConfigurationService" ref="btgConfigurationService"/>
+		<property name="l10nService" ref="l10nService"/>
+	</bean>	
+	
+	<alias alias="btgSearchProvider" name="defaultBtgSearchProvider" />
+	<bean id="defaultBtgSearchProvider" class="de.hybris.platform.btgcockpit.session.impl.BTGSearchProvider" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+	</bean>
+	
+	
+	<!--  ************************************************************* -->
+	<!--  *** 		BTG Label Providers Configuration            ****** -->
+   <!--  ************************************************************* -->
+	
+	<alias alias="btgExpressionLabelProvider" name="defaultBtgExpressionLabelProvider" />	
+	<bean id="defaultBtgExpressionLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGExpressionLabelProvider" scope="tenant">
+		<property name="typeService" ref="typeService"></property>
+	</bean>
+	<alias alias="btgOperatorLabelProvider" name="defaultBtgOperatorLabelProvider" />
+	<bean id="defaultBtgOperatorLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGOperatorLabelProvider" scope="tenant"/>
+	<alias alias="cmsRestrictionActionLabelProvider" name="defaultCmsRestrictionActionLabelProvider" />
+	<bean id="defaultCmsRestrictionActionLabelProvider" class="de.hybris.platform.btgcockpit.service.label.CmsRestrictionActionLabelProvider" scope="tenant"/>
+	<alias alias="btgReferenceDateOperandLabelProvider" name="defaultBtgReferenceDateOperandLabelProvider" />
+	<bean id="defaultBtgReferenceDateOperandLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGReferenceDateOperandLabelProvider" scope="tenant"/>
+	<alias alias="btgReferenceExactDateOperandLabelProvider" name="defaultBtgReferenceExactDateOperandLabelProvider" />
+	<bean id="defaultBtgReferenceExactDateOperandLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGReferenceExactDateOperandLabelProvider" scope="tenant"/>
+	<alias alias="btgReferencePriceOperandLabelProvider" name="defaultBtgReferencePriceOperandLabelProvider" />
+	<bean id="defaultBtgReferencePriceOperandLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGReferencePriceOperandLabelProvider" scope="tenant"/>
+	<alias alias="btgReferenceProductsOperandLabelProvider" name="defaultBtgReferenceProductsOperandLabelProvider" />
+	<bean id="defaultBtgReferenceProductsOperandLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGReferenceProductsOperandLabelProvider" scope="tenant"/>
+	<alias alias="btgReferenceCategoriesOperandLabelProvider" name="defaultBtgReferenceCategoriesOperandLabelProvider" />
+	<bean id="defaultBtgReferenceCategoriesOperandLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGReferenceCategoriesOperandLabelProvider" scope="tenant"/>
+	<alias alias="btgReferenceContentpagesOperandLabelProvider" name="defaultBtgReferenceContentpagesOperandLabelProvider" />
+	<bean id="defaultBtgReferenceContentpagesOperandLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGReferenceContentpagesOperandLabelProvider" scope="tenant"/>
+	<alias alias="btgReferenceRegExpListOperandLabelProvider" name="defaultBtgReferenceRegExpListOperandLabelProvider" />
+	<bean id="defaultBtgReferenceRegExpListOperandLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGReferenceRegExpListOperandLabelProvider" scope="tenant"/>
+	<alias alias="btgReferenceKeyValuePairListOperandLabelProvider" name="defaultBtgReferenceKeyValuePairListOperandLabelProvider" />
+	<bean id="defaultBtgReferenceKeyValuePairListOperandLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGReferenceKeyValuePairListOperandLabelProvider" scope="tenant"/>
+	<alias alias="btgAssignToGroupDefinitionLabelProvider" name="defaultBtgAssignToGroupDefinitionLabelProvider" />
+	<bean id="defaultBtgAssignToGroupDefinitionLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGAssignToGroupDefinitionLabelProvider" scope="tenant"/>
+	<alias alias="btgReferencePrincipalGroupsOperandLabelProvider" name="defaultBtgReferencePrincipalGroupsOperandLabelProvider" />
+	<bean id="defaultBtgReferencePrincipalGroupsOperandLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGReferencePrincipalGroupsOperandLabelProvider" scope="tenant"/>
+	<alias alias="btgReferenceStringListOperandLabelProvider" name="defaultBtgReferenceStringListOperandLabelProvider" />
+	<bean id="defaultBtgReferenceStringListOperandLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGReferenceStringListOperandLabelProvider" scope="tenant"/>
+	<alias alias="btgReferenceCountriesOperandLabelProvider" name="defaultBtgReferenceCountriesOperandLabelProvider" />
+	<bean id="defaultBtgReferenceCountriesOperandLabelProvider" class="de.hybris.platform.btgcockpit.service.label.BTGReferenceCountriesOperandLabelProvider" scope="tenant"/>
+	
+	<alias alias="btgSynchronizationService" name="defaultBtgSynchronizationService" />	
+	<bean id="defaultBtgSynchronizationService" class="de.hybris.platform.btgcockpit.sync.BTGSynchronizationService" scope="tenant"/>
+	
+	<!--  ************************************************************* -->
+	<!--  *** 		BTG Default Value Resolvers Configuration    ****** -->
+   <!--  ************************************************************* -->
+	
+	<alias alias="btgSegmentCatalogVersionResolver" name="defaultBtgSegmentCatalogVersionResolver" />
+	<bean id="defaultBtgSegmentCatalogVersionResolver" class="de.hybris.platform.btgcockpit.wizard.DefaultCatalogVersionValueResolver" scope="tenant">
+		<property name="btgConfigurationService" ref="btgConfigurationService" />
+	</bean>
+	
+	
+</beans>

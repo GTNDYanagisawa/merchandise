@@ -1,0 +1,165 @@
+# 
+# ImpEx for Responsive Apparel DE Site CMS Content 
+# 
+$contentCatalog=apparel-deContentCatalog 
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged] 
+ 
+$productCatalog=apparelProductCatalog 
+$productCatalogName=Apparel Product Catalog 
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged] 
+$picture=media(code, $contentCV);
+$siteResource=jar:de.hybris.platform.apparelstore.constants.ApparelstoreConstants&/apparelstore/import/sampledata/contentCatalogs/$contentCatalog
+$jarResourceCms=jar:de.hybris.platform.apparelstore.constants.ApparelstoreConstants&/apparelstore/import/sampledata/cockpits/cmscockpit
+$medias=medias(code, $contentCV);
+$lang=de
+$mediaContainer=media(qualifier, $contentCV)[lang=$lang];
+
+# Load the storefront context root config param
+$storefrontContextRoot=$config-storefrontContextRoot
+
+UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];title[lang=$lang]
+;;ApparelDEHomepageProductCarouselComponent;Meistverkauften Produkte;
+;;NewApparelDEHomepageProductCarouselComponent;Was ist neu;
+
+###  Home page splash   #######
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images];
+;mobile;Appa_480x320_Season_DE_01_480W.jpg;$siteResource/images/banners/homepage/responsive/Appa_480x320_Season_DE_01_480W.jpg;Appa_480x320_Season_DE_01_480W.jpg;"Starten Sie in die Neue Saison";
+;tablet;Appa_770x350_Season_DE_01_770W.jpg;$siteResource/images/banners/homepage/responsive/Appa_770x350_Season_DE_01_770W.jpg;Appa_770x350_Season_DE_01_770W.jpg;"Starten Sie in die Neue Saison";
+;desktop;Appa_960x400_Season_DE_01_960W.jpg;$siteResource/images/banners/homepage/responsive/Appa_960x400_Season_DE_01_960W.jpg;Appa_960x400_Season_DE_01_960W.jpg;"Starten Sie in die Neue Saison";
+;widescreen;Appa_1400x600_Season_DE_01_1400W.jpg;$siteResource/images/banners/homepage/responsive/Appa_1400x600_Season_DE_01_1400W.jpg;Appa_1400x600_Season_DE_01_1400W.jpg;"Starten Sie in die Neue Saison";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;apparel-de-homepage-spalsh-de;Appa_480x320_Season_DE_01_480W.jpg,Appa_770x350_Season_DE_01_770W.jpg,Appa_960x400_Season_DE_01_960W.jpg,Appa_1400x600_Season_DE_01_1400W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ApparelDEHompageSplashBannerComponent;apparel-de-homepage-spalsh-de
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;mobile;Appa_480x110_Save_DE_01_480W.jpg;$siteResource/images/banners/homepage/responsive/Appa_480x110_Save_DE_01_480W.jpg;Appa_480x110_Save_DE_01_480W.jpg;"70% Rabatt auf Winterkleidung!";
+;tablet;Appa_770x50_Save_DE_01_770W.jpg;$siteResource/images/banners/homepage/responsive/Appa_770x50_Save_DE_01_770W.jpg;Appa_770x50_Save_DE_01_770W.jpg;"70% Rabatt auf Winterkleidung!";
+;desktop;Appa_960x50_Save_DE_01_960W.jpg;$siteResource/images/banners/homepage/responsive/Appa_960x50_Save_DE_01_960W.jpg;Appa_960x50_Save_DE_01_960W.jpg;"70% Rabatt auf Winterkleidung!";
+;widescreen;Appa_1400x50_Save_DE_01_1400W.jpg;$siteResource/images/banners/homepage/responsive/Appa_1400x50_Save_DE_01_1400W.jpg;Appa_1400x50_Save_DE_01_1400W.jpg;"70% Rabatt auf Winterkleidung!";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;apparel-de-homepage-save-de;Appa_480x110_Save_DE_01_480W.jpg,Appa_770x50_Save_DE_01_770W.jpg,Appa_960x50_Save_DE_01_960W.jpg,Appa_1400x50_Save_DE_01_1400W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ApparelDEHompageSaveBannerComponent;apparel-de-homepage-save-de;
+
+
+
+###  Home page slot 2A  ####
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Appa_200x240_Women_DE_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Appa_200x240_Women_DE_01_200W.jpg;Appa_200x240_Women_DE_01_200W.jpg;"Frauen";
+;desktop;Appa_240x290_Women_DE_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Appa_240x290_Women_DE_01_240W.jpg;Appa_240x290_Women_DE_01_240W.jpg;"Frauen";
+;widescreen;Appa_350x430_Women_DE_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Appa_350x430_Women_DE_01_350W.jpg;Appa_350x430_Women_DE_01_350W.jpg;"Frauen";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;apparel-de-homepage-women-street-de;Appa_200x240_Women_DE_01_200W.jpg,Appa_240x290_Women_DE_01_240W.jpg,Appa_350x430_Women_DE_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ApparelDEHompageWomenStreetBannerComponent;apparel-de-homepage-women-street-de
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Appa_200x240_Men_DE_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Appa_200x240_Men_DE_01_200W.jpg;Appa_200x240_Men_DE_01_200W.jpg;"Männer";
+;desktop;Appa_240x290_Men_DE_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Appa_240x290_Men_DE_01_240W.jpg;Appa_240x290_Men_DE_01_240W.jpg;"Männer";
+;widescreen;Appa_350x430_Men_DE_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Appa_350x430_Men_DE_01_350W.jpg;Appa_350x430_Men_DE_01_350W.jpg;"Männer";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;apparel-de-homepage-men-de;Appa_200x240_Men_DE_01_200W.jpg,Appa_240x290_Men_DE_01_240W.jpg,Appa_350x430_Men_DE_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ApparelDEHompageMenStreetBannerComponent;apparel-de-homepage-men-de
+
+#### Home section 2B #######
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Appa_200x240_Youth_DE_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Appa_200x240_Youth_DE_01_200W.jpg;Appa_200x240_Youth_DE_01_200W.jpg;"Jugend";
+;desktop;Appa_240x290_Youth_DE_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Appa_240x290_Youth_DE_01_240W.jpg;Appa_240x290_Youth_DE_01_240W.jpg;"Jugend";
+;widescreen;Appa_350x430_Youth_DE_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Appa_350x430_Youth_DE_01_350W.jpg;Appa_350x430_Youth_DE_01_350W.jpg;"Jugend";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;apparel-de-homepage-youth-de;Appa_200x240_Youth_DE_01_200W.jpg,Appa_240x290_Youth_DE_01_240W.jpg,Appa_350x430_Youth_DE_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ApparelDEHompageStreetYouthBannerComponent;apparel-de-homepage-youth-de
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Appa_200x240_Brands_DE_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Appa_200x240_Brands_DE_01_200W.jpg;Appa_200x240_Brands_DE_01_200W.jpg;"Unser Markensortiment";
+;desktop;Appa_240x290_Brands_DE_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Appa_240x290_Brands_DE_01_240W.jpg;Appa_240x290_Brands_DE_01_240W.jpg;"Unser Markensortiment";
+;widescreen;Appa_350x430_Brands_DE_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Appa_350x430_Brands_DE_01_350W.jpg;Appa_350x430_Brands_DE_01_350W.jpg;"Unser Markensortiment";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;apparel-de-homepage-brands-de;Appa_200x240_Brands_DE_01_200W.jpg,Appa_240x290_Brands_DE_01_240W.jpg,Appa_350x430_Brands_DE_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ApparelDEHompageBrandsBannerComponent;apparel-de-homepage-brands-de
+
+### Section 4
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Appa_200x200_HomeSmallDiscount_DE_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Appa_200x200_HomeSmallDiscount_DE_01_200W.jpg;Appa_200x200_HomeSmallDiscount_DE_01_200W.jpg;"Kleine Preise, satte Rabatte!";
+;desktop;Appa_240x240_HomeSmallDiscount_DE_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Appa_240x240_HomeSmallDiscount_DE_01_240W.jpg;Appa_240x240_HomeSmallDiscount_DE_01_240W.jpg;"Kleine Preise, satte Rabatte!";
+;widescreen;Appa_350x350_HomeSmallDiscount_DE_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Appa_350x350_HomeSmallDiscount_DE_01_350W.jpg;Appa_350x350_HomeSmallDiscount_DE_01_350W.jpg;"Kleine Preise, satte Rabatte!";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;apparel-de-homepage-sm-discount-de;Appa_200x200_HomeSmallDiscount_DE_01_200W.jpg,Appa_240x240_HomeSmallDiscount_DE_01_240W.jpg,Appa_350x350_HomeSmallDiscount_DE_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ApparelDEHompageSmDiscountBannerComponent;apparel-de-homepage-sm-discount-de
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Appa_200x200_HomeShop_DE_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Appa_200x200_HomeShop_DE_01_200W.jpg;Appa_200x200_HomeShop_DE_01_200W.jpg;"30 Tage Rückgaberecht";
+;desktop;Appa_240x240_HomeShop_DE_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Appa_240x240_HomeShop_DE_01_240W.jpg;Appa_240x240_HomeShop_DE_01_240W.jpg;"30 Tage Rückgaberecht";
+;widescreen;Appa_350x350_HomeShop_DE_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Appa_350x350_HomeShop_DE_01_350W.jpg;Appa_350x350_HomeShop_DE_01_350W.jpg;"30 Tage Rückgaberecht";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;apparel-de-homepage-shop-de;Appa_200x200_HomeShop_DE_01_200W.jpg,Appa_240x240_HomeShop_DE_01_240W.jpg,Appa_350x350_HomeShop_DE_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ApparelDEHompageShopBannerComponent;apparel-de-homepage-shop-de
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Appa_200x200_HomeShipment_DE_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Appa_200x200_HomeShipment_DE_01_200W.jpg;Appa_200x200_HomeShipment_DE_01_200W.jpg;"Bestellen bis 16 Uhr, Lieferung innerhalb 24h";
+;desktop;Appa_240x240_HomeShipment_DE_01_240W.jpg ;$siteResource/images/banners/homepage/responsive/Appa_240x240_HomeShipment_DE_01_240W.jpg ;Appa_240x240_HomeShipment_DE_01_240W.jpg ;"Bestellen bis 16 Uhr, Lieferung innerhalb 24h";
+;widescreen;Appa_350x350_HomeShipment_DE_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Appa_350x350_HomeShipment_DE_01_350W.jpg;Appa_350x350_HomeShipment_DE_01_350W.jpg;"Bestellen bis 16 Uhr, Lieferung innerhalb 24h";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;apparel-de-homepage-shipment-de;Appa_200x200_HomeShipment_DE_01_200W.jpg,Appa_240x240_HomeShipment_DE_01_240W.jpg ,Appa_350x350_HomeShipment_DE_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ApparelDEHompageShipmentBannerComponent;apparel-de-homepage-shipment-de
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Appa_200x200_HomeService_DE_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Appa_200x200_HomeService_DE_01_200W.jpg;Appa_200x200_HomeService_DE_01_200W.jpg;"Bester Kundenservice!";
+;desktop;Appa_240x240_HomeService_DE_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Appa_240x240_HomeService_DE_01_240W.jpg;Appa_240x240_HomeService_DE_01_240W.jpg;"Bester Kundenservice!";
+;widescreen;Appa_350x350_HomeService_DE_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Appa_350x350_HomeService_DE_01_350W.jpg;Appa_350x350_HomeService_DE_01_350W.jpg;"Bester Kundenservice!";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;apparel-de-homepage-service-de;Appa_200x200_HomeService_DE_01_200W.jpg,Appa_240x240_HomeService_DE_01_240W.jpg,Appa_350x350_HomeService_DE_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ApparelDEHompageServiceBannerComponent;apparel-de-homepage-service-de
+
+#### Section 5
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;mobile;Appa_480x110_FreeDel_DE_01_480W.jpg;$siteResource/images/banners/homepage/responsive/Appa_480x110_FreeDel_DE_01_480W.jpg;Appa_480x110_FreeDel_DE_01_480W.jpg;"VersandkostenfreiE Lieferung und retoure!";
+;tablet;Appa_770x80_FreeDel_DE_01_770W.jpg;$siteResource/images/banners/homepage/responsive/Appa_770x80_FreeDel_DE_01_770W.jpg;Appa_770x80_FreeDel_DE_01_770W.jpg;"VersandkostenfreiE Lieferung und retoure!";
+;desktop;Appa_960x80_FreeDel_DE_01_960W.jpg;$siteResource/images/banners/homepage/responsive/Appa_960x80_FreeDel_DE_01_960W.jpg;Appa_960x80_FreeDel_DE_01_960W.jpg;"VersandkostenfreiE Lieferung und retoure!";
+;widescreen;Appa_1400x80_FreeDel_DE_01_1400W.jpg;$siteResource/images/banners/homepage/responsive/Appa_1400x80_FreeDel_DE_01_1400W.jpg;Appa_1400x80_FreeDel_DE_01_1400W.jpg;"VersandkostenfreiE Lieferung und retoure!";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;apparel-de-homepage-discount-de;Appa_480x110_FreeDel_DE_01_480W.jpg,Appa_770x80_FreeDel_DE_01_770W.jpg,Appa_960x80_FreeDel_DE_01_960W.jpg,Appa_1400x80_FreeDel_DE_01_1400W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ApparelDEHompageFreeDelBannerComponent;apparel-de-homepage-discount-de
+
+# CMS Paragraph Component (Contact information)
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=$lang];
+;;faqTextParagraph;"<div class=""global-alerts""><div class=""alert alert-info"" role=""alert""><strong> Informationen: </ strong>Seite Under Construction - Nicht voll funktionsfähig</div></div><a name=""00""></a><div class=""textpage textpage-faqs""><div class=""item_container"">		<h2><a name=""a00""></a>Rücksendung und Rückerstattungen</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">zurück zum Seitenanfang</a>	</div>		<div class=""item_container"">		<h2><a name=""b00""></a>Lieferinformationen</h2>		<a class=""faq-menulink"" href=""#b01"">Lieferoptionen</a>		<a class=""faq-menulink"" href=""#b02"">Lieferzeiten&amp; Kosten</a>		<a class=""faq-menulink"" href=""#b03"">Tracking-Informationen anfordern</a>		<a class=""faq-menulink"" href=""#b04"">Informationen zum aktuellen Lieferungsstatus</a>			<h3><a name=""b01""></a>Lieferoptionen</h3>		<p>			Die für Sie verfügbaren Lieferoptionen werden im Bereich „Check-out“ unter „Liefermethode“ angezeigt.<br><br>			Je nach Lieferadresse sind einige dieser Optionen möglicherweise nicht verfügbar.			</p><ul>			<li>					<b>Home Delivery</b> - Gratis-Standardversand im Raum UK für alle Bestellungen im Wert von über 50 GBP innerhalb von 4 Werktagen (*Ausnahmen sind möglich)				</li>				<li>					<b>Standard-Lieferung</b> – 1 bis 2 Werktage				</li>				<li>					<b>Andere Liefermethode</b>  &ndash; – 3 bis 5 Werktage				</li>				<li>				<b>Internationale Lieferung</b> &ndash; 7 bis 10 Werktage (nicht in allen Ländern verfügbar)				</li>			</ul>		<p></p>		<h3><a name=""b02""></a>Lieferzeiten&amp; Kosten</h3>		<p>			Wir liefern die meisten unserer Bestellungen innerhalb von 4 Werktagen* aus. Die Versandkosten betragen 3,99 GBP, bei einem Bestellwert von über 50 GBP ist der Versand kostenlos (*Ausnahmen siehe Tabelle unten).			</p><ul>				<li>					Lieferungen an Adressen in Großbritannien werden montags bis freitags von 8:00 Uhr bis 18:00 Uhr zugestellt (mit Ausnahme von Feiertagen). 				</li>				<li>					Lieferungen an Adressen in den Schottischen Highlands und Inseln, in Nordirland und anderen küstenfernen Orten brauchen möglicherweise etwas länger.<br>					Informationen zu Lieferungen an Adressen in Irland entnehmen Sie bitte unserer irischen Website auf hybris.com.				</li>				<li>					Bestellungen mit mehreren Artikeln können in mehreren Einzelpaketen zu verschiedenen Zeitpunkten geliefert werden.				</li>			</ul>		<p></p>	<h3><a name=""b03""></a>Tracking-Informationen anfordern</h3>		<p>			Wir werden Sie per E-Mail über alle Phasen Ihrer Bestellung auf dem Laufenden halten. In allen E-Mails wird der Status Ihrer aktuellen Bestellung angezeigt. Die jeweiligen Status sind in der Tabelle unten beschrieben. Die Mehrzahl unserer Pakete stellen wir über unseren Kurierdienst zu. Diese Pakete können Sie verfolgen, indem Sie auf den Paket-Referenz-Link in Ihrer E-Mail klicken. Wenn Sie auf den Link klicken, werden Sie direkt an die Website des Kurierdienstes weitergeleitet. Weitere Informationen über die Sendungsstatus erhalten Sie <a href=""#b04"">hier</a>.		</p>		<table width=""100%"" cellspacing=""0"" cellpadding=""0"" border=""0"">			<tbody>				<tr>					<th>Status</th>					<th>Beschreibung</th>				</tr>				<!--ROW 1-->				<tr>					<td class=""blue3"">						<strong>Bearbeitung</strong><br>					</td>					<td class=""grey3"">						Ihre Bestellung wird bearbeitet.<br>					</td>				</tr>				<!--ROW 2-->	<tr>					<td class=""blue3"">						<strong>Versandt</strong><br>					</td>					<td class=""grey3"">						Ihre Bestellung wurde an den Kurier übergeben.<br><br>    Bei schweren und sperrigen Produkten wird Ihre Bestellung von unserem Paketdienst zugestellt. Der Paketdienst wird Kontakt mit Ihnen aufnehmen, um ein geeignetes Zustelldatum mit Ihnen zu vereinbaren.<br><br>Bei Bestellungen, die direkt aus dem Geschäft abgeholt werden, erhalten Sie eine weitere Bestellstatusinformation, sobald ihr(e) Artikel zur Abholung bereit stehen (weitere Informationen zu den Status zur Abholung aus einem Geschäft finden Sie unten).<br><br>					</td>				</tr>				<!--ROW 3-->				<tr>					<td class=""blue3"">						<strong>Storniert<br>Nicht lieferbar<br> Rückbuchung</strong><br>					</td>					<td class=""grey3"">						Ihre Bestellung wurde aus Lagerverfügbarkeitsgründen storniert, es hat keine Abbuchung/Zahlung stattgefunden.<br><br>					</td>				</tr>				<!--ROW 4-->				<tr>					<td class=""blue3"">						<strong>Storniert<br>Nicht lieferbar<br> Rückerstattung</strong><br>				</td>					<td class=""grey3"">						Ihre Bestellung wurde aus Lagerverfügbarkeitsgründen storniert. Wir haben eine Rückerstattung auf Ihr Konto vorgenommen.<br><br>					</td>				</tr>				<!--ROW 5-->				<tr>					<td class=""blue3"">						<strong>Rücksendung erhalten</strong><br>					</td>					<td class=""grey3"">Wir haben Ihre Rücksendung erhalten. Aufgrund von ans falsche Lager adressierten Waren, die zunächst ans richtige Lager weitergeleitet werden müssen, kann es zu einer kurzen Verzögerung bei der Bearbeitung Ihrer Rückerstattung kommen.<br><br>					</td>				</tr>				<!--ROW 6-->				<tr>					<td class=""blue3"">						<strong>Bestellung zur Abholung bereit</strong><br>					</td>					<td class=""grey3"">						Ihre Bestellung steht im Geschäft Ihrer Wahl zur Abholung bereit.<br><br><strong><i>Hinweis:</i></strong> Bitte holen Sie Ihre Bestellung innerhalb von 14 Tagen nach Erhalt Ihrer Benachrichtigungs-E-Mail ab.<br><br>					</td>				</tr>				<!--ROW 7-->				<tr>					<td class=""blue3"">						<strong>Abgeholt</strong><br>					</td>					<td class=""grey3"">					Ihre Bestellung wurde abgeholt.<br><br>					</td>				</tr>				<!--ROW 8-->				<tr>					<td class=""blue3"">						<strong>Rücksendung wird bearbeitet</strong><br>					</td>					<td class=""grey3"">						Ihre Rücksendung wird gerade von uns bearbeitet.<br><br>					</td>				</tr>				<!--ROW 9-->				<tr>					<td class=""blue3"">						<strong>Rückerstattung für Rücksendung abgeschlossen</strong><br>					</td>					<td class=""grey3"">						Wir haben Ihre Rücksendung bearbeitet,<br><br><strong><i>Hinweis:</i></strong>  Manche Banken brauchen länger als andere, um Rückerstattungen zu bearbeiten.<br><br>					</td>				</tr>			</tbody>		</table>		<p></p>		<h3><a name=""b04""></a>Statusinformation Paketdienst</h3>		<p></p>		<table width=""100%"" cellspacing=""0"" cellpadding=""0"" border=""0"">			<tbody>				<tr>					<th>Status</th>					<th>Beschreibung</th>				</tr>			<!--ROW 1-->				<tr>					<td class=""blue3"">						<strong>Bestellung generiert</strong><br>					</td>					<td class=""grey3"">						Ihre Bestellung steht fertig zur Zustellung bereit und ist ansTransportsystem übergeben worden.<br>					</td>				</tr>				<!--ROW 2-->				<tr>					<td class=""blue3"">						<strong>Empfang im Depot </strong><br>					</td>					<td class=""grey3"">					Ihr Paket ist im Depot eingegangen. <br><br>					</td>				</tr>				<!--ROW 3-->				<tr>					<td class=""blue3"">						<strong>Im Depot bearbeitet</strong><br>					</td>					<td class=""grey3"">						Ihr Paket wurde im Depot bearbeitet und steht nun zum Weitertransport durch den Paketdienst bereit.<br><br>					</td>				</tr>				<!--ROW 4-->				<tr>					<td class=""blue3"">						<strong>Ausgang zur Zustellung durch Paketdienst</strong><br>					</td>					<td class=""grey3"">						Ihr Paket hat das Depot verlassen und ist zur Zustellung durch den Paketdienst unterwegs.<br><br>					</td>				</tr>				<!--ROW 5-->				<tr>					<td class=""blue3"">						<strong>Erneuter Zustellungsversuch durch Paketdienst</strong><br>					</td>					<td class=""grey3"">						Der Paketdienst hat versucht, Ihr Paket zuzustellen und wird später einen erneuten Versuch unternehmen. Sie erhalten eine Karte, auf der der Zustellversuch bestätigt wird.<br><br>					</td>				</tr>			<!--ROW 6-->				<tr>					<td class=""blue3"">						<strong>Zugestellt an</strong><br>					</td>					<td class=""grey3"">						Ihr Paket wurde zugestellt.<br><br>					</td>				</tr>			</tbody>		</table>		<p></p>		<a class=""pagetop-link"" href=""#00"">zurück zum Seitenanfang</a>	</div>		<div class=""item_container"">		<h2><a name=""c00""></a>Registrierung</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">zurück zum Seitenanfang</a>	</div>	<div class=""item_container"">		<h2><a name=""d00""></a>Ihr Online-Konto</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">zurück zum Seitenanfang</a>	</div>	<div class=""item_container"">		<h2><a name=""e00""></a>Bestellungen</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">zurück zum Seitenanfang</a>	</div>	<div class=""item_container"">		<h2><a name=""f00""></a>Werbeaktionen und Rabatte</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">zurück zum Seitenanfang</a>	</div>	<div class=""item_container"">		<h2><a name=""g00""></a>Produkt- und allgemeine Informationen</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">zurück zum Seitenanfang</a>	</div>	<div class=""item_container"">		<h2><a name=""h00""></a>Informationen zu Verkaufsstellen</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">zurück zum Seitenanfang</a>	</div>	<div class=""item_container"">		<h2><a name=""i00""></a>Geschäftliche Kontakte</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">zurück zum Seitenanfang</a>	</div>		<div class=""item_container"">		<h2><a name=""j00""></a>Einkaufsratgeber</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">zurück zum Seitenanfang</a>	</div>		<div class=""item_container"">		<h2><a name=""k00""></a>Größenratgeber</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">zurück zum Seitenanfang</a>	</div>		<div class=""item_container"">		<h2><a name=""l00""></a>Datenschutz und Sicherheit</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">zurück zum Seitenanfang</a>	</div></div>";
+
+# Remove image from checkout Side Content 
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef);;;
+;;SideContent-multiStepCheckoutSummaryPage;
+
+# Site Logo Component
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+;;SiteLogoComponent;/images/theme/logo-hybris-responsive.png

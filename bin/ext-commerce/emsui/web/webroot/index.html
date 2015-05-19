@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:ng="http://angularjs.org" ng-app="EDUI">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="">
+
+    <title>Entitlement UI</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="public/css/bootstrap.min.css" rel="stylesheet">
+    <link href="public/css/style.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="public/js/vendor/html5shiv.js"></script>
+    <script src="public/js/vendor/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<nav role="navigation" class="navbar navbar-default navbar-fixed-top">
+    <div ng-controller="restURLCtrl" id="restUrlConfigPanel" class="collapse" ng-class="in">
+        <div class="container">
+            <form class="" name="restURLForm" ng-submit="restURLForm.$valid && save()">
+                <div class="form-group">
+                    <label for="restUrlInput">REST URL</label>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="url" class="form-control" ng-model="resturl" id="restUrlInput"
+                                   placeholder="Rest url">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="container">
+        <button type="button" class="menu btn btn-link navbar-btn" data-toggle="collapse"
+                data-target="#restUrlConfigPanel"><span class="glyphicon glyphicon-cog"></span></button>
+        <img class="logo" src="public/img/header_logo.png" alt="" width="20" height="23">
+
+        <form ng-submit="submitSearch()" ng-controller="searchCtrl">
+            <div class="form-group">
+                <div class="btn-group">
+                    <input id="searchinput" type="text" placeholder="Type user id here" ng-model="search" class="form-control">
+                    <span id="searchclear" class="glyphicon glyphicon-remove-circle" ng-click="search=undefined"></span>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+    <div class="container-fluid secondLine" ng-controller="subMenuCtrl" ng-hide="hideSubMenu">
+        <div class="container">
+            <div class="subHeader">
+                <div class="pull-left back" ng-hide="hideBack" ng-click="back()">
+                    <a href=""><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
+                </div>
+                <div class="headline">
+                    {{headline}}
+                    <div class="pull-right" ng-show="mode=='editGrant'">
+                        <button class="btn btn-link deleteGrantByID" data-grant-id="{{grant.id}}" ng-show="mode=='editGrant'">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </button>
+                        <button class="btn btn-link" ng-click="reload()"><span
+                                class="glyphicon glyphicon-refresh"></span>
+                        </button>
+                        <button class="btn btn-primary" ng-hide="mode=='list'" ng-click="save()">{{saveUpdateButtonTitle}}</button>
+                    </div>
+                    <div class="pull-right" ng-show="mode=='createGrant'">
+                        <button class="btn btn-primary" ng-hide="mode=='list'" ng-click="save()">{{saveUpdateButtonTitle}}</button>
+                    </div>
+                    <div class="pull-right" ng-show="mode=='list'">
+                        <button class="btn btn-link" ng-show="isUserDefined()" ng-click="addNewGrant()">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </button>
+                        <button class="btn btn-link" ng-click="reload()"><span
+                                class="glyphicon glyphicon-refresh"></span>
+                        </button>
+                        <button class="btn btn-primary" ng-click="openExecutor(userid)">Check/use</button>
+                    </div>
+                    <div class="pull-right" ng-show="mode=='check'">
+                        <button class="btn btn-primary" ng-click="openList(userid)">List</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div id="alerts" class="container">
+    <div id="alert" style="display:none"></div>
+</div>
+
+<div class="container listGrants" ng-controller="grantsListCtrl" ng-show="visible">
+    <div class="toolbar clearfix">
+        <div class="pull-right">
+        </div>
+    </div>
+
+    <div class="resultList">
+        <div class="row" ng-show="isUserDefined()">
+            <div class="col-md-6" ng-repeat="grant in grants.grants | orderObjects:'grantTime'">
+                <div data-grant-id="{{grant.id}}" class="item" ng-class="grant.status | lowercase">
+                    <div class="description" ng-click="showDetail(grant.id)">
+                        <div class="entitlementType">{{grant.entitlementType}}</div>
+                        <div class="grantSource">Source: {{grant.grantSource}}</div>
+                        <div class="grantSourceId">Source Id: {{grant.grantSourceId}}</div>
+                        <div class="grantTime">Granted: {{grant.grantTime | date:'mediumDate'}}</div>
+                    </div>
+                    <div class="control">
+                        <a href="" class="control-element pause" ng-click="toggleStatus(grant.id,grant.status)">
+                            <span class="glyphicon"
+                                  ng-class="(grant.status=='ACTIVE')?'glyphicon-pause':'glyphicon-play';"></span>
+                        </a>
+                        <a href="" class="control-element delete deleteGrantByID" data-grant-id="{{grant.id}}"><span
+                                class="glyphicon glyphicon-trash"></span></a>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-6 ">
+                <div class="item addGrant" ng-click="addNewGrant()" ng-class="active">
+                    <a href=""><span class="glyphicon glyphicon-plus"></span> Add Grant</a>
+                </div>
+            </div>
+        </div>
+        <div class="search-hint" ng-hide="isUserDefined()">
+            Search for User ID to display according grants
+        </div>
+    </div>
+</div>
+
+
+<div class="container detailGrant" ng-controller="executionCtrl" ng-show="visible">
+    <div class="toolbar clearfix addmargin">
+        <div class="pull-right">
+            <div class="btn btn-primary" ng-click="use()">Use</div>
+            <div class="btn btn-primary" ng-click="check()">Check</div>
+        </div>
+    </div>
+
+    <form name="grantExecutionForm">
+        <a class="firstlevelCollapseHeader" data-toggle="collapse" href="#executorCollapse">
+            <span class="glyphicon glyphicon-chevron-down"></span>
+            <span class="glyphicon glyphicon-chevron-right"></span>
+            Parameters
+        </a>
+
+        <div id="executorCollapse" class="firstlevelCollapseBody collapse in">
+            <div class="inner">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="entitlementType">Entitlement:</label>
+                            <input type="text" ng-model="entitlementType"
+                                   class="form-control {{isValid('entitlementType')?'':'invalid'}}" id="entitlement"
+                                   placeholder="e.g. Video" ng-required="true">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a class="firstlevelCollapseHeader" data-toggle="collapse" href="#executorCriteria">
+            <span class="glyphicon glyphicon-chevron-down"></span>
+            <span class="glyphicon glyphicon-chevron-right"></span>
+            Criteria
+        </a>
+
+        <div id="executorCriteria" class="firstlevelCollapseBody collapse in">
+            <div class="inner">
+                <div ng-repeat="criterion in criteria">
+                    <div class="secondlevelHeader">
+                        <div class="title">
+                            {{criterion.type.substring(0,1).toUpperCase() + criterion.type.substring(1)}}
+                        </div>
+                        <button type="button" class="btn btn-link removeCondition glyphicon glyphicon-remove-circle"
+                                ng-click="removeCriterion($index)">
+                        </button>
+                    </div>
+
+                    <div class="secondlevelBody">
+                        <div class="inner">
+                            <div ng-include="'criterion_'+criterion.type"
+                                 ng-init="data = {payload: criterion, index: $index}"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="addNew">
+                    <div class="inner">
+                        <div class="headline">Add criterion</div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="path">Condition Type</label>
+                                    <select
+                                            ng-model="newCriterion" class="form-control"
+                                            ng-options="c.type for c in knownConditionTypes()"
+                                            ng-change="addCriterion(newCriterion)">
+                                        <option value="">-</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a class="firstlevelCollapseHeader" data-toggle="collapse" href="#affectedGrants">
+            <span class="glyphicon glyphicon-chevron-down"></span>
+            <span class="glyphicon glyphicon-chevron-right"></span>
+            Found grants
+        </a>
+
+        <div id="affectedGrants" class="firstlevelCollapseBody collapse in resultList" style="background:#f0f0f0">
+            <div class="row">
+                <div class="col-md-6" ng-show="getAffectedGrants().length == 0">
+                    <div class="item ranout">
+                        <div class="description">
+                            <div class="entitlementType">
+                                No grants conform given criteria
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6" ng-repeat="grant in getAffectedGrants()">
+                    <div data-grant-id="{{grant.id}}" class="item {{isEntitlementGranted() ? 'active' : 'ranout'}}">
+                        <div class="description" ng-click="showDetail(grant.id)">
+                            <div class="entitlementType">{{grant.entitlementType}}</div>
+                            <div class="grantSource">Source: {{grant.grantSource}}</div>
+                            <div class="grantSourceId">Source Id: {{grant.grantSourceId}}</div>
+                            <div class="grantTime">Granted: {{grant.grantTime | date:'mediumDate'}}</div>
+                            <div class="grantUnits" ng-show="getCondition(grant, 'metered')">
+                                Units available: {{getProperty(grant, 'remainingQuantity').value}} of
+                                {{getProperty(getCondition(grant, 'metered'), 'maxQuantity').value}}
+                            </div>
+                        </div>
+                        <!--
+                                                    <div class="control">
+                                                        <a href="" class="control-element pause" ng-click="toggleStatus(grant.id,grant.status)">
+                                                            <span class="glyphicon" ng-class="(grant.status=='ACTIVE')?'glyphicon-pause':'glyphicon-play';"></span>
+                                                        </a>
+                                                        <a href=""  class="control-element delete deleteGrantByID" data-grant-id="{{grant.id}}"><span class="glyphicon glyphicon-trash"></span></a>
+                                                    </div>
+                        -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<div class="container detailGrant" ng-controller="grantDetailCtrl" ng-show="visible">
+    <form name="grantDetailForm">
+
+        <a class="firstlevelCollapseHeader" data-toggle="collapse" href="#firstlevelCollapse1">
+            <span class=" glyphicon glyphicon-chevron-down"></span>
+            <span class=" glyphicon glyphicon-chevron-right"></span>
+            Parameters
+        </a>
+
+        <div id="firstlevelCollapse1" class="firstlevelCollapseBody collapse in">
+            <div class="inner">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="entitlementType">Entitlement</label>
+                            <input
+                                    type="text" ng-model="grant.entitlementType"
+                                    class="form-control {{isValid('entitlementType') ? '' : 'error'}}"
+                                    id="entitlementType" placeholder="e.g. send SMS"
+                                    ng-show="newGrantBoolean" ng-required="true">
+
+                            <p class="form-control-static" ng-hide="newGrantBoolean">{{grant.entitlementType}}</p>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+
+                            <div class="row" ng-show="newGrantBoolean">
+                                <div class="col-xs-6 "><input type="radio" ng-model="grant.status" value="ACTIVE"
+                                                              selected id="status"> Active
+                                </div>
+                                <div class="col-xs-6 "><input type="radio" ng-model="grant.status" value="SUSPENDED">
+                                    Suspended
+                                </div>
+                            </div>
+
+                            <p class="form-control-static" ng-hide="newGrantBoolean">
+                                {{grant.status.substring(0,1).toUpperCase() + grant.status.substring(1).toLowerCase()}}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="clearfix ">
+
+                    </div>
+
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="grantSource">Grant Source</label>
+                            <input type="text" ng-model="grant.grantSource"
+                                   class="form-control {{isValid('grantSource') ? '' : 'invalid'}}" id="grantSource"
+                                   placeholder="e.g. christmas sales" ng-show="newGrantBoolean" ng-required="true">
+
+                            <p class="form-control-static" ng-hide="newGrantBoolean">{{grant.grantSource}}</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="grantSourceId">Grant Source ID</label>
+                            <input type="text" ng-model="grant.grantSourceId"
+                                   class="form-control {{isValid('grantSourceId') ? '' : 'invalid'}}" id="grantSourceId"
+                                   placeholder="e.g. payment order id" ng-show="newGrantBoolean" ng-required="true">
+
+                            <p class="form-control-static" ng-hide="newGrantBoolean">{{grant.grantSourceId}}</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="grantTime">Grant Date</label>
+                            <input type="text" class="form-control {{isValid('grantTime') ? '' : 'invalid'}}"
+                                   datepicker-popup="{{format}}"
+                                   name="Start time"
+                                   ng-model="grant.grantTime"
+                                   is-open="openedGrantTime"
+                                   ng-change="conditionModified();"
+                                   datepicker-options="dateOptions"
+                                   placeholder="when it was granted"
+                                   ng-show="newGrantBoolean"
+                                   ng-required="true"
+                                   id="grantTime"
+                                   close-text="Close"/>
+
+                            <p class="form-control-static" ng-hide="newGrantBoolean">{{grant.grantTime |
+                                date:'mediumDate'}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Conditions -->
+        <a class="firstlevelCollapseHeader" data-toggle="collapse" href="#firstlevelCollapse3">
+            <span class=" glyphicon glyphicon-chevron-down"></span>
+            <span class=" glyphicon glyphicon-chevron-right"></span>
+            Conditions
+        </a>
+
+        <div id="firstlevelCollapse3" class="firstlevelCollapseBody collapse in">
+            <div class="inner">
+                <div ng-repeat="condition in grant.conditions | orderBy:'type':false">
+                    <div class="secondlevelHeader">
+                        <div class="title">
+                            {{condition.type.substring(0,1).toUpperCase() + condition.type.substring(1)}}
+                        </div>
+                        <button type="button" class="btn btn-link removeCondition glyphicon glyphicon-remove-circle"
+                                ng-click="removeCondition(grant.id,condition.type); $event.stopPropagation();">
+                        </button>
+                    </div>
+                    <div class="inner">
+                        <div ng-include="'condition_'+condition.type"
+                             ng-init="data = {'grant': grant, 'condition' : condition}"></div>
+                    </div>
+                </div>
+
+                <div class="addNew" ng-hide="filterConditions().length == 0">
+                    <div class="inner">
+                        <div class="headline">Add New Condition</div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="path">Condition Type</label>
+                                    <select
+                                            ng-model="newConditions" class="form-control"
+                                            ng-options="c.type for c in filterConditions()"
+                                            ng-change="addConditions(newConditions);">
+                                        <option value="">-</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script type="text/ng-template" id="inputradio">
+    <div class="row">
+        <div class="col-xs-6 "><input type="radio" ng-model="inputradioData.value" value="true"
+                                      ng-change="conditionModified();"> Yes
+        </div>
+        <div class="col-xs-6 "><input type="radio" ng-model="inputradioData.value" value="false"
+                                      ng-change="conditionModified();"> No
+        </div>
+    </div>
+</script>
+
+
+<script type="text/ng-template" id="condition_string">
+    <div class="form-group">
+        <label>Value</label>
+        <input type="text" ng-model="getProperty(data.condition, 'string').value" class="form-control"
+               ng-change="conditionModified();">
+    </div>
+</script>
+
+
+<script type="text/ng-template" id="condition_metered">
+    <div class="row">
+        <div class="col-xs-6 col-sm-3">
+            <div class="form-group">
+                <label>Maximum quantity</label>
+            </div>
+        </div>
+        <div class="col-xs-6 col-sm-3">
+            <div class="form-group">
+                <input type="text" ng-model="getProperty(data.condition, 'maxQuantity').value"
+                       class="form-control {{isValid('properties.maxQuantity') ? '' : 'invalid'}}"
+                       ng-change="conditionModified();">
+            </div>
+        </div>
+    </div>
+    <div ng-hide="newGrantBoolean || getProperty(data.grant, 'remainingQuantity') == undefined">
+        <div class="row">
+            <div class="col-xs-6 col-sm-3">
+                <div class="form-group">
+                    <label>Remaining quantity</label>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-3">
+                <div class="form-group">
+                    <div>{{getProperty(data.grant, 'remainingQuantity').value}}</div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-3">
+                <div class="form-group">
+                    <button class="btn btn-secondary"
+                            ng-click="setRemainingQuantity(data.grant.id, getProperty(data.condition, 'maxQuantity').value)">
+                        Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-3">
+                <div class="form-group">
+                    Set to:
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-3">
+                <div class="form-group">
+                    <input type="text" ng-model="absRemainingQuantity"
+                           class="form-control {{isValid('remainingQuantity') ? '' : 'invalid'}}">
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-3">
+                <div class="form-group">
+                    <button class="btn btn-secondary" ng-click="setRemainingQuantity(data.grant.id, absRemainingQuantity)">
+                        Update
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-3">
+                <div class="form-group">
+                    Add:
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-3">
+                <div class="form-group">
+                    <input type="text" ng-model="relRemainingQuantity"
+                           class="form-control {{isValid('remainingQuantity') ? '' : 'invalid'}}">
+                </div>
+            </div>
+            <div class="col-xs-6 col-sm-3">
+                <div class="form-group">
+                    <button class="btn btn-secondary" ng-click="addRemainingQuantity(data.grant.id, relRemainingQuantity)">
+                        Update
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-6 col-sm-3">
+            <div class="form-group">
+                <label>Allow overage</label>
+
+                <div ng-include="'inputradio'"
+                     onLoad="inputradioData = getProperty(data.condition, 'allowOverage', 'false')"></div>
+            </div>
+        </div>
+    </div>
+    </div>
+</script>
+
+
+<script type="text/ng-template" id="condition_path">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="path">Path</label>
+                <input type="text" ng-model="getProperty(data.condition, 'path').value" class="form-control" id="path"
+                       ng-change="conditionModified();">
+            </div>
+        </div>
+    </div>
+</script>
+
+
+<script type="text/ng-template" id="condition_geo">
+    <input id="GeoInput" type="hidden" ng-model="getProperty(data.condition, 'geoPath').value" class="form-control"
+           id="path">
+
+    <div ng-init="parts = getGeoParts(getProperty(data.condition, 'geoPath').value)">
+        <div ng-repeat="part in parts">
+            <div class="row">
+                <div class="col-md-3" ng-repeat="partItem in part">
+                    <div class="form-group">
+                        <label for="path">{{partItem.key}}</label>
+                        <input type="text" ng-model="partItem.value"
+                               class="form-control {{isValid('proerties.geoPath') ? '' : 'invalid'}}"
+                               id="path"
+                               ng-change="conditionModified();getProperty(data.condition, 'geoPath').value=setGeoParts(parts);">
+                    </div>
+                </div>
+                <div class="col-md-3" ng-show="parts.length > 1">
+                    <div class="form-group justButtons">
+                        <button class="btn btn-secondary removeGeoLine" ng-click="removeGeoLine($index,parts)">
+                            <span class="glyphicon glyphicon-minus"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-secondary  addNewButton" ng-click="addGeoLine(parts)">
+        <span class="glyphicon glyphicon-plus"></span>
+    </button>
+
+</script>
+
+
+<script type="text/ng-template" id="condition_timeframe">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="startTime">Start date</label>
+                <input type="text" class="form-control"
+                       datepicker-popup="{{format}}"
+                       name="Start time"
+                       ng-model="getProperty(data.condition, 'startTime').value"
+                       is-open="openedStartTime"
+                       ng-change="conditionModified();"
+                       datepicker-options="dateOptions"
+                       ng-required="true"
+                       id="startTime"
+                       close-text="Close"/>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="endTime">End date</label>
+                <input type="text" class="form-control"
+                       datepicker-popup="{{format}}"
+                       name="Start time"
+                       ng-model="getProperty(data.condition, 'endTime', '').value"
+                       is-open="openedEndTime"
+                       ng-change="conditionModified();"
+                       datepicker-options="dateOptions"
+                       ng-required="true"
+                       id="endTime"
+                       close-text="Close"/>
+            </div>
+        </div>
+    </div>
+    </div>
+</script>
+
+
+<script type="text/ng-template" id="condition_"></script>
+
+<script type="text/ng-template" id="criterion_string">
+    <div class="form-group">
+        <label for="stringCondition{{data.index}}">Value</label>
+        <input type="text" ng-model="getProperty(data.payload, 'string').value"
+               class="form-control {{isValid('string') ? '' : 'invalid'}}" id="stringCondition{{data.index}}">
+    </div>
+</script>
+
+<script type="text/ng-template" id="criterion_path">
+    <div class="form-group">
+        <label for="pathCondition{{data.index}}">Path</label>
+        <input type="text" ng-model="getProperty(data.payload, 'file').value"
+               class="form-control {{isValid('path') ? '' : 'invalid'}}" id="pathCondition{{data.index}}">
+    </div>
+</script>
+
+<script type="text/ng-template" id="criterion_geo">
+    <input type="hidden" ng-model="getProperty(data.payload, 'geoPath').value" class="form-control"
+           id="geoCriterion{{data.index}}">
+
+    <div ng-init="part = getGeoParts(getProperty(data.payload, 'geoPath').value)">
+        <div class="row">
+            <div class="col-md-3" ng-repeat="partItem in part">
+                <div class="form-group">
+                    <label for="pathItem{{partItem.key}}{{data.index}}">{{partItem.key}}</label>
+                    <input type="text" ng-model="partItem.value"
+                           class="form-control {{isValid(partItem.key) ? '' : 'invalid'}}"
+                           id="pathItem{{partItem.key}}{{data.index}}"
+                           ng-change="getProperty(data.payload, 'geoPath').value=setGeoParts(part);">
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="criterion_metered">
+    <div class="form-group">
+        <label for="metered-quantity{{data.index}}">Quantity</label>
+        <input id="metered-quantity{{data.index}}" type="text" ng-model="getProperty(data.payload, 'quantity').value"
+               class="form-control {{isValid('quantity') ? '' : 'invalid'}}">
+    </div>
+</script>
+
+<script type="text/ng-template" id="criterion_timeframe">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label for="timeframe-time{{data.index}}">Time</label>
+                <input type="text" class="form-control {{isValid('time') ? '' : 'invalid'}}"
+                       datepicker-popup="{{format}}"
+                       name="Effective time"
+                       ng-model="getProperty(data.payload, 'time').value"
+                       is-open="openedEffectiveTime"
+                       datepicker-options="dateOptions"
+                       ng-required="true"
+                       id="timeframe-time{{data.index}}"
+                       close-text="Close"/>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="criterion_"></script>
+
+<script src="public/js/vendor/jquery/1.11.0/jquery.min.js"></script>
+<script src="public/js/vendor/angular/angular.js"></script>
+<script src="public/js/vendor/bootstrap.min.js"></script>
+<script src="public/js/vendor/ui-bootstrap-tpls-0.10.0.js"></script>
+<script src="public/js/vendor/angular/angular-animate.js"></script>
+<script src="public/js/vendor/angular/angular-resource.js"></script>
+<script src="public/js/vendor/angular/angular-cookies.js"></script>
+<script src="public/js/vendor/angular/angular-strap.min.js"></script>
+<script src="public/js/vendor/angular/angular-strap.tpl.min.js"></script>
+<script src="public/js/edui/services/EDUIServices.js"></script>
+<script src="public/js/edui/edui.js"></script>
+<script src="public/js/vendor/dateparser.js"></script>
+
+</body>
+</html>
+
+

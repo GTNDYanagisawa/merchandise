@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../config/SolrFacetConfig.xsd">
+  <solrconfig>
+    <mode>embedded</mode>
+    <clusterconfig embeddedMaster="true">
+    	<aliveCheckInterval>5000</aliveCheckInterval>
+    	<connectionTimeout>5000</connectionTimeout>
+    	<readTimeout>5000</readTimeout>
+    </clusterconfig>
+  </solrconfig>
+  <indexconfig>
+    <batchSize>100</batchSize>
+  </indexconfig>
+  <itemTypes>
+    <itemType code="Product" variant="false" identityProvider="itemIdentityProvider" indexName="restrictionTest">
+      <properties>
+      	<property name="code" type="string"/>
+      </properties>
+      <flexibleSearchUpdateQueries>
+        <fullIndexQuery user="demo">
+			SELECT {pk} FROM {Product}
+        </fullIndexQuery>
+        <updateIndexQuery user="demo" injectLastIndexTime="true">
+			SELECT {PK} FROM {Product} WHERE {modifiedtime} &gt;= ?lastIndexTime
+        </updateIndexQuery>
+        <deleteFromIndexQuery>
+        	SELECT {PK} FROM {Product} WHERE code = 'HW2310-1001'
+        </deleteFromIndexQuery>
+      </flexibleSearchUpdateQueries>
+    </itemType>
+  </itemTypes>
+</config>

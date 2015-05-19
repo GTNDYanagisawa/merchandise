@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<alias name="sapOrderexchangeDefaultCheckOrderAction" alias="sapOrderexchangeCheckOrderAction" />
+	<bean id="sapOrderexchangeDefaultCheckOrderAction" class="de.hybris.platform.sap.yorderfulfillment.actions.CheckSAPOrderAction"
+		parent="abstractAction">
+	</bean>
+
+	<alias name="sapOrderexchangeDefaultCustomerReplicationCheckAction" alias="sapCustomerexchangeCheckOrderAction" />
+	<bean id="sapOrderexchangeDefaultCustomerReplicationCheckAction" class="de.hybris.platform.sap.yorderfulfillment.actions.CheckCustomerReplicationAction"
+		parent="abstractAction">
+		<property name="flexibleSearchService" ref="flexibleSearchService"></property>
+		<property name="sAPGlobalConfigurationService" ref="sapCoreDefaultSAPGlobalConfigurationService"></property>
+	   <property name="b2CCustomerHelper" ref="sapOrderexchangeB2CCustomerHelper"></property>
+	</bean> 
+
+	<alias name="sapOrderexchangeDefaultSendOrderToDataHubAction" alias="sapOrderexchangeSendOrderToDataHubAction" />
+	<bean id="sapOrderexchangeDefaultSendOrderToDataHubAction" class="de.hybris.platform.sap.yorderfulfillment.actions.SendOrderToDataHubAction"
+		parent="abstractAction">
+		<property name="sendOrderToDataHubHelper" ref="sapOrderexchangeSendOrderToDataHubHelper"></property>
+		<property name="retryDelay" value="${saporderexchange.orderoutbound.retryDelay}"></property>
+		<property name="maxRetries" value="${saporderexchange.orderoutbound.maxRetries}"></property>
+		<property name="modelService" ref="modelService"></property>
+	</bean>
+
+
+	<alias name="sapOrderexchangeDefaultSetConfirmationStatusAction" alias="sapOrderexchangeSetConfirmationStatusAction" />
+	<bean id="sapOrderexchangeDefaultSetConfirmationStatusAction" class="de.hybris.platform.sap.yorderfulfillment.actions.SetConfirmationStatusAction"
+		parent="abstractAction">
+	</bean>
+
+	<alias name="sapOrderexchangeDefaultSetCompletionStatusAction" alias="sapOrderexchangeSetCompletionStatusAction" />
+	<bean id="sapOrderexchangeDefaultSetCompletionStatusAction" class="de.hybris.platform.sap.yorderfulfillment.actions.SetCompletionStatusAction"
+		parent="abstractAction">
+	</bean>
+
+	<alias name="sapOrderexchangeDefaultSetCancelAction" alias="sapOrderexchangeSetCancelAction" />
+	<bean id="sapOrderexchangeDefaultSetCancelAction" class="de.hybris.platform.sap.yorderfulfillment.actions.SetCancelAction"
+		parent="abstractAction">
+	</bean>
+
+</beans>

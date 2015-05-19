@@ -1,0 +1,940 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<!-- webservice error data -->
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.error.ErrorWsDTO">
+		<description>Error message</description>
+		<property name="type" type="String">
+			<description>Type of the error e.g. 'LowStockError'.</description>
+		</property>
+		<property name="reason" type="String">
+			<description>Additional classification specific for each error type e.g. 'noStock'.</description>
+		</property>
+		<property name="message" type="String">
+			<description>Descriptive, human readable error message.</description>
+		</property>
+		<property name="subjectType" type="String">
+			<description>Type of the object related to the error e.g. 'entry'.</description>
+		</property>
+		<property name="subject" type="String">
+			<description>Identifier of the related object e.g. '1'.</description>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.error.ErrorListWsDTO">
+		<description>List of errors</description>
+		<property name="errors"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.error.ErrorWsDTO>"/>
+	</bean>
+
+
+	<!-- v2 DTOs ====================================================================================================== -->
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.voucher.VoucherWsDTO">
+		<property name="code" type="String"/>
+		<property name="voucherCode" type="String"/>
+		<property name="name" type="String"/>
+		<property name="description" type="String"/>
+		<property name="value" type="Double"/>
+		<property name="valueFormatted" type="String"/>
+		<property name="valueString" type="String"/>
+		<property name="freeShipping" type="Boolean"/>
+		<property name="currency" type="de.hybris.platform.commercewebservicescommons.dto.storesession.CurrencyWsDTO"/>
+		<property name="appliedValue" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.voucher.VoucherListWsDTO">
+		<property name="vouchers"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.voucher.VoucherWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.storesession.CurrencyWsDTO">
+		<property name="isocode" type="String"/>
+		<property name="name" type="String"/>
+		<property name="active" type="Boolean"/>
+		<property name="symbol" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.storesession.CurrencyListWsDTO">
+		<property name="currencies"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.storesession.CurrencyWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO">
+		<property name="currencyIso" type="String"/>
+		<property name="value" type="java.math.BigDecimal"/>
+		<property name="priceType" type="de.hybris.platform.commercefacades.product.data.PriceDataType"/>
+		<property name="formattedValue" type="String"/>
+		<property name="minQuantity" type="Long"/>
+		<property name="maxQuantity" type="Long"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.PromotionWsDTO">
+		<property name="code" type="String"/>
+		<property name="title" type="String"/>
+		<property name="promotionType" type="String"/>
+		<property name="startDate" type="java.util.Date"/>
+		<property name="endDate" type="java.util.Date"/>
+		<property name="description" type="String"/>
+		<property name="couldFireMessages" type="java.util.List&lt;String>"/>
+		<property name="firedMessages" type="java.util.List&lt;String>"/>
+		<property name="productBanner" type="de.hybris.platform.commercewebservicescommons.dto.product.ImageWsDTO"/>
+		<property name="enabled" type="Boolean"/>
+		<property name="priority" type="Integer"/>
+		<property name="promotionGroup" type="String"/>
+		<property name="restrictions"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.PromotionRestrictionWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.PromotionListWsDTO">
+		<property name="promotions"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.PromotionWsDTO>"/>
+	</bean>
+
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.ImageWsDTO">
+		<property name="imageType" type="de.hybris.platform.commercefacades.product.data.ImageDataType"/>
+		<property name="format" type="String"/>
+		<property name="url" type="String"/>
+		<property name="altText" type="String"/>
+		<property name="galleryIndex" type="Integer"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.PromotionRestrictionWsDTO">
+		<property name="restrictionType" type="String"/>
+		<property name="description" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.catalog.AbstractCatalogItemWsDTO">
+		<property name="id" type="String"/>
+		<property name="lastModified" type="java.util.Date"/>
+		<property name="name" type="String"/>
+		<property name="url" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.catalog.CatalogWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.catalog.AbstractCatalogItemWsDTO">
+		<property name="catalogVersions"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.catalog.CatalogVersionWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.catalog.CatalogListWsDTO">
+		<property name="catalogs"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.catalog.CatalogWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.catalog.CatalogVersionWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.catalog.AbstractCatalogItemWsDTO">
+		<property name="categories"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.catalog.CategoryHierarchyWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.catalog.CategoryHierarchyWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.catalog.AbstractCatalogItemWsDTO">
+		<property name="pageSize" type="Integer"/>
+		<property name="totalNumber" type="Integer"/>
+		<property name="currentPage" type="Integer"/>
+		<property name="numberOfPages" type="Integer"/>
+		<property name="subcategories"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.catalog.CategoryHierarchyWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.ProductWsDTO">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="url" type="String"/>
+		<property name="description" type="String"/>
+		<property name="purchasable" type="Boolean"/>
+		<property name="stock" type="de.hybris.platform.commercewebservicescommons.dto.product.StockWsDTO"/>
+		<property name="futureStocks"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.FutureStockWsDTO>"/>
+		<property name="availableForPickup" type="java.lang.Boolean"/>
+		<property name="averageRating" type="Double"/>
+		<property name="numberOfReviews" type="Integer"/>
+		<property name="summary" type="String"/>
+		<property name="manufacturer" type="String"/>
+		<property name="variantType" type="String"/>
+		<property name="price" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+		<property name="baseProduct" type="String"/>
+		<property name="images"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.ImageWsDTO>"/>
+		<property name="categories"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.CategoryWsDTO>"/>
+		<property name="reviews"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.ReviewWsDTO>"/>
+		<property name="classifications"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.ClassificationWsDTO>"/>
+		<property name="potentialPromotions"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.PromotionWsDTO>"/>
+		<property name="variantOptions"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.VariantOptionWsDTO>"/>
+		<property name="baseOptions"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.BaseOptionWsDTO>"/>
+		<property name="volumePricesFlag" type="Boolean"/>
+		<property name="volumePrices"
+		          type="List&lt;de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO>"/>
+		<property name="productReferences"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.ProductReferenceWsDTO>"/>
+		<property name="variantMatrix"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.VariantMatrixElementWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.StockWsDTO">
+		<property name="stockLevelStatus"
+		          type="String"/>
+		<property name="stockLevel" type="Long"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.FutureStockWsDTO">
+		<property name="stock" type="de.hybris.platform.commercewebservicescommons.dto.product.StockWsDTO"/>
+		<property name="date" type="java.util.Date"/>
+		<property name="formattedDate" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.CategoryWsDTO">
+		<property name="code" type="String"/>
+		<!--<property name="name" type="String"/>-->
+		<property name="url" type="String"/>
+		<!--<property name="description" type="String"/>-->
+		<property name="image" type="de.hybris.platform.commercewebservicescommons.dto.product.ImageWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.ReviewWsDTO">
+		<property name="id" type="String"/>
+		<property name="headline" type="String"/>
+		<property name="comment" type="String"/>
+		<property name="rating" type="Double"/>
+		<property name="date" type="java.util.Date"/>
+		<property name="alias" type="String"/>
+		<property name="principal" type="de.hybris.platform.commercewebservicescommons.dto.user.UserWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.ReviewListWsDTO">
+		<property name="reviews"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.ReviewWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.ClassificationWsDTO">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="features"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.FeatureWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.FeatureWsDTO">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="description" type="String"/>
+		<property name="type" type="String"/>
+		<property name="range" type="Boolean"/>
+		<property name="comparable" type="Boolean"/>
+		<property name="featureUnit" type="de.hybris.platform.commercewebservicescommons.dto.product.FeatureUnitWsDTO"/>
+		<property name="featureValues"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.FeatureValueWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.FeatureUnitWsDTO">
+		<property name="symbol" type="String"/>
+		<property name="name" type="String"/>
+		<property name="unitType" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.FeatureValueWsDTO">
+		<property name="value" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.VariantOptionWsDTO">
+		<property name="code" type="String"/>
+		<property name="stock" type="de.hybris.platform.commercewebservicescommons.dto.product.StockWsDTO"/>
+		<property name="url" type="String"/>
+		<property name="priceData" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+		<property name="variantOptionQualifiers"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.VariantOptionQualifierWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.VariantOptionQualifierWsDTO">
+		<property name="qualifier" type="String"/>
+		<property name="name" type="String"/>
+		<property name="value" type="String"/>
+		<property name="image" type="de.hybris.platform.commercewebservicescommons.dto.product.ImageWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.BaseOptionWsDTO">
+		<property name="variantType" type="String"/>
+		<property name="options"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.VariantOptionWsDTO>"/>
+		<property name="selected" type="de.hybris.platform.commercewebservicescommons.dto.product.VariantOptionWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.ProductReferenceWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.product.ReferenceWsDTO">
+		<property name="preselected" type="Boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.ReferenceWsDTO">
+		<property name="referenceType" type="String"/>
+		<property name="description" type="String"/>
+		<property name="quantity" type="Integer"/>
+		<property name="target" type="de.hybris.platform.commercewebservicescommons.dto.product.ProductWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.VariantMatrixElementWsDTO">
+		<property name="variantValueCategory"
+		          type="de.hybris.platform.commercewebservicescommons.dto.product.VariantValueCategoryWsDTO"/>
+		<property name="parentVariantCategory"
+		          type="de.hybris.platform.commercewebservicescommons.dto.product.VariantCategoryWsDTO"/>
+		<property name="variantOption"
+		          type="de.hybris.platform.commercewebservicescommons.dto.product.VariantOptionWsDTO"/>
+		<property name="elements"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.VariantMatrixElementWsDTO>"/>
+		<property name="isLeaf" type="Boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.VariantValueCategoryWsDTO">
+		<property name="name" type="String"/>
+		<property name="sequence" type="Integer"/>
+		<property name="superCategories"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.VariantCategoryWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.VariantCategoryWsDTO">
+		<property name="name" type="String"/>
+		<property name="hasImage" type="Boolean"/>
+		<property name="priority" type="Integer"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.UserWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.user.PrincipalWsDTO">
+		<!--<property name="defaultBillingAddress" type="de.hybris.platform.commercewebservicescommons.dto.user.AddressWsDTO"/>-->
+		<property name="defaultAddress" type="de.hybris.platform.commercewebservicescommons.dto.user.AddressWsDTO"/>
+		<property name="titleCode" type="String"/>
+		<property name="title" type="String"/>
+		<property name="firstName" type="String"/>
+		<property name="lastName" type="String"/>
+		<property name="currency" type="de.hybris.platform.commercewebservicescommons.dto.storesession.CurrencyWsDTO"/>
+		<property name="language" type="de.hybris.platform.commercewebservicescommons.dto.storesession.LanguageWsDTO"/>
+		<property name="displayUid" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.UserSignUpWsDTO">
+		<property name="uid" type="String"/>
+		<property name="firstName" type="String"/>
+		<property name="lastName" type="String"/>
+		<property name="titleCode" type="String"/>
+		<property name="password" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.storesession.LanguageWsDTO">
+		<property name="isocode" type="String"/>
+		<property name="name" type="String"/>
+		<property name="nativeName" type="String"/>
+		<property name="active" type="Boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.storesession.LanguageListWsDTO">
+		<property name="languages"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.storesession.LanguageWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.UserGroupWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.user.PrincipalWsDTO">
+		<property name="members" type="java.util.List&lt;PrincipalWsDTO>"/>
+		<property name="subGroups" type="java.util.List&lt;UserGroupWsDTO>"/>
+		<property name="membersCount" type="Integer"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.UserGroupListWsDTO">
+		<property name="userGroups"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.user.UserGroupWsDTO>"/>
+		<property name="totalNumber" type="Integer"/>
+		<property name="pageSize" type="Integer"/>
+		<property name="numberOfPages" type="Integer"/>
+		<property name="currentPage" type="Integer"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.MemberListWsDTO">
+		<property name="members"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.user.PrincipalWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.OrderHistoryListWsDTO">
+		<property name="orders"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.OrderHistoryWsDTO>"/>
+		<property name="sorts"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.pagedata.SortWsDTO>"/>
+		<property name="pagination"
+		          type="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PaginationWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.OrderHistoryWsDTO">
+		<property name="code" type="String"/>
+		<property name="status" type="String"/>
+		<property name="statusDisplay" type="String"/>
+		<property name="placed" type="java.util.Date"/>
+		<property name="guid" type="String"/>
+		<property name="total" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.SortWsDTO">
+		<description>POJO representing a sort option.</description>
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="selected" type="Boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PageableWsDTO">
+		<description>POJO representation of search query pagination.</description>
+		<property name="pageSize" type="Integer">
+			<description>The number of results per page. A page may have less results if there are less than a full page
+				of results, only on the last page in the results.
+			</description>
+		</property>
+		<property name="currentPage" type="Integer">
+			<description>The current page number. The first page is number zero (0), the second page is number one (1),
+				and so on.
+			</description>
+		</property>
+		<property name="sort" type="String">
+			<description>The selected sort code.</description>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PaginationWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PageableWsDTO">
+		<description>POJO representation of search results pagination.</description>
+		<property name="totalPages" type="Integer">
+			<description>The total number of pages. This is the number of pages, each of pageSize, required to display
+				the totalResults.
+			</description>
+		</property>
+		<property name="totalResults" type="Long">
+			<description>The total number of matched results across all pages.</description>
+		</property>
+	</bean>
+
+	<!--<bean class="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.SearchPageWsDTO&lt;RESULT>">
+		<description>POJO that includes all necessary data for creating proper result in refine search.</description>
+		<property name="results" type="java.util.List&lt;RESULT>"/>
+		<property name="sorts"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.pagedata.SortWsDTO>"/>
+		<property name="pagination" type="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PaginationWsDTO"/>
+	</bean>-->
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.search.SearchStateWsDTO">
+		<property name="url" type="String"/>
+		<property name="query" type="de.hybris.platform.commercewebservicescommons.dto.search.SearchQueryWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.search.SearchQueryWsDTO">
+		<property name="value" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.ProductListWsDTO">
+		<property name="products"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.ProductWsDTO>"/>
+		<property name="catalog" type="String"/>
+		<property name="version" type="String"/>
+		<property name="totalProductCount" type="Integer"/>
+		<property name="totalPageCount" type="Integer"/>
+		<property name="currentPage" type="Integer"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.queues.ProductExpressUpdateElementWsDTO">
+		<property name="code" type="String"/>
+		<property name="catalogId" type="String"/>
+		<property name="catalogVersion" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.queues.ProductExpressUpdateElementListWsDTO">
+		<property name="productExpressUpdateElements"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.queues.ProductExpressUpdateElementWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.queues.OrderStatusUpdateElementWsDTO">
+		<property name="code" type="String"/>
+		<property name="status" type="String"/>
+		<property name="baseSiteId" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.queues.OrderStatusUpdateElementListWsDTO">
+		<property name="orderStatusUpdateElements"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.queues.OrderStatusUpdateElementWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.TitleWsDTO">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.TitleListWsDTO">
+		<property name="titles"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.user.TitleWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.CardTypeWsDTO">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.CardTypeListWsDTO">
+		<property name="cardTypes"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.CardTypeWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.AbstractOrderWsDTO">
+		<property name="code" type="String"/>
+		<property name="net" type="Boolean"/>
+		<property name="totalPriceWithTax" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+		<property name="totalPrice" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+		<property name="totalTax" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+		<property name="subTotal" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+		<property name="deliveryCost" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+		<property name="entries"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.OrderEntryWsDTO>"/>
+		<property name="totalItems" type="Integer"/>
+		<property name="deliveryMode" type="de.hybris.platform.commercewebservicescommons.dto.order.DeliveryModeWsDTO"/>
+		<property name="deliveryAddress" type="de.hybris.platform.commercewebservicescommons.dto.user.AddressWsDTO"/>
+		<property name="paymentInfo"
+		          type="de.hybris.platform.commercewebservicescommons.dto.order.PaymentDetailsWsDTO"/>
+		<property name="appliedOrderPromotions"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.PromotionResultWsDTO>"/>
+		<property name="appliedProductPromotions"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.PromotionResultWsDTO>"/>
+		<property name="productDiscounts" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+		<property name="orderDiscounts" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+		<property name="totalDiscounts" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+		<property name="site" type="String"/>
+		<property name="store" type="String"/>
+		<property name="guid" type="String"/>
+		<property name="calculated" type="Boolean"/>
+		<property name="appliedVouchers"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.voucher.VoucherWsDTO>"/>
+		<property name="user" type="de.hybris.platform.commercewebservicescommons.dto.user.PrincipalWsDTO"/>
+		<property name="pickupOrderGroups"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.PickupOrderEntryGroupWsDTO>"/>
+		<property name="deliveryOrderGroups"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.DeliveryOrderEntryGroupWsDTO>"/>
+		<property name="pickupItemsQuantity" type="Long"/>
+		<property name="deliveryItemsQuantity" type="Long"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.ConsignmentWsDTO">
+		<property name="code" type="String"/>
+		<property name="trackingID" type="String"/>
+		<property name="status" type="String"/>
+		<property name="statusDate" type="java.util.Date"/>
+		<property name="entries"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.ConsignmentEntryWsDTO>"/>
+		<property name="shippingAddress" type="de.hybris.platform.commercewebservicescommons.dto.user.AddressWsDTO"/>
+		<property name="deliveryPointOfService"
+		          type="de.hybris.platform.commercewebservicescommons.dto.store.PointOfServiceWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.ConsignmentEntryWsDTO">
+		<property name="orderEntry" type="de.hybris.platform.commercewebservicescommons.dto.order.OrderEntryWsDTO"/>
+		<property name="quantity" type="Long"/>
+		<property name="shippedQuantity" type="Long"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.CartWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.order.AbstractOrderWsDTO">
+		<property name="totalUnitCount" type="Integer"/>
+		<property name="potentialOrderPromotions"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.PromotionResultWsDTO>"/>
+		<property name="potentialProductPromotions"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.PromotionResultWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.CartListWsDTO">
+		<property name="carts"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.CartWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.CartModificationWsDTO">
+		<property name="statusCode" type="String"/>
+		<property name="quantityAdded" type="Long"/>
+		<property name="quantity" type="Long"/>
+		<property name="entry" type="de.hybris.platform.commercewebservicescommons.dto.order.OrderEntryWsDTO"/>
+		<property name="deliveryModeChanged" type="Boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.CartModificationListWsDTO">
+		<property name="cartModifications"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.CartModificationWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.PaymentDetailsWsDTO">
+		<property name="id" type="String"/>
+		<property name="accountHolderName" type="String"/>
+		<!--<property name="cardType" type="String"/>-->
+		<property name="cardType" type="de.hybris.platform.commercewebservicescommons.dto.order.CardTypeWsDTO"/>
+		<property name="cardNumber" type="String"/>
+		<property name="startMonth" type="String"/>
+		<property name="startYear" type="String"/>
+		<property name="expiryMonth" type="String"/>
+		<property name="expiryYear" type="String"/>
+		<property name="issueNumber" type="String"/>
+		<property name="subscriptionId" type="String"/>
+		<property name="saved" type="Boolean"/>
+		<property name="defaultPayment" type="Boolean"/>
+		<property name="billingAddress" type="de.hybris.platform.commercewebservicescommons.dto.user.AddressWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.PaymentDetailsListWsDTO">
+		<property name="payments"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.PaymentDetailsWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.DeliveryModeWsDTO">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="description" type="String"/>
+		<property name="deliveryCost" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.DeliveryModeListWsDTO">
+		<property name="deliveryModes"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.DeliveryModeWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.OrderWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.order.AbstractOrderWsDTO">
+		<property name="created" type="java.util.Date"/>
+		<property name="status" type="String"/>
+		<property name="statusDisplay" type="String"/>
+		<property name="guestCustomer" type="Boolean"/>
+		<property name="consignments"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.ConsignmentWsDTO>"/>
+		<property name="deliveryStatus" type="String"/>
+		<property name="deliveryStatusDisplay" type="String"/>
+		<property name="unconsignedEntries"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.OrderEntryWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.OrderEntryWsDTO">
+		<property name="entryNumber" type="Integer"/>
+		<property name="quantity" type="Long"/>
+		<property name="basePrice" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+		<property name="totalPrice" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+		<property name="product" type="de.hybris.platform.commercewebservicescommons.dto.product.ProductWsDTO"/>
+		<property name="updateable" type="Boolean"/>
+		<property name="deliveryMode" type="de.hybris.platform.commercewebservicescommons.dto.order.DeliveryModeWsDTO"/>
+		<property name="deliveryPointOfService"
+		          type="de.hybris.platform.commercewebservicescommons.dto.store.PointOfServiceWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.OrderEntryListWsDTO">
+		<property name="orderEntries"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.OrderEntryWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.PromotionOrderEntryConsumedWsDTO">
+		<property name="code" type="String"/>
+		<property name="adjustedUnitPrice" type="Double"/>
+		<property name="orderEntryNumber" type="Integer"/>
+		<property name="quantity" type="Long"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.OrderEntryGroupWsDTO">
+		<property name="totalPriceWithTax" type="de.hybris.platform.commercewebservicescommons.dto.product.PriceWsDTO"/>
+		<property name="entries"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.order.OrderEntryWsDTO>"/>
+		<property name="quantity" type="Long"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.PickupOrderEntryGroupWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.order.OrderEntryGroupWsDTO">
+		<property name="deliveryPointOfService"
+		          type="de.hybris.platform.commercewebservicescommons.dto.store.PointOfServiceWsDTO"/>
+		<property name="distance" type="Double"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.DeliveryOrderEntryGroupWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.order.OrderEntryGroupWsDTO">
+		<property name="deliveryAddress" type="de.hybris.platform.commercewebservicescommons.dto.user.AddressWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.PromotionResultWsDTO">
+		<property name="description" type="String"/>
+		<property name="promotion" type="de.hybris.platform.commercewebservicescommons.dto.product.PromotionWsDTO"/>
+		<property name="consumedEntries"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.order.PromotionOrderEntryConsumedWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.PromotionResultListWsDTO">
+		<property name="promotions"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.PromotionResultWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.PrincipalWsDTO">
+		<property name="uid" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.store.PointOfServiceWsDTO">
+		<property name="name" type="String"/>
+		<property name="displayName" type="String"/>
+		<property name="url" type="String"/>
+		<property name="description" type="String"/>
+		<property name="openingHours"
+		          type="de.hybris.platform.commercewebservicescommons.dto.store.OpeningScheduleWsDTO"/>
+		<property name="storeContent" type="String"/>
+		<property name="features" type="java.util.Map&lt;String, String>"/>
+		<property name="geoPoint" type="de.hybris.platform.commercewebservicescommons.dto.store.GeoPointWsDTO"/>
+		<property name="formattedDistance" type="String"/>
+		<property name="distanceKm" type="Double"/>
+		<property name="mapIcon" type="de.hybris.platform.commercewebservicescommons.dto.product.ImageWsDTO"/>
+		<property name="address" type="de.hybris.platform.commercewebservicescommons.dto.user.AddressWsDTO"/>
+		<property name="storeImages"
+		          type="java.util.Collection&lt;de.hybris.platform.commercewebservicescommons.dto.product.ImageWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.AddressWsDTO">
+		<property name="id" type="String"/>
+		<property name="title" type="String"/>
+		<property name="titleCode" type="String"/>
+		<property name="firstName" type="String"/>
+		<property name="lastName" type="String"/>
+		<property name="companyName" type="String"/>
+		<property name="line1" type="String"/>
+		<property name="line2" type="String"/>
+		<property name="town" type="String"/>
+		<property name="region" type="de.hybris.platform.commercewebservicescommons.dto.user.RegionWsDTO"/>
+		<property name="postalCode" type="String"/>
+		<property name="phone" type="String"/>
+		<property name="email" type="String"/>
+		<property name="country" type="de.hybris.platform.commercewebservicescommons.dto.user.CountryWsDTO"/>
+		<property name="shippingAddress" type="Boolean"/>
+		<!--<property name="billingAddress" type="Boolean"/>-->
+		<!--<property name="defaultAddress" type="Boolean"/>-->
+		<property name="visibleInAddressBook" type="Boolean"/>
+		<property name="formattedAddress" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.AddressListWsDTO">
+		<property name="addresses"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.user.AddressWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.CountryWsDTO">
+		<property name="isocode" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.CountryListWsDTO">
+		<property name="countries"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.user.CountryWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.RegionWsDTO">
+		<property name="isocode" type="String"/>
+		<property name="isocodeShort" type="String"/>
+		<property name="countryIso" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.store.OpeningDayWsDTO">
+		<property name="openingTime" type="de.hybris.platform.commercewebservicescommons.dto.store.TimeWsDTO"/>
+		<property name="closingTime" type="de.hybris.platform.commercewebservicescommons.dto.store.TimeWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.store.OpeningScheduleWsDTO">
+		<property name="name" type="String"/>
+		<property name="code" type="String"/>
+		<property name="weekDayOpeningList"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.store.WeekdayOpeningDayWsDTO>"/>
+		<property name="specialDayOpeningList"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.store.SpecialOpeningDayWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.store.GeoPointWsDTO">
+		<property name="latitude" type="Double"/>
+		<property name="longitude" type="Double"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.store.SpecialOpeningDayWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.store.OpeningDayWsDTO">
+		<property name="date" type="java.util.Date"/>
+		<property name="formattedDate" type="String"/>
+		<property name="closed" type="Boolean"/>
+		<property name="name" type="String"/>
+		<property name="comment" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.store.TimeWsDTO">
+		<property name="hour" type="Byte"/>
+		<property name="minute" type="Byte"/>
+		<property name="formattedHour" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.store.WeekdayOpeningDayWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.store.OpeningDayWsDTO">
+		<property name="weekDay" type="String"/>
+		<property name="closed" type="Boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.store.StoreFinderSearchPageWsDTO">
+		<property name="stores"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.store.PointOfServiceWsDTO>"/>
+		<property name="sorts"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.pagedata.SortWsDTO>"/>
+		<property name="pagination"
+		          type="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PaginationWsDTO"/>
+		<property name="locationText" type="String"/>
+		<property name="sourceLatitude" type="Double"/>
+		<property name="sourceLongitude" type="Double"/>
+		<property name="boundNorthLatitude" type="Double"/>
+		<property name="boundEastLongitude" type="Double"/>
+		<property name="boundSouthLatitude" type="Double"/>
+		<property name="boundWestLongitude" type="Double"/>
+	</bean>
+
+
+	<!-- Search Facet Data -->
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.search.facetdata.BreadcrumbWsDTO">
+		<description>POJO representing a section of the Breadcrumb.</description>
+		<property name="facetCode" type="String"/>
+		<property name="facetName" type="String"/>
+		<property name="facetValueCode" type="String"/>
+		<property name="facetValueName" type="String"/>
+		<property name="removeQuery" type="de.hybris.platform.commercewebservicescommons.dto.search.SearchStateWsDTO"/>
+		<property name="truncateQuery"
+		          type="de.hybris.platform.commercewebservicescommons.dto.search.SearchStateWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.search.facetdata.FacetWsDTO">
+		<description>POJO representing a facet.</description>
+		<!--<property name="code" type="String"/>-->
+		<property name="name" type="String"/>
+		<property name="priority" type="Integer"/>
+		<property name="category" type="Boolean"/>
+		<property name="multiSelect" type="Boolean"/>
+		<property name="visible" type="Boolean"/>
+		<property name="topValues"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.facetdata.FacetValueWsDTO>"/>
+		<property name="values"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.facetdata.FacetValueWsDTO>"/>
+	</bean>
+
+	<!--<bean class="de.hybris.platform.commercewebservicescommons.dto.search.facetdata.FacetSearchPageWsDTO&lt;STATE, RESULT>"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.SearchPageWsDTO&lt;RESULT>">
+		<description>POJO that includes all necessary data for creating proper result in facet search.</description>
+		<property name="currentQuery" type="STATE"/>
+		<property name="breadcrumbs"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.facetdata.BreadcrumbWsDTO&lt;STATE>>"/>
+		<property name="facets"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.facetdata.FacetWsDTO&lt;STATE>>"/>
+	</bean>-->
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.search.facetdata.FacetValueWsDTO">
+		<description>POJO representing a facet value.</description>
+		<!--<property name="code" type="String"/>-->
+		<property name="name" type="String"/>
+		<property name="count" type="Long"/>
+		<property name="query" type="de.hybris.platform.commercewebservicescommons.dto.search.SearchStateWsDTO"/>
+		<property name="selected" type="Boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.search.facetdata.ProductCategorySearchPageWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.search.facetdata.ProductSearchPageWsDTO">
+		<description>POJO containing the result page for product or category search.</description>
+		<property name="subCategories"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.CategoryWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.search.facetdata.ProductSearchPageWsDTO">
+		<description>POJO containing the result page for product search.</description>
+		<property name="freeTextSearch" type="String"/>
+		<property name="categoryCode" type="String"/>
+		<property name="keywordRedirectUrl" type="String"/>
+		<property name="spellingSuggestion"
+		          type="de.hybris.platform.commercewebservicescommons.dto.search.facetdata.SpellingSuggestionWsDTO"/>
+		<property name="products"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.ProductWsDTO>"/>
+		<property name="sorts"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.pagedata.SortWsDTO>"/>
+		<property name="pagination"
+		          type="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PaginationWsDTO"/>
+		<property name="currentQuery" type="de.hybris.platform.commercewebservicescommons.dto.search.SearchStateWsDTO"/>
+		<property name="breadcrumbs"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.facetdata.BreadcrumbWsDTO>"/>
+		<property name="facets"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.facetdata.FacetWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.search.facetdata.SpellingSuggestionWsDTO">
+		<description>POJO representing a spell checker suggestion.</description>
+		<property name="suggestion" type="String"/>
+		<property name="query" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.search.solrfacetsearch.SolrSearchQueryWsDTO">
+		<description>POJO representing a Search query.</description>
+		<!--<property name="freeTextSearch" type="String"/>-->
+		<property name="categoryCode" type="String"/>
+		<!--<property name="filterTerms" type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.solrfacetsearch.SolrSearchQueryTermWsDTO>"/>-->
+		<!--<property name="sort" type="String"/>-->
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.search.solrfacetsearch.SolrSearchQueryTermWsDTO">
+		<property name="key" type="String"/>
+		<property name="value" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.SuggestionWsDTO">
+		<property name="value" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.product.SuggestionListWsDTO">
+		<property name="suggestions"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.product.SuggestionWsDTO>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.order.ZoneDeliveryModeWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.order.DeliveryModeWsDTO"/>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.store.PointOfServiceStockWsDTO"
+	      extends="de.hybris.platform.commercewebservicescommons.dto.store.PointOfServiceWsDTO">
+		<property name="stockInfo" type="de.hybris.platform.commercewebservicescommons.dto.product.StockWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.store.StoreFinderStockSearchPageWsDTO">
+		<property name="stores"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.store.PointOfServiceStockWsDTO>"/>
+		<property name="sorts"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.search.pagedata.SortWsDTO>"/>
+		<property name="pagination"
+		          type="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PaginationWsDTO"/>
+		<property name="locationText" type="String"/>
+		<property name="sourceLatitude" type="Double"/>
+		<property name="sourceLongitude" type="Double"/>
+		<property name="boundNorthLatitude" type="Double"/>
+		<property name="boundEastLongitude" type="Double"/>
+		<property name="boundSouthLatitude" type="Double"/>
+		<property name="boundWestLongitude" type="Double"/>
+		<property name="product" type="de.hybris.platform.commercewebservicescommons.dto.product.ProductWsDTO"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercewebservicescommons.dto.user.AddressValidationWsDTO">
+		<property name="errors" type="de.hybris.platform.commercewebservicescommons.dto.error.ErrorListWsDTO"/>
+		<property name="decision" type="String"/>
+		<property name="suggestedAddresses"
+		          type="java.util.List&lt;de.hybris.platform.commercewebservicescommons.dto.user.AddressWsDTO>"/>
+	</bean>
+
+
+</beans>

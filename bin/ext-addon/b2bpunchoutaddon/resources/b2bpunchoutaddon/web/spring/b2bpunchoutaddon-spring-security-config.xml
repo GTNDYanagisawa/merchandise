@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<security:http pattern="${b2bpunchoutaddon.mapping.cxml.pattern}">
+	
+		<security:anonymous username="anonymous" granted-authority="ROLE_ANONYMOUS"/>
+		
+		<security:intercept-url pattern="/**" requires-channel="https"/>
+		
+		<security:form-login
+				login-page="/login"
+				authentication-failure-handler-ref="loginAuthenticationFailureHandler"
+				authentication-success-handler-ref="loginGuidAuthenticationSuccessHandler"/>
+
+		<security:port-mappings>
+			<security:port-mapping http="#{configurationService.configuration.getProperty('tomcat.http.port')}"
+								   https="#{configurationService.configuration.getProperty('tomcat.ssl.port')}"/>
+			<security:port-mapping http="80" https="443"/>
+		</security:port-mappings>
+	</security:http>
+	
+	<!-- Add b2bPunchOutUrlSet to the excludeUrlSet so that the main http element ignores and passes over the matching to the above secuirity:http configuration -->
+	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetObject">
+			<ref bean="excludeUrlSet"/>
+		</property>
+		<property name="targetMethod">
+			<value>addAll</value>
+		</property>
+		<property name="arguments">
+			<util:set>
+				<value>${b2bpunchoutaddon.mapping.cxml.pattern}</value>
+			</util:set>
+		</property>
+	</bean>
+	
+	<bean id="punchOutAuthenticationProvider" class="de.hybris.platform.b2bpunchoutaddon.security.PunchOutAuthenticationProvider" >
+		<property name="cartService" ref="cartService" />
+		<property name="userService" ref="userService" />
+		<property name="modelService" ref="modelService" />
+		<property name="preAuthenticationChecks" ref="rejectUserPreAuthenticationChecks" />
+		<property name="userDetailsService" ref="originalUidUserDetailsService" />
+	</bean>
+	
+	<bean id="punchOutUserAuthenticationStrategy" class="de.hybris.platform.b2bpunchoutaddon.security.impl.DefaultPunchOutUserAuthenticationStrategy">
+		<property name="authenticationProvider" ref="punchOutAuthenticationProvider"/>
+		<property name="authenticationSuccessHandlers">
+			<list>
+				<bean class="de.hybris.platform.yb2bacceleratorstorefront.security.GUIDAuthenticationSuccessHandler">
+					<property name="guidCookieStrategy" ref="guidCookieStrategy"/>
+					<property name="authenticationSuccessHandler" ref="punchOutAuthenticationSuccessHandler"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="orderPunchOutUserAuthenticationStrategy" parent="punchOutUserAuthenticationStrategy">
+		<property name="authenticationSuccessHandlers">
+			<list>
+				<bean class="de.hybris.platform.b2bpunchoutaddon.security.impl.PunchOutOrderAuthenticationSuccessHandler">
+					<property name="customerFacade" ref="customerFacade"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="punchOutAuthenticationSuccessHandler" class="de.hybris.platform.b2bpunchoutaddon.security.impl.PunchOutAuthenticationSuccessHandler">
+		<property name="customerFacade" ref="customerFacade"/>
+		<property name="redirectStrategy" ref="redirectStrategy"/>
+		<property name="targetUrl" value="/"/>
+	</bean>
+	
+	<alias name="defaultPunchOutUserSelectionStrategy" alias="punchOutUserSelectionStrategy"/>
+	<bean id="defaultPunchOutUserSelectionStrategy" class="de.hybris.platform.b2bpunchoutaddon.security.impl.DefaultPunchOutUserSelectionStrategy">
+		<property name="customerAccountService" ref="customerAccountService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+		<property name="acceptedUserTypes">
+			<list>
+				<value>B2BCustomer</value>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPunchOutUserGroupSelectionStrategy" alias="punchOutUserGroupSelectionStrategy"/>
+	<bean id="defaultPunchOutUserGroupSelectionStrategy" class="de.hybris.platform.b2bpunchoutaddon.security.impl.DefaultPunchOutUserGroupSelectionStrategy">
+		<property name="userService" ref="userService" />
+		<property name="userGroupsIDs">
+			<list>
+				<value>b2bcustomergroup</value>
+				<value>PunchOut Organization</value> <!-- Sample user group. Punch Out users should belong to a particular group giving them access to specific catalog and pricing data -->
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultPunchOutUserAuthenticationService" alias="punchOutUserAuthenticationService"/>
+	<bean id="defaultPunchOutUserAuthenticationService" class="de.hybris.platform.b2bpunchoutaddon.services.impl.DefaultPunchOutUserAuthenticationService">
+		<property name="punchOutUserAuthenticationStrategy" ref="punchOutUserAuthenticationStrategy"/>
+		<property name="punchOutUserSelectionStrategy" ref="punchOutUserSelectionStrategy"/>
+		<property name="punchOutUserGroupSelectionStrategy" ref="punchOutUserGroupSelectionStrategy"/>
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+	
+	<bean id="orderPunchOutUserAuthenticationService" parent="defaultPunchOutUserAuthenticationService">
+		<property name="punchOutUserAuthenticationStrategy" ref="orderPunchOutUserAuthenticationStrategy"/>
+	</bean>
+	
+</beans>

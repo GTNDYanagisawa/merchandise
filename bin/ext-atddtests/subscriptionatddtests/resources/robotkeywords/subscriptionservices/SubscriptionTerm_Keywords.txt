@@ -1,0 +1,30 @@
+*** Settings ***
+Library         de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Resource		impex/Impex_Keywords.txt
+Resource		commerce/SubscriptionCommerce_Keywords.txt
+
+*** Keywords ***
+create subscription term "${termId}" with renewal type "${renewalType}" and term frequency "${termFrequency}" and term number "${termNumber:[^"]+}"
+    [Documentation]    ${renewalType}=non_renewing/auto_renewing/renews_once/renews_twice/renews_three_times ${termFrequency}=monthly/quarterly/yearly
+    @{binding}    create list    termId    ${termId}    renewalType    ${renewalType}    termFrequency    ${termFrequency}    termNumber    ${termNumber}    cancellable    ${EMPTY}    billingPlanId    ${EMPTY}
+    ${templateName}=    Set Variable    impex-templates/subscription-term/subscriptionterm-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+
+create subscription term "${termId}" with renewal type "${renewalType}" and term frequency "${termFrequency}" and term number "${termNumber:[^"]+}" and cancellable "${cancellable}"
+    [Documentation]    ${renewalType}=non_renewing/auto_renewing/renews_once/renews_twice/renews_three_times ${termFrequency}=monthly/quarterly/yearly ${cancellable}=true/false
+    @{binding}    create list    termId    ${termId}    renewalType    ${renewalType}    termFrequency    ${termFrequency}    termNumber    ${termNumber}    cancellable    ${cancellable}    billingPlanId    ${EMPTY}
+    ${templateName}=    Set Variable    impex-templates/subscription-term/subscriptionterm-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+
+create subscription term "${termId}" with billing plan "${billingPlanId}" and renewal type "${renewalType}" and term frequency "${termFrequency}" and term number "${termNumber}" and cancellable "${cancellable}"
+    [Documentation]    ${renewalType}=non_renewing/auto_renewing/renews_once/renews_twice/renews_three_times ${termFrequency}=monthly/quarterly/yearly ${cancellable}=true/false
+    @{binding}    create list    termId    ${termId}    renewalType    ${renewalType}    termFrequency    ${termFrequency}    termNumber    ${termNumber}    cancellable    ${cancellable}    billingPlanId    ${billingPlanId}
+    ${templateName}=    Set Variable    impex-templates/subscription-term/subscriptionterm-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+
+for product "${productCode}" verify that the XML for subscription term matches "${expectedXml}"
+	[Documentation]   Verifies that XML for supscription term matches the expected XML 
+    for product "${productCode}" verify that "product/subscriptionTerm" evaluates to "${expectedXml}"

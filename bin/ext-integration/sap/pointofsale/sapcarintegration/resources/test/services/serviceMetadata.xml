@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<edmx:Edmx Version="1.0"
+	xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+	<edmx:DataServices
+		xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"
+		m:DataServiceVersion="2.0">
+		<Schema Namespace="tmp.i827395.hybris.odata.Services"
+			xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices"
+			xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"
+			xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+			<EntityType Name="MultiChannelPurchasesQueryResultsType"
+				sap:semantics="aggregate">
+				<Key>
+					<PropertyRef Name="GenID" />
+				</Key>
+				<Property Name="GenID" Type="Edm.String" Nullable="false"
+					MaxLength="2147483647" sap:filterable="false" />
+				<Property Name="SAPClient" Type="Edm.String" MaxLength="3"
+					sap:aggregation-role="dimension" sap:label="SAPClient" />
+				<Property Name="CustomerNumber" Type="Edm.String"
+					MaxLength="10" sap:aggregation-role="dimension" sap:label="CustomerNumber" />
+				<Property Name="TransactionNumber" Type="Edm.String"
+					MaxLength="20" sap:aggregation-role="dimension" sap:label="TransactionNumber" />
+				<Property Name="SalesDocumentType" Type="Edm.String"
+					MaxLength="4" sap:aggregation-role="dimension" sap:label="SalesDocumentType" />
+				<Property Name="RetailStoreID" Type="Edm.String" MaxLength="10"
+					sap:aggregation-role="dimension" sap:label="RetailStoreID" />
+				<Property Name="BusinessDayDate" Type="Edm.String"
+					MaxLength="8" sap:aggregation-role="dimension" sap:label="BusinessDayDate" />
+				<Property Name="TransactionIndex" Type="Edm.Int32"
+					sap:aggregation-role="dimension" sap:label="TransactionIndex" />
+				<Property Name="Article" Type="Edm.String" MaxLength="18"
+					sap:aggregation-role="dimension" sap:label="Article" />
+				<Property Name="ArticleName" Type="Edm.String" MaxLength="40"
+					sap:aggregation-role="dimension" sap:label="ArticleName" />
+				<Property Name="OrderChannel" Type="Edm.String" MaxLength="2"
+					sap:aggregation-role="dimension" sap:label="OrderChannel" />
+				<Property Name="OrderChannelName" Type="Edm.String"
+					MaxLength="50" sap:aggregation-role="dimension" sap:label="OrderChannelName" />
+				<Property Name="SalesOrganization" Type="Edm.String"
+					MaxLength="4" sap:aggregation-role="dimension" sap:label="SalesOrganization" />
+				<Property Name="DistributionChannel" Type="Edm.String"
+					MaxLength="2" sap:aggregation-role="dimension" sap:label="DistributionChannel" />
+				<Property Name="OrganizationDivision" Type="Edm.String"
+					MaxLength="2" sap:aggregation-role="dimension" sap:label="OrganizationDivision" />
+				<Property Name="OrderQuantityUnit" Type="Edm.String"
+					MaxLength="3" sap:aggregation-role="dimension" sap:label="OrderQuantityUnit" />
+				<Property Name="UnitOfMeasureName" Type="Edm.String"
+					MaxLength="10" sap:aggregation-role="dimension" sap:label="Unit Of Measure Name" />
+				<Property Name="OperatorID" Type="Edm.String" MaxLength="30"
+					sap:aggregation-role="dimension" sap:label="OperatorID" />
+				<Property Name="WorkstationID" Type="Edm.String" MaxLength="10"
+					sap:aggregation-role="dimension" sap:label="WorkstationID" />
+				<Property Name="UnitOfMeasure_E" Type="Edm.String"
+					MaxLength="3" sap:aggregation-role="dimension"
+					sap:label="Unit Of Measure Commercial Name" />
+				<Property Name="PaymentMethod" Type="Edm.String" MaxLength="1"
+					sap:aggregation-role="dimension" sap:label="PaymentMethod" />
+				<Property Name="OverallOrderProcessStatus" Type="Edm.String"
+					MaxLength="1" sap:aggregation-role="dimension" sap:label="OverallSDProcessStatus" />
+				<Property Name="OverallOrderProcessStatusDesc" Type="Edm.String"
+					MaxLength="20" sap:aggregation-role="dimension" sap:label="OverallSDProcessStatusDesc" />
+				<Property Name="Location" Type="Edm.String" MaxLength="4"
+					sap:aggregation-role="dimension" sap:label="Location" />
+				<Property Name="TransactionCurrency" Type="Edm.String"
+					MaxLength="5" sap:aggregation-role="dimension" sap:label="TransactionCurrency" />
+				<Property Name="CreationDate" Type="Edm.String"
+					MaxLength="8" sap:aggregation-role="dimension" sap:label="CreationDate" />
+				<Property Name="CreationTime" Type="Edm.String" MaxLength="6"
+					sap:aggregation-role="dimension" sap:label="CreationTime" />
+				<Property Name="OrderQuantity" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="OrderQuantity" />
+				<Property Name="TaxAmount" Type="Edm.Decimal" Precision="34"
+					sap:filterable="false" sap:aggregation-role="measure" sap:label="TaxAmount" />
+				<Property Name="TotalNetAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="TotalNetAmount" />
+				<Property Name="SalesOrdersCount" Type="Edm.Int64"
+					sap:filterable="false" sap:aggregation-role="measure" sap:label="Sales Orders Count" />
+			</EntityType>
+			<EntityType Name="MultiChannelPurchasesQueryType"
+				sap:semantics="parameters">
+				<Key>
+					<PropertyRef Name="P_SAPClient" />
+				</Key>
+				<Property Name="P_SAPClient" Type="Edm.String" Nullable="false"
+					MaxLength="3" sap:label="P_SAPClient" sap:parameter="mandatory" />
+				<NavigationProperty Name="Results"
+					Relationship="tmp.i827395.hybris.odata.Services.MultiChannelPurchasesQuery_MultiChannelPurchasesQueryResultsType"
+					FromRole="MultiChannelPurchasesQueryPrincipal" ToRole="MultiChannelPurchasesQueryResultsDependent" />
+			</EntityType>
+			<EntityType Name="POSSalesQueryResultsType" sap:semantics="aggregate">
+				<Key>
+					<PropertyRef Name="GenID" />
+				</Key>
+				<Property Name="GenID" Type="Edm.String" Nullable="false"
+					MaxLength="2147483647" sap:filterable="false" />
+				<Property Name="SAPClient" Type="Edm.String" MaxLength="3"
+					sap:aggregation-role="dimension" sap:label="SAP Client" />
+				<Property Name="OrderChannel" Type="Edm.String" MaxLength="2"
+					sap:aggregation-role="dimension" sap:label="Order Channel" />
+				<Property Name="OrderChannelName" Type="Edm.String"
+					MaxLength="50" sap:aggregation-role="dimension" sap:label="Order Channel Name" />
+				<Property Name="Location" Type="Edm.String" MaxLength="4"
+					sap:aggregation-role="dimension" sap:label="Location" />
+				<Property Name="LocationCustomerNmbr" Type="Edm.String"
+					MaxLength="10" sap:aggregation-role="dimension"
+					sap:label="Retail Location Customer Number" />
+				<Property Name="LocationName" Type="Edm.String" MaxLength="30"
+					sap:aggregation-role="dimension" sap:label="Retail Location Description Text" />
+				<Property Name="Article" Type="Edm.String" MaxLength="18"
+					sap:aggregation-role="dimension" sap:label="Article" />
+				<Property Name="ArticleName" Type="Edm.String" MaxLength="40"
+					sap:aggregation-role="dimension" sap:label="Article Name" />
+				<Property Name="RetailStoreID" Type="Edm.String" MaxLength="10"
+					sap:aggregation-role="dimension" sap:label="Retail Store ID" />
+				<Property Name="BusinessDayDate" Type="Edm.String"
+					MaxLength="8" sap:aggregation-role="dimension" sap:label="Business Day Date" />
+				<Property Name="OperatorID" Type="Edm.String" MaxLength="30"
+					sap:aggregation-role="dimension" sap:label="Operator ID" />
+				<Property Name="TransactionIndex" Type="Edm.Int32"
+					sap:aggregation-role="dimension" sap:label="Transaction Index" />
+				<Property Name="TransactionNumber" Type="Edm.String"
+					MaxLength="20" sap:aggregation-role="dimension" sap:label="Transaction Number" />
+				<Property Name="BeginTimestamp" Type="Edm.String"
+					MaxLength="14" sap:aggregation-role="dimension" sap:label="Begin Timestamp" />
+				<Property Name="TransactionCurrency" Type="Edm.String"
+					MaxLength="5" sap:aggregation-role="dimension" sap:label="Transaction Currency" />
+				<Property Name="CustomerNumber" Type="Edm.String"
+					MaxLength="10" sap:aggregation-role="dimension" sap:label="Customer Number" />
+				<Property Name="SalesUnit" Type="Edm.String" MaxLength="3"
+					sap:aggregation-role="dimension" sap:label="Sales Unit" />
+				<Property Name="BaseUnit" Type="Edm.String" MaxLength="3"
+					sap:aggregation-role="dimension" sap:label="Base Unit" />
+				<Property Name="Promotion" Type="Edm.String" MaxLength="10"
+					sap:aggregation-role="dimension" sap:label="Promotion" />
+				<Property Name="RetailPromotion" Type="Edm.String"
+					MaxLength="10" sap:aggregation-role="dimension" sap:label="Retail Promotion" />
+				<Property Name="RetailPromotionName" Type="Edm.String"
+					MaxLength="40" sap:aggregation-role="dimension"
+					sap:label="Retail Promotion Description Text" />
+				<Property Name="RetailPromotionType" Type="Edm.String"
+					MaxLength="4" sap:aggregation-role="dimension" sap:label="Retail Promotion Type" />
+				<Property Name="RetailPromotionTypeName" Type="Edm.String"
+					MaxLength="20" sap:aggregation-role="dimension"
+					sap:label="Retail Promotion Type Description Text" />
+				<Property Name="EuropeanArticleNumber" Type="Edm.String"
+					MaxLength="18" sap:aggregation-role="dimension" sap:label="International Article Number" />
+				<Property Name="RetailItemCategory" Type="Edm.String"
+					MaxLength="1" sap:aggregation-role="dimension" sap:label="Retail Item Category" />
+				<Property Name="RetailItemSubcategory" Type="Edm.String"
+					MaxLength="1" sap:aggregation-role="dimension" sap:label="Retail Item Subcategory" />
+				<Property Name="MaterialGroup" Type="Edm.String" MaxLength="9"
+					sap:aggregation-role="dimension" sap:label="Material Group" />
+				<Property Name="SalesAmount" Type="Edm.Decimal" Precision="34"
+					sap:filterable="false" sap:aggregation-role="measure" sap:label="Sales Amount" />
+				<Property Name="SalesQuantityInBaseUnit" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Sales Quantity in Base Unit" />
+				<Property Name="SalesQuantityInSalesUnit" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Sales Quantity in Sales Unit" />
+				<Property Name="ItemDiscountsAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Item Discounts Amount" />
+				<Property Name="TaxIncludedAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Tax Included Amount" />
+				<Property Name="TaxExcludedAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Tax Excluded Amount" />
+				<Property Name="DistributedDiscountsAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Discounts Amount Distributed from Header" />
+				<Property Name="DistributedHeaderTaxAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Distributed Header Tax Amount" />
+				<Property Name="DistributedTaxIncludedAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Distributed Tax Included Amount" />
+				<Property Name="DistributedTaxExcludedAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Distributed Tax Excluded Amount" />
+				<Property Name="NumberOfSalesItems" Type="Edm.Int64"
+					sap:filterable="false" sap:aggregation-role="measure" sap:label="Number Of Sales Items" />
+				<Property Name="NumberOfReturnItems" Type="Edm.Int64"
+					sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Number Of Return Items" />
+				<Property Name="NumberOfDiscountItems" Type="Edm.Int64"
+					sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Number Of Discount Items" />
+				<Property Name="NumberOfPromotionItems" Type="Edm.Int64"
+					sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Number Of Promotion Items" />
+				<Property Name="NetSalesAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Retail Net Sales Amount" />
+				<Property Name="RetailSalesAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Retail Sales Amount" />
+				<Property Name="DiscountAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Discount Amount" />
+				<Property Name="TaxAmount" Type="Edm.Decimal" Precision="34"
+					sap:filterable="false" sap:aggregation-role="measure" sap:label="Tax Amount" />
+				<Property Name="LineItemTaxAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Line Item Tax Amount" />
+				<Property Name="ReturnsAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Returns Amount" />
+				<Property Name="NetReturnsAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Net Returns Amount" />
+				<Property Name="ReturnsQuantityInSalesUnit" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Returns Quantity in Sales Unit" />
+				<Property Name="ReturnsQuantityInBaseUnit" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Returns Quantity in Base Unit" />
+				<Property Name="ReturnsCostAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Returns Cost Amount" />
+				<Property Name="ReturnsDiscountAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Returns Discount Amount" />
+				<Property Name="DiscountedReturnsAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Discounted Returns Amount" />
+				<Property Name="PromotionSalesAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Promotion Sales Amount" />
+				<Property Name="PromotionNetSalesAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Promotion Net Sales Amount" />
+				<Property Name="PromotionQuantityInSalesUnit" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Promotion Quantity In Sales Unit" />
+				<Property Name="MerchandiseSalesAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Merchandise Sales Amount" />
+				<Property Name="MerchandiseSalesCostAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Merchandise Sales Cost Amount" />
+				<Property Name="MerchandiseReturnsAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Merchandise Returns Amount" />
+				<Property Name="MerchandiseDiscountAmount" Type="Edm.Decimal"
+					Precision="34" sap:filterable="false" sap:aggregation-role="measure"
+					sap:label="Merchandise Discount Amount" />
+			</EntityType>
+			<EntityType Name="POSSalesQueryType" sap:semantics="parameters">
+				<Key>
+					<PropertyRef Name="P_SAPClient" />
+				</Key>
+				<Property Name="P_SAPClient" Type="Edm.String" Nullable="false"
+					MaxLength="3" sap:label="P_SAPClient" sap:parameter="mandatory" />
+				<NavigationProperty Name="Results"
+					Relationship="tmp.i827395.hybris.odata.Services.POSSalesQuery_POSSalesQueryResultsType"
+					FromRole="POSSalesQueryPrincipal" ToRole="POSSalesQueryResultsDependent" />
+			</EntityType>
+			<EntityType Name="RetailLocationQueryResultsType"
+				sap:semantics="aggregate">
+				<Key>
+					<PropertyRef Name="GenID" />
+				</Key>
+				<Property Name="GenID" Type="Edm.String" Nullable="false"
+					MaxLength="2147483647" sap:filterable="false" />
+				<Property Name="SAPClient" Type="Edm.String" MaxLength="3"
+					sap:aggregation-role="dimension" sap:label="SAP Client" />
+				<Property Name="AddressNumber" Type="Edm.String" MaxLength="10"
+					sap:aggregation-role="dimension" sap:label="Address Number" />
+				<Property Name="HouseNumber" Type="Edm.String" MaxLength="10"
+					sap:aggregation-role="dimension" sap:label="House Number" />
+				<Property Name="FirstTelephoneNumber" Type="Edm.String"
+					MaxLength="30" sap:aggregation-role="dimension" sap:label="Telephone Number 1" />
+				<Property Name="FirstFaxNumber" Type="Edm.String"
+					MaxLength="30" sap:aggregation-role="dimension" sap:label="Fax Number 1" />
+				<Property Name="Location" Type="Edm.String" MaxLength="4"
+					sap:aggregation-role="dimension" sap:label="Retail Location" />
+				<Property Name="LocationCustomerNmbr" Type="Edm.String"
+					MaxLength="10" sap:aggregation-role="dimension"
+					sap:label="Retail Location Customer Number" />
+				<Property Name="LocationName" Type="Edm.String" MaxLength="30"
+					sap:aggregation-role="dimension" sap:label="Retail Location Description Text" />
+				<Property Name="StreetName" Type="Edm.String" MaxLength="30"
+					sap:aggregation-role="dimension" sap:label="Street Name" />
+				<Property Name="POBox" Type="Edm.String" MaxLength="10"
+					sap:aggregation-role="dimension" sap:label="PO Box" />
+				<Property Name="PostalCode" Type="Edm.String" MaxLength="10"
+					sap:aggregation-role="dimension" sap:label="Postal Code" />
+				<Property Name="CityName" Type="Edm.String" MaxLength="25"
+					sap:aggregation-role="dimension" sap:label="City Name" />
+				<Property Name="PurchasingOrganisation" Type="Edm.String"
+					MaxLength="4" sap:aggregation-role="dimension" sap:label="Purchasing Organization" />
+				<Property Name="SalesOrganization" Type="Edm.String"
+					MaxLength="4" sap:aggregation-role="dimension" sap:label="Sales Organization" />
+				<Property Name="Country" Type="Edm.String" MaxLength="3"
+					sap:aggregation-role="dimension" sap:label="Country" />
+				<Property Name="Region" Type="Edm.String" MaxLength="3"
+					sap:aggregation-role="dimension" sap:label="Region" />
+				<Property Name="DistributionChannel" Type="Edm.String"
+					MaxLength="2" sap:aggregation-role="dimension" sap:label="Distribution Channel" />
+			</EntityType>
+			<EntityType Name="RetailLocationQueryType" sap:semantics="parameters">
+				<Key>
+					<PropertyRef Name="P_SAPClient" />
+				</Key>
+				<Property Name="P_SAPClient" Type="Edm.String" Nullable="false"
+					MaxLength="3" sap:label="P_SAPClient" sap:parameter="mandatory" />
+				<NavigationProperty Name="Results"
+					Relationship="tmp.i827395.hybris.odata.Services.RetailLocationQuery_RetailLocationQueryResultsType"
+					FromRole="RetailLocationQueryPrincipal" ToRole="RetailLocationQueryResultsDependent" />
+			</EntityType>
+			<Association
+				Name="MultiChannelPurchasesQuery_MultiChannelPurchasesQueryResultsType">
+				<End
+					Type="tmp.i827395.hybris.odata.Services.MultiChannelPurchasesQueryType"
+					Role="MultiChannelPurchasesQueryPrincipal" Multiplicity="*" />
+				<End
+					Type="tmp.i827395.hybris.odata.Services.MultiChannelPurchasesQueryResultsType"
+					Role="MultiChannelPurchasesQueryResultsDependent" Multiplicity="*" />
+			</Association>
+			<Association Name="POSSalesQuery_POSSalesQueryResultsType">
+				<End Type="tmp.i827395.hybris.odata.Services.POSSalesQueryType"
+					Role="POSSalesQueryPrincipal" Multiplicity="*" />
+				<End Type="tmp.i827395.hybris.odata.Services.POSSalesQueryResultsType"
+					Role="POSSalesQueryResultsDependent" Multiplicity="*" />
+			</Association>
+			<Association Name="RetailLocationQuery_RetailLocationQueryResultsType">
+				<End Type="tmp.i827395.hybris.odata.Services.RetailLocationQueryType"
+					Role="RetailLocationQueryPrincipal" Multiplicity="*" />
+				<End
+					Type="tmp.i827395.hybris.odata.Services.RetailLocationQueryResultsType"
+					Role="RetailLocationQueryResultsDependent" Multiplicity="*" />
+			</Association>
+			<EntityContainer Name="Services"
+				m:IsDefaultEntityContainer="true">
+				<EntitySet Name="MultiChannelPurchasesQueryResults"
+					EntityType="tmp.i827395.hybris.odata.Services.MultiChannelPurchasesQueryResultsType"
+					sap:addressable="false" />
+				<EntitySet Name="MultiChannelPurchasesQuery"
+					EntityType="tmp.i827395.hybris.odata.Services.MultiChannelPurchasesQueryType"
+					sap:addressable="false" />
+				<EntitySet Name="POSSalesQueryResults"
+					EntityType="tmp.i827395.hybris.odata.Services.POSSalesQueryResultsType"
+					sap:addressable="false" />
+				<EntitySet Name="POSSalesQuery"
+					EntityType="tmp.i827395.hybris.odata.Services.POSSalesQueryType"
+					sap:addressable="false" />
+				<EntitySet Name="RetailLocationQueryResults"
+					EntityType="tmp.i827395.hybris.odata.Services.RetailLocationQueryResultsType"
+					sap:addressable="false" />
+				<EntitySet Name="RetailLocationQuery"
+					EntityType="tmp.i827395.hybris.odata.Services.RetailLocationQueryType"
+					sap:addressable="false" />
+				<AssociationSet
+					Name="MultiChannelPurchasesQuery_MultiChannelPurchasesQueryResults"
+					Association="tmp.i827395.hybris.odata.Services.MultiChannelPurchasesQuery_MultiChannelPurchasesQueryResultsType">
+					<End Role="MultiChannelPurchasesQueryPrincipal" EntitySet="MultiChannelPurchasesQuery" />
+					<End Role="MultiChannelPurchasesQueryResultsDependent"
+						EntitySet="MultiChannelPurchasesQueryResults" />
+				</AssociationSet>
+				<AssociationSet Name="POSSalesQuery_POSSalesQueryResults"
+					Association="tmp.i827395.hybris.odata.Services.POSSalesQuery_POSSalesQueryResultsType">
+					<End Role="POSSalesQueryPrincipal" EntitySet="POSSalesQuery" />
+					<End Role="POSSalesQueryResultsDependent" EntitySet="POSSalesQueryResults" />
+				</AssociationSet>
+				<AssociationSet Name="RetailLocationQuery_RetailLocationQueryResults"
+					Association="tmp.i827395.hybris.odata.Services.RetailLocationQuery_RetailLocationQueryResultsType">
+					<End Role="RetailLocationQueryPrincipal" EntitySet="RetailLocationQuery" />
+					<End Role="RetailLocationQueryResultsDependent" EntitySet="RetailLocationQueryResults" />
+				</AssociationSet>
+			</EntityContainer>
+		</Schema>
+	</edmx:DataServices>
+</edmx:Edmx>

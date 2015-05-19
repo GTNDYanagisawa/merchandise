@@ -1,0 +1,107 @@
+bmecat.xml --> HEADER element
+
+HEADER(start)
+	GENERATOR_INFO
+		--: neglected, just information for creater of bmecat.xml
+	CATALOG(start)
+		LANGUAGE --> catalogversion.csv[Language]
+		CATALOG_ID --> catalogversion.csv[Catalog ID], catalog.csv[Catalog ID], agreements.csv[Catalog ID]
+		CATALOG_VERSION --> catalogversion.csv[Version]
+		CATALOG_NAME --> catalog.csv[Name]
+		DATETIME(start)
+			DATE --> catalogversion.csv[Generation date]
+			TIME --> catalogversion.csv[Generation date]
+			TIMEZONE --> catalogversion.csv[Generation date]
+		DATETIME(end)
+		TERRITORY --> countries.csv[Country], regions.csv[Country, Region]
+		CURRENCY --> catalogversion.csv[Default currency]
+		MIME_ROOT 
+			--: combined with MIME_INFO.MIME
+		PRICE_FLAG(type="incl_freight") --> catalogversion.csv[Incl freight]
+		PRICE_FLAG(type="incl_assurance") --> catalogversion.csv[Incl assurance]
+		PRICE_FLAG(type="incl_duty") --> catalogversion.csv[Incl duty]
+		PRICE_FLAG(type="incl_packing") --> catalogversion.csv[Incl packing]
+	CATALOG(end)
+	BUYER(start)
+		BUYER_ID(one of the following 5 items below) --> catalog.csv[Buyer ID], addresses.csv[Company ID]
+			--: type=null(type not specified) --> customers.csv[Company ID]
+			--: type="duns" --> customers.csv[Company ID, Duns ID]
+			--: type="iln" --> customers.csv[Company ID, Iln ID]
+			--: type="buyer_specific" --> customers.csv[Company ID, Buyer specific ID]
+			--: type="supplier_specific" --> customers.csv[Company ID, Supplier specific ID]
+		BUYER_NAME --> customers.csv[Company name]
+		ADDRESS(type="buyer")(start)
+			NAME --> addresses.csv[Address name]
+			NAME2 --> addresses.csv[Address name2]
+			NAME3 --> addresses.csv[Address name3]
+			CONTACT --> addresses.csv[Contact]
+			STREET --> addresses.csv[Street]
+			ZIP --> addresses.csv[Zip]
+			BOXNO --> addresses.csv[Boxno]
+			ZIPBOX --> addresses.csv[Zipbox]
+			CITY --> addresses.csv[City]
+			STATE --> addresses.csv[State]
+			COUNTRY --> addresses.csv[Country]
+			PHONE --> addresses.csv[Phone]
+			FAX --> addresses.csv[Fax]
+			EMAIL --> addresses.csv[Email]
+			PUBLIC_KEY --> addresses.csv[Public key]
+			URL --> addresses.csv[Url]
+			ADDRESS_REMARKS --> addresses.csv[Remarks]
+		ADDRESS(end)
+	BUYER(end)
+	AGREEMENT(start)
+		AGREEMENT_ID --> agreements.csv[Agreement ID]
+		DATETIME(type="agreement_start_date")(start)
+			DATE --> agreements.csv[Start date]
+			TIME --> agreements.csv[Start date]
+			TIMEZONE --> agreements.csv[Start date]
+		DATETIME(end)
+		DATETIME(type="agreement_end_date")(start)
+			 DATE --> agreements.csv[End date]
+			 TIME --> agreements.csv[End date]
+			 TIMEZONE --> agreements.csv[End date]
+		DATETIME(end)
+	AGREEMENT(end)
+	SUPPLIER(start)
+		SUPPLIER_ID(one of the following 5 items below) --> catalog.csv[Supplier ID]
+			--: type=null(type not specified) --> customers.csv[Company ID]
+			--: type="duns" --> customers.csv[Company ID, Duns ID]
+			--: type="iln" --> customers.csv[Company ID, Iln ID]
+			--: type="buyer_specific" --> customers.csv[Company ID, Buyer specific ID]
+			--: type="supplier_specific" --> customers.csv[Company ID, Supplier specific ID]
+		SUPPLIER_NAME --> customers.csv[Company name], addresses.csv[Company name]
+		ADDRESS(type="supplier")(start)
+			NAME --> addresses.csv[Address name]
+			NAME2 --> addresses.csv[Address name2]
+			NAME3 --> addresses.csv[Address name3]
+			CONTACT --> addresses.csv[Contact]
+			STREET --> addresses.csv[Street]
+			ZIP --> addresses.csv[Zip]
+			BOXNO --> addresses.csv[Boxno]
+			ZIPBOX --> addresses.csv[Zipbox]
+			CITY --> addresses.csv[City]
+			STATE --> addresses.csv[State]
+			COUNTRY --> addresses.csv[Country]
+			PHONE --> addresses.csv[Phone]
+			FAX --> addresses.csv[Fax]
+			EMAIL --> addresses.csv[Email]
+			PUBLIC_KEY --> addresses.csv[Public key]
+			URL --> addresses.csv[Url]
+			ADDRESS_REMARKS --> addresses.csv[Remarks]
+		ADDRESS(end)
+		MIME_INFO(start)
+			MIME(start)
+				MIME_TYPE --> medias.csv[Code, Type]
+				MIME_SOURCE --> medias.csv[Source](complete path)
+					--: MIME_ROOT + MIME_SOURCE 
+				MIME_DESCR --> medias.csv[Description]
+				MIME_ALT --> medias.csv[Alt text]
+				MIME_PURPOSE --> medias.csv[Purpose]
+					--: no such attribute in hybris system, making sense only for the ARTICLE element
+				MIME_ORDER --> medias.csv[Order]
+					--: no such attribute in hybris system, ignored 
+			MIME(end)
+		MIME_INFO(end)
+	SUPPLIER(end)
+HEADER(end)

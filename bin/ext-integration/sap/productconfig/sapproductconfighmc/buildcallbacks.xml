@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+--><!--
+ All hybris buildcallbacks.xml macrodefinitions:
+ 
+ Build/Documentation
+ 
+	 before/after ant macro "clean"
+		 <macrodef name="sapproductconfighmc_before_clean"/>
+		 <macrodef name="sapproductconfighmc_after_clean"/>
+	 
+	 before/after ant macro "build"
+		 <macrodef name="sapproductconfighmc_before_build"/>
+		 <macrodef name="sapproductconfighmc_after_build"/>
+		 
+	 before/after ant macro "compile_core" - the core module of the extension
+		 <macrodef name="sapproductconfighmc_before_compile_core">
+		 <macrodef name="sapproductconfighmc_after_compile_core">
+	 
+	 before/after ant macro "compile_web" - the web module of the extension
+		 <macrodef name="sapproductconfighmc_before_compile_web" />
+		 <macrodef name="sapproductconfighmc_after_compile_web" />
+	 
+	 before/after ant macro "compile_hmc" - the hmc module of the extension
+		 <macrodef name="sapproductconfighmc_before_compile_hmc" />
+		 <macrodef name="sapproductconfighmc_after_compile_hmc" />
+ 
+ Preparing extension
+ 
+	 will be called in the beginning of the ant call and only once (also when using multiple 
+	 ant targets e.g. ant build yunittest)	
+		 <macrodef name="sapproductconfighmc_only_once_prepare"/>
+ 
+ Creating ear module/production
+ 
+	 before/after ant macro "ear"
+		 <macrodef name="sapproductconfighmc_before_ear"/>
+		 <macrodef name="sapproductconfighmc_after_ear"/>
+
+	 before/after ant macro "production" - for hybris server only
+		 <macrodef name="sapproductconfighmc_before_production" />
+		 <macrodef name="sapproductconfighmc_after_production" />
+ 
+ JUnit Test
+ 
+	 before/after ant macro "yunitinit" 
+		 <macrodef name="sapproductconfighmc_before_yunitinit" />
+		 <macrodef name="sapproductconfighmc_after_yunitinit" />
+	 
+	 before/after ant macro "yunit"
+		 <macrodef name="sapproductconfighmc_before_yunit" />
+		 <macrodef name="sapproductconfighmc_after_yunit" /> 
+		 
+ Distribution package
+ 
+ 	 before/after ant macro "dist" - internal target; only for use when platform is available in source code
+		 <macrodef name="sapproductconfighmc_after_dist"/>
+		 <macrodef name="sapproductconfighmc_before_dist"/>
+	 
+	 before/after ant macro "dist_copy" - internal target; only for use when platform is available in source code
+		 <macrodef name="sapproductconfighmc_before_dist_copy"/>
+		 <macrodef name="sapproductconfighmc_after_dist_copy"/>
+		  
+ 	 With these filters you can override the default extension filters defined in platform/resources/ant/dist/filtersets.xml
+ 	  	 <patternset id="extension.sapproductconfighmc.binary.filter">
+ 	  	  	 <patternset refid="extension.filter" />
+ 	  	  	 <exclude name="**/*-source.jar" />
+ 	  	 </patternset>
+ 	  	 <patternset id="extension.sapproductconfighmc.source.filter">
+ 	  	  	 <exclude name="**/bin/**" />
+ 	  	 </patternset>
+ 
+--><project name="sapproductconfighmc_buildcallbacks">
+
+	
+	<macrodef name="sapproductconfighmc_before_dist">
+		<sequential>
+			
+			<property name="ssc.buildtime.path" value="${ext.sapproductconfighmc.path}/lib" />
+			<echo level="info" message="Delete any SSC Jars from ${ssc.buildtime.path} before packaging" />
+			<delete failonerror="true" deleteonexit="false">
+				<fileset dir="${ssc.buildtime.path}" includes="com.sap.custdev.projects.fbs.slc*.jar" />
+				<fileset dir="${ssc.buildtime.path}" includes="com.sap.jco*.jar" />
+				<fileset dir="${ssc.buildtime.path}" includes="dataloader-deps*.jar" />
+				<fileset dir="${ssc.buildtime.path}" includes="jtds*.jar" />
+			</delete>
+			
+			
+		</sequential>
+	</macrodef>
+	
+	
+	<!-- 
+	    Called whenever 'ant ear' is used. this callback can be used to modify the content of the ear file
+	
+	     ${ear.path}: 			path to ear
+	 -->
+	<macrodef name="sapproductconfighmc_before_ear">
+		<sequential>
+
+			<!-- you can do anything before the EAR file is being packed -->
+
+		</sequential>
+	</macrodef>
+
+	   <patternset id="extension.sapproductconfighmc.binary.filter">
+	        <patternset refid="extension.binary.filter" />
+	        <exclude name="lib/com.sap.custdev.projects.fbs.slc*.jar" />
+	   		<exclude name="lib/com.sap.jco*.jar" />
+	        <exclude name="lib/dataloader-deps*.jar"  />
+	    	<exclude name="lib/jtds*.jar" />
+	   </patternset>
+		         
+	   <patternset id="extension.sapproductconfighmc.source.filter">
+	        <patternset refid="extension.source.filter" />
+        	<exclude name="lib/com.sap.custdev.projects.fbs.slc*.jar" />
+   		    <exclude name="lib/com.sap.jco*.jar" />
+            <exclude name="lib/dataloader-deps*.jar"  />
+    	    <exclude name="lib/jtds*.jar" />
+	   </patternset>
+</project>

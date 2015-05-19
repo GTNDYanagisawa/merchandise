@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    +++++++++++ dynamic attribute handlers ++++++++++++++++++++++++++++++++++++++++++++++++++ 
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+           
+    <alias name="defaultMediaContainerMasterAttributeHandler" alias="mediaContainerMasterAttributeHandler"/>
+    <bean id="defaultMediaContainerMasterAttributeHandler"
+        class="de.hybris.platform.mediaconversion.model.attributes.MediaContainerMasterAttributeHandler">
+        <property name="mediaConversionService" ref="mediaConversionService"/>
+    </bean>
+    
+    <alias name="defaultMediaContainerConversionStatusAttributeHandler" 
+    		alias="mediaContainerConversionStatusAttributeHandler"/>
+    <bean id="defaultMediaContainerConversionStatusAttributeHandler"
+        class="de.hybris.platform.mediaconversion.model.attributes.MediaContainerConversionStatusAttributeHandler">
+        <property name="mediaConversionService" ref="mediaConversionService"/>
+    </bean>
+    
+    <alias name="defaultMediaContainerMetaDataAttributeHandler" alias="mediaContainerMetaDataAttributeHandler"/>
+    <bean id="defaultMediaContainerMetaDataAttributeHandler"
+        class="de.hybris.platform.mediaconversion.model.attributes.MediaContainerMetaDataAttributeHandler" />
+    
+    <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    +++++++++++ interceptors ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+    
+    <bean id="conversionStrategyValidateInterceptor" 
+        class="de.hybris.platform.mediaconversion.model.interceptors.ConversionStrategyValidateInterceptor" />
+    <bean id="conversionStrategyValidateInterceptorMapping" 
+        class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="conversionStrategyValidateInterceptor"/>
+        <property name="typeCode" value="MediaFormat"/>
+    </bean>
+    
+    <bean id="cyclicConversionMediaFormatValidateInterceptor" 
+        class="de.hybris.platform.mediaconversion.model.interceptors.CyclicConversionMediaFormatValidateInterceptor" />
+
+    <bean id="cyclicConversionMediaFormatValidateInterceptorMapping" 
+        class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="cyclicConversionMediaFormatValidateInterceptor"/>
+        <property name="typeCode" value="ConversionMediaFormat"/>
+    </bean>
+    
+    <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    +++++++++++ jobs ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+    
+    <alias name="defaultMediaConversionJobDao" alias="mediaConversionJobDao"/>
+    <bean id="defaultMediaConversionJobDao" 
+        class="de.hybris.platform.mediaconversion.job.DefaultMediaConversionJobDao">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+    
+    <bean id="mediaConversionJob" 
+        class="de.hybris.platform.mediaconversion.job.MediaConversionJob">
+        <property name="dao" ref="mediaConversionJobDao"/>
+        <property name="mediaConversionService" ref="mediaConversionService"/>
+        <property name="taskService" ref="taskService"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+    
+    <bean id="deleteConvertedMediasJob" 
+        class="de.hybris.platform.mediaconversion.job.DeleteConvertedMediasJob">
+        <property name="dao" ref="mediaConversionJobDao"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+    
+    <bean id="extractMediaMetaDataJob" 
+        class="de.hybris.platform.mediaconversion.job.ExtractMediaMetaDataJob">
+        <property name="mediaMetaDataService" ref="mediaMetaDataService"/>
+        <property name="dao" ref="extractMediaMetaDataJobDao"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+    
+    <alias name="defaultExtractMediaMetaDataJobDao" alias="extractMediaMetaDataJobDao"/>
+    <bean id="defaultExtractMediaMetaDataJobDao" 
+        class="de.hybris.platform.mediaconversion.job.DefaultExtractMediaMetaDataJobDao">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+    
+    <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    +++++++++++ tasks runner ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+    
+    <alias name="defaultMediaMetaDataTaskRunner" alias="mediaMetaDataTaskRunner"/>
+    <bean id="defaultMediaMetaDataTaskRunner" 
+        class="de.hybris.platform.mediaconversion.metadata.MediaMetaDataTaskRunner">
+        <property name="mediaMetaDataService" ref="mediaMetaDataService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+    
+    <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    +++++++++++ strategies ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+    
+    <!-- Media MetaData Provider -->
+    
+    <bean id="imageMediaMetaDataProvider" 
+        class="de.hybris.platform.mediaconversion.metadata.image.ImageMediaMetaDataProvider">
+        <property name="modelService" ref="modelService"/>
+        <property name="mediaService" ref="mediaService"/>
+        <property name="mediaConversionService" ref="mediaConversionService"/>
+        <property name="imageMagickService" ref="imageMagickService"/>
+    </bean>
+    
+    <!-- Conversion strategies -->
+	
+    <bean id="imageMagickMediaConversionStrategy" 
+        class="de.hybris.platform.mediaconversion.imagemagick.ImageMagickMediaConversionStrategy">
+        <property name="configurationService" ref="configurationService"/>
+        <property name="imageMagickService" ref="imageMagickService"/>
+        <property name="mediaService" ref="mediaService"/>
+        <property name="mimeMappingStrategy" ref="mimeMappingStrategy"/>
+        <property name="convertedMediaCreationStrategy" ref="convertedMediaCreationStrategy"/>
+    </bean>
+    
+    <!-- MimeMapping Strategies -->
+    
+    <alias name="defaultMimeMappingStrategy" alias="mimeMappingStrategy"/>
+    <bean id="defaultMimeMappingStrategy"
+        class="de.hybris.platform.mediaconversion.imagemagick.DefaultMimeMappingStrategy">
+        <property name="configurationService" ref="configurationService"/>
+    </bean>
+    
+    <!-- Media creation strategies -->
+    
+    <alias name="defaultConvertedMediaCreationStrategy" alias="convertedMediaCreationStrategy"/>
+    <bean id="defaultConvertedMediaCreationStrategy"
+        class="de.hybris.platform.mediaconversion.conversion.DefaultConvertedMediaCreationStrategy">
+        <property name="modelService" ref="modelService"/>
+        <property name="mediaService" ref="mediaService"/>
+    </bean>
+    
+    <!-- Conversion error log strategy-->
+    
+    <alias name="defaultConversionErrorLogStrategy" alias="conversionErrorLogStrategy"/>
+    <bean id="defaultConversionErrorLogStrategy"
+        class="de.hybris.platform.mediaconversion.conversion.DefaultConversionErrorLogStrategy"
+        init-method="init"
+        destroy-method="destroy">
+        <property name="modelService" ref="modelService"/>
+        <property name="configurationService" ref="configurationService"/>
+        <property name="dao" ref="conversionErrorLogStrategyDao"/>
+    </bean>
+    <alias name="defaultConversionErrorLogStrategyDao" alias="conversionErrorLogStrategyDao"/>
+    <bean id="defaultConversionErrorLogStrategyDao"
+        class="de.hybris.platform.mediaconversion.conversion.DefaultConversionErrorLogStrategyDao">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+    
+    <bean id="logOnlyConversionErrorLogStrategy"
+        class="de.hybris.platform.mediaconversion.conversion.LogOnlyConversionErrorLogStrategy">
+    </bean>
+    
+    <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    +++++++++++ services ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+    
+    <alias name="defaultMediaConversionService" alias="mediaConversionService"/>
+    <bean id="defaultMediaConversionService"
+        class="de.hybris.platform.mediaconversion.conversion.DefaultMediaConversionService">
+        <property name="dao" ref="mediaConversionServiceDao"/>
+        <property name="lockRowInTransactionStrategy" ref="lockRowInTransactionStrategy"/>
+        <property name="mediaService" ref="mediaService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="conversionErrorLogStrategy" ref="conversionErrorLogStrategy"/>
+    </bean>
+    
+    <alias name="defaultMediaConversionServiceDao" alias="mediaConversionServiceDao"/>
+    <bean id="defaultMediaConversionServiceDao"
+        class="de.hybris.platform.mediaconversion.conversion.DefaultMediaConversionServiceDao">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+    
+    <alias name="defaultImageMagickService" alias="imageMagickService"/>
+    <bean id="defaultImageMagickService" 
+        class="de.hybris.platform.mediaconversion.imagemagick.DefaultImageMagickService">
+        <property name="processExecutor" ref="processExecutor"/>
+        <property name="osConfigurationService" ref="osConfigurationService"/>
+        <property name="configurationService" ref="configurationService"/>
+    </bean>
+    
+    <alias name="defaultLockRowInTransactionStrategy" alias="lockRowInTransactionStrategy"/>
+    <bean id="defaultLockRowInTransactionStrategy"
+        class="de.hybris.platform.mediaconversion.util.DefaultLockRowInTransactionStrategy">
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <alias name="defaultMediaMetaDataService" alias="mediaMetaDataService"/>
+    <bean id="defaultMediaMetaDataService"
+        class="de.hybris.platform.mediaconversion.metadata.DefaultMediaMetaDataService">
+        <property name="modelService" ref="modelService"/>
+        <property name="dao" ref="mediaMetaDataServiceDao"/>
+    </bean>
+    
+    <alias name="defaultMediaMetaDataServiceDao" alias="mediaMetaDataServiceDao"/>
+    <bean id="defaultMediaMetaDataServiceDao"
+        class="de.hybris.platform.mediaconversion.metadata.DefaultMediaMetaDataServiceDao">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+    
+    <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    +++++++++++ facades +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+    
+    <alias name="defaultOnDemandConversionFacade" alias="onDemandConversionFacade"/>
+    <bean id="defaultOnDemandConversionFacade"
+        class="de.hybris.platform.mediaconversion.web.facades.DefaultOnDemandConversionFacade">
+        <property name="configurationService" ref="configurationService"/>
+        <property name="mediaService" ref="mediaService"/>
+        <property name="mediaConversionService" ref="mediaConversionService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="mimeMappingStrategy" ref="mimeMappingStrategy" />
+        <property name="conversionServletPath" value="/convert"/>
+    </bean>
+			
+	<alias name="os.processExecutorFactory" alias="processExecutorFactory"/>
+	<bean id="os.processExecutorFactory" 
+	       class="de.hybris.platform.mediaconversion.os.process.factory.ProcessExecutorFactory" 
+	       destroy-method="destroy">
+       <property name="limit" value="${os.processexecutor.limit}"/>
+       <property name="configurationService" ref="configurationService"/>
+       <property name="rmiRegistryService" ref="rmiRegistryService"/>
+       <property name="osConfigurationService" ref="osConfigurationService"/>
+       <property name="processContextRegistry" ref="processContextRegistry"/>
+    </bean>
+    
+    <bean id="processExecutor" factory-bean="processExecutorFactory" factory-method="create"/>
+
+    <alias name="os.osConfigurationService" alias="osConfigurationService"/>
+    <bean id="os.osConfigurationService" 
+           class="de.hybris.platform.mediaconversion.os.config.DefaultOsConfigurationService">
+       <property name="configurationService" ref="configurationService"/>
+    </bean>
+    	
+    <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    +++++++++++ SystemSetup annotated beans +++++++++++++++++++++++++++++++++++++++++++++++++
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+    
+    <bean id="mediaconversion.sampledata" class="de.hybris.platform.mediaconversion.setup.SampleData" lazy-init="false"/>
+
+</beans>

@@ -1,0 +1,72 @@
+
+#include "internal/types.h"
+
+// Param1		MinSize		float			2.0
+// Param2		MaxSize		float			0.0
+// Param3		int font sizes	bool			0
+// Param4		check overset	bool			0
+
+int getBoolParam (char * p, int defaultValue)
+{
+	if (!p || !*p)				return defaultValue;
+	
+	if (strcmp (p, "1") == 0)		return 1;
+	if (strcmp (p, "yes") == 0)		return 1;
+	if (strcmp (p, "Yes") == 0)		return 1;
+	if (strcmp (p, "YES") == 0)	return 1;
+	if (strcmp (p, "ja") == 0)		return 1;
+	if (strcmp (p, "Ja") == 0)		return 1;
+	if (strcmp (p, "JA") == 0)		return 1;
+	
+	if (strcmp (p, "0") == 0)		return 0;
+	if (strcmp (p, "no") == 0)		return 0;
+	if (strcmp (p, "No") == 0)		return 0;
+	if (strcmp (p, "NO") == 0)		return 0;
+	if (strcmp (p, "nein") == 0)	return 0;
+	if (strcmp (p, "Nein") == 0)	return 0;
+	if (strcmp (p, "NEIN") == 0)	return 0;
+	
+	return defaultValue;
+}
+
+float getFloatParam (char * p, float defaultValue)
+{
+	if (!p || !*p)				return defaultValue;
+	return fval (p);
+}
+
+int main ()
+{
+	float 	minSize			= getFloatParam (gParam1, 0.0);
+	float 	maxSize			= getFloatParam (gParam2, 0.0);
+	int 	intSizes		= getBoolParam (gParam3, 0);
+	int 	checkOverset	= getBoolParam (gParam4, 0);
+	float	resiz			= 1.0;
+	int		err				= 0;
+	
+	if (gResizeX < gResizeY)
+		resiz = gResizeX;
+	else				
+		resiz = gResizeY;
+	
+	err = textmodel::scale_font (
+			gFrame,
+			0, -1,			// complete text
+			resiz,
+			1,				// chunk wise
+			1,				// leading control
+			checkOverset,
+			intSizes,
+			minSize,
+			maxSize,
+			1);				// use min/max as limits (not as stopper)
+
+	if( err != 0 )
+	{
+		wlog("", "Error [%i], message: [%s], from method main() in 10038.crpt. \n", err, serror(err));
+	}
+
+	return 0;
+}
+
+

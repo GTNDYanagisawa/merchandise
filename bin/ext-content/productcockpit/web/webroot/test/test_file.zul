@@ -1,0 +1,365 @@
+<?page title="new page title" contentType="text/html;charset=UTF-8"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+
+<zk 	xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:h="http://www.w3.org/1999/xhtml" 
+		xmlns:zk="http://www.zkoss.org/2005/zk"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd ">
+		
+	<style src="/cockpit/css/cockpit.css" /> 
+	
+	
+		
+<window border="normal" width="100%" height="100%" shadow="false">
+	<div width="500px" height="500px" style="background: red; overflow: auto;">
+		<div style="background: blue; width: 700px">
+			<div width="400px" height="300px;" style="background: white; border: 1px dotted black; display: inline-table;">
+				<div height="50px" sclass="gradientDiv"> </div>
+			</div>
+		</div>
+	</div>
+</window>
+
+
+		
+<window border="normal" width="100%" height="100%" shadow="false">
+	<html><![CDATA[ 
+		<script type="text/javascript">
+			function clearSelection()
+			{
+				if(document.selection)
+				{
+					document.selection.empty();
+				}
+				else if(window.getSelection)
+				{
+					window.getSelection().removeAllRanges();
+				}
+			}
+		</script>
+	]]>
+	</html>
+
+
+	<div width="100px">
+		<label action="onclick: this.onselectstart=function(){ return false;};">sdfölgsd  sdlökgdös kl  dflg jdofkg öldk ölkdfgö ösdlfkölköldfk  öllksdf lkjlökdf  lökdjfglöksdfgklöj löokdfglö kdfg löadksfj ökdf gölk</label>
+	</div>
+	<button label="deselect_dummy" onClick='Clients.evalJavaScript("clearSelection()")'/>
+	<toolbarbutton label="deselect" onClick='Clients.evalJavaScript("clearSelection()")'/>
+</window>
+	
+	
+	
+<window border="normal" width="100%" height="100%" shadow="false">
+		
+		
+	
+		
+	<html><![CDATA[ 
+		<style type="text/css">
+		/*
+		  Basis-Stylesheet
+		*/
+		
+		  div.lastSelectedListEditorItem { background:blue !important; } /* Format für blaue Überschrift, ergänzt am 19.07.2001 */
+		</style>
+
+		<script type="text/javascript">
+			var lastselected="";
+			var l1="1";
+			
+			
+			
+			function globalKeyHit(e) 
+			{
+				var pressedKey = e ? e.which: window.event.keyCode;
+				var ctrlPressed = e ? e.ctrlKey: window.event.ctrlKey;
+				var shiftPressed = e ? e.shiftKey: window.event.shiftKey;
+				
+				if(pressedKey == 122 && ctrlPressed) // ctrl + x
+				{
+					alert("Undo");
+					return false;
+				}
+				else if(pressedKey == 121 && ctrlPressed) // ctrl + y
+				{
+					alert("Redo");
+					return false;
+				}
+				
+				return true;
+			}
+			
+			document.onkeypress = globalKeyHit;
+			
+			
+			
+			function selectItem(item) {
+				unselectLast();
+				item.className="lastSelectedListEditorItem";
+				lastselected=item;
+			}
+			
+			function unselectLast() {
+				lastselected.className="";
+			}
+			
+			function unselectItem(item) {
+				item.className="";
+			}
+			
+			function removeItem(item)
+			{
+				confirm("Sie sind jetzt schon 10 Sekunden auf dieser Seite. Fortfahren?");
+
+				//item.parentNode.removeChild(item);
+			}
+			
+			function move(item) {
+				var dolly=item.cloneNode(false); 
+				item.appendChild(dolly);
+				window.setTimeout(function(thisObj) { thisObj.parentNode.removeChild(thisObj); }, 15000, dolly);
+				new Effect.Move(dolly, { x: 1160, y: 0, mode: "absolute" }); 
+			}
+			
+			function localizeIframeBody(iFrameName, sender)
+			{
+				var myIFrame = document.getElementsByName(iFrameName)[0];  
+				var button = myIFrame.contentWindow.document.getElementById('j_username');
+				//alert(myIFrame.contentWindow.location.href);
+				//alert(frameBody);
+				var pos = getRelativePosition(button, myIFrame.contentWindow.document.body);
+				//var top = getRelativeY(button, myIFrame.contentWindow.document.body);
+				//var left = getRelativeX(button, myIFrame.contentWindow.document.body);
+				comm.sendUser(sender, pos[0], pos[1], button.offsetWidth, button.offsetHeight, getDocHeight(myIFrame.contentWindow.document));
+				//alert("x: " + left + ", y: " + top);
+			}
+			
+			
+			function getRelativePosition(item, parent)
+			{
+				var cnode=item; 
+				var Left=cnode.offsetLeft; 
+				var Top=cnode.offsetTop; 
+				
+				while(cnode!=parent && cnode!=null)
+				{ 
+					cnode=cnode.offsetParent; 
+					Left+=cnode.offsetLeft; 
+					Top+=cnode.offsetTop; 
+				}
+				var cnode=item; 
+				var scrollleft=0;
+				var scrolltop=0;
+				
+				while(cnode!=parent && cnode!=null)
+				{ 
+					scrollleft += cnode.scrollLeft; 
+					scrolltop += cnode.scrollTop; 
+					cnode=cnode.parentNode; 
+				}
+				return [Left-scrollleft,Top-scrolltop];
+			}
+			
+					
+			function checkf2(event)
+			{
+				alert(event.keyCode);
+			}
+			
+			
+			function getDocHeight(doc) {
+				  var docHt = 0, sh, oh;
+				  if (doc.height) docHt = doc.height;
+				  else if (doc.body) {
+				    if (doc.body.scrollHeight) docHt = sh = doc.body.scrollHeight;
+				    if (doc.body.offsetHeight) docHt = oh = doc.body.offsetHeight;
+				    if (sh && oh) docHt = Math.max(sh, oh);
+				  }
+				  return docHt;
+				}
+
+			
+		</script>
+		]]>
+	</html>
+<!--	<borderlayout width="100%" height="100%">-->
+<!--		<center autoscroll="true">-->
+<!--			<div id="iframeContainer" style="position:relative">-->
+<!--		-->
+<!--				<iframe src="http://localhost:9001/" name="myframe" width="100%" height="1000px">-->
+<!--				</iframe>-->
+<!--			-->
+<!--				<div id="overlay" style="background: red; position: absolute; opacity: 0.5;" top="1px" left="1px"/>-->
+<!--			-->
+<!--			</div>-->
+<!--		</center>-->
+<!--		<west>-->
+<!--			<button action="onclick:localizeIframeBody('myframe', #{self})" label="iframe">-->
+<!--				<attribute name="onUser">-->
+<!--					System.out.println(event.getData()[1] + "," + event.getData()[0] + "," + event.getData()[2] + "," + event.getData()[3] + "," + event.getData()[4]);-->
+<!--					overlay.setTop(event.getData()[1] + "px");-->
+<!--				index.zul	overlay.setLeft(event.getData()[0] + "px");-->
+<!--					overlay.setWidth(event.getData()[2] + "px");-->
+<!--					overlay.setHeight(event.getData()[3] + "px");-->
+<!--					iframeContainer.setHeight(event.getData()[4] + "px")-->
+<!--				</attribute>-->
+<!--			</button>-->
+<!--		</west>-->
+<!--	</borderlayout>	-->
+<!--	<div>-->
+<!--		<textbox action="onkeydown: checkf2(event)"></textbox>-->
+<!--	</div>-->
+<!--	-->
+<!--	<image src="no" action="onerror: alert('error')"></image>-->
+<!--	-->
+
+
+	<div width="300px" height="300px" style="background:gray" onClick='System.out.println("outer")' action="onclick: comm.sendClick(#{self},null)">
+	   	<div width="100px" height="100px" style="background:red" onClick='System.out.println("inner")'
+	   		action="ondblclick: var dolly=this.cloneNode(true);
+	   			dolly.style.position='absolute';
+	   			dolly.style.zIndex=100;
+	   			dolly.style.left=this.offsetLeft+'px';
+	   			dolly.style.top=this.clientTop+'px'; 
+				document.body.appendChild(dolly);
+				alert(document.activeElement.nodeName);
+				function OnFinish(obj){
+     				alert('Finishing - I am element :' + obj.element.id);
+     				document.body.removeChild(obj.element);
+   				}
+				
+				/*window.setTimeout(function(thisObj) { thisObj.parentNode.removeChild(thisObj); }, 15000, dolly);*/
+				new Effect.Move(dolly, { x: document.body.clientWidth-150, y: 50, mode: 'absolute', afterFinish: OnFinish });">
+		</div>
+		<div width="100px" height="100px" style="background:green" onClick='System.out.println("inner")'
+	   		action="ondblclick: var dolly=this.cloneNode(true);
+	   			dolly.style.position='absolute';
+	   			dolly.style.left=this.offsetLeft+'px';
+	   			dolly.style.top=this.offsetTop+'px'; 
+				document.body.appendChild(dolly);
+				window.setTimeout(function(thisObj) { thisObj.parentNode.removeChild(thisObj); }, 15000, dolly);
+				new Effect.Move(dolly, { x: document.body.clientWidth-150, y: 50, mode: 'absolute' });">
+		</div>
+		<textbox onCancel='self.value="abc"'></textbox>
+		<div width="100px" height="100px" style="background:yellow" onClick='System.out.println("inner")'
+	   		action="ondblclick: var dolly=this.cloneNode(true);
+	   			dolly.style.position='absolute';
+	   			dolly.style.left=this.offsetLeft+'px';
+	   			dolly.style.top=this.offsetTop+'px'; 
+				document.body.appendChild(dolly);
+				window.setTimeout(function(thisObj) { thisObj.parentNode.removeChild(thisObj); }, 15000, dolly);
+				new Effect.Move(dolly, { x: document.body.clientWidth-150, y: 50, mode: 'absolute' });">
+		</div>
+	</div>
+			
+</window>
+		
+<window border="normal" width="100%" height="100%" >
+	<style src="/cockpit/css/cockpit.css" /> 
+
+	<script type="text/javascript">
+		var startX=0; 
+		var columnElement = null; 
+		document.onmouseup=m_up; 
+		document.onmousemove=m_mov;
+	
+		function m_up (e) {
+			if(columnElement!=null)
+			{ 		
+				var event;
+			
+				if(e) 
+					event = e;
+				else 
+					event = window.event;
+								
+				var newWidth = columnElement.offsetWidth+event.screenX-startX;
+				if(newWidth &lt; 0)
+					newWidth=0;
+				columnElement.style.width=(newWidth)+"px";
+				startX=-1;
+				
+				var splitterGhostElement = columnElement.parentNode.nextSibling; 
+				splitterGhostElement.style.display="none";
+				columnElement.parentNode.style.width=childWidths(columnElement.parentNode)+"px";
+			}
+		}
+		
+		function m_mov (e) {
+			if(columnElement!=null) 
+			{ 
+				var event;
+				if(e) 
+					event = e;
+				else 
+					event = window.event;
+				
+				var newX=event.screenX-startX;
+				
+				
+				var splitterGhostElement = columnElement.parentNode.nextSibling; 
+				splitterGhostElement.style.left=(newX+columnElement.offsetLeft+columnElement.offsetWidth-6)+"px";
+				
+				return false;
+			}
+		}
+		
+		function childWidths(element) {
+			var ret = 0;
+			for(var i = 0; i &lt; element.childNodes.length; i++)
+			{
+				var w = element.childNodes[i].offsetWidth;
+				if(w &gt; 0)
+					ret += element.childNodes[i].offsetWidth;
+			}
+			return ret;
+		}
+		
+		function splitterActionMouseDown(element, event)
+		{
+			splitterElement = element.childNodes[0];
+			startX=event.screenX; 
+			
+			columnElement = element.parentNode;
+			var splitterGhostElement = columnElement.parentNode.nextSibling; 
+			splitterGhostElement.style.left=(columnElement.offsetLeft+columnElement.offsetWidth-6)+"px";
+			splitterGhostElement.style.display="block";
+			
+		}
+		
+		
+	</script>
+	<zscript>
+		String splitterAction = "onmousedown: splitterActionMouseDown(this, event); return false;";
+		String splitterStyle = "background: red; position: absolute; height: 100%; width: 6px; right: 0; top: 0; cursor: e-resize; ";
+		String splitterGhostStyle = "width: 6px; height: 100%; background: green; display:none; top: 0; left:0; position:absolute; ";
+		String columnStyle = "height: 100%; width: 100px; min-width:20px; background: blue; position: relative; top: 0; float: left;";
+	</zscript>
+	<div id="listview" width="500px" height="100%" style="background: gray; overflow: auto; white-space: nowrap; position: relative;">
+		<div height="100%" style="position:relative">
+				
+			<div style="${columnStyle} z-index:1;">
+				<div style="background: cyan; width: 100%; height: 100%"><label value="dd"></label> </div>
+			
+				<div style="${splitterStyle}"	action="${splitterAction}"></div>
+			</div>
+
+			<div style="${columnStyle} z-index:1;">
+				<div style="background: cyan; width: 100%; height: 100%"><label value="dd"></label> </div>
+			
+				<div style="${splitterStyle}"	action="${splitterAction}"></div>
+			</div>
+			
+			<div style="${columnStyle} z-index:1;">
+				<div style="background: cyan; width: 100%; height: 100%"><label value="dd"></label> </div>
+			
+				<div style="${splitterStyle}"	action="${splitterAction}"></div>
+			</div>
+			
+		</div>
+		<div style="${splitterGhostStyle}"/>
+	</div>
+</window>
+</zk>

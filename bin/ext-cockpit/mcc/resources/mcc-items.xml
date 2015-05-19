@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype elementtype="StaticLink" code="StaticLinkCollection" autocreate="true" type="collection"/>
+	</collectiontypes>
+	
+	<enumtypes>		
+		<enumtype generate="true" code="CockpitLinkArea"
+			autocreate="true" dynamic="true">
+			<value code="platform" />
+			<value code="commerce" />
+			<value code="content" />
+			<value code="channel" />
+		</enumtype>
+	</enumtypes>
+
+
+	<relations>
+ 		<relation code="Principal2ReadableAbstractLinkEntryRelation" autocreate="true" generate="true" localized="false">
+ 			<deployment table="PrincToLinkRelations" typecode="6001"/>
+    		<sourceElement qualifier="readPrincipals" type="Principal" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers read="true" write="true" search="true" optional="true" />
+    		</sourceElement>
+    		<targetElement qualifier="readAbstractLinkEntry" type="AbstractLinkEntry" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers read="true" write="true" search="true" optional="true" />
+    		</targetElement>		
+    	</relation>
+    	
+ 		<relation code="StaticLink2StaticLinkRelation" autocreate="true" generate="true" localized="false">
+    		<sourceElement qualifier="parentLink" type="StaticLink" cardinality="one" >
+				<modifiers read="true" write="true" search="true" optional="true" />
+    		</sourceElement>
+    		<targetElement qualifier="sublinks" type="StaticLink" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers read="true" write="true" search="true" optional="true" />
+    		</targetElement>		
+    	</relation>		
+	</relations>
+	
+	
+	<itemtypes>
+		<itemtype 	code="AbstractLinkEntry" 
+					extends="GenericItem"
+					autocreate="true" 
+					generate="true"
+					jaloclass="de.hybris.platform.mcc.jalo.AbstractLinkEntry"
+					abstract="true">
+
+			<deployment table="AbstractLinkEntries" typecode="6002"/>
+			<attributes>								
+				<attribute qualifier="code" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" initial="true" optional="false" search="true" unique="true"/>
+				</attribute>
+				
+				<attribute qualifier="area" type="CockpitLinkArea">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" initial="true" optional="false" search="true" />
+				</attribute>
+
+				<attribute qualifier="sortorder" type="java.lang.Integer">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" />
+				</attribute>	
+			</attributes>
+			
+			<indexes>
+				<index name="code">
+					<key attribute="code"/>
+				</index>
+				<index name="area">
+					<key attribute="area"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+
+		<itemtype 	code="Divider" 
+					extends="AbstractLinkEntry"
+					autocreate="true" 
+					generate="true"
+					jaloclass="de.hybris.platform.mcc.jalo.Divider">
+					
+			<attributes>
+				<attribute qualifier="height" type="java.lang.Integer">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" />
+				</attribute>				
+				<attribute qualifier="spacer" type="boolean">
+					<description>Defines if item is a spacer only or should render horizontal bar as well</description>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<modifiers read="true" write="true"  optional="false" />
+				</attribute>	
+			</attributes>					
+		</itemtype>	
+
+
+		<itemtype 	code="StaticLink" 
+					extends="AbstractLinkEntry"
+					autocreate="true" 
+					generate="true"
+					jaloclass="de.hybris.platform.mcc.jalo.StaticLink">
+			
+			<attributes>
+				<attribute qualifier="title" type="localized:java.lang.String">
+					<persistence type="property"/>
+					<modifiers read="true" write="true"/>
+				</attribute>
+				
+				<attribute qualifier="descriptionIcon" type="Media">
+					<modifiers read="true" write="true" />
+					<persistence type="property"/>
+				</attribute>				
+				
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<persistence type="property">
+					<columntype>
+						<value>HYBRIS.LONG_STRING</value>
+					</columntype>
+					</persistence>
+					<modifiers read="true" write="true"/>
+				</attribute>
+				
+				<attribute qualifier="url" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<description>If no url is provided, render link as text</description>
+				</attribute>
+				
+				<attribute qualifier="extensionName" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" />
+				</attribute>	
+				
+			</attributes>
+		</itemtype>
+		
+		
+		<itemtype 	code="DynamicLink" 
+					extends="StaticLink"
+					autocreate="true" 
+					generate="true"
+					jaloclass="de.hybris.platform.mcc.jalo.DynamicLink">
+					
+			<attributes>
+				<attribute qualifier="script" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" dontOptimize="true"/>
+					<description>Script that returns title->URL dynamic link map</description>
+				</attribute>
+				
+				<attribute qualifier="visibleScript" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" dontOptimize="true"/>
+					<description>Script that returns true if the link should be visible</description>
+				</attribute>
+			</attributes>					
+
+		</itemtype>		
+		
+	</itemtypes>
+</items>

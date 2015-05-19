@@ -1,0 +1,30 @@
+*** Settings ***
+Library	   de.hybris.platform.emsclientatddtests.keywords.emsclient.EntitlementsBuilderKeywordLibrary
+Library    de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Library	   de.hybris.platform.commerceservicesatddtests.keywords.CommerceServicesKeywordLibrary
+Resource   common/EntitlementStartup_Keywords.txt
+Resource   atdd/keywords/entitlements-test/modify_entitlements_keywords.txt
+Resource   atdd/keywords/entitlements-test/builder_entitlements_keywords.txt
+
+*** Keywords ***
+
+verify grants of "${userId}" xml are equal to "${expectedXml:[^"]+}"
+    [Documentation]    Verifies that the grants are equal to the expected XML for given user
+    verify grants xml for user    ${userId}    ${expectedXml}
+
+reset grants
+    [Documentation]    Resets the system attributes to the original values
+    reset system
+#
+#create EmsGrantData with type "${entitlementType:[^"]*}" for user "${userId:[^"]*}" granted at "${dateCreatedAt:[^"]*}"
+#    [Documentation]    Create EmsGrantData
+#    ${result}=    build ems grant data    ${entitlementType}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${dateCreatedAt}    ${userId}
+#    [Return]    ${result}
+#
+#
+#
+#create entitlement with type "${entitlementType:[^"]*}" for user "${userId:[^"]*}" granted at "${dateCreatedAt:[^"]*}"
+#    [Documentation]    Create GrantData in memory (return GrantData.id)
+#    ${EmsGrantData}=    build ems grant data    ${entitlementType}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${dateCreatedAt}    ${userId}
+#    ${result} =    grant ems entitlement    ${EmsGrantData}
+#    [Return]    ${result}

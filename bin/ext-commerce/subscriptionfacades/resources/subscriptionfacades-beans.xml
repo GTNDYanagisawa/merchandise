@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<enum class="de.hybris.platform.subscriptionfacades.action.SubscriptionUpdateActionEnum">
+		<value>CANCEL</value>
+	</enum>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.ProductData">
+		<property name="itemType" type="String"/>
+		<property name="subscriptionTerm" type="de.hybris.platform.subscriptionfacades.data.SubscriptionTermData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.subscriptionfacades.data.BillingTimeData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="nameInOrder" type="String"/>
+		<property name="description" type="String"/>
+		<property name="orderNumber" type="int"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.AbstractOrderData">
+		<property name="orderPrices" type="java.util.List&lt;de.hybris.platform.subscriptionfacades.data.OrderPriceData>"/>
+		<property name="merchantCustomerId" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.commercefacades.order.data.OrderEntryData">
+		<property name="orderEntryPrices" type="java.util.List&lt;de.hybris.platform.subscriptionfacades.data.OrderEntryPriceData>"/>
+		<property name="originalSubscriptionId" type="String"/>
+		<property name="originalOrderCode" type="String"/>
+		<property name="originalEntryNumber" type="int"/>
+		<property name="entryMessage" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.BillingTimePriceData">
+		<property name="totalPrice" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="billingTime" type="de.hybris.platform.subscriptionfacades.data.BillingTimeData"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.OrderPriceData" extends="de.hybris.platform.subscriptionfacades.data.BillingTimePriceData">
+		<property name="totalTax" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="subTotal" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="deliveryCost" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="totalDiscounts" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+        <property name="appliedProductPromotions" type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.PromotionResultData>"/>
+        <property name="appliedOrderPromotions" type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.PromotionResultData>"/>
+        <property name="potentialProductPromotions" type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.PromotionResultData>"/>
+        <property name="potentialOrderPromotions" type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.PromotionResultData>"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.OrderEntryPriceData" extends="de.hybris.platform.subscriptionfacades.data.BillingTimePriceData">
+		<property name="basePrice" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="defaultPrice" type="boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.subscriptionfacades.data.SubscriptionTermData">
+		<property name="id" type="String"/>
+		<property name="name" type="String"/>
+		<property name="termOfServiceNumber" type="int"/>
+		<property name="cancellable" type="boolean"/>
+		<property name="termOfServiceFrequency" type="TermOfServiceFrequencyData"/>
+		<property name="termOfServiceRenewal" type="TermOfServiceRenewalData"/>
+		<property name="billingPlan" type="BillingPlanData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.subscriptionfacades.data.BillingPlanData">
+		<property name="id" type="String"/>
+		<property name="name" type="String"/>
+		<property name="billingCycleDay" type="Integer"/>
+		<property name="billingTime" type="BillingTimeData"/>
+		<property name="billingCycleType" type="BillingCycleTypeData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.subscriptionfacades.data.UsageChargeData">
+		<property name="name" type="String"/>
+		<property name="usageUnit" type="de.hybris.platform.entitlementfacades.data.UsageUnitData"/>
+		<property name="usageChargeEntries" type="java.util.List&lt;UsageChargeEntryData>"/>
+	</bean>
+
+    <bean class="de.hybris.platform.subscriptionfacades.data.VolumeUsageChargeData" extends="UsageChargeData"/>
+    
+    <bean class="de.hybris.platform.subscriptionfacades.data.PerUnitUsageChargeData" extends="UsageChargeData">
+		<property name="usageChargeType" type="UsageChargeTypeData"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.ChargeEntryData">
+		<property name="price" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.subscriptionfacades.data.UsageChargeEntryData" extends="ChargeEntryData"/>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.RecurringChargeEntryData" extends="ChargeEntryData">
+		<property name="cycleStart" type="int"/>
+		<property name="cycleEnd" type="int"/>
+	</bean>
+
+	<bean class="de.hybris.platform.subscriptionfacades.data.OneTimeChargeEntryData" extends="ChargeEntryData">
+		<property name="name" type="String"/>
+		<property name="billingTime" type="BillingTimeData"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.OverageUsageChargeEntryData" extends="UsageChargeEntryData"/>
+
+	<bean class="de.hybris.platform.subscriptionfacades.data.SubscriptionPricePlanData" extends="de.hybris.platform.commercefacades.product.data.PriceData">
+		<property name="name" type="String"/>
+		<property name="usageCharges" type="java.util.List&lt;UsageChargeData>"/>
+		<property name="oneTimeChargeEntries" type="java.util.List&lt;OneTimeChargeEntryData>"/>
+		<property name="recurringChargeEntries" type="java.util.List&lt;RecurringChargeEntryData>"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.TierUsageChargeEntryData" extends="UsageChargeEntryData">
+		<property name="tierStart" type="int"/>
+		<property name="tierEnd" type="int"/>
+	</bean>
+
+	<bean class="de.hybris.platform.subscriptionfacades.data.TermOfServiceFrequencyData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.subscriptionfacades.data.TermOfServiceRenewalData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.subscriptionfacades.data.BillingCycleTypeData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.subscriptionfacades.data.UsageChargeTypeData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.SubscriptionPaymentData">
+		<property name="parameters" type="java.util.Map&lt;String, String>"/>
+		<property name="postUrl" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.SubscriptionData">
+		<property name="id" type="String"/>
+		<property name="name" type="String"/>
+		<property name="description" type="String"/>
+		<property name="productCode" type="String"/>
+		<property name="productUrl" type="String"/>
+		<property name="orderNumber" type="String"/>
+		<property name="orderEntryNumber" type="Integer"/>
+		<property name="billingsystemId" type="String"/>
+		<property name="startDate" type="java.util.Date"/>
+		<property name="endDate" type="java.util.Date"/>
+		<property name="renewalType" type="String"/>
+		<property name="subscriptionStatus" type="String"/>
+		<property name="cancellable" type="Boolean"/>
+		<property name="billingFrequency" type="String"/>
+		<property name="contractDuration" type="Integer"/>
+		<property name="contractFrequency" type="String"/>
+		<property name="placedOn" type="java.util.Date"/>
+		<property name="cancelledDate" type="java.util.Date"/>
+		<property name="customerId" type="String"/>
+		<property name="paymentMethodId" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.SubscriptionBillingData">
+		<property name="billingId" type="String"/>
+		<property name="billingPeriod" type="String"/>
+		<property name="billingDate" type="String"/>
+		<property name="paymentAmount" type="String"/>
+		<property name="paymentStatus" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.SubscriptionBillingDetailFileStream">
+		<property name="fileName" type="String"/>
+		<property name="inputStream" type="java.io.InputStream"/>
+		<property name="mimeType" type="String"/>
+	</bean>
+</beans>

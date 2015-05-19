@@ -1,0 +1,631 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns:aop="http://www.springframework.org/schema/aop"
+		 xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+<!--
+	Print extension manager
+ -->
+	<bean id="print.manager" class="de.hybris.platform.print.jalo.PrintManager" init-method="init" scope="tenant">
+		<!--
+			List of all available axis data providers for the table editor.
+		-->
+		<property name="tableAxisDataProviders">
+			<list value-type="java.lang.Class">
+				<value>de.hybris.platform.print.util.table.SingleItemDataProvider</value>
+				<value>de.hybris.platform.print.util.table.ItemListDataProvider</value>
+				<value>de.hybris.platform.print.util.table.ClassAttrDataProvider</value>
+				<value>de.hybris.platform.print.util.table.VariantProductsDataProvider</value>
+				<value>de.hybris.platform.print.util.table.VariantAttributesDataProvider</value>
+				<value>de.hybris.platform.print.util.table.CategoryProductDataProvider</value>
+				<value>de.hybris.platform.print.util.table.PagePlacementsProvider</value>
+			</list>
+		</property>
+		<!--
+			List of all available cell data resolvers for the table editor.
+		-->
+		<property name="tableCellDataResolvers">
+			<list value-type="java.lang.Class">
+				<value>de.hybris.platform.print.util.table.DefaultDataResolver</value>
+			</list>
+		</property>
+		<!--
+			List of all available sorting comparators for the table editor.
+		-->
+		<property name="tableSortComparators">
+			<list value-type="java.lang.Class">
+				<value>de.hybris.platform.print.util.table.DefaultCellValueComparator</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- System Setup -->
+	<bean id="printSystemSetup" class="de.hybris.platform.print.systemsetup.PrintSystemSetup" />
+	
+<!--
+	Werk II Comet interface configuration
+ -->
+
+	<!-- 
+		Session Manager 
+		
+		Override the class of this bean to register your own session manager.
+		Your custom session manager must implement the de.hybris.platform.print.comet.SessionManager interface.
+	-->
+	<bean id="PrintSessionManager" class="de.hybris.platform.print.comet.DefaultSessionManager" scope="tenant">
+	</bean>
+
+	<!-- 
+		Default Publication Controller 
+		
+		You can override the class of this bean - or any of its properties to change the behaviour of the
+		default publication controller.
+		You can define additional publication controller as well (see SamplePublicationController for an example).
+		
+		In both cases, your publication controller class must implement the de.hybris.platform.print.comet.PublicationController interface.
+	-->
+	<bean id="DefaultPublicationController" class="de.hybris.platform.print.comet.DefaultPublicationController" scope="tenant" lazy-init="true">
+		<property name="callProcessors">
+			<list>
+				<ref bean="GetAttribute"/>
+				<ref bean="SyncAttribute"/>
+				<ref bean="SetAttribute"/>
+				<ref bean="GetCellValue"/>
+				<ref bean="GetColumnWidth"/>
+				<ref bean="GetCrossreferenceReplacementType"/>
+				<ref bean="GetPdfPreset"/>
+				<ref bean="GetTableWidth"/>
+				<ref bean="SetMediaContext"/>
+				<ref bean="SetLanguage"/>
+				<ref bean="SetStatus"/>
+				<ref bean="GetPublication"/>
+				<ref bean="SetPublication"/>
+				<ref bean="SetOS"/>
+				<ref bean="SetClientLanguage"/>
+				<ref bean="GetEnvironment"/>
+				<ref bean="GetAdaptionDimensions"/>
+				<ref bean="GetPagePreviewSize"/>
+				<ref bean="HasPageForDocumentProcessor"/>
+				<ref bean="GetPageComments"/>
+			</list>
+		</property>
+		<property name="listProcessors">
+			<list>
+				<ref bean="ColumnList"/>
+				<ref bean="LanguageList"/>
+				<ref bean="StatusList"/>
+				<ref bean="MediaContextList"/>
+				<ref bean="PreviewPanelHandler"/>
+				<ref bean="PreviewPanelPlacementHandler"/>
+				<ref bean="PublicationList"/>
+				<ref bean="PublicationPanelHandler"/>
+				<ref bean="RowList"/>
+			</list>
+		</property>
+		<property name="productListProcessors">
+			<list>
+				<ref bean="DefaultProductList"/>
+				<ref bean="PagePreviewProductList"/>
+				<ref bean="ChapterPreviewProductList"/>
+				<ref bean="PublicationPreviewProductList"/>
+				<ref bean="SearchProductList"/>
+				<ref bean="PageAdaptionProductList"/>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 
+		Sample Publication Controller 
+	-->
+	<bean id="SamplePublicationController" class="de.hybris.platform.print.comet.DefaultPublicationController" scope="tenant" lazy-init="true">
+		<property name="callProcessors">
+			<list>
+				<ref bean="SampleCallProcessor"/>
+			</list>
+		</property>
+		<property name="listProcessors">
+			<list>
+				<ref bean="SampleListProcessor"/>
+			</list>
+		</property>
+		<property name="productListProcessors">
+			<list>
+				<ref bean="SampleProductListProcessor"/>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 
+		Call Processors
+		
+		If you define your own call processor or override existing one, remember that your class needs to implement
+		the de.hybris.platform.print.comet.CallProcessor interface.
+	-->
+	<bean id="GetAttribute" class="de.hybris.platform.print.comet.GetAttributeCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="SetAttribute" class="de.hybris.platform.print.comet.SetAttributeCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="SyncAttribute" class="de.hybris.platform.print.comet.SyncAttributeCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="GetCellValue" class="de.hybris.platform.print.comet.GetCellValueCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="GetColumnWidth" class="de.hybris.platform.print.comet.GetColumnWidthCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="GetCrossreferenceReplacementType" class="de.hybris.platform.print.comet.GetCrossreferenceReplacementType" scope="tenant" lazy-init="true"/>
+	<bean id="GetPdfPreset" class="de.hybris.platform.print.comet.GetPdfPresetCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="GetTableWidth" class="de.hybris.platform.print.comet.GetTableWidthCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="SetMediaContext" class="de.hybris.platform.print.comet.SetMediaContextCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="SetLanguage" class="de.hybris.platform.print.comet.SetSessionLanguageCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="SetStatus" class="de.hybris.platform.print.comet.SetElementStatusCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="GetPublication" class="de.hybris.platform.print.comet.GetPublicationCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="SetPublication" class="de.hybris.platform.print.comet.SetPublicationCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="SetOS" class="de.hybris.platform.print.comet.SetOSCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="SetClientLanguage" class="de.hybris.platform.print.comet.processors.SetClientLanguageCallProcessor" scope="tenant" lazy-init="true">
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+	<bean id="SampleCallProcessor" class="de.hybris.platform.print.comet.SampleCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="GetEnvironment" class="de.hybris.platform.print.comet.EnvironmentProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="GetAdaptionDimensions" class="de.hybris.platform.print.comet.GetAdaptionDimensionsCallProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="GetPagePreviewSize" class="de.hybris.platform.print.comet.GetPagePreviewSizeProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="HasPageForDocumentProcessor" class="de.hybris.platform.print.comet.HasPageForDocumentProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="GetPageComments" class="de.hybris.platform.print.comet.processors.GetPageCommentsProcessor" scope="tenant" lazy-init="true">
+		<property name="cometLogTools" ref="cometLogTools"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="notesArchivingService" ref="notesArchivingService"/>
+		<property name="page2NotesTranslatorService" ref="page2NotesTranslatorService"/>
+		<property name="pageDao" ref="pageDao"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<!-- catches every callProcessor which modify anything in platform - assumption: bean id starts with "Set". -->
+	<aop:config>
+		<aop:aspect ref="cometServiceAdvice">
+			<aop:around method="checkPermissions" pointcut="target(de.hybris.platform.print.comet.CallProcessor)
+									and execution(public java.lang.String[] de.hybris.platform.print.comet.*.process(..))
+									and bean(Set*)"/>
+		</aop:aspect>
+	</aop:config>
+
+	<bean id="cometServiceAdvice" class="de.hybris.platform.print.comet.aop.CometServicePermissionAdvice"/>
+
+	<!-- 
+		ListProcessors
+		
+		If you define your own list processor or override existing one, remember that your class needs to implement
+		the de.hybris.platform.print.comet.ListProcessor interface.
+	-->
+	<bean id="ColumnList" class="de.hybris.platform.print.comet.ColumnListProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="LanguageList" class="de.hybris.platform.print.comet.LanguageListProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="StatusList" class="de.hybris.platform.print.comet.StatusListProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="MediaContextList" class="de.hybris.platform.print.comet.MediaContextListProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="PreviewPanelHandler" class="de.hybris.platform.print.comet.PreviewPanelHandler" scope="tenant" lazy-init="true"/>
+	<!-- <bean id="PreviewPanelPlaceholderHandler" class="de.hybris.platform.print.comet.PreviewPanelPlaceholderHandler" scope="tenant" lazy-init="true"/> -->
+	<bean id="PreviewPanelPlacementHandler" class="de.hybris.platform.print.comet.PreviewPanelPlacementHandler" scope="tenant" lazy-init="true"/>
+	<bean id="PublicationList" class="de.hybris.platform.print.comet.PublicationListProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="PublicationPanelHandler" class="de.hybris.platform.print.comet.PublicationPanelHandler" scope="tenant" lazy-init="true"/>
+	<bean id="RowList" class="de.hybris.platform.print.comet.RowListProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="SampleListProcessor" class="de.hybris.platform.print.comet.SampleListProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="PageAdaptionProductList" class="de.hybris.platform.print.comet.PageAdaptionProductListProcessor" scope="tenant" lazy-init="true"/>
+
+
+	<!-- 
+		ProductListProcessors
+		
+		If you define your own product-list processor or override existing one, remember that your class needs to implement
+		the de.hybris.platform.print.comet.ProductListProcessor interface.
+	-->
+	<bean id="DefaultProductList" class="de.hybris.platform.print.comet.DefaultProductListProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="PagePreviewProductList" class="de.hybris.platform.print.comet.PagePreviewProductListProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="ChapterPreviewProductList" class="de.hybris.platform.print.comet.ChapterPreviewProductListProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="PublicationPreviewProductList" class="de.hybris.platform.print.comet.PublicationPreviewProductListProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="SearchProductList" class="de.hybris.platform.print.comet.SearchProductListProcessor" scope="tenant" lazy-init="true"/>
+	<bean id="SampleProductListProcessor" class="de.hybris.platform.print.comet.SampleProductListProcessor" scope="tenant" lazy-init="true"/>
+
+	<!-- 
+		ElementlistProcessors
+		
+		If you define your own element-list processor or override existing one, remember that your class needs to implement
+		the de.hybris.platform.print.comet.ElementListProcessor interface.
+	-->
+
+
+	<!-- 
+		Script/expression language configuration 
+		
+		To change the default expression language for evaluating of expression placeholder values, you need to override the class of this bean.
+		Your class needs to implement the de.hybris.platform.print.util.expression.ExpressionEvaluator interface.
+	 -->
+	<bean id="ExpressionEvaluator" class="de.hybris.platform.print.util.expression.impl.JexlExpressionEvaluator" scope="tenant" lazy-init="true"/>
+
+	<!-- 
+		PostProcessing configuration 
+		
+		To change the value post- and preprocessing, you must override these beans. 
+		Your implementing classes need to implement the 
+		de.hybris.platform.print.util.ValuePostProcessingService
+		or
+		de.hybris.platform.print.util.ValuePreProcessingService
+		interface.
+	 -->
+	<bean id="ValuePostProcessingService" class="de.hybris.platform.print.util.ValuePostProcessingServiceImpl" scope="tenant" lazy-init="true"/>
+	<bean id="ValuePreProcessingService" class="de.hybris.platform.print.util.ValuePreProcessingServiceImpl" scope="tenant" lazy-init="true"/>
+
+	<!-- 
+		Utils configuration 
+		
+		These beans are put to context of the expression placeholder when evaluating the expression. So you can use them im your expressions.
+	 -->
+	<bean id="ValueUtils" class="de.hybris.platform.print.util.ValueUtilsImpl" scope="tenant" lazy-init="true"/>
+	<bean id="FormatUtils" class="de.hybris.platform.print.util.FormatUtilsImpl" scope="tenant" lazy-init="true"/>
+	<bean id="PriceUtils" class="de.hybris.platform.print.util.PriceUtilsImpl" scope="tenant" lazy-init="true"/>
+	<bean id="ClassificationUtils" class="de.hybris.platform.print.util.ClassificationUtilsImpl" scope="tenant" lazy-init="true"/>
+	<bean id="VariantUtils" class="de.hybris.platform.print.util.VariantUtilsImpl" scope="tenant" lazy-init="true"/>
+
+	<alias alias="cometLogTools" name="defaultCometLogTools"/>
+	<bean id="defaultCometLogTools" class="de.hybris.platform.print.comet.utils.impl.DefaultCometLogTools" scope="tenant" lazy-init="true">
+		<property name="i18nService" ref="i18nService"/>
+		<property name="l10nService" ref="l10nService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<alias alias="cometResultMessageTools" name="defaultCometResultMessageTools"/>
+	<bean id="defaultCometResultMessageTools" class="de.hybris.platform.print.comet.utils.impl.DefaultCometResultMessageTools" scope="tenant" lazy-init="true">
+		<property name="l10nService" ref="l10nService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<!-- 
+		Comment configuration
+	 -->
+
+	<alias alias="page2NotesTranslatorService" name="defaultPage2NotesTranslatorService"/>
+	<bean id="defaultPage2NotesTranslatorService" class="de.hybris.platform.print.comet.services.impl.DefaultPage2NotesTranslatorService" scope="tenant" lazy-init="true">
+		<property name="converter" ref="comment2NotePopulatingConverter"/>
+		<property name="page2NotesFilterStrategies">
+			<list>
+				<ref bean="resolvedJobsPage2NotesFilterStrategy" />
+			</list>
+        </property>
+	</bean>
+
+	<bean id="resolvedJobsPage2NotesFilterStrategy" class="de.hybris.platform.print.comet.validation.impl.ResolvedJobsPage2NotesFilterStrategy" scope="tenant" lazy-init="true">
+		<property name="printCollaborationFacade" ref="printCollaborationFacade"/>
+		<property name="workflowService" ref="newestWorkflowService"/>
+	</bean>
+
+	<alias alias="comment2NotePopulatingConverter" name="defaultComment2NotePopulatingConverter"/>
+	<bean id="defaultComment2NotePopulatingConverter" parent="abstractPopulatingConverter" class="de.hybris.platform.print.comet.converter.impl.Comment2NotePopulatingConverter" scope="tenant" lazy-init="true">
+        <property name="populators">
+            <list>
+				<ref bean="noteInfoPopulator" />
+				<ref bean="noteCommentsPopulator" />
+				<ref bean="noteReferencePopulator" />
+			</list>
+        </property>
+    </bean>
+
+	<bean id="noteInfoPopulator" class="de.hybris.platform.print.comet.converter.impl.NoteInfoPopulator" scope="tenant" lazy-init="true">
+		<property name="printCollaborationFacade" ref="printCollaborationFacade"/>
+	</bean>
+	<bean id="noteCommentsPopulator" class="de.hybris.platform.print.comet.converter.impl.NoteCommentsPopulator" scope="tenant" lazy-init="true">
+		<property name="printTranslatorService" ref="printTranslatorService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+	<bean id="noteReferencePopulator" class="de.hybris.platform.print.comet.converter.impl.NoteReferencePopulator" scope="tenant" lazy-init="true">
+		<property name="width" value="120.0"/>
+		<property name="height" value="70.0"/>
+		<property name="maxperrow" value="4"/>
+		<property name="bgcolorRed" value="255.0"/>
+		<property name="bgcolorGreen" value="182.0"/>
+		<property name="bgcolorBlue" value="195.0"/>
+	</bean>
+
+	<alias alias="noteValidationService" name="defaultNoteValidationService"/>
+	<bean id="defaultNoteValidationService" class="de.hybris.platform.print.comet.services.impl.DefaultNoteValidationService" scope="tenant" lazy-init="true">
+		<property name="validationStrategies">
+			<list>
+				<ref bean="assigneeNoteValidationStrategy" />
+				<ref bean="commentDescriptionValidationStrategy" />
+				<ref bean="commentEditingValidationStrategy" />
+				<ref bean="notePageIndexValidationStrategy" />
+				<ref bean="stateChangeValidationStrategy" />
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="notes2PageTranslatorService" name="defaultNotes2PageTranslatorService"/>
+	<bean id="defaultNotes2PageTranslatorService" class="de.hybris.platform.print.comet.services.impl.DefaultNotes2PageTranslatorService" scope="tenant" lazy-init="true">
+        <property name="cometResultMessageTools" ref="cometResultMessageTools"/>
+		<property name="converter" ref="note2CommentPopulatingConverter"/>
+		<property name="validationStrategies">
+			<list>
+				<ref bean="uniquePKValidationStrategy" />
+				<ref bean="commentOnPageValidationStrategy" />
+			</list>
+		</property>
+	</bean>
+	 
+	<bean id="uniquePKValidationStrategy" class="de.hybris.platform.print.comet.validation.impl.UniquePKValidationStrategy" />
+	<bean id="commentOnPageValidationStrategy" class="de.hybris.platform.print.comet.validation.impl.CommentOnPageValidationStrategy">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias alias="note2CommentPopulatingConverter" name="defaultNote2CommentPopulatingConverter"/>
+	<bean id="defaultNote2CommentPopulatingConverter" parent="abstractPopulatingConverter" class="de.hybris.platform.print.comet.converter.impl.Note2CommentPopulatingConverter" scope="tenant" lazy-init="true">
+        <property name="populators">
+            <list>
+				<ref bean="commentDataPopulator" />
+				<ref bean="commentRepliesPopulator" />
+				<ref bean="commentJobPopulator" />
+				<ref bean="commentMetadataPopulator" />
+			</list>
+        </property>
+        <property name="configurationService" ref="configurationService"/>
+        <property name="cometResultMessageTools" ref="cometResultMessageTools"/>
+        <property name="commentGroupService" ref="commentGroupService"/>
+        <property name="commentService" ref="commentService"/>
+        <property name="modelService" ref="modelService"/>
+		<property name="noteValidationService" ref="noteValidationService" />
+        <property name="userService" ref="userService"/>
+    </bean>
+
+	<bean id="assigneeNoteValidationStrategy" class="de.hybris.platform.print.comet.validation.impl.AssigneeNoteValidationStrategy" scope="tenant" lazy-init="true">
+		<property name="permissionCheckingService" ref="permissionCheckingService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+	<bean id="commentDescriptionValidationStrategy" class="de.hybris.platform.print.comet.validation.impl.CommentDescriptionValidationStrategy" scope="tenant" lazy-init="true">
+		<property name="printTranslatorService" ref="printTranslatorService"/>
+	</bean>
+	<bean id="commentEditingValidationStrategy" class="de.hybris.platform.print.comet.validation.impl.CommentEditingValidationStrategy" scope="tenant" lazy-init="true">
+		<property name="userService" ref="userService"/>
+		<property name="printTranslatorService" ref="printTranslatorService"/>
+	</bean>
+	<bean id="notePageIndexValidationStrategy" class="de.hybris.platform.print.comet.validation.impl.NotePageIndexValidationStrategy" scope="tenant" lazy-init="true" />
+	<bean id="stateChangeValidationStrategy" class="de.hybris.platform.print.comet.validation.impl.StateChangeValidationStrategy" scope="tenant" lazy-init="true">
+		<property name="printCollaborationFacade" ref="printCollaborationFacade"/>
+	</bean>
+
+	<bean id="commentDataPopulator" class="de.hybris.platform.print.comet.converter.impl.CommentDataPopulator" scope="tenant" lazy-init="true">
+		<property name="userService" ref="userService"/>
+		<property name="printTranslatorService" ref="printTranslatorService"/>
+	</bean>
+	<bean id="commentRepliesPopulator" class="de.hybris.platform.print.comet.converter.impl.CommentRepliesPopulator" scope="tenant" lazy-init="true">
+		<property name="printCollaborationFacade" ref="printCollaborationFacade"/>
+		<property name="printTranslatorService" ref="printTranslatorService"/>
+		<property name="taggedText2HtmlTranslator" ref="taggedText2HtmlTranslator"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+	<bean id="commentJobPopulator" class="de.hybris.platform.print.comet.converter.impl.CommentJobPopulator" scope="tenant" lazy-init="true">
+		<property name="printCollaborationFacade" ref="printCollaborationFacade"/>
+		<property name="userService" ref="userService"/>
+		<property name="workflowProcessingService" ref="workflowProcessingService"/>
+	</bean>
+	<bean id="commentMetadataPopulator" class="de.hybris.platform.print.comet.converter.impl.CommentMetadataPopulator" scope="tenant" lazy-init="true">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias alias="pageDao" name="defaultPageDao"/>
+	<bean id="defaultPageDao" class="de.hybris.platform.print.dao.impl.DefaultPageDao" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<!--
+		Comet-Notes archiving and validating strategies 
+	 -->
+	<alias alias="notesArchivingService" name="defaultNotesArchivingService"/>
+	<bean id="defaultNotesArchivingService" class="de.hybris.platform.print.comet.services.impl.DefaultNotesArchivingService" scope="tenant">
+		<property name="archiveStrategies">
+			<list>
+				<bean class="de.hybris.platform.print.comet.services.impl.DefaultNotesArchivingStrategy">
+					<property name="configurationService" ref="configurationService" />
+					<property name="mediaService" ref="mediaService" />
+					<property name="modelService" ref="modelService" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 
+		Table translation
+		
+		With overriding of these beans you can alter the transformation and rendering of table blocks.
+	 -->
+	<!--
+		Table builder transforms the TableBlock item to the PrintTable POJO object. 
+		This object is then used as a basis for rendering of the table as HTML or InDesign TaggedText.
+		Your own implementation must implement the de.hybris.platform.print.util.table.TableBuilder interface.
+	-->
+	<bean id="TableBuilder" class="de.hybris.platform.print.util.table.TableBuilderImpl" scope="tenant" lazy-init="true"/>
+	<!--
+		Renders table as HTML. 
+		Your implementation must implement the e.hybris.platform.print.util.table.TableRenderer interface.
+	-->
+	<bean id="TableToHTMLRenderer" class="de.hybris.platform.print.util.table.TableToHTMLRenderer" lazy-init="true"/>
+	<!--
+		Renders table as HTML (for small previews). 
+		Your implementation must implement the e.hybris.platform.print.util.table.TableRenderer interface.
+	-->
+	<bean id="TableToHTMLPreviewRenderer" class="de.hybris.platform.print.util.table.TableToHTMLPreviewRenderer" lazy-init="true"/>
+	<!--
+		Renders table as InDesign TaggedText. 
+		Your implementation must implement the e.hybris.platform.print.util.table.TableRenderer interface.
+	-->
+	<bean id="TableToTaggedTextRenderer" class="de.hybris.platform.print.util.table.TableToTaggedTextRenderer" lazy-init="true"/>
+
+	<bean id="cometKeyGenerator" class="de.hybris.platform.print.jalo.AutoCometJobKeyGenerator" init-method="init" scope="tenant">
+		<property name="key" value="AUTOCOMETJOB_ID"/>
+		<property name="digits" value="8"/>
+		<property name="start" value="00000000"/>
+		<property name="numeric" value="true"/>
+	</bean>
+
+	<bean id="PrepareAutoCometJobInterceptor" class="de.hybris.platform.print.jalo.AutoCometJobPreparer">
+		<property name="keyGenerator" ref="cometKeyGenerator"/>
+	</bean>
+
+	<bean id="PlaceholderPrepareInterceptor" class="de.hybris.platform.print.jalo.PlaceholderPrepareInterceptor"/>
+
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="PrepareAutoCometJobInterceptor" />
+		<property name="typeCode" value="AutoCometJob"/>
+	</bean>
+
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="PlaceholderPrepareInterceptor"/>
+		<property name="typeCode" value="PlaceHolder"/>
+	</bean>
+
+	<bean id="PagePlacementSortPrepareInterceptor" class="de.hybris.platform.print.interceptors.prepare.PagePlacementSortPrepareInterceptor"/>
+
+	<bean id="PagePlacementSortPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+	    <property name="interceptor" ref="PagePlacementSortPrepareInterceptor"/>
+	    <property name="typeCode" value="Page"/>
+	</bean>
+
+	<bean id="WorkflowJobRemoveInterceptor" class="de.hybris.platform.print.interceptors.remove.WorkflowJobRemoveInterceptor" scope="tenant">
+		<property name="printCollaborationFacade" ref="printCollaborationFacade"/>
+	</bean>
+	<bean id="WorkflowJobRemoveInterceptorMapping" scope="tenant" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+	    <property name="interceptor" ref="WorkflowJobRemoveInterceptor"/>
+	    <property name="typeCode" value="AbstractComment"/>
+	</bean>
+
+	<bean id="CellEntryConsistencyInterceptor" class="de.hybris.platform.print.interceptors.CellEntryConsistencyInterceptor"/>
+	<bean id="CellEntryConsistencyInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="CellEntryConsistencyInterceptor"/>
+		<property name="typeCode" value="CellEntry"/>
+	</bean>
+
+	<bean id="RowEntryConsistencyInterceptor" class="de.hybris.platform.print.interceptors.RowEntryConsistencyInterceptor"/>
+	<bean id="RowEntryConsistencyInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="RowEntryConsistencyInterceptor"/>
+		<property name="typeCode" value="RowEntry"/>
+	</bean>
+
+	<bean id="ColumnEntryConsistencyInterceptor" class="de.hybris.platform.print.interceptors.ColumnEntryConsistencyInterceptor"/>
+	<bean id="ColumnEntryConsistencyInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="ColumnEntryConsistencyInterceptor"/>
+		<property name="typeCode" value="ColumnEntry"/>
+	</bean>
+
+	<bean id="TableBlockConsistencyInterceptor" class="de.hybris.platform.print.interceptors.TableBlockConsistencyInterceptor"/>
+	<bean id="TableBlockConsistencyInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="TableBlockConsistencyInterceptor"/>
+		<property name="typeCode" value="TableBlock"/>
+	</bean>
+
+	<!--
+		Job Workflow Integration
+	-->
+	<alias alias="printJobService" name="defaultPrintJobService"/>
+	<bean id="defaultPrintJobService" class="de.hybris.platform.print.collaboration.services.impl.DefaultPrintJobService" scope="tenant">
+		<property name="configurationService" ref="configurationService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+		<property name="workflowActionService" ref="workflowActionService"/>
+		<property name="workflowService" ref="newestWorkflowService"/>
+		<property name="workflowTemplateService" ref="workflowTemplateService"/>
+	</bean>
+
+	<alias alias="printCommentService" name="defaultPrintCommentService"/>
+	<bean id="defaultPrintCommentService" class="de.hybris.platform.print.collaboration.services.impl.DefaultPrintCommentService" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="printCommentDao" ref="printCommentDao"/>
+		<property name="filterStrategies">
+			<map>
+				<entry key="TYPE" value-ref="filterByTypeStrategy"/>
+				<entry key="COMMENTGROUP" value-ref="filterByCommentGroupStrategy"/>
+				<entry key="STATUS" value-ref="filterByStatusStrategy"/>
+			</map>
+		</property>
+		<property name="sortStrategies">
+			<map>
+				<entry key="CREATIONTIME" value-ref="sortByCreationTimeStrategy"/>
+				<entry key="ONPAGE" value-ref="sortByOnPageStrategy"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="filterByTypeStrategy" class="de.hybris.platform.print.collaboration.filter.impl.FilterByTypeStrategy">
+		<property name="printCollaborationFacade" ref="printCollaborationFacade"/>
+	</bean>
+	<bean id="filterByCommentGroupStrategy" class="de.hybris.platform.print.collaboration.filter.impl.FilterByCommentGroupStrategy"/>
+	<bean id="filterByStatusStrategy" class="de.hybris.platform.print.collaboration.filter.impl.FilterByStatusStrategy">
+		<property name="printCollaborationFacade" ref="printCollaborationFacade"/>
+	</bean>
+
+	<bean id="sortByCreationTimeStrategy" class="de.hybris.platform.print.collaboration.sort.impl.SortByCreationTimeStrategy"/>
+	<bean id="sortByOnPageStrategy" class="de.hybris.platform.print.collaboration.sort.impl.SortByOnPageStrategy"/>
+
+	<alias alias="commentDao" name="printCommentDao"/>
+	<bean id="printCommentDao" class="de.hybris.platform.comments.services.impl.PrintCommentDao" parent="defaultCommentDao"/>
+
+	<alias alias="commentGroupDao" name="defaultCommentGroupDao"/>
+	<bean id="defaultCommentGroupDao" class="de.hybris.platform.comments.services.impl.DefaultCommentGroupDao" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<alias alias="commentGroupService" name="defaultCommentGroupService"/>
+	<bean id="defaultCommentGroupService" class="de.hybris.platform.comments.services.impl.DefaultCommentGroupService" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="commentGroupDao" ref="commentGroupDao"/>
+		<property name="commentGroupKeyGenerator" ref="commentGroupKeyGenerator" />
+	</bean>
+
+	<alias alias="workflowProcessingService" name="printWorkflowProcessingService"/>
+	<bean id="printWorkflowProcessingService" class="de.hybris.platform.workflow.impl.DefaultWorkflowProcessingService" parent="defaultWorkflowProcessingService">
+		<property name="decideActionStrategy" ref="printDecideActionStrategy" />
+	</bean>
+
+	<bean id="printDecideActionStrategy" class="de.hybris.platform.print.workflow.PrintDecideActionStrategy">
+		<property name="decideActionStrategy" ref="decideActionStrategy"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<bean id="workflowAssignedJobAttributeHandler" class="de.hybris.platform.print.workflow.WorkflowAssignedJobAttributeHandler">
+		<property name="printCommentDao" ref="printCommentDao"/>
+	</bean>
+	
+	<alias alias="printTranslatorService" name="defaultPrintTranslatorService"/>
+	<bean id="defaultPrintTranslatorService" class="de.hybris.platform.print.comet.services.impl.DefaultPrintTranslatorService" scope="tenant">
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="l10nService" ref="l10nService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="taggedText2HtmlTranslator" ref="taggedText2HtmlTranslator"/>
+	</bean>
+
+	<alias alias="taggedText2HtmlTranslator" name="defaultTaggedText2HtmlTranslator"/>
+	<bean id="defaultTaggedText2HtmlTranslator" class="de.hybris.platform.print.util.translator.TaggedText2HtmlTranslator" scope="tenant"/>
+
+	<!--
+		Facades 
+	-->
+	<alias alias="printCollaborationFacade" name="defaultPrintCollaborationFacade"/>
+	<bean id="defaultPrintCollaborationFacade" class="de.hybris.platform.print.collaboration.facades.impl.DefaultPrintCollaborationFacade" scope="tenant">
+		<property name="commentService" ref="commentService"/>
+		<property name="commentGroupService" ref="commentGroupService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="printCommentService" ref="printCommentService"/>
+		<property name="printJobService" ref="printJobService"/>
+		<property name="workflowProcessingService" ref="workflowProcessingService"/>
+	</bean>
+
+	<bean id="commentGroupKeyGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" init-method="init" scope="tenant">
+		<property name="key" value="ext.print.commentgroup"/>
+		<property name="digits" value="8"/>
+		<property name="start" value="00000000"/>
+		<property name="numeric" value="false"/>
+	</bean>
+
+	<bean id="cleanupDtpCommentPerformable" parent="abstractGenericMaintenanceJobPerformable">
+		<property name="maintenanceCleanupStrategy">
+			<bean class="de.hybris.platform.print.maintenance.CleanupDtpCommentsStrategy">
+				<property name="modelService" ref="modelService"/>
+			</bean>
+		</property>
+	</bean>
+
+</beans>

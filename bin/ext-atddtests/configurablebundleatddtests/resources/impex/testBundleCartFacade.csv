@@ -1,0 +1,176 @@
+$catalog-id=testCatalog
+$catalog-version=Online
+$approved=approvalstatus(code)[default='approved']
+$catalogversion=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+
+$currencies=USD	
+$defaultCurrency=USD		
+$defaultLanguage=en		
+$deliveryCountries=US		
+$paymentProvider=Mockup		
+
+$ruleType=ruleType(code)[default='ANY']
+
+INSERT_UPDATE Catalog;id[unique=true]
+;$catalog-id
+
+INSERT_UPDATE Currency;isocode[unique=true];active;conversion;digits;symbol
+;USD;true;1.5;2;"$"
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];conversion
+;pieces;pieces;1
+
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode)
+;$catalog-id;$catalog-version;true;USD
+
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);currencies(isocode);net;defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);paymentProvider		
+;testStore;$catalog-id;$currencies;false;$defaultCurrency;$defaultLanguage;$defaultLanguage;$paymentProvider	
+
+INSERT_UPDATE BaseSite;uid[unique=true];stores(uid)	
+;testSite;testStore
+
+INSERT_UPDATE Product;code[unique=true];$supercategories;manufacturerName;manufacturerAID;unit(code)[default=pieces];ean;$prices;$catalogversion;$approved
+;PRODUCT01;;product01;product01;;8000000000001;600 USD
+;PRODUCT02;;product02;product02;;8000000000002;650 USD
+;PRODUCT03;;product03;product03;;8000000000003;850 USD
+;PRODUCT04;;product04;product04;;8000000000004;950 USD
+;PRODUCT05;;product05;product05;;8000000000005;650 USD
+;PRODUCT06;;product06;product06;;8000000000006;600 USD
+;PREMIUM01;;premium01;premium01;;8000000000021;710 USD
+;PREMIUM02;;premium02;premium02;;8000000000022;720 USD
+;PREMIUM03;;premium03;premium03;;8000000000023;730 USD
+;PREMIUM04;;premium04;premium04;;8000000000024;740 USD
+;PREMIUM05;;premium05;premium05;;8000000000025;750 USD
+;PREMIUM06;;premium06;premium06;;8000000000026;760 USD
+
+INSERT_UPDATE Vendor;code[unique=true];
+;vendor;
+
+INSERT_UPDATE Warehouse;code[unique=true];vendor(code);default;baseStores(uid)
+;warehouse;vendor;true;testStore
+
+INSERT_UPDATE StockLevel;productCode[unique=true];inStockStatus(code)[default=forceInStock];warehouse(code);
+;PRODUCT01;;warehouse;
+;PRODUCT02;;warehouse;
+;PRODUCT03;;warehouse;
+;PRODUCT04;;warehouse;
+;PRODUCT05;;warehouse;
+;PRODUCT06;;warehouse;
+;PREMIUM01;;warehouse;
+;PREMIUM02;;warehouse;
+;PREMIUM03;;warehouse;
+;PREMIUM04;;warehouse;
+;PREMIUM05;;warehouse;
+;PREMIUM06;;warehouse;
+;SUBSCRIPTIONPRODUCT01;;warehouse;
+;SUBSCRIPTIONPRODUCT02;;warehouse;
+;SUBSCRIPTIONPRODUCT03;;warehouse;
+;SUBSCRIPTIONPRODUCT04;;warehouse;
+;SUBSCRIPTIONPREMIUM01;;warehouse;
+;SUBSCRIPTIONPREMIUM02;;warehouse;
+;SUBSCRIPTIONPREMIUM03;;warehouse;
+;SUBSCRIPTIONPREMIUM04;;warehouse;
+;SUBSCRIPTIONPREMIUM05;;warehouse;
+;SUBSCRIPTIONPREMIUM06;;warehouse;
+;SUBSCRIPTIONPREMIUM07;;warehouse;
+;SUBSCRIPTIONPREMIUM08;;warehouse;
+
+INSERT_UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];$catalogversion;parentTemplate(id);
+;ParentPackage;;;;
+;ProductComponent1;;;ParentPackage;
+;PremiumComponent2;;;ParentPackage;
+
+
+UPDATE BundleTemplateStatus[batchmode=true];itemtype(code)[unique=true];status(code)
+;BundleTemplateStatus;approved
+
+
+INSERT_UPDATE PickExactlyNBundleSelectionCriteria;id[unique=true];n;$catalogversion
+;ProductComponent_PickExactly_2;3
+;PremiumComponent_PickExactly_2;3
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0];bundleSelectionCriteria(id, $catalogversion);$catalogversion
+;ProductComponent1;;ProductComponent_PickExactly_2
+;PremiumComponent2;;PremiumComponent_PickExactly_2
+
+INSERT_UPDATE BillingEvent;code[unique=true];order;cartAware[default=true]
+;paynow;1;
+;onetimeprice;2;
+
+INSERT_UPDATE BillingFrequency;code[unique=true];order;cartAware[default=true]
+;monthly;5
+;quarterly;6
+;yearly;7
+;annually;8
+
+INSERT_UPDATE BillingPlan;id[unique=true];billingCycleType(code);billingFrequency(code)
+;yearlyplan;subscription_start;yearly
+;monthlyplan;subscription_start;monthly
+
+INSERT_UPDATE SubscriptionTerm;id[unique=true];termOfServiceFrequency(code);termOfServiceNumber(code);termOfServiceRenewal(code);billingPlan(id);cancellable
+;annually;none;1;non_renewing;yearlyplan;false
+;monthly;monthly;1;auto_renewing;monthlyplan;false
+
+INSERT_UPDATE SubscriptionProduct;code[unique=true];subscriptionTerm(id);unit(code)[default=pieces];$supercategories;$catalogversion;$approved
+;SUBSCRIPTIONPRODUCT01;annually
+;SUBSCRIPTIONPRODUCT02;annually
+;SUBSCRIPTIONPRODUCT03;monthly
+;SUBSCRIPTIONPRODUCT04;annually
+;SUBSCRIPTIONPREMIUM01;annually
+;SUBSCRIPTIONPREMIUM02;annually
+;SUBSCRIPTIONPREMIUM03;annually
+;SUBSCRIPTIONPREMIUM04;monthly
+;SUBSCRIPTIONPREMIUM05;monthly
+;SUBSCRIPTIONPREMIUM06;annually
+;SUBSCRIPTIONPREMIUM07;annually
+;SUBSCRIPTIONPREMIUM08;annually
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];products(code, $catalogversion);$catalogversion
+;ProductComponent1;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SUBSCRIPTIONPRODUCT01,SUBSCRIPTIONPRODUCT02,SUBSCRIPTIONPRODUCT03,SUBSCRIPTIONPRODUCT04;
+;PremiumComponent2;;PREMIUM01,PREMIUM02,PREMIUM03,PREMIUM04,PREMIUM05,PREMIUM06,SUBSCRIPTIONPREMIUM01,SUBSCRIPTIONPREMIUM02,SUBSCRIPTIONPREMIUM03,SUBSCRIPTIONPREMIUM04,SUBSCRIPTIONPREMIUM05,SUBSCRIPTIONPREMIUM06,SUBSCRIPTIONPREMIUM07,SUBSCRIPTIONPREMIUM08;
+
+INSERT_UPDATE SubscriptionPricePlan;&pricePlan;product(code, $catalogversion)[unique=true];$catalogversion;currency(isocode)[default=USD,unique=true];unit(code)[default=pieces]
+;pricePlan_SUBPRODUCT01;SUBSCRIPTIONPRODUCT01;
+;pricePlan_SUBPRODUCT02;SUBSCRIPTIONPRODUCT02;
+;pricePlan_SUBPRODUCT03;SUBSCRIPTIONPRODUCT03;
+;pricePlan_SUBPRODUCT04;SUBSCRIPTIONPRODUCT04;
+;pricePlan_SUBPREMIUM01;SUBSCRIPTIONPREMIUM01;
+;pricePlan_SUBPREMIUM02;SUBSCRIPTIONPREMIUM02;
+;pricePlan_SUBPREMIUM03;SUBSCRIPTIONPREMIUM03;
+;pricePlan_SUBPREMIUM04;SUBSCRIPTIONPREMIUM04;
+;pricePlan_SUBPREMIUM05;SUBSCRIPTIONPREMIUM05;
+;pricePlan_SUBPREMIUM06;SUBSCRIPTIONPREMIUM06;
+;pricePlan_SUBPREMIUM07;SUBSCRIPTIONPREMIUM07;
+
+INSERT_UPDATE OneTimeChargeEntry;id[unique=true];subscriptionPricePlanOneTime(&pricePlan);price;billingEvent(code);$catalogversion
+;onetimepricecharge01;pricePlan_SUBPRODUCT01;10;onetimeprice
+;onetimepricecharge02;pricePlan_SUBPRODUCT02;15;onetimeprice
+;paynowpricecharge01;pricePlan_SUBPRODUCT01;100;paynow
+;paynowpricecharge02;pricePlan_SUBPRODUCT02;150;paynow
+;paynowpricecharge03;pricePlan_SUBPREMIUM03;210;paynow
+;paynowpricecharge05;pricePlan_SUBPRODUCT03;170;paynow
+;paynowpricecharge06;pricePlan_SUBPREMIUM05;190;paynow
+;paynowpricecharge07;pricePlan_SUBPRODUCT04;125;paynow
+
+INSERT_UPDATE RecurringChargeEntry;id[unique=true];subscriptionPricePlanRecurring(&pricePlan);price;cycleStart;cycleEnd;$catalogversion
+;RCE_SUBPRODUCT03_monthly;pricePlan_SUBPRODUCT03;17;1
+
+INSERT_UPDATE ChangeProductPriceBundleRule;id[unique=true];bundleTemplate(id,version[default=1.0],$catalogversion);conditionalProducts(code,$catalogversion);targetProducts(code,$catalogversion);$ruleType;price;currency(isocode)[default=USD, unique=true];billingEvent(code);$catalogversion
+;productrule1;ProductComponent1;SUBSCRIPTIONPREMIUM01;SUBSCRIPTIONPRODUCT01;;7;;onetimeprice
+;productrule2;ProductComponent1;SUBSCRIPTIONPREMIUM02;SUBSCRIPTIONPRODUCT01,SUBSCRIPTIONPRODUCT02;;9;;onetimeprice
+;productrule3;ProductComponent1;SUBSCRIPTIONPREMIUM03;SUBSCRIPTIONPRODUCT01;;4;;onetimeprice
+;productrule4;ProductComponent1;SUBSCRIPTIONPREMIUM04;SUBSCRIPTIONPRODUCT03;;7
+;productrule5;ProductComponent1;SUBSCRIPTIONPREMIUM05;SUBSCRIPTIONPRODUCT03;;20
+;productrule6;ProductComponent1;PREMIUM06;PRODUCT06;;100
+;productrule7;ProductComponent1;SUBSCRIPTIONPREMIUM06;SUBSCRIPTIONPRODUCT04;;13;;onetimeprice
+;productrule8;ProductComponent1;SUBSCRIPTIONPREMIUM07;SUBSCRIPTIONPRODUCT01;;13;;
+
+# Disable Product rule
+INSERT_UPDATE DisableProductBundleRule;id[unique=true];$catalogversion;bundleTemplate(id,version[default=1.0],$catalogversion);conditionalProducts(code,$catalogversion);targetProducts(code,$catalogversion);$ruleType
+;disablerulesingleproduct;;PremiumComponent2;SUBSCRIPTIONPRODUCT04;SUBSCRIPTIONPREMIUM07;
+;disablerulemanyproducts;;PremiumComponent2;SUBSCRIPTIONPRODUCT03,SUBSCRIPTIONPRODUCT04;SUBSCRIPTIONPREMIUM08,SUBSCRIPTIONPREMIUM07;
+;disablerulepotentialproducts;;PremiumComponent2;SUBSCRIPTIONPRODUCT04,SUBSCRIPTIONPRODUCT03;PREMIUM02,PREMIUM03;
+

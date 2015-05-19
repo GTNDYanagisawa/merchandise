@@ -1,0 +1,174 @@
+/*
+	You may use one of the following special globals here :
+
+	int 		gScriptType	(one of kActionBefore, kActionAfterMove, kActionAfterResize, kActionAfter)
+	float 		gPageWidthOrg
+	float		gPageHeightOrg
+	float		gPageWidthNew
+	float		gPageHeightNew
+	float		gResizeX
+	float		gResizeY
+	int		gPage
+	ItemRef	gOrgFrame
+
+
+ Param1		Direction X or Y	
+ Param2		MaxSize		float			0.0
+ Param3		int font sizes	bool			0
+ Param4		check overset	bool			0
+
+*/
+
+#include "internal/types.h"
+
+
+
+
+int getBoolParam (char * p, int defaultValue)
+
+{
+
+	if (!p || !*p)				return defaultValue;
+
+	if (strcmp (p, "Y") == 0)		return 0;
+            if (strcmp (p, "y") == 0)		return 0;
+            if (strcmp (p, "X") == 0)		return 1;
+            if (strcmp (p, "x") == 0)		return 1;
+
+            if (strcmp (p, "yes") == 0)		return 1;
+	if (strcmp (p, "Yes") == 0)		return 1;
+	if (strcmp (p, "YES") == 0)	return 1;
+	if (strcmp (p, "ja") == 0)		return 1;
+	if (strcmp (p, "Ja") == 0)		return 1;
+	if (strcmp (p, "JA") == 0)		return 1;
+
+	if (strcmp (p, "0") == 0)		return 0;
+
+	if (strcmp (p, "no") == 0)		return 0;
+	if (strcmp (p, "No") == 0)		return 0;
+	if (strcmp (p, "NO") == 0)		return 0;
+	if (strcmp (p, "nein") == 0)	return 0;
+	if (strcmp (p, "Nein") == 0)	return 0;
+	if (strcmp (p, "NEIN") == 0)	return 0;
+	return defaultValue;
+
+}
+
+int main ()
+{
+	 float       newWidth = 44.0;
+	 float       newHeight = 22.0;
+	 float       resize, refPoint;
+	 float       top, bottom, left, right;
+	 float       horizontScale, verticalScale, newScale;
+	 int 	  direction			= getBoolParam (gParam3, 0);
+	 float		imageScaleOldX, imageScaleOldY, imageScaleX, imageScaleY;
+	 float			l, t, r, b, dw, dh;
+	 float			x, y;
+		int          err;
+
+	
+
+
+
+     if (strcmp (gParam2, "oben") == 0)
+	{
+		if (strcmp (gParam1, "links") == 0)	refPoint	= kRefPointTopLeft;
+		if (strcmp (gParam1, "mitte") == 0)	refPoint	= kRefPointTopCenter;
+		if (strcmp (gParam1, "rechts") == 0)	refPoint	= kRefPointTopRight;
+	}
+
+           if (strcmp (gParam2, "mitte") == 0)
+	{
+		if (strcmp (gParam1, "links") == 0)	refPoint	= kRefPointLeftCenter;
+		if (strcmp (gParam1, "mitte") == 0)	refPoint	= kRefPointCenter;
+		if (strcmp (gParam1, "rechts") == 0)	refPoint	= kRefPointRightCenter;
+	}
+
+	if (strcmp (gParam2, "unten") == 0)
+	{
+		if (strcmp (gParam1, "links") == 0)	refPoint	= kRefPointBottomLeft;
+		if (strcmp (gParam1, "mitte") == 0)	refPoint	= kRefPointBottomCenter;
+		if (strcmp (gParam1, "rechts") == 0)	refPoint	= kRefPointBottomRight;
+	}
+  
+   // Ermitteln Box Koordinaten
+   err = frame::bbox(gFrame,&left,&top,&right, &bottom);
+
+ 	if (err != 0)
+	{
+		wlog("", "Error [%i], message: [%s], while getting getting frame coordinates in script 20059.crpt, method main().", err, serror(err));
+	}
+	else
+	{
+
+		// Ermitteln der aktuellen Bildskalierung
+		err = frame::image_getscale(gFrame, &imageScaleOldX, &imageScaleOldY);
+		if (err != 0)
+		{
+			wlog("", "Error [%i], message: [%s], while getting image scale in script 20059.crpt, method main().", err, serror(err));
+		}
+		else
+		{
+
+			// Ermitteln Bildausschnitt
+			x = gOrgImageLeft;
+			y = gOrgImageTop;
+			frame::bbox (gFrame, &l, &t, &r, &b);
+			dw = (r-l) - (gOrgFrameRight - gOrgFrameLeft);
+			dh = (b -t) - (gOrgFrameBottom - gOrgFrameTop);
+			if (strcmp (gParam1, "mitte") == 0)	x = x + (dw / 2.0);
+			if (strcmp (gParam1, "rechts") == 0)	x = x + dw;
+			if (strcmp (gParam2, "mitte") == 0)	y = y + (dh / 2.0);
+			if (strcmp (gParam2, "unten") == 0)	y = y + dh;
+
+
+			if (direction == 0)
+			{
+				// Y Richtung skalieren mit dem Wert von X-Skalierung
+				newWidth = (right - left );
+				newHeight = (bottom - top) * gResizeX;
+				imageScaleX 			= imageScaleOldX * gResizeX;
+				imageScaleY 			= imageScaleOldY * gResizeX;
+
+				//  showmessage("neue Hoehe: %f", newHeight);
+			}
+			else
+			{
+				// X Richtung skalieren mit dem Wert von X-Skalierung
+				newWidth = (right - left ) * gResizeY;
+				newHeight = (bottom - top) ;
+				imageScaleX 			= imageScaleOldX * gResizeY;
+				imageScaleY 			= imageScaleOldY * gResizeY;
+
+				// showmessage("neue Breite: %f", newWidth );
+			}
+			
+			// Rahmen skalieren
+			frame::resize(gFrame,newWidth,newHeight,0, refPoint);
+			if (err != 0)
+			{
+				wlog("", "Error [%i], message: [%s], while resizing frame in script 20059.crpt, method main().", err, serror(err));
+				return 0;
+			}
+				
+			// Bild skalieren
+			err = frame::image_scale(gFrame, imageScaleX, imageScaleY, refPoint);
+			if (err != 0)
+			{
+				wlog("", "Error [%i], message: [%s], while scaling image in script 20059.crpt, method main().", err, serror(err));
+				return 0;
+			}
+			
+			// Bildausschnitt neu setzen
+			err = frame::image_pos (gFrame, gOrgImageLeft, gOrgImageTop);
+			if (err != 0)
+			{
+				wlog("", "Error [%i], message: [%s], while changing image position in script 20059.crpt, method main().", err, serror(err));
+				return 0;
+			}
+		}
+	}
+	
+	return 0;
+}

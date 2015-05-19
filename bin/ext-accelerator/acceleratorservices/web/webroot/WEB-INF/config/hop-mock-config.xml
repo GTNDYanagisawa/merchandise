@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<util:map id="supportedCardTypes" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="001" value="Visa"/>
+		<entry key="002" value="MasterCard"/>
+		<entry key="003" value="American Express"/>
+		<entry key="005" value="Diners Club"/>
+		<entry key="024" value="Maestro (UK Domestic)"/>
+	</util:map>
+
+	<bean id="defaultPaymentDetailsForm" class="de.hybris.platform.acceleratorservices.web.payment.forms.PaymentDetailsForm">
+		<property name="cardTypeCode" value="001"/>
+		<property name="cardNumber" value="4111111111111111"/>
+		<property name="verificationNumber" value="123"/>
+		<property name="issueNumber" value="01"/>
+		<property name="startMonth" value="1"/>
+		<property name="startYear" value="#{T(java.util.Calendar).getInstance().get(T(java.util.Calendar).YEAR) - 1}"/>
+		<property name="expiryMonth" value="12"/>
+		<property name="expiryYear" value="#{T(java.util.Calendar).getInstance().get(T(java.util.Calendar).YEAR) + 1}"/>
+	</bean>
+
+	<alias name="defaultAcceleratorDigestUtils" alias="acceleratorDigestUtils"/>
+	<bean id="defaultAcceleratorDigestUtils" class="de.hybris.platform.acceleratorservices.payment.utils.impl.DefaultAcceleratorDigestUtils">
+		<property name="macAlgorithm" value="HmacSHA1"/>
+	</bean>
+</beans>

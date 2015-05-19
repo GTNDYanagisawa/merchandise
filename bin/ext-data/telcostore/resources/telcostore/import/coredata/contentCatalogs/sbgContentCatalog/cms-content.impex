@@ -1,0 +1,57 @@
+$contentCatalog=telcoContentCatalog
+$contentCV=catalogversion(catalog(id[default=$contentCatalog]),version[default=Staged])[default=$contentCatalog:Staged]
+
+$wideContent=CMSImageComponent,SimpleBannerComponent,BannerComponent,ImageMapComponent,RotatingImagesComponent,ProductCarouselComponent,CMSParagraphComponent
+$narrowContent=ProductFeatureComponent,CategoryFeatureComponent,CMSImageComponent,SimpleBannerComponent,BannerComponent,ImageMapComponent,RotatingImagesComponent,ProductCarouselComponent,CMSParagraphComponent
+
+# CMS Link Components
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;&componentRef;target(code)[default='sameWindow']
+;;SBGProductsCategoryLink;TV Channels Category Link;/Open-Catalog/sbgproducts/c/sbgproducts;SBGProductsCategoryLink;SBGProductsCategoryLink
+
+# Navigation Bar Component
+INSERT_UPDATE NavigationBarComponent;$contentCV[unique=true];uid[unique=true];name;wrapAfter;link(uid,$contentCV);styleClass;&componentRef
+;;SBGProductsBarComponent;TV Channels Bar Component;10;SBGProductsCategoryLink;;SBGProductsBarComponent
+
+# Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)[mode=append]
+;;NavigationBarSlot;SBGProductsBarComponent
+
+# Page Templates
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;SBGProductsLandingPageTemplate;TV Channel Product Landing Page Template;category/sbgProductsLandingPage;CategoryPage
+
+# Content slots for template
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='SBGProductsLandingPageTemplate'];validComponentTypes(code)
+;SiteLogo;;CMSImageComponent,BannerComponent
+;HeaderLinks;;CMSLinkComponent,CMSParagraphComponent
+;MiniCart;;MiniCartComponent
+;NavigationBar;;NavigationBarComponent
+;Section1;;$wideContent
+;Section2;;$wideContent
+;Section3;;$narrowContent
+;Section4;;$narrowContent
+;Footer;;CMSLinkComponent,CMSParagraphComponent,FooterComponent
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='SBGProductsLandingPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-SBGProductsLandingPage;SiteLogo;;SiteLogoSlot;true
+;;HomepageLink-SBGProductsLandingPage;HomepageNavLink;;HomepageNavLinkSlot;true
+;;MiniCart-SBGProductsLandingPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-SBGProductsLandingPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-SBGProductsLandingPage;Footer;;FooterSlot;true
+;;HeaderLinks-SBGProductsLandingPage;HeaderLinks;;HeaderLinksSlot;true
+
+# Category Pages
+INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;SBGProductsCategoryPage;TV Channels Category Page;SBGProductsLandingPageTemplate;false;
+
+# CMS Navigation Nodes
+INSERT CMSNavigationNode;uid[unique=true];$contentCV[unique=true]
+;SBGProductsNavNode;
+
+# CMS Navigation Nodes
+UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;SBGProductsNavNode;;TV Channels Category;telcoNavNode;SBGProductsCategoryLink;SBGProductsNavNode
+
+# Navigation Bar Component
+INSERT_UPDATE NavigationBarComponent;$contentCV[unique=true];uid[unique=true];navigationNode(&nodeRef);dropDownLayout(code)
+;;SBGProductsBarComponent;SBGProductsNavNode

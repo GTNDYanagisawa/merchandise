@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<!-- 
+	  - Events: Session 
+	  -->
+
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterSessionCreationEvent" type="event"/>
+	
+	<bean class="de.hybris.platform.servicelayer.event.events.BeforeSessionCloseEvent" type="event"/>
+	
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterSessionAttributeChangeEvent" type="event">
+		<property name="attributeName" type="String"/>
+		<property name="value" type="Object"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterSessionUserChangeEvent" type="event">
+		<property name="previousUserUID" type="String"/>
+	</bean>
+	
+	<!-- 
+	  - Events: Tenant 
+	  -->
+
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterTenantRestartEvent" type="event">
+		<property name="tenantId" type="String"/>
+	</bean>
+	
+	<!--  
+	  - Events: Item Life Cycle 
+	  -->
+	  
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterItemCreationEvent" 
+		extends="de.hybris.platform.servicelayer.event.events.AbstractPersistenceEvent"
+		type="event">
+		<property name="typeCode" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterItemRemovalEvent"
+		extends="de.hybris.platform.servicelayer.event.events.AbstractPersistenceEvent"
+		type="event">
+	</bean>
+	
+	<!-- 
+	  - Events: Initialization 
+	  -->
+
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterInitializationStartEvent" type="event">
+		<property name="params" type="java.util.Map&lt;String, String&gt;"/>
+		<property name="ctx" type="de.hybris.platform.util.JspContext"/>
+	</bean>
+
+	<bean class="de.hybris.platform.servicelayer.event.events.AfterInitializationEndEvent" type="event">
+		<property name="params" type="java.util.Map&lt;String, String&gt;"/>
+		<property name="ctx" type="de.hybris.platform.util.JspContext"/>
+	</bean>
+
+	<!-- 
+	  - Events: Internals 
+	  -->
+
+	<bean class="de.hybris.platform.servicelayer.event.events.InvalidateModelConverterRegistryEvent" type="event">
+		<property name="composedTypeCode" type="String"/>
+		<property name="composedClass" type="Class"/>
+		<property name="refresh" type="boolean"/>
+	</bean>
+
+</beans>

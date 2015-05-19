@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+
+	<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+        <property name="scopes">
+            <map>
+                <entry key="session">
+                    <bean class="de.hybris.platform.cockpit.test.mock.MockSessionScope"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+	<bean id="testColumnConfiguration" class="de.hybris.platform.cockpit.services.config.impl.LineNumberColumn" scope="prototype"/>
+	
+	<bean id="testCustomEditorSectionConfiguration" class="de.hybris.platform.cockpit.services.config.impl.UnassignedEditorSectionConfiguration" scope="prototype"/>
+	
+	<bean id="systemService" class="de.hybris.platform.cockpit.test.mock.MockSystemService" />
+	
+	<bean id="typeCache" class="de.hybris.platform.cockpit.services.meta.impl.TypeCache"  destroy-method="clear">
+		<constructor-arg value="2000" />	
+	</bean>	
+	
+	<bean id="uiComponentCache" class="de.hybris.platform.cockpit.services.config.impl.UIComponentCache" destroy-method="clear">
+		<aop:scoped-proxy/>		
+	</bean>	
+	
+		<alias alias="tableValueRequestCache" name="defaultTableValueRequestCache"/>
+	<bean id="defaultTableValueRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="singleton">
+		<constructor-arg type="int"><value>65536</value></constructor-arg>
+	</bean>
+
+	<alias alias="uiAccessRightServiceWriteRequestCache" name="defaultUiAccessRightServiceWriteRequestCache"/>
+	<bean id="defaultUiAccessRightServiceWriteRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="singleton">
+		 <constructor-arg type="int"><value>1024</value></constructor-arg>
+	</bean>	 
+	
+	<alias alias="uiAccessRightServiceReadRequestCache" name="defaultUiAccessRightServiceReadRequestCache"/>
+	<bean id="defaultUiAccessRightServiceReadRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="singleton">
+ 	    <constructor-arg type="int"><value>1024</value></constructor-arg>
+ 	</bean>
+	
+	<alias alias="valueHandlerChainRequestCache" name="defaultValueHandlerChainRequestCache"/>
+	<bean id="defaultValueHandlerChainRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="singleton">
+		<constructor-arg type="int"><value>256</value></constructor-arg>
+	</bean>
+	
+	<alias alias="matchingDescriptorsRequestCache" name="defaultMatchingDescriptorsRequestCache"/>
+	<bean id="defaultMatchingDescriptorsRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="singleton">
+		<constructor-arg type="int"><value>8192</value></constructor-arg>
+	</bean>
+	
+	<alias alias="coverageInfoRequestCache" name="defaultCoverageInfoRequestCache"/>
+	<bean id="defaultCoverageInfoRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="singleton">
+ 		<constructor-arg type="int"><value>256</value></constructor-arg>
+	</bean>
+	
+ 	<bean id="classAttributeRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="singleton">
+ 		<constructor-arg type="int"><value>1024</value></constructor-arg>
+ 	</bean>
+
+		
+</beans>

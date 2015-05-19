@@ -1,0 +1,716 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype code="SiteMapLanguageCurrencyCollection"
+			elementtype="SiteMapLanguageCurrency" autocreate="true" generate="false" />
+		<collectiontype code="SiteMapPageCollection"
+			elementtype="SiteMapPage" autocreate="true" generate="false" />
+	</collectiontypes>
+
+	<enumtypes>
+		<enumtype code="ExportDataStatus" autocreate="true" generate="true"
+			dynamic="true">
+			<description>The status of the data export</description>
+			<value code="COMPLETE" />
+			<value code="FAILED" />
+			<value code="RUNNING" />
+		</enumtype>
+		<enumtype generate="true" code="CheckoutPciOptionEnum"
+			autocreate="true" dynamic="true">
+			<value code="Default" />
+			<value code="HOP" />
+			<value code="SOP" />
+		</enumtype>
+		<enumtype generate="true" code="CheckoutFlowEnum" autocreate="true"
+			dynamic="true">
+			<value code="MULTISTEP" />
+		</enumtype>
+		<enumtype generate="true" code="SiteMapChangeFrequencyEnum"
+			autocreate="true" dynamic="true">
+			<value code="always" />
+			<value code="hourly" />
+			<value code="daily" />
+			<value code="weekly" />
+			<value code="monthly" />
+			<value code="yearly" />
+			<value code="never" />
+		</enumtype>
+		<enumtype generate="true" code="SiteMapPageEnum" autocreate="true"
+			dynamic="true">
+			<value code="Homepage" />
+			<value code="Product" />
+			<value code="Category" />
+			<value code="CategoryLanding" />
+			<value code="Store" />
+			<value code="Content" />
+			<value code="Custom" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		<relation code="EmailMessage2ToAddressesRel" localized="false"
+			autocreate="true" generate="true">
+			<description>This is a link between email message and the addresses where the message is sent.</description>
+			<deployment table="EmailMsg2ToAddrRel" typecode="6202" />
+			<sourceElement type="EmailMessage" qualifier="toMessages"
+				cardinality="many" collectiontype="list" />
+			<targetElement type="EmailAddress" qualifier="toAddresses"
+				cardinality="many" collectiontype="list" />
+		</relation>
+
+		<relation code="EmailMessage2CcAddressesRel" localized="false"
+			autocreate="true" generate="true">
+			<description>This is a link between email message and the addresses where carbon copy of the message is sent.</description>
+			<deployment table="EmailMsg2CcAddrRel" typecode="6203" />
+			<sourceElement type="EmailMessage" qualifier="ccMessages"
+				cardinality="many" collectiontype="list" />
+			<targetElement type="EmailAddress" qualifier="ccAddresses"
+				cardinality="many" collectiontype="list" />
+		</relation>
+
+		<relation code="EmailMessage2BccAddressesRel" localized="false"
+			autocreate="true" generate="true">
+			<description>This is a link between email message and the addresses where blind carbon copy of the message is sent.</description>
+			<deployment table="EmailMsg2BccAddrRel" typecode="6204" />
+			<sourceElement type="EmailMessage" qualifier="bccMessages"
+				cardinality="many" collectiontype="list" />
+			<targetElement type="EmailAddress" qualifier="bccAddresses"
+				cardinality="many" collectiontype="list" />
+		</relation>
+
+		<relation code="EmailMessage2FromAddressRel" localized="false"
+			autocreate="true" generate="true">
+			<description>This relation holds information about the sender of the email message.</description>
+			<sourceElement type="EmailMessage" qualifier="messagesSent"
+				cardinality="many" collectiontype="list" />
+			<targetElement type="EmailAddress" qualifier="fromAddress"
+				cardinality="one" />
+		</relation>
+
+		<relation code="EmailMessage2EmailAttachmentsRel" localized="false"
+			autocreate="true" generate="true">
+			<description>This relation links email message with the attachments of this message.</description>
+			<sourceElement type="EmailMessage" qualifier="message"
+				cardinality="one" />
+			<targetElement type="EmailAttachment" qualifier="attachments"
+				cardinality="many" collectiontype="list">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="BusinessProcess2EmailMessageRel" autocreate="true"
+			generate="true" localized="false">
+			<description>This relation links email message with specific business process.</description>
+			<sourceElement qualifier="process" type="BusinessProcess"
+				cardinality="one" />
+			<targetElement qualifier="emails" type="EmailMessage"
+				cardinality="many" collectiontype="list" />
+		</relation>
+
+		<relation code="ExportDataCronJob2ExportDataHistoryRel"
+			localized="false" autocreate="true" generate="true">
+			<description>A one to many relation between ExportDataCronJob and ExportDataHistory</description>
+			<sourceElement qualifier="exportDataCronJob" type="ExportDataCronJob"
+				cardinality="one" />
+			<targetElement qualifier="historyEntries" type="ExportDataHistoryEntry"
+				cardinality="many" collectiontype="list" />
+		</relation>
+
+		<relation code="BaseSite2CartRemovalCronJob" generate="true"
+			localized="false" autocreate="true">
+			<sourceElement type="BaseSite" cardinality="many"
+				qualifier="sites">
+				<modifiers read="true" write="true" search="true"
+					optional="false" />
+			</sourceElement>
+			<targetElement type="CartRemovalCronJob" cardinality="one"
+				qualifier="cartRemovalCronJob">
+				<modifiers read="true" write="true" search="true"
+					optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="BaseSite2UncollectedOrdersCronJob" generate="true"
+			localized="false" autocreate="true">
+			<sourceElement type="BaseSite" cardinality="many"
+				qualifier="sites">
+				<modifiers read="true" write="true" search="true"
+					optional="false" />
+			</sourceElement>
+			<targetElement type="UncollectedOrdersCronJob"
+				cardinality="one" qualifier="uncollectedOrdersCronJob">
+				<modifiers read="true" write="true" search="true"
+					optional="true" />
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+
+		<typegroup name="CmsSite">
+			<itemtype code="CMSSite" autocreate="false" generate="false">
+				<description>Extends existing type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="urlEncodingAttributes" type="StringCollection">
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="siteMaps" type="MediaCollection">
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="siteMapConfig" type="SiteMapConfig">
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+
+		<typegroup name="Consignment">
+
+			<itemtype code="Consignment" autocreate="false" generate="false">
+				<description>Extending Consignment type with additional attributes.</description>
+				<attributes>
+					<attribute type="java.lang.String" qualifier="statusDisplay">
+						<persistence type="dynamic"
+							attributeHandler="dynamicAttributesConsignmentStatusDisplay" />
+						<modifiers write="false" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="Payment">
+
+			<itemtype code="CreditCardPaymentInfo" autocreate="false"
+				generate="false">
+				<description>Extending CreditCardPaymentInfo type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="subscriptionValidated" type="boolean">
+						<description>Determines whether the subscription ID has been validated.</description>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="Subscription">
+						<key attribute="subscriptionId" />
+					</index>
+				</indexes>
+			</itemtype>
+
+			<itemtype code="CCPaySubValidation" autocreate="true"
+				generate="true"
+				jaloclass="de.hybris.platform.acceleratorservices.jalo.payment.CCPaySubValidation">
+				<description>Used for keeping track of valid subscriptions.</description>
+				<deployment table="CCPaySubValidation" typecode="6216" />
+				<attributes>
+					<attribute qualifier="subscriptionId" type="java.lang.String">
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+
+		<typegroup name="Promotions">
+
+			<itemtype code="AbstractPromotion" autocreate="false"
+				abstract="true" generate="false">
+				<attributes>
+					<attribute qualifier="name" generate="true"
+						type="localized:java.lang.String">
+						<persistence type="property" />
+						<modifiers optional="true" />
+						<description>Displayable name for this promotion</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="AcceleratorProductBOGOFPromotion" extends="ProductBOGOFPromotion"
+				autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.acceleratorservices.jalo.promotions.AcceleratorProductBOGOFPromotion">
+				<description>Replacement for ProductBOGOFPromotion. Fire only once for a entry rather firing for each set of qualifying count.</description>
+			</itemtype>
+
+			<itemtype code="AcceleratorProductMultiBuyPromotion"
+				extends="ProductMultiBuyPromotion" autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.acceleratorservices.jalo.promotions.AcceleratorProductMultiBuyPromotion">
+				<description>Replacement for ProductMultiBuyPromotion. Fire only once for a entry rather firing for each set of qualifying count.</description>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="Customer">
+
+			<itemtype code="EmailAddress" generate="true" autocreate="true"
+				jaloclass="de.hybris.platform.acceleratorservices.jalo.email.EmailAddress">
+				<description>Extending EmailAddress type with additional attributes.</description>
+				<deployment table="EmailAddress" typecode="6207" />
+				<attributes>
+					<attribute qualifier="emailAddress" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers unique="true" optional="false" initial="true"
+							write="false" />
+						<description>Email address of the given item.</description>
+					</attribute>
+					<attribute qualifier="displayName" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers unique="true" optional="false" initial="true"
+							write="false" />
+						<description>Display name displayed for given item.</description>
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="EmailAddress" unique="true">
+						<key attribute="emailAddress" />
+						<key attribute="displayName" />
+					</index>
+				</indexes>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="Emails">
+
+			<itemtype code="EmailMessage" generate="true" autocreate="true"
+				jaloclass="de.hybris.platform.acceleratorservices.jalo.email.EmailMessage">
+				<description>Extending EmailMessage type with additional attributes.</description>
+				<deployment table="EmailMessage" typecode="6208" />
+				<attributes>
+					<attribute qualifier="sent" type="boolean">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+						<description>Is set when the email message has been already sent.</description>
+					</attribute>
+					<attribute qualifier="replyToAddress" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers optional="false" initial="true" write="false" />
+						<description>It's a string value with email address that message has to be replied to.</description>
+					</attribute>
+					<attribute qualifier="subject" type="java.lang.String">
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+						<modifiers optional="false" initial="true" write="false" />
+						<description>Subject of the email message.</description>
+					</attribute>
+					<attribute qualifier="body" type="java.lang.String">
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+						<modifiers optional="true" />
+						<description>Body of the email message.</description>
+					</attribute>
+					<attribute qualifier="bodyMedia" type="Media">
+						<persistence type="property" />
+						<modifiers optional="true" partof="true" />
+						<description>Body of the email message which is too big to put in 'body' attribute</description>
+					</attribute>
+					<attribute qualifier="sentDate" type="java.util.Date">
+						<modifiers optional="true" initial="false" />
+						<persistence type="property" />
+						<description>Date of sending the email message.</description>
+					</attribute>
+					<attribute qualifier="sentMessageID" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers optional="true" initial="false" />
+						<description>Identifier of the email message.</description>
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="EmailMessageSent" unique="false">
+						<key attribute="sent" />
+					</index>
+				</indexes>
+			</itemtype>
+
+			<itemtype code="EmailAttachment" extends="Media" generate="true"
+				autocreate="true"
+				jaloclass="de.hybris.platform.acceleratorservices.jalo.email.EmailAttachment">
+				<description>Item that represents email attachment. It extends Media type without adding any new attribute.</description>
+			</itemtype>
+
+
+			<itemtype code="EmailPageTemplate" extends="PageTemplate"
+				autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.acceleratorservices.jalo.cms2.pages.EmailPageTemplate">
+				<description>Represents template to generate email messages.</description>
+				<attributes>
+					<attribute qualifier="htmlTemplate" type="RendererTemplate">
+						<persistence type="property" />
+						<description>Contains renderer that generates body of the email message.</description>
+					</attribute>
+					<attribute qualifier="subject" type="RendererTemplate">
+						<persistence type="property" />
+						<description>Contains renderer that generates subject of the email message.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="EmailPage" extends="AbstractPage"
+				autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.acceleratorservices.jalo.cms2.pages.EmailPage">
+				<description>Represents generated or created email page. Extends AbstractPage type without adding any new attribute.</description>
+				<attributes>
+					<attribute qualifier="fromEmail" type="localized:java.lang.String">
+						<persistence type="property" />
+						<description>Holds email From address information for the email page.</description>
+					</attribute>
+					<attribute qualifier="fromName" type="localized:java.lang.String">
+						<persistence type="property" />
+						<description>Holds email address From name information for the email page.</description>
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="EmailPageMasterTpl" unique="false">
+						<key attribute="mastertemplate" />
+					</index>
+				</indexes>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="Import Batch">
+
+			<itemtype code="Product" autocreate="false" generate="false">
+				<description>Extending the Product type from core with additional attributes.</description>
+				<attributes>
+					<attribute type="java.lang.Long" qualifier="sequenceId">
+						<modifiers optional="true" />
+						<persistence type="property" />
+						<description>Attribute is used in batch import process for avoiding multiple imports.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="PriceRow" autocreate="false" generate="false">
+				<description>Extending the PriceRow type from core with additional attributes.</description>
+				<attributes>
+					<attribute type="java.lang.Long" qualifier="sequenceId">
+						<modifiers optional="true" />
+						<persistence type="property" />
+						<description>Attribute is used in batch import process for avoiding multiple imports.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="Export Batch">
+
+			<itemtype code="ExportDataCronJob" autocreate="true"
+				generate="true" extends="CronJob"
+				jaloclass="de.hybris.platform.acceleratorservices.jalo.export.ExportDataCronJob">
+				<description>CronJob holding information to export to a third party</description>
+				<attributes>
+
+					<attribute qualifier="job" type="ServicelayerJob"
+						redeclare="true">
+						<description>Redeclare job type as ServicelayerJob</description>
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true"
+							optional="false" />
+					</attribute>
+
+					<attribute qualifier="baseStore" type="BaseStore">
+						<description>The base store to run against</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" />
+					</attribute>
+
+					<attribute qualifier="cmsSite" type="CMSSite">
+						<description>The cms site to run against</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" />
+					</attribute>
+
+					<attribute qualifier="language" type="Language">
+						<description>The language context</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" />
+					</attribute>
+
+					<attribute qualifier="currency" type="Currency">
+						<description>The currency context</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" />
+					</attribute>
+
+					<attribute qualifier="user" type="User">
+						<description>The user to set the export context to</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" />
+					</attribute>
+
+					<attribute qualifier="thirdPartyHost" type="java.lang.String">
+						<description>The location of the third party account</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" />
+					</attribute>
+
+					<attribute qualifier="thirdPartyUsername" type="java.lang.String">
+						<description>The username of the third party account</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" />
+					</attribute>
+
+					<attribute qualifier="thirdPartyPassword" type="java.lang.String">
+						<description>The password of the third party account</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" />
+					</attribute>
+
+					<attribute qualifier="dataGenerationPipeline" type="java.lang.String">
+						<description>The name of the pipeline that generates the data</description>
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true"
+							optional="false" />
+					</attribute>
+
+				</attributes>
+			</itemtype>
+
+			<itemtype code="ExportDataHistoryEntry" autocreate="true"
+				generate="true" extends="GenericItem"
+				jaloclass="de.hybris.platform.acceleratorservices.jalo.export.ExportDataHistoryEntry">
+				<description>Contains a history of executed exports</description>
+				<deployment table="ExportDataHistoryEntry" typecode="6211" />
+				<attributes>
+					<attribute qualifier="code" type="java.lang.String">
+						<description>unique code that identifies the export data history</description>
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true"
+							optional="false" unique="true" />
+					</attribute>
+
+					<attribute qualifier="status" type="ExportDataStatus">
+						<description>The status of this particular export</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" />
+					</attribute>
+
+					<attribute qualifier="startTime" type="java.util.Date">
+						<description>Start time of this export</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" />
+					</attribute>
+
+					<attribute qualifier="finishTime" type="java.util.Date">
+						<description>Start time of this export</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" />
+					</attribute>
+
+					<attribute qualifier="processedResultCount" type="java.lang.Integer">
+						<description>The amount of records that was written to the export file</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" />
+					</attribute>
+
+					<attribute qualifier="failureMessage" type="java.lang.String">
+						<description>Message if failure occurred</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" />
+					</attribute>
+
+				</attributes>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="Solr">
+
+			<itemtype code="SolrPageRedirect" autocreate="true"
+				generate="true" extends="SolrAbstractKeywordRedirect"
+				jaloclass="de.hybris.platform.acceleratorservices.jalo.redirect.SolrPageRedirect">
+				<attributes>
+					<attribute qualifier="redirectItem" type="AbstractPage">
+						<modifiers read="true" write="false" initial="true"
+							optional="false" search="true" />
+						<persistence type="property" />
+					</attribute>
+					<attribute type="java.lang.String" qualifier="hmcLabel"
+						redeclare="true">
+						<modifiers write="false" read="true" search="true" />
+						<persistence type="dynamic" attributeHandler="pageRedirectHmcLabelProvider" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="Cart Removal">
+
+			<itemtype code="CartRemovalCronJob" autocreate="true"
+				generate="true" extends="CronJob"
+				jaloclass="de.hybris.platform.acceleratorservices.jalo.CartRemovalCronJob">
+			</itemtype>
+
+			<itemtype code="BaseSite" autocreate="false" generate="false">
+				<attributes>
+					<attribute type="java.lang.Integer" qualifier="cartRemovalAge">
+						<modifiers />
+						<persistence type="property" />
+						<defaultvalue>Integer.valueOf(2419200)</defaultvalue>
+						<description>After specified number of seconds carts will be cleaned up. Default is 28 days.</description>
+					</attribute>
+					<attribute type="java.lang.Integer" qualifier="anonymousCartRemovalAge">
+						<modifiers />
+						<persistence type="property" />
+						<defaultvalue>Integer.valueOf(1209600)</defaultvalue>
+						<description>After specified number of seconds carts will be cleaned up. Default is 14 days.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="Uncollected pick up orders reminders">
+			<itemtype code="UncollectedOrdersCronJob" autocreate="true"
+				generate="true" extends="CronJob"
+				jaloclass="de.hybris.platform.acceleratorservices.jalo.UncollectedOrdersCronJob">
+			</itemtype>
+		</typegroup>
+
+
+		<typegroup name="Processes">
+			<itemtype code="StoreFrontCustomerProcess" autocreate="false"
+				generate="false">
+				<attributes>
+					<attribute qualifier="currency" type="Currency">
+						<persistence type="property" />
+						<description>Storefront currency.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<!-- Subtype of BusinessProcess -->
+			<itemtype code="OrderModificationProcess" autocreate="true"
+				generate="true"
+				jaloclass="de.hybris.platform.acceleratorservices.orderprocessing.jalo.OrderModificationProcess"
+				extends="OrderProcess">
+				<attributes>
+					<attribute qualifier="orderModificationRecordEntry" type="OrderModificationRecordEntry">
+						<persistence type="property" />
+						<description>Object storing order modification details.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="BaseStore">
+
+			<itemtype code="BaseStore" autocreate="false" generate="false">
+				<description>Extending BaseStore type with additional attributes.</description>
+				<attributes>
+					<attribute type="java.lang.Boolean" qualifier="expressCheckoutEnabled">
+						<description>Determines if a site has the express checkout option.</description>
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					</attribute>
+					<attribute type="java.lang.Boolean" qualifier="taxEstimationEnabled">
+						<description>Determines if a site has the tax estimation enabled.</description>
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					</attribute>
+					<attribute type="java.lang.String" qualifier="checkoutFlowGroup">
+						<description>Determines the checkout group</description>
+						<persistence type="property" />
+						<modifiers optional="true"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+
+		<typegroup name="SiteMap">
+
+			<itemtype code="SiteMapPage" autocreate="true" generate="true">
+				<description>Creating a Site Map type to group attributes per page type</description>
+				<deployment table="SiteMapPage" typecode="6225" />
+				<attributes>
+					<attribute qualifier="code" type="SiteMapPageEnum">
+						<description>The type of page to be qualified</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="frequency" type="SiteMapChangeFrequencyEnum">
+						<description>How often the page should be updated.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="priority" type="java.lang.Double">
+						<description>The weight the page should have in the sitemap</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="active" type="java.lang.Boolean">
+						<description>Is sitemap page enabled or disabled</description>
+						<persistence type="property" />
+						<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="SiteMapLanguageCurrency" autocreate="true"
+				generate="true">
+				<description>Holds the language and currency combination allowed for a site</description>
+				<deployment table="SiteMapLanguageCurrency" typecode="6223" />
+				<attributes>
+					<attribute qualifier="language" type="Language">
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="currency" type="Currency">
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="SiteMapConfig" autocreate="true" generate="true">
+				<description>Holds the site map configurations</description>
+				<deployment table="SiteMapConfig" typecode="6224" />
+				<attributes>
+					<attribute qualifier="configId" type="java.lang.String">
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="siteMapLanguageCurrencies" type="SiteMapLanguageCurrencyCollection">
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="siteMapPages" type="SiteMapPageCollection">
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="siteMapTemplate" type="RendererTemplate">
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="customUrls" type="StringCollection">
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="SiteMapMediaCronJob" autocreate="true"
+				generate="true" extends="CronJob">
+				<description>Cronjob to generate the sitemap media per site</description>
+				<attributes>
+					<attribute qualifier="contentSite" type="CMSSite">
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="siteMapUrlLimitPerFile" type="java.lang.Integer">
+						<persistence type="property" />
+						<defaultvalue>java.lang.Integer.valueOf(50000)</defaultvalue>
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+	</itemtypes>
+</items>

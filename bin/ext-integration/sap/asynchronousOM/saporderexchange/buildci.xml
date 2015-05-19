@@ -1,0 +1,28 @@
+<project name="Translate" default="movexx" basedir=".">
+	<description>
+		Generates language independent properties files
+	</description>
+
+	<target name="movexx">
+		<!-- renames all *_xx.properties to *.properties for translation those renamed must never be checked in, as this will delete the 
+			_xx files as they are not visible anymore. After translation comes back the content will be in the _en files -->
+		<move todir="${fpath}" includeemptydirs="false">
+			<fileset dir="${fpath}" />
+			<mapper type="glob" from="*_xx.properties" to="*.properties" />
+		</move>
+	</target>
+	
+	<target name="createxx">
+			<!-- renames all *.properties to *_xx.properties for translation if they are not language dependent,
+				i.e. follow the _<co>.properties pattern (with <co> 0 country, e.g. de, en, fr, etc.).
+			-->
+			<property name="fpath" value=".\" />
+			<move todir="${fpath}" includeemptydirs="false">
+				<fileset dir="${fpath}" includes="**/localization/*">
+					<filename regex="[^_]\D\D\.properties" />
+				</fileset>
+				<mapper type="glob" from="*.properties" to="*_xx.properties" />
+			</move>
+			<delete dir="target" /> <!-- we don't care for the xlf files -->
+		</target>
+</project>

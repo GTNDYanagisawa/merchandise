@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- The items -->
+	<bean id="de.hybris.platform.ldap.util.LDAPInputFilter" class="de.hybris.platform.ldap.util.LDAPInputFilterImpl" scope="prototype" />
+
+	<bean id="ldifImportJobPerformable" class="de.hybris.platform.ldap.jobs.LDIFImportJobPerformable" parent="abstractJobPerformable">
+		<lookup-method name="lookupLDIFImportStrategy" bean="commonLDIFImportStrategy" />
+	</bean>
+
+	<bean id="ldifGroupImportJobPerformable" class="de.hybris.platform.ldap.jobs.LDIFGroupImportJobPerformable" parent="abstractJobPerformable">
+		<lookup-method name="lookupLDIFImportStrategy" bean="commonLDIFImportStrategy" />
+	</bean>
+
+	<bean id="commonLDIFImportStrategy" class="de.hybris.platform.ldap.jobs.impl.DefaultLDIFImportStrategy" scope="prototype">
+		<property name="ldapManager">
+			<bean class="de.hybris.platform.ldap.jalo.LDAPManager" factory-method="getInstance"/>
+		</property>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<alias name="ldapPasswordEncoderService" alias="passwordEncoderService"/>
+	<bean id="ldapPasswordEncoderService" class="de.hybris.platform.ldap.services.impl.LDAPPasswordEncoderService" parent="defaultPasswordEncoderService"/>
+
+	<alias alias="core.userManager" name="ldap.core.userManager" />
+
+	<bean id="ldap.core.userManager" class="de.hybris.platform.jalo.user.UserManager" init-method="init" >
+		<property name="passwordCheckingStrategy">
+			<bean class="de.hybris.platform.ldap.jalo.security.user.LDAPUserPasswordCheckingStrategy"/>
+		</property>
+	</bean>
+	
+	<bean id="defaultHacLdapController" class="de.hybris.platform.ldap.util.DefaultHacLdapController" />
+
+</beans>

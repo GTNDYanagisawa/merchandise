@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PostSalesRecovery" language="groovy" pageWidth="595" pageHeight="420" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" scriptletClass="de.hybris.platform.cockpit.reports.scriptlets.DateTimeScriptlet" resourceBundle="localization/jasperreports">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="lineDS">
+		<parameter name="From" class="java.util.Date" isForPrompting="false"/>
+		<parameter name="To" class="java.util.Date" isForPrompting="false"/>
+		<parameter name="PreviousYearFrom" class="java.util.Date" isForPrompting="false"/>
+		<parameter name="PreviousYearTo" class="java.util.Date" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[select PER, PERIOD from
+(
+{{
+select case when (REFUNDCOUNT + REPLACEMENTCOUNT) = 0 then null else REPLACEMENTCOUNT *100/(REFUNDCOUNT + REPLACEMENTCOUNT) end PER, PERIOD from
+({{
+select refundtb.REFUNDCOUNT, replacementtb.REPLACEMENTCOUNT, refundtb.PERIOD from
+({{
+select count(distinct({o.code})) REFUNDCOUNT, 'GP1' PERIOD from {order as o join ReturnRequest on {o.pk} = {ReturnRequest.order} join RefundEntry on {RefundEntry.ReturnRequest} = {ReturnRequest.pk}  join ReturnStatus on {RefundEntry.STATUS}={ReturnStatus.PK} and {ReturnStatus.CODE}='RECEIVED'} where {o.DATE} < $P{To} and {o.DATE} >= $P{From}
+}})  refundtb
+join
+({{
+select count(distinct({o.code})) REPLACEMENTCOUNT, 'GP1' PERIOD from {order as o join ReturnRequest on {o.pk} = {ReturnRequest.order} join ReplacementEntry on {ReplacementEntry.ReturnRequest} = {ReturnRequest.pk}  join ReturnStatus on {ReplacementEntry.STATUS}={ReturnStatus.PK} and {ReturnStatus.CODE}='RECEIVED'} where {o.DATE} < $P{To} and {o.DATE} >= $P{From}
+}})  replacementtb
+on refundtb.PERIOD=replacementtb.PERIOD  where (REFUNDCOUNT + REPLACEMENTCOUNT) >0
+}}) GROUP1 }}
+union all
+{{
+select case when (REFUNDCOUNT + REPLACEMENTCOUNT) = 0 then null else REPLACEMENTCOUNT *100/(REFUNDCOUNT + REPLACEMENTCOUNT) end PER, PERIOD from
+({{
+select refundtb.REFUNDCOUNT, replacementtb.REPLACEMENTCOUNT, refundtb.PERIOD from
+({{
+select count(distinct({o.code})) REFUNDCOUNT, 'GP2' PERIOD from {order as o join ReturnRequest on {o.pk} = {ReturnRequest.order} join RefundEntry on {RefundEntry.ReturnRequest} = {ReturnRequest.pk}  join ReturnStatus on {RefundEntry.STATUS}={ReturnStatus.PK} and {ReturnStatus.CODE}='RECEIVED'} where {o.DATE} < $P{PreviousYearTo} and {o.DATE} >= $P{PreviousYearFrom}
+}})  refundtb
+join
+({{
+select count(distinct({o.code})) REPLACEMENTCOUNT, 'GP2' PERIOD from {order as o join ReturnRequest on {o.pk} = {ReturnRequest.order} join ReplacementEntry on {ReplacementEntry.ReturnRequest} = {ReturnRequest.pk}  join ReturnStatus on {ReplacementEntry.STATUS}={ReturnStatus.PK} and {ReturnStatus.CODE}='RECEIVED'} where {o.DATE} < $P{PreviousYearTo} and {o.DATE} >= $P{PreviousYearFrom}
+}})  replacementtb
+on refundtb.PERIOD=replacementtb.PERIOD where (REFUNDCOUNT + REPLACEMENTCOUNT) >0
+}}) GROUP2 }}
+) final order by PERIOD desc]]>
+		</queryString>
+		<field name="PER" class="java.math.BigDecimal"/>
+		<field name="PERIOD" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="barDS">
+		<parameter name="From" class="java.util.Date" isForPrompting="false"/>
+		<parameter name="To" class="java.util.Date" isForPrompting="false"/>
+		<parameter name="PreviousYearFrom" class="java.util.Date" isForPrompting="false"/>
+		<parameter name="PreviousYearTo" class="java.util.Date" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[select count(ORDCODE) ORDCOUNT, STATUS, GROUPED
+from (
+{{select distinct({o.code}) ORDCODE, 'Refunds' STATUS, 'GP1' GROUPED from {order as o join ReturnRequest on {o.pk} = {ReturnRequest.order} join RefundEntry on {RefundEntry.ReturnRequest} = {ReturnRequest.pk}  join ReturnStatus on {RefundEntry.STATUS}={ReturnStatus.PK} and {ReturnStatus.CODE}='RECEIVED'} where {o.DATE} < $P{To} and {o.DATE} >= $P{From} }}
+union all
+{{select distinct({o.code}) ORDCODE, 'Replacement' STATUS, 'GP1' GROUPED from {order as o join ReturnRequest on {o.pk} = {ReturnRequest.order} join ReplacementEntry on {ReplacementEntry.ReturnRequest} = {ReturnRequest.pk} join ReturnStatus on {ReplacementEntry.STATUS}={ReturnStatus.PK} and {ReturnStatus.CODE}='RECEIVED'} where {o.DATE} < $P{To} and {o.DATE} >= $P{From} }}
+union all
+{{select distinct({o.code}) ORDCODE, 'Refunds' STATUS, 'GP2' GROUPED from {order as o join ReturnRequest on {o.pk} = {ReturnRequest.order} join RefundEntry on {RefundEntry.ReturnRequest} = {ReturnRequest.pk}  join ReturnStatus on {RefundEntry.STATUS}={ReturnStatus.PK} and {ReturnStatus.CODE}='RECEIVED'} where {o.DATE} < $P{PreviousYearTo} and {o.DATE} >= $P{PreviousYearFrom} }}
+union all
+{{select distinct({o.code}) ORDCODE, 'Replacement' STATUS, 'GP2' GROUPED from {order as o join ReturnRequest on {o.pk} = {ReturnRequest.order} join ReplacementEntry on {ReplacementEntry.ReturnRequest} = {ReturnRequest.pk} join ReturnStatus on {ReplacementEntry.STATUS}={ReturnStatus.PK} and {ReturnStatus.CODE}='RECEIVED'} where {o.DATE} < $P{PreviousYearTo} and {o.DATE} >= $P{PreviousYearFrom} }}
+)tbl group by STATUS, GROUPED order by GROUPED desc]]>
+		</queryString>
+		<field name="ORDCOUNT" class="java.lang.Long"/>
+		<field name="STATUS" class="java.lang.String"/>
+		<field name="GROUPED" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="timerange" class="java.lang.String">
+		<property name="type" value="ReportTimeRange"/>
+		<defaultValueExpression><![CDATA["LAST7DAYS"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="REPORT_TITLE" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="specificday" class="java.util.Date"/>
+	<parameter name="From" class="java.util.Date"/>
+	<parameter name="To" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[SELECT {code} FROM {Order}]]>
+	</queryString>
+	<field name="Code" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="595" height="80"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<summary>
+		<band height="340" splitType="Stretch">
+			<textField pattern="dd MMMM yyyy">
+				<reportElement x="459" y="282" width="114" height="20">
+					<printWhenExpression><![CDATA[$P{timerange} == 'USERDEFINED']]></printWhenExpression>
+				</reportElement>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{To}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MMMM yyyy">
+				<reportElement x="185" y="302" width="114" height="20">
+					<printWhenExpression><![CDATA[$P{timerange} == 'SPECIFICDAY']]></printWhenExpression>
+				</reportElement>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{specificday}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="10" y="282" width="175" height="20"/>
+				<textElement>
+					<font isBold="true" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString( "legend.timerange" )]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="10" y="262" width="175" height="20"/>
+				<textElement>
+					<font isBold="true" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString( "legend.created" )]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="316" y="282" width="143" height="20">
+					<printWhenExpression><![CDATA[$P{timerange} == 'USERDEFINED']]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font isBold="true" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString( "legend.to" )]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="185" y="282" width="114" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString( "series." + $P{timerange}.toLowerCase() )]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="316" y="262" width="143" height="20">
+					<printWhenExpression><![CDATA[$P{timerange} == 'USERDEFINED']]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font isBold="true" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString( "legend.from" )]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MMMM yyyy" isBlankWhenNull="false">
+				<reportElement x="459" y="262" width="114" height="20">
+					<printWhenExpression><![CDATA[$P{timerange} == 'USERDEFINED']]></printWhenExpression>
+				</reportElement>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{From}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MMMM yyyy HH:mm">
+				<reportElement x="185" y="262" width="114" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="10" y="302" width="175" height="20">
+					<printWhenExpression><![CDATA[$P{timerange} == 'SPECIFICDAY']]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font isBold="true" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString( "legend.specificday" )]]></textFieldExpression>
+			</textField>
+			<multiAxisChart>
+				<chart>
+					<reportElement x="0" y="0" width="595" height="230"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<multiAxisPlot>
+					<plot/>
+					<axis>
+						<barChart>
+							<chart customizerClass="de.hybris.platform.cockpit.reports.customizer.CSMBarChartCustomizer">
+								<reportElement x="0" y="0" width="0" height="0" backcolor="#FFFFFF"/>
+								<chartTitle color="#000000"/>
+								<chartSubtitle color="#000000"/>
+								<chartLegend textColor="#000000" backgroundColor="#FFFFFF"/>
+							</chart>
+							<categoryDataset>
+								<dataset>
+									<datasetRun subDataset="barDS">
+										<datasetParameter name="From">
+											<datasetParameterExpression><![CDATA[$P{REPORT_SCRIPTLET}.getFrom($P{timerange},$P{From},$P{specificday})]]></datasetParameterExpression>
+										</datasetParameter>
+										<datasetParameter name="To">
+											<datasetParameterExpression><![CDATA[$P{REPORT_SCRIPTLET}.getTo($P{timerange},$P{To},$P{specificday})]]></datasetParameterExpression>
+										</datasetParameter>
+										<datasetParameter name="PreviousYearFrom">
+											<datasetParameterExpression><![CDATA[$P{REPORT_SCRIPTLET}.getFromYearAgo($P{timerange},$P{From},$P{specificday})]]></datasetParameterExpression>
+										</datasetParameter>
+										<datasetParameter name="PreviousYearTo">
+											<datasetParameterExpression><![CDATA[$P{REPORT_SCRIPTLET}.getToYearAgo($P{timerange},$P{To},$P{specificday})]]></datasetParameterExpression>
+										</datasetParameter>
+										<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+									</datasetRun>
+								</dataset>
+								<categorySeries>
+									<seriesExpression><![CDATA[str($F{STATUS})]]></seriesExpression>
+									<categoryExpression><![CDATA[$F{GROUPED} == "GP2" ? (new org.joda.time.DateMidnight($P{PreviousYearFrom}).toString("dd MMMM yyyy") + " - " + new org.joda.time.DateMidnight($P{PreviousYearTo}).toString("dd MMMM yyyy"))
+: (new org.joda.time.DateMidnight($P{From}).toString("dd MMMM yyyy") + " - " + new org.joda.time.DateMidnight($P{To}).toString("dd MMMM yyyy"))]]></categoryExpression>
+									<valueExpression><![CDATA[$F{ORDCOUNT}]]></valueExpression>
+									<labelExpression><![CDATA[str($F{STATUS})]]></labelExpression>
+								</categorySeries>
+							</categoryDataset>
+							<barPlot>
+								<plot/>
+								<itemLabel color="#000000" backgroundColor="#FFFFFF"/>
+								<categoryAxisLabelExpression><![CDATA[str("axis.refrepl")]]></categoryAxisLabelExpression>
+								<categoryAxisFormat>
+									<axisFormat>
+										<labelFont/>
+										<tickLabelFont/>
+									</axisFormat>
+								</categoryAxisFormat>
+								<valueAxisLabelExpression><![CDATA[str("axis.orders")]]></valueAxisLabelExpression>
+								<valueAxisFormat>
+									<axisFormat>
+										<labelFont/>
+										<tickLabelFont/>
+									</axisFormat>
+								</valueAxisFormat>
+							</barPlot>
+						</barChart>
+					</axis>
+					<axis>
+						<lineChart>
+							<chart customizerClass="de.hybris.platform.cockpit.reports.customizer.CSMLineChartCustomizer">
+								<reportElement x="0" y="0" width="0" height="0" backcolor="#FFFFFF"/>
+								<chartTitle color="#000000"/>
+								<chartSubtitle color="#000000"/>
+								<chartLegend textColor="#000000" backgroundColor="#FFFFFF"/>
+							</chart>
+							<categoryDataset>
+								<dataset>
+									<datasetRun subDataset="lineDS">
+										<datasetParameter name="From">
+											<datasetParameterExpression><![CDATA[$P{REPORT_SCRIPTLET}.getFrom($P{timerange},$P{From},$P{specificday})]]></datasetParameterExpression>
+										</datasetParameter>
+										<datasetParameter name="To">
+											<datasetParameterExpression><![CDATA[$P{REPORT_SCRIPTLET}.getTo($P{timerange},$P{To},$P{specificday})]]></datasetParameterExpression>
+										</datasetParameter>
+										<datasetParameter name="PreviousYearFrom">
+											<datasetParameterExpression><![CDATA[$P{REPORT_SCRIPTLET}.getFromYearAgo($P{timerange},$P{From},$P{specificday})]]></datasetParameterExpression>
+										</datasetParameter>
+										<datasetParameter name="PreviousYearTo">
+											<datasetParameterExpression><![CDATA[$P{REPORT_SCRIPTLET}.getFromYearAgo($P{timerange},$P{To},$P{specificday})]]></datasetParameterExpression>
+										</datasetParameter>
+										<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+									</datasetRun>
+								</dataset>
+								<categorySeries>
+									<seriesExpression><![CDATA[str("recoveryconversion")]]></seriesExpression>
+									<categoryExpression><![CDATA[$F{PERIOD} == "GP2" ? (new org.joda.time.DateMidnight($P{PreviousYearFrom}).toString("dd MMMM yyyy") + " - " + new org.joda.time.DateMidnight($P{PreviousYearTo}).toString("dd MMMM yyyy"))
+: (new org.joda.time.DateMidnight($P{From}).toString("dd MMMM yyyy") + " - " + new org.joda.time.DateMidnight($P{To}).toString("dd MMMM yyyy"))]]></categoryExpression>
+									<valueExpression><![CDATA[$F{PER}/100]]></valueExpression>
+								</categorySeries>
+							</categoryDataset>
+							<linePlot>
+								<plot/>
+								<categoryAxisFormat>
+									<axisFormat>
+										<labelFont/>
+										<tickLabelFont/>
+									</axisFormat>
+								</categoryAxisFormat>
+								<valueAxisLabelExpression><![CDATA[str("axis.recoveryconversion")]]></valueAxisLabelExpression>
+								<valueAxisFormat>
+									<axisFormat>
+										<labelFont/>
+										<tickLabelFont/>
+									</axisFormat>
+								</valueAxisFormat>
+							</linePlot>
+						</lineChart>
+					</axis>
+				</multiAxisPlot>
+			</multiAxisChart>
+		</band>
+	</summary>
+</jasperReport>

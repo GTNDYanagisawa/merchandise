@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<web-app id="hmc" version="3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" 
+         metadata-complete="true">
+  <absolute-ordering />
+  
+	<display-name>hybris Management Console (hmc)</display-name>
+
+	<context-param>
+  		<param-name>logincookie</param-name>
+    	<param-value>hmcCookie</param-value> <!-- dont change this value (see MainChip) -->
+  	</context-param>
+  	  	
+	<!-- uncomment this to activate http session replication -->
+	<!-- <distributable/> -->
+		
+	<!--
+	<filter>
+		<filter-name>gzipfilter</filter-name>
+		<filter-class>de.hybris.platform.util.GZIPServletFilter</filter-class>
+	</filter>
+	-->
+	
+	<!-- <filter>
+		<filter-name>InitFilter</filter-name>
+		<filter-class>de.hybris.platform.util.HybrisInitFilter</filter-class>
+		<init-param>
+			<param-name>enable.compression</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>tenantIDPattern</param-name>
+			<param-value>;\s*tenantID\s*=\s*(\w+)</param-value>
+		</init-param>
+		<init-param>
+			<param-name>redirectOnSystemInit</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>tenantID.cookies</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>tenantID.cookie.name</param-name>
+			<param-value>_hybris.tenantID.hmc_</param-value>
+		</init-param>
+	</filter> -->
+ 
+	<filter>
+   		<filter-name>XSSFilter</filter-name>
+		<filter-class>de.hybris.platform.servicelayer.web.XSSFilter</filter-class>
+	</filter>
+
+    <filter>
+     <filter-name>characterEncodingFilter</filter-name>
+     <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+     <init-param>
+     	<param-name>encoding</param-name>
+     	<param-value>UTF-8</param-value>
+     </init-param>
+     <init-param>
+     	<param-name>forceEncoding</param-name>
+     	<param-value>true</param-value>
+     </init-param>
+    </filter>
+    
+    <filter>
+     <filter-name>hmcFilterChain</filter-name>
+     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+
+	<!--
+	<filter>
+      <filter-name>profilingfilter</filter-name>
+      <filter-class>de.hybris.platform.util.ProfilingFilter</filter-class>
+      <init-param>
+         <param-name>autostart</param-name>
+         <param-value>false</param-value>
+      </init-param>
+    </filter>
+	-->
+	<!--
+	<filter-mapping>
+		<filter-name>gzipfilter</filter-name>
+		<servlet-name>hmc</servlet-name>
+	</filter-mapping>
+	-->
+	
+	<filter-mapping>
+		<filter-name>XSSFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>characterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>hmcFilterChain</filter-name>
+		<servlet-name>hmc</servlet-name>
+	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>hmcFilterChain</filter-name>
+		<servlet-name>prototype</servlet-name>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>hmcFilterChain</filter-name>
+		<servlet-name>filedownload</servlet-name>
+	</filter-mapping>
+
+	<!-- <filter-mapping>
+		<filter-name>hmcFilterChain</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+	</filter-mapping>
+  -->
+   <filter-mapping>
+     <filter-name>hmcFilterChain</filter-name>
+     <url-pattern>/*</url-pattern>
+   </filter-mapping>
+   
+   <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>WEB-INF/hmc-web-spring.xml</param-value>
+   </context-param>
+  
+   <listener>
+    <listener-class>de.hybris.platform.spring.HybrisContextLoaderListener</listener-class>
+   </listener>
+	
+
+	<!--
+	<filter-mapping>
+      <filter-name>profilingfilter</filter-name>
+      <url-pattern>*.jsp</url-pattern>
+	</filter-mapping>
+	
+    <filter-mapping>
+      <filter-name>profilingfilter</filter-name>
+	  <servlet-name>hmc</servlet-name>
+    </filter-mapping>
+	-->
+	
+	<servlet>
+		<servlet-name>hmc</servlet-name>
+		
+		<servlet-class>de.hybris.platform.hmc.HMCMasterServlet</servlet-class>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>filedownload</servlet-name>
+		<servlet-class>de.hybris.platform.hmc.FileDownloadServlet</servlet-class>
+	</servlet>
+	
+
+	<servlet>
+		<servlet-name>prototype</servlet-name>
+		<servlet-class>de.hybris.platform.hmc.ajax.PrototypeServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>hmc</servlet-name>
+		<url-pattern>/hybris</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>filedownload</servlet-name>
+		<url-pattern>/FileDownloadServlet</url-pattern>
+	</servlet-mapping>
+	
+
+	<servlet-mapping>
+		<servlet-name>prototype</servlet-name>
+		<url-pattern>/prototype</url-pattern>
+	</servlet-mapping>
+
+	<session-config>
+      <session-timeout>240</session-timeout>
+   </session-config>
+	
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+	
+
+</web-app>

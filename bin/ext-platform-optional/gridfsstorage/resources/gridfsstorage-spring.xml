@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="http://www.springframework.org/schema/data/mongo 
+			  http://www.springframework.org/schema/data/mongo/spring-mongo-1.2.xsd
+	 		  http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<mongo:db-factory 
+		dbname="${media.globalSettings.gridFsStorageStrategy.mongo.dbname}" 
+		host="${media.globalSettings.gridFsStorageStrategy.mongo.host}"
+		port="${media.globalSettings.gridFsStorageStrategy.mongo.port}" 
+		username="${media.globalSettings.gridFsStorageStrategy.mongo.username}"
+		password="${media.globalSettings.gridFsStorageStrategy.mongo.password}" />
+
+	<bean id="gridFsStorageStrategy" class="de.hybris.platform.gridfs.media.storage.GridFSMediaStorageStrategy" init-method="setTenantPrefix">
+		<constructor-arg ref="mongoDbFactory" />
+		<constructor-arg ref="mediaLocationHashService" />
+	</bean>
+
+	<bean id="gridFsStorageCleaner" class="de.hybris.platform.gridfs.media.storage.GridFSMediaStorageCleaner" init-method="setTenantPrefix">
+		<property name="cleanOnInit" value="${media.globalSettings.gridFsStorageStrategy.cleanOnInit}" />
+		<property name="dbFactory" ref="mongoDbFactory" />
+		<property name="storageConfigService" ref="mediaStorageConfigService" />
+	</bean>
+</beans>

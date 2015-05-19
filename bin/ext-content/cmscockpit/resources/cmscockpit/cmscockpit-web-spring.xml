@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+
+<!-- WARNING: This is the Spring WEB configuration file. If you want to replace 
+	items or managers you have to do this from the extensions core configuration 
+	file (cmscockpit/resources/cmscockpit-application-context.xml) -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+
+	<import resource="cmscockpit-catalog-perspective.xml"/>
+	<import resource="cmscockpit-liveedit-perspective.xml"/>
+	<import resource="cmscockpit-navigation-perspective.xml"/>
+
+	<bean id="UICockpitSession" class="de.hybris.platform.cockpit.session.impl.UISessionImpl"
+		scope="session">
+		<property name="initialSessionListeners">
+			<list></list>
+		</property>
+		<property name="availablePerspectives">
+			<list>
+				<ref bean="CatalogPerspective" />
+				<ref bean="LiveEditPerspective" />
+				<ref bean="NavigationNodePerspective"/>
+				<!-- uncomment the following line if you want to enable external applications 
+					e.g. hMC -->
+				<!-- <ref bean="CmsExtAppPerspective"/> -->
+				
+				<!-- uncomment the following line if you want an administration perspective -->
+<!--				<ref bean="AdminPerspective" />-->
+				
+			</list>
+		</property>				
+		<property name="cachePerspectivesEnabled" value="true" />
+		<property name="requestHandler" ref="CMSRequestHandler" />
+		<property name="dragOverPerspectivesEnabled" value="true" />
+		<property name="cockpitTypeService" ref="cockpitTypeService" />
+		<property name="sendEventsImmediately" value="false" />
+		<property name="pushContainers">
+			<list value-type="de.hybris.platform.cockpit.session.impl.PushCreationContainer">
+				<ref bean="WorkflowPushContainer" />
+			</list>
+		</property>
+	</bean>
+
+
+	<bean id="WorkflowPushContainer"
+		class="de.hybris.platform.cockpit.session.impl.PushCreationContainer"
+		scope="session">
+		<constructor-arg
+			value="de.hybris.platform.cockpit.session.impl.WorkflowPushController"
+			index="0" />
+		<constructor-arg index="1">
+			<map>
+				<entry key="updateInterval" value="30000" />
+				<entry key="attClassNames" value-ref="WorkflowAttachmentData" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="CMSRequestHandler"
+		class="de.hybris.platform.cockpit.session.impl.DefaultRequestHandler"
+		scope="session">
+		<property name="requestEventHandlers">
+			<map>
+				<entry key="activation">
+					<bean
+						class="de.hybris.platform.cockpit.session.impl.ActivationEventHandler">
+						<property name="prefix" value="act" />
+					</bean>
+				</entry>
+				<entry key="search">
+					<bean class="de.hybris.platform.cockpit.session.impl.SearchEventHandler">
+						<property name="prefix" value="srch" />
+					</bean>
+				</entry>
+				<entry key="celum">
+					<bean class="de.hybris.platform.cockpit.session.impl.CelumEventHandler" />
+				</entry>
+				<entry key="cmsnavigation">
+					<bean
+						class="de.hybris.platform.cmscockpit.session.impl.CmsNavigationEventHandler">
+						<property name="prefix" value="nav" />
+					</bean>
+				</entry>
+				<entry key="pageviewnavigation">
+					<bean
+						class="de.hybris.platform.cmscockpit.session.impl.PageViewNavigationEventHandler">
+						<property name="prefix" value="pnav" />
+					</bean>
+				</entry>
+				<entry key="liveedit">
+					<bean
+						class="de.hybris.platform.cmscockpit.session.impl.CmsLiveEditEventHandler">
+						<property name="prefix" value="live" />
+					</bean>
+				</entry>
+				<entry key="liveeditpagenavigation">
+					<bean
+						class="de.hybris.platform.cmscockpit.session.impl.LiveEditPageNavigationEventHandler">
+						<property name="prefix" value="live" />
+					</bean>
+				</entry>
+				<entry key="wf">
+					<bean class="de.hybris.platform.cockpit.session.impl.TaskEventHandler">
+						<property name="attachmentTypes" ref="WorkflowAttachmentData" />
+						<property name="prefix" value="wf" />
+					</bean>
+				</entry>
+				<entry key="msg">
+					<bean
+						class="de.hybris.platform.cockpit.session.impl.NotificationEventHandler">
+						<property name="prefix" value="msg" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<!--#### External Applications Perspective start #### -->
+	<bean id="CmsExtAppPerspective" scope="session" parent="BasePerspective">
+		<property name="uid" value="cmscockpit.perspective.extapp" />  <!-- unique ID of the perspective -->
+		<property name="label" value="cmscockpit.perspective.extapp" />  <!-- localization key for the label of the perspective -->
+		<property name="customCsaURI" value="/cmscockpit/urlCSA.zul" />  <!-- file with optional custom client side actions -->
+
+		<property name="navigationArea">
+			<ref bean="CmsExtAppNavigationArea" />
+		</property>
+		<property name="browserArea">
+			<bean class="de.hybris.platform.cockpit.session.impl.UrlBrowserArea">
+				<property name="browserUid" value="urlbrowser.hmc" />
+				<property name="viewURI" value="/cmscockpit/urlBrowser.zul" />
+				<property name="wideScreen" value="true" />
+				<property name="viewModes">
+					<list>
+						<ref bean="hmcMainAreaFactory" />
+						<ref bean="hybrisMainAreaFactory" />
+					</list>
+				</property>
+			</bean>
+		</property>
+		<property name="editorArea">
+			<bean id="CmsExtAppEditorAreaModel" parent="BaseEditorAreaModel">
+				<property name="editorAreaController">
+					<ref bean="CmsExtAppEditorAreaController" />
+				</property>
+			</bean>
+		</property>
+		<property name="popupEditorArea">
+			<bean id="CmsExtAppPopupEditor" parent="BasePopupEditor">
+				<property name="editorAreaController">
+					<ref bean="CmsExtAppPopupEditorAreaController" />
+				</property>
+			</bean>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService" />
+	</bean>
+
+	<bean id="CmsExtAppNavigationArea"
+		class="de.hybris.platform.cockpit.session.impl.UrlNavigationArea"
+		scope="session" parent="BaseNavigationArea">
+		<property name="sectionModel">
+			<ref bean="CmsExtAppNavigationAreaModel" />
+		</property>
+		<property name="infoSlotRenderer">
+			<bean
+				class="de.hybris.platform.cockpit.components.navigationarea.renderer.InfoBoxRenderer" />
+		</property>
+		<property name="sections">
+			<list>
+				<!-- add section here -->
+			</list>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService" />
+	</bean>
+
+	<bean id="CmsExtAppNavigationAreaModel"
+		class="de.hybris.platform.cockpit.components.navigationarea.DefaultNavigationAreaModel"
+		scope="session">
+	</bean>
+
+	<bean id="CmsExtAppEditorAreaController"
+		class="de.hybris.platform.cockpit.session.impl.DefaultEditorAreaController"
+		scope="session">
+		<property name="sectionRowRenderer">
+			<bean id="CmsExtAppEditorSectionRowRenderer" parent="EditorSectionRowRenderer" />
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory" />
+		</property>
+	</bean>
+
+	<bean id="CmsExtAppPopupEditorAreaController"
+		class="de.hybris.platform.cockpit.session.impl.UrlPopupEditorAreaControllerImpl"
+		scope="prototype">
+		<property name="sectionRowRenderer">
+			<bean id="CmsExtAppPopupEditorSectionRowRenderer" parent="EditorSectionRowRenderer" />
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory" />
+		</property>
+	</bean>
+
+	<!-- view modes -->
+	<bean id="hmcMainAreaFactory"
+		class="de.hybris.platform.cockpit.components.contentbrowser.DefaultUrlMainAreaComponentFactory"
+		scope="prototype">
+		<property name="uid" value="urlarea.hmc" />
+		<property name="urlMappingBeanId" value="cmsUid2UrlMap" />
+	</bean>
+	<bean id="hybrisMainAreaFactory"
+		class="de.hybris.platform.cockpit.components.contentbrowser.DefaultUrlMainAreaComponentFactory"
+		scope="prototype">
+		<property name="uid" value="urlarea.hybris" />
+		<property name="urlMappingBeanId" value="cmsUid2UrlMap" />
+	</bean>
+
+	<!-- view mode url mappings -->
+	<bean id="cmsUid2UrlMap" class="org.springframework.beans.factory.config.MapFactoryBean"
+		scope="singleton">
+		<property name="sourceMap">
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="urlarea.hmc" value="/hmc/hybris" />
+				<entry key="urlarea.hybris" value="http://www.hybris.de/" />
+			</map>
+		</property>
+	</bean>
+
+	<!--#### External Applications Perspective end #### -->
+
+
+	<bean id="CmsPopupEditorAreaController"
+		class="de.hybris.platform.cmscockpit.session.impl.CmsPopupEditorAreaControllerImpl"
+		scope="prototype">
+		<property name="sectionRowRenderer">
+			<bean id="CmsPopupEditorSectionRowRenderer" parent="EditorSectionRowRenderer" />
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory" />
+		</property>
+	</bean>
+
+	<bean id="ContentElementBrowserActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="EditContentElementAction" />
+				<ref bean="CloneContentElementAction" />
+				<ref bean="MoveContentElementAction" />
+				<ref bean="RemoveContentElementAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="EditContentElementAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.EditContentElementAction"
+		scope="prototype" />
+	<bean id="ZoomContentElementAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.ZoomContentElementAction"
+		scope="prototype" />
+	<bean id="CloneContentElementAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.CloneContentElementAction"
+		scope="prototype" />
+	<bean id="MoveContentElementAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.MoveContentElementAction"
+		scope="prototype" />
+	<bean id="RemoveContentElementAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.RemoveContentElementAction"
+		scope="prototype" />
+	<bean id="ElementLockedAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.ElementLockedInfoAction"
+		scope="prototype" >
+		<property name="alwaysEnabled" value="true"/>
+	</bean>	
+
+
+	<bean id="CatalogAbstractPageSectionListActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="SitePreviewThumbnailAction" />
+				<ref bean="ApprovalPageStatusAction" />
+				<ref bean="SynchronizationAction" />
+				<ref bean="EditPageBrowserAction" />
+				<ref bean="RemovePageBrowserAction" />
+				<ref bean="CmsRestrictionAction" />
+			</list>
+		</property>
+	</bean>
+	<bean id="PersonalizeListActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="EditPageBrowserAction" />
+				<ref bean="RemovePageBrowserAction" />
+			</list>
+		</property>
+	</bean>
+	<bean id="CatalogAbstractContentElementSectionListActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="SynchronizationAction" />
+				<ref bean="CloneContentElementAction" />
+				<ref bean="EditContentElementAction" />
+				<ref bean="RemoveContentElementAction" />
+				<ref bean="CmsListviewMoveItemAction" />
+				<ref bean="ElementLockedAction" />
+			</list>
+		</property>
+	</bean>
+	<bean id="CmsComponentIconColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="CmsComponentIconAction" />
+			</list>
+		</property>
+	</bean>
+	<bean id="CmsComponentStatusColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="CmsRestrictionAction" />
+				<ref bean="CmsMultiplePagesAction" />
+			</list>
+		</property>
+	</bean>
+	<bean id="CatalogAbstractContentSlotSectionListActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="EditPageBrowserAction" />
+				<ref bean="RemoveContentSlotAction" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="PageHeaderListActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="PageLockBrowserAction" />
+				<ref bean="CmsRestrictionHeaderAction" />
+				<ref bean="ApprovalPageStatusAction" />
+				<ref bean="SynchronizationAction" /> 
+				<ref bean="EditPageBrowserAction" />
+				<ref bean="RemovePageBrowserAction" />
+				</list>
+		</property>
+	</bean>
+	
+	<bean id="PageHeaderMultiViewSelectListActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="CreatePersonalizedPageAction" />
+			</list>
+		</property>
+	</bean>
+
+<bean id="CmsListviewMoveItemAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.CmsListviewMoveItemAction"
+		scope="prototype" />
+		
+	<!-- <bean id="PerspectiveSwitchAction" class="de.hybris.platform.cockpit.components.listview.DefaultPerspectiveSwitchAction" 
+		scope="prototype"> -->
+	<!-- <property name="targetPerspectiveUid" value="cmscockpit.perspective.stuctureview"/> -->
+	<!-- </bean> -->
+	<bean id="RemoveContentSlotAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.RemoveContentSlotAction"
+		scope="prototype" />
+	<bean id="CreatePersonalizedPageAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.CmsCreatePersonalizedPageAction"
+		scope="prototype" />		
+	<bean id="SynchronizationAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.CmsElementSyncAction"
+		scope="prototype" />
+	<bean id="EditPageBrowserAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.EditPageBrowserAction"
+		scope="prototype" />
+	<bean id="RemovePageBrowserAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.RemovePageBrowserAction"
+		scope="prototype" />
+	<bean id="ApprovalPageStatusAction" class="de.hybris.platform.cmscockpit.components.listview.impl.ApprovalPageStatusAction"
+		scope="prototype">
+        <property name="modelHelper" ref="cockpitModelHelper" />
+    </bean>
+    <bean id="NewPageBrowserAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.NewPageBrowserAction"
+		scope="prototype" />
+		
+	<bean id="SitePreviewThumbnailAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.SitePreviewThumbnailAction"
+		scope="prototype" />
+
+	<bean id="CmsComponentIconAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.CmsComponentIconAction"
+		scope="prototype" />
+	<bean id="CmsMultiplePagesAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.CmsMultiplePagesAction"
+		scope="prototype" 
+		autowire="byName"/>
+	<bean id="CmsRestrictionAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.CmsRestrictionAction"
+		scope="prototype" />
+	<bean id="PageLockBrowserAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.PageLockBrowserAction"
+		scope="prototype">
+		<property name="forceDisplay" value="true" />
+	</bean>
+	<bean id="CmsRestrictionHeaderAction"
+		class="de.hybris.platform.cmscockpit.components.listview.impl.CmsRestrictionAction"
+		scope="prototype">
+		<property name="forceDisplay" value="true" />
+	</bean>
+	<!--#### Welcome page #### -->
+	<bean id="CatalogWelcomeBrowserModel" class="de.hybris.platform.cmscockpit.session.impl.WelcomeBrowserModel" scope="prototype">
+		<property name="welcomeTemplate" value="cmscockpit/welcome/welcome.zul"/>
+	</bean>
+
+	<!-- workflow related -->
+	<bean id="WorkflowAttachmentData" class="java.util.LinkedList"
+		scope="singleton">
+		<constructor-arg>
+			<list value-type="java.lang.String">
+				<value>de.hybris.platform.cms2.model.contents.components.AbstractCMSComponentModel</value>
+				<value>de.hybris.platform.cms2.model.pages.AbstractPageModel</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="LoginForm" class="de.hybris.platform.cockpit.forms.login.LoginForm" scope="session">
+		<property name="viewComponentURI" value="/cmscockpit/loginDialog.zul"/>
+		<property name="exceptionToLabelConverter" ref="authenticationExceptionToLabelConverter"/>
+	</bean>
+	
+	<!-- filter -->	
+	<bean id="cmsCockpitFilterChain" class="de.hybris.platform.servicelayer.web.BackOfficeFilterChain">
+		<constructor-arg>
+			<list>
+				<ref bean="log4jFilter"/>
+				<ref bean="dynamicTenantActivationFilter"/>				
+				<ref bean="sessionFilter"/>
+				<ref bean="cmsCockpitDataSourceSwitchingFilter"/>
+				<ref bean="cmsCockpitCatalogVersionActivationFilter"/>
+            <ref bean="cmsCockpitSecureMediaFilter"/>				
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="cmsCockpitDataSourceSwitchingFilter" class="de.hybris.platform.servicelayer.web.DataSourceSwitchingFilter">
+	</bean>
+	
+	 <bean id="cmsCockpitCatalogVersionActivationFilter" class="de.hybris.platform.servicelayer.web.DynamicCatalogVersionActivationFilter" scope="tenant">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="catalogService" ref="catalogService"/>
+		<aop:scoped-proxy/>
+	</bean>
+ 
+ <bean id="cmsCockpitSecureMediaFilter" class="de.hybris.platform.servicelayer.web.SecureMediaFilter">
+       <property name="mediaPermissionService" ref="mediaPermissionService"/>
+       <property name="modelService" ref="modelService"/>
+       <property name="userService" ref="userService"/>
+       <property name="mediaService" ref="mediaService"/>
+      <!-- <property name="secureMediaToken" value="securemedias"/>  securemedias is default but you may overwrite it -->
+       <aop:scoped-proxy/>
+     </bean>
+	
+	<import resource="classpath:/cmscockpit/cmscockpit-spring-uitest.xml"/>
+
+	<bean id="PageUrlCustomSection" class="de.hybris.platform.cmscockpit.components.editorarea.PageUrlCustomSection" scope="tenant">
+		<property name="sectionRenderer" ref="pageUrlSectionRenderer"/>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+	
+	<bean id="pageUrlSectionRenderer" class="de.hybris.platform.cmscockpit.components.editorarea.PageUrlSectionRenderer" scope="tenant">
+		<property name="resolvers">
+			<map>
+				<entry key="previewUrl" value-ref="previewUrlPageResolver"></entry>
+				<entry key="liveUrl" value-ref="liveUrlPageResolver"></entry>
+				<!-- register any CMSUrlResolver bean here to render a new url section in the PageUrlCustomSection -->
+				<!-- <entry key="dummy" value-ref="dummyUrlPageResolver"></entry>-->
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="themeConfig" class="de.hybris.platform.cockpit.util.CockpitThemeConfig" scope="singleton">
+		<property name="keepZKCss" value="false"/>
+		<property name="uris">
+			<list>
+				<value>/cockpit/css/zk_essential.css</value>
+				<value>/cockpit/css/zk_recommended.css</value>
+				 <value>/cockpit/css/zk_additional.css</value>
+
+				<value>/cockpit/css/cockpit_essential.css</value>
+				<value>/cockpit/css/cockpit_comments.css</value>
+				<value>/cockpit/css/cockpit_compare.css</value>
+				<value>/cockpit/css/cockpit_login.css</value>
+				<value>/cockpit/css/cockpit_navsections.css</value>
+				<value>/cockpit/css/cockpit_refeditor.css</value>
+				<value>/cockpit/css/cockpit_sectionbrowser.css</value>
+				<value>/cockpit/css/cockpit_widgets.css</value>
+				<value>/cockpit/css/cockpit_wizard.css</value>
+				<value>/cockpit/css/cockpit_workflow.css</value>
+				<value>/cockpit/css/cockpit_fileupload.css</value>
+				
+				<value>/cmscockpit/css/cmscockpit.css</value>
+			</list>
+		</property>
+		<property name="ieCssUris">
+			<list>
+				<value>/cockpit/css/cockpit_essential_ie.css</value>
+			</list>
+		</property>
+	</bean>
+	
+</beans>
+

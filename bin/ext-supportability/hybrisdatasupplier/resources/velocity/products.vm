@@ -1,0 +1,373 @@
+
+<!-- ********************************************************************************************************* -->
+<!-- ****           Product Version List  START                                                           **** -->
+<!-- ********************************************************************************************************* -->
+#foreach($deployment in ${InstalledProducts.deployments})
+	<!--  ***  ${InstalledProducts.currIndex}. Product Version  [${deployment.productVersion.technicalName}] (${deployment.productVersion.technicalRelease}) (${deployment.productVersion.ppmsId}) on [${deployment.server.caption}]-->
+#end
+<!--                         ....                                                                               -->
+
+<!-- ========================================================================================================== -->
+<!-- == Installed Product of the server                                                                        == -->
+<!-- ========================================================================================================== -->
+#foreach( $server in $TomcatConfiguration.tomcat.servers )	
+   	<!-- ****************************************************************** -->
+   	<!--  Installed Software Features of server   ${server.objectIndex}. + ${server.caption} -->
+	<group name="InstalledProduct$server.objectIndex" group_type="GENERIC">
+	  <rootclass 
+	    name="SAP_ATCServer" 
+	    sync="FALSE"
+	    merge_properties="TRUE" 
+	    merge_roots="FALSE" 
+	    clean="NONE">
+	   	 <instance>
+	      <!--  key properties   --> 
+	      <property name="CreationClassName">
+	        <value>SAP_ATCServer</value> 
+	      </property>
+	      <property name="Name">
+	       	<value>${server.technicalName}</value>
+	      </property>
+	    </instance>
+	  </rootclass>  
+	  <memberclass 
+	    name="SAP_InstalledProduct"
+	    association_name="SAP_InstalledProductOnApplicationSystem" 
+	    root_role="System"  
+	    member_role="Product"
+	    sync="TRUE" 
+	    merge_properties="TRUE" 
+	    merge_members="FALSE"
+	    clean="ALL">
+	     #foreach($deployment in ${InstalledProducts.getDeployments($server)} )		
+	    	 <!--   *** Product Version  [$deployment.productVersion.technicalName] ($deployment.productVersion.technicalRelease) ($deployment.productVersion.ppmsId) on [$server.caption]-->
+	    	 <instance>
+			    <!-- key properties -->			   
+			      <property name="ProductIdentifyingNumber">
+			        <value>$deployment.productVersion.ppmsId</value>
+			      </property>
+			      <property name="ProductName">
+			       <value>$deployment.productVersion.technicalName</value>
+			      </property>
+			      <property name="ProductVendor">
+			        <value>sap.com</value>
+			      </property>
+			      <property name="ProductVersion">
+			       <value>$deployment.productVersion.technicalRelease</value>
+			      </property>
+			      <property name="SystemID">
+			       <value>$deployment.server.technicalName</value>
+			      </property>
+			       <!-- non-key properties -->
+			      <property name="Caption">
+			        <value>$deployment.productVersion.technicalName $deployment.productVersion.technicalRelease ON ${deployment.server.caption}</value>
+			      </property>
+			      <property name="Description">
+    		  		<value>    		  				
+    		  			@${SLDInfo.sldTag};
+    		  		</value>
+    			  </property>
+	    	</instance>	  
+	    #end	    	 
+	  </memberclass> 	  
+	</group>
+#end
+
+<!-- ========================================================================================================== -->
+<!-- == Installed Product assignments (Installed Software Component, Component Repository, SoftwareFeature ) == -->
+<!-- ========================================================================================================== -->
+#foreach ($deployment in $InstalledProducts.deployments)
+	<!-- ****************************************************************** -->
+	<!-- *** Product Version  [$deployment.productVersion.technicalName] ($deployment.productVersion.technicalRelease) ($deployment.productVersion.ppmsId) on [$deployment.server.caption] -->
+	<group name="InstalledProduct${InstalledProducts.currIndex}_To_InstalledSoftwareComponent" group_type="GENERIC">
+	  <rootclass 
+	    name="SAP_InstalledProduct" 
+	    sync="FALSE"
+	    merge_properties="FALSE" 
+	    merge_roots="TRUE" 
+	    clean="NONE">
+	    <instance>
+	    <!-- key properties -->	      	
+	      <property name="ProductIdentifyingNumber">
+	        <value>$deployment.productVersion.ppmsId</value>
+	      </property>
+	      <property name="ProductName">
+	       <value>$deployment.productVersion.technicalName</value>
+	      </property>
+	      <property name="ProductVendor">
+	        <value>sap.com</value>
+	      </property>
+	      <property name="ProductVersion">
+	       <value>$deployment.productVersion.technicalRelease</value>
+	      </property>
+	      <property name="SystemID">
+	       <value>$deployment.server.technicalName</value>
+	      </property>
+	    </instance>
+	  </rootclass>
+	  
+	  <memberclass 
+		    name="SAP_InstalledSoftwareComponent"
+		    association_name="SAP_CollectedSoftwareComponents" 
+		    root_role="Collection"  
+		    member_role="Member"
+		    sync="FALSE" 
+		    merge_properties="FALSE" 
+		    merge_members="TRUE"
+		    clean="NONE">
+		  #foreach($scDeployment in ${InstalledSoftwareComponents.getDeployments($deployment.productVersion)} )
+		    	<!-- +++ Software Component Version  [$scDeployment.softwareComponentVersion.technicalName] ($scDeployment.softwareComponentVersion.technicalRelease) ($scDeployment.softwareComponentVersion.ppmsId) on [$scDeployment.server.caption]	-->
+		    <instance>		    	
+		      <property name="Name">
+		        <value>$scDeployment.softwareComponentVersion.technicalName</value>
+		      </property>
+		      <property name="SoftwareElementState">
+		        <value>3</value>
+		      </property>
+		      <property name="TargetOperatingSystem">
+		        <value>0</value>
+		      </property>
+		      <property name="Version">
+		        <value>$scDeployment.softwareComponentVersion.technicalRelease</value>
+		      </property>
+		    </instance>
+	    #end 
+	 </memberclass>			  
+	</group>
+	
+
+	<group name="InstalledProduct${InstalledProducts.currIndex}_To_ComponentRepository" group_type="GENERIC">
+	  <rootclass 
+	    name="SAP_InstalledProduct" 
+	    sync="FALSE" 
+	    merge_properties="FALSE" 
+	    merge_roots="TRUE" 
+	    clean="NONE">
+	    <instance>
+	    <!-- key properties -->	     
+	      <property name="ProductIdentifyingNumber">
+	        <value>$deployment.productVersion.ppmsId</value>
+	      </property>
+	      <property name="ProductName">
+	        <value>$deployment.productVersion.technicalName</value>
+	      </property>
+	      <property name="ProductVendor">
+	        <value>sap.com</value>
+	      </property>
+	      <property name="ProductVersion">
+	        <value>$deployment.productVersion.technicalRelease</value>
+	      </property>
+	      <property name="SystemID">
+	        <value>$deployment.server.technicalName</value>
+	      </property>
+	    </instance>
+	  </rootclass>
+	  <memberclass 
+	    name="SAP_Product"
+	    association_name="SAP_InstalledProductImage" 
+	    root_role="Collection" 
+	    member_role="Product" 
+	    sync="FALSE" 
+	    merge_properties="FALSE"
+	    merge_members="FALSE"	 
+	    clean="NONE"
+	    optional="TRUE">
+	    <instance>
+	    <!-- key properties -->
+	      <property name="IdentifyingNumber">
+	        <value>$deployment.productVersion.ppmsId</value>
+	      </property>
+	      <property name="Name">
+	        <value>$deployment.productVersion.technicalName</value>
+	      </property>
+	      <property name="Vendor">
+	        <value>sap.com</value>
+	      </property>
+	      <property name="Version">
+	        <value>$deployment.productVersion.technicalRelease</value>
+	      </property>
+	    </instance>
+	  </memberclass>
+	</group>
+	
+	<group name="InstalledProduct${InstalledProducts.currIndex}_To_InstalledSoftwareFeature">
+		 <rootclass name="SAP_InstalledProduct" 
+		 	sync="FALSE" merge_properties="FALSE" 
+		 	merge_roots="TRUE"
+		 	clean="NONE">
+		 	<instance>
+				<!-- key properties -->			   
+				<property name="ProductIdentifyingNumber">
+					<value>$deployment.productVersion.ppmsId</value>
+				</property>
+				<property name="ProductName">
+					<value>$deployment.productVersion.technicalName</value>
+				</property>
+				<property name="ProductVendor">
+					<value>sap.com</value>
+				</property>
+				 <property name="ProductVersion">
+					<value>$deployment.productVersion.technicalRelease</value>
+				</property>
+				 <property name="SystemID">
+					<value>$deployment.server.technicalName</value>
+				</property>
+			</instance>		 	
+		</rootclass>		
+		<memberclass name="SAP_InstalledSoftwareFeature" 
+			sync="FALSE" merge_properties="FALSE" 
+			association_name="SAP_CollectedSoftwareFeatures" 
+			root_role="Collection" 
+			member_role="Member" 
+			merge_members="TRUE" 
+			clean="NONE"
+			optional="FALSE">
+			 #foreach($instanceDeployment in ${InstalledSoftwareFeatures.getDeployments($deployment.productVersion)})
+			 <!--  +++ $InstalledSoftwareFeatures.currIndex. Software Feature [$instanceDeployment.productVersion.technicalName: $instanceDeployment.instance.key] ($deployment.productVersion.technicalRelease) ($instanceDeployment.productVersion.ppmsId) on [$instanceDeployment.server.caption] -->
+				<instance>
+		 	 	<!-- key properties -->				
+				 <property name="Name">		
+					<value>$instanceDeployment.productVersion.technicalName: $instanceDeployment.instance.key</value>
+				</property>
+				 <property name="SoftwareElementState">
+					<value>3</value>
+				</property>
+				 <property name="TargetOperatingSystem">
+					<value>0</value>
+				</property>
+				 <property name="Version">
+					<value>$instanceDeployment.productVersion.technicalRelease</value>
+				</property>
+				<!-- non-key properties -->
+				 <property name="Caption">
+					<value>$instanceDeployment.productVersion.technicalName: $instanceDeployment.instance.key ON $instanceDeployment.server.caption</value>
+				</property>
+				 <property name="IdentificationCode">
+					<value>$instanceDeployment.instance.key</value>
+				</property>
+			</instance>
+			#end
+		</memberclass>
+	</group>
+#end
+
+#foreach( $server in $TomcatConfiguration.tomcat.servers )
+   <group
+    name="ATCServer_WrapperSetting">
+    <rootclass
+      name="SAP_ATCServer"
+      sync="FALSE"
+      merge_roots="FALSE"
+      clean="NONE">
+      <instance>
+        <!-- key properties -->
+        <property name="CreationClassName">
+            <value>SAP_ATCServer</value>
+        </property>
+        <property name="Name">
+            <value>${server.technicalName}</value>
+        </property>
+      </instance>
+    </rootclass>
+    <memberclass
+      name="SAP_ATCWrapperSettingData"
+      association_name="SAP_ATCServerWrapperSetting"
+      root_role="ManagedElement"
+      member_role="SettingData"
+      merge_members="FALSE"
+      clean="ALL">
+      <instance>
+        <!-- key properties -->
+        <property
+          name="InstanceID">
+          <value>${server.technicalName}</value>
+        </property>
+        <!-- normal properties -->
+        <property
+          name="Caption">
+          <value>$server.caption</value>
+        </property>
+        <property
+          name="InstallPath">
+          <value>$server.hybrisInstallPath</value>
+        </property>
+        <property
+          name="BinPath">
+          <value>$server.hybrisBinPath</value>
+        </property>
+        <property
+          name="ConfigPath">
+          <value>$server.hybrisConfigPath</value>
+        </property>
+        <property
+          name="DataPath">
+          <value>$server.hybrisDataPath</value>
+        </property>
+        <property
+          name="LogPath">
+          <value>$server.hybrisLogPath</value>
+        </property>
+        <property
+          name="TempPath">
+          <value>$server.hybrisTempPath</value>
+        </property>
+        <property
+          name="ServerLogPath">
+          <value>$server.hybrisServerLogPath</value>
+        </property>
+        <property
+          name="PlatformHome">
+          <value>$server.hybrisPlatformHome</value>
+        </property>
+        <property
+          name="ExtensionSet">
+          <value>$server.hybrisExtensionSet</value>
+        </property>
+      </instance>
+    </memberclass>
+  </group>
+  <group
+    name="ATCServer_ClusterCollection">
+    <rootclass
+      name="SAP_ATCServer"
+      sync="FALSE"
+      merge_roots="TRUE"
+      clean="NONE">
+      <instance>
+        <!-- key properties -->
+        <property name="CreationClassName">
+            <value>SAP_ATCServer</value>
+        </property>
+        <property name="Name">
+            <value>${server.technicalName}</value>
+        </property>
+      </instance>
+    </rootclass>
+    <memberclass
+      name="SAP_ATCClusterCollection"
+      association_name="SAP_CollectedATCServer"
+      root_role="Member"
+      member_role="Collection"
+      merge_members="FALSE"
+      clean="LONE">
+      #if( $server.hybrisClusterID )
+      <instance>
+        <!-- key properties -->
+        <property
+          name="ClusterID">
+          <value>${server.hostName}:${server.port}:${server.hybrisClusterID}</value>
+        </property>
+        <!-- normal properties -->
+        <property
+          name="Caption">
+          <value>ATC Cluster ${server.hostName}:${server.port}:${server.hybrisClusterID}</value>
+        </property>
+      </instance>
+      #end
+    </memberclass>
+  </group>
+#end
+
+
+<!-- ****            Product Version List  END                                                             **** -->
+<!--                         ....                                                                               -->

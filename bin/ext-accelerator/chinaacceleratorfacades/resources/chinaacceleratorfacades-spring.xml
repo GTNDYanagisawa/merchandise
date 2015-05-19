@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+
+	<alias name="accexCartPopulator" alias="cartPopulator"/>
+	<bean id="accexCartPopulator" class="de.hybris.platform.chinaaccelerator.facades.populators.ChinaCartPopulator"
+	 parent="defaultCartPopulator" >
+		<property name="invoiceConverter" ref="invoiceConverter"/>
+		<property name="paymentModeConverter" ref="paymentModeConverter"/>
+	</bean>
+	
+ 	<bean id="invoiceData" class="de.hybris.platform.commercefacades.order.data.InvoiceData" scope="prototype"/>
+ 	
+	<alias name="defaultInvoiceConverter" alias="invoiceConverter"/> 
+	<bean id="defaultInvoiceConverter" parent="abstractPopulatingConverter">
+			<lookup-method name="createTarget" bean="invoiceData"/>
+			<property name="populators">
+				<list>
+					<ref bean="invoicePopulator"/>
+				</list>
+			</property>
+	</bean>
+	
+	<alias name="defaultInvoicePopulator" alias="invoicePopulator"/>
+	<bean id="defaultInvoicePopulator" class="de.hybris.platform.chinaaccelerator.facades.populators.InvoicePopulator" >
+	</bean>
+
+	<bean id="paymentModeData" class="de.hybris.platform.chinaaccelerator.facades.data.PaymentModeData" scope="prototype"/>
+	<alias name="defaultPaymentModeConverter" alias="paymentModeConverter"/> 
+	<bean id="defaultPaymentModeConverter" parent="abstractPopulatingConverter">
+			<lookup-method name="createTarget" bean="paymentModeData"/>
+			<property name="populators">
+				<list>
+					<ref bean="paymentModePopulator"/>
+				</list>
+			</property>
+	</bean>
+	
+	<alias name="defaultPaymentModePopulator" alias="paymentModePopulator"/>
+	<bean id="defaultPaymentModePopulator" class="de.hybris.platform.chinaaccelerator.facades.populators.PaymentModePopulator" >
+	</bean>
+	
+	<alias name="defaultChinaCheckoutFacade" alias="chinaCheckoutFacade"/>
+	<bean id="defaultChinaCheckoutFacade" class="de.hybris.platform.chinaaccelerator.facades.checkout.impl.ChinaCheckoutFacadeImpl" >
+		<property name="invoiceConverter" ref="invoiceConverter"/>
+	</bean>
+
+	<alias name="accDefaultStoreLocatorFacade" alias="storeLocatorFacade"/>
+	<bean id="accDefaultStoreLocatorFacade" parent="defaultStoreLocatorFacade" class="de.hybris.platform.chinaaccelerator.facades.storefinder.impl.ChinaStoreLocatorFacadeImpl">
+	  <property name="flexibleSearchService" ref="flexibleSearchService"></property>
+	</bean>
+	
+	<alias name="extendedAddressPopulator" alias="addressPopulator"/>
+	<bean id="extendedAddressPopulator" parent="defaultAddressPopulator"
+			class="de.hybris.platform.chinaaccelerator.facades.populators.AddressPopulator">
+	</bean>
+		
+	<alias name="chinaUserFacade" alias="userFacade"/>
+	<bean id="chinaUserFacade" class="de.hybris.platform.chinaaccelerator.facades.user.impl.ChinaUserFacade"  parent="defaultUserFacade"/>
+	
+	<alias alias="addressReversePopulator" name="chinaAddressReversePopulator" />
+	<bean id="chinaAddressReversePopulator" class="de.hybris.platform.chinaaccelerator.facades.populators.ChinaAddressReversePopulator" scope="tenant" parent="defaultAddressReversePopulator">
+		 <property name="cityService" ref="cityService" />
+		 <property name="districtService" ref="districtService" />
+	</bean>
+
+	<alias name="enhancedProductDescriptionPopulator" alias="productDescriptionPopulator"/>
+	<bean id="enhancedProductDescriptionPopulator" parent="defaultProductDescriptionPopulator"
+			class="de.hybris.platform.chinaaccelerator.facades.populators.EnhancedProductDescriptionPopulator"/>
+
+	<!-- Spring Alipay orderfacade -->
+	<alias name="extOrderFacade" alias="orderFacade" />
+	<bean id="extOrderFacade" class="de.hybris.platform.chinaaccelerator.facades.order.impl.ChinaOrderFacadeImpl" parent="defaultOrderFacade" scope="tenant">		
+		<property name="alipayPaymentService" ref="alipayPaymentService" />
+		<property name="orderService" ref="orderService" />
+	</bean>
+	
+	<alias name="alipayCheckoutFacade" alias="acceleratorCheckoutFacade"/>
+	<bean id="alipayCheckoutFacade" class="de.hybris.platform.chinaaccelerator.facades.checkout.impl.AlipayCheckoutFacadeImpl" parent="defaultAcceleratorCheckoutFacade">
+		<property name="alipayPaymentInfoConverter" ref="alipayPaymentInfoConverter" />
+	</bean>
+	
+	<alias name="accAlipayPaymentInfoConverter" alias="alipayPaymentInfoConverter"/>
+	<bean id="accAlipayPaymentInfoConverter" class="de.hybris.platform.chinaaccelerator.facades.converters.AlipayPaymentInfoConverter" >
+	</bean>
+
+	<alias alias="regionFacade" name="defaultRegionFacade" />
+	<bean id="defaultRegionFacade" class="de.hybris.platform.chinaaccelerator.facades.location.impl.DefaultRegionFacade">
+	  <property name="regionService" ref="regionService"></property>
+	  <property name="regionPopulator" ref="regionPopulator"></property>
+	</bean>
+
+	<alias alias="cityFacade" name="defaultCityFacade" />
+	<bean id="defaultCityFacade" class="de.hybris.platform.chinaaccelerator.facades.location.impl.DefaultCityFacade">
+	  <property name="cityService" ref="cityService"></property>
+	  <property name="cityPopulator" ref="cityPopulator"></property>
+	</bean>
+
+	<alias alias="cityPopulator" name="defaultCityPopulator" />
+	<bean id="defaultCityPopulator" class="de.hybris.platform.chinaaccelerator.facades.populators.CityPopulator" />
+
+	<alias alias="districtFacade" name="defaultDistrictFacade" />
+	<bean id="defaultDistrictFacade" class="de.hybris.platform.chinaaccelerator.facades.location.impl.DefaultDistrictFacade">
+	  <property name="districtService" ref="districtService"></property>
+	  <property name="districtPopulator" ref="districtPopulator"></property>
+	</bean>
+
+	<alias alias="districtPopulator" name="defaultDistrictPopulator" />
+	<bean id="defaultDistrictPopulator" class="de.hybris.platform.chinaaccelerator.facades.populators.DistrictPopulator" />
+
+	<bean id="accExOrderData" class="de.hybris.platform.chinaaccelerator.facades.order.data.ExOrderData" scope="prototype"/>
+	<alias name="accExOrderConverter" alias="orderConverter"/>
+	<bean id="accExOrderConverter" parent="defaultOrderConverter">
+		<property name="targetClass" value="de.hybris.platform.chinaaccelerator.facades.order.data.ExOrderData"/>
+	</bean>
+
+	<alias name="accExOrderPopulator" alias="orderPopulator"/>
+	<bean id="accExOrderPopulator"
+			class="de.hybris.platform.chinaaccelerator.facades.populators.ChinaOrderPopulator"
+			parent="defaultOrderPopulator">
+		<property name="invoiceConverter" ref="invoiceConverter"/>
+		<property name="paymentModeConverter" ref="paymentModeConverter"/>
+	</bean>
+	
+
+	<alias name="extOrderNotificationEmailContext" alias="orderNotificationEmailContext"/>
+	<bean id="extOrderNotificationEmailContext" class="de.hybris.platform.chinaaccelerator.facades.email.OrderNotificationEmailContext" parent="abstractEmailContext" scope="prototype" >
+		<property name="orderConverter" ref="orderConverter"/>
+	</bean>
+	
+	<alias name="defaultExtendedCustomerFacade" alias="customerFacade"/>
+	<bean id="defaultExtendedCustomerFacade" class="de.hybris.platform.chinaaccelerator.facades.customer.impl.DefaultExtendedCustomerFacade" parent= "defaultCustomerFacade"/>
+	
+	<bean id="extendedChinaCustomerPopulator" class="de.hybris.platform.chinaaccelerator.facades.populators.ExtendedCustomerPopulator"/>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="customerConverter"/>
+		<property name="add" ref="extendedChinaCustomerPopulator"/>
+	</bean>  
+</beans>

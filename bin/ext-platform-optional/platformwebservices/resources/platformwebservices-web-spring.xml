@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="
+			  http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security.xsd
+           http://cxf.apache.org/jaxws
+           http://cxf.apache.org/schemas/jaxws.xsd">
+
+    <!--
+    	Business service(s) from platformwebservices
+    -->
+	<alias alias="wsUtilService" name="defaultWsUtilService" />
+	<bean id="defaultWsUtilService" parent="abstractBusinessService"
+		class="de.hybris.platform.webservices.impl.DefaultWsUtilService">
+		<property name="i18nDao" ref="i18nDao"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="userService" ref="userService"/>
+		<property name="cronJobService" ref="cronJobService"/>
+		<property name="nodeFactoriesMap" ref="customModelFactoryMap">
+      </property>
+	</bean>
+
+	<bean id="customModelFactoryMap"
+		class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="sourceMap">
+			<map>
+         	<entry>
+         		<key><bean class="de.hybris.platform.core.dto.enumeration.EnumerationMetaTypeDTO"/></key>
+         		<bean class="de.hybris.platform.webservices.model.nodefactory.EnumerationMetaTypeModelFactory"/>
+         	</entry>
+         	<entry>
+         		<key><bean class="de.hybris.platform.core.dto.enumeration.EnumerationValueDTO"/></key>
+         		<bean class="de.hybris.platform.webservices.model.nodefactory.EnumerationValueModelFactory"/>
+         	</entry>
+         </map>
+		</property>
+	</bean>
+
+	<!--  This element enables web security and says that we want all URLs
+	within our Web Services to be secured. The Web Services uses basic authentication which
+	will be used to prompt for a login when a user attempts to access a protected resource. -->
+   <security:http>
+    	<security:intercept-url  pattern="/**" />
+		<security:http-basic />
+		<security:logout />
+		<security:remember-me />
+  	</security:http>
+
+	<security:authentication-manager alias="mainAuthenticationManager">
+   		<security:authentication-provider ref="coreAuthenticationProvider"/>
+	</security:authentication-manager>
+
+	<bean id="coreAuthenticationProvider" class="de.hybris.platform.spring.security.CoreAuthenticationProvider">
+		<property name="userDetailsService" ref="coreUserDetailsService" />
+	</bean>
+
+	<bean id="coreUserDetailsService" class="de.hybris.platform.spring.security.CoreUserDetailsService"/>
+
+	 <!--
+    	ServiceLocator
+    	Globally used locator for any service which is used.
+    	(it's not possible to let spring inject any dependency...e.g. in JAXB controlled classes)
+    	Gets injected into Resources.
+	 -->
+    <bean id="serviceLocator" class="de.hybris.platform.webservices.impl.ServiceLocatorImpl">
+		<property name="userService" ref="userService"/>
+		<property name="i18nService" ref="i18nService"/>
+		<property name="wsUtilService" ref="wsUtilService"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="productService" ref="productService"/>
+		<property name="catalogService" ref="catalogService"/>
+		<property name="categoryService" ref="categoryService"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="orderService" ref="orderService"/>
+		<property name="cronJobService" ref="cronJobService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="eventService" ref="eventService"/>
+		<property name="importService" ref="importService"/>
+    </bean>
+
+    <!--
+    	Caching strategies ,gets injected into specific RequestProcessor.
+     -->
+    <bean id="cachingStrategy" class="de.hybris.platform.webservices.cache.impl.DefaultCachingStrategy"/>
+
+	<bean id="notificationProcessor" class="de.hybris.platform.webservices.processor.impl.NotificationRequestProcessor">
+    	<property name="eventActionFactory" ref="actionEventFactory"/>
+    </bean>
+
+    <bean id="accessRightProcessor" class="de.hybris.platform.webservices.processor.impl.AccessGrantRequestProcessor" />
+
+     <!--  Legacy implementation for a etag based caching  -->
+    <bean id="etagCacheProcessor" class="de.hybris.platform.webservices.processor.impl.ETagCacheRequestProcessor"/>
+
+    <!-- LastModified based caching -->
+    <bean id="lmCacheProcessor" class="de.hybris.platform.webservices.processor.impl.LastModificationCacheRequestProcessor"/>
+
+    <bean id="requestProcessChain" class="de.hybris.platform.webservices.processchain.impl.DefaultRequestProcessChain" scope="prototype">
+		<property name="processors">
+			<list value-type="de.hybris.platform.webservices.processor.RequestProcessor">
+			 	<ref bean="notificationProcessor" />
+			 	<ref bean="accessRightProcessor" />
+			 	<ref bean="lmCacheProcessor" />
+			 	<ref bean="etagCacheProcessor" />
+			</list>
+		</property>
+	</bean>
+
+    <!--
+    	Security strategies
+    	Gets injected into Resources.
+     -->
+    <bean id="abstractSecurityStrategy" class="de.hybris.platform.webservices.AbstractSecurityStrategy" abstract="true" scope="prototype">
+    	<property name="modelService" ref="modelService"/>
+    </bean>
+
+    <bean id="securityStrategy" class="de.hybris.platform.webservices.AccessManagerSecurityStrategy" scope="prototype"  parent="abstractSecurityStrategy"/>
+
+    <!--  <bean id="securityStrategy" class="de.hybris.platform.webservices.PropertyFileSecurityStrategy" scope="prototype" parent="abstractSecurityStrategy"/>  -->
+
+    <!--
+    	Paging mechanism for root collections and property collections
+    	Gets injected into Resources.
+    -->
+	<bean id="pagingStrategy" class="de.hybris.platform.webservices.paging.impl.QueryPagingStrategy" scope="prototype">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	 <!--
+	 	REST Resources
+	 -->
+	 <bean id="abstractBaseResource" class="de.hybris.platform.webservices.AbstractResource" abstract="true" scope="prototype">
+	 	<property name="serviceLocator" ref="serviceLocator"/>
+	 	<property name="securityStrategy" ref="securityStrategy"/>
+	 	<property name="pagingStrategy" ref="pagingStrategy"/>
+		<property name="eventActionFactory" ref="actionEventFactory"/>
+		<property name="requestProcessChain" ref="requestProcessChain"/>
+	 </bean>
+
+	 <bean id="abstractResource" class="de.hybris.platform.webservices.AbstractYResource" abstract="true" scope="prototype" parent="abstractBaseResource">
+		<property name="objectGraph" ref="genericGraph"/>
+	 </bean>
+
+ 	 <bean id="actionEventFactory" class="de.hybris.platform.webservices.impl.DefaultEventActionFactory"/>
+
+	 <!--
+	 	Untyped resources
+	 -->
+	<!--	Checking credentials -->
+	<bean id="loginResource" class="de.hybris.platform.webservices.resources.credentials.LoginResource" scope="prototype" parent="abstractBaseResource"/>
+
+	<!--	Retrieve a lost password -->
+	<bean id="retrievePasswordResource" class="de.hybris.platform.webservices.resources.credentials.RetrievePasswordResource" scope="prototype" parent="abstractBaseResource">
+		<property name="encoder" ref="core.saltedMD5PasswordEncoder"/>
+	</bean>
+	
+	<!--	Change password -->
+	<bean id="changePasswordResource" class="de.hybris.platform.webservices.resources.credentials.ChangePasswordResource" scope="prototype" parent="abstractBaseResource"/>
+
+	 <!--
+	 	Modified resources
+	 -->
+	<bean id="cartsResource" class="de.hybris.platform.core.resource.order.CartsResource" scope="prototype" parent="abstractResource">
+		<property name="postMethod" value="de.hybris.platform.webservices.resources.methods.PostCartToCarts" />
+	</bean>
+
+	<bean id="cartEntryCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="cartentry_entrynumber"/>
+		<property name="digits" value="8"/>
+		<property name="start" value="00000000"/>
+		<property name="numeric" value="true"/>
+	</bean>
+
+	<bean id="cartResource" class="de.hybris.platform.core.resource.order.CartResource" scope="prototype" parent="abstractResource">
+		<property name="postCommandHandler" ref="cartResourceCommands" />
+		<property name="putMethod" value="de.hybris.platform.webservices.resources.methods.PutCartToCarts" />
+	</bean>
+
+	<bean id="cartEntryResource" class="de.hybris.platform.core.resource.order.CartEntryResource" scope="prototype" parent="abstractResource">
+		<property name="putMethod" value="de.hybris.platform.webservices.resources.methods.cartentry.PutCartEntryMethod" />
+	</bean>
+
+	<bean id="cartEntriesResource" class="de.hybris.platform.core.resource.order.CartEntriesResource" scope="prototype" parent="abstractResource">
+		<property name="postMethod" value="de.hybris.platform.webservices.resources.methods.PostCartEntryToCartEntries"/>
+	</bean>
+
+	<bean id="cronJobResource" class="de.hybris.platform.cronjob.resource.CronJobResource" scope="prototype" parent="abstractResource">
+		<property name="putCommandHandler" ref="cronJobResourcePutCommands"/>
+		<property name="postCommandHandler" ref="cronJobResourcePostCommands"/>
+	</bean>
+
+	<!--
+		Commands
+	-->
+
+	<!-- declare Command: PlaceOrder  -->
+	<bean id="placeOrderCommand" class="de.hybris.platform.webservices.resources.commands.PlaceOrderCommand">
+		<property name="objectGraph" ref="genericGraph"/>
+	</bean>
+
+	<!-- add Command: PlaceOrder to CartResource -->
+	<bean id="cartResourceCommands" class="de.hybris.platform.webservices.DefaultCommandHandler">
+		<property name="allCommands">
+			<list>
+				<ref bean="placeOrderCommand"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="createCronJobCommand" class="de.hybris.platform.webservices.resources.commands.CreateCronJobCommand">
+		<property name="objectGraph" ref="genericGraph"/>
+	</bean>
+
+	<bean id="startCronJobCommand" class="de.hybris.platform.webservices.resources.commands.StartCronJobCommand">
+		<property name="objectGraph" ref="genericGraph"/>
+	</bean>
+
+	<bean id="abortCronJobCommand" class="de.hybris.platform.webservices.resources.commands.AbortCronJobCommand">
+		<property name="objectGraph" ref="genericGraph"/>
+	</bean>
+
+	<bean id="cronJobResourcePutCommands" class="de.hybris.platform.webservices.DefaultCommandHandler">
+		<property name="allCommands">
+			<list>
+				<ref bean="startCronJobCommand"/>
+				<ref bean="abortCronJobCommand"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="cronJobResourcePostCommands" class="de.hybris.platform.webservices.DefaultCommandHandler">
+		<property name="allCommands">
+			<list>
+				<ref bean="createCronJobCommand"/>
+			</list>
+		</property>
+	</bean>
+
+</beans>

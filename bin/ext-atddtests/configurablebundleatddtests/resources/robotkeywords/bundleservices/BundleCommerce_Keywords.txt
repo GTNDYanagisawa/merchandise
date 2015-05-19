@@ -1,0 +1,24 @@
+*** Settings ***
+Library           de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Library			  de.hybris.platform.configurablebundleatddtests.commerceservices.keywords.BundleCommerceKeywordLibrary
+
+*** Keywords ***
+
+
+verify that "${xPath}" evaluates to "${expectedXml}" for product "${productCode}" with the "@{option}"
+	[Documentation]    Verifies that the XPath evaluates to the expected XML when applied to the given product's XML	  
+	verify product xml with option    ${xPath}    ${expectedXml}    ${productCode}    @{option}
+
+verify that the XML for bundle template matches "${expectedXml}" for product "${productCode}" with the "@{option}"
+	[Documentation]   Verifies that XML for bundle template matches the expected XML	
+	verify that "product/bundleTemplates" evaluates to "${expectedXml}" for product "${productCode}" with the "@{option}"
+	
+	
+verify cart that "${xPath}" evaluates to "${expectedXml}"
+	[Documentation]    Verifies that the XPath evaluates to the expected XML when applied to the given product's XML	  
+	verify cart xml    ${xPath}    ${expectedXml}
+	
+
+verify that the XML for cart with potential product matches "${expectedXml}"
+	[Documentation]   Verifies that XML for bundle template matches the expected XML	
+	verify cart that "cart" evaluates to "${expectedXml}"

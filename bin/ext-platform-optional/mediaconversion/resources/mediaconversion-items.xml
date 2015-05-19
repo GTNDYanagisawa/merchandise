@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+	<collectiontypes>
+	   <collectiontype elementtype="ConversionMediaFormat" code="ConversionMediaFormatCollection" 
+	       autocreate="true" type="collection"/>
+       <collectiontype elementtype="MediaMetaData" code="MediaMetaDataCollection" 
+           autocreate="true" type="collection"/>
+       <collectiontype elementtype="Media" code="MediaList" 
+           autocreate="true" type="list"/>
+	</collectiontypes>
+	
+	<enumtypes>
+		<enumtype code="ConversionStatus" autocreate="true" dynamic="false" generate="true">
+			<value code="EMPTY" />
+			<value code="UNCONVERTED" />
+			<value code="PARTIALLY_CONVERTED" />
+			<value code="CONVERTED" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>       
+       <relation generate="true" localized="false" code="ConvertedMediasRelation" autocreate="true">
+           <sourceElement type="Media" cardinality="one" qualifier="original">
+               <description>The parent media this media was converted from.</description>
+               <modifiers optional="true" initial="true"/>
+           </sourceElement>
+           <targetElement type="Media" cardinality="many" qualifier="convertedMedias">
+               <description>Medias (in other formats) which were converted from this media.</description>
+           </targetElement>
+       </relation>
+       
+       <relation generate="true" localized="false" code="MediaToMediaMetaDataRel" autocreate="true">
+           <sourceElement type="Media" cardinality="one" qualifier="media">
+               <description>The media the meta data refers to.</description>
+               <modifiers optional="false" initial="true" write="false"/>
+           </sourceElement>
+           <targetElement type="MediaMetaData" cardinality="many" qualifier="metaData">
+               <description>Meta data information for the media, which has been persisted to database.</description>
+               <modifiers partof="true" />
+           </targetElement>
+       </relation>
+       
+       <relation generate="true" localized="false" code="ConversionGroupToFormatRel" autocreate="true">
+		   <deployment table="mediaconttypeformats" typecode="402"/>
+           <sourceElement type="ConversionGroup" cardinality="many" navigable="false"/>
+           <targetElement type="ConversionMediaFormat" cardinality="many" collectiontype="set"
+           		qualifier="supportedFormats">
+               <description>All supported formats, i.e. all formats to convert the original media to.</description>
+               <modifiers read="true" write="true"/>
+           </targetElement>
+       </relation>
+       
+       <relation generate="true" localized="false" code="ContainerToConversionErrorLogRel" autocreate="true">
+           <sourceElement type="MediaContainer" cardinality="one" qualifier="container">
+               <description>The container for which the conversion failed.</description>
+               <modifiers optional="false" initial="true" write="false"/>
+           </sourceElement>
+           <targetElement type="ConversionErrorLog" cardinality="many" collectiontype="collection"
+           		qualifier="conversionErrorLog">
+               <description>Failed conversion for this container.</description>
+               <modifiers read="true" write="false"/>
+           </targetElement>
+       </relation>
+    </relations>
+	
+	<itemtypes>
+        <itemtype code="Media"
+				autocreate="false" generate="false">
+		    <attributes>
+		      <attribute type="java.lang.Long" qualifier="metaDataDataPK">
+		          <description>The data pk from which the meta data was extracted from.</description>
+		          <persistence type="property"/>
+		          <modifiers optional="true" read="true" write="true"/>
+		      </attribute>
+		      <attribute type="java.lang.Long" qualifier="originalDataPK">
+		          <description>The data pk from which this media was converted from.</description>
+		          <persistence type="property"/>
+		          <modifiers optional="true" read="true" write="true"/>
+		      </attribute>
+		    </attributes>
+			<indexes>
+			     <index name="containerformat_idx">
+			         <key attribute="mediaContainer"/>
+                     <key attribute="mediaFormat"/>
+			     </index>
+                 <index name="parentformat_idx">
+                     <key attribute="original"/>
+                     <key attribute="mediaFormat"/>
+                 </index>
+			</indexes>
+		</itemtype>
+		
+		<itemtype code="MediaMetaData" autocreate="true" generate="true"
+                jaloclass="de.hybris.platform.mediaconversion.jalo.MediaMetaData">
+		  <deployment table="mediametadata" typecode="400"/>
+		  <attributes>
+		      <attribute type="java.lang.String" qualifier="code">
+		          <description>
+		              Identifier of this meta data entry. 
+		              Note: this identifier is not unique, it is only unique in combination with the metaDataProvider.
+		          </description>
+		          <modifiers initial="true" write="false" optional="false"/>
+		          <persistence type="property"/>
+		      </attribute>
+              <attribute qualifier="value" type="java.lang.String">
+                  <description>Actual value of the meta data.</description>
+                  <modifiers optional="true" initial="true" write="false"/>
+                  <persistence type="property">
+                      <columntype>
+                          <value>HYBRIS.LONG_STRING</value>
+                      </columntype>
+                  </persistence>
+              </attribute>
+                <attribute qualifier="groupName" type="java.lang.String">
+                    <description>A short display name of the provider handling this meta data.</description>
+		          	<modifiers initial="true" write="false" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+		  </attributes>
+          <indexes>
+	          <index name="mmetadata_uidx" unique="true">
+	           <key attribute="media"/>
+	           <key attribute="groupName"/>
+	           <key attribute="code"/>
+	          </index>
+          </indexes>
+		</itemtype>
+		
+		<itemtype code="MediaContainer" autocreate="false" generate="false">
+            <attributes>
+                <attribute qualifier="master" type="Media">
+                    <description>Accesses the current 'master' media.</description>
+                    <modifiers write="false" read="true" optional="true"/>
+                    <persistence type="dynamic" attributeHandler="mediaContainerMasterAttributeHandler"/>
+                </attribute>
+                <attribute qualifier="metaData" type="MediaMetaDataCollection">
+                    <description>Accesses this container's master media's meta data</description>
+                    <modifiers write="false" read="true" optional="true"/>
+                    <persistence type="dynamic" attributeHandler="mediaContainerMetaDataAttributeHandler"/>
+                </attribute>
+                <attribute qualifier="conversionStatus" type="ConversionStatus">
+                    <description>Accesses this container's current conversion status</description>
+                    <modifiers write="false" read="true" optional="false"/>
+                    <persistence type="dynamic" attributeHandler="mediaContainerConversionStatusAttributeHandler"/>
+                </attribute>
+                <attribute qualifier="conversionGroup" type="ConversionGroup">
+                    <description>Optional conversionGroup to restrict converted formats.</description>
+                    <modifiers write="true" read="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+        <itemtype code="ConversionErrorLog" autocreate="true" generate="true"
+                jaloclass="de.hybris.platform.mediaconversion.jalo.ConversionErrorLog">
+		    <deployment table="conversionerrors" typecode="403"/>
+            <attributes>
+                <attribute qualifier="targetFormat" type="ConversionMediaFormat">
+                    <description>The targeted format, for which the conversion failed.</description>
+                    <modifiers write="false" read="true" optional="false" initial="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="sourceMedia" type="Media">
+                    <description>The source Media.</description>
+                    <modifiers write="false" read="true" optional="true" initial="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="errorMessage" type="java.lang.String">
+                    <description>Technical description of the error.</description>
+                    <modifiers write="false" read="true" optional="true" initial="true"/>
+                    <persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>TEXT</value>
+						</columntype>
+                        <columntype>
+                            <value>HYBRIS.LONG_STRING</value>
+                        </columntype>
+                    </persistence>
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+        <itemtype code="ConversionGroup" autocreate="true" generate="true"
+                jaloclass="de.hybris.platform.mediaconversion.jalo.ConversionGroup">
+		    <deployment table="conversiongroups" typecode="401"/>
+            <attributes>
+                <attribute qualifier="code" type="java.lang.String">
+                    <description>Unique identifier</description>
+                    <modifiers write="true" read="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="name" type="localized:java.lang.String">
+                    <description>Display name</description>
+                    <modifiers write="true" read="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+            <indexes>
+            	<index name="ConvGroup_code_idx" unique="true">
+            		<key attribute="code"/>
+            	</index>
+            </indexes>
+        </itemtype>
+        
+        <itemtype code="ConversionMediaFormat"
+                jaloclass="de.hybris.platform.mediaconversion.jalo.ConversionMediaFormat"
+                extends="MediaFormat"
+                autocreate="true" generate="true">
+            <attributes>
+                <attribute qualifier="mimeType" type="java.lang.String">
+                    <description>Mime type of this format.</description>
+                    <modifiers initial="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="conversion" type="java.lang.String">
+                    <description>Mime type of this format.</description>
+                    <modifiers optional="true"/>
+                    <persistence type="property">
+                        <columntype>
+                            <value>HYBRIS.LONG_STRING</value>
+                        </columntype>
+                    </persistence>
+                </attribute>
+                <attribute qualifier="conversionStrategy" type="java.lang.String">
+                    <description>Bean name of the conversion strategy to use.</description>
+                    <defaultvalue>"imageMagickMediaConversionStrategy"</defaultvalue>
+                    <modifiers optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="inputFormat" type="ConversionMediaFormat">
+                    <description>Media format to take as input for the conversion (optional).</description>
+                    <modifiers optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="mediaAddOns" type="MediaList">
+                    <description>Additional media to be used in the conversion (optional).</description>
+                    <modifiers optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+        
+        <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        ++++++++++++++++++++++++++++  Jobs  ++++++++++++++++++++++++++++++++++++++++++++++ 
+        +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  -->
+        
+        <itemtype code="AbstractMediaCronJob"
+                jaloclass="de.hybris.platform.mediaconversion.jalo.job.AbstractMediaCronJob"
+                extends="CronJob"
+                abstract="true"
+                autocreate="true" generate="true">
+            <attributes>
+                <attribute qualifier="maxThreads" type="int">
+                    <description>Amount of threads to use.</description>
+                    <modifiers optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="catalogVersion" type="CatalogVersion">
+                    <description>Optional catalog version to work on.</description>
+                    <modifiers optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+        <itemtype code="MediaConversionCronJob"
+                jaloclass="de.hybris.platform.mediaconversion.jalo.job.MediaConversionCronJob"
+                extends="AbstractMediaCronJob"
+                autocreate="true" generate="true">
+            <attributes>
+                <attribute qualifier="includedFormats" type="ConversionMediaFormatCollection">
+                    <description>Optional collection of ConversionMediaFormats to obey.</description>
+                    <modifiers optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="asynchronous" type="java.lang.Boolean">
+                    <description>Optional collection of ConversionMediaFormats to obey.</description>
+                    <defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+                    <modifiers optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+        <itemtype code="ExtractMediaMetaDataCronJob"
+                jaloclass="de.hybris.platform.mediaconversion.jalo.job.ExtractMediaMetaDataCronJob"
+                extends="AbstractMediaCronJob"
+                autocreate="true" generate="true">
+            <attributes>
+                <attribute qualifier="includeConverted" type="java.lang.Boolean">
+                    <description>Whether converted media should also be obeyed.</description>
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="containerMediasOnly" type="java.lang.Boolean">
+                    <description>Whether only media which reside in media container should be obeyed.</description>
+                    <defaultvalue>Boolean.FALSE</defaultvalue>
+                    <modifiers optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+	</itemtypes>
+</items>

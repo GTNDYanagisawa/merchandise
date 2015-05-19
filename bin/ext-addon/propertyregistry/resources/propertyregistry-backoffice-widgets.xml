@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<widgets>
+
+    <widget-extension widgetId="backofficeMainSlot">
+        <widget id="propertyRegistryBackofficePerspective" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+                slotId="perspectives" title="Property Registry" template="false" access="admin">
+            <widget id="propertyRegistryExplorerTree"
+                    widgetDefinitionId="com.hybris.cockpitng.widgets.common.explorertree"
+                    slotId="leftSlot" template="false">
+                <setting key="shortcutSectionRowHeight" value="28" type="Integer"/>
+                <setting key="refreshBtnVisiblility" value="false" type="Boolean"/>
+                <setting key="widgetStyleAttribute" value="min-height: 30px; height:100%" type="String"/>
+                <setting key="cacheTreemodel" value="false" type="Boolean"/>
+                <setting key="searchVisible" value="false" type="Boolean"/>
+                <setting key="searchAsYouType" value="true" type="Boolean"/>
+                <setting key="shortcutSectionScrollAfter" value="8" type="Integer"/>
+                <setting key="shortcutSectionInitHeight" value="50" type="Integer"/>
+                <setting key="navigationVisible" value="false" type="Boolean"/>
+                <setting key="widgetStyleClass" value="" type="String"/>
+                <setting key="config.context.component" value="propertyregistry-explorer-tree" type="String"/>
+                <setting key="shortcutSectionMaxHeight" value="274" type="Integer"/>
+                <setting key="dropAreaVisible" value="false" type="Boolean"/>
+                <virtual-sockets/>
+            </widget>
+            <widget id="propertyRegistryPerspectiveContainer"
+                    widgetDefinitionId="com.hybris.backoffice.perspectiveContainer"
+                    slotId="centerSlot" template="false">
+
+
+                <widget id="propertyUpdater" widgetDefinitionId="com.hybris.oms.omsadmin.widgets.propertyUpdater"
+                        slotId="perspectives" title="Property Updater" template="false">
+                    <instance-settings socketEventRoutingMode="LAST_USED">
+                        <create onInit="false" reuseExisting="true">
+                          <all-incoming-events/>
+                        </create>
+                        <close/>
+                        <select onInit="false">
+                            <all-incoming-events/>
+                        </select>
+                    </instance-settings>
+                    <setting key="widgetStyleAttribute" value="background-color: #FFFFFF;" type="String"/>
+                    <setting key="widgetStyleClass" value="" type="String"/>
+                    <virtual-sockets/>
+                </widget>
+
+            </widget>
+            <setting key="opaqueBG" value="true" type="Boolean"/>
+            <setting key="southHeight" value="50px" type="String"/>
+            <setting key="widgetStyleAttribute" value="background-color: #EDEDED;" type="String"/>
+            <setting key="northHeight" value="0px" type="String"/>
+            <setting key="westBorder" value="none" type="String"/>
+            <setting key="northBorder" value="none" type="String"/>
+            <setting key="eastDisabled" value="true" type="Boolean"/>
+            <setting key="southBorder" value="none" type="String"/>
+            <setting key="southDisabled" value="true" type="Boolean"/>
+            <setting key="eastBorder" value="none" type="String"/>
+            <setting key="eastWidth" value="25%" type="String"/>
+            <setting key="westCollapsible" value="true" type="Boolean"/>
+            <setting key="northDisabled" value="true" type="Boolean"/>
+            <setting key="widgetStyleClass" value="property-registry-backoffice-perspective" type="String"/>
+            <setting key="southCollapsible" value="true" type="Boolean"/>
+            <setting key="northCollapsible" value="true" type="Boolean"/>
+            <setting key="border" value="normal" type="String"/>
+            <setting key="westWidth" value="300px" type="String"/>
+            <setting key="centerBorder" value="none" type="String"/>
+            <setting key="eastCollapsible" value="true" type="Boolean"/>
+            <setting key="perspectiveImageUrl" value="cng/images/propertyregistry-icon.png" type="String"/>
+            <virtual-sockets/>
+        </widget>
+
+    </widget-extension>
+
+
+    <widget-connection sourceWidgetId="propertyRegistryExplorerTree" outputId="nodeSelected"
+                       targetWidgetId="propertyRegistryPerspectiveContainer"
+                       inputId="selectPerspective"/>
+    <widget-connection sourceWidgetId="propertyRegistryExplorerTree" outputId="nodeSelected" targetWidgetId="propertyUpdater" inputId="selectedNode"/>
+   
+
+
+</widgets>

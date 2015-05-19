@@ -1,0 +1,217 @@
+# Import the CMS content for the Product Configuration Component
+#
+
+### Staged Catalog ###
+# Set Macros used by the impex script
+$contentCatalog=powertoolsContentCatalog
+$productCatalog=powertoolsProductCatalog
+$contentCV=catalogVersion(catalog(id[default=$contentCatalog]),version[default='Staged'])
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])
+$jarResource=jar:de.hybris.platform.yb2bacceleratorcore.setup.CoreSystemSetup&/ysapproductconfigb2baddon/import/cockpits/cmscockpit
+
+################################################
+### Product Configuration component Group    ###
+################################################
+
+INSERT_UPDATE ComponentTypeGroup;code[unique=true]
+;productconfiguration
+
+################################################
+### Product Configure Link                   ###
+################################################
+
+# CMS ProductConfiguration Components
+INSERT_UPDATE ProductConfigurationButtonComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ProductConfigurationButton;Product Configuration Button;ProductConfigurationButton
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;narrow;ProductConfigurationButtonComponent
+
+################################################
+### Product Configuration Form               ###
+################################################
+
+
+# Add default restriction
+INSERT_UPDATE CMSCategoryRestriction;$contentCV[unique=true];uid[unique=true];name;categories(code, $productCV)
+;;SAPProductConfigMultiLevelRestriction;SAP Product Configuration Multi Level Restriction;SAPCFG_TAB
+
+INSERT_UPDATE CMSInverseRestriction;$contentCV[unique=true];uid[unique=true];name;originalRestriction(uid,$contentCV)
+;;SAPProductConfigSingleLevelRestriction;SAP Product Configuration Single Level Restriction;SAPProductConfigMultiLevelRestriction
+
+# CMS ProductConfigurationForm Components
+INSERT_UPDATE ProductConfigurationFormComponent;$contentCV[unique=true];uid[unique=true];name;groupStartLevel;&componentRef;restrictions(uid,$contentCV)
+;;ProductConfigurationFormLevel0;Product Configuration Form - Starting Level 0;0;ProductConfigurationFormLevel0;SAPProductConfigSingleLevelRestriction
+;;ProductConfigurationFormLevel1;Product Configuration Form - Starting Level 1;1;ProductConfigurationFormLevel1;SAPProductConfigMultiLevelRestriction
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductConfigurationFormComponent
+
+
+################################################
+### Product Configuration Add Config To Cart ###
+################################################
+# CMS Product Add Config To Cart Components
+INSERT_UPDATE ProductAddConfigToCartComponent;$contentCV[unique=true];uid[unique=true];name;showOnlyForLongConfigurations;&componentRef
+;;ProductAddConfigToCart;Add Configuration To Cart;FALSE;ProductAddConfigToCart
+;;ProductAddConfigToCartEndOfPage;Add Configuration To Cart - End of Page;TRUE;ProductAddConfigToCartEndOfPage
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductAddConfigToCartComponent
+
+################################################
+### Product Configuration Specification      ###
+################################################
+# CMS Product Add Config To Cart Components
+INSERT_UPDATE ProductConfigurationSpecificationComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ProductConfigurationSpecification;Product Configuration Specification;ProductConfigurationSpecification
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductConfigurationSpecificationComponent
+
+################################################
+### Product Configuration Title Summary      ###
+################################################
+
+# CMS ProductConfiguration Components
+INSERT_UPDATE ProductConfigurationTitleSummaryComponent;$contentCV[unique=true];uid[unique=true];name;showSummary;&componentRef
+;;ProductConfigurationTitleSummary;Product Configuration Title and Summary;TRUE;ProductConfigurationTitleSummary
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductConfigurationTitleSummaryComponent
+
+################################################
+### Product Configuration Image              ###
+################################################
+
+# CMS ProductConfiguration Components
+INSERT_UPDATE ProductConfigurationImageComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ProductConfigurationImage;Product Configuration Image;ProductConfigurationImage
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductConfigurationImageComponent
+
+################################################
+### Product Configuration Price Summary      ###
+################################################
+
+# CMS ProductConfiguration Components
+INSERT_UPDATE ProductConfigurationPriceSummaryComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ProductConfigurationPriceSummary;Product Configuration Price Summary;ProductConfigurationPriceSummary
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductConfigurationPriceSummaryComponent
+
+################################################
+### Product Configuration Tab Navigation     ###
+################################################
+# CMS ProductConfigurationTab Navigation Components
+INSERT_UPDATE ProductConfigurationTabNavigationComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;restrictions(uid,$contentCV)
+;;ProductConfigurationTabNavigation;Product Configuration Tab Navigation;ProductConfigurationTabNavigation;SAPProductConfigMultiLevelRestriction
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductConfigurationTabNavigationComponent
+
+################################################
+### Page Type / Page Template Definition     ###
+################################################
+
+# define page template
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;ProductConfigurationTemplate;Product Configuration Template;configuration/configurationPage;ProductConfigPage
+;;ProductListPageTemplate;Product List Page Template;addon:/ysapproductconfigb2baddon/pages/product/productListPage;CategoryPage
+;;SearchResultsListPageTemplate;Search Results List Page Template;addon:/ysapproductconfigb2baddon/pages/search/searchListPage;ContentPage
+;;SearchAdvancedResultsEmptyPageTemplate;Advanced Search Results Empty Page Template;addon:/ysapproductconfigb2baddon/pages/search/searchAdvancedEmptyPage;ContentPage
+
+
+# define velocity template, which is used CMS  Cockpit view
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;ProductConfigurationTemplate;$jarResource/structure-view/structure_productConfigurationPageTemplate.vm
+
+# assign content slots to page template
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ProductConfigurationTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Section1;;;wide
+;Section2;;;wide
+;Section3;;;narrow
+;Section4;;;narrow
+;Footer;;;footer
+;ConfigHeader;;ProductConfigurationImageComponent;wide
+;ConfigTitle;;ProductConfigurationTitleSummaryComponent;narrow
+;ConfigNavBar;;ProductConfigurationTabNavigationComponent;narrow
+;ConfigContent;;ProductConfigurationFormComponent;narrow
+;ConfigSidebar;;ProductConfigurationPriceSummaryComponent,ProductAddConfigToCartComponent,ProductConfigurationSpecificationComponent,ProductReferencesComponent;narrow
+
+# define slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;ConfigHeaderSlot;Product Configuration Header Slot;true
+;;ConfigTitleSlot;Product Configuration Title Slot;true
+;;ConfigNavBarSlot;Product Configuration Navigation Bar Slot;true
+;;ConfigContentSlot;Product Configuration Content Slot;true
+;;ConfigSidebarSlot;Product Configuration Side Bar Slot;true
+
+
+# bind slots to the template
+INSERT_UPDATE ContentSlotForTemplate;$contentCV;uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ProductConfigurationTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ConfigPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-ConfigPage;HeaderLinks;;HeaderLinksSlot;true
+;;SearchBox-ConfigPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-ConfigPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-ConfigPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-ConfigPage;Footer;;FooterSlot;true
+;;ConfigHeader-ConfigPage;ConfigHeader;;ConfigHeaderSlot;true
+;;ConfigTitle-ConfigPage;ConfigTitle;;ConfigTitleSlot;true
+;;ConfigNavBar-ConfigPage;ConfigNavBar;;ConfigNavBarSlot;true
+;;ConfigContent-ConfigPage;ConfigContent;;ConfigContentSlot;true
+;;ConfigSidebar-ConfigPage;ConfigSidebar;;ConfigSidebarSlot;true
+
+# Default Product Config Page
+INSERT_UPDATE ProductConfigPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;productConfig;Product Configuration;ProductConfigurationTemplate;true
+
+# texts
+UPDATE ProductConfigPage;$contentCV[unique=true];uid[unique=true];title[lang=en]
+;;productConfig;Product Configuration;
+
+UPDATE ProductConfigPage;$contentCV[unique=true];uid[unique=true];title[lang=de]
+;;productConfig;Produkt Konfiguration;
+
+
+
+# Bind Component to Slot
+INSERT_UPDATE ElementsForSlot;source($contentCV,uid)[unique=true];target(&componentRef)[unique=true];
+;AddToCartSlot;ProductConfigurationButton
+;ConfigHeaderSlot;ProductConfigurationImage
+;ConfigTitleSlot;ProductConfigurationTitleSummary
+;ConfigSidebarSlot;ProductConfigurationPriceSummary
+;ConfigSidebarSlot;ProductConfigurationSpecification
+;ConfigContentSlot;ProductConfigurationFormLevel0
+;ConfigContentSlot;ProductConfigurationFormLevel1
+;ConfigContentSlot;ProductAddConfigToCartEndOfPage
+;ConfigNavBarSlot;ProductConfigurationTabNavigation
+
+# Remove hybris AddToCart 
+INSERT_UPDATE ProductAddToCartComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;visible
+;;AddToCart;ProductAddToCart Component;AddToCart;false
+
+REMOVE ElementsForSlot;source($contentCV,uid)[unique=true];target(&componentRef)[unique=true];
+;AddToCartSlot;AddToCart
+
+# Add configurable attribute to solr index - otherwise the parameter will not be available on product-/searchListPage
+$solrIndexedType=powertoolsProductType
+
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);sortableType(code);currency[default=false];localized[default=false];multiValue[default=false];useForSpellchecking[default=false];useForAutocomplete[default=false];fieldValueProvider;valueProviderParameter
+;$solrIndexedType; sapConfigurable           ;boolean;            ;    ;    ;    ;    ;    ;;
+

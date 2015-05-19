@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype code="LDIFImportModeEnum" autocreate="true" generate="true">
+			<value code="filebased"/>
+			<value code="querybased"/>
+		</enumtype>
+		<enumtype code="LDAPVersionEnum" autocreate="true" generate="true">
+			<value code="v2"/>
+			<value code="v3"/>
+		</enumtype>
+		<enumtype code="JNDIAuthenticationEnum" autocreate="true" generate="true">
+			<value code="simple"/>
+		</enumtype>
+		<enumtype code="SearchOperationEnum" autocreate="true" generate="true">
+			<value code="equals"/>
+			<value code="exists"/>
+			<value code="similar"/>
+			<value code="greater"/>
+			<value code="lesser"/>
+		</enumtype>
+		<enumtype code="PersonObjectClassEnum" autocreate="true" generate="true">
+			<value code="person"/>
+			<value code="posixAccount"/>
+			<value code="organizationalPerson"/>
+			<value code="residentialPerson"/>
+			<value code="inetOrgPerson"/>
+			<value code="eduPerson"/>
+		</enumtype>
+		<enumtype code="GroupObjectClassEnum" autocreate="true" generate="true">
+			<value code="posixGroup"/>
+			<value code="organizationalUnit"/>
+		</enumtype>
+	</enumtypes>
+
+	<itemtypes>
+		<itemtype code="LDIFImportCronJob"
+			 jaloclass="de.hybris.platform.ldap.jalo.LDIFImportCronJob"
+			 extends="MediaProcessCronJob" 
+			 autocreate="true"
+			 generate="true" >
+			<attributes>
+				<attribute qualifier="searchbase" type="java.lang.String">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="ldapquery" type="java.lang.String">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="resultfilter" type="java.lang.String">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<!--<attribute qualifier="job" redeclare="true" type="LDIFImportJob">
+					<modifiers read="true" write="false" initial="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>-->	
+				<attribute qualifier="importmode" type="LDIFImportModeEnum">
+					<modifiers write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="ldifFile" type="LDIFMedia">
+					<modifiers write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="configFile" type="ConfigurationMedia">
+					<modifiers write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="configFile2" type="ConfigurationMedia">
+					<modifiers write="true" optional="true"/>
+					<persistence type="jalo"/>
+				</attribute>
+				<attribute qualifier="destMedia" type="ImpExMedia">
+					<modifiers write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="dumpMedia" type="ImpExMedia">
+					<modifiers write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>	
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="LDIFGroupImportCronJob"
+			 jaloclass="de.hybris.platform.ldap.jalo.LDIFGroupImportCronJob"
+			 extends="MediaProcessCronJob" 
+			 autocreate="true"
+			 generate="true" >
+			<attributes>
+				<attribute qualifier="searchbase" type="java.lang.String">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="ldapquery" type="java.lang.String">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="resultfilter" type="java.lang.String">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="userSearchFieldQualifier" type="java.lang.String">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>	
+				<attribute qualifier="userRootDN" type="java.lang.String">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="userResultfilter" type="java.lang.String">
+					<modifiers read="true" write="true" initial="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>	
+				<attribute qualifier="importUsers" type="java.lang.Boolean">
+					<modifiers write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="codeExecution" type="java.lang.Boolean">
+					<modifiers write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="ldifFile" type="LDIFMedia">
+					<modifiers write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="configFile" type="ConfigurationMedia">
+					<modifiers write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="destMedia" type="ImpExMedia">
+					<modifiers write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="dumpMedia" type="ImpExMedia">
+					<modifiers write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>	
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="LDIFImportJob"
+			 jaloclass="de.hybris.platform.ldap.jalo.LDIFImportJob"
+			 extends="Job" 
+			 autocreate="true"
+			 generate="true">
+		</itemtype>
+		
+		<itemtype code="LDIFGroupImportJob"
+			 jaloclass="de.hybris.platform.ldap.jalo.LDIFGroupImportJob"
+			 extends="Job" 
+			 autocreate="true"
+			 generate="true">
+		</itemtype>
+		
+		<itemtype code="LDAPConfigProxyItem"
+			metatype="ConfigProxyMetaType"
+			jaloclass="de.hybris.platform.ldap.jalo.LDAPConfigProxyItem"
+			extends="Item"
+			singleton="true"
+			jaloonly="true"
+			autocreate="true"
+			generate="false">
+			<attributes>
+				<attribute autocreate="true" qualifier="minimumFailbackTime" type="java.lang.Integer" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"minimum.fail.backtime"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="localAccountsOnly" type="PrincipalCollection" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"local.accounts.only"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="poolInitsize" type="java.lang.Integer" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"pool.init.size"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="poolPrefsize" type="java.lang.Integer" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"pool.pref.size"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="poolMaxsize" type="java.lang.Integer" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"pool.max.size"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="poolTimeout" type="java.lang.Integer" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"pool.time.out"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="poolEnabled" type="java.lang.Boolean" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"pool.enabled"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="loginField" type="java.lang.String" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"login.field"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="jndiFactory" type="java.lang.String" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"jndi.factory"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="socketFactory" type="java.lang.String" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"socket.factory"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>			
+				<attribute autocreate="true" qualifier="cacerts" type="java.lang.String" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"cacerts"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				
+				<attribute autocreate="true" qualifier="clientcerts" type="java.lang.String" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"clientcerts"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>					
+				<attribute autocreate="true" qualifier="caKeystorePwd" type="java.lang.String" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"caKeystorePwd"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>					
+				<attribute autocreate="true" qualifier="clientKeystorePwd" type="java.lang.String" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"clientKeystorePwd"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>				
+				<attribute autocreate="true" qualifier="caKeystoreType" type="java.lang.String" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"caKeystoreType"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="clientKeystoreType" type="java.lang.String" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"clientKeystoreType"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="jndiVersion" type="LDAPVersionEnum" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"jndi.version"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="jndiAuthentication" type="JNDIAuthenticationEnum" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"jndi.authentication"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="jndiPrincipals" type="java.lang.String" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"jndi.principals"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="jndiCredentials" type="java.lang.String" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"jndi.credentials"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="securityProtocol" type="java.lang.String" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"security.protocol"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="serverUrl" type="StringCollection" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"server.url"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="serverRootDN" type="java.lang.String" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"server.root.dn"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute autocreate="true" qualifier="jndiConnectTimeout" type="java.lang.Integer" metatype="ConfigAttributeDescriptor">
+					<persistence type="jalo"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<custom-properties>
+						<property name="externalQualifier">
+							<value>"ldap.jndi.connection.timeout"</value>
+						</property>
+						<property name="storeInDatabase">
+							<value>Boolean.TRUE</value>
+						</property>
+						<property name="needRestart">
+							<value>Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="Principal" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="ldapsearchbase" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="DN" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>					
+					</persistence>    
+				</attribute>
+				<attribute qualifier="CN" type="java.lang.String">
+               		<modifiers read="true" write="true" search="true" optional="true" />
+  						<persistence type="property"/>
+            	</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="User" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="ldapaccount" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="domain" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="ldaplogin" type="java.lang.String">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="ConfigurationMedia" generate="true" autocreate="true"
+			jaloclass="de.hybris.platform.ldap.jalo.ConfigurationMedia"
+			extends="Media">
+		</itemtype>
+		
+		<itemtype code="LDIFMedia" generate="true" autocreate="true"
+			jaloclass="de.hybris.platform.ldap.jalo.LDIFMedia"
+			extends="Media">
+			<attributes>
+				<attribute qualifier="catalogVersion" type="CatalogVersion" redeclare="true">
+					<modifiers read="true" write="true" initial="false" search="true" optional="true" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+	</itemtypes>
+</items>

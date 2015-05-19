@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<itemtypes>
+   <!-- bmecat import job with csv: transform job -->
+   		 <itemtype code="BMECatImportWizard" 
+         extends="WizardBusinessItem"
+         jaloonly="true"
+         jaloclass="de.hybris.platform.bmecat.hmc.BMECatImportWizard"
+         generate="true" autocreate="true" >
+      <attributes>
+   
+       <!-- tab 1: Upload / Media Selection -->
+       <attribute qualifier="file" type="BMECatJobMedia">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="mediaFile" type="BMECatJobMedia">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="mediasNotIncluded" type="java.lang.Boolean">
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       
+       <attribute qualifier="importJob" type="BMECatImportBatchJob">
+        <modifiers optional="false"/>
+        <persistence type="jalo"/>
+       </attribute>    
+   
+       <!-- tab 2: Catalog Basic Data -->
+       <attribute qualifier="transactionMode" type="TransactionModeEnum">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="catalogName" type="java.lang.String">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="catalog" type="Catalog">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="catalogDate" type="java.util.Date">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="catalogVersionName" type="java.lang.String">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="catalogVersion" type="CatalogVersion">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="catalogLanguageISO" type="java.lang.String">
+        <modifiers write="false" optional="false"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="catalogLanguage" type="Language">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="defaultCurrencyISO" type="java.lang.String">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="defaultCurrency" type="Currency">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       
+       <attribute qualifier="territories" type="StringCollection">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/>
+       </attribute>
+       
+       <attribute qualifier="articleCount" type="java.lang.Integer">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="categoryCount" type="java.lang.Integer">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="mediaCount" type="java.lang.Integer">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="keywordCount" type="java.lang.Integer">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="categoryAssignmentsCount" type="java.lang.Integer">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <!-- tab 3: import settings -->
+       <attribute qualifier="enableUndo" type="java.lang.Boolean">
+        <modifiers write="true" optional="false"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+        <defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+       </attribute>
+   
+       <attribute qualifier="keepLogs" type="java.lang.Boolean">
+        <modifiers write="true" optional="false"/>
+        <persistence type="property"/>
+        <defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+       </attribute>
+   
+       <attribute qualifier="sendEmail" type="java.lang.Boolean">
+        <modifiers write="true" optional="false"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="emailAddress" type="java.lang.String">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="currencyMappings" type="Iso2CurrencyMap">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="classificationMappings" type="Classification2QualifierMap">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="unitMappings" type="Code2UnitMap">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <attribute qualifier="priceTypeMappings" type="BMECatPriceType2UserPriceGroupMapType">
+        <persistence type="jalo"/>
+       </attribute>    
+       <attribute qualifier="taxTypeMappings" type="BMECatTax2TaxGroupMapType">
+        <persistence type="jalo"/>
+       </attribute>
+       <attribute qualifier="localizationUpdate" type="java.lang.Boolean">
+        <modifiers optional="false"/>
+        <persistence type="jalo"/>
+       </attribute>
+   
+       <attribute qualifier="bmeCatImportCronJob" type="BMECatImportCronJob">
+        <modifiers write="false"/>
+        <persistence type="jalo"/>
+       </attribute>      
+      </attributes>
+     </itemtype>
+   
+     <!-- bmecat import wizard with csv -->
+     <itemtype  code="BMECatImportWithCsvWizard" 
+        extends="WizardBusinessItem"
+        jaloonly="true"
+        jaloclass="de.hybris.platform.bmecat.hmc.BMECatImportWithCsvWizard"
+        generate="true" autocreate="true" >
+      <attributes>
+       <!-- tab 0 and 1: Upload / Media Selection -->
+       <attribute qualifier="importJob" type="BMECatImportWithCsvJob">
+        <modifiers optional="false"/>
+        <persistence type="jalo"/>
+       </attribute>
+       <attribute qualifier="file" type="BMECatJobMedia">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="mediaFile" type="BMECatJobMedia">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="mediasNotIncluded" type="java.lang.Boolean">
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <!-- tab 2 and 3: Catalog Basic Data -->
+       <attribute qualifier="transactionMode" type="TransactionModeEnum">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="catalogName" type="java.lang.String">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="catalog" type="Catalog">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="catalogDate" type="java.util.Date">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="catalogVersionName" type="java.lang.String">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="catalogVersion" type="CatalogVersion">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="catalogLanguageISO" type="java.lang.String">
+        <modifiers write="false" optional="false"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="catalogLanguage" type="Language">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="defaultCurrencyISO" type="java.lang.String">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="defaultCurrency" type="Currency">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="territories" type="StringCollection">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/>
+       </attribute>
+       <attribute qualifier="articleCount" type="java.lang.Integer">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="categoryCount" type="java.lang.Integer">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="mediaCount" type="java.lang.Integer">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="keywordCount" type="java.lang.Integer">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="categoryAssignmentsCount" type="java.lang.Integer">
+        <modifiers write="false" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <!-- tab 4: import settings -->
+       <attribute qualifier="currencyMappings" type="Iso2CurrencyMap">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="classificationMappings" type="Classification2QualifierMap">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="unitMappings" type="Code2UnitMap">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="priceTypeMappings" type="PriceType2BMECatPriceMapType">
+        <persistence type="jalo"/>
+       </attribute>    
+       <attribute qualifier="taxTypeMappings" type="BMECatTax2TaxGroupMapType">
+        <persistence type="jalo"/>
+       </attribute>
+       <attribute qualifier="localizationUpdate" type="java.lang.Boolean">
+        <modifiers optional="false"/>
+        <persistence type="jalo"/>
+       </attribute>
+   
+       <!-- TODO Q: is a media also compatible for an ImpExImportCronJob???
+       tab 5: impex script file -->
+       <attribute qualifier="impexScriptFile" type="BMECatImpExScriptMedia">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+   
+       <!-- tab 6: other settings -->
+       <attribute qualifier="enableUndo" type="java.lang.Boolean">
+        <modifiers write="true" optional="false"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+        <defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+       </attribute>
+       <attribute qualifier="keepLogs" type="java.lang.Boolean">
+        <modifiers write="true" optional="false"/>
+        <persistence type="property"/>
+        <defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+       </attribute>
+       <attribute qualifier="sendEmail" type="java.lang.Boolean">
+        <modifiers write="true" optional="false"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+       <attribute qualifier="emailAddress" type="java.lang.String">
+        <modifiers write="true" optional="true"/>
+        <persistence type="jalo"/><!-- delegated to cronjob -->
+       </attribute>
+   
+       <!-- 2 cronjobs, one for transforming bmecat.xml to csv files,
+         and the other for the whole wizard
+        -->
+       <attribute qualifier="bmecatImportWithCsvCronJob" type="BMECatImportWithCsvCronJob">
+        <modifiers write="false"/>
+        <persistence type="jalo"/>
+       </attribute>
+       <attribute qualifier="bmecatImportWithCsvTransformCronJob" type="BMECatImportWithCsvTransformCronJob">
+        <modifiers write="false"/>
+        <persistence type="jalo"/>
+       </attribute>
+      </attributes>
+     </itemtype>
+   
+     <itemtype code="BMECatExportWizard"
+         extends="WizardBusinessItem"
+         jaloonly="true"
+         jaloclass="de.hybris.platform.bmecat.hmc.BMECatExportWizard"
+         generate="true" autocreate="true" >
+      <attributes>
+       <attribute qualifier="exportCatalogVersion" type="CatalogVersion">
+        <description>CatalogVersion to export</description>
+        <modifiers optional="false"/>
+        <persistence type="jalo"/>
+       </attribute>
+       <attribute qualifier="exportLanguages" type="LanguageCollection">
+        <modifiers read="true" write="true" optional="true" initial="true"/>
+        <persistence type="property"/>
+       </attribute>
+       <attribute qualifier="exportCurrency" type="Currency">
+        <modifiers read="true" write="true" optional="true"/>
+        <persistence type="jalo"/>
+       </attribute>
+       <attribute qualifier="exportedProductSize" type="java.lang.Integer" >
+        <modifiers read="true" write="false"/>
+        <persistence type="jalo"/>
+       </attribute>
+       <attribute qualifier="existedProductSize" type="java.lang.Integer" >
+        <modifiers read="true" write="false"/>
+        <persistence type="jalo"/>
+       </attribute>
+       <attribute qualifier="classificationSystemVersions" type="ClassificationSystemVersionCollection" >
+        <persistence type="jalo"/>      
+       </attribute>
+       <attribute qualifier="ClassificationSystemNumberFormat" type="java.lang.String" >
+        <persistence type="jalo"/>      
+       </attribute> 
+       <attribute qualifier="Hybris2BMECatMimePurposeMapping" type="Hybris2BMECatMimePurposeMappingType">
+        <persistence type="jalo"/>
+       </attribute>
+       <attribute qualifier="priceTypeMapping" type="BMECatPriceType2UserPriceGroupMapType">
+        <persistence type="jalo"/>      
+       </attribute>     
+       <attribute qualifier="exportedMedias" type="BMECatJobMedia">
+        <persistence type="jalo"/>
+       </attribute>
+       <attribute qualifier="bmeCatExportCronJob" type="BMECatExportCronJob">
+        <modifiers write="false"/>
+        <persistence type="jalo"/>
+       </attribute>
+       <attribute qualifier="jobMedia" type="JobMedia">
+        <modifiers write="false"/>
+        <persistence type="jalo"/>     
+       </attribute>
+       <attribute qualifier="udpNet" type="java.lang.Boolean">
+        <modifiers optional="false"/>
+        <persistence type="jalo"/>    
+       </attribute>
+       <attribute qualifier="referenceDate" type="java.util.Date">
+        <modifiers optional="false"/>
+        <persistence type="jalo"/>
+       </attribute>         
+       <attribute qualifier="referenceCustomer" type="Customer">
+        <modifiers optional="false"/>
+        <persistence type="jalo"/>
+       </attribute>         
+       <attribute qualifier="suppressEmptyCategories" type="java.lang.Boolean">
+        <modifiers optional="false"/>
+        <persistence type="jalo"/>
+       </attribute>
+       <attribute qualifier="suppressProductsWithoutPrice" type="java.lang.Boolean">
+        <modifiers optional="false"/>
+        <persistence type="jalo"/>
+       </attribute>
+      </attributes>
+     </itemtype>
+	</itemtypes>
+</items>

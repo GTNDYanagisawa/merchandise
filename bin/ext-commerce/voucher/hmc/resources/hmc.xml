@@ -1,0 +1,705 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+<!--
+################################################################################
+# Configuration for extension voucher
+################################################################################
+-->
+
+	<explorertree>
+	   <group name="marketing">
+	      <typeref type="Voucher" description="typeref.voucher.description"/>
+	   </group>
+	</explorertree>
+	
+	<type name="AbstractOrder" mode="append">
+	   <organizer>
+	      <editor>      
+	         <tab name="tab.abstractorder.vouchers">
+	            <section name="section.abstractorder.vouchers">
+	               <listlayout>
+	                  <attribute name="discounts">
+	                     <specialeditor classname="de.hybris.platform.voucher.hmc.VoucherEditorChip"/>
+	                  </attribute>
+	               </listlayout>
+	            </section>
+	         </tab>   
+	      </editor>
+	   </organizer>
+	</type>
+	
+   <type name="Voucher" icon="ext/voucher/images/e_voucher.gif" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="code"/>
+            <condition attribute="name"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="100"/>
+                  <attribute name="name" width="150"/>
+                  <attribute name="valueString" width="150"/>
+                  <attribute name="freeShipping" width="150"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="100"/>
+                  <attribute name="name" width="150"/>
+                  <attribute name="valueString" width="150"/>
+                  <attribute name="freeShipping" width="150"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+                  <attribute name="name"/>
+                  <attribute name="valueString"/>
+                  <attribute name="freeShipping"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor mode="replace">
+            <exclude>
+               <exclusion attribute="valueString"/>
+               <exclusion attribute="global"/>
+            </exclude>                  
+            <essentials>
+               <listlayout>
+                  <text name="text.voucher.code" width="353"/>
+                  <attribute name="code"/>
+                  <attribute name="name"/>
+               </listlayout>
+            </essentials>
+            <tab name="tab.common">
+               <section name="section.voucher.description">
+                  <listlayout>
+                     <attribute name="description"/>
+                  </listlayout>
+               </section>
+               <section name="section.voucher.value">
+                  <columnlayout leftwidth="370" rightwidth="370">
+                     <row>
+                        <attribute name="absolute">
+                           <advancedbooleaneditor truename="absolute" falsename="relative"/>
+                        </attribute>
+                     </row>
+                     <row>
+                        <attribute name="value"/>
+                        <attribute name="currency"/>
+                     </row>
+                     <row>
+                        <attribute name="priority"/>
+                        <attribute name="freeShipping">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                  </columnlayout>
+               </section>
+            </tab>
+            <tab name="tab.voucher.orders">
+               <section name="section.voucher.orders">
+                  <listlayout>
+                     <attribute name="orders">
+                        <referencecollectioneditor create="false" add="false" remove="false">
+                        	<itemlayout>
+                        		<attribute name="code" width="206"/>
+                        		<attribute name="date" width="120"/>
+                        		<attribute name="totalPrice" width="100"/>
+                        		<attribute name="user" width="120"/>
+                        	</itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+            <tabref idref="tab_administration"/>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+            <attribute name="name"/>
+            <attribute name="valueString"/>
+            <attribute name="freeShipping"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+	
+	<type name="PromotionVoucher" icon="ext/voucher/images/e_voucher.gif" mode="append">
+	   <organizer>
+	      <search>
+	         <condition attribute="voucherCode"/>
+	      </search>
+	      <editor>
+	         <essentials mode="replace">
+	            <listlayout>
+	               <text name="text.promotionvoucher.common" width="353"/>
+	               <attribute name="code" maxlength="3"/>
+	               <attribute name="name"/>
+	            </listlayout>
+	         </essentials>
+	         <tab name="tab.common" position="0">
+	            <section name="section.voucher.description">
+	               <listlayout>
+	                  <text name="text.promotionvoucher.vouchercode" width="353"/>
+	                  <table>
+	                     <tr>
+	                        <td>
+	                           <attribute name="voucherCode"/>
+	                        </td>
+	                        <td>
+	                           <action type="item" classname="de.hybris.platform.voucher.hmc.GeneratePromotionVoucherCodeAction" name="btn.generate.voucher.code.action"/>
+	                        </td>
+	                     </tr>
+	                  </table>
+	               </listlayout>
+	            </section>
+	         </tab>
+	         <tab name="tab.voucher.restrictions" position="1">
+	            <section name="section.voucher.restrictions">
+	               <listlayout>
+	               	<text name="text.voucher.restrictions" width="595"/>
+                     <attribute name="restrictions">
+                        <referencecollectioneditor presetattribute="voucher"
+                        									create="true"
+                        									add="true"
+                        									remove="true"
+                        									autosave="true">
+                           <itemlayout>
+                              <attribute name="restrictionType" width="194"/>
+                              <attribute name="description" width="357"/>
+                           </itemlayout> 
+                        </referencecollectioneditor>
+                     </attribute>
+	                  <attribute name="redemptionQuantityLimit" position="0"/>
+	                  <attribute name="redemptionQuantityLimitPerUser" position="1"/>
+	               </listlayout>
+	            </section>
+	         </tab>                  
+	      </editor>
+	   </organizer>
+	</type>
+	
+	<type name="SerialVoucher" icon="ext/voucher/images/e_serialvoucher.gif" mode="append">
+	   <organizer>
+	      <editor>
+	         <essentials mode="replace">
+	            <listlayout>
+	               <text name="text.serialvoucher.common" width="353"/>
+	               <attribute name="code" maxlength="3"/>
+	               <attribute name="name"/>
+	            </listlayout>
+	         </essentials>
+	         <tab name="tab.common" position="0">
+	            <section name="section.voucher.description">
+	               <listlayout>
+	                  <attribute name="codes">
+	                     <referencecollectioneditor create="false" add="false" remove="true">
+	                        <itemlayout>
+	                           <attribute name="code" width="85"/>
+	                           <attribute name="url2" title="title.download" width="92">
+	                              <display classname="de.hybris.platform.hmc.attribute.MediaDownloadUrlChip" />
+	                           </attribute>
+	                        </itemlayout>
+	                     </referencecollectioneditor>
+	                  </attribute>            
+	               	<customchip classname="de.hybris.platform.voucher.hmc.VoucherCodeGeneratorChip"/>
+	               </listlayout>
+	            </section>
+	         </tab>
+	         <tab name="tab.voucher.restrictions" position="1">
+	            <section name="section.voucher.restrictions">
+	               <listlayout>
+	               	<text name="text.serialvoucher.restrictions" width="595"/>
+                     <attribute name="restrictions">
+                        <referencecollectioneditor presetattribute="voucher"
+                        									create="true"
+                        									add="true"
+                        									remove="true"
+                        									autosave="true">
+                           <itemlayout>
+                              <attribute name="restrictionType" width="194"/>
+                              <attribute name="description" width="357"/>
+                           </itemlayout> 
+                        </referencecollectioneditor>
+                     </attribute>
+	               </listlayout>
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	</type>
+	
+	<type name="Restriction" mode="append">
+	   <organizer>
+	      <search mode="replace">
+	         <condition attribute="itemType"/>
+	         <condition attribute="voucher"/>
+	      </search>
+	      <result mode="replace">
+	         <listview>
+	            <itemlayout>
+	               <attribute name="restrictionType" width="150"/>
+	               <attribute name="description" width="250"/>
+	               <attribute name="positive" width="50"/>
+	            </itemlayout>
+	         </listview>
+	         <editview>
+	            <itemlayout>
+	               <attribute name="restrictionType" width="150"/>
+	               <attribute name="description" width="250"/>
+	               <attribute name="positive" width="50"/>
+	            </itemlayout>
+	         </editview>
+	         <treeview>
+	            <itemlayout>
+	               <attribute name="restrictionType" width="150"/>
+	               <attribute name="description" width="250"/>
+	               <attribute name="positive" width="50"/>
+	            </itemlayout>
+	         </treeview>
+	      </result>
+	      <editor>
+	         <essentials mode="replace">
+	            <listlayout>
+	               <attribute name="voucher"/>
+	               <attribute name="description"/>
+	            </listlayout>
+	         </essentials>
+	         <tab name="properties" mode="replace">
+	            <section name="section.restriction.errormessage">
+	               <listlayout>
+	                  <text name="text.restriction.errormessage" width="353"/>
+	                  <attribute name="violationMessage">
+	                     <textareaeditor expanded="true" wrap="true" rows="4"/>
+	                  </attribute>
+	               </listlayout>
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	   <defaultreference mode="replace">
+	      <itemlayout>
+	         <attribute name="restrictionType"/>
+	         <attribute name="description"/>
+	      </itemlayout>
+	   </defaultreference>
+	</type>
+	
+	<type name="UserRestriction" mode="append">
+	   <organizer>
+	      <result>
+	         <listview>
+	            <itemlayout>
+	               <attribute name="users" width="200"/>
+	            </itemlayout>
+	         </listview>
+	         <editview>
+	            <itemlayout>
+	               <attribute name="users" width="200"/>
+	            </itemlayout>
+	         </editview>
+	         <treeview>
+	            <itemlayout>
+	               <attribute name="users" width="200"/>
+	            </itemlayout>
+	         </treeview>
+	      </result>
+	      <editor>
+	         <essentials mode="replace">
+	            <listlayout>
+	               <text name="text.userrestriction.common" width="353"/>
+	               <attribute name="voucher"/>
+	               <attribute name="description"/>
+	            </listlayout>
+	         </essentials>
+	         <tab name="properties">
+	            <section name="section.restrictions" mode="replace" position="0">
+	               <listlayout>
+	                  <attribute name="users">
+                           <referencecollectioneditor>
+                              <itemlayout>
+                                 <attribute name="uid" width="166"/>
+                                 <attribute name="displayname" width="166"/>
+                              </itemlayout>
+                           </referencecollectioneditor>
+                        </attribute>
+	                  <attribute name="positive">
+	                     <advancedbooleaneditor truename="userrestriction.positive.true"
+	                                            falsename="userrestriction.positive.false"/>
+	                  </attribute>
+	               </listlayout>
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	</type>
+	
+	<type name="NewCustomerRestriction" mode="append">
+	   <organizer>
+	      <editor>
+	         <essentials mode="replace">
+	            <listlayout>
+	               <text name="text.newcustomerrestriction.common" width="353"/>
+	               <attribute name="voucher"/>
+	               <attribute name="description"/>
+	            </listlayout>
+	         </essentials>
+	      </editor>
+	   </organizer>
+	</type>
+	
+	<type name="ProductRestriction" mode="append">
+	   <organizer>
+	      <result>
+	         <listview>
+	            <itemlayout>
+	               <attribute name="products"/>
+	            </itemlayout>
+	         </listview>
+	         <editview>
+	            <itemlayout>
+	               <attribute name="products" width="150"/>
+	            </itemlayout>
+	         </editview>
+	         <treeview>
+	            <itemlayout>
+	               <attribute name="products"/>
+	            </itemlayout>
+	         </treeview>
+	      </result>
+	      <editor>
+	         <essentials mode="replace">
+	            <listlayout>
+	               <text name="text.productrestriction.common" width="353"/>
+	               <attribute name="voucher"/>
+	               <attribute name="description"/>
+	            </listlayout>
+	         </essentials>
+	         <tab name="properties">
+	            <section name="section.restrictions" mode="replace" position="0">
+	               <listlayout>
+	                  <attribute name="products">
+								<referencecollectioneditor create="false" add="true" remove="true">
+									<itemlayout>
+										<attribute name="code" width="92"/>
+										<attribute name="name" width="85"/>										
+									</itemlayout>
+								</referencecollectioneditor>
+	                  </attribute>
+	                  <attribute name="positive">
+	                     <advancedbooleaneditor truename="productrestriction.positive.true"
+	                                            falsename="productrestriction.positive.false"/>
+	                  </attribute>
+	               </listlayout>
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	</type>
+	
+	<type name="ProductCategoryRestriction" mode="append">
+	   <organizer>
+	      <result>
+	         <listview>
+	            <itemlayout>
+	               <attribute name="categories" width="200"/>
+	            </itemlayout>
+	         </listview>
+	         <editview>
+	            <itemlayout>
+	               <attribute name="categories" width="200"/>
+	            </itemlayout>
+	         </editview>
+	         <treeview>
+	            <itemlayout>
+	               <attribute name="categories" width="200"/>
+	            </itemlayout>
+	         </treeview>
+	      </result>
+	      <editor>
+	         <essentials mode="replace">
+	            <listlayout>
+	               <text name="text.productcategoryrestriction.common" width="353"/>
+	               <attribute name="voucher"/>
+	               <attribute name="description"/>
+	            </listlayout>
+	         </essentials>
+	         <tab name="properties">
+	            <section name="section.restrictions" mode="replace" position="0">
+	               <listlayout>
+	                  <attribute name="categories"/>
+	                  <attribute name="positive">
+	                     <advancedbooleaneditor truename="productcategoryrestriction.positive.true"
+	                                            falsename="productcategoryrestriction.positive.false"/>
+	                  </attribute>
+	               </listlayout>
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	</type>
+	
+	<type name="ProductQuantityRestriction" mode="append">
+	   <organizer>
+	      <result>
+	         <listview>
+	            <itemlayout>
+	               <attribute name="products" width="200"/>
+	               <attribute name="quantity" width="100"/>
+	               <attribute name="unit" width="100"/>
+	            </itemlayout>
+	         </listview>
+	         <editview>
+	            <itemlayout>
+	               <attribute name="products" width="200"/>
+	               <attribute name="quantity" width="100"/>
+	               <attribute name="unit" width="100"/>
+	            </itemlayout>
+	         </editview>
+	         <treeview>
+	            <itemlayout>
+	               <attribute name="products"/>
+	               <attribute name="quantity"/>
+	               <attribute name="unit"/>
+	            </itemlayout>
+	         </treeview>
+	      </result>
+	      <editor>
+	         <essentials mode="replace">
+	            <listlayout>
+	               <text name="text.productquantityrestriction.common" width="353"/>
+	               <attribute name="voucher"/>
+	               <attribute name="description"/>
+	            </listlayout>
+	         </essentials>
+	         <tab name="properties">
+	            <section name="section.restrictions" mode="replace" position="0">
+	               <listlayout>
+	                  <attribute name="products"/>
+	                  <attribute name="quantity"/>
+	                  <attribute name="unit"/>
+	                  <attribute name="positive">
+	                     <advancedbooleaneditor truename="productquantityrestriction.positive.true"
+	                                            falsename="productquantityrestriction.positive.false"/>
+	                  </attribute>
+	               </listlayout>
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	</type>
+	
+	<type name="RegularCustomerOrderQuantityRestriction" mode="append">
+	   <organizer>
+	      <result>
+	         <listview>
+	            <itemlayout>
+	               <attribute name="orderQuantity" width="100"/>
+	            </itemlayout>
+	         </listview>
+	         <editview>
+	            <itemlayout>
+	               <attribute name="orderQuantity" width="100"/>
+	            </itemlayout>
+	         </editview>
+	         <treeview>
+	            <itemlayout>
+	               <attribute name="orderQuantity"/>
+	            </itemlayout>
+	         </treeview>
+	      </result>
+	      <editor>
+	         <exclude>
+	            <exclusion attribute="positive"/>
+	         </exclude>
+	         <essentials mode="replace">
+	            <listlayout>
+	               <text name="text.regularcustomerorderquantityrestriction.common" width="353"/>
+	               <attribute name="voucher"/>
+	               <attribute name="description"/>
+	            </listlayout>
+	         </essentials>
+	         <tab name="properties">
+	            <section name="section.restrictions" mode="replace" position="0">
+	               <listlayout>
+	                  <attribute name="orderQuantity"/>
+	               </listlayout>
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	</type>
+	
+	<type name="RegularCustomerOrderTotalRestriction" mode="append">
+	   <organizer>
+	      <result>
+	         <listview>
+	            <itemlayout>
+	               <attribute name="allOrdersTotal" width="150"/>
+	               <attribute name="currency" width="100"/>
+	            </itemlayout>
+	         </listview>
+	         <editview>
+	            <itemlayout>
+	               <attribute name="allOrdersTotal" width="150"/>
+	               <attribute name="currency" width="100"/>
+	            </itemlayout>
+	         </editview>
+	         <treeview>
+	            <itemlayout>
+	               <attribute name="allOrdersTotal"/>
+	               <attribute name="currency"/>
+	            </itemlayout>
+	         </treeview>
+	      </result>
+	      <editor>
+	         <exclude>
+	            <exclusion attribute="positive"/>
+	         </exclude>
+	         <essentials mode="replace">
+	            <listlayout>
+	               <text name="text.regularcustomerordertotalrestriction.common" width="353"/>
+	               <attribute name="voucher"/>
+	               <attribute name="description"/>
+	            </listlayout>
+	         </essentials>
+	         <tab name="properties">
+	            <section name="section.restrictions" mode="replace" position="0">
+	               <listlayout>
+	                  <attribute name="allOrdersTotal"/>
+	                  <attribute name="currency"/>
+	                  <attribute name="net"/>
+	                  <attribute name="valueOfGoodsOnly"/>
+	               </listlayout>
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	</type>
+	
+	<type name="OrderRestriction" mode="append">
+	   <organizer>
+	      <result>
+	         <listview>
+	            <itemlayout>
+	               <attribute name="total" width="100"/>
+	               <attribute name="currency" width="100"/>
+	            </itemlayout>
+	         </listview>
+	         <editview>
+	            <itemlayout>
+	               <attribute name="total" width="100"/>
+	               <attribute name="currency" width="100"/>
+	            </itemlayout>
+	         </editview>
+	         <treeview>
+	            <itemlayout>
+	               <attribute name="total" width="100"/>
+	               <attribute name="currency" width="100"/>
+	            </itemlayout>
+	         </treeview>
+	      </result>
+	      <editor>
+	         <essentials mode="replace">
+	            <listlayout>
+	               <text name="text.orderrestriction.common" width="353"/>
+	               <attribute name="voucher"/>
+	               <attribute name="description"/>
+	            </listlayout>
+	         </essentials>
+	         <tab name="properties">
+	            <section name="section.restrictions" mode="replace" position="0">
+	               <listlayout>
+	                  <attribute name="total"/>
+	                  <attribute name="currency"/>
+	                  <attribute name="net"/>
+	                  <attribute name="valueOfGoodsOnly"/>
+	                  <attribute name="positive">
+	                     <advancedbooleaneditor truename="orderrestriction.positive.true"
+	                                            falsename="orderrestriction.positive.false"/>
+	                  </attribute>
+	               </listlayout>
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	   <defaultreference mode="replace">
+	      <itemlayout>
+	         <attribute name="restrictionType"/>
+	         <attribute name="total"/>
+	         <attribute name="currency"/>
+	      </itemlayout>
+	   </defaultreference>
+	</type>
+	
+	<type name="DateRestriction" mode="append">
+	   <organizer>
+	      <result>
+	         <listview>
+	            <itemlayout>
+	               <attribute name="startDate" width="100"/>
+	               <attribute name="endDate" width="100"/>
+	            </itemlayout>
+	         </listview>
+	         <editview>
+	            <itemlayout>
+	               <attribute name="startDate" width="100"/>
+	               <attribute name="endDate" width="100"/>
+	            </itemlayout>
+	         </editview>
+	         <treeview>
+	            <itemlayout>
+	               <attribute name="startDate" width="100"/>
+	               <attribute name="endDate" width="100"/>
+	            </itemlayout>
+	         </treeview>
+	      </result>
+	      <editor>
+	         <exclude>
+	            <exclusion attribute="positive"/>
+	         </exclude>
+	         <essentials mode="replace">
+	            <listlayout>
+	               <text name="text.daterestriction.common" width="353"/>
+	               <attribute name="voucher"/>
+	               <attribute name="description"/>
+	            </listlayout>
+	         </essentials>
+	         <tab name="properties">
+	            <section name="section.restrictions" mode="replace" position="0">
+	               <listlayout>
+	                  <attribute name="startDate"/>
+	                  <attribute name="endDate"/>
+	               </listlayout>
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	   <defaultreference mode="replace">
+	      <itemlayout>
+	         <attribute name="restrictionType"/>
+	         <attribute name="startDate"/>
+	         <attribute name="endDate"/>
+	      </itemlayout>
+	   </defaultreference>
+	</type>
+</configuration>
+                                                                                                                                  

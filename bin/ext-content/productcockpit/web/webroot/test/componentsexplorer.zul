@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<?taglib 			uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+
+<?page title="Components Explorer" ?>
+
+<window xmlns="http://www.zkoss.org/2005/zul" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:a="http://www.zkoss.org/2005/zk/annotation"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
+	width="100%"
+	height="100%"
+	shadow="false">
+
+	<zscript>
+		void loadPage(Listitem item)
+		{
+			pageContainer.setSrc(item.getValue().toString());
+			
+			//Executions.createComponents(item.getValue().toString(), pageContainer, null);
+			bl.getCenter().setTitle(item.getLabel());
+		}
+	
+	</zscript>
+	
+	<borderlayout id="bl">
+		<west title="Available Components" width="200px" splittable="true" collapsible="true">
+			<vbox width="100%">
+			<listbox onSelect="loadPage(self.selectedItem)" width="100%">
+				<!-- <listitem label="Product Cockpit Prototype" value="index.zul"/> --> 
+				<listitem label="Section Panel" value="sectionpaneltestpage.zul"/>
+				<!-- <listitem label="Selector" value="test_selector.zul"/> -->
+				<listitem label="User Search" value="userSearchTest.zul"/>
+				<listitem label="Product Search" value="productSearchTest.zul"/>
+				<!-- listitem label="Wizards" value="wizardtestpage.zul"/-->
+				<listitem label="Wysiwyg" value="test_wysiwyg.zul"/>
+				<listitem label="Text editor" value="test_texteditor.zul"/>
+				<listitem label="Navigation Area" value="test_navigationarea.zul"/>
+				<listitem label="Reference selector" value="test_selector.zul"/>
+				<listitem label="List editor" style="color: red;" value="test_listeditor.zul"/>
+				<listitem label="Grid View" style="color: red;" value="test_gridview.zul"/>								
+			</listbox>
+			<separator height="24px"/>
+			<label value="New component" style="color: red; font-size: xx-small"/>
+			</vbox>
+		</west>	
+		<center style="background-color: white">
+			<iframe id="pageContainer" width="100%" height="100%" />
+		</center>
+	</borderlayout>
+</window>

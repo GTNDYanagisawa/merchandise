@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+    <enumtypes>
+        <enumtype code="DeliveryTimeslot" generate="true" autocreate="true">
+            <value code="WEEKEND_ONLY"/>
+            <value code="WEEKDAY_ONLY"/>
+            <value code="ANYDAY"/>
+        </enumtype>
+
+        <enumtype code="InvoiceCategory" generate="true" autocreate="true" dynamic="true">
+            <value code="FASHION"/>
+            <value code="ELECTRONICS"/>
+            <value code="FOOD"/>
+            <value code="STATIONARY"/>
+        </enumtype>
+
+        <enumtype code="InvoiceTitle" generate="true" autocreate="true" dynamic="true">
+            <value code="CORPS"/>
+            <value code="INDIVIDUAL"/>
+        </enumtype>
+    </enumtypes>
+
+    <relations>
+        <relation code="LinksForTabContainerComponent" generate="true" localized="false" autocreate="true">
+            <deployment table="LinksForTabCTNCompRels" typecode="9851"/>
+            <sourceElement qualifier="tabContainerComponents" type="TabContainerComponent" cardinality="many">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </sourceElement>
+            <targetElement qualifier="links" type="CMSLinkComponent" cardinality="many" collectiontype="list"
+                           ordered="true">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </targetElement>
+        </relation>
+        <relation code="TabsForTabContainerComponent" generate="true" localized="false" autocreate="true">
+            <deployment table="TabsForTabCTNCompRels" typecode="9852"/>
+            <sourceElement qualifier="tabContainerComponents" type="TabContainerComponent" cardinality="many">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </sourceElement>
+            <targetElement qualifier="tabs" type="TabComponent" cardinality="many" collectiontype="list" ordered="true">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </targetElement>
+        </relation>
+        <relation code="ProductsForSelectableProductsTabComponent" generate="true" localized="false" autocreate="true">
+            <deployment table="PrdsForTabCompRels" typecode="9853"/>
+            <sourceElement qualifier="selectableProductsTabComponents" type="SelectableProductsTabComponent"
+                           cardinality="many">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </sourceElement>
+            <targetElement qualifier="products" type="Product" cardinality="many" collectiontype="list" ordered="true">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </targetElement>
+        </relation>
+        <relation code="CategoriesForCategorySelectedProductsTabComponent" generate="true" localized="false"
+                  autocreate="true">
+            <deployment table="CatsForCatSPrdTabCmpRels" typecode="9854"/>
+            <sourceElement qualifier="categorySelectedProductsTabComponents" type="CategorySelectedProductsTabComponent"
+                           cardinality="many">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </sourceElement>
+            <targetElement qualifier="categories" type="Category" cardinality="many" collectiontype="list"
+                           ordered="true">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </targetElement>
+        </relation>
+        <relation code="CategoriesForCategoryNavComponent" generate="true" localized="false" autocreate="true">
+            <deployment table="CatsForCatNavCmpRels" typecode="9855"/>
+            <sourceElement qualifier="categoryNavComponents" type="CategoryNavComponent" cardinality="many">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </sourceElement>
+            <targetElement qualifier="categories" type="Category" cardinality="many" collectiontype="list"
+                           ordered="true">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </targetElement>
+        </relation>
+        <relation code="SearchBoxComponent2CmsLinkComponentsRel" generate="true" localized="false" autocreate="true">
+            <sourceElement qualifier="searchBox" type="SearchBoxComponent" cardinality="one"/>
+            <targetElement qualifier="linkComponents" type="CmsLinkComponent" cardinality="many" collectiontype="list"
+                           ordered="true"/>
+        </relation>
+        <relation code="ProductsForFeaturedProductsComponent" generate="true" localized="false" autocreate="true">
+            <deployment table="PrdsForFtPrdCmpRels" typecode="9856"/>
+            <sourceElement qualifier="featuredProductsComponent" type="FeaturedProductsComponent" cardinality="many">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </sourceElement>
+            <targetElement qualifier="products" type="Product" cardinality="many" collectiontype="list" ordered="true">
+                <modifiers read="true" write="true" search="true" optional="true"/>
+            </targetElement>
+        </relation>
+
+        <relation code="Region2CitiesRelation"
+                  autocreate="true"
+                  generate="true"
+                  localized="false">
+            <description>This relation links a region (province) with one or more cities.</description>
+            <sourceElement qualifier="region" type="Region" cardinality="one">
+                <modifiers read="true" write="true" optional="true"/>
+            </sourceElement>
+            <targetElement qualifier="cities" type="City" cardinality="many" collectiontype="list" ordered="true">
+                <modifiers read="true" write="true" optional="true"/>
+            </targetElement>
+        </relation>
+
+        <relation code="City2DistrictsRelation"
+                  autocreate="true"
+                  generate="true"
+                  localized="false">
+            <description>This relation links a city with one or more districts.</description>
+            <sourceElement qualifier="city" type="City" cardinality="one">
+                <modifiers read="true" write="true" optional="true"/>
+            </sourceElement>
+            <targetElement qualifier="districts" type="District" cardinality="many" collectiontype="list"
+                           ordered="true">
+                <modifiers read="true" write="true" optional="true"/>
+            </targetElement>
+        </relation>
+
+        <!--
+            Zone -> Region / City / District should be a 1:1 relationship.
+            Only a finer location should be set. For example if a City is set,
+            the Region / Country should set to null.
+        -->
+        <relation code="Zone2RegionRelation" generate="true" localized="false" autocreate="true">
+            <description>This will extend the Zone with linkage to region (province)</description>
+            <sourceElement type="Zone" qualifier="zone" cardinality="many">
+                <modifiers read="true" write="true" optional="true" search="true"/>
+            </sourceElement>
+            <targetElement type="Region" qualifier="region" cardinality="one">
+                <modifiers read="true" write="true" optional="true" search="true"/>
+            </targetElement>
+        </relation>
+
+        <relation code="Zone2CityRelation" generate="true" localized="false" autocreate="true">
+            <description>This will extend the Zone with linkage to city</description>
+            <sourceElement type="Zone" qualifier="zone" cardinality="many">
+                <modifiers read="true" write="true" optional="true" search="true"/>
+            </sourceElement>
+            <targetElement type="City" qualifier="city" cardinality="one">
+                <modifiers read="true" write="true" optional="true" search="true"/>
+            </targetElement>
+        </relation>
+
+        <relation code="Zone2DistrictRelation" generate="true" localized="false" autocreate="true">
+            <description>This will extend the Zone with linkage to district</description>
+            <sourceElement type="Zone" qualifier="zone" cardinality="many">
+                <modifiers read="true" write="true" optional="true" search="true"/>
+            </sourceElement>
+            <targetElement type="District" qualifier="district" cardinality="one">
+                <modifiers read="true" write="true" optional="true" search="true"/>
+            </targetElement>
+        </relation>
+    </relations>
+
+    <itemtypes>
+
+        <itemtype code="Invoice" autocreate="true" generate="true" jaloclass="de.hybris.platform.chinaaccelerator.services.jalo.invoice.Invoice" >
+            <deployment table="Invoice" typecode="9802"/> 
+            <attributes>
+                <attribute qualifier="category" type="InvoiceCategory" generate="true">
+                    <description>Invoice category</description>
+                    <modifiers read="true" write="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="title" type="InvoiceTitle" generate="true">
+                    <description>Invoice title</description>
+                    <modifiers read="true" write="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="invoicedName" type="java.lang.String">
+                    <description>The name (e.g. company's name) that being invoiced</description>
+                    <modifiers read="true" write="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="AbstractOrder" autocreate="false" generate="false">
+            <attributes>
+                <attribute qualifier="deliveryTimeslot" type="DeliveryTimeslot" generate="true">
+                    <description>Defining the delivery timeslot</description>
+                    <defaultvalue>em().getEnumerationValue("DeliveryTimeslot", "ANYDAY")</defaultvalue>
+                    <modifiers read="true" write="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="invoice" type="Invoice" generate="true">
+                    <description>Invoice (as in Fapiao in China)</description>
+                    <modifiers read="true" write="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+
+        <itemtype code="PointOfService" autocreate="false" generate="false">
+            <attributes>
+                <attribute qualifier="sortOrder" type="java.lang.Integer" generate="true">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true" optional="true"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="NavigationBarWithImageComponent" autocreate="true" generate="true"
+                  extends="NavigationBarComponent"
+                  jaloclass="de.hybris.platform.chinaaccelerator.services.jalo.cms.components.NavigationBarWithImageComponent">
+            <description>It represents a navigation bar component with image and a link for the image.</description>
+            <attributes>
+                <attribute type="CMSLinkComponent" qualifier="imageLink">
+                    <persistence type="property"/>
+                    <modifiers optional="true"/>
+                    <description>The cms link component that is attached to this bar component's image.</description>
+                </attribute>
+                <attribute type="Media" qualifier="image">
+                    <description>The image which can be attached to this navigation bar component.</description>
+                    <modifiers read="true" write="true" search="true" optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+
+        <!-- TypeGroups are for structure of this file only -->
+        <typegroup name="Locations">
+
+            <itemtype code="AbstractLocationItem"
+                      extends="GenericItem"
+                      jaloclass="de.hybris.platform.chinaaccelerator.services.jalo.location.AbstractLocationItem"
+                      autocreate="true"
+                      generate="true"
+                      abstract="true">
+                <description>Generic location item to be used for being extended into City and District item types.
+                </description>
+				<deployment table="AbstractLocationItem" typecode="9801"/>              
+                <attributes>
+                    <attribute qualifier="code" type="java.lang.String" autocreate="true">
+                        <description>Unique identifier.</description>
+                        <persistence type="property"/>
+                        <modifiers read="true" write="true" optional="false" unique="true"/>
+                    </attribute>
+                    <attribute qualifier="name" type="localized:java.lang.String" autocreate="true">
+                        <description>Name of the location.</description>
+                        <persistence type="property"/>
+                        <modifiers read="true" write="true" optional="true"/>
+                    </attribute>
+                    <attribute qualifier="sortOrder" type="java.lang.Integer" autocreate="true">
+                        <description>SortOrder allows for defining an ordering. For example used on StoreLocator page
+                            displaying cities in specific order.
+                        </description>
+                        <persistence type="property"/>
+                        <modifiers read="true" write="true" optional="true"/>
+                        <defaultvalue>Integer.valueOf(0)</defaultvalue>
+                    </attribute>
+                    <attribute qualifier="latitude" type="java.lang.Double" autocreate="true">
+                        <description>Latitude of the location item.</description>
+                        <persistence type="property"/>
+                        <modifiers read="true" write="true" optional="true"/>
+                    </attribute>
+                    <attribute qualifier="longitude" type="java.lang.Double" autocreate="true">
+                        <description>Longitude of the location item.</description>
+                        <persistence type="property"/>
+                        <modifiers read="true" write="true" optional="true"/>
+                    </attribute>
+                    <attribute qualifier="active" type="java.lang.Boolean" autocreate="true">
+                        <description>Flags if the location item is active or not. Usable as condition.</description>
+                        <persistence type="property" qualifier="ActiveFlag"/>
+                        <modifiers read="true" write="true" optional="false"/>
+                        <defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+                    </attribute>
+                </attributes>
+                <indexes>
+                    <index name="IDX_LOC_CODE">
+                        <key attribute="code"/>
+                    </index>
+                </indexes>
+            </itemtype>
+
+            <itemtype code="City"
+                      extends="AbstractLocationItem"
+                      jaloclass="de.hybris.platform.chinaaccelerator.services.jalo.location.City"
+                      autocreate="true"
+                      generate="true"
+                      abstract="false">
+            </itemtype>
+
+            <itemtype code="District"
+                      extends="AbstractLocationItem"
+                      jaloclass="de.hybris.platform.chinaaccelerator.services.jalo.location.District"
+                      autocreate="true"
+                      generate="true"
+                      abstract="false">
+            </itemtype>
+
+            <itemtype code="Address" autocreate="false" generate="false">
+                <attributes>
+                    <attribute qualifier="city" type="City" generate="true">
+                        <description>The city.</description>
+                        <persistence type="property"/>
+                        <modifiers read="true" write="true" optional="true"/>
+                    </attribute>
+                    <attribute qualifier="cityDistrict" type="District">
+                        <description>District of the city.</description>
+                        <persistence type="property"/>
+                        <modifiers read="true" write="true" optional="true"/>
+                    </attribute>
+                </attributes>
+            </itemtype>
+        </typegroup>
+
+        <typegroup name="CMS">
+            <itemtype code="TabContainerComponent" generate="true" extends="SimpleCMSComponent" autocreate="true"
+                      jaloclass="de.hybris.platform.chinaaccelerator.services.jalo.cms.components.TabContainerComponent">
+                <attributes>
+                    <attribute type="localized:java.lang.String" qualifier="title">
+                        <modifiers read="true" write="true" search="false" optional="true"/>
+                        <persistence type="property"/>
+                    </attribute>
+                    <attribute type="CMSLinkComponent" qualifier="moreLink">
+                        <modifiers read="true" write="true" search="false" optional="true"/>
+                        <persistence type="property"/>
+                    </attribute>
+                </attributes>
+            </itemtype>
+            <itemtype code="VerticalTabContainerComponent" generate="true" extends="TabContainerComponent"
+                      autocreate="true"
+                      jaloclass="de.hybris.platform.chinaaccelerator.services.jalo.cms.components.VerticalTabContainerComponent">
+                <attributes>
+                    <attribute type="BannerComponent" qualifier="banner">
+                        <modifiers read="true" write="true" search="false" optional="true"/>
+                        <persistence type="property"/>
+                    </attribute>
+                </attributes>
+            </itemtype>
+            <itemtype code="HorizontalTabContainerComponent" generate="true" extends="VerticalTabContainerComponent"
+                      autocreate="true"
+                      jaloclass="de.hybris.platform.chinaaccelerator.services.jalo.cms.components.HorizontalTabContainerComponent">
+            </itemtype>
+            <itemtype code="TabComponent" generate="true" extends="SimpleCMSComponent" autocreate="true"
+                      jaloclass="de.hybris.platform.chinaaccelerator.services.jalo.cms.components.TabComponent">
+                <attributes>
+                    <attribute type="localized:java.lang.String" qualifier="title">
+                        <modifiers read="true" write="true" search="false" optional="true"/>
+                        <persistence type="property"/>
+                    </attribute>
+                    <attribute type="Media" qualifier="titleImage">
+                        <modifiers read="true" write="true" search="false" optional="true"/>
+                        <persistence type="property"/>
+                    </attribute>
+                </attributes>
+            </itemtype>
+            <itemtype code="SelectableProductsTabComponent" generate="true" extends="TabComponent" autocreate="true"
+                      jaloclass="de.hybris.platform.chinaaccelerator.services.jalo.cms.components.SelectableProductsTabComponent">
+            </itemtype>
+            <itemtype code="CategorySelectedProductsTabComponent" generate="true" extends="TabComponent"
+                      autocreate="true"
+                      jaloclass="de.hybris.platform.chinaaccelerator.services.jalo.cms.components.CategorySelectedProductsTabComponent">
+            </itemtype>
+            <itemtype code="CategoryNavComponent" generate="true" extends="SimpleCMSComponent" autocreate="true"
+                      jaloclass="de.hybris.platform.chinaaccelerator.services.jalo.cms.components.CategoryNavComponent">
+            </itemtype>
+            <itemtype code="FeaturedProductsComponent" generate="true" extends="SimpleCMSComponent" autocreate="true"
+                      jaloclass="de.hybris.platform.chinaaccelerator.services.jalo.cms.components.FeaturedProductsComponent">
+                <attributes>
+                    <attribute type="localized:java.lang.String" qualifier="title">
+                        <modifiers read="true" write="true" search="false" optional="true"/>
+                        <persistence type="property"/>
+                    </attribute>
+                </attributes>
+            </itemtype>
+        </typegroup>
+        
+        <typegroup name="Customer">
+			<itemtype code="Customer" autocreate="false" generate="false">
+				<description>Extending Customer type with Mobile No.</description>
+				<attributes>
+					<attribute autocreate="true" qualifier="mobileNumber" type="java.lang.String">
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property" />
+						<description>It holds information about customer's mobile Number</description>
+					</attribute>
+				</attributes>
+			</itemtype>        
+        </typegroup>
+        
+    </itemtypes>
+</items>

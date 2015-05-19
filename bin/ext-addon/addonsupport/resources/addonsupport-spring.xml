@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/util
+		   http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- Impex Importing -->
+	<alias name="defaultSetupImpexAddonService" alias="setupImpexAddonService" />
+	<bean id="defaultSetupImpexAddonService" scope="tenant"
+		class="de.hybris.platform.addonsupport.setup.impl.DefaultSetupImpexAddOnService"
+		parent="defaultSetupImpexService" />
+
+	<alias name="defaultAddonConfigDataImportService" alias="addonConfigDataImportService" />
+	<bean id="defaultAddonConfigDataImportService" scope="tenant"
+		class="de.hybris.platform.addonsupport.setup.impl.DefaultAddOnConfigDataImportService">
+		<property name="setupImpexService" ref="setupImpexAddonService" />
+	</bean>
+
+	<alias name="defaultAddonSampleDataImportService" alias="addonSampleDataImportService" />
+	<bean id="defaultAddonSampleDataImportService" parent="abstractCoreSystemSetup"
+		class="de.hybris.platform.addonsupport.setup.impl.DefaultAddonSampleDataImportService" />
+
+	<bean id="abstractGenericAddOnSampleDataEventListener" abstract="true"
+		class="de.hybris.platform.addonsupport.setup.impl.GenericAddOnSampleDataEventListener">
+		<property name="addOnSampleDataImportService" ref="addonSampleDataImportService" />
+		<property name="tenantService" ref="tenantService" />
+		<property name="clusterService" ref="clusterService" />
+	</bean>
+
+	<alias name="defaultAddonSystemSetupSupport" alias="addonSystemSetupSupport" />
+	<bean id="defaultAddonSystemSetupSupport" scope="tenant"
+		parent="abstractCoreSystemSetup"
+		class="de.hybris.platform.addonsupport.setup.impl.DefaultAddOnSystemSetupSupport" />
+
+	<bean id="abstractCoreDataImportedEventListener" parent="abstractEventListener"
+		abstract="true"
+		class="de.hybris.platform.addonsupport.setup.impl.AddOnCoreDataImportedEventListener">
+		<property name="impexMacroParametersConverter" ref="impexMacroParametersConverter" />
+		<property name="selectedProductCatalogImpexMacroParametersPopulators"
+			ref="selectedProductCatalogImpexMacroParametersPopulators" />
+		<property name="selectedBaseSiteImpexMacroParametersPopulators"
+			ref="selectedBaseSiteImpexMacroParametersPopulators" />
+		<property name="selectedContentCatalogImpexMacroParametersPopulators"
+			ref="selectedContentCatalogImpexMacroParametersPopulators" />
+		<property name="addonConfigDataImportService" ref="addonConfigDataImportService" />
+		<property name="addonSystemSetupSupport" ref="addonSystemSetupSupport" />
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="catalogService" ref="catalogService" />
+	</bean>
+
+	<alias name="defaultImpexMacroParametersConverter" alias="impexMacroParametersConverter" />
+	<bean id="defaultImpexMacroParametersConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commerceservices.setup.data.ImpexMacroParameterData"/>
+		<property name="populators">
+			<list>
+				<ref bean="configExtensionNameImpexMacroParametersPopulator" />
+			</list>
+		</property>
+	</bean>
+	<alias name="defaultConfigExtensionNameImpexMacroParametersPopulator"
+		alias="configExtensionNameImpexMacroParametersPopulator" />
+	<bean id="defaultConfigExtensionNameImpexMacroParametersPopulator"
+		scope="tenant"
+		class="de.hybris.platform.addonsupport.setup.populator.ConfigExtensionNameImpexMacroParametersPopulator" />
+
+
+	<alias name="defaultSelectedProductCatalogImpexMacroParametersPopulators"
+		alias="selectedProductCatalogImpexMacroParametersPopulators" />
+	<bean id="defaultSelectedProductCatalogImpexMacroParametersPopulators"
+		parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="productCatalogImpexMacroParametersPopulator" />
+			</list>
+		</property>
+	</bean>
+	<alias name="defaultProductCatalogImpexMacroParametersPopulator"
+		alias="productCatalogImpexMacroParametersPopulator" />
+	<bean id="defaultProductCatalogImpexMacroParametersPopulator"
+		scope="tenant"
+		class="de.hybris.platform.addonsupport.setup.populator.ProductCatalogImpexMacroParametersPopulator" />
+
+	<alias name="defaultSelectedBaseSiteImpexMacroParametersPopulators"
+		alias="selectedBaseSiteImpexMacroParametersPopulators" />
+	<bean id="defaultSelectedBaseSiteImpexMacroParametersPopulators"
+		parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="baseSiteImpexMacroParametersPopulator" />
+				<ref bean="addonExtensionNameImpexMacroParametersPopulator" />
+			</list>
+		</property>
+	</bean>
+	<alias name="defaultBaseSiteImpexMacroParametersPopulator" alias="baseSiteImpexMacroParametersPopulator" />
+	<bean id="defaultBaseSiteImpexMacroParametersPopulator" scope="tenant"
+		class="de.hybris.platform.addonsupport.setup.populator.BaseSiteImpexMacroParametersPopulator" />
+	<alias name="defaultAddonExtensionNameImpexMacroParametersPopulator"
+		alias="addonExtensionNameImpexMacroParametersPopulator" />
+	<bean id="defaultAddonExtensionNameImpexMacroParametersPopulator"
+		class="de.hybris.platform.addonsupport.setup.populator.AddOnExtensionNameImpexMacroParametersPopulator" />
+
+
+	<alias name="defaultSelectedContentCatalogImpexMacroParametersPopulators"
+		alias="selectedContentCatalogImpexMacroParametersPopulators" />
+	<bean id="defaultSelectedContentCatalogImpexMacroParametersPopulators"
+		parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="contentCatalogImpexMacroParametersPopulator" />
+			</list>
+		</property>
+	</bean>
+	<alias name="defaultContentCatalogImpexMacroParametersPopulator"
+		alias="contentCatalogImpexMacroParametersPopulator" />
+	<bean id="defaultContentCatalogImpexMacroParametersPopulator"
+		scope="tenant"
+		class="de.hybris.platform.addonsupport.setup.populator.ContentCatalogImpexMacroParametersPopulator" />
+
+	<alias alias="supportedUiExperienceImpexMacroParameterPopulator"
+		name="defaultSupportedUiExperienceImpexMacroParameterPopulator" />
+	<bean id="defaultSupportedUiExperienceImpexMacroParameterPopulator"
+		class="de.hybris.platform.addonsupport.setup.populator.SupportedUiExperienceImpexMacroParameterPopulator">
+		<property name="uiExperienceService" ref="uiExperienceService" />
+		<property name="siteConfigService" ref="siteConfigService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="baseSiteService" ref="baseSiteService" />
+	</bean>
+	<!-- End Impex Importing -->
+
+    <!-- List of tag data attribute providers -->
+    <util:list id="tagDataAttributesProviders" value-type="de.hybris.platform.addonsupport.config.cms.dataattributeproviders.TagDataAttributesProvider"/>
+
+
+    <alias alias="defaultSpelBeanFactory" name="spelBeanFactory" />
+    <bean id="spelBeanFactory" class="de.hybris.platform.addonsupport.config.SpelBeanFactory" />
+    
+    
+
+</beans>

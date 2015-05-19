@@ -1,0 +1,19 @@
+*** Settings ***
+Test Setup        import bundlecartdata sampledata
+Test Teardown     reset system
+
+Resource          bundleservices/Add_To_Cart_Keywords.txt
+Resource          bundleservices/Common_Keywords.txt
+Resource          bundleservices/Remove_From _Cart_Keywords.txt
+Resource          bundleservices/Verify_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+Resource		  commerce/SubscriptionCommerce_Keywords.txt
+
+*** Test Cases ***      
+
+Test_Remove_From_Cart_SingleBundle_SingleProduct
+	[Documentation]    Delete all the entries from the given bundle
+	add to cart product "PRODUCT01" for component "ProductComponent1"
+	verify that cart total is "600"
+	remove from cart bundle with index "1"
+	verify that cart total is "0"

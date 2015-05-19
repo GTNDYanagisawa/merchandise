@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+--><!--
+ All hybris buildcallbacks.xml macrodefinitions:
+ 
+ Build/Documentation
+ 
+	 before/after ant macro "clean"
+		 <macrodef name="sapordermgmtbol_before_clean"/>
+		 <macrodef name="sapordermgmtbol_after_clean"/>
+	 
+	 before/after ant macro "build"
+		 <macrodef name="sapordermgmtbol_before_build"/>
+		 <macrodef name="sapordermgmtbol_after_build"/>
+		 
+	 before/after ant macro "compile_core" - the core module of the extension
+		 <macrodef name="sapordermgmtbol_before_compile_core">
+		 <macrodef name="sapordermgmtbol_after_compile_core">
+	 
+	 before/after ant macro "compile_web" - the web module of the extension
+		 <macrodef name="sapordermgmtbol_before_compile_web" />
+		 <macrodef name="sapordermgmtbol_after_compile_web" />
+	 
+	 before/after ant macro "compile_hmc" - the hmc module of the extension
+		 <macrodef name="sapordermgmtbol_before_compile_hmc" />
+		 <macrodef name="sapordermgmtbol_after_compile_hmc" />
+ 
+ Preparing extension
+ 
+	 will be called in the beginning of the ant call and only once (also when using multiple 
+	 ant targets e.g. ant build yunittest)	
+		 <macrodef name="sapordermgmtbol_only_once_prepare"/>
+ 
+ Creating ear module/production
+ 
+	 before/after ant macro "ear"
+		 <macrodef name="sapordermgmtbol_before_ear"/>
+		 <macrodef name="sapordermgmtbol_after_ear"/>
+
+	 before/after ant macro "production" - for hybris server only
+		 <macrodef name="sapordermgmtbol_before_production" />
+		 <macrodef name="sapordermgmtbol_after_production" />
+ 
+ JUnit Test
+ 
+	 before/after ant macro "yunitinit" 
+		 <macrodef name="sapordermgmtbol_before_yunitinit" />
+		 <macrodef name="sapordermgmtbol_after_yunitinit" />
+	 
+	 before/after ant macro "yunit"
+		 <macrodef name="sapordermgmtbol_before_yunit" />
+		 <macrodef name="sapordermgmtbol_after_yunit" /> 
+		 
+ Distribution package
+ 
+ 	 before/after ant macro "dist" - internal target; only for use when platform is available in source code
+		 <macrodef name="sapordermgmtbol_after_dist"/>
+		 <macrodef name="sapordermgmtbol_before_dist"/>
+	 
+	 before/after ant macro "dist_copy" - internal target; only for use when platform is available in source code
+		 <macrodef name="sapordermgmtbol_before_dist_copy"/>
+		 <macrodef name="sapordermgmtbol_after_dist_copy"/>
+		  
+ 	 With these filters you can override the default extension filters defined in platform/resources/ant/dist/filtersets.xml
+ 	  	 <patternset id="extension.sapordermgmtbol.binary.filter">
+ 	  	  	 <patternset refid="extension.filter" />
+ 	  	  	 <exclude name="**/*-source.jar" />
+ 	  	 </patternset>
+ 	  	 <patternset id="extension.sapordermgmtbol.source.filter">
+ 	  	  	 <exclude name="**/bin/**" />
+ 	  	 </patternset>
+ 
+--><project name="sapordermgmtbol_buildcallbacks">
+
+	<!-- 
+	    Called whenever 'ant ear' is used. this callback can be used to modify the content of the ear file
+	
+	     ${ear.path}: 			path to ear
+	 -->
+	<macrodef name="sapordermgmtbol_before_ear">
+		<sequential>
+
+			<!-- you can do anything before the EAR file is being packed -->
+
+		</sequential>
+	</macrodef>
+	
+     <patternset id="extension.sapordermgmtbol.binary.filter">
+         <patternset refid="extension.binary.filter" />
+         <exclude name="**/erp*.properties" />
+         <exclude name="**/jco_recording/**"/>
+         <exclude name="**/testdata/**"/>
+         <exclude name="**/integtests/**" />
+     </patternset>
+ 
+     <patternset id="extension.sapordermgmtbol.source.filter">
+         <patternset refid="extension.source.filter" /> 
+         <exclude name="**/erp*.properties" />
+         <exclude name="**/jco_recording/**"/>
+         <exclude name="**/testdata/**"/>
+         <exclude name="**/integtests/**" />
+    </patternset>	
+
+</project>

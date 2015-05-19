@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?init 				class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+<?taglib 			uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+
+<?page title="[y] hybris Product Cockpit : Test page for Grid View [y]"?>
+
+<window xmlns="http://www.zkoss.org/2005/zul"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:zk="http://www.zkoss.org/2005/zk"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd "
+	width="100%" height="100%" style="background-color: white" shadow="false">
+		
+	<zscript>
+		<![CDATA[  
+		import de.hybris.platform.productcockpit.components.listeditor.*;
+		import de.hybris.platform.productcockpit.util.*;
+		
+		DefaultListEditorModel listEditorModel = new DefaultListEditorModel();
+		listEditorModel.setEditable(false);
+		
+		int itemNr = 1;	
+		
+			
+		class GridViewItemRenderer extends DefaultListEditorItemRenderer
+		{
+			final static String WIDTH = "190px";
+			final static String HEIGHT = "160px";
+			final static String IMG_WIDTH = "120px";
+			final static String IMG_HEIGHT = "120px";
+			
+			public GridViewItemRenderer()
+			{
+				super();	
+			}
+			
+			public GridViewItemRenderer(ElementRenderer elementRenderer)
+			{
+				super(elementRenderer);	
+			}
+			
+			public void render(AbstractComponent parent, Object item)
+			{
+				if(item == null)
+				{
+					System.out.println("GridViewItemRenderer#render: 'item' can not be null.");
+					return;
+				}
+				Div mainDiv = new Div();
+				mainDiv.setSclass("itemBox");
+				mainDiv.setHeight(HEIGHT);
+				mainDiv.setWidth(WIDTH);								
+		
+				parent.appendChild(mainDiv);						
+						
+				Borderlayout bl = new Borderlayout();
+				bl.setSclass("plainBorderlayout");
+				bl.setHeight("99%");
+				bl.setWidth("99%");
+				bl.appendChild(new Center());
+				bl.appendChild(new East());
+				bl.appendChild(new South());
+				mainDiv.appendChild(bl);
+
+				// add image
+				Div imgDiv = new Div();
+				imgDiv.setSclass("itemImageContainer");
+				bl.getCenter().appendChild(imgDiv);
+				imgDiv.setWidth(IMG_WIDTH);
+				imgDiv.setHeight(IMG_HEIGHT);
+		
+				if(this.getElementRenderer() != null && this.getElementRenderer().getThumbnailUrl(item) != null)
+				{
+					imgUrl = this.getElementRenderer().getThumbnailUrl(item);
+
+					imgUrl = "/.." + imgUrl;
+					Image img = new Image(imgUrl);
+					img.setSclass("itemImage");			
+				
+					// scale image								
+					imgDiv.appendChild(img);
+				}
+				else
+				{
+					imgDiv.appendChild(new Label("No image!"));
+				}
+
+				// add product name and identifier
+				Vbox vb = new Vbox();
+				bl.getSouth().appendChild(vb);
+
+				Label mainLabel = null;
+				if(this.getElementRenderer() != null)
+				{
+					mainLabel = new Label(this.getElementRenderer().getLabel(item));
+				}
+				else
+				{
+					mainLabel = new Label(item.toString());
+				}
+				
+				mainLabel.setSclass("itemCaption");
+				vb.appendChild(mainLabel);
+				try
+				{
+					Label idLabel = null;
+					if(this.getElementRenderer() != null)
+					{
+						idLabel = new Label(this.getElementRenderer().getValue(item, 0));
+					}
+					else
+					{
+						idLabel = new Label("unknown");
+					}
+					idLabel.setSclass("itemId");
+					vb.appendChild(idLabel);
+				}
+				catch (IllegalArgumentException iae)
+				{
+					System.out.println("GridViewItemRenderer#render: Error: " + iae.getMessage());
+				}
+
+				// add buttons to the right
+				Grid g = new Grid();
+				g.setSclass("plainGrid");
+				bl.getEast().appendChild(g);
+				g.appendChild(new Rows());
+
+				Row r1 = new Row();
+				g.getRows().appendChild(r1);
+				Row r2 = new Row();
+				g.getRows().appendChild(r2);
+				Row r3 = new Row();
+				g.getRows().appendChild(r3);
+
+				Toolbarbutton asBtn = new Toolbarbutton("", "/css/images/as_btn.gif");
+				asBtn.setSclass("plainBtn");
+				r1.appendChild(asBtn);
+				Toolbarbutton peBtn = new Toolbarbutton("", "/css/images/pe_btn.gif");
+				peBtn.setSclass("plainBtn");
+				r1.appendChild(peBtn);
+
+				Toolbarbutton clBtn = new Toolbarbutton("", "/css/images/cl_btn.gif");
+				clBtn.setSclass("plainBtn");
+				r2.appendChild(clBtn);
+				Toolbarbutton vaBtn = new Toolbarbutton("", "/css/images/va_btn.gif");
+				vaBtn.setSclass("plainBtn");
+				r2.appendChild(vaBtn);
+
+				Toolbarbutton cpBtn = new Toolbarbutton("", "/css/images/cp_btn.gif");
+				cpBtn.setSclass("plainBtn");
+				r3.appendChild(cpBtn);
+				Toolbarbutton dpBtn = new Toolbarbutton("", "/css/images/dp_btn.gif");
+				dpBtn.setSclass("plainBtn");
+				r3.appendChild(dpBtn);						
+			}
+		}		
+		
+		//GridViewItemRenderer testGridViewItemRenderer = new GridViewItemRenderer(new ProductRenderer()); // 
+		GridViewItemRenderer testGridViewItemRenderer = new GridViewItemRenderer(); //
+		]]>
+	</zscript>
+	
+	<!--  custom styles in here -->
+	<style src="/css/productcockpit.css" />
+	<style src="/css/defaultstyles.css" />
+	<borderlayout sclass="plainBorderlayout" style="background-color: white">
+		<north>
+			<vbox>
+				<separator height="12px"/>
+				<label value="Grid View: Test Area" style="font-size: large; font-weight: bold"/>
+				<separator height="12px"/>
+			</vbox>
+		</north>
+		<center autoscroll="true" style="border: 1px solid black;">
+			<vbox>	
+				<button label="Add sample items to list editor model">
+				<attribute name="onClick">
+						listEditorModel.add("Unremovable/-movable item " + (itemNr++), false, false);
+						listEditorModel.add("Unremovable/-movable item " + (itemNr++), false, false);
+						listEditorModel.add("Unmovable item " + (itemNr++), true, false);
+						listEditorModel.add("Normal item " + (itemNr++), true, true);
+						listEditorModel.add("Normal item " + (itemNr++), true, true);				
+						listEditorModel.add("Normal item " + (itemNr++), true, true);
+						listEditorModel.add("Normal item " + (itemNr++), true, true);
+						listEditorModel.add("Normal item " + (itemNr++), true, true);
+					</attribute>
+				</button>
+				<button label="Clear sample list editor model">			
+					<attribute name="onClick">
+						listEditorModel.clear();								
+					</attribute>
+				</button>
+				<separator height="24px"/>	
+				<hbox align="center">
+					<label value="Width"/>
+					<intbox cols="4" value="850" maxlength="4" constraint="no empty">
+						<attribute name="onChange">
+							gridView.setWidth(self.getValue() + "px");
+						</attribute>	
+					</intbox>
+					<label value="px"/>
+					<separator width="12px"/>
+					<label value="Height"/>
+					<intbox cols="4" value="340" maxlength="4" constraint="no empty">
+						<attribute name="onChange">
+							gridView.setHeight(self.getValue() + "px");
+						</attribute>	
+					</intbox>
+					<label value="px"/>
+					<separator width="12px"/>
+					<button label="Update"/>
+				</hbox>		
+				<gridview id="gridView" width="850px" height="340px" model="@{listEditorModel}" listEditorItemRenderer="${testGridViewItemRenderer}" sclass="fredriktestgrid">														
+					<attribute name="onMoveElement">
+						<![CDATA[
+						import de.hybris.platform.productcockpit.components.listeditor.*;
+								
+						ListEditorMoveEvent leme = (ListEditorMoveEvent)event;
+						listEditorModel.moveElement(leme.getFromIndex(), leme.getToIndex());
+						]]>
+					</attribute>
+					<attribute name="onRemoveElement">
+						<![CDATA[
+						import de.hybris.platform.productcockpit.components.listeditor.*;
+						
+						ListEditorRemoveEvent lere = (ListEditorRemoveEvent)event;
+						listEditorModel.removeAll(lere.getElements());							
+						]]>
+					</attribute>
+					<attribute name="onSelect">
+						<![CDATA[
+						import de.hybris.platform.productcockpit.components.listeditor.*;
+						import java.text.DateFormat;
+														
+						ListEditorSelectEvent lese = (ListEditorSelectEvent)event;
+						java.util.Set selItems = lese.getSelectedItems();
+						Iterator it = selItems.iterator();
+					
+						if(it.hasNext())
+						{
+							String s = "";
+							while(it.hasNext())
+							{
+								s += it.next().toString() + "\n";
+							}
+							selectedItemLabel.setValue(s);
+						}
+						else
+						{
+							selectedItemLabel.setValue("");
+						}
+						]]>
+					</attribute>
+				</gridview>
+				<separator height="24px"/>		
+				<label value="Selected items:"/>
+				<textbox multiline="true" readonly="true" value="" id="selectedItemLabel" cols="40" rows="8"/>			
+			</vbox>	
+		</center>
+	</borderlayout>	
+</window>

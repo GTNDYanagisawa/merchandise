@@ -1,0 +1,68 @@
+#We need orders that cover most common ranges: a day, a week, a month, 6 months, a year.
+
+$certainDay01_date_01=27.04.2010 00:00:00
+$certainDay01_date_02=27.04.2010 11:01:27
+$certainDay01_date_03=27.04.2010 11:53:00
+$certainDay01_date_04=27.04.2010 23:59:59
+
+$certainDay02_date_01=30.04.2010 12:35:00
+$certainDay02_date_02=30.04.2010 21:53:00
+
+#Orders for certain day 01 (4 of them)
+INSERT Order;code;date[dateformat=dd.MM.yyyy HH:mm:ss];net;currency(isocode);calculated;user(uid)
+;certainDay01_date_01;$certainDay01_date_01;false;USD;false;abrode
+;certainDay01_date_02;$certainDay01_date_02;false;USD;false;dkaufmann
+;certainDay01_date_03;$certainDay01_date_03;false;USD;false;sbrueck
+;certainDay01_date_04;$certainDay01_date_04;false;USD;false;bpoweronoff
+
+#Order Entries for certain day 01
+INSERT OrderEntry;order(Order.code);creationTime[dateformat=dd.MM.yyyy HH:mm:ss];product(code,catalogVersion(catalog(id),version));quantity;unit(code)
+;certainDay01_date_01;$certainDay01_date_01;HW1100-0025:hwcatalog:Online;1;pieces
+;certainDay01_date_01;$certainDay01_date_01;HW2310-1007:hwcatalog:Online;3;pieces
+
+;certainDay01_date_02;$certainDay01_date_02;HW2120-0341:hwcatalog:Online;1;pieces
+;certainDay01_date_02;$certainDay01_date_02;HW1240-1733:hwcatalog:Online;1;pieces
+;certainDay01_date_02;$certainDay01_date_02;HW2200-0878:hwcatalog:Online;1;pieces
+;certainDay01_date_02;$certainDay01_date_02;HW2310-1005:hwcatalog:Online;1;pieces
+
+;certainDay01_date_03;$certainDay01_date_03;HW2300-4121:hwcatalog:Online;2;pieces
+
+;certainDay01_date_04;$certainDay01_date_04;HW1230-0001:hwcatalog:Online;1;pieces
+
+#Recalculating orders for certain day 01
+UPDATE Order;code[unique=true];status(code)
+;certainDay01_date_01;CREATED
+#%   impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getAllAddresses().iterator().next());
+#%   impex.getLastImportedItem().recalculate(); 
+;certainDay01_date_02;CREATED
+#%   impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getAllAddresses().iterator().next());
+#%   impex.getLastImportedItem().recalculate();
+;certainDay01_date_03;CREATED
+#%   impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getAllAddresses().iterator().next());
+#%   impex.getLastImportedItem().recalculate();
+;certainDay01_date_04;CREATED
+#%   impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getAllAddresses().iterator().next());
+#%   impex.getLastImportedItem().recalculate();
+
+
+#Orders for certain day 02 (2 of them)
+INSERT Order;code;date[dateformat=dd.MM.yyyy HH:mm:ss];net;currency(isocode);calculated;user(uid)
+;certainDay02_date_01;$certainDay02_date_01;false;USD;false;ppetersonson
+;certainDay02_date_02;$certainDay02_date_02;false;USD;false;hweaving
+
+#Order Entries for certain day 02
+INSERT OrderEntry;order(Order.code);creationTime[dateformat=dd.MM.yyyy HH:mm:ss];product(code,catalogVersion(catalog(id),version));quantity;unit(code)
+;certainDay02_date_01;$certainDay02_date_01;HW1210-3422:hwcatalog:Online;2;pieces
+;certainDay02_date_01;$certainDay02_date_01;HW1100-0024:hwcatalog:Online;1;pieces
+
+;certainDay02_date_02;$certainDay02_date_02;HW2320-1008:hwcatalog:Online;1;pieces
+;certainDay02_date_02;$certainDay02_date_02;HW2310-1001:hwcatalog:Online;1;pieces
+
+#Recalculating orders for certain day 02
+UPDATE Order;code[unique=true];status(code)
+;certainDay02_date_01;CREATED
+#%   impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getAllAddresses().iterator().next());
+#%   impex.getLastImportedItem().recalculate();
+;certainDay02_date_02;CREATED
+#%   impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getAllAddresses().iterator().next());
+#%   impex.getLastImportedItem().recalculate();

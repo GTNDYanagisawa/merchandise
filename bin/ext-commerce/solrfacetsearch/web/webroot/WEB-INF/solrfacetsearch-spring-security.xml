@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                    http://www.springframework.org/schema/beans/spring-beans.xsd
+                    http://www.springframework.org/schema/security 
+                    http://www.springframework.org/schema/security/spring-security.xsd
+                    http://www.springframework.org/schema/util
+                    http://www.springframework.org/schema/util/spring-util.xsd"
+    default-autowire="byName">
+	
+	<http use-expressions="true">
+		<anonymous username="anonymous" granted-authority="ROLE_ANONYMOUS" />
+        <intercept-url pattern="/css/**" access="permitAll" />
+    	<intercept-url pattern="/hybris/**" access="permitAll" />
+    	<intercept-url pattern="/img/**" access="permitAll" />
+    	<intercept-url pattern="/js/**" access="permitAll" />
+    	<intercept-url pattern="/tpl/**" access="permitAll" />
+    	<intercept-url pattern="/favicon.ico" access="permitAll" />
+    	<intercept-url pattern="/**/replication" access="permitAll" />
+        <intercept-url pattern="/**" access="hasRole('ROLE_ADMINGROUP')" />
+		
+        <form-login
+        				always-use-default-target="false"
+        				login-page="/hybris/login.jsp" 
+        				authentication-failure-url="/hybris/login.jsp?login_error=1" 
+        				default-target-url="/admin.html"  
+                        />
+        <logout logout-url="/j_spring_security_logout"  logout-success-url="/hybris/login.jsp" />
+        <!-- <remember-me services-ref="rememberMeServices" key="solrfacetsearch"/> -->
+     </http>
+    
+    <authentication-manager>
+        <authentication-provider ref="coreAuthenticationProvider"/>
+    </authentication-manager>
+    
+    <beans:bean id="fixation" class="de.hybris.platform.servicelayer.security.spring.HybrisSessionFixationProtectionStrategy"/> 
+	
+	<!-- 
+	<beans:bean id="rememberMeServices" class="de.hybris.platform.spring.security.CoreRememberMeService">
+		<beans:property name="key" value="solrfacetsearch" />
+		<beans:property name="cookieName" value="LoginToken" /> -->
+		<!-- avoiding hard reference to tenant-scoped 'coreUserDetailsService' -->
+		<!-- <beans:lookup-method name="lookupUserDetailsService" bean="coreUserDetailsService" />
+	</beans:bean> -->
+	
+    <beans:alias name="defaultCorePreAuthenticationChecks" alias="corePreAuthenticationChecks"/>
+	<beans:bean id="defaultCorePreAuthenticationChecks" class="de.hybris.platform.spring.security.RejectUserPreAuthenticationChecks">
+		<beans:property name="allowedUserGroups">
+			<beans:list merge="false">
+				<beans:value>Admingroup</beans:value>
+			</beans:list>
+		</beans:property>
+	</beans:bean>
+
+	<beans:bean id="coreAuthenticationProvider" class="de.hybris.platform.spring.security.CoreAuthenticationProvider">
+		<beans:property name="preAuthenticationChecks" ref="corePreAuthenticationChecks" />
+		<beans:property name="userDetailsService" ref="coreUserDetailsService" />
+	</beans:bean>
+
+    <beans:bean id="coreUserDetailsService" class="de.hybris.platform.spring.security.CoreUserDetailsService" />
+
+</beans:beans>

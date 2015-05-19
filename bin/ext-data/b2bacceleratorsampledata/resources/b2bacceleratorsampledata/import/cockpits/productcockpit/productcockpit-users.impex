@@ -1,0 +1,16 @@
+#
+# Import Sample Product Cockpit User
+#
+
+$passwordEncoding=md5
+$defaultPassword=1234
+$setPassword=@password[translator=de.hybris.platform.impex.jalo.translators.ConvertPlaintextToEncodedUserPasswordTranslator][default='$passwordEncoding:$defaultPassword']
+
+
+INSERT_UPDATE Employee;UID[unique=true];$setPassword;description;name;groups(uid);sessionLanguage(isocode);sessionCurrency(isocode)
+;productmanager;;Product manager;Product Manager;productmanagergroup;en;EUR
+
+UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];writePrincipals(uid);
+;powertoolsProductCatalog;Online;productmanagergroup,productmanager;
+;powertoolsProductCatalog;Staged;productmanagergroup,productmanager;
+;PowertoolsClassification;1.0;productmanagergroup,productmanager;

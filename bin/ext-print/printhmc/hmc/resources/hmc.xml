@@ -1,0 +1,2386 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+	[y] hybris Platform
+	
+	Copyright (c) 2000-2013 hybris AG
+	All rights reserved.
+	
+	This software is the confidential and proprietary information of hybris
+	("Confidential Information"). You shall not disclose such Confidential
+	Information and shall use it only in accordance with the terms of the
+	license agreement you entered into with hybris.
+	
+	
+-->
+<configuration xmlns="hybris.de/schemas/hmc/generic" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+
+	<!--
+		##############################################################################################
+		## Print Engine
+		##############################################################################################
+	-->
+
+	<explorertree>
+		<group name="group.print" description="group.print.description">
+			<typeref type="Publication" description="print.publication.description" />
+			<typeref type="Chapter" description="print.chapter.description" />
+			<typeref type="Page" description="print.page.description" />
+			<typeref type="ItemPlacement" description="print.placement.description" />
+			<typeref type="ContentBlock" description="print.contentblock.description" />
+			<group name="group.print.administration" description="group.print.administration.description">
+				<typeref type="CometConfiguration" description="print.cometconfiguration.description" />
+				<typeref type="ImportCometConfigurationWizard" description="print.cometimportwizard.description" />
+				<typeref type="LayoutTemplate" description="print.layouttemplate.description" />
+				<typeref type="PlaceholderTemplate" description="print.placeholdertemplate.description" />
+				<typeref type="MasterPage" description="print.masterpage.description" />
+				<typeref type="Grid" description="print.grid.description" />
+				<typeref type="StyleContainer" description="print.stylecontainer.description" />
+				<typeref type="PageFormat" description="print.pageformat.description" />
+				<typeref type="Crossreference" description="print.crossreference.description" />
+				<typeref type="PathPrefix" description="print.pathprefix.description" />
+				<typeref type="AutoCometJob" description="print.autocometjob.description" />
+			</group>
+		</group>
+	</explorertree>
+	
+	<type name="ImportCometConfigurationWizard" icon="images/ext/catalog/e_catalog_import.gif" mode="append">
+		<organizer>
+			<editor>
+				<exclude>
+					<exclusion attribute="owner"/>
+				</exclude>
+
+				<tab name="cometconfigurationtwizard.tab0" position="0">
+					<section name="cometconfigurationtwizard.section.existing">
+						<listlayout>
+							<attribute name="cometConfiguration" />
+						</listlayout>
+					</section>
+					<section name="cometconfigurationtwizard.section.new">
+						<listlayout>
+							<attribute name="code"  />
+							<attribute name="name" />
+							<attribute name="defaultConfiguration" />
+							<attribute name="publicationController" />
+							<attribute name="defaultDeleteAutoCometJob" />
+						</listlayout>
+					</section>
+					<section name="cometconfigurationtwizard.section.file">
+						<listlayout>
+							<attribute name="importFile">
+								<uploadtomediaeditor />
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	
+	
+	<type name="ExportCometConfigurationWizard" useselector="true" mode="append">
+	   <organizer>
+	      <editor>
+	         <exclude>
+	            <exclusion attribute="owner"/>
+	         </exclude>
+	         <tab name="exportcometconfigurationwizard.tab1" position="0">
+	            <section name="exportcometconfigurationwizard.section1">
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	</type>	
+	
+
+	<type name="CreatePagePreviewWizard" useselector="true" mode="append">
+	   <organizer>
+	      <editor>
+	         <exclude>
+	            <exclusion attribute="owner"/>
+	         </exclude>
+	         <tab name="createpagepreviewwizard.tab1" position="0">
+	            <section name="createpagepreviewwizard.section1">
+	               <listlayout>
+	                  <attribute name="previewSize"/>
+	                  <attribute name="pdfPreset"/>
+	               </listlayout>
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	</type>
+	
+	<type name="CreateChapterPreviewWizard" useselector="true" mode="append">
+	   <organizer>
+	      <editor>
+	         <exclude>
+	            <exclusion attribute="owner"/>
+	         </exclude>
+	         <tab name="createchapterpreviewwizard.tab1" position="0">
+	            <section name="createchapterpreviewwizard.section1">
+	               <listlayout>
+	                  <attribute name="previewSize"/>
+	                  <attribute name="pdfPreset"/>
+	               </listlayout>
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	</type>
+	
+	<type name="CreatePublicationPreviewWizard" useselector="true" mode="append">
+	   <organizer>
+	      <editor>
+	         <exclude>
+	            <exclusion attribute="owner"/>
+	         </exclude>
+	         <tab name="createpublicationpreviewwizard.tab1" position="0">
+	            <section name="createpublicationpreviewwizard.section1">
+	               <listlayout>
+	                  <attribute name="previewSize"/>
+	                  <attribute name="pdfPreset"/>
+	               </listlayout>
+	            </section>
+	         </tab>
+	      </editor>
+	   </organizer>
+	</type>
+
+	<type name="Style" useselector="true">
+		<organizer>
+			<search autoperform="true">
+				<condition attribute="id" operator="contains" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="id" width="150"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="id" width="150"/>
+						</row>
+					</columnlayout>
+				</essentials>
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="id" noselectionname="style.novalue">
+			<itemlayout>
+				<attribute name="id" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="PathPrefix" useselector="true">
+		<organizer>
+			<search autoperform="true">
+				<condition attribute="code" operator="contains" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="code" width="200"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="code" width="200"/>
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="common">
+					<section name="common">
+						<listlayout>
+							<attribute name="prefixWIN" width="516"/>
+							<attribute name="prefixMAC" width="516"/>
+						</listlayout>
+					</section>
+				</tab>
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="Placement" mode="replace" icon="images/ext/print/e_placement.gif">
+		<organizer>
+			<search autoperform="true">
+				<condition attribute="page" />
+				<condition attribute="placeholderTemplate" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="displayName" width="250" />
+						<attribute name="layoutTemplate" width="150"/>
+					</itemlayout>
+				</listview>				
+			</result>
+			<editor>
+				<exclude>
+					<exclusion attribute="allUsablePlaceholderTemplates"></exclusion>
+					<exclusion attribute="allUsableLayoutTemplates"></exclusion>
+					<exclusion attribute="allDocuments"></exclusion>
+				</exclude>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="displayName" />
+							<attribute name="publication" />
+						</row>
+						<row>
+							<attribute name="position" />
+							<attribute name="status" />
+						</row>
+						<row>
+							<attribute name="gridelementid" />
+							<void />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="common">
+					<section name="common">
+						<columnlayout>
+							<row>
+								<attribute name="placeholderTemplate" />
+								<attribute name="page" />
+							</row>
+							<row>
+								<attribute name="layoutTemplate" />
+								<attribute name="forcePageBreak" />
+							</row>
+							<row>
+								<attribute name="instructionComment">
+									<textareaeditor cols="40" rows="10" expanded="true" />
+								</attribute>
+								<void />
+							</row>
+						</columnlayout>
+						<listlayout>
+							<attribute name="preview">
+								<customeditor classname="de.hybris.platform.hmc.attribute.HTMLDisplayEditorChip" />
+							</attribute>
+							<attribute name="placeholderValues">
+								<specialeditor classname="de.hybris.platform.print.hmc.attribute.PlaceholderDisplayChip"></specialeditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference>
+			<itemlayout>
+				<attribute name="displayName" />
+				<attribute name="layoutTemplate" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="ItemPlacement" mode="append" icon="images/ext/print/e_placement.gif">
+		<organizer>
+			<result mode="append">
+				<treeview mode="append">
+					<explorable>
+						<attribute name="item" suppressroot="true"/>
+					</explorable>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="common">
+					<section name="common">
+						<columnlayout>
+							<row>
+								<attribute name="item" />
+								<void />
+							</row>
+						</columnlayout>
+						<listlayout>
+							<attribute name="placeholderValues">
+								<specialeditor classname="de.hybris.platform.print.hmc.attribute.PlaceholderDisplayChip"></specialeditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="Action" mode="replace">
+		<organizer>
+			<search>
+				<condition attribute="id" operator="contains" />
+				<condition attribute="cometconfig" />
+				<condition attribute="classid" />
+				<condition attribute="actiontype" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="id" width="80"/>
+						<attribute name="cometconfig" width="170"/>
+						<attribute name="classid" width="80"/>
+						<attribute name="actiontype" width="80"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<exclude>
+					<exclusion attribute="allDocuments"></exclusion>
+				</exclude>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="id"></attribute>
+							<attribute name="cometconfig"></attribute>
+						</row>
+						<row>
+							<attribute name="name"></attribute>
+							<void />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="common">
+					<section name="common">
+						<columnlayout>
+							<row>
+								<attribute name="classid" />
+								<attribute name="domainid" />
+							</row>
+							<row>
+								<attribute name="sequencenr" />
+								<attribute name="actiontype" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference>
+			<itemlayout>
+				<attribute name="id"/>
+				<attribute name="classid"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="Page" mode="replace" icon="images/ext/print/e_pages.gif">
+		<organizer>
+			<search autoperform="false">
+				<condition attribute="code" operator="contains" />
+				<condition attribute="chapter" />
+				<condition attribute="publication" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="code" width="200"/>
+						<attribute name="chapter" width="200"/>
+					</itemlayout>
+				</listview>				
+				<treeview>
+					<itemlayout>
+						<attribute name="code" />
+						<attribute name="chapter" />
+					</itemlayout>
+					<explorable>
+						<attribute name="placements" suppressroot="true"/>
+					</explorable>
+				</treeview>
+			</result>
+			<editor>
+				<exclude>
+					<exclusion attribute="displayNamePattern"></exclusion>
+					<exclusion attribute="allUsableMasterPages"></exclusion>
+					<exclusion attribute="allDocuments"></exclusion>
+				</exclude>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="code" />
+							<attribute name="publication" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="common">
+					<section name="common">
+						<columnlayout>
+							<row>
+								<attribute name="title" />
+								<attribute name="subtitle" />
+							</row>
+							<row>
+								<attribute name="masterPage" />
+								<attribute name="masterPageAlt" />
+							</row>
+							<row>
+								<attribute name="chapter" />
+								<attribute name="alignment" />
+							</row>
+							<row>
+								<attribute name="pageType" />
+								<void />
+							</row>
+							<row>
+								<attribute name="gridId" />
+								<attribute name="grid" />
+							</row>
+							<row>
+								<attribute name="gridMode" />
+								<attribute name="status" />
+							</row>
+						</columnlayout>
+						<listlayout>
+							<attribute name="placements" width="516">
+								<referencecollectioneditor>
+									<itemlayout>
+										<attribute name="displayName"></attribute>
+										<attribute name="position"></attribute>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="description"/>
+							<attribute name="comment"/>
+							<attribute name="subtitle2"/>
+						</listlayout>
+					</section>
+					<section name="print.filehandling">
+						<listlayout>
+							<attribute name="filePath" width="516"/>
+							<attribute name="fileName" width="516"/>
+							<attribute name="documentTemplate" width="516"/>
+						</listlayout>
+					</section>
+					<section name="print.preview">
+						<listlayout>
+							<attribute name="previewImages">
+								<referencecollectioneditor >
+									<itemlayout>
+										<attribute name="url" title="title.image" width="50">
+						                     <display classname="de.hybris.platform.hmc.attribute.UrlAsImageDisplayChip">
+						                        <parameter key="height" value="30"/>
+						                     </display>
+						                  </attribute>
+										<attribute name="code" width="320"/>
+										<attribute name="realfilename" width="155"/>
+										<attribute name="creationtime" width="110"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="previewPdfs" >
+								<referencecollectioneditor >
+									<itemlayout>
+										<attribute name="code" width="330"/>
+										<attribute name="realfilename" width="155"/>
+										<attribute name="creationtime" width="110"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+						<table>
+							<tr>
+								<td width="16px" />
+								<td>
+									<action type="item"
+											classname="de.hybris.platform.print.hmc.CreatePagePreviewAction"
+											name="print.action.createpagepreviewaction"
+											icon="images/ext/print/action_pagepreview.gif"
+											disabledicon="images/ext/print/action_pagepreview.gif"
+											toolbaricon="images/ext/print/action_pagepreview.gif"
+											showtoolbarlabel="true" 
+											hidebutton="true" />
+								</td>
+							</tr>
+						</table>
+					</section>
+				</tab>
+				
+            <tab name="tab.rights">
+               <section name="section.rights">
+                  <columnlayout>
+                     <row>
+                        <text name="text.rights.page" width="720"/>
+                     </row>
+                     <row>
+                        <attribute name="writePrincipals">
+							<referencecollectioneditor showsearcheditor="true">
+								<itemlayout>
+									<attribute name="uid" width="166"/>
+								</itemlayout>
+							</referencecollectioneditor>
+                        </attribute>
+                        <attribute name="readPrincipals">
+							<referencecollectioneditor showsearcheditor="true">
+								<itemlayout>
+									<attribute name="uid" width="166"/>
+								</itemlayout>
+							</referencecollectioneditor>
+                        </attribute>
+                     </row>
+                  </columnlayout>
+               </section>
+            </tab>
+				
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" noselectionname="style.novalue">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+
+	<type name="StyleContainer">
+		<organizer>
+			<search autoperform="true">
+				<condition attribute="code" operator="contains" />
+				<condition attribute="name" operator="contains" />
+				<condition attribute="characterStyles" />
+				<condition attribute="paragraphStyles" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="code" />
+						<attribute name="name" />
+						<attribute name="characterStyles" />
+						<attribute name="paragraphStyles" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<exclude>
+					<exclusion attribute="allDocuments" />
+				</exclude>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="code" />
+							<attribute name="name" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties">
+					<section name="common">
+						<columnlayout>
+							<row>
+								<attribute name="previewCssUrl" />
+								<void/>
+							</row>
+							<row>
+								<attribute name="characterStyles">
+									<referencecollectioneditor create="true" add="true" remove="true" editable="true" externalcreate="false" resortable="true" autosave="true" />
+								</attribute>
+								<attribute name="paragraphStyles">
+									<referencecollectioneditor create="true" add="true" remove="true" editable="true" externalcreate="false" resortable="true" autosave="true" />
+								</attribute>
+							</row>
+							<row>
+								<attribute name="tableStyles">
+									<referencecollectioneditor create="true" add="true" remove="true" editable="true" externalcreate="false" resortable="true" autosave="true" />
+								</attribute>
+								<attribute name="cellStyles">
+									<referencecollectioneditor create="true" add="true" remove="true" editable="true" externalcreate="false" resortable="true" autosave="true" />
+								</attribute>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code">
+			<itemlayout>
+				<attribute name="code" />
+				<attribute name="name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="Publication" mode="append" icon="images/ext/print/e_publication.gif">
+		<organizer>
+			<search autoperform="true" mode="replace">
+				<condition attribute="code" operator="contains" />
+				<condition attribute="title" operator="contains" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="code" width="200" />
+						<attribute name="title" width="250"/>
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="code" width="200" />
+						<attribute name="title" width="250"/>
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="code" width="200"/>
+						<attribute name="title" width="250"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<exclude>
+					<exclusion attribute="components" />
+				</exclude>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="code"></attribute>
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties">
+					<section name="common">
+						<columnlayout>
+							<row>
+								<attribute name="title" />
+								<attribute name="description" />
+							</row>
+							<row>
+								<attribute name="subTitle" />
+								<attribute name="status" />
+							</row>
+							<row>
+								<attribute name="subtitle2" />
+								<attribute name="comment">
+									<textareaeditor cols="40" rows="10" />
+								</attribute>
+							</row>
+							<row>
+								<attribute name="picture" />
+								<attribute name="logo"/>
+							</row>
+						</columnlayout>
+						<listlayout>
+							<attribute name="media"/>
+							<attribute name="pageformat"/>
+							<action type="item"
+									classname="de.hybris.platform.print.hmc.action.OpenPublicationAction"
+									name="print.action.openpublication"
+									icon="images/icons/header_open_alt_main.gif"
+									disabledicon="images/icons/header_open_alt_inactive_main.gif"
+									toolbaricon="images/icons/header_open_alt.gif"
+									showtoolbarlabel="true" 
+									hidebutton="true" />
+						</listlayout>
+					</section>
+					<section name="print.chapter">
+						<listlayout>
+							<attribute name="rootChapters" />
+							<attribute name="unassignedPages" />
+						</listlayout>
+					</section>
+					<section name="print.session">
+						<listlayout>
+							<attribute name="configuration" />
+							<attribute name="languageFallbackEnabled" />
+							<attribute name="priceDate" />
+							<attribute name="pricesAreNet" />
+							<attribute name="sessionCurrency" />
+							<attribute name="sessionUser" />
+							<attribute name="visibleInDTP" />
+							<attribute name="defaultMediaContext" />
+						</listlayout>
+					</section>
+					<section name="print.filehandling">
+						<listlayout>
+							<attribute name="fileHandling" />
+							<attribute name="filePath" width="516"/>
+							<attribute name="fileName" width="516"/>
+							<attribute name="documentTemplate" width="516"/>
+						</listlayout>
+					</section>
+					<section name="print.preview">
+						<listlayout>
+							<attribute name="previewImages">
+								<referencecollectioneditor >
+									<itemlayout>
+										<attribute name="url" title="title.image" width="50">
+						                     <display classname="de.hybris.platform.hmc.attribute.UrlAsImageDisplayChip">
+						                        <parameter key="height" value="30"/>
+						                     </display>
+						                  </attribute>
+										<attribute name="code" width="320"/>
+										<attribute name="realfilename" width="155"/>
+										<attribute name="creationtime" width="110"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="previewPdfs" >
+								<referencecollectioneditor >
+									<itemlayout>
+										<attribute name="code" width="330"/>
+										<attribute name="realfilename" width="155"/>
+										<attribute name="creationtime" width="110"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+						<table>
+							<tr>
+								<td width="16px" />
+								<td>
+									<action type="item"
+											classname="de.hybris.platform.print.hmc.CreatePublicationPreviewAction"
+											name="print.action.createpagepreviewaction"
+											icon="images/ext/print/action_pagepreview.gif"
+											disabledicon="images/ext/print/action_pagepreview.gif"
+											toolbaricon="images/ext/print/action_pagepreview.gif"
+											showtoolbarlabel="true" 
+											hidebutton="true" />
+								</td>
+							</tr>
+						</table>
+					</section>							
+				</tab>
+            
+            <tab name="tab.rights">
+               <section name="section.rights">
+                  <columnlayout>
+                     <row>
+                        <text name="text.rights.publication" width="720"/>
+                     </row>
+                     <row>
+                        <attribute name="writePrincipals">
+							<referencecollectioneditor showsearcheditor="true">
+								<itemlayout>
+									<attribute name="uid" width="166"/>
+								</itemlayout>
+							</referencecollectioneditor>
+                        </attribute>
+                        <attribute name="readPrincipals">
+							<referencecollectioneditor showsearcheditor="true">
+								<itemlayout>
+									<attribute name="uid" width="166"/>
+								</itemlayout>
+							</referencecollectioneditor>
+                        </attribute>
+                     </row>
+                  </columnlayout>
+               </section>
+            </tab>
+            				
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="code">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="ChaptersConfiguration">
+		<organizer>
+			<search autoperform="true">
+				<condition attribute="name" operator="contains" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="name" width="200"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="name" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties">
+					<section name="common">
+						<listlayout>
+							<attribute name="chapterConfigurations" width="600">
+								<referencecollectioneditor create="true" remove="true" editable="true" externalcreate="false" resortable="true" autosave="true" presetattribute="chaptersConfiguration" />
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="name">
+			<itemlayout>
+				<attribute name="name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="ChapterConfiguration">
+		<organizer>
+			<search autoperform="true">
+				<condition attribute="chapterLevel" />
+				<condition attribute="showChapter" />
+				<condition attribute="chapterParagraphStyle" />
+				<condition attribute="flowControl" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="chapterLevel" width="80" />
+						<attribute name="showChapter" width="200" />
+						<attribute name="chapterParagraphStyle" width="180" />
+						<attribute name="flowControl" width="100" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="properties">
+					<section name="common">
+						<listlayout>
+							<attribute name="chapterLevel" />
+							<attribute name="showChapter">
+								<advancedbooleaneditor truename="text.chapterconfiguration.showchapter.true" falsename="text.chapterconfiguration.showchapter.false"
+									nullname="text.chapterconfiguration.showchapter.unspecified" wrapvalues="true" />
+							</attribute>
+							<attribute name="chapterParagraphStyle" />
+							<attribute name="flowControl" />
+						</listlayout>
+					</section>
+				</tab>
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference>
+			<itemlayout>
+				<attribute name="chapterLevel" />
+				<attribute name="showChapter" />
+				<attribute name="chapterParagraphStyle" />
+				<attribute name="flowControl" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="PageFormat" mode="replace" useselector="true">
+		<organizer>
+			<search autoperform="true">
+				<condition attribute="qualifier" operator="contains" />
+				<condition attribute="name" operator="contains" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="qualifier" width="100" />
+						<attribute name="name" width="200" />
+						<attribute name="dimension" width="150" />
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="qualifier" width="100" />
+						<attribute name="name" width="200" />
+						<attribute name="width" width="100" />
+						<attribute name="height" width="100" />
+					</itemlayout>
+				</editview>
+			</result>
+			<editor>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="qualifier"></attribute>
+							<attribute name="name"></attribute>
+						</row>
+						<row>
+							<attribute name="dimension"></attribute>
+							<void/>
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties">
+					<section name="common">
+						<columnlayout>
+							<row>
+								<attribute name="width"></attribute>
+								<attribute name="widthinpixel"></attribute>
+							</row>
+							<row>
+								<attribute name="height"></attribute>
+								<attribute name="heightinpixel"></attribute>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="name">
+			<itemlayout>
+				<attribute name="name" fallback="qualifier" />
+				<attribute name="dimension" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="Chapter" mode="append" icon="images/ext/print/e_chapter.gif">
+		<organizer>
+			<search autoperform="true" mode="replace">
+				<condition attribute="publication" />
+				<condition attribute="code" operator="contains" />
+				<condition attribute="title" operator="contains" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="publication" width="150" />
+						<attribute name="code" width="150" />
+						<attribute name="title" width="200"/>
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="code" width="200" />
+						<attribute name="title" width="200"/>
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="code" />
+						<attribute name="title" />
+					</itemlayout>
+					<explorable>
+						<attribute name="subChapters" suppressroot="true"/>
+						<attribute name="Pages" suppressroot="true"/>
+					</explorable>
+				</treeview>
+			</result>
+			<editor>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="publication" />
+							<attribute name="code" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="common">
+					<section name="common">
+						<columnlayout>
+							<row>
+								<attribute name="title" />
+								<attribute name="subTitle" />
+							</row>
+							<row>
+								<attribute name="description" />
+								<attribute name="comment" />
+							</row>
+							<row>
+								<attribute name="header" />
+								<attribute name="footer" />
+							</row>
+							<row>
+								<attribute name="subtitle2" />
+								<attribute name="status" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="print.images">
+						<columnlayout>
+							<row>
+								<attribute name="picture" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="print.content">
+						<listlayout>
+							<attribute name="superChapter" />
+							<attribute name="subchapters">
+								<referencecollectioneditor add="true" remove="true"></referencecollectioneditor>
+							</attribute>
+							<attribute name="pages" />
+						</listlayout>
+					</section>
+					<section name="print.filehandling">
+						<listlayout>
+							<attribute name="filePath" width="516"/>
+							<attribute name="fileName" width="516"/>
+							<attribute name="documentTemplate" width="516"/>
+						</listlayout>
+					</section>
+					<section name="print.preview">
+						<listlayout>
+							<attribute name="previewImages">
+								<referencecollectioneditor >
+									<itemlayout>
+										<attribute name="url" title="title.image" width="50">
+						                     <display classname="de.hybris.platform.hmc.attribute.UrlAsImageDisplayChip">
+						                        <parameter key="height" value="30"/>
+						                     </display>
+						                  </attribute>
+										<attribute name="code" width="320"/>
+										<attribute name="realfilename" width="155"/>
+										<attribute name="creationtime" width="110"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="previewPdfs" >
+								<referencecollectioneditor >
+									<itemlayout>
+										<attribute name="code" width="330"/>
+										<attribute name="realfilename" width="155"/>
+										<attribute name="creationtime" width="110"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+						<table>
+							<tr>
+								<td width="16px" />
+								<td>
+									<action type="item"
+											classname="de.hybris.platform.print.hmc.CreateChapterPreviewAction"
+											name="print.action.createpagepreviewaction"
+											icon="images/ext/print/action_pagepreview.gif"
+											disabledicon="images/ext/print/action_pagepreview.gif"
+											toolbaricon="images/ext/print/action_pagepreview.gif"
+											showtoolbarlabel="true" 
+											hidebutton="true" />
+								</td>
+							</tr>
+						</table>
+					</section>							
+				</tab>
+				
+            <tab name="tab.rights">
+               <section name="section.rights">
+                  <columnlayout>
+                     <row>
+                        <text name="text.rights.chapter" width="720"/>
+                     </row>
+                     <row>
+                        <attribute name="writePrincipals">
+							<referencecollectioneditor showsearcheditor="true">
+								<itemlayout>
+									<attribute name="uid" width="166"/>
+								</itemlayout>
+							</referencecollectioneditor>
+                        </attribute>
+                        <attribute name="readPrincipals">
+							<referencecollectioneditor showsearcheditor="true">
+								<itemlayout>
+									<attribute name="uid" width="166"/>
+								</itemlayout>
+							</referencecollectioneditor>
+                        </attribute>
+                     </row>
+                  </columnlayout>
+               </section>
+            </tab>
+				
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="code">
+			<itemlayout>
+				<attribute name="code" />
+				<attribute name="publication" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="AbstractLayoutTemplate">
+		<organizer>
+			<search autoperform="true">
+				<condition attribute="code" operator="contains" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="code" width="150" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<exclude>
+					<exclusion attribute="allDocuments" />
+				</exclude>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="code" />
+							<attribute name="placeholderTemplate" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties">
+					<section name="preview">
+						<listlayout>
+							<attribute name="previewTemplate">
+								<textareaeditor expanded="true" cols="80" rows="20"></textareaeditor>
+							</attribute>
+							<customchip classname="de.hybris.platform.print.hmc.attribute.PreviewContextDisplayChip"></customchip>
+						</listlayout>
+					</section>
+				</tab>
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="LayoutTemplate" mode="replace">
+		<organizer>
+			<search autoperform="true">
+				<condition attribute="code" operator="contains" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="previewImageUrl" title="title.image" width="55">
+							<display classname="de.hybris.platform.hmc.attribute.UrlAsImageDisplayChip">
+								<parameter key="height" value="30"/>
+							</display>
+						</attribute>
+						<attribute name="code" width="200" />
+						<attribute name="id" width="100" />
+						<attribute name="cometConfig" width="150" />
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="code" width="200" />
+						<attribute name="id" width="100" />
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="code" />
+						<attribute name="id" />
+						<attribute name="cometConfig" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<exclude>
+					<exclusion attribute="allDocuments" />
+				</exclude>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="code" />
+							<attribute name="cometConfig" />
+						</row>
+						<row>
+							<attribute name="id" />
+							<attribute name="description" />
+						</row>
+						<row>
+							<attribute name="placeholderTemplate" />
+							<void />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties">
+					<section name="preview">
+						<listlayout>
+							<attribute name="previewimage" >
+								<mediaeditor/>
+							</attribute>
+							<attribute name="previewmedia" />
+							<attribute name="previewTemplate">
+								<textareaeditor expanded="true" cols="80" rows="20"></textareaeditor>
+							</attribute>
+							<customchip classname="de.hybris.platform.print.hmc.attribute.PreviewContextDisplayChip"></customchip>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.spread">
+					<section name="section.spread">
+						<columnlayout>
+							<row>
+								<attribute name="spreadPosition" />
+								<void/>
+							</row>
+							<row>
+								<attribute name="leftTemplateId" />
+								<attribute name="leftTemplate" />
+							</row>
+							<row>
+								<attribute name="middleTemplateId" />
+								<attribute name="middleTemplate" />
+							</row>
+							<row>
+								<attribute name="rightTemplateId" />
+								<attribute name="rightTemplate" />
+							</row>
+							<row>
+								<attribute name="continueTemplateId" />
+								<void/> <!-- <attribute name="continueTemplate" />  -->
+							</row>
+							<row>
+								<attribute name="scriptId" />
+								<void/>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="MasterPage" useselector="true" mode="replace">
+		<organizer>
+			<search autoperform="true">
+				<condition attribute="code" operator="contains" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="code" width="150" />
+						<attribute name="placeholderTemplate" width="250" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<exclude>
+					<exclusion attribute="allDocuments" />
+				</exclude>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="code" />
+							<attribute name="description" />
+						</row>
+						<row>
+							<attribute name="placeholderTemplate" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties">
+					<section name="preview">
+						<listlayout>
+							<attribute name="previewmedia" />
+							<attribute name="previewTemplate">
+								<textareaeditor expanded="true" cols="80" rows="20"></textareaeditor>
+							</attribute>
+							<customchip classname="de.hybris.platform.print.hmc.attribute.PreviewContextDisplayChip"></customchip>
+						</listlayout>
+					</section>
+				</tab>
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="Grid" mode="append">
+		<organizer>
+			<search autoperform="true" mode="replace">
+				<condition attribute="cometConfig" />
+				<condition attribute="id" operator="contains" />
+				<condition attribute="name" operator="contains" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="previewImageUrl" title="title.image" width="55">
+							<display classname="de.hybris.platform.hmc.attribute.UrlAsImageDisplayChip">
+								<parameter key="height" value="30"/>
+							</display>
+						</attribute>
+						<attribute name="id" width="100" />
+						<attribute name="name" width="150" />
+						<attribute name="cometConfig" width="150" />
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="id" width="100" />
+						<attribute name="name" width="150" />
+					</itemlayout>
+				</editview>
+			</result>
+			<editor>
+				<essentials mode="replace">
+					<columnlayout>
+						<row>
+							<attribute name="id" />
+							<attribute name="cometConfig" />
+						</row>
+						<row>
+							<attribute name="previewImage">
+								<mediaeditor/>
+							</attribute>
+							<void/>
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties">
+					<section name="common">
+						<listlayout>
+							<attribute name="name" />
+							<attribute name="description" />
+						</listlayout>
+						<columnlayout>
+							<row>
+								<attribute name="xpos" />
+								<attribute name="ypos" />
+							</row>
+							<row>
+								<attribute name="xsize" />
+								<attribute name="ysize" />
+							</row>
+						</columnlayout>
+						<listlayout>
+							<attribute name="elements">
+								<referencecollectioneditor add="false" remove="false" resortable="false" create="false">
+									<itemeditorlayout>
+										<attribute name="id" />
+										<attribute name="name" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.spread">
+					<section name="section.spread">
+						<columnlayout>
+							<row>
+								<attribute name="spreadPosition" />
+								<void/>
+							</row>
+							<row>
+								<attribute name="leftGridId" />
+								<attribute name="leftGrid" />
+							</row>
+							<row>
+								<attribute name="middleGridId" />
+								<attribute name="middleGrid" />
+							</row>
+							<row>
+								<attribute name="rightGridId" />
+								<attribute name="rightGrid" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="name">
+			<itemlayout>
+				<attribute name="name" fallback="id" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="GridElement" mode="append">
+		<organizer>
+			<search autoperform="true" mode="replace">
+				<condition attribute="grid" />
+				<condition attribute="id" operator="contains" />
+				<condition attribute="name" operator="contains" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="grid" width="200" />
+						<attribute name="id" width="80" />
+						<attribute name="name" width="150"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="replace">
+					<columnlayout>
+						<row>
+							<attribute name="id" />
+							<attribute name="grid" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties">
+					<section name="common">
+						<listlayout>
+							<attribute name="name" />
+						</listlayout>
+						<columnlayout>
+							<row>
+								<attribute name="xpos" />
+								<attribute name="ypos" />
+							</row>
+							<row>
+								<attribute name="xsize" />
+								<attribute name="ysize" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="name">
+			<itemlayout>
+				<attribute name="name" fallback="id"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="PlaceholderTemplate" mode="append">
+		<organizer>
+			<search autoperform="true" mode="replace">
+				<condition attribute="code" operator="contains" />
+				<condition attribute="type" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="code" width="150" />
+						<attribute name="type" width="150" />
+						<attribute name="cometconfig" width="150" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="replace">
+					<columnlayout>
+						<row>
+							<attribute name="code" />
+							<attribute name="cometconfig" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties">
+					<section name="common">
+						<columnlayout>
+							<row>
+								<attribute name="type" />
+								<attribute name="displayNamePattern" />
+							</row>
+							<row>
+								<attribute name="placeholders">
+									<referencecollectioneditor add="true" autoperform="true" create="true" presetattribute="placeholderTemplate" remove="true">
+										<preset sourceattribute="cometconfig" targetattribute="cometconfig"/>
+										<itemlayout>
+											<attribute name="qualifier" />
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<attribute name="alternativeMediaExpression">
+									<textareaeditor expanded="true" cols="40" rows="15"></textareaeditor>
+								</attribute>
+							</row>
+							<row>
+								<attribute name="layoutTemplates">
+									<referencecollectioneditor add="true" showsearcheditor="true">
+										<preset sourceattribute="cometconfig" targetattribute="cometconfig"/>
+										<itemlayout>
+											<attribute name="code"></attribute>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<attribute name="previewTemplate">
+									<textareaeditor expanded="true" cols="40" rows="15"></textareaeditor>
+								</attribute>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="code">
+			<itemlayout>
+				<attribute name="code" />
+				<attribute name="cometconfig" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="Placeholder" mode="append" icon="images/ext/print/toolbar_placeholder_custom.gif">
+		<organizer>
+			<search autoperform="true" mode="replace">
+				<condition attribute="qualifier" operator="contains" />
+				<condition attribute="placeholderTemplate" />
+				<condition attribute="cometConfig" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="qualifier" width="180" />
+						<attribute name="placeholderTemplate" width="280" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<exclude>
+					<exclusion attribute="domain" />
+					<exclusion attribute="domainid" />
+					<exclusion attribute="classid" />
+				</exclude>
+				<essentials mode="replace">
+					<columnlayout>
+						<row>
+							<attribute name="qualifier" />
+							<attribute name="placeholderTemplate" />
+						</row>
+						<row>
+							<attribute name="description" />
+							<attribute name="cometconfig" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties">
+					<section name="common">
+						<columnlayout>
+							<row>
+								<attribute name="placeholderType" />
+								<attribute name="valueType" />
+							</row>
+							<row>
+								<attribute name="writable" />
+								<attribute name="syncable" />
+							</row>
+							<row>
+								<attribute name="convert" />
+								<void/>
+							</row>
+							<row>
+								<attribute name="language" />
+								<void/>
+							</row>
+						</columnlayout>
+					</section>
+					<section name="section.placeholder.config">
+						<columnlayout>
+							<row>
+								<attribute name="placeholderID" />
+								<attribute name="loadActionID" />
+							</row>
+							<row>
+								<void/>
+								<attribute name="syncActionID" />
+							</row>
+							<row>
+								<void/>
+								<attribute name="storeActionID" />
+							</row>
+							<row>
+								<attribute name="postprocessingexpression">
+									<textareaeditor expanded="true" cols="30" rows="8"/>
+								</attribute>
+								<attribute name="preprocessingexpression">
+									<textareaeditor expanded="true" cols="30" rows="8"/>
+								</attribute>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="qualifier">
+			<itemlayout>
+				<attribute name="qualifier" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="AttributePlaceholder" mode="append" icon="images/ext/print/toolbar_placeholder_attribute.gif">
+		<organizer>
+			<search autoperform="true" mode="append">
+				<condition attribute="attributeQualifierPath" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="qualifier" width="180" />
+						<attribute name="placeholderTemplate" width="280" />
+						<attribute name="attributeQualifierPath" width="150"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="append">
+					<columnlayout>
+						<row>
+							<attribute name="attributeQualifierPath"/>
+							<attribute name="attributeDescriptorList"></attribute>
+						</row>
+					</columnlayout>
+				</essentials>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ClassificationAttributePlaceholder" mode="append" icon="images/ext/print/toolbar_placeholder_classification.gif">
+		<organizer>
+			<search autoperform="true" mode="append">
+				<condition attribute="classAttributeAssignment" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="qualifier" width="180" />
+						<attribute name="placeholderTemplate" width="280" />
+						<attribute name="classAttributeAssignment" width="300"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="append">
+					<columnlayout>
+						<row>
+							<attribute name="classAttributeAssignment" />
+							<void />
+						</row>
+					</columnlayout>
+				</essentials>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ExpressionPlaceholder" mode="append" icon="images/ext/print/toolbar_placeholder_expression.gif">
+		<organizer>
+			<search autoperform="true" mode="append">
+				<condition attribute="getExpression" operator="contains" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="qualifier" width="180" />
+						<attribute name="placeholderTemplate" width="280" />
+						<attribute name="getExpression" width="150"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="properties">
+					<section name="properties">
+						<columnlayout>
+							<row>
+								<attribute name="getExpression">
+									<textareaeditor expanded="true" rows="10" cols="80" />
+								</attribute>
+								<attribute name="setExpression">
+									<textareaeditor expanded="true" rows="10" cols="80" />
+								</attribute>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="TablePlaceholder" mode="append" icon="images/ext/print/toolbar_placeholder_custom.gif">
+		<organizer>
+			<search autoperform="true" mode="append">
+				<condition attribute="table" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="qualifier" width="180" />
+						<attribute name="table" width="150" />
+						<attribute name="placeholderTemplate" width="280" />
+						<attribute name="itemParameter" width="150"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="append">
+					<columnlayout>
+						<row>
+							<attribute name="table"/>
+							<attribute name="itemParameter"></attribute>
+						</row>
+					</columnlayout>
+				</essentials>
+			</editor>
+		</organizer>
+	</type>
+
+   <type name="Category" mode="append">
+      <organizer>
+         <result>
+            <treeview>
+               <explorable>
+                  <attribute name="contentBlocks" suppressroot="true"/>
+               </explorable>
+            </treeview>
+         </result>
+        <editor>
+        	 <tab name="tab.structure">
+          	<section name="section.subcategoriesandproducts">
+            	<listlayout>
+               	<attribute name="contentblocks">
+                  	<referencecollectioneditor autoperform="true" resortable="true" add="true" remove="true" create="true" showsearcheditor="true">
+                     	<preset sourceattribute="catalogVersion" targetattribute="catalogVersion"/>
+                        <itemlayout>
+                        	<attribute name="code" width="180"/>
+                           <attribute name="catalogversion" width="187"/>
+								</itemlayout>
+                     </referencecollectioneditor>
+                 </attribute>
+              </listlayout>
+          	</section>
+         </tab>
+      </editor>
+      </organizer>
+   </type>
+   
+   <type name="ContentBlock" mode="append" icon="images/ext/print/e_contentblock.gif">
+		<organizer>
+			<search autoperform="true" mode="replace">
+				<condition attribute="code" operator="contains" />
+				<condition attribute="name" operator="contains" />
+				<condition attribute="catalogversion" operator="contains" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="code" width="150" />
+						<attribute name="name" width="200"/>
+						<attribute name="catalogversion" width="344"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="replace">
+					<columnlayout>
+						<row>
+							<attribute name="code" />
+							<attribute name="name" />
+						</row>
+						<row>
+							<attribute name="catalogversion" />
+							<void />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="tab.contentblock.properties">
+					<section name="section.contentblock.categories">
+						<listlayout>
+							<attribute name="categories" width="595">
+								<referencecollectioneditor autoperform="true" showsearcheditor="true">
+									<itemlayout>
+										<attribute name="code" width="150" />
+										<attribute name="name" width="150" />
+										<attribute name="catalogVersion" width="150" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="code">
+			<itemlayout>
+				<attribute name="name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="TextBlock" mode="append" icon="images/ext/print/toolbar_textblock.gif">
+		<organizer>
+			<search mode="append">
+				<condition attribute="text" operator="contains" />
+			</search>
+			<editor>
+				<tab name="tab.contentblock.properties">
+					<section name="section.contentblock.content">
+						<listlayout>
+							<attribute name="text" width="595">
+								<customeditor classname="de.hybris.platform.print.hmc.attribute.StyleWysiwygEditorChip" />
+							</attribute>
+							<attribute name="renderedContent">
+								<specialeditor classname="de.hybris.platform.print.hmc.attribute.ContentBlockPreviewChip"/>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ImageBlock" mode="append" icon="images/ext/print/toolbar_imageblock.gif">
+		<organizer>
+			<editor>
+				<tab name="tab.contentblock.properties">
+					<section name="section.contentblock.content">
+						<listlayout>
+							<attribute name="image" width="595">
+								<mediaeditor />
+							</attribute>
+							<attribute name="caption" width="595" />
+							<attribute name="renderedContent">
+								<specialeditor classname="de.hybris.platform.print.hmc.attribute.ContentBlockPreviewChip"/>
+							</attribute>							
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="TableBlock" mode="append" icon="images/ext/print/toolbar_tableblock.gif">
+		<organizer>
+			<editor>
+				<exclude>
+					<exclusion attribute="allTableTemplates"/>
+					<exclusion attribute="rows"/>
+					<exclusion attribute="columns"/>
+					<exclusion attribute="tableStyle"/>
+					<exclusion attribute="width"/>
+					<exclusion attribute="widthType"/>
+					<exclusion attribute="headerRowCount"/>
+					<exclusion attribute="footerRowCount"/>
+					<exclusion attribute="locked"/>
+				</exclude>
+				<tab name="tab.contentblock.properties">
+					<section name="section.contentblock.content">
+						<listlayout>
+							<attribute name="isTemplate" />
+							<attribute name="tableTemplate" />
+							<attribute name="renderedContent">
+								<specialeditor classname="de.hybris.platform.print.hmc.attribute.ContentBlockPreviewChip"/>
+							</attribute>							
+							<action type="item"
+									classname="de.hybris.platform.print.hmc.action.OpenTableEditorAction"
+									name="print.action.opentableeditor"
+									icon="images/icons/header_open_alt_main.gif"
+									disabledicon="images/icons/header_open_alt_inactive_main.gif"
+									toolbaricon="images/icons/header_open_alt.gif"
+									showtoolbarlabel="true" 
+									hidebutton="true" />			
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="TOCBlock" mode="append">
+		<organizer>
+			<editor>
+				<tab name="tab.contentblock.properties">
+					<section name="section.contentblock.content">
+						<listlayout>
+							<attribute name="tocstyle" width="595" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="AutoCometJob" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="id" operator="contains" />
+				<condition attribute="name" operator="contains" />
+				<condition attribute="startTime" />
+				<condition attribute="endTime" />
+				<condition attribute="statusId" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="id" width="50" />
+						<attribute name="name" width="260" />
+						<attribute name="startTime" width="110" />
+						<attribute name="endTime" width="110" />
+						<attribute name="statusId" width="60" />
+						<attribute name="pdfPreset" width="150" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="replace">
+					<listlayout>
+						<attribute name="id" />
+						<attribute name="name" />
+					</listlayout>
+				</essentials>
+				<tab name="common" position="0" mode="replace">
+					<section name="print.autocometjob.details">
+						<listlayout>
+							<attribute name="command" />
+							<attribute name="commandId" />
+							<attribute name="objectId" />
+							<attribute name="pdfPreset" />
+							<attribute name="clientLanguage" />
+							<attribute name="configuration" />
+							<attribute name="contextitem" />
+							<attribute name="destroyJob"/>
+						</listlayout>
+					</section>
+					<section name="print.autocometjob.template">
+						<listlayout>
+							<attribute name="serverTemplatePath" width="516"/>	
+							<attribute name="templateFileName" width="516"/>
+							<attribute name="templatePath" width="516"/>
+						</listlayout>
+					</section>
+					<section name="print.autocometjob.object">
+						<listlayout>
+							<attribute name="serverWorkingPath" width="516"/>
+							<attribute name="objectFileNameInternal" width="516"/>
+							<attribute name="objectFileName" width="516"/>
+							<attribute name="objectPath" width="516"/>
+						</listlayout>
+					</section>
+					<section name="print.autocometjob.executiondetails">
+						<listlayout>
+							<attribute name="startTime" />
+							<attribute name="endTime" />
+							<attribute name="duration" />
+							<attribute name="statusId" />
+							<attribute name="delay" />
+							<attribute name="doAgain" />
+							<attribute name="priority" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="id" />
+				<attribute name="name" />
+				<attribute name="statusId" />
+				<attribute name="startTime" />
+				<attribute name="endTime" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="Hotfolder" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="id" operator="contains" />
+				<condition attribute="inFolder" />
+				<condition attribute="outFolder" />
+				<condition attribute="errorFolder" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="id" width="75"/>
+						<attribute name="inFolder" width="75"/>
+						<attribute name="outFolder" width="100"/>
+						<attribute name="errorFolder" width="100"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="replace">
+					<listlayout>
+						<attribute name="id"></attribute>
+					</listlayout>
+				</essentials>
+				<tab name="common" position="0" mode="replace">
+					<section name="print.comet.directories">
+						<listlayout>
+							<attribute name="inFolder" />
+							<attribute name="outFolder" />
+							<attribute name="errorFolder" />
+						</listlayout>
+					</section>
+					<section name="print.comet.details">
+						<listlayout>
+							<attribute name="command" />
+							<attribute name="commandId" />
+							<attribute name="parameter" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CometConfiguration" mode="replace">
+		<organizer>
+			<search autoperform="true">
+				<condition attribute="code" operator="contains" />
+				<condition attribute="name" operator="contains" />
+				<condition attribute="publicationController" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="code" width="150" />
+						<attribute name="name" width="150" />
+						<attribute name="defaultConfiguration" width="50" title="cometconfiguration.defaultconfig.title"/>
+						<attribute name="publicationController" width="150" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<exclude>
+					<exclusion attribute="allDocuments" />
+					<exclusion attribute="configurationfiles" /><!-- see shortcut shortcut.cometconfiguration.configurationfiles -->
+					<exclusion attribute="actions" /><!-- see shortcut shortcut.cometconfiguration.actions -->
+					<exclusion attribute="placeholdertemplates" />
+					<exclusion attribute="placeholders" />
+					<exclusion attribute="grids" />
+					<exclusion attribute="layouttemplates" />
+					<exclusion attribute="assignedCockpitItemTemplates"/>
+					<exclusion attribute="customLinkQualifier"/>
+				</exclude>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="code"/>
+							<attribute name="publicationController" />
+						</row>
+					</columnlayout>
+				</essentials>
+
+				<tab name="tab.common">
+					<section name="cometconfiguration.settings_and_path.section">
+						<listlayout>
+							<attribute name="defaultConfiguration" />
+							<attribute name="name" />
+							<attribute name="imageRoot" width="516"/>
+							<attribute name="serverTemplatePath" width="516"/>
+							<attribute name="serverWorkingPath" width="516"/>
+							<attribute name="defaultDeleteAutoCometJob"/>
+							<attribute name="previewHistoryCount" width="60"/>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="cometconfiguration.tab.placeholder_and_templates">
+					<section name="cometconfiguration.includeditems">
+						<table>
+							<tr>
+								<td colspan="3">
+									<inlineshortcut name="shortcut.cometconfiguration.placeholdertemplates_attributename" type="PlaceholderTemplate">
+										<preset targetattribute="cometConfig"/>
+										<itemlayout>
+											<attribute name="code" width="255"/>
+											<attribute name="type" width="255"/>
+										</itemlayout>
+									</inlineshortcut>
+								</td>
+							</tr>
+							<tr>
+								<td width="150"></td>
+								<td colspan="1" width="150">
+									<shortcut name="shortcut.cometconfiguration.showall_placeholdertemplates" type="PlaceholderTemplate" usage="finder" autoperform="true" >
+										<preset targetattribute="cometConfig"/>
+									</shortcut>
+								</td>
+								<td></td>
+							</tr>
+							<tr><td><text name="text.empty"/></td></tr>
+							<tr>
+								<td colspan="3">
+									<inlineshortcut name="shortcut.cometconfiguration.placeholders_attributename" type="Placeholder">
+										<preset targetattribute="cometConfig"/>
+										<itemlayout>
+											<attribute name="qualifier" width="170"/>
+											<attribute name="placeholderType" width="120"/>
+											<attribute name="placeholderTemplate" width="220"/>
+										</itemlayout>
+									</inlineshortcut>
+								</td>
+							</tr>
+							<tr>
+								<td width="150"></td>
+								<td colspan="1" width="150">
+									<shortcut name="shortcut.cometconfiguration.showall_placeholders" type="Placeholder" usage="finder" autoperform="true" >
+										<preset targetattribute="cometConfig"/>
+									</shortcut>
+								</td>
+								<td></td>
+							</tr>
+							<tr><td><text name="text.empty2"/></td></tr>
+							<tr>
+								<td colspan="3">
+									<inlineshortcut name="shortcut.cometconfiguration.grids_attributename" type="Grid">
+										<preset targetattribute="cometConfig"/>
+										<itemlayout>
+											<attribute name="previewImageUrl" width="170">
+												<display classname="de.hybris.platform.hmc.attribute.UrlAsImageDisplayChip">
+													<parameter key="height" value="30"/>
+												</display>
+											</attribute>
+											<attribute name="id" width="170"/>
+											<attribute name="name" width="170"/>
+										</itemlayout>
+									</inlineshortcut>
+								</td>
+							</tr>
+							<tr>
+								<td width="150"></td>
+								<td width="150">
+									<shortcut name="shortcut.cometconfiguration.showall_grids" type="Grid" usage="finder" autoperform="true" >
+										<preset targetattribute="cometConfig"/>
+									</shortcut>
+								</td>
+								<td></td>
+							</tr>
+							<tr><td><text name="text.empty3"/></td></tr>
+							<tr>
+								<td colspan="3">
+									<inlineshortcut name="shortcut.cometconfiguration.layouttemplates_attributename" type="LayoutTemplate">
+										<preset targetattribute="cometConfig"/>
+										<itemlayout>
+											<attribute name="previewImageUrl" width="170">
+												<display classname="de.hybris.platform.hmc.attribute.UrlAsImageDisplayChip">
+													<parameter key="height" value="30"/>
+												</display>
+											</attribute>
+											<attribute name="code" width="170"/>
+											<attribute name="id" width="170"/>
+										</itemlayout>
+									</inlineshortcut>
+								</td>
+							</tr>
+							<tr>
+								<td width="150"></td>
+								<td colspan="1" width="150">
+									<shortcut name="shortcut.cometconfiguration.showall_layouttemplates" type="LayoutTemplate" usage="finder" autoperform="true" >
+										<preset targetattribute="cometConfig"/>
+									</shortcut>
+								</td>
+								<td></td>
+							</tr>
+							<tr>
+								<td colspan="3">
+									<inlineshortcut name="shortcut.cometconfiguration.actions" type="Action">
+										<preset targetattribute="cometConfig"/>
+										<itemlayout>
+											<attribute name="id" width="90"/>
+											<attribute name="name" width="200"/>
+											<attribute name="classId" width="110"/>
+											<attribute name="actionType" width="110"/>
+										</itemlayout>
+									</inlineshortcut>
+								</td>
+							</tr>
+							<tr>
+								<td width="150"></td>
+								<td colspan="1" width="150">
+									<shortcut name="shortcut.cometconfiguration.showall_actions" type="Action" usage="finder" autoperform="true">
+										<preset targetattribute="cometConfig"/>
+									</shortcut>
+								</td>
+								<td></td>
+							</tr>
+						</table>
+					</section>
+				</tab>
+				<tab name="cometconfiguration.tab.translatorsettings">
+					<section name="cometconfiguration.section.translatorsettings">
+						<table>
+							<tr>
+								<td colspan="3">
+									<attribute name="translatorConfiguration" />
+								</td>
+							</tr>
+							<tr>
+								<td colspan="3">
+									<inlineshortcut name="shortcut.cometconfiguration.configurationfiles" type="CometFile">
+										<preset targetattribute="configuration"/>
+										<itemlayout>
+											<attribute name="code" width="170"/>
+											<attribute name="realfilename" width="170"/>
+											<attribute name="mime" width="170"/>
+										</itemlayout>
+									</inlineshortcut>
+								</td>
+							</tr>
+							<tr>
+								<td width="150"></td>
+								<td width="150">
+									<shortcut name="shortcut.cometconfiguration.showall_configurationfiles" type="CometFile" usage="finder" autoperform="true" >
+										<preset targetattribute="configuration"/>
+									</shortcut>
+								</td>
+								<td></td>
+							</tr>
+						</table>
+					</section>
+					<section name="tab.testconfiguration">
+                 		<listlayout> 
+                  			<text name="tab.testconfiguration.description"/>                    
+                     			<customchip classname="de.hybris.platform.print.hmc.attribute.TranslatorConfigurationPreviewChip">
+			                     	<parameter key="width" value="224"/>
+			                     	<parameter key="rows" value="15"/>
+			                     	<parameter key="cols" value="120"/>
+                     			</customchip>		
+				  		</listlayout>
+				  		
+						<table>
+							<tr>
+								<td width="16px" />
+								<td>
+									<action type="item"
+											classname="de.hybris.platform.print.hmc.ExportCometConfigurationAction"
+											name="print.action.exportcometconfigurationaction"
+											icon="images/ext/print/config_export.gif"
+											disabledicon="images/ext/print/config_export.gif"
+											toolbaricon="images/ext/print/config_export.gif"
+											showtoolbarlabel="true" 
+											hidebutton="true" />
+								</td>
+							</tr>
+						</table>
+				  		
+				  	</section>	
+				</tab>
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code">
+			<itemlayout>
+				<attribute name="name" fallback="code" />
+			</itemlayout>
+		</defaultreference>
+	     <labels>
+	        <label name="create"/>
+	     </labels>		
+	</type>
+
+	<type name="CometFile" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" operator="contains" />
+				<condition attribute="realfilename" operator="contains" />
+				<condition attribute="configuration" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="code" width="150" />
+						<attribute name="realfilename" width="150" />
+						<attribute name="mime" width="150" />
+						<attribute name="configuration" width="150" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.common" position="0">
+					<section name="properties">
+						<listlayout>
+							<attribute name="configuration" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+				<attribute name="realfilename" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="Crossreference" mode="replace">
+		<organizer>
+			<search>
+				<condition attribute="qualifier" operator="contains" />
+				<condition attribute="source" />
+				<condition attribute="target" />
+				<condition attribute="attribute" operator="contains" />
+				<condition attribute="language" />
+				<condition attribute="displayDetails" operator="contains" />
+				<condition attribute="catalogVersion" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="qualifier" width="150" />
+						<attribute name="attribute" width="120" />
+						<attribute name="language" width="100" />
+						<attribute name="displayDetails" width="200" />
+						<attribute name="catalogVersion" width="334"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.common">
+					<section name="properties">
+						<listlayout>
+							<attribute name="catalogVersion" />
+							<attribute name="qualifier" />
+							<attribute name="source" />
+							<attribute name="target" />
+							<attribute name="attribute" />
+							<attribute name="language" />
+							<attribute name="displayDetails" />
+							<attribute name="indesignReplacementType" />
+							<attribute name="id" />
+						</listlayout>
+					</section>
+				</tab>
+				<tabref idref="tab_administration" />
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="qualifier">
+			<itemlayout>
+				<attribute name="qualifier" />
+				<attribute name="attribute" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+  <type name="Principal" mode="append">
+      <organizer>
+         <editor>
+            <tab name="tab.personalization" mode="append">
+               <section name="section.printelements.rights">
+                  <listlayout>
+                     <attribute name="writePublication">
+                     	<referencecollectioneditor showsearcheditor="true">
+                     	</referencecollectioneditor>
+                     </attribute>
+                     <attribute name="readPublication">
+                     	<referencecollectioneditor showsearcheditor="true">
+                     	</referencecollectioneditor>
+                     </attribute>
+                     <attribute name="writePublicationComponent">
+                     	<referencecollectioneditor showsearcheditor="true">
+                     	</referencecollectioneditor>
+                     </attribute>
+                     <attribute name="readPublicationComponent">
+                     	<referencecollectioneditor showsearcheditor="true">
+                     	</referencecollectioneditor>
+                     </attribute>
+                  </listlayout>
+               </section>	
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+   	
+</configuration>

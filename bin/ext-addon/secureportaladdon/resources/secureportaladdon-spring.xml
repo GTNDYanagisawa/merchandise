@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+<bean id="secureCustomerPortalCoreDataImportedEventListener" parent="abstractCoreDataImportedEventListener">
+		<property name="supportedChannels">
+			<list value-type="de.hybris.platform.commerceservices.enums.SiteChannel">
+				<value>B2B</value>
+			</list>
+		</property>
+		<property name="addonExtensionMetadata">
+			<bean class="de.hybris.platform.addonsupport.data.AddonExtensionMetadata">
+				<property name="baseExtensionName" value="secureportaladdon" />
+			</bean>
+		</property>
+	</bean>
+
+	<!--
+		The EmailContext class to use when generating emails 
+	-->
+	<bean id="b2bRegistrationEmailContext" class="de.hybris.platform.secureportaladdon.email.context.B2BRegistrationEmailContext" parent="abstractEmailContext" scope="prototype"/>
+	<bean id="b2bRegistrationApprovedEmailContext" class="de.hybris.platform.secureportaladdon.email.context.B2BRegistrationApprovedEmailContext" parent="b2bRegistrationEmailContext" scope="prototype"/>
+	<bean id="b2bRegistrationRejectedEmailContext" class="de.hybris.platform.secureportaladdon.email.context.B2BRegistrationRejectedEmailContext" parent="b2bRegistrationEmailContext" scope="prototype"/>							
+	
+	<!--  
+		The process actions to generate the different emails. The frontendTemplateName property refers to the name of the email template 
+		as defined within the email-context.impex file  
+	-->
+    <bean id="b2bRegistrationPendingApprovalGenerateEmailAction" 
+    		class="de.hybris.platform.secureportaladdon.email.process.actions.RegistrationPendingApprovalGenerateEmailAction" 
+    		parent="abstractGenerateEmailAction">
+   		<property name="frontendTemplateName" value="RegistrationPendingApprovalEmailTemplate"/>
+   		<property name="registrationService" ref="b2bRegistrationService"/>
+   	</bean>
+   	
+    <bean id="b2bRegistrationReceivedGenerateEmailAction" parent="abstractGenerateEmailAction">
+    	<property name="frontendTemplateName" value="RegistrationReceivedEmailTemplate"/>
+   	</bean>
+   	
+    <bean id="b2bRegistrationApprovedGenerateEmailAction" parent="abstractGenerateEmailAction">
+    	<property name="frontendTemplateName" value="RegistrationApprovedEmailTemplate"/>
+   	</bean>
+   	
+    <bean id="b2bRegistrationRejectedGenerateEmailAction" parent="abstractGenerateEmailAction">
+    	<property name="frontendTemplateName" value="RegistrationRejectedEmailTemplate"/>
+   	</bean>   	   	
+	
+	<bean id="b2bRegistrationApprovedCleanupAction" class="de.hybris.platform.secureportaladdon.email.process.actions.RegistrationCleanupAction" parent="abstractAction">
+		<property name="modelService" ref="modelService"/> 
+	</bean>
+	
+	<bean id="b2bRegistrationRejectedCleanupAction" class="de.hybris.platform.secureportaladdon.email.process.actions.RegistrationCleanupAction">
+		<property name="modelService" ref="modelService"/>
+		<property name="deleteCustomer" value="true"/>
+	</bean>	
+	
+   	<!-- 
+   		Process definitions
+   	 -->	
+	<bean id="b2bRegistrationPendingApprovingEmailProcess" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource" >
+		<property name="resource" value="classpath:/secureportaladdon/processes/registrationPendingApprovalEmailProcess.xml"/>
+	</bean>
+	
+	<bean id="b2bRegistrationReceivedEmailProcess" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource" >
+		<property name="resource" value="classpath:/secureportaladdon/processes/registrationReceivedEmailProcess.xml"/>
+	</bean>
+	
+	<bean id="b2bRegistrationApprovedEmailProcess" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource" >
+		<property name="resource" value="classpath:/secureportaladdon/processes/registrationApprovedEmailProcess.xml"/>
+	</bean>
+	
+	<bean id="b2bRegistrationRejectedEmailProcess" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource" >
+		<property name="resource" value="classpath:/secureportaladdon/processes/registrationRejectedEmailProcess.xml"/>
+	</bean>			
+	
+	<!-- 
+		Workflows specific beans called by each automated-action (to send emails)
+	 -->	
+	<bean id="b2bAbstractAutomatedWorkflowTemplateJob" class="de.hybris.platform.secureportaladdon.workflows.actions.AbstractAutomatedWorkflowTemplateJob" abstract="true">
+		<property name="businessProcessService" ref="businessProcessService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="workflowAttachmentService" ref="workflowAttachmentService"/>
+		<property name="userService" ref="userService"/>				
+	</bean>
+	
+	<bean id="b2bSendEmailAutomatedWorkflowTemplateJob" class="de.hybris.platform.secureportaladdon.workflows.actions.SendEmailAutomatedWorkflowTemplateJob" abstract="true" parent="b2bAbstractAutomatedWorkflowTemplateJob"/>
+	
+	<bean id="b2bRegistrationPendingApprovalSendEmailAutomatedWorkflowTemplateJob" parent="b2bSendEmailAutomatedWorkflowTemplateJob">
+		<property name="processDefinitionName" value="b2bRegistrationPendingApprovalEmailProcess"/>
+	</bean>
+
+	<bean id="b2bRegistrationReceivedSendEmailAutomatedWorkflowTemplateJob" parent="b2bSendEmailAutomatedWorkflowTemplateJob">
+		<property name="processDefinitionName" value="b2bRegistrationReceivedEmailProcess"/>
+	</bean>
+
+	<bean id="b2bRegistrationApprovedSendEmailAutomatedWorkflowTemplateJob"
+		parent="b2bSendEmailAutomatedWorkflowTemplateJob"
+		class="de.hybris.platform.secureportaladdon.workflows.actions.SendApprovedEmailAutomatedWorkflowTemplateJob">
+		<property name="secureTokenService" ref="secureTokenService" />
+		<property name="processDefinitionName" value="b2bRegistrationApprovedEmailProcess" />
+	</bean>
+
+	<bean id="b2bRegistrationRejectedSendEmailAutomatedWorkflowTemplateJob"
+		parent="b2bSendEmailAutomatedWorkflowTemplateJob"
+		class="de.hybris.platform.secureportaladdon.workflows.actions.SendRejectedEmailAutomatedWorkflowTemplateJob">
+		<property name="processDefinitionName" value="b2bRegistrationRejectedEmailProcess" />
+	</bean>			
+
+	<bean id="b2bRegistrationApprovedAutomatedWorkflowTemplateJob" class="de.hybris.platform.secureportaladdon.workflows.actions.RegistrationApprovedAutomatedWorkflowTemplateJob" parent="b2bAbstractAutomatedWorkflowTemplateJob"/>
+			
+	<bean id="b2bRegistrationRejectedAutomatedWorkflowTemplateJob" class="de.hybris.platform.secureportaladdon.workflows.actions.RegistrationRejectedAutomatedWorkflowTemplateJob" parent="b2bAbstractAutomatedWorkflowTemplateJob"/>	
+		
+	<!-- 
+		Facades 
+	-->
+	<bean id="b2bRegistrationFacade" class="de.hybris.platform.secureportaladdon.facades.impl.DefaultB2BRegistrationFacade">
+		<property name="cmsSiteService" ref="cmsSiteService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="userService" ref="userService"/>
+		<property name="workflowTemplateService" ref="workflowTemplateService"/>		
+		<property name="b2bRegistrationWorkflowFacade" ref="b2bRegistrationWorkflowFacade"/>
+	</bean>	
+	
+	<bean id="b2bRegistrationWorkflowFacade" class="de.hybris.platform.secureportaladdon.facades.impl.DefautB2BRegistrationWorkflowFacade">
+		<property name="workflowService" ref="newestWorkflowService"/>
+		<property name="workflowProcessingService" ref="workflowProcessingService"/>
+		<property name="userService" ref="userService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>	
+	
+	<!-- 
+		Services 
+	-->
+	<bean id="b2bRegistrationService" class="de.hybris.platform.secureportaladdon.services.impl.DefaultB2BRegistrationService">
+		<property name="registrationDao" ref="b2bRegistrationDao"/>	
+		<property name="emailService" ref="emailService"/>		
+	</bean>
+	
+	<!-- 
+		Daos 
+	-->
+	<bean id="b2bRegistrationDao" class="de.hybris.platform.secureportaladdon.dao.impl.DefaultB2BRegistrationDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>		
+
+	<bean id="secureportalInitialDataSystemSetup" class="de.hybris.platform.secureportaladdon.setup.InitialDataSystemSetup"  parent="abstractCoreSystemSetup"/>
+
+    <bean id="cmsSecurePortalRestrictionEvaluator" class="de.hybris.platform.secureportaladdon.services.evaluator.impl.CMSSecurePortalRestrictionEvaluator"
+          scope="tenant">
+        <property name="cmsSiteService" ref="cmsSiteService"/>
+    </bean>
+
+    <bean id="cmsSecurePortalRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping"
+          scope="tenant">
+        <property name="restrictionTypeCode" value="CMSSecurePortalRestriction" />
+        <property name="restrictionEvaluator" ref="cmsSecurePortalRestrictionEvaluator" />
+    </bean>
+
+    <bean id="cmsSecurePortalRestrictionDynamicDescription" class="de.hybris.platform.secureportaladdon.model.restrictions.CMSSecurePortalDynamicDescription" />
+
+</beans>

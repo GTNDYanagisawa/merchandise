@@ -1,0 +1,423 @@
+*** Settings ***
+Test Setup        import commercecart sampledata
+Test Teardown     reset system
+Resource          commerce/CommerceServices_Keywords.txt
+Resource		  commerce/SubscriptionCommerce_Keywords.txt
+Resource          subscriptionservices/SubscriptionProduct_Keywords.txt
+Resource          subscriptionservices/SubscriptionPricePlan_Keywords.txt
+
+
+*** Test Cases ***
+Test_Cart_Calculation_Recurring_Charge_CycleFrom0To_OneProduct
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20" with cycle start "0"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20" 
+    for billing event "monthly" verify discount price of "0.00" 
+    verify that cart total is "0"   
+    
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To_OneProduct
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20.99"   
+    for billing event "monthly" verify discount price of "0.00" 
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To1_From2To_OneProduct
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00"
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To1_From2To2_From3To3_OneProduct
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "3" and cycle end "3"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "30.00"    
+    verify that cart total is "0"
+        
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To1_From2To2_From3To4_OneProduct
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "3" and cycle end "4"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "30.00"     
+    verify that cart total is "0" 
+    
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To3_From4To6_OneProduct
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "6"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "20.00"   
+    verify that cart total is "0"  
+    
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To3_From4To4_OneProduct
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "20.00" 
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To3_From4To4_From5To_OneProduct
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "5"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "30.00"  
+    verify that cart total is "0"  
+
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To_TwoProducts
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20" with cycle start "1"
+    create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"     
+    for subscription priceplan "PP2" add recurring charge of "20" with cycle start "1"
+    add product "P1" to cart
+    add product "P2" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "40" 
+    verify that cart total is "0"   
+    
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To1_From2To_TwoProducts
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    create subscription product "P2" 
+    for product "P2" add subscription priceplan "PP2" with currency "USD"     
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP2" add recurring charge of "32.99" with cycle start "2"
+    add product "P1" to cart
+    add product "P2" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "42.98"
+    for billing event "monthly" verify discount price of "21.00"
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To1_From2To2_From3To3_TwoProducts
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "3" and cycle end "3"
+    create subscription product "P2" 
+    for product "P2" add subscription priceplan "PP2" with currency "USD"     
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP2" add recurring charge of "42.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP2" add recurring charge of "53.99" with cycle start "3" and cycle end "3"
+    add product "P1" to cart
+    add product "P2" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "42.98"
+    for billing event "monthly" verify discount price of "62.00"    
+    verify that cart total is "0"
+        
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To1_From2To2_From3To4_TwoProducts
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "3" and cycle end "4"    
+    create subscription product "P2" 
+    for product "P2" add subscription priceplan "PP2" with currency "USD"     
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP2" add recurring charge of "42.99" with cycle start "2" and cycle end "2"
+    for subscription priceplan "PP2" add recurring charge of "53.99" with cycle start "3" and cycle end "4"
+    add product "P1" to cart
+    add product "P2" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "42.98"
+    for billing event "monthly" verify discount price of "62.00"      
+    verify that cart total is "0" 
+    
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To3_From4To6_TwoProducts
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "6"
+    create subscription product "P2" 
+    for product "P2" add subscription priceplan "PP2" with currency "USD"     
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP2" add recurring charge of "42.99" with cycle start "4" and cycle end "6"
+    add product "P1" to cart
+    add product "P2" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "42.98"
+    for billing event "monthly" verify discount price of "41.00"     
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To3_From4To4_TwoProducts
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    create subscription product "P2" 
+    for product "P2" add subscription priceplan "PP2" with currency "USD"     
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP2" add recurring charge of "42.99" with cycle start "4" and cycle end "4"
+    add product "P1" to cart
+    add product "P2" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "42.98"
+    for billing event "monthly" verify discount price of "41.00" 
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To3_From4To4_From5To_TwoProducts
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "5"
+    create subscription product "P2" 
+    for product "P2" add subscription priceplan "PP2" with currency "USD"     
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP2" add recurring charge of "42.99" with cycle start "4" and cycle end "4"
+    for subscription priceplan "PP2" add recurring charge of "53.99" with cycle start "5"
+    add product "P1" to cart
+    add product "P2" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "42.98"
+    for billing event "monthly" verify discount price of "62.00"  
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_Recurring_Charge_CycleFrom1To1_From2To_OneProductx2
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00"
+    verify that cart total is "0"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "41.98"
+    for billing event "monthly" verify discount price of "20.00"
+    verify that cart total is "0"
+        
+Test_Cart_Calculation_Recurring_Charge_DifferentCycleRanges_ThreeProducts
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "5"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "30.00"   
+    verify that cart total is "0"
+    create subscription product "P2" 
+    for product "P2" add subscription priceplan "PP2" with currency "USD"     
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP2" add recurring charge of "42.99" with cycle start "2" and cycle end "3"
+    add product "P2" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "42.98"
+    for billing event "monthly" verify discount price of "51.00" 
+    verify that cart total is "0" 
+    create subscription product "P3" 
+    for product "P3" add subscription priceplan "PP3" with currency "USD"     
+    for subscription priceplan "PP3" add recurring charge of "25.99" with cycle start "1" and cycle end "4"
+    for subscription priceplan "PP3" add recurring charge of "46.99" with cycle start "5" and cycle end "5"
+    for subscription priceplan "PP3" add recurring charge of "57.99" with cycle start "6"
+    verify that cart total is "0"
+    add product "P3" to cart
+    verify that cart total for "monthly" is "68.97"
+    for billing event "monthly" verify discount price of "83.00"  
+    verify that cart total is "0"
+    add product "P1" to cart
+    add product "P2" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "111.95"
+    for billing event "monthly" verify discount price of "134.00"
+    verify that cart total is "0" 
+    add product "P1" to cart
+    add product "P3" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "158.93"
+    for billing event "monthly" verify discount price of "196.00"  
+    verify that cart total is "0"   
+    
+    ########### removing from cart
+    
+    
+Test_Cart_Calculation_Recurring_Charge_Removing_OneProductx1
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20" with cycle start "0"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20" 
+    for billing event "monthly" verify discount price of "0.00" 
+    verify that cart total is "0"
+    remove product "P1" from cart
+    verify that number of child carts is "0"
+    verify that cart total is "0"    
+    remove product "P1" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    
+Test_Cart_Calculation_Recurring_Charge_Removing_OneProductx2
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20" with cycle start "0"
+    add product "P1" to cart
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "40" 
+    for billing event "monthly" verify discount price of "0.00" 
+    verify that cart total is "0"
+    remove product "P1" from cart
+    verify that number of child carts is "1"
+    verify that cart total is "0"
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20" 
+    for billing event "monthly" verify discount price of "0.00" 
+    verify that cart total is "0"   
+    remove product "P1" from cart 
+    verify that number of child carts is "0"
+    verify that cart total is "0"
+    remove product "P1" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+
+Test_Cart_Calculation_Recurring_Charge_RemovingAddingRemoving_OneProductx1
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    for subscription priceplan "PP1" add recurring charge of "20" with cycle start "0"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20" 
+    for billing event "monthly" verify discount price of "0.00" 
+    verify that cart total is "0"
+    remove product "P1" from cart
+    verify that number of child carts is "0"
+    verify that cart total is "0"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20" 
+    for billing event "monthly" verify discount price of "0.00" 
+    verify that cart total is "0"
+    remove product "P1" from cart
+    verify that number of child carts is "0"
+    verify that cart total is "0"
+    remove product "P1" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+        
+Test_Cart_Calculation_Recurring_Charge_Removing_Complex
+    [Documentation]    This test case creates a subscription product with a recurring charge entry
+    create subscription product "P1" 
+    for product "P1" add subscription priceplan "PP1" with currency "USD"           
+    create subscription product "P2" 
+    for product "P2" add subscription priceplan "PP2" with currency "USD"             
+    create subscription product "P3" 
+    for product "P3" add subscription priceplan "PP3" with currency "USD"  
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "5"
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP2" add recurring charge of "42.99" with cycle start "2" and cycle end "3" 
+    for subscription priceplan "PP3" add recurring charge of "25.99" with cycle start "1" and cycle end "4"
+    for subscription priceplan "PP3" add recurring charge of "46.99" with cycle start "5" and cycle end "5"
+    for subscription priceplan "PP3" add recurring charge of "57.99" with cycle start "6"   
+    add product "P1" to cart 
+    add product "P1" to cart 
+    add product "P1" to cart
+    add product "P2" to cart
+    add product "P2" to cart  
+    add product "P3" to cart    
+    add product "P3" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "158.93"
+    for billing event "monthly" verify discount price of "196.00"  
+    verify that cart total is "0"    
+    remove product "P2" from cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "136.94"
+    for billing event "monthly" verify discount price of "175.00"  
+    verify that cart total is "0" 
+    remove product "P3" from cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "110.95"
+    for billing event "monthly" verify discount price of "143.00"  
+    verify that cart total is "0"  
+    remove product "P2" from cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "88.96"
+    for billing event "monthly" verify discount price of "122.00"  
+    verify that cart total is "0"  
+    remove product "P1" from cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "67.97"
+    for billing event "monthly" verify discount price of "92.00"  
+    verify that cart total is "0" 
+    remove product "P3" from cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "41.98"
+    for billing event "monthly" verify discount price of "60.00"  
+    verify that cart total is "0"  
+    remove product "P1" from cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "30.00"  
+    verify that cart total is "0"  
+    remove product "P1" from cart
+    verify that number of child carts is "0"
+    verify that cart total is "0"  
+    remove product "P1" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P2" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P3" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED

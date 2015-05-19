@@ -1,0 +1,16 @@
+*** Settings ***
+Library        	de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Library         de.hybris.platform.entitlementatddtests.keywords.EntitlementKeywordLibrary
+Resource		impex/Impex_Keywords.txt
+
+*** Keywords ***
+create product "${productCode:[^"]+}"
+	[Documentation]      Creates a product with the given code
+	@{binding}           create list    productCode    ${productCode}
+	${templateName} =    Set Variable    impex-templates/product-insert.impex.vm
+	${impEx} =           generate impex from template    ${templateName}    @{binding}
+	import impex "${impEx}" use template "${templateName}"
+
+for product "${productCode}" verify that "${xPath}" evaluates to "${expectedXml}"
+	[Documentation]    Verifies that the XPath evaluates to the expected XML when applied to the given product's XML
+	verify product xml    ${productCode}    ${xPath}    ${expectedXml}

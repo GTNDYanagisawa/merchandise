@@ -1,0 +1,145 @@
+﻿INSERT_UPDATE PlaceholderTemplate;code[unique=true];type(code);displayNamePattern;alternativeMediaExpression;previewTemplate;$cometConfig[unique=true];
+;PageDefault;Page;item.code;
+
+;CategoryDefault;Category;item.code;
+
+;ProductDefault;Product;"name = """"; if (item.name == null) { name = item.code; } else { name = item.name; }";"if(item.thumbnail != null) 
+{ 
+media.add( item.thumbnail );
+}
+if(item.picture != null) 
+{ 
+   media.add(item.picture);
+}
+if(item.getProperty('normal') != null) 
+{ 
+   media.addAll( item.getProperty('normal') );
+}";"<div style=""font-size:0.8em""><img src=""$item.thumbnail.uRL""/><br/>
+<b>$item.name</b><br/>
+</div>
+<div style=""font-size:0.6em"">
+$!item.description 
+$!item.getAttribute( ""remarks"" )<br/>
+</div>";
+
+;TextBlockDefault;TextBlock;"name = """"; if (item.name == null) { name = item.code; } else { name = item.name; }";;"<div style=""font-size:0.9em""><b>$!item.code $!item.name</b><br/></div><br/>
+<div style=""font-size:0.8em"">$!item.text<br/></div>
+";
+
+;ImageBlockDefault;ImageBlock;"name = """"; if (item.name == null) { name = item.code; } else { name = item.name; }";;"<div style=""font-size:0.9em""><b>$!item.code $!item.name</b><br/></div><br/>
+<div style=""font-size:0.8em"">
+#if($item.image)
+<img src=""$item.image.getURL()"" /><br />
+#end
+$!item.caption<br/></div>
+";
+
+;TableBlockDefault;TableBlock;"name = """"; if (item.name == null) { name = item.code; } else { name = item.name; }";;"<div style=""font-size:0.9em""><b>$!item.code $!item.name</b><br/></div><br/>
+<div style=""font-size:0.8em"">
+$!item.renderHTML()<br/></div>
+";
+
+
+
+# ATTENTION:
+# placeholderIDs in the range 900-989 are considered as masterpage frame placeholders. Use them only in conjunction with page related placeholders
+#
+# Use <ignore> tags for pre- and postProcessingExpressions to not set a script but use the default one.
+# if you dont use the <ignore> tag, an empty script is set
+
+INSERT_UPDATE AttributePlaceholder;qualifier[unique=true];$placeholderTemplate;attributeQualifierPath;placeholderType(code)[default='text'];convert[default=false];placeholderID;loadActionID;syncActionID;storeActionID;valueType(code)[default='automatic'];writable[default=true];syncable[default=true];language(isoCode);preProcessingExpression;postProcessingExpression;$cometConfig[unique=true];
+;Product.code;ProductDefault;code;;;100;1001;1002;1003;;;;;<ignore>;<ignore>
+;Product.name;ProductDefault;name;;;110;1101;1102;1103;;;;;<ignore>;<ignore>
+;Product.name_en;ProductDefault;name;;;111;1111;1112;1113;;;;en;<ignore>;<ignore>
+;Product.name_de;ProductDefault;name;;;112;1121;1122;1123;;;;de;<ignore>;<ignore>
+;Product.description;ProductDefault;description;;true;120;1201;1202;1203;;false;;;<ignore>;<ignore>
+;Product.description_en;ProductDefault;description;;true;121;1211;1212;1213;;false;;en;<ignore>;<ignore>
+;Product.description_de;ProductDefault;description;;true;122;1221;1222;1223;;false;;de;<ignore>;<ignore>
+;Product.remarks;ProductDefault;remarks;;true;130;1301;1302;1303;;false;;;<ignore>;<ignore>
+;Product.picture;ProductDefault;picture;imageframe;false;160;1601;1602;1603;media;false;;;<ignore>;<ignore>
+;Product.unit.name;ProductDefault;unit.name;;false;210;211;212;213;text;false;;;<ignore>;<ignore>
+;TextBlock.code;TextBlockDefault;code;;;260;2601;2602;2603;;;;;<ignore>;<ignore>
+;TextBlock.name;TextBlockDefault;name;;;261;2611;2612;2613;;;;;<ignore>;<ignore>
+;TextBlock.text;TextBlockDefault;text;;true;262;2621;2622;2623;;false;;;<ignore>;<ignore>
+;ImageBlock.code;ImageBlockDefault;code;;;270;2701;2702;2703;;;;;<ignore>;<ignore>
+;ImageBlock.name;ImageBlockDefault;name;;;271;2711;2712;2713;;;;;<ignore>;<ignore>
+;ImageBlock.caption;ImageBlockDefault;caption;;;272;2721;2722;2723;;;;;<ignore>;<ignore>
+;ImageBlock.picture;ImageBlockDefault;image;imageframe;false;276;2761;2762;2763;media;false;;;<ignore>;<ignore>
+;Category.code;CategoryDefault;code;;;290;2901;2902;2903;;;;;<ignore>;<ignore>
+;Category.name;CategoryDefault;name;;;291;2911;2912;2913;;;;;<ignore>;<ignore>
+;Category.picture;CategoryDefault;picture;imageframe;false;295;2951;2952;2953;media;false;;;<ignore>;<ignore>
+
+
+INSERT_UPDATE ExpressionPlaceholder;qualifier[unique=true];$placeholderTemplate;getExpression;setExpression;placeholderType(code)[default='text'];convert[default=false];placeholderID;loadActionID;syncActionID;storeActionID;valueType(code)[default='automatic'];writable[default=true];syncable[default=true];language;$cometConfig[unique=true];
+;Product.code:name;ProductDefault;item.composedType.getAttributeDescriptor( 'code' ).name;;;;101;1011;1012;1013;text;false;
+;Product.code_uppercase;ProductDefault;item.code.toUpperCase();;;;102;1021;1022;1023;text;false;
+;Product.name:name;ProductDefault;item.composedType.getAttributeDescriptor( 'name' ).name;;;;113;1131;1132;1133;text;false;
+;Product.description:name;ProductDefault;item.composedType.getAttributeDescriptor( 'description' ).name;;;;123;1231;1232;1233;text;false;
+;Product.picture:name;ProductDefault;item.composedType.getAttributeDescriptor( 'picture' ).name;;;;161;1611;1612;1613;;false;
+;Product.position;ProductDefault;"placement.position + 1";;;;170;1701;1702;1703;;false;
+;Product.bestprice;ProductDefault;"FormatUtils.getPrice( PriceUtils.getPriceContainer( item ).getPrimaryPriceValue() );";;;;180;1801;1802;1803;;false;
+;Product.currency;ProductDefault;de.hybris.platform.jalo.JaloSession.getCurrentSession().getSessionContext().getCurrency().getIsoCode();;;;190;1901;1902;1903;;false;
+;Product.variantsTableName;ProductDefault;"i18nService = ValueUtils.getBean('commonI18NService'); lang = i18nService.getCurrentLanguage().getIsocode(); name = ''; if (lang.equals('en')) { name = 'SIZES TABLE'; } else if (lang.equals('de')) { name = 'GRÖßENTABLE'; } else { name = lang; } name;";;;;200;2001;2002;203;;false;true;
+;Product.variantsAsString;ProductDefault;"name = VariantUtils.getAllVariantAttributeValues(item, true, null, "": "", "", ""); if (name == null) { name = """"; } name;";;;;220;2201;2202;2203;;false;
+;Product.variantsColorAsString;ProductDefault;"name = VariantUtils.getVariantAttributeValue(item, ""color"", true, "": "", "", ""); if (name == null) { name = """"; } name;";;;;230;2301;2302;2303;;false;
+# ;Product.variantsSizeAsString;ProductDefault;"name = VariantUtils.getVariantAttributeValue(item, ""size"", true, "": "", "", ""); if (name == null) { name = """"; } name;";;;;240;2401;2402;2403;;false;true;
+;Product.barcode;ProductDefault;"barcode = item.getAttribute(""barcodes""); if (empty(barcode)) { barcode = null; } else { barcode = item.getAttribute(""barcodes"").get(0); } barcode;";;imageframe;;255;2551;2552;2553;media;false;
+;Product.publication.title;ProductDefault;"placement.getAttribute('publication').getAttribute('title');";;;;256;2561;2562;2563;;false;
+;Product.publication.subtitle;ProductDefault;"placement.getAttribute('publication').getAttribute('subTitle');";;;;257;2571;2572;2573;;false;
+;Product.publication.subtitle;ProductDefault;"placement.getAttribute('publication').getAttribute('subTitle2');";;;;258;2581;2582;2583;;false;
+;Placement.positionInPreviewPage;ProductDefault;placement.positionInPreviewPage;;;;333;3331;3332;3333;;false;
+;TextBlock.code:name;TextBlockDefault;item.composedType.getAttributeDescriptor( 'code' ).name;;;;263;2631;2632;2633;text;false;
+;TextBlock.code_uppercase;TextBlockDefault;item.code.toUpperCase();;;;264;2641;2642;2643;text;false;
+;TextBlock.name:name;TextBlockDefault;item.composedType.getAttributeDescriptor( 'name' ).name;;;;265;2651;2652;2653;text;false;
+;ImageBlock.code:name;ImageBlockDefault;item.composedType.getAttributeDescriptor( 'code' ).name;;;;273;2731;2732;2733;text;false;
+;ImageBlock.code_uppercase;ImageBlockDefault;item.code.toUpperCase();;;;274;2741;2742;2743;text;false;
+;ImageBlock.name:name;ImageBlockDefault;item.composedType.getAttributeDescriptor( 'name' ).name;;;;275;2751;2752;2753;text;false;
+;ImageBlock.image:name;ImageBlockDefault;item.composedType.getAttributeDescriptor( 'image' ).name;;;;277;2771;2772;2773;;false;
+;ImageBlock.caption:name;ImageBlockDefault;item.composedType.getAttributeDescriptor( 'caption' ).name;;;;278;2781;2782;2783;text;false;
+;TableBlock.text;TableBlockDefault;item.renderInDesign();;;;280;2801;2802;2803;text;false;false;
+
+;Page.masterpageplaceholders.marker;PageDefault;"'';";;textframe;;989;0;0;0;;false;false;
+;Page.chapter.footer;PageDefault;item.chapter.footer;;;;900;9001;9002;9003;;false;
+;Page.chapter.header;PageDefault;item.chapter.header;;;;910;9101;9102;9103;;false;
+;Page.chapter.title;PageDefault;item.chapter.title;;;;920;9201;9202;9203;;false;
+;Page.chapter.subtitle;PageDefault;item.chapter.subTitle;;;;921;9211;9212;9213;;false;
+;Page.chapter.subtitle2;PageDefault;item.chapter.subTitle2;;;;922;9221;9222;9223;;false;
+;Page.chapter.picture;PageDefault;item.chapter.picture;;imageframe;;925;9251;9252;9253;media;false;
+;Page.publication.title;PageDefault;item.publication.title;;;;930;9301;9302;9303;;false;
+;Page.publication.subtitle;PageDefault;item.publication.subTitle;;;;931;9311;9312;9313;;false;
+;Page.publication.subtitle2;PageDefault;item.publication.subTitle2;;;;932;9321;9322;9323;;false;
+;Page.publication.picture;PageDefault;item.publication.picture;;imageframe;;935;9351;9352;9353;media;false;
+;Page.title;PageDefault;item.title;;;;940;9401;9402;9403;;false;
+;Page.subtitle;PageDefault;item.subTitle;;;;941;9411;9412;9413;;false;
+;Page.subtitle2;PageDefault;item.subTitle2;;;;942;9421;9422;9423;;false;
+
+
+INSERT_UPDATE ClassificationAttributePlaceholder;qualifier[unique=true];$placeholderTemplate;$assignment;placeholderType(code)[default='text'];convert[default=false];placeholderID;loadActionID;syncActionID;storeActionID;valueType(code)[default='automatic'];writable[default=true];syncable[default=true];language(isoCode);preProcessingExpression;postProcessingExpression;$cometConfig[unique=true];
+# ;Product.sensor;ProductDefault;sensor:$systemName:$systemVersion:photography:$systemName:$systemVersion;;;560;5601;5602;5603;;false;;;<ignore>;<ignore>
+# ;Product.type;ProductDefault;type:$systemName:$systemVersion:photography:$systemName:$systemVersion;;;570;5701;5702;5703;;false;;;<ignore>;<ignore>
+# ;Product.display;ProductDefault;display:$systemName:$systemVersion:photography:$systemName:$systemVersion;;;580;5801;5802;5803;;false;;;<ignore>;<ignore>
+# ;Product.focalDistance;ProductDefault;focalDistance:$systemName:$systemVersion:photography:$systemName:$systemVersion;;;590;5901;5902;5903;;false;;;<ignore>;<ignore>
+# ;Product.shutterSpeed;ProductDefault;shutterSpeed:$systemName:$systemVersion:photography:$systemName:$systemVersion;;;600;6001;6002;6003;;false;;;<ignore>;<ignore>
+# ;Product.weight;ProductDefault;weight:$systemName:$systemVersion:electronics:$systemName:$systemVersion;;;610;6101;6102;6103;;false;;;<ignore>;<ignore>
+# ;Product.dimensions;ProductDefault;dimensions:$systemName:$systemVersion:electronics:$systemName:$systemVersion;;;620;6201;6202;6203;;false;;;<ignore>;<ignore>
+
+
+INSERT_UPDATE TablePlaceholder;qualifier[unique=true];$placeholderTemplate;placeholderType(code)[default='text'];convert[default=false];placeholderID;loadActionID;syncActionID;storeActionID;valueType(code)[default='automatic'];writable[default=true];syncable[default=true];language(isoCode);itemParameter;$table;$cometConfig[unique=true];
+# See publication specific imports for additional (table) placeholders
+
+
+# Special placeholder that delivers the placing instructions of a placement
+INSERT_UPDATE ExpressionPlaceholder;qualifier[unique=true];$placeholderTemplate;getExpression;setExpression;placeholderType(code)[default='text'];convert[default=false];placeholderID;loadActionID;syncActionID;storeActionID;valueType(code)[default='automatic'];writable[default=false];syncable[default=true];language;$cometConfig[unique=true];
+;Placement.notes;ProductDefault;placement.instructionComment;;textframe;;997;9971;9972;9973;
+
+
+# Special placeholders used for crossreferencing functionality
+INSERT_UPDATE CustomPlaceholder;qualifier[unique=true];$placeholderTemplate;placeholderType(code)[default='text'];convert[default=false];placeholderID;loadActionID;syncActionID;storeActionID;valueType(code)[default='automatic'];writable[default=true];syncable[default=true];language(isoCode);$cometConfig[unique=true];
+;Product.crossref_Source;ProductDefault;crossref;true;998;102;0;0;text;false;false;
+
+INSERT_UPDATE CrossreferenceTargetPlaceholder;qualifier[unique=true];$placeholderTemplate;placeholderType(code)[default='text'];convert[default=false];placeholderID;loadActionID;syncActionID;storeActionID;valueType(code)[default='automatic'];writable[default=true];syncable[default=true];language(isoCode);$cometConfig[unique=true];
+;Product.crossref_Target;ProductDefault;text;false;999;9991;0;0;text;false;false;
+
+
+
+

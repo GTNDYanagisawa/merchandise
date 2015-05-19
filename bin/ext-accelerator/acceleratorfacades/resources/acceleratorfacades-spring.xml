@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- Customer Location -->
+	<alias name="defaultCustomerLocationFacade" alias="customerLocationFacade"/>
+	<bean id="defaultCustomerLocationFacade" class="de.hybris.platform.acceleratorfacades.customerlocation.impl.DefaultCustomerLocationFacade">
+		<property name="customerLocationService" ref="customerLocationService"/>
+	</bean>
+
+	<!-- Customer Location END -->
+
+	<!-- Address Verification -->
+	<alias name="acceleratorAddressVerificationFacade" alias="addressVerificationFacade"/>
+	<bean id="acceleratorAddressVerificationFacade" parent="defaultAddressVerificationFacade">
+		<property name="addressVerificationService" ref="addressVerificationService"/>
+	</bean>
+
+	<!-- Address Verification END -->
+
+	<!-- Device -->
+
+	<bean name="springMobileRequestDeviceDataPopulator" class="de.hybris.platform.acceleratorfacades.device.populators.SpringMobileRequestDeviceDataPopulator">
+		<property name="deviceResolver">
+			<bean class="org.springframework.mobile.device.LiteDeviceResolver"/>
+		</property>
+	</bean>
+
+	<alias name="defaultDeviceDataUiExperienceDataConverter" alias="deviceDataUiExperienceDataConverter"/>
+	<bean id="defaultDeviceDataUiExperienceDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorfacades.device.data.UiExperienceData"/>
+		<property name="populators">
+			<list>
+				<ref bean="deviceDataUiExperiencePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+    <!--Responsive-->
+
+    <alias alias="responsiveImageFormats" name="responsiveImageFormats" />
+    <util:map id="responsiveImageFormats" map-class="java.util.LinkedHashMap" value-type="java.lang.Integer">
+        <entry key="widescreen" value="1200"/>
+        <entry key="desktop" value="992"/>
+        <entry key="tablet" value="768"/>
+        <entry key="mobile" value="480"/>
+    </util:map>
+
+
+    <alias name="defaultResponsiveMediaFacade" alias="responsiveMediaFacade"/>
+    <bean id="defaultResponsiveMediaFacade" class="de.hybris.platform.acceleratorfacades.device.impl.DefaultResponsiveMediaFacade">
+        <property name="mediaContainerConverter" ref="responsiveMediaContainerConverter"/>
+    </bean>
+
+    <bean id="responsiveMediaContainerConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="java.util.ArrayList"/>
+        <property name="populators">
+            <list merge="true">
+                <ref bean="responsiveMediaContainerPopulator" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="responsiveImagePopulator" class="de.hybris.platform.acceleratorfacades.device.populators.ResponsiveImagePopulator">
+        <property name="responsiveImageFormats" ref="responsiveImageFormats"/>
+    </bean>
+
+    <alias name="responsiveImageConverter" alias="responsiveImageConverter"/>
+    <bean id="responsiveImageConverter" parent="defaultImageConverter">
+        <property name="populators">
+            <list merge="true">
+                <ref bean="imagePopulator"/>
+                <ref bean="responsiveImagePopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="responsiveMediaContainerPopulator" class="de.hybris.platform.acceleratorfacades.device.populators.ResponsiveMediaContainerPopulator">
+        <property name="imageConverter" ref="responsiveImageConverter"/>
+    </bean>
+
+	<alias name="defaultDeviceDataUiExperiencePopulator" alias="deviceDataUiExperiencePopulator"/>
+	<bean id="defaultDeviceDataUiExperiencePopulator" class="de.hybris.platform.acceleratorfacades.device.populators.DeviceDataUiExperiencePopulator"/>
+
+	<alias name="defaultDeviceDetectionFacade" alias="deviceDetectionFacade"/>
+	<bean id="defaultDeviceDetectionFacade" class="de.hybris.platform.acceleratorfacades.device.impl.DefaultDeviceDetectionFacade">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="uiExperienceService" ref="uiExperienceService"/>
+		<property name="requestDeviceDataConverter" ref="defaultSpringMobileRequestDeviceDataConverter"/>
+		<property name="deviceDataUiExperienceDataConverter" ref="deviceDataUiExperienceDataConverter"/>
+		<property name="siteConfigService" ref="siteConfigService"/>
+	</bean>
+
+	<bean id="defaultSpringMobileRequestDeviceDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorfacades.device.data.DeviceData"/>
+		<property name="populators">
+			<list>
+				<ref bean="springMobileRequestDeviceDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<!--  Device END -->
+
+
+	<!-- Order -->
+	<alias name="defaultAcceleratorCheckoutFacade" alias="acceleratorCheckoutFacade"/>
+	<bean id="defaultAcceleratorCheckoutFacade" class="de.hybris.platform.acceleratorfacades.order.impl.DefaultAcceleratorCheckoutFacade" parent="defaultCheckoutFacade">
+		<property name="uiExperienceService" ref="uiExperienceService"/>
+		<property name="acceleratorCheckoutService" ref="acceleratorCheckoutService"/>
+		<property name="pointOfServiceService" ref="pointOfServiceService"/>
+		<property name="pointOfServiceDistanceConverter" ref="pointOfServiceDistanceConverter"/>
+		<property name="cartModificationConverter" ref="cartModificationConverter"/>
+	</bean>
+
+	<alias name="defaultAcceleratorDeliveryModePopulator" alias="acceleratorDeliveryModePopulator"/>
+	<bean id="defaultAcceleratorDeliveryModePopulator" class="de.hybris.platform.acceleratorfacades.order.populators.AcceleratorDeliveryModePopulator">
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="deliveryModeConverter"/>
+		<property name="add" ref="acceleratorDeliveryModePopulator"/>
+	</bean>
+
+	<alias name="accConsignmentPopulator" alias="consignmentPopulator"/>
+	<bean id="accConsignmentPopulator" class="de.hybris.platform.acceleratorfacades.order.populators.AcceleratorConsignmentPopulator" parent="defaultConsignmentPopulator"/>
+
+	<alias name="accOrderConverter" alias="orderConverter"/>
+	<bean id="accOrderConverter" parent="defaultOrderConverter">
+		<property name="populators">
+			<list merge="true">
+				<ref bean="orderPopulator"/>
+				<ref bean="orderConsignmentPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="accCartConverter" alias="cartConverter"/>
+	<bean id="accCartConverter" parent="defaultCartConverter">
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cartPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="accExtendedCartConverter" alias="extendedCartConverter"/>
+	<bean id="accExtendedCartConverter" parent="defaultExtendedCartConverter">
+		<property name="populators">
+			<list merge="true">
+				<!--Add your accelerator specific populators here and merge it -->
+			</list>
+		</property>
+	</bean>
+
+	<!-- Order END -->
+
+	<!-- Payment -->
+
+	<alias name="defaultPaymentFacade" alias="paymentFacade"/>
+	<bean id="defaultPaymentFacade" class="de.hybris.platform.acceleratorfacades.payment.impl.DefaultPaymentFacade">
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="paymentSubscriptionResultDataConverter" ref="paymentSubscriptionResultDataConverter"/>
+		<property name="siteConfigService" ref="siteConfigService"/>
+		<property name="paymentService" ref="acceleratorPaymentService"/>
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService"/>
+		<property name="userService" ref="userService"/>
+		<property name="checkoutCustomerStrategy" ref="checkoutCustomerStrategy"/>
+	</bean>
+
+	<alias name="defaultPaymentSubscriptionResultDataConverter" alias="paymentSubscriptionResultDataConverter"/>
+	<bean id="defaultPaymentSubscriptionResultDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorfacades.payment.data.PaymentSubscriptionResultData"/>
+		<property name="populators">
+			<list>
+				<ref bean="paymentSubscriptionResultDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPaymentSubscriptionResultDataPopulator" alias="paymentSubscriptionResultDataPopulator"/>
+	<bean id="defaultPaymentSubscriptionResultDataPopulator" class="de.hybris.platform.acceleratorfacades.payment.populators.PaymentSubscriptionResultDataPopulator">
+		<property name="creditCardPaymentInfoConverter" ref="creditCardPaymentInfoConverter"/>
+	</bean>
+
+	<!-- Payment END -->
+
+	<!-- Product Populators -->
+
+	<bean id="accProductFacade" parent="defaultProductFacade">
+		<property name="productConfiguredPopulator" ref="accProductConfiguredPopulator"/>
+	</bean>
+
+	<alias name="defaultProductVolumePricesPopulator" alias="productVolumePricesPopulator"/>
+	<bean id="defaultProductVolumePricesPopulator" parent="baseProductPopulator" class="de.hybris.platform.acceleratorfacades.product.converters.populator.ProductVolumePricesPopulator">
+		<property name="priceDataFactory" ref="priceDataFactory"/>
+		<property name="priceService" ref="priceService"/>
+	</bean>
+
+	<bean id="accProductConfiguredPopulator" parent="defaultProductConfiguredPopulator">
+		<property name="populators">
+			<map key-type="de.hybris.platform.commercefacades.product.ProductOption" merge="true">
+				<entry key="VOLUME_PRICES" value-ref="productVolumePricesPopulator"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Urlencoder -->
+	<alias name="defaultUrlEncoderFacade" alias="urlEncoderFacade"/>
+	<bean id="defaultUrlEncoderFacade" class="de.hybris.platform.acceleratorfacades.urlencoder.impl.DefaultUrlEncoderFacade">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="urlEncoderService" ref="urlEncoderService"/>
+	</bean>
+	<!-- Urlencoder END -->
+
+	<!-- Prototype Beans for Data POJOs -->
+	<bean id="deviceData" class="de.hybris.platform.acceleratorfacades.device.data.DeviceData" scope="prototype"/>
+	<bean id="uiExperienceData" class="de.hybris.platform.acceleratorfacades.device.data.UiExperienceData" scope="prototype"/>
+	<bean id="paymentSubscriptionResultData" class="de.hybris.platform.acceleratorfacades.payment.data.PaymentSubscriptionResultData" scope="prototype"/>
+
+	<!-- Point of service -->
+
+	<alias name="defaultPointOfServiceDistancePopulator" alias="pointOfServiceDistancePopulator"/>
+	<bean id="defaultPointOfServiceDistancePopulator"
+	      class="de.hybris.platform.acceleratorfacades.storelocator.populators.PointOfServiceDistancePopulator">
+		<property name="customerLocationService" ref="customerLocationService"/>
+		<property name="distanceHelper" ref="distanceHelper"/>
+	</bean>
+
+	<!-- Converter for PointOfServiceModel as source and PointOfServiceData as target type -->
+	<alias name="defaultPointOfServiceDistanceModelConverter" alias="pointOfServiceDistanceModelConverter"/>
+	<bean id="defaultPointOfServiceDistanceModelConverter" parent="defaultPointOfServiceConverter">
+		<property name="populators">
+			<list merge="true">
+				<ref bean="pointOfServiceDistancePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="accPickupOrderEntryGroupPopulator" alias="pickupOrderEntryGroupPopulator"/>
+	<bean id="accPickupOrderEntryGroupPopulator" class="de.hybris.platform.commercefacades.order.converters.populator.PickupOrderEntryGroupPopulator" parent="defaultOrderEntryGroupPopulator">
+		<property name="pointOfServiceConverter" ref="pointOfServiceDistanceModelConverter"/>
+	</bean>
+
+
+</beans>

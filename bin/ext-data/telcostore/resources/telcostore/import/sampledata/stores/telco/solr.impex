@@ -1,0 +1,46 @@
+# ImpEx for SOLR Configuration
+
+# Macros / Replacement Parameter definitions
+$classficationCatalog=TelcoClassification
+
+$classSystemVersion=systemVersion(catalog(id[default='$classficationCatalog']),version[default='1.0'])
+$classCatalogVersion=catalogVersion(catalog(id[default='$classficationCatalog']),version[default='1.0'])
+$classAttribute=classificationAttribute(code,$classSystemVersion)
+$classClass=classificationClass(code,$classCatalogVersion)
+$classAttributeAssignment=classAttributeAssignment($classClass,$classAttribute,$classSystemVersion)
+
+# Define price range set
+INSERT_UPDATE SolrValueRangeSet;name[unique=true];qualifier;type;solrValueRanges(&rangeValueRefID)
+
+# Define Megapixel ranges
+INSERT_UPDATE SolrValueRange;&rangeValueRefID;solrValueRangeSet(name)[unique=true];name[unique=true];from;to
+
+
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true,default=telcoProductType];name[unique=true];type(code);sortableType(code);currency[default=false];localized[default=false];multiValue[default=false];facet[default=true];facetType(code);facetSort(code)[default=Alpha];priority[default=1000];fieldValueProvider[default=commerceClassificationPropertyValueProvider];$classAttributeAssignment                       
+;;colorcompatibility  ;string      ;;;    ;    ;;MultiSelectOr ;;;;compatibilityclassification:::colorcompatibility::::
+;;color               ;string      ;;;    ;    ;;MultiSelectOr ;;;;mobilephoneclassification:::color::::            
+;;gps                 ;boolean     ;;;true;    ;;Refine        ;;;;mobilephoneclassification:::gps::::              
+;;camera              ;boolean     ;;;true;    ;;Refine        ;;;;mobilephoneclassification:::camera:::: 
+;;keyboard            ;boolean     ;;;true;    ;;Refine        ;;;;mobilephoneclassification:::keyboard::::         
+;;formfactor          ;string      ;;;true;    ;;MultiSelectOr ;;;;mobilephoneclassification:::formfactor::::       
+;;displayresolution   ;string      ;;;    ;    ;;MultiSelectOr ;;;;mobilephoneclassification:::displayresolution::::
+;;touchscreen         ;boolean     ;;;true;    ;;Refine        ;;;;mobilephoneclassification:::touchscreen::::      
+;;mobileplatform      ;string      ;;;true;    ;;MultiSelectOr ;;;;mobilephoneclassification:::mobileplatform::::      
+;;featurecompatibility;string      ;;;true;true;;MultiSelectAnd;;;;compatibilityclassification:::featurecompatibility::::      
+;;vendorcompatibility ;string      ;;;true;true;;MultiSelectOr ;;;;accessoryclassification:::vendorcompatibility::::      
+;;bands               ;string      ;;;true;    ;;MultiSelectOr ;;;;mobilephoneclassification:::bands::::           
+;;includedminutes     ;string      ;;;true;true;;MultiSelectOr ;;;entitlementPhoneValueProvider;;  
+;;includedtexts       ;string      ;;;true;true;;MultiSelectOr ;;;entitlementSMSValueProvider;;    
+;;includeddata        ;string      ;;;true;true;;MultiSelectOr ;;;entitlementDataValueProvider;;     
+
+# Show the classification features in the product lister
+INSERT_UPDATE ClassAttributeAssignment;$classClass[unique=true];$classAttribute[unique=true];$classSystemVersion[unique=true];listable
+;mobilephoneclassification;keyboard             ;;false
+;mobilephoneclassification;gps                  ;;false
+;mobilephoneclassification;formfactor           ;;true
+;mobilephoneclassification;displayresolution    ;;false
+;mobilephoneclassification;touchscreen          ;;false
+;mobilephoneclassification;mobileplatform       ;;true
+;mobilephoneclassification;color                ;;false
+;mobilephoneclassification;bands                ;;false
+

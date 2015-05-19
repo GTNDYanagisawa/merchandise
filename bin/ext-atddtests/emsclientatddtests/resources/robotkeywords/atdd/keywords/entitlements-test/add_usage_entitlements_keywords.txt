@@ -1,0 +1,21 @@
+*** Settings ***
+Library         com.hybris.services.entitlements.atdd.keywords.EntitlementsAddUsageKeywordLibrary
+Library         com.hybris.services.entitlements.atdd.keywords.EntitlementsDetailsKeywordLibrary
+
+
+*** Keywords ***
+add ${amountToAdd:[^"]+} usage for grant "${grantId:[^"]+}"
+    [Documentation]    Add usage
+    ${result}=    add usage    ${grantId}    ${amountToAdd}
+    [Return]    ${result}
+
+add ${amountToAdd:[^"]+} usage for grant "${grantId:[^"]+}" and expect exception "${exceptionType:[^"]+}" with message "${exceptionMessage:[^"]+}"
+    [Documentation]    Add usage exception with message is expected
+     ${result}=    add usage    ${grantId}    ${amountToAdd}    ${exceptionType}    ${exceptionMessage}
+    [Return]    ${result}
+
+
+assert used quantity is ${remainingQuantity:[^"]+} for grant id ${grantId:[^"]+}
+    [Documentation]    Assert used quantity
+    ${result}=    assert used quantity    ${grantId}    ${remainingQuantity}
+    [Return]    ${result}

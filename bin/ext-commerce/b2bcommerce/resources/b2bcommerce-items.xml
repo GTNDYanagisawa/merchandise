@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+<!-- ATTENTION: This is just an example file. You have to edit it according 
+	to your needs.	 -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype code="OrderStatus" autocreate="false" generate="false"
+			dynamic="true">
+			<value code="OPEN" />
+			<value code="PENDING_APPROVAL" />
+			<value code="PENDING_APPROVAL_FROM_MERCHANT" />
+			<value code="PENDING_QUOTE" />
+			<value code="APPROVED_QUOTE" />
+			<value code="REJECTED_QUOTE" />
+			<value code="APPROVED" />
+			<value code="REJECTED" />
+			<value code="APPROVED_BY_MERCHANT" />
+			<value code="REJECTED_BY_MERCHANT" />
+			<value code="ASSIGNED_TO_ADMIN" />
+			<value code="B2B_PROCESSING_ERROR" />
+		</enumtype>
+		<enumtype code="B2BGroupEnum" autocreate="true" generate="true"
+			dynamic="true">
+			<description>Four Special B2B Groups because they grant rights to members</description>
+			<value code="b2badmingroup" />
+			<value code="b2bcustomergroup" />
+			<value code="b2bapprovergroup" />
+			<value code="b2bmanagergroup" />
+		</enumtype>
+		<enumtype code="B2BBookingLineStatus" autocreate="true"
+			generate="true" dynamic="true">
+			<value code="OPEN" />
+			<value code="INVOICED" />
+			<value code="PENDINGINVOICE" />
+			<value code="DISABLED" />
+		</enumtype>
+		<enumtype code="BookingType" autocreate="true" generate="true"
+			dynamic="true">
+			<value code="ENTRY" />
+			<value code="SHIPPING" />
+		</enumtype>
+		<enumtype generate="true" code="B2BPeriodRange" autocreate="true">
+			<value code="DAY" />
+			<value code="WEEK" />
+			<value code="MONTH" />
+			<value code="QUARTER" />
+			<value code="YEAR" />
+		</enumtype>
+		<enumtype generate="true" code="B2BRateType" autocreate="true">
+			<value code="CURRENCY" />
+			<value code="PERCENTAGE" />
+		</enumtype>
+
+		<enumtype code="MerchantCheckType" autocreate="true"
+			generate="true" dynamic="true">
+			<value code="CREDITLIMIT" />
+		</enumtype>
+		<enumtype code="MerchantCheckStatus" autocreate="true"
+			generate="true" dynamic="true">
+			<value code="APPROVED" />
+			<value code="REJECTED" />
+			<value code="OPEN" /> <!-- credit limit result with no credit limit set. -->
+			<value code="ERROR" />
+			<value code="FAILURE" />
+		</enumtype>
+		<enumtype code="MerchantCheckStatusEmail" autocreate="true"
+			generate="true" dynamic="true">
+			<value code="ALERT" />
+			<value code="NO_ALERT" />
+		</enumtype>
+	</enumtypes>
+
+	<maptypes>
+		<!-- It is not recommended by hybris to use this type, consider it deprecated -->
+		<maptype code="KeyValueCollection" argumenttype="java.lang.String"
+			returntype="java.lang.String" autocreate="true" generate="false" />
+	</maptypes>
+
+	<relations>
+		<!-- B2BUnit2B2BUserGroups relationship is used for search restrictions
+			only. -->
+		<relation code="B2BUnit2B2BUserGroups" localized="false"
+			generate="true" autocreate="true">
+			<sourceElement type="B2BUnit" qualifier="Unit"
+				cardinality="one">
+				<description>The Parent B2BUnit</description>
+				<modifiers read="true" write="true" search="true"
+					optional="false" />
+			</sourceElement>
+			<targetElement type="B2BUserGroup" qualifier="UserGroups"
+				cardinality="many" collectiontype="set">
+				<description></description>
+				<modifiers read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="B2BUnit2B2BCostCenter" localized="false"
+			generate="true" autocreate="true">
+			<sourceElement type="B2BUnit" qualifier="Unit"
+				cardinality="one">
+				<description>The Parent B2BUnit</description>
+				<modifiers read="true" write="true" search="true"
+					optional="false" />
+			</sourceElement>
+			<targetElement type="B2BCostCenter" qualifier="CostCenters"
+				cardinality="many" collectiontype="list">
+				<description>CostCenters associated to a Parent B2BUnit</description>
+				<modifiers read="true" write="true" search="true" />
+			</targetElement>
+		</relation>
+		<relation code="B2BUnit2B2BBudget" localized="false"
+			generate="true" autocreate="true">
+			<sourceElement type="B2BUnit" qualifier="Unit"
+				cardinality="one">
+				<modifiers read="true" write="true" search="true"
+					optional="false" />
+			</sourceElement>
+			<targetElement type="B2BBudget" qualifier="Budgets"
+				cardinality="many" collectiontype="list">
+				<description>Budgets associated to a Parent B2BUnit</description>
+				<modifiers read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+		<relation code="B2BBudgets2CostCenters" localized="false"
+			generate="true" autocreate="true">
+			<deployment table="budgets2CostCenter" typecode="10010" />
+			<sourceElement type="B2BBudget" qualifier="Budgets"
+				cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" search="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement type="B2BCostCenter" qualifier="CostCenters"
+				cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" search="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="B2BUnit2AbstractOrders" localized="false"
+			generate="true" autocreate="true">
+			<sourceElement type="B2BUnit" qualifier="Unit"
+				cardinality="one">
+				<modifiers read="true" write="true" search="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement type="AbstractOrder" qualifier="Orders"
+				cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" search="true" />
+			</targetElement>
+		</relation>
+
+
+		<relation code="B2BReportingEntry" localized="false"
+			generate="true" autocreate="true">
+			<deployment table="b2breportingentries" typecode="10018" />
+			<sourceElement type="Item" qualifier="ReportingEntries"
+				cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" search="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement type="B2BReportingSet" cardinality="many"
+				collectiontype="set" ordered="true" navigable="false">
+				<description>Grouping for Reporting Purposes</description>
+			</targetElement>
+		</relation>
+		<relation code="B2BUnit2B2BCreditLimit" localized="false"
+			generate="true" autocreate="true">
+			<sourceElement type="B2BUnit" qualifier="Unit"
+				cardinality="many">
+				<modifiers read="true" write="true" search="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement type="B2BCreditLimit" cardinality="one"
+				qualifier="CreditLimit">
+				<description>Merchant Check associated to a Parent B2BUnit</description>
+				<modifiers read="true" write="true" search="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="B2BUnit2B2BQuoteLimit" localized="false"
+			generate="true" autocreate="true">
+			<sourceElement type="B2BUnit" qualifier="Unit"
+				cardinality="many">
+				<modifiers read="true" write="true" search="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement type="B2BQuoteLimit" cardinality="one"
+				qualifier="QuoteLimit">
+				<description>Minimum Amount on Cart for qualifying for Quote Request</description>
+				<modifiers read="true" write="true" search="true" />
+			</targetElement>
+		</relation>
+		
+		
+		<relation code="B2BUnit2Employee" localized="false" generate="true"
+			autocreate="true">
+			<sourceElement type="B2BUnit" qualifier="Unit"
+				cardinality="many">
+				<modifiers read="false" write="false" search="false"
+					optional="false" />
+			</sourceElement>
+			<targetElement type="Employee" cardinality="one"
+				qualifier="accountManager">
+				<description>Employee-Account Manager associated to a Parent B2BUnit</description>
+				<modifiers read="true" write="true" search="true" />
+			</targetElement>
+		</relation>
+		<relation code="B2BUnit2AccountManagerGroup" localized="false"
+			generate="true" autocreate="true">
+			<deployment table="unit2acctMgrGrpRel" typecode="10036" />
+			<sourceElement type="B2BUnit" navigable="false"
+				cardinality="many">
+				<description>The Parent B2BUnit</description>
+				<modifiers read="true" write="true" search="true"
+					optional="false" />
+			</sourceElement>
+			<targetElement type="UserGroup" qualifier="AccountManagerGroups"
+				cardinality="many" collectiontype="set" ordered="true">
+				<description>User groups associated to a B2BUnit that hold other employees who can approve quotes</description>
+				<modifiers read="true" write="true" search="true" />
+			</targetElement>
+		</relation>
+		<relation code="AbstractOrder2B2BComment" localized="false"
+			generate="true" autocreate="true">
+			<sourceElement type="AbstractOrder" qualifier="order"
+				cardinality="one">
+				<modifiers read="true" write="true" search="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement type="B2BComment" cardinality="many"
+				qualifier="b2bcomments">
+				<description>B2B Comments associated to Order</description>
+				<modifiers read="true" write="true" search="true" partof="true"/>
+			</targetElement>
+		</relation>
+	</relations>
+
+	<!-- Start ItemTypes -->
+
+	<itemtypes>
+		<itemtype code="B2BUnit" jaloclass="de.hybris.platform.b2b.jalo.B2BUnit"
+			extends="Company" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="reportingOrganization" type="B2BUnit">
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="B2BCustomer" generate="true"
+			jaloclass="de.hybris.platform.b2b.jalo.B2BCustomer" extends="Customer"
+			autocreate="true">
+			<attributes>
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="email" type="java.lang.String">
+					<modifiers read="true" write="true" search="true"
+					optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="defaultB2BUnit" type="B2BUnit">
+					<modifiers read="true" write="true" search="true"
+							   optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="B2BCostCenter" jaloclass="de.hybris.platform.b2b.jalo.B2BCostCenter"
+			autocreate="true" generate="true">
+			<deployment table="b2bcostcenters" typecode="10002" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" initial="false" unique="true" />
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="currency" type="Currency">
+					<modifiers read="true" write="true" initial="false"
+						search="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="B2BBudget" jaloclass="de.hybris.platform.b2b.jalo.B2BBudget"
+			autocreate="true" generate="true">
+			<deployment table="b2bbudgets" typecode="10001" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" initial="false" unique="true" />
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="budget" type="java.math.BigDecimal">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<defaultvalue>java.math.BigDecimal.valueOf(0D)</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="currency" type="Currency">
+					<modifiers read="true" write="true" initial="false"
+						search="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="dateRange"
+					type="de.hybris.platform.util.StandardDateRange">
+					<description>date range the budget is active</description>
+					<modifiers read="true" write="true" initial="false"
+						optional="false" />
+					<persistence type="property" />
+					<defaultvalue>
+						((de.hybris.platform.b2b.util.DateRangeFactory) de.hybris.platform.core.Registry.getApplicationContext().getBean("defaultDateRangeFactory")).createDateRange(de.hybris.platform.b2b.enums.B2BPeriodRange.QUARTER)
+					</defaultvalue>
+				</attribute>
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AbstractOrderEntry" autocreate="false"
+			generate="false">
+			<attributes>
+				<attribute qualifier="costCenter" type="B2BCostCenter">
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- Bookingline entry -->
+		<itemtype code="B2BBookingLineEntry"
+			jaloclass="de.hybris.platform.b2b.jalo.B2BBookingLineEntry"
+			autocreate="true" generate="true">
+			<deployment table="b2bbookinglineentry" typecode="10005" />
+			<attributes>
+				<attribute qualifier="bookingStatus" type="B2BBookingLineStatus">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="costCenter" type="B2BCostCenter">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="amount" type="java.math.BigDecimal">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="currency" type="Currency">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="product" type="java.lang.String">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="quantity" type="java.lang.Long">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="orderID" type="java.lang.String">
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="orderEntryNr" type="java.lang.Integer">
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="orderEntry" type="OrderEntry">
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="bookingDate" type="java.util.Date">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="bookingType" type="BookingType">
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("BookingType", "ENTRY")</defaultvalue>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="bookingDateIdx">
+					<key attribute="bookingDate" />
+				</index>
+				<index name="bookingStatusIdx">
+					<key attribute="bookingStatus" />
+				</index>
+				<index name="costCtrIdx">
+					<key attribute="costCenter" />
+				</index>
+				<index name="currencyIdx">
+					<key attribute="currency" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="B2BUserGroup" generate="true"
+			jaloclass="de.hybris.platform.b2b.jalo.B2BUserGroup" extends="UserGroup"
+			autocreate="true">
+			<attributes>
+			</attributes>
+		</itemtype>
+		<itemtype code="B2BReportingSet" jaloclass="de.hybris.platform.b2b.jalo.B2BReportingSet"
+			autocreate="true" generate="true">
+			<deployment table="b2breportingset" typecode="10017" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers optional="false" initial="false" unique="true"
+						read="true" write="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="b2bReportingSetIdx" unique="true">
+					<key attribute="code" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="Order" jaloclass="de.hybris.platform.jalo.order.Order"
+			generate="true" autocreate="false">
+			<indexes>
+				<index name="dateIdx">
+					<key attribute="date" />
+				</index>
+				<index name="statusIdx">
+					<key attribute="status" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="B2BUnit" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="approvalProcessCode" type="java.lang.String">
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<description>A name of the process to be consumed by process engine for
+						b2b order approval as defined in the process definition file.</description>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="B2BQuoteLimit" jaloclass="de.hybris.platform.b2b.jalo.B2BQuoteLimit"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="b2bquotelimit" typecode="10037" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" initial="false" unique="true" />
+				</attribute>
+				<attribute qualifier="amount" type="java.math.BigDecimal">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="currency" type="Currency">
+					<modifiers read="true" write="true" initial="false"
+						search="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<!-- The item type for B2B Merchant check -->
+
+		<itemtype code="B2BMerchantCheck" jaloclass="de.hybris.platform.b2b.jalo.B2BMerchantCheck"
+			abstract="true" autocreate="true" generate="true">
+			<deployment table="b2bmerchantcheck" typecode="10032" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" initial="false" unique="true" />
+				</attribute>
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="B2BCreditLimit" jaloclass="de.hybris.platform.b2b.jalo.B2BCreditLimit"
+			autocreate="true" generate="true" extends="B2BMerchantCheck">
+			<deployment table="b2bcreditlimit" typecode="10028" />
+			<attributes>
+				<attribute qualifier="currency" type="Currency">
+					<modifiers read="true" write="true" initial="false"
+						search="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="amount" type="java.math.BigDecimal">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<defaultvalue>java.math.BigDecimal.valueOf(0D)</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="datePeriod"
+					type="de.hybris.platform.util.StandardDateRange">
+					<description>date range the credit limit is active</description>
+					<modifiers read="true" write="true" initial="false"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="dateRange" type="B2BPeriodRange">
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="alertThreshold" type="java.math.BigDecimal">
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="alertRateType" type="B2BRateType">
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("B2BRateType","PERCENTAGE")</defaultvalue>
+				</attribute>
+
+				<attribute qualifier="alertSentDate" type="java.util.Date">
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="B2BMerchantCheckResult"
+			jaloclass="de.hybris.platform.b2b.jalo.B2BMerchantCheckResult"
+			autocreate="true" generate="true">
+			<deployment table="b2bmerchantcheckresult" typecode="10031" />
+			<attributes>
+				<attribute qualifier="merchantcheck" type="B2BMerchantCheck">
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="merchantCheckTypeCode" type="java.lang.String">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<description>the item type code for the merchant check, the result is
+						holding as defined in items.xml</description>
+					<persistence type="property" />
+					<defaultvalue>"B2BCreditLimit"</defaultvalue>
+				</attribute>
+				<attribute qualifier="status" type="MerchantCheckStatus">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("MerchantCheckStatus", "OPEN")
+					</defaultvalue>
+				</attribute>
+				<attribute qualifier="statusEmail" type="MerchantCheckStatusEmail">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("MerchantCheckStatusEmail", "NO_ALERT")
+					</defaultvalue>
+				</attribute>
+				<attribute qualifier="note" type="localized:java.lang.String">
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+					<modifiers optional="true" initial="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="B2BCreditCheckResult"
+			jaloclass="de.hybris.platform.b2b.jalo.B2BCreditCheckResult"
+			autocreate="true" generate="true" extends="B2BMerchantCheckResult">
+			<deployment table="b2bcreditcheckresult" typecode="10030" />
+			<attributes>
+				<attribute qualifier="currency" type="Currency">
+					<modifiers read="true" write="true" initial="false"
+						search="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="creditLimit" type="java.math.BigDecimal">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<defaultvalue>java.math.BigDecimal.valueOf(0D)</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="amountUtilised" type="java.math.BigDecimal">
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+					<defaultvalue>java.math.BigDecimal.valueOf(0D)</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="B2BComment" jaloclass="de.hybris.platform.b2b.jalo.B2BComment"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="b2bcomment" typecode="10035" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" />
+				</attribute>
+				<attribute qualifier="comment" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="modifiedDate" type="java.util.Date">
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="owner" type="User"
+					metatype="ExpressionAttributeDescriptor" redeclare="true">
+					<modifiers initial="true" read="true" write="true"
+						optional="false" />
+					<persistence type="property" />
+					<description>responsible user for this template</description>
+					<custom-properties>
+						<property name="defaultValueExpression">
+							<value>"de.hybris.platform.jalo.JaloSession.getCurrentSession().getUser()"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="AbstractOrder" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="locale" type="java.lang.String"
+					generate="true">
+					<description>name of the entire locale, with the language, country
+						and variant separated by underbars,
+						which was used when the order
+						was created.</description>
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<!-- Removed part of attribute from workflow to make workflow independent of Order - BTOBT 153 -->
+				<attribute qualifier="workflow" type="Workflow" generate="true">
+					<persistence type="property" />
+					<modifiers read="true" write="true" optional="true" />
+				</attribute>
+				<attribute qualifier="quoteExpirationDate" type="java.util.Date">
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="B2BCustomerEmailConstraint" autocreate="true" generate="true"
+			extends="AttributeConstraint"
+			jaloclass="de.hybris.platform.b2b.jalo.B2BCustomerEmailConstraint">
+			<description>Ensures B2BCustomer's email address is valid.</description>
+			<attributes>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+						<defaultvalue>
+							org.hibernate.validator.constraints.Email.class
+						</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="GenericVariantProduct" extends="VariantProduct"
+				  autocreate="true" generate="true"
+				  jaloclass="de.hybris.platform.b2b.jalo.GenericVariantProduct">
+			<description>Generic variant product type.  It doesn't not contain attributes describing the variant.</description>
+		</itemtype>
+
+		<itemtype code="VariantCategory" autocreate="true" generate="true"
+				  extends="Category"
+				  jaloclass="de.hybris.platform.b2b.jalo.VariantCategory">
+			<description>Container category for variant types</description>
+			<attributes>
+				<attribute qualifier="hasImage" type="java.lang.Boolean">
+					<modifiers read="true" write="true" search="true"
+							   optional="false" />
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="VariantValueCategory" autocreate="true" generate="true"
+				  extends="Category"
+				  jaloclass="de.hybris.platform.b2b.jalo.VariantValueCategory">
+			<description>Value category for variant types (it defines the dimensions)</description>
+			<attributes>
+				<attribute qualifier="sequence" type="java.lang.Integer">
+					<modifiers read="true" write="true" search="true"
+							   optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

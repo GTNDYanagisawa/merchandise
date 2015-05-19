@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans            http://www.springframework.org/schema/beans/spring-beans-3.1.xsd            http://www.springframework.org/schema/aop            http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<bean
+		class="de.hybris.platform.sap.core.jco.service.impl.DefaultSAPRFCDestinationService"
+		destroy-method="destroy" id="sapCoreDefaultSAPRFCDestinationService"
+		init-method="init">
+		<property name="rfcDestinationService" ref="sapCoreRFCDestinationService" />
+		<property name="tenantService" ref="tenantService" />
+		<property name="clusterService" ref="clusterService" />
+		<property name="sncLibraryPath" value="${sapcorejco.SncLibraryPath}" />
+		<property name="rfcDefaultLanguage" value="${sapcorejco.RFCDestination.language:en}" />
+	</bean>
+
+
+	<!-- Connection Parameters for JCo -->
+	<alias alias="sapCoreConnectionParametersJCo" name="sapCoreDefaultConnectionParametersJCo" />
+	<bean
+		class="de.hybris.platform.sap.core.jco.connection.impl.JCoConnectionParametersImpl"
+		id="sapCoreDefaultConnectionParametersJCo" scope="singleton">
+		<!-- Use sapCoreConnectionParameterConfigurerJCo in order to define JCo 
+			connection parameters -->
+	</bean>
+
+	<alias alias="sapCoreConnectionParameterJCo" name="sapCoreDefaultConnectionParameterJCo" />
+	<bean
+		class="de.hybris.platform.sap.core.jco.connection.impl.JCoConnectionParameterImpl"
+		id="sapCoreDefaultConnectionParameterJCo" abstract="true" init-method="init"
+		scope="singleton">
+		<property name="connectionParameters" ref="sapCoreConnectionParametersJCo" />
+		<!-- Possible properties to be set -->
+		<!-- <property name="functionModule" value="FUNCTION_MODULE_NAME" /> -->
+		<!-- <property name="cacheType" value="Default"/> -->
+		<!-- <property name="eventListener" ref="myJCoConnectionEventListenerBeanName" 
+			/> -->
+		<!-- <property name="traceBefore" value="true/false" /> -->
+		<!-- <property name="traceAfter" value="true/false" /> -->
+		<!-- <property name="functionModuleToBeReplaced" value="ORIGINAL_FUNCTION_MODULE_NAME"/> -->
+		<!-- <property name="traceExcludeImportParameters" value="comma-separated 
+			list of import parameter names, which should be excluded from tracing (without 
+			whitespaces)" /> -->
+		<!-- <property name="traceExcludeExportParameters" value="comma-separated 
+			list of export parameter names, which should be excluded from tracing (without 
+			whitespaces)" /> -->
+		<!-- <property name="traceExcludeTableParameters" value="comma-separated 
+			list of table parameter names, which should be excluded from tracing (without 
+			whitespaces)" /> -->
+	</bean>
+
+	<alias alias="sapCoreJCoManagedConnectionFactory" name="sapCoreDefaultJCoManagedConnectionFactory" />
+	<bean
+		class="de.hybris.platform.sap.core.jco.connection.impl.DefaultJCoManagedConnectionFactory"
+		id="sapCoreDefaultJCoManagedConnectionFactory">
+		<constructor-arg>
+			<map>
+				<entry key="JCoStatefulServiceUser" value="sapCoreJCoConnectionStateful" />
+				<entry key="JCoStatefulServiceUserSecond" value="sapCoreJCoConnectionStatefulSecond" />
+				<entry key="JCoStateless" value="sapCoreJCoConnectionStateless" />
+			</map>
+		</constructor-arg>
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+	</bean>
+
+	<alias alias="sapCoreManagedConnectionContainer" name="sapCoreDefaultManagedConnectionContainer" />
+	<bean
+		class="de.hybris.platform.sap.core.jco.connection.impl.DefaultJCoManagedConnectionContainer"
+		id="sapCoreDefaultManagedConnectionContainer" scope="sapSession"
+		destroy-method="destroy">
+		<property name="managedConnectionFactory" ref="sapCoreJCoManagedConnectionFactory" />
+	</bean>
+
+	<!-- Connection type stateless -->
+	<alias alias="sapCoreJCoConnectionStateless" name="sapCoreDefaultJCoConnectionStateless" />
+	<bean
+		class="de.hybris.platform.sap.core.jco.connection.impl.JCoConnectionStateless"
+		id="sapCoreDefaultJCoConnectionStateless" scope="prototype"
+		init-method="init">
+		<constructor-arg>
+			<props>
+				<prop key="destination">#{sapCoreConfigurationService.getRFCDestination().getRfcDestinationName()}
+				</prop>
+			</props>
+		</constructor-arg>
+		<property name="connectionParameters" ref="sapCoreConnectionParametersJCo" />
+		<property name="jcoManagedConnectionContainer" ref="sapCoreManagedConnectionContainer" />
+		<property name="rfcDestinationService" ref="sapCoreRFCDestinationService" />
+	</bean>
+
+	<!-- Connection type stateful -->
+	<alias alias="sapCoreJCoConnectionStateful" name="sapCoreDefaultJCoConnectionStateful" />
+	<bean
+		class="de.hybris.platform.sap.core.jco.connection.impl.JCoConnectionStateful"
+		id="sapCoreDefaultJCoConnectionStateful" scope="prototype"
+		init-method="init">
+		<constructor-arg>
+			<props>
+				<prop key="destination">#{sapCoreConfigurationService.getRFCDestination().getRfcDestinationName()}
+				</prop>
+			</props>
+		</constructor-arg>
+		<property name="connectionParameters" ref="sapCoreConnectionParametersJCo" />
+		<property name="jcoManagedConnectionContainer" ref="sapCoreManagedConnectionContainer" />
+		<property name="rfcDestinationService" ref="sapCoreRFCDestinationService" />
+	</bean>
+
+	<!-- Second connection type stateful -->
+	<alias alias="sapCoreJCoConnectionStatefulSecond" name="sapCoreDefaultJCoConnectionStatefulSecond" />
+	<bean
+		class="de.hybris.platform.sap.core.jco.connection.impl.JCoConnectionStateful"
+		id="sapCoreDefaultJCoConnectionStatefulSecond" scope="prototype"
+		init-method="init">
+		<constructor-arg>
+			<props>
+				<prop key="destination">#{sapCoreConfigurationService.getRFCDestination().getRfcDestinationName()}
+				</prop>
+			</props>
+		</constructor-arg>
+		<property name="connectionParameters" ref="sapCoreConnectionParametersJCo" />
+		<property name="jcoManagedConnectionContainer" ref="sapCoreManagedConnectionContainer" />
+		<property name="rfcDestinationService" ref="sapCoreRFCDestinationService" />
+	</bean>
+ 
+</beans>

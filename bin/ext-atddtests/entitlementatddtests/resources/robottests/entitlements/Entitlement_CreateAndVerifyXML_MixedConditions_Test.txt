@@ -1,0 +1,1283 @@
+*** Settings ***
+Resource    entitlements/Product_Keywords.txt
+Resource    entitlements/Entitlement_Keywords.txt
+Resource    common/EntitlementStartup_Keywords.txt
+
+Test Setup        entitlements test setup
+Test Teardown     reset system
+
+*** Test Cases ***
+
+###
+# NONMETERED
+# NONMETERED + STRING
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_Simple_String
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" without conditions 
+	for product "P1" add non metered entitlement "NME2" with stringCondition "stringCondition1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<conditionString>stringCondition1</conditionString>
+			<quantity>0</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# NONMETERED
+# NONMETERED + PATH
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_Simple_Path
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" without conditions 
+	for product "P1" add non metered entitlement "NME2" with pathCondition "pathCondition1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<conditionPath>pathCondition1</conditionPath>
+			<quantity>0</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# NONMETERED
+# METERED
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_Simple_Metered
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" without conditions 
+	for product "P1" add metered entitlement "ME1" with quantity "9"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>    		
+			<name>Metered Entitlement 1</name>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>9</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# NONMETERED + STRING + PATH
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_StringAndPath
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with stringCondition "stringCondition1" and pathCondition "pathCondition1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<conditionString>stringCondition1</conditionString>
+			<conditionPath>pathCondition1</conditionPath>
+		</entitlement>
+	</entitlements>"
+
+###
+# NONMETERED + STRING
+# NONMETERED + PATH
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_String_Path
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with stringCondition "stringCondition1"
+	for product "P1" add non metered entitlement "NME2" with pathCondition "pathCondition1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<conditionString>stringCondition1</conditionString>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+			<conditionPath>pathCondition1</conditionPath>
+		</entitlement>
+	</entitlements>"
+
+###
+# METERED + STRING
+###
+Test_Entitlement_CreateAndVerifyXML_MixedConditions_StringAndMetered
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	...                All entitlement details(name/usageUnit) are defined in impex file: testEntitlements.csv
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "9" with stringCondition "stringCondition1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<conditionString>stringCondition1</conditionString>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>9</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# METERED
+# NONMETERED + STRING
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_String_Metered
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "10"
+	for product "P1" add non metered entitlement "NME1" with stringCondition "stringCondition1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>10</quantity>
+		</entitlement>    	
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<conditionString>stringCondition1</conditionString>
+		</entitlement>
+	</entitlements>"
+
+###
+# METERED
+# NONMETERED + PATH
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_Path_Metered
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "10"
+	for product "P1" add non metered entitlement "NME1" with pathCondition "pathCondition1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>10</quantity>
+		</entitlement>    	
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<conditionPath>pathCondition1</conditionPath>
+		</entitlement>
+	</entitlements>"
+
+###
+# METERED + PATH
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_PathAndMetered_x1
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "10" with pathCondition "pathCondition1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>    		
+			<name>Metered Entitlement 1</name>
+			<conditionPath>pathCondition1</conditionPath>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>10</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# METERED + TIMEFRAME
+###
+Test_Entitlement_CreateAndVerifyXML_MixedConditions_TimeframeAndMetered_x1
+	[Documentation]    Verifies addition of metered entitlement with timeframe conditions
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "99" and timeunit values timeunit "day" start time "1" and duration "365"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+		<name>Metered Entitlement 1</name>
+		<quantity>99</quantity>
+		<timeUnit>DAY</timeUnit>
+		<timeUnitStart>1</timeUnitStart>
+		<timeUnitDuration>365</timeUnitDuration>
+		<usageUnit>
+			<id>minute</id>
+			<namePlural>Minutes</namePlural>
+			<name>Minute</name>
+			<accumulative>false</accumulative>
+			</usageUnit>
+		</entitlement>
+	</entitlements>"
+
+###
+# METERED + TIMEFRAME
+# METERED + TIMEFRAME
+###
+Test_Entitlement_CreateAndVerifyXML_MixedConditions_TimeframeAndMetered_x2
+	[Documentation]    Verifies addition of 2 entitlement with timeframe conditions
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "1" and timeunit "day" and starttime "1" and duration "1"
+	for product "P1" add metered entitlement "ME2" with quantity "99" and timeunit "month" and starttime "1" and duration "0"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<quantity>1</quantity>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>1</timeUnitStart>
+			<timeUnitDuration>1</timeUnitDuration>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 2</name>
+			<quantity>99</quantity>
+			<timeUnit>MONTH</timeUnit>
+			<timeUnitStart>1</timeUnitStart>
+			<timeUnitDuration>0</timeUnitDuration>
+			<usageUnit>
+				<id>textMessage</id>
+				<namePlural>Text Message</namePlural>
+				<name>Text Message</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+		</entitlement>
+	</entitlements>"
+
+###
+# METERED + GEO
+###
+Test_Entitlement_CreateAndVerifyXML_MixedConditions_GeoAndMetered_x1
+	[Documentation]    Verifies addition of metered entitlement with geo condition
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "2" with geoCondition "geoCondition1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<quantity>2</quantity>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition1</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+		</entitlement>
+	</entitlements>"
+
+###
+# METERED + GEO
+# METERED + GEO
+###
+Test_Entitlement_CreateAndVerifyXML_MixedConditions_GeoAndMetered_x2
+	[Documentation]    Verifies addition of 2 metered entitlements with geo conditions
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "1" with geoCondition "geoCondition1"
+	for product "P1" add metered entitlement "ME2" with quantity "2" with geoCondition "geoCondition2"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<quantity>1</quantity>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition1</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 2</name>
+			<quantity>2</quantity>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition2</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<usageUnit>
+				<id>textMessage</id>
+				<namePlural>Text Message</namePlural>
+				<name>Text Message</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+		</entitlement>
+	</entitlements>"
+
+###
+# NONMETERED
+# NONMETERED + STRING
+# NONMETERED + PATH
+# METERED
+###
+Test_Entitlement_CreateAndVerifyXML_MixedConditions_Simple_String_Path_Metered_No1
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" without conditions
+	for product "P1" add non metered entitlement "NME2" with stringCondition "stringCondition1"
+	for product "P1" add non metered entitlement "NME3" with pathCondition "pathCondition1"
+	for product "P1" add metered entitlement "ME1" with quantity "99"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<conditionString>stringCondition1</conditionString>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 3</name>
+			<conditionPath>pathCondition1</conditionPath>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>99</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# NONMETERED
+# NONMETERED + STRING
+# NONMETERED + PATH
+# METERED
+###
+Test_Entitlement_CreateAndVerifyXML_MixedConditions_Simple_String_Path_Metered_No2
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	...                The same entitlement type (id) is used
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" without conditions
+	for product "P1" add non metered entitlement "NME1" with stringCondition "stringCondition1"
+	for product "P1" add non metered entitlement "NME1" with pathCondition "pathCondition1"
+	for product "P1" add metered entitlement "ME1" with quantity "99"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<conditionString>stringCondition1</conditionString>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<conditionPath>pathCondition1</conditionPath>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>99</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# METERED + STRING + PATH
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_StringAndPathAndMetered
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "99" with stringCondition "stringCondition1" and pathCondition "pathCondition1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<conditionString>stringCondition1</conditionString>
+			<conditionPath>pathCondition1</conditionPath>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>99</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# NONMETERED
+# METERED + STRING + PATH
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_Simple_StringAndPathAndMetered
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" without conditions
+	for product "P1" add metered entitlement "ME1" with quantity "99" with stringCondition "stringCondition1" and pathCondition "pathCondition1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<conditionString>stringCondition1</conditionString>
+			<conditionPath>pathCondition1</conditionPath>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>99</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# NONMETERED + STRING
+# METERED + STRING + PATH
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_String_StringAndPathAndMetered
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with stringCondition "stringCondition1"
+	for product "P1" add metered entitlement "ME1" with quantity "99" with stringCondition "stringCondition2" and pathCondition "pathCondition2"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<conditionString>stringCondition1</conditionString>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<conditionString>stringCondition2</conditionString>
+			<conditionPath>pathCondition2</conditionPath>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>99</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# NONMETERED + PATH
+# METERED + STRING + PATH
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_Path_StringAndPathAndMetered
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with pathCondition "pathCondition1"
+	for product "P1" add metered entitlement "ME1" with quantity "99" with stringCondition "stringCondition2" and pathCondition "pathCondition2"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<conditionPath>pathCondition1</conditionPath>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<conditionString>stringCondition2</conditionString>
+			<conditionPath>pathCondition2</conditionPath>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>99</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# METERED
+# METERED + STRING + PATH
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_Metered_StringAndPathAndMetered
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "77"
+	for product "P1" add metered entitlement "ME2" with quantity "99" with stringCondition "stringCondition2" and pathCondition "pathCondition2"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>77</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 2</name>
+			<conditionString>stringCondition2</conditionString>
+			<conditionPath>pathCondition2</conditionPath>
+			<usageUnit>
+				<id>textMessage</id>
+				<name>Text Message</name>
+				<namePlural>Text Message</namePlural>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>99</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# NONMETERED
+# NONMETERED + STRING
+# NONMETERED + PATH
+# METERED
+###
+Test_Entitlement_CreateAndVerifyXML_MixedConditions_Simple_String_Path_Metered
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	...                All entitlement details(name/usageUnit) are defined in impex file: testEntitlements.csv
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" without conditions
+	for product "P1" add non metered entitlement "NME1" with stringCondition "stringCondition1"
+	for product "P1" add non metered entitlement "NME1" with pathCondition "pathCondition2"
+	for product "P1" add metered entitlement "ME1" with quantity "11"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<conditionString>stringCondition1</conditionString>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<conditionPath>pathCondition2</conditionPath>
+		</entitlement>
+		<entitlement> 
+			<name>Metered Entitlement 1</name>
+			<usageUnit> 
+				<id>minute</id> 
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name> 
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>11</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# METERED + STRING
+# METERED
+# NONMETERED + STRING
+# NONMETERED
+###
+Test_Entitlement_CreateAndVerifyXML_MixedConditions_MeteredAndString_Metered_String_Simple
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	...                All entitlement details(name/usageUnit) are defined in impex file: testEntitlements.csv
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "10" with stringCondition "stringCondition1"
+	for product "P1" add metered entitlement "ME2" with quantity "11"
+	for product "P1" add non metered entitlement "NME1" with stringCondition "stringCondition2"
+	for product "P1" add non metered entitlement "NME2" without conditions
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<conditionString>stringCondition1</conditionString>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>10</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 2</name>
+			<usageUnit>
+				<accumulative>false</accumulative>
+				<id>textMessage</id>
+				<name>Text Message</name>
+				<namePlural>Text Message</namePlural>
+			</usageUnit>
+			<quantity>11</quantity>
+		</entitlement>
+		<entitlement>
+			<conditionString>stringCondition2</conditionString>
+			<quantity>0</quantity>
+			<name>Non-Metered Entitlement 1</name>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# METERED + PATH
+# METERED
+# NONMETERED + PATH
+# NONMETERED
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_MeteredAndPath_Metered_Path_Simple
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "10" with pathCondition "pathCondition1"
+	for product "P1" add metered entitlement "ME2" with quantity "11"
+	for product "P1" add non metered entitlement "NME1" with pathCondition "pathCondition2"
+	for product "P1" add non metered entitlement "NME2" without conditions
+	for product "P1" verify that the XML for entitlements matches " <entitlements>
+		<entitlement>
+			<conditionPath>pathCondition1</conditionPath>
+			<name>Metered Entitlement 1</name>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>10</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 2</name>
+			<usageUnit>
+				<id>textMessage</id>
+				<namePlural>Text Message</namePlural>
+				<name>Text Message</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>11</quantity>
+		</entitlement>
+		<entitlement>
+			<conditionPath>pathCondition2</conditionPath>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# METERED + STRING  + PATH
+# METERED
+# NONMETERED + STRING + PATH
+# NONMETERED
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_MeteredAndStringAndPath_Metered_StringAndPath_Simple
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "10" with stringCondition "stringCondition2" and pathCondition "pathCondition1"
+	for product "P1" add metered entitlement "ME2" with quantity "11"
+	for product "P1" add non metered entitlement "NME1" with stringCondition "stringCondition2" and pathCondition "pathCondition2"
+	for product "P1" add non metered entitlement "NME2" without conditions
+	for product "P1" verify that the XML for entitlements matches " <entitlements>
+		<entitlement>
+			<conditionPath>pathCondition1</conditionPath>
+			<conditionString>stringCondition2</conditionString>
+			<name>Metered Entitlement 1</name>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>10</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 2</name>
+			<usageUnit>
+				<id>textMessage</id>
+				<namePlural>Text Message</namePlural>
+				<name>Text Message</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>11</quantity>
+		</entitlement>
+		<entitlement>
+			<conditionPath>pathCondition2</conditionPath>
+			<conditionString>stringCondition2</conditionString>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# NONMETERED + STRING + PATH
+# NONMETERED
+###
+Test_Entitlement_CreateAndVerifyXML_MixedConditions_MeteredAndStringAndPath_Metered_StringAndPath_Simple
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "10" with stringCondition "stringCondition2" and pathCondition "pathCondition1"
+	for product "P1" add metered entitlement "ME2" with quantity "11"
+	for product "P1" add non metered entitlement "NME1" with stringCondition "stringCondition2" and pathCondition "pathCondition2"
+	for product "P1" add non metered entitlement "NME2" without conditions
+	for product "P1" verify that the XML for entitlements matches " <entitlements>
+		<entitlement>
+			<conditionPath>pathCondition1</conditionPath>
+			<conditionString>stringCondition2</conditionString>
+			<name>Metered Entitlement 1</name>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>10</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 2</name>
+			<usageUnit>
+				<id>textMessage</id>
+				<namePlural>Text Message</namePlural>
+				<name>Text Message</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>11</quantity>
+		</entitlement>
+		<entitlement>
+			<conditionPath>pathCondition2</conditionPath>
+			<conditionString>stringCondition2</conditionString>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+		</entitlement>
+	</entitlements>"
+
+###
+# NONMETERED 
+# NONMETERED  
+# NONMETERED + STRING
+# NONMETERED + STRING
+# NONMETERED + PATH
+# NONMETERED + PATH
+# METERED
+# METERED
+# NONMETERED + STRING + PATH
+# NONMETERED + STRING + PATH
+# METERED + STRING
+# METERED + STRING
+# METERED + PATH
+# METERED + PATH
+# METERED + STRING  + PATH
+# METERED + STRING  + PATH
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_Complex_No1
+	[Documentation]    Verifies addition of multiple entitlements with mixed conditions
+	create product "P1"
+	#
+	for product "P1" add non metered entitlement "NME2" without conditions
+	for product "P1" add non metered entitlement "NME2" without conditions
+	#
+	for product "P1" add non metered entitlement "NME2" with stringCondition "stringCondition1"
+	for product "P1" add non metered entitlement "NME2" with stringCondition "stringCondition2"
+	#          
+	for product "P1" add non metered entitlement "NME2" with pathCondition "pathCondition1"
+	for product "P1" add non metered entitlement "NME2" with pathCondition "pathCondition2"
+	#                      
+	for product "P1" add metered entitlement "ME2" with quantity "12"
+	for product "P1" add metered entitlement "ME2" with quantity "11"
+	#
+	for product "P1" add non metered entitlement "NME2" with stringCondition "stringCondition1" and pathCondition "pathCondition1"
+	for product "P1" add non metered entitlement "NME2" with stringCondition "stringCondition2" and pathCondition "pathCondition2"
+	#
+	for product "P1" add metered entitlement "ME1" with quantity "10" with stringCondition "stringCondition1"
+	for product "P1" add metered entitlement "ME1" with quantity "9" with stringCondition "stringCondition2"
+	#
+	for product "P1" add metered entitlement "ME1" with quantity "8" with pathCondition "pathCondition1"
+	for product "P1" add metered entitlement "ME1" with quantity "7" with pathCondition "pathCondition2"
+	#
+	for product "P1" add metered entitlement "ME1" with quantity "6" with stringCondition "stringCondition1" and pathCondition "pathCondition1"
+	for product "P1" add metered entitlement "ME1" with quantity "5" with stringCondition "stringCondition2" and pathCondition "pathCondition2"
+	#
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+			<conditionString>stringCondition1</conditionString>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+			<conditionString>stringCondition2</conditionString>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+			<conditionPath>pathCondition1</conditionPath>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+			<conditionPath>pathCondition2</conditionPath>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 2</name>
+			<usageUnit>
+				<id>textMessage</id>
+				<namePlural>Text Message</namePlural>
+				<name>Text Message</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>12</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 2</name>
+			<usageUnit>
+				<id>textMessage</id>
+				<namePlural>Text Message</namePlural>
+				<name>Text Message</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>11</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+			<conditionPath>pathCondition1</conditionPath>
+			<conditionString>stringCondition1</conditionString>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+			<conditionPath>pathCondition2</conditionPath>
+			<conditionString>stringCondition2</conditionString>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<conditionString>stringCondition1</conditionString>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>10</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<conditionString>stringCondition2</conditionString>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>9</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<conditionPath>pathCondition1</conditionPath>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>8</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<conditionPath>pathCondition2</conditionPath>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>7</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<conditionPath>pathCondition1</conditionPath>
+			<conditionString>stringCondition1</conditionString>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>6</quantity>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<conditionPath>pathCondition2</conditionPath>
+			<conditionString>stringCondition2</conditionString>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+			<quantity>5</quantity>
+		</entitlement>
+	</entitlements>"
+
+##
+# NONMETERED + STRING + PATH + GEO + TIMEFRAME
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_NonMetered_Full
+	[Documentation]    Verifies addition of different types of entitlements with mixed conditions to different products 
+	create product "P1"
+	for product "P1" add non metered entitlement "NME2" having stringCondition "stringCondition1" and pathCondition "pathCondition1" and geoCondition "geoCondition1" and timeunit "day" and starttime "100" and duration "0"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<conditionString>stringCondition1</conditionString>
+			<conditionPath>pathCondition1</conditionPath>
+			<quantity>0</quantity>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition1</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>100</timeUnitStart>
+			<timeUnitDuration>0</timeUnitDuration>
+		</entitlement>
+	</entitlements>"
+
+##
+# METERED + STRING + PATH + GEO + TIMEFRAME
+###
+Entitlement_CreateAndVerifyXML_MixedConditions_Metred_Full
+	[Documentation]    Verifies addition of different types of entitlements with mixed conditions to different products
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "199" with stringCondition "stringCondition1" and pathCondition "pathCondition1" and geoCondition "geoCondition1" and timeunit "month" andd starttime "12" and duration "1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>    		
+			<name>Metered Entitlement 1</name>
+			<quantity>199</quantity>
+			<conditionString>stringCondition1</conditionString>
+			<conditionPath>pathCondition1</conditionPath>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition1</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>MONTH</timeUnit>
+			<timeUnitStart>12</timeUnitStart>
+			<timeUnitDuration>1</timeUnitDuration>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+		</entitlement> 
+	</entitlements>"
+
+##
+# METERED + STRING + PATH + GEO + TIMEFRAME
+# METERED + STRING + PATH + GEO + TIMEFRAME
+# NONMETERED + STRING + PATH + GEO + TIMEFRAME
+# NONMETERED + STRING + PATH + GEO + TIMEFRAME
+###
+Entitlement_CompareXML_MixedConditions_DifferentTypes
+	[Documentation]    Verifies addition of different types of entitlements with mixed conditions to different products
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "1" with stringCondition "stringCondition1" and pathCondition "pathCondition1" and geoCondition "geoCondition1" and timeunit "day" andd starttime "30" and duration "60"
+	for product "P1" add metered entitlement "ME1" with quantity "2" with stringCondition "stringCondition2" and pathCondition "pathCondition2" and geoCondition "geoCondition2" and timeunit "month" andd starttime "2" and duration "1"
+	for product "P1" add non metered entitlement "NME1" having stringCondition "stringCondition3" and pathCondition "pathCondition3" and geoCondition "geoCondition3" and timeunit "day" and starttime "1" and duration "30"
+	for product "P1" add non metered entitlement "NME2" having stringCondition "stringCondition4" and pathCondition "pathCondition4" and geoCondition "geoCondition4" and timeunit "day" and starttime "30" and duration "99"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<quantity>1</quantity>
+			<conditionString>stringCondition1</conditionString>
+			<conditionPath>pathCondition1</conditionPath>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition1</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>30</timeUnitStart>
+			<timeUnitDuration>60</timeUnitDuration>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<quantity>2</quantity>
+			<conditionString>stringCondition2</conditionString>
+			<conditionPath>pathCondition2</conditionPath>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition2</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>MONTH</timeUnit>
+			<timeUnitStart>2</timeUnitStart>
+			<timeUnitDuration>1</timeUnitDuration>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<conditionString>stringCondition3</conditionString>
+			<conditionPath>pathCondition3</conditionPath>
+			<quantity>0</quantity>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition3</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>1</timeUnitStart>
+			<timeUnitDuration>30</timeUnitDuration>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+			<conditionString>stringCondition4</conditionString>
+			<conditionPath>pathCondition4</conditionPath>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition4</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>30</timeUnitStart>
+			<timeUnitDuration>99</timeUnitDuration>
+		</entitlement>
+	</entitlements>"
+
+##
+# METERED + STRING + PATH + GEO + TIMEFRAME
+# METERED + STRING + PATH + GEO + TIMEFRAME
+# NONMETERED + STRING + PATH + GEO + TIMEFRAME
+# NONMETERED + STRING + PATH + GEO + TIMEFRAME
+# (for every product)
+###
+Entitlement_CompareXML_MixedConditions_DifferentProducts
+	[Documentation]    Verifies addition of different types of entitlements with mixed conditions to different products
+	create product "P1"
+	create product "P2"
+	for product "P1" add metered entitlement "ME1" with quantity "1" with stringCondition "stringCondition1" and pathCondition "pathCondition1" and geoCondition "geoCondition1" and timeunit "day" andd starttime "30" and duration "60"
+	for product "P2" add metered entitlement "ME1" with quantity "1" with stringCondition "stringCondition1" and pathCondition "pathCondition1" and geoCondition "geoCondition1" and timeunit "day" andd starttime "30" and duration "60"
+	for product "P1" add metered entitlement "ME2" with quantity "2" with stringCondition "stringCondition2" and pathCondition "pathCondition2" and geoCondition "geoCondition2" and timeunit "month" andd starttime "2" and duration "1"
+	for product "P2" add metered entitlement "METU1" with quantity "10" with stringCondition "stringCondition1forP2" and pathCondition "pathCondition1forP2" and geoCondition "geoCondition1forP2" and timeunit "month" andd starttime "1" and duration "30"
+	for product "P1" add non metered entitlement "NME1" having stringCondition "stringCondition3" and pathCondition "pathCondition3" and geoCondition "geoCondition3" and timeunit "day" and starttime "1" and duration "30"
+	for product "P2" add non metered entitlement "NME1" having stringCondition "stringCondition3" and pathCondition "pathCondition3" and geoCondition "geoCondition3" and timeunit "day" and starttime "1" and duration "30"
+	for product "P1" add non metered entitlement "NME2" having stringCondition "stringCondition4" and pathCondition "pathCondition4" and geoCondition "geoCondition4" and timeunit "day" and starttime "30" and duration "99"
+	for product "P2" add non metered entitlement "NMETU1" having stringCondition "stringCondition2forP2" and pathCondition "pathCondition2forP2" and geoCondition "geoCondition2forP2" and timeunit "day" and starttime "100" and duration "365"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<quantity>1</quantity>
+			<conditionString>stringCondition1</conditionString>
+			<conditionPath>pathCondition1</conditionPath>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition1</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>30</timeUnitStart>
+			<timeUnitDuration>60</timeUnitDuration>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement 2</name>
+			<quantity>2</quantity>
+			<conditionString>stringCondition2</conditionString>
+			<conditionPath>pathCondition2</conditionPath>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition2</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>MONTH</timeUnit>
+			<timeUnitStart>2</timeUnitStart>
+			<timeUnitDuration>1</timeUnitDuration>
+			<usageUnit>
+				<id>textMessage</id>
+				<namePlural>Text Message</namePlural>
+				<name>Text Message</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<conditionString>stringCondition3</conditionString>
+			<conditionPath>pathCondition3</conditionPath>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition3</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>1</timeUnitStart>
+			<timeUnitDuration>30</timeUnitDuration>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+			<conditionString>stringCondition4</conditionString>
+			<conditionPath>pathCondition4</conditionPath>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition4</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>30</timeUnitStart>
+			<timeUnitDuration>99</timeUnitDuration>
+		</entitlement>
+	</entitlements>"
+	for product "P2" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Metered Entitlement 1</name>
+			<quantity>1</quantity>
+			<conditionString>stringCondition1</conditionString>
+			<conditionPath>pathCondition1</conditionPath>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list"> 
+					<string>geoCondition1</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>30</timeUnitStart>
+			<timeUnitDuration>60</timeUnitDuration>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+		</entitlement>
+		<entitlement>
+			<name>Metered Entitlement TimeUnits1</name>
+			<quantity>10</quantity>
+			<conditionString>stringCondition1forP2</conditionString>
+			<conditionPath>pathCondition1forP2</conditionPath>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition1forP2</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>MONTH</timeUnit>
+			<timeUnitStart>1</timeUnitStart>
+			<timeUnitDuration>30</timeUnitDuration>
+			<usageUnit>
+				<id>minute</id>
+				<namePlural>Minutes</namePlural>
+				<name>Minute</name>
+				<accumulative>false</accumulative>
+			</usageUnit>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<conditionString>stringCondition3</conditionString>
+			<conditionPath>pathCondition3</conditionPath>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition3</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>1</timeUnitStart>
+			<timeUnitDuration>30</timeUnitDuration>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement TimeUnits1</name>
+			<quantity>0</quantity>
+			<conditionString>stringCondition2forP2</conditionString>
+			<conditionPath>pathCondition2forP2</conditionPath>
+			<conditionGeo class="java.util.Collections$UnmodifiableRandomAccessList" resolves-to="java.util.Collections$UnmodifiableList">
+				<c class="list">
+					<string>geoCondition2forP2</string>
+				</c>
+				<list reference="../c"/>
+			</conditionGeo>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>100</timeUnitStart>
+			<timeUnitDuration>365</timeUnitDuration>
+		</entitlement>
+	</entitlements>"

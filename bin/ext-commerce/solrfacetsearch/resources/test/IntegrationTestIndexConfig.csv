@@ -1,0 +1,41 @@
+$solrValueRanges=solrValueRanges(name);
+$defaultSortOrder=defaultSortOrder;
+$document=document(code);
+$solrSearchConfig=solrSearchConfig(pageSize);
+$catalogVersions=catalogVersions(catalog(id[default='hwcatalog']),version[default='Online'])[unique=true,default='hwcatalog:Online']
+$solrValueRangeSets = solrValueRangeSets(name)
+$solrValueRangeSet = solrValueRangeSet(name)
+;;
+INSERT_UPDATE  Media;code[unique=true];catalogVersion(catalog(id),version)[allowNull=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];
+;IntegrationTestIndexConfig;;text/plain;IntegrationTestFacetConfig.xml;jar:/test/IntegrationTestFacetConfig.xml;
+;;
+INSERT_UPDATE  SolrValueRangeSet;name[unique=true];type;$solrValueRanges;;
+;priceRanges;double;1-100,101-200,201-300,301-400,401-500,501-600,601-700,701-800,801-900,901-1000,1001-INF;
+;stringRange;string;A-D,E-K,L-R,S-Z;
+;dateRange;date;2009_02,2009_12,2008_05;
+;;
+INSERT_UPDATE  SolrValueRange;name[unique=true];from;to;$solrValueRangeSet;
+;1-100;1;100;priceRanges;
+;101-200;101;200;priceRanges;
+;201-300;201;300;priceRanges;
+;301-400;301;400;priceRanges;
+;401-500;401;500;priceRanges;
+;501-600;501;600;priceRanges;
+;601-700;601;700;priceRanges;
+;701-800;701;800;priceRanges;
+;801-900;801;900;priceRanges;
+;901-1000;901;1000;priceRanges;
+;1001-INF;1001;;priceRanges
+;A-D;A;D;stringRange;
+;E-K;E;K;stringRange;
+;L-R;L;R;stringRange;
+;S-Z;S;Z;stringRange;
+;2009_02;2009-02-01;2009-02-28;dateRange;
+;2009_12;2009-12-01;2009-12-31;dateRange;
+;2008_05;2008-05-01;2008-05-31;dateRange;
+;;
+INSERT_UPDATE  SolrSearchConfig;pageSize[unique=true];$defaultSortOrder;
+;20;score;
+;;
+INSERT_UPDATE  SolrFacetSearchConfig;name[unique=true];description;$document;$solrSearchConfig;currencies(isocode);languages(isocode);$catalogVersions;$solrValueRangeSets;
+;TestSOLRConfiguration;sample SOLR configuration;IntegrationTestIndexConfig;20;EUR,USD;de,en;hwcatalog:Online,hwcatalog:Staged;priceRanges,stringRange,dateRange;

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:security="http://www.springframework.org/schema/security"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/security
+            http://www.springframework.org/schema/security/spring-security.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop.xsd"
+    	default-autowire="byName">
+	
+<!--	-->
+<!--	<security:http pattern="/cockpit/css/**" security="none" /> -->
+<!--	<security:http pattern="/cockpit/images/**" security="none" /> -->
+	
+<!--	<security:http access-denied-page="/accessDenied.zul">-->
+<!--		<security:session-management session-fixation-protection="none"/>-->
+<!--		<security:anonymous key="cockpitAnonymous" username="anonymousUser" granted-authority="ROLE_ANONYMOUS"/>-->
+<!--		<security:intercept-url pattern="/login.zul" access="IS_AUTHENTICATED_ANONYMOUSLY" />-->
+<!--		<security:intercept-url pattern="/register.zul" access="IS_AUTHENTICATED_ANONYMOUSLY" />-->
+<!--		<security:intercept-url pattern="/zkau/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />-->
+<!--		<security:remember-me services-ref="rememberMeServices" key="cockpit"/>-->
+<!--		<security:logout logout-success-url="/index.zul" />-->
+<!--		<security:form-login-->
+<!--			always-use-default-target="false"-->
+<!--			login-page="/login.zul"-->
+<!--			authentication-failure-url="/login.zul?login_error=1"/>-->
+<!--	</security:http>-->
+<!--	-->
+		
+	<security:http pattern="/cockpit/css/**" security="none" />
+	<security:http pattern="/cockpit/images/**" security="none" />
+		
+	<security:http access-denied-page="/accessDenied.zul">
+		<security:session-management session-fixation-protection="none"/>
+		<security:anonymous key="cockpitAnonymous" username="anonymousUser" granted-authority="ROLE_ANONYMOUS"/>
+		<security:intercept-url pattern="/login.zul" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:intercept-url pattern="/index.zul" /><!-- access="IS_AUTHENTICATED_ANONYMOUSLY" />-->
+		<security:intercept-url pattern="/zkau/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:intercept-url pattern="/cockpit/css/**" />
+		<security:intercept-url pattern="/cockpit/images/**" />
+		<security:intercept-url pattern="/**" access="IS_AUTHENTICATED_REMEMBERED" />
+		<security:remember-me services-ref="rememberMeServices" key="cockpit"/>
+		<security:logout logout-success-url="/index.zul" />
+		<security:form-login
+			always-use-default-target="false"
+			login-page="/login.zul"
+			authentication-failure-url="/login.zul?login_error=1"/>
+	</security:http>
+	
+
+	<security:authentication-manager alias="rememberMeAuthenticationManager">
+   		<security:authentication-provider ref="coreAuthenticationProvider"/>
+	</security:authentication-manager>
+	
+	<bean id="rememberMeServices" class="de.hybris.platform.cockpit.security.CockpitRememberMeService">
+		<property name="key" value="cockpit"/>
+		<property name="cookieName" value="LoginToken"/>
+		<!-- avoiding hard reference to tenant-scoped 'coreUserDetailsService' -->
+		<lookup-method name="lookupUserDetailsService" bean="coreUserDetailsService" />
+	</bean>
+	
+	<bean id="coreAuthenticationProvider" class="de.hybris.platform.cockpit.security.CockpitAuthenticationProvider" scope="tenant">
+		<property name="userDetailsService" ref="coreUserDetailsService" />
+	</bean>
+	
+	<!--  						-->
+	<!-- COCKPIT SPECIFIC	-->
+	<!--  						-->
+
+	<bean id="sessionProxy" class="de.hybris.platform.cockpit.util.SessionProxy" scope="session">
+		<aop:scoped-proxy />
+		<property name="session" ref="UICockpitSession" />
+	</bean>
+	
+	<bean id="coreUserDetailsService" class="de.hybris.platform.cockpit.security.DefaultCockpitUserDetailsService" scope="tenant">
+		<property name="activateCatalogVersions" value="true" />
+		<property name="userService" ref="userService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+	</bean>
+
+</beans>

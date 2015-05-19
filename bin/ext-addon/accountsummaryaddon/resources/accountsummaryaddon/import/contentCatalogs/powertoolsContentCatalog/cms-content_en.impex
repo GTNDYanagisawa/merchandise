@@ -1,0 +1,101 @@
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$picture=media(code, $contentCV);
+$siteResource=jar:de.hybris.platform.b2bacceleratorsampledata.constants.B2BAcceleratorSampleDataConstants&/b2bacceleratorsampledata/import/contentCatalogs/$contentCatalog
+
+# Language
+$lang=en
+
+# Site Logo Component
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+
+# CMS Image Components
+UPDATE CMSImageComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+
+# CMS Link Components
+UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];linkName[lang=en]
+
+# CMS Link Components - My Company
+UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];linkName[lang=$lang]
+;;CompanySummaryLink;"Account Summary"
+;;CompanySummaryViewLink;"View Account Summary"
+
+
+
+# Lightbox Banner for Mini Cart (banner is not localizable so we must create a separate banner per language)
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];&imageRef;altText
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+
+# CMS Mini Cart Component
+UPDATE MiniCartComponent;$contentCV[unique=true];uid[unique=true];title[lang=en]
+
+# CMS tabs components
+UPDATE CMSTabParagraphComponent;$contentCV[unique=true];uid[unique=true];title[lang=en];content[lang=en]
+
+# CMS Footer Component
+UPDATE FooterComponent;$contentCV[unique=true];uid[unique=true];notice[lang=en]
+
+# CMS Paragraph Component (Contact information)
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=en]
+
+# CMS ProductReferences Components
+UPDATE ProductReferencesComponent;$contentCV[unique=true];uid[unique=true];title[lang=en]
+
+# Category Pages
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];title[lang=en]
+
+# CMS Navigation Nodes
+UPDATE CMSNavigationNode;$contentCV[unique=true];uid[unique=true];title[lang=en]
+
+# CMS Navigation Nodes - My Company
+UPDATE CMSNavigationNode;$contentCV[unique=true];uid[unique=true];title[lang=$lang]
+;;CompanySummaryNavNode;"Account Summary"
+
+# Powertools Terms and Conditions Page
+
+# CMS Paragraph Component
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=en];
+
+#  Powertools Homepage
+
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];&imageRef;altText
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+
+UPDATE BannerComponent;$contentCV[unique=true];uid[unique=true];headline[lang=en];$picture[lang=$lang];content[lang=en]
+
+UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];title[lang=en]
+
+UPDATE CategoryFeatureComponent;$contentCV[unique=true];uid[unique=true];title[lang=en];description[lang=en];$picture[lang=$lang]
+ ;;ScrewdriversFeatureComponent;Screwdrivers;;Powertools_96x96_CatScrewdrivers_EN_01.jpg;
+
+
+#  Powertools Search Results Page
+
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=en]
+
+
+#  Powertools Cart Page
+
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=en]
+
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=en]
+
+# Powertools Store Finder Page
+
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]

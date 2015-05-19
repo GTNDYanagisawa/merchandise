@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+
+<project name="platformwebservices_buildcallbacks">
+
+	<property name="jersey.version" value="1.13" />
+
+	<macrodef name="platformwebservices_before_clean">
+		<sequential>
+			<echo>Removing core-webservices.jar</echo>
+			<foreachext>
+				<do>
+					<if>
+						<and>
+							<equals arg1="@{extname}" arg2="${webservice.module}" />
+							<not>
+								<equals arg1="@{extname}" arg2="platformwebservices" />
+							</not>
+						</and>
+						<then>
+							<sequential>
+								<if>
+									<and>
+										<available file="${ext.@{extname}.path}/web/webroot/WEB-INF/lib/core-webservices.jar" />
+									</and>
+									<then>
+										<delete  verbose="true"  >
+											<fileset dir="${ext.@{extname}.path}/web/webroot/WEB-INF/lib/"  >
+												<include name="core-webservices.jar" />
+												<include name="jersey-client-${jersey.version}.jar" />
+												<include name="jersey-core-${jersey.version}.jar" />
+												<include name="jersey-json-${jersey.version}.jar" />
+												<include name="jersey-server-${jersey.version}.jar" />
+												<include name="jersey-servlet-${jersey.version}.jar" />
+												<include name="jersey-spring-${jersey.version}.jar" />
+												<include name="jersey-test-framework-core-${jersey.version}.jar" />
+												<include name="jsr311-api-1.1.1.jar" />
+												<include name="stax-api-1.0-2.jar" />
+											</fileset>
+										</delete>
+										<echo>Removed core-webservices.jar from ${ext.@{extname}.path}/web/webroot/WEB-INF/lib/</echo>
+									</then>
+								</if>
+							</sequential>
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="platformwebservices_after_compile_web">
+		<sequential>
+			<if>
+				<not>
+					<equals arg1="${webservice.module}" arg2="platformwebervices"/>
+				</not>
+				<then>
+					<echo>Generating core-webservices.jar for extension ${webservice.module}</echo>
+					<foreachext>
+						<do>
+							<if>
+								<and>
+									<equals arg1="@{extname}" arg2="${webservice.module}" />
+									<not>
+										<equals arg1="@{extname}" arg2="platformwebservices" />
+									</not>
+								</and>
+								<then>
+									<sequential>
+										<if>
+											<available file="${ext.platformwebservices.path}/web/webroot/WEB-INF/classes" />
+											<then>
+												<mkdir dir="${ext.@{extname}.path}/web/webroot/WEB-INF/lib/" />
+												<jar destfile="${ext.@{extname}.path}/web/webroot/WEB-INF/lib/core-webservices.jar">
+													<fileset dir="${ext.platformwebservices.path}/web/webroot/WEB-INF/classes" >
+														<!--include name="de/hybris/platform/webservices/**/*" /-->
+													</fileset>
+													<!-- include here webservice tests bas class -->
+													<fileset dir="${ext.platformwebservices.path}/web/testclasses" includes="**/*/AbstractWebServicesTest.class"/>
+												</jar>
+												<echo>Generated core-webservices.jar into ${ext.@{extname}.path}/web/webroot/WEB-INF/lib/</echo>
+												<copy todir="${ext.@{extname}.path}/web/webroot/WEB-INF/lib/"  verbose="true"   >
+													<fileset dir="${ext.platformwebservices.path}/web/webroot/WEB-INF/lib"  >
+														<include name="jersey-client-${jersey.version}.jar" />
+														<include name="jersey-core-${jersey.version}.jar" />
+														<include name="jersey-json-${jersey.version}.jar" />
+														<include name="jersey-server-${jersey.version}.jar" />
+														<include name="jersey-servlet-${jersey.version}.jar" />
+														<include name="jersey-spring-${jersey.version}.jar" />
+														<include name="jersey-test-framework-core-${jersey.version}.jar" />
+														<include name="jsr311-api-1.1.1.jar" />
+														<include name="stax-api-1.0-2.jar" />
+													</fileset>
+												</copy>
+												<echo>Copied webservice libraries</echo>
+											</then>
+										</if>
+									</sequential>
+								</then>
+							</if>
+						</do>
+					</foreachext>
+					<if>
+						<available file="${ext.@{extname}.path}/custom/src" />
+						<then>
+							<echo>Touching a @{extname} extension to replace potential custom DTO/resources ...</echo>
+							<touch file="${ext.@{extname}.path}/custom/src/.generated_touch"/>
+						</then>
+					</if>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+</project>

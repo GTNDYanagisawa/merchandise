@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	
+	<collectiontypes>
+		<!-- dont remove since this type is required by VoucherEditorChip -->
+		<collectiontype code="VoucherCollection" elementtype="Voucher" autocreate="true" generate="true"/>
+	</collectiontypes>
+
+	<relations>
+	
+		<relation code="VoucherRestrictionsRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement qualifier="voucher" type="Voucher" cardinality="one">
+				<modifiers read="true" write="false" initial="true" optional="false"/>
+			</sourceElement>
+			<targetElement qualifier="restrictions" type="Restriction" cardinality="many" collectiontype="set" ordered="true">
+				<modifiers read="true" write="true" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="VoucherInvalidationsRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement qualifier="voucher" type="Voucher" cardinality="one">
+				<modifiers read="true" write="false" initial="true" optional="false" search="true"/>
+			</sourceElement>
+			<targetElement qualifier="invalidations" type="VoucherInvalidation" cardinality="many" collectiontype="collection">
+				<modifiers read="true" write="true" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+			
+	</relations>
+		
+	<itemtypes>
+		<itemtype code="Voucher" 
+			extends="Discount" 
+			jaloclass="de.hybris.platform.voucher.jalo.Voucher"
+			abstract="true"
+			autocreate="true" 
+			generate="true">
+			<attributes>
+				<attribute qualifier="code" redeclare="true" type="java.lang.String" autocreate="true" >
+					<modifiers read="true" write="false" search="true" initial="true" optional="false" unique="true"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>	
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<description>the description of the voucher.</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="freeShipping" type="java.lang.Boolean">
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<description>
+						Specifies if the order this voucher is applied to is shipped 
+						for free (true) or not (false). Default is not (false).
+					</description>
+					<persistence type="property"/>
+					<modifiers search="false" optional="false"/>
+				</attribute>
+				<attribute qualifier="valueString" type="java.lang.String">
+					<description>
+						the value of this voucher to display.
+					</description>
+					<modifiers write="false" search="false"/>
+					<persistence type="jalo"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="value" redeclare="true" type="java.lang.Double">
+					<modifiers read="true" write="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="orders" redeclare="true" type="AbstractOrderCollection">
+					<modifiers read="true" write="false" search="true"/>
+				</attribute>
+				<attribute qualifier="global" redeclare="true" type="java.lang.Boolean">
+               <modifiers read="true" write="true" search="true" optional="true" />
+            </attribute>
+			</attributes>
+			<indexes>
+         		<index name="codeIDX" unique="false">
+         			<key attribute="code"/>
+         		</index>
+	        </indexes>
+		</itemtype>
+		
+		<itemtype code="SerialVoucher" 
+			extends="Voucher" 
+			jaloclass="de.hybris.platform.voucher.jalo.SerialVoucher"
+			autocreate="true" 
+			generate="true">
+			<attributes>
+				<attribute qualifier="codes" type="MediaCollection">
+					<description>the generated codes of this voucher.</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="PromotionVoucher" 
+			extends="Voucher" 
+			jaloclass="de.hybris.platform.voucher.jalo.PromotionVoucher"
+			autocreate="true" 
+			generate="true">
+			<attributes>
+				<attribute qualifier="voucherCode" type="java.lang.String">
+					<description>the voucher code.</description>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="redemptionQuantityLimit" type="java.lang.Integer">
+					<defaultvalue>Integer.valueOf(1)</defaultvalue>
+					<description>the upper limit of uses possible for this voucher.</description>
+					<persistence type="property"/>
+					<modifiers search="false" optional="false"/>
+				</attribute>
+				<attribute qualifier="redemptionQuantityLimitPerUser" type="java.lang.Integer">
+					<defaultvalue>Integer.valueOf(1)</defaultvalue>
+					<description>the upper limit of voucher uses possible per user. Default is one.</description>
+					<persistence type="property"/>
+					<modifiers search="false" optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="VoucherInvalidation"
+			extends="GenericItem"
+			jaloclass="de.hybris.platform.voucher.jalo.VoucherInvalidation"
+			autocreate="true"
+			generate="true">
+			<deployment table="VoucherInvalidations" typecode="1600"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>the code used redeeming the voucher.</description>
+					<persistence type="property"/>
+					<modifiers write="false" initial="true" optional="false"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="user" type="User">
+					<description>the user who redeemed the voucher.</description>
+					<persistence type="property"/>
+					<modifiers write="false" initial="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="order" type="Order">
+					<description>the order for which the voucher code was applied.</description>
+					<persistence type="property"/>
+					<modifiers write="false" initial="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="status" type="java.lang.String">
+					<description>the status of the invalidation.</description>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="codeIdx">
+					<key attribute="code"/>
+				</index>
+				<index name="codeUserIdx">
+					<key attribute="code"/>
+					<key attribute="user"/>
+				</index>
+				<index name="codeOrderIdx">
+					<key attribute="code"/>
+					<key attribute="order"/>
+				</index>
+			</indexes>
+		</itemtype>
+		
+		<itemtype code="Restriction"
+			extends="GenericItem"
+			jaloclass="de.hybris.platform.voucher.jalo.Restriction"
+			autocreate="true"
+			generate="true">
+			<deployment table="Restrictions" typecode="1601"/>
+			<attributes>
+				<attribute qualifier="positive" type="java.lang.Boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<description>
+						Specifies if this restriction is a positive (true) or negative 
+						(false) one.
+					</description>
+					<persistence type="property"/>
+					<modifiers search="false" optional="false"/>
+				</attribute>
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<description>the description of the restriction.</description>
+					<modifiers read="true" write="true" search="false" optional="true"/>
+					<persistence type="property"/>				
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="violationMessage" type="localized:java.lang.String">
+					<description>
+						the message to return if the restriction is violated (not fulfilled).
+					</description>
+					<modifiers search="false"/>
+					<persistence type="property"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="restrictionType" type="localized:java.lang.String">
+					<description>
+						the type of this restriction.
+					</description>
+					<modifiers write="false" search="false"/>
+					<persistence type="jalo"/>
+					<custom-properties>
+						<property name="hmcIndexField"><value>"thefield"</value></property>
+					</custom-properties>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="ProductRestriction"
+			extends="Restriction"
+			jaloclass="de.hybris.platform.voucher.jalo.ProductRestriction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute autocreate="true" qualifier="products" type="ProductCollection">
+					<description>the products the given voucher is valid for.</description>
+					<persistence type="property"/>
+					<modifiers search="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="ProductQuantityRestriction"
+			extends="ProductRestriction"
+			jaloclass="de.hybris.platform.voucher.jalo.ProductQuantityRestriction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute autocreate="true" qualifier="quantity" type="java.lang.Long">
+					<description>the quantity of products the given voucher is valid for.</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="false" initial="false" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="unit" type="Unit">
+					<description>
+						the unit for the quantity of products the given voucher is valid for.
+					</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="false" initial="false" optional="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="ProductCategoryRestriction"
+			extends="ProductRestriction"
+			jaloclass="de.hybris.platform.voucher.jalo.ProductCategoryRestriction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute autocreate="true" qualifier="categories" type="CategoryCollection">
+					<description>the categories the given voucher is valid for.</description>
+					<persistence type="property"/>
+					<modifiers search="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="OrderRestriction"
+			extends="Restriction"
+			jaloclass="de.hybris.platform.voucher.jalo.OrderRestriction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute autocreate="true" qualifier="total" type="java.lang.Double">
+					<description>the total sum of an order for which the given voucher is valid.</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="false" initial="false" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="currency" type="Currency">
+					<description>
+						the currency of the total sum of an order for which the given voucher is valid.
+					</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="false" initial="false" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="net" type="java.lang.Boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<description>
+						Specifies if total sum of an order is consulted inclusive or exclusive VAT. 
+						Default is true (exclusive VAT).
+					</description>
+					<persistence type="property"/>
+					<modifiers search="false" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="valueofgoodsonly" type="java.lang.Boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<description>
+						Specifies if total sum of an order is consulted inclusive or exclusive shipping and payment costs.
+						Default is true (exclusive shipping costs).
+					</description>
+					<persistence type="property"/>
+					<modifiers search="false" optional="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="DateRestriction"
+			extends="Restriction"
+			jaloclass="de.hybris.platform.voucher.jalo.DateRestriction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute autocreate="true" qualifier="startDate" type="java.util.Date">
+					<description>the date past which the given voucher is valid.</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="false" initial="false" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="endDate" type="java.util.Date">
+					<description>the date until the given voucher is valid.</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="false" initial="false" optional="false"/>
+				</attribute>
+				<attribute type="java.lang.Boolean" qualifier="positive" redeclare="true" >
+					<modifiers optional="true"/>
+					<defaultvalue>
+						Boolean.TRUE
+					</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="UserRestriction"
+			extends="Restriction"
+			jaloclass="de.hybris.platform.voucher.jalo.UserRestriction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute qualifier="users" type="PrincipalCollection">
+					<description>the principals the given voucher is valid for.</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="false" initial="false" optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="NewCustomerRestriction"
+			extends="Restriction"
+			jaloclass="de.hybris.platform.voucher.jalo.NewCustomerRestriction"
+			autocreate="true"
+			generate="true">
+		</itemtype>
+		
+		<itemtype code="RegularCustomerOrderQuantityRestriction"
+			extends="Restriction"
+			jaloclass="de.hybris.platform.voucher.jalo.RegularCustomerOrderQuantityRestriction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute qualifier="orderQuantity" type="java.lang.Integer">
+					<description>
+						restrict to customers with a total of x completed orders.
+					</description>
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="java.lang.Boolean" qualifier="positive" redeclare="true" >
+					<modifiers optional="true"/>
+					<defaultvalue>
+						Boolean.TRUE
+					</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="RegularCustomerOrderTotalRestriction"
+			extends="Restriction"
+			jaloclass="de.hybris.platform.voucher.jalo.RegularCustomerOrderTotalRestriction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute qualifier="allOrdersTotal" type="java.lang.Double">
+					<description>
+						restrict to customers who ordered a total of x or greater in 
+						their lifetime.
+					</description>
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="currency" type="Currency">
+					<description>
+						the currency associated with the orderTotalSum.
+					</description>
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute autocreate="true" qualifier="net" type="java.lang.Boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<description>
+						Specifies if total sum of all existing orders is consulted 
+						inclusive or exclusive VAT. Default is true (exclusive VAT).
+					</description>
+					<persistence type="property"/>
+					<modifiers search="false" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="valueofgoodsonly" type="java.lang.Boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<description>
+						Specifies if total sum of all orders is consulted inclusive or 
+						exclusive shipping and payment costs. Default is true (exclusive shipping 
+						and payment costs).
+					</description>
+					<persistence type="property"/>
+					<modifiers search="false" optional="false" />
+				</attribute>
+				<attribute type="java.lang.Boolean" qualifier="positive" redeclare="true" >
+					<modifiers optional="true"/>
+					<defaultvalue>
+						Boolean.TRUE
+					</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="AbstractOrder" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="appliedVoucherCodes" type="StringCollection">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" search="false" private="true" dontOptimize="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

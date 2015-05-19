@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  [y] hybris Platform
+ 
+  Copyright (c) 2000-2014 hybris AG
+  All rights reserved.
+ 
+  This software is the confidential and proprietary information of hybris
+  ("Confidential Information"). You shall not disclose such Confidential
+  Information and shall use it only in accordance with the terms of the
+  license agreement you entered into with hybris.
+ 
+  
+--><beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans            http://www.springframework.org/schema/beans/spring-beans-3.1.xsd            http://www.springframework.org/schema/aop            http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<alias alias="sapCoreGlobalConfigurationManager" name="sapCoreDefaultGlobalConfigurationManager"/>
+	<bean class="de.hybris.platform.sap.core.configuration.impl.DefaultGlobalConfigurationManager" id="sapCoreDefaultGlobalConfigurationManager" init-method="init" scope="singleton" />
+
+	<alias alias="sapCoreConfigurationService" name="sapCoreDefaultSAPConfigurationService"/>
+	<bean class="de.hybris.platform.sap.core.configuration.impl.DefaultSAPConfigurationService" id="sapCoreDefaultSAPConfigurationService" scope="singleton" >
+		<property name="rfcDestinationService" ref="sapCoreRFCDestinationService"/>
+	</bean>
+	
+ 	<!-- ============================ -->
+	<!-- Global Configuration Service -->
+	<!-- ============================ -->
+	<alias alias="sapCoreSAPGlobalConfigurationService" name="sapCoreDefaultSAPGlobalConfigurationService"/>
+	<bean class="de.hybris.platform.sap.core.configuration.global.impl.DefaultSAPGlobalConfigurationService" id="sapCoreDefaultSAPGlobalConfigurationService" scope="singleton" />
+
+	<!-- ==================================== -->
+	<!-- Abstract Module Configuration Access -->
+	<!-- ==================================== -->
+	<alias alias="sapCoreModuleConfigurationAccess" name="sapCoreDefaultModuleConfigurationAccess"/>
+	<bean abstract="true" class="de.hybris.platform.sap.core.module.impl.ModuleConfigurationAccessImpl" id="sapCoreDefaultModuleConfigurationAccess" init-method="init" scope="singleton">
+		<property name="configurationService" ref="sapCoreConfigurationService"/>
+	</bean>
+
+	<alias alias="sapCoreRFCDestination" name="sapCoreDefaultRFCDestination"/>
+	<bean class="de.hybris.platform.sap.core.configuration.rfc.impl.DefaultRFCDestination" id="sapCoreDefaultRFCDestination" scope="prototype" />
+
+	<alias alias="sapCoreRFCDestinationService" name="sapCoreDefaultRFCDestinationService"/>
+	<bean class="de.hybris.platform.sap.core.configuration.rfc.impl.DefaultRFCDestinationService" id="sapCoreDefaultRFCDestinationService" scope="singleton" />
+
+	<alias alias="sapCoreHTTPDestination" name="sapCoreDefaultHTTPDestination"/>
+	<bean class="de.hybris.platform.sap.core.configuration.http.impl.DefaultHTTPDestination" id="sapCoreDefaultHTTPDestination" scope="prototype" />
+
+	<alias alias="sapCoreHTTPDestinationService" name="sapCoreDefaultHTTPDestinationService"/>
+	<bean class="de.hybris.platform.sap.core.configuration.http.impl.DefaultHTTPDestinationService" id="sapCoreDefaultHTTPDestinationService" scope="singleton" />
+	
+	<bean class="de.hybris.platform.sap.core.configuration.impl.DefaultConfigurationPropertyAccess" id="sapCoreDefaultConfigurationPropertyAccess" scope="prototype" />
+	
+</beans>

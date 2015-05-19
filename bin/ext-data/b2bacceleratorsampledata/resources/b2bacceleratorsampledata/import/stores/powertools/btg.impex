@@ -1,0 +1,244 @@
+# ImpEx for Importing BTG configuration into Powertools Store
+
+#Macros / Replacement Parameter definitions
+$contentCatalog=powertoolsContentCatalog
+$contentCatalogVersion=catalogVersion(catalog(id[default=$contentCatalog]),version[default='Staged'])[unique=true]
+$productCatalog=powertoolsProductCatalog
+$productCatalogVersion=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true]
+
+#####################################################################
+#     Making the new Operands accessible to cms cockpit
+# - BTGOrganizationTotalSpentInCurrencyRelativeDatesOperand	Order
+# - BTGOrganizationTotalSpentInCurrencyLastYearOperand		Order
+# - BTGOrganizationUIDOfUserOperand							User
+# - BTGNumberOfOrdersAboveAmountRelativeDateOperand			Order
+#####################################################################
+INSERT_UPDATE BTGConfig[unique=true];defaultTimeUnit(code);usedRuleTypes(code);operandMapping(key(code),value(code))[map-delimiter=|]
+BTGConfig;WEEK;ORDER,CART,USER,WCMS;ORDER->BTGOrganizationTotalSpentInCurrencyRelativeDatesOperand,BTGOrganizationTotalSpentInCurrencyLastYearOperand,BTGNumberOfOrdersAboveAmountRelativeDateOperand,BTGCategoriesInOrdersOperand,BTGEachOrderTotalSumOperand,BTGOrderTotalSumOperand,BTGProductsInOrdersOperand,BTGNumberOfOrdersOperand,BTGNumberOfOrdersRelativeDateOperand,BTGLastOrderDateOperand|CART->BTGCartIsEmptyOperand,BTGCartTotalSumOperand,BTGCategoriesInCartOperand,BTGProductsInCartOperand,BTGQuantityOfProductInCartOperand|WCMS->BTGViewedProductsOperand,BTGViewedCategoriesOperand,BTGVisitedContentpagesOperand,BTGReferalUrlOperand,BTGUrlParameterOperand|USER->BTGOrganizationUIDOfUserOperand,BTGUserAddressPostalCodeOperand,BTGUserCountryOperand,BTGUserGenderOperand,BTGUserMemberOfGroupsOperand|SCRIPT->BTGMediaScriptOperand,BTGStringScriptOperand
+
+#####################################################################
+# Common Operators
+#####################################################################
+INSERT_UPDATE BTGOperator;uid[unique=true];code;$contentCatalogVersion
+;powerToolsOrderThresholdOrMoreOperator;numGreaterThanOrEqual;
+;powertoolsContainsOperator;contains
+;powertoolsNotContainsOperator;notContains;
+;powertoolsContainsAnyOperator;containsAny;
+
+INSERT_UPDATE BTGNumberOfOrdersOperand;uid[unique=true];$contentCatalogVersion
+;powerToolsNumberOfOrdersOperand;;
+
+INSERT_UPDATE BTGUserMemberOfGroupsOperand;uid[unique=true];$contentCatalogVersion
+;powertoolsUserMemberOfGroupsOperand;
+
+INSERT_UPDATE BTGOrganizationTotalSpentInCurrencyLastYearOperand;uid[unique=true];$contentCatalogVersion;currency(isocode);productCatalogId[default=$productCatalog]
+;powertoolsTotalDollarsSpentLastYear;;USD;;
+
+INSERT_UPDATE BTGOperator;uid[unique=true];code;$contentCatalogVersion
+;orderThresholdOrMoreOperator;numGreaterThanOrEqual;
+
+INSERT_UPDATE BTGOperator;uid[unique=true];code;$contentCatalogVersion
+;orderThresholdLessOperator;numLessThan;
+
+##################################################################
+# Premium Tool Buyer Segment
+# A member of prospectivepowerdrill will see an alternative Product Carousel Component
+# A user who is not a member of prospectivepowerdrill will see the default Carousel Component
+##################################################################
+INSERT_UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];$contentCatalogVersion
+;premiumToolBuyerSegment;Premium Tool Buyer Segment;powertools
+;regularCustomerSegment;Regular Customer Segment;powertools
+
+INSERT_UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+;premiumToolBuyerRule;Premium Tool Buyer Rule;premiumToolBuyerSegment;USER
+;regularCustomerRule;Regular Customer Rule;regularCustomerSegment;USER
+
+INSERT_UPDATE BTGReferencePrincipalGroupsOperand;uid[unique=true];groups(uid);$contentCatalogVersion
+;powertoolsUserGroupsOperand;prospectivepowerdrill;
+
+INSERT_UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+;powertoolsPremiumBuyerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;premiumToolBuyerRule
+;powertoolsRegularCustomerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsNotContainsOperator;regularCustomerRule
+
+INSERT_UPDATE CmsRestrictionActionDefinition;uid[unique=true];code;target;inverted;segment(uid, $contentCatalogVersion);$contentCatalogVersion
+;premiumToolBuyerRestrictionAction;Premium Tool Buyer Action;btgDummyAction;false;premiumToolBuyerSegment
+;regularCustomerRestrictionAction;Regular Customer Action;btgDummyAction;false;regularCustomerSegment
+
+INSERT_UPDATE BtgSegmentRestriction;uid[unique=true];name;outputActionDefinition(uid, $contentCatalogVersion);components(uid, $contentCatalogVersion);$contentCatalogVersion
+;premiumToolBuyerProductcarouselRestriction;Premium Tool Buyer Carousel Restriction;premiumToolBuyerRestrictionAction;PremiumbuyersgroupHomepageProductCarouselComponent
+;powertoolsHomepageProductCarouselComponentRestriction;Regular Customer Carousel;regularCustomerRestrictionAction;PowertoolsHomepageProductCarouselComponent
+
+##################################################################
+# Prospective Powerdrill Promotion Segment
+# Product Detail
+# Include promotion banner component to promote Bosch PSR 14.4 LI-2
+##################################################################
+INSERT_UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=PERMANENT];$contentCatalogVersion
+;prospectivePowerdrillPromotionSegment;Prospective Powerdrill Promotion Segment;powertools
+
+INSERT_UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+;prospectivePowerdrillPromotionRule;Prospective Powerdrill Promotion Rule;prospectivePowerdrillPromotionSegment;USER
+
+INSERT_UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+;prospectivePowerdrillProductDetailExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;prospectivePowerdrillPromotionRule
+
+INSERT_UPDATE CmsRestrictionActionDefinition;uid[unique=true];code;target;inverted;segment(uid, $contentCatalogVersion);$contentCatalogVersion
+;prospectivePowerdrillPromotionRestrictionAction;Prospective Powerdrill Promotion Restriction Action;btgDummyAction;false;prospectivePowerdrillPromotionSegment
+
+INSERT_UPDATE BtgSegmentRestriction;uid[unique=true];name;outputActionDefinition(uid, $contentCatalogVersion);components(uid, $contentCatalogVersion);$contentCatalogVersion
+;premiumToolBuyerProductDetailPagePromotionBannerRestriction;Premium Tool Buyer Product Detail Page Promotion Banner Restriction;prospectivePowerdrillPromotionRestrictionAction;BTGBannerProductDetail
+
+
+#####################################################################
+# Powerdrill Viewed Segments
+#####################################################################
+
+INSERT_UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=SESSION];$contentCatalogVersion
+;powerdrillViewedSegment;Powerdrill Viewed Segments;powertools;
+
+INSERT_UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+;powerdrillViewedRule;Powerdrill Viewed Rule;powerdrillViewedSegment;WCMS;
+
+INSERT_UPDATE BTGOperator;uid[unique=true];code;$contentCatalogVersion
+;powertoolsContainsOperator;containsAny;
+
+INSERT_UPDATE BTGViewedCategoriesOperand;uid[unique=true];$contentCatalogVersion;
+;powerdrillCategoriesViewedOperand;;
+
+INSERT_UPDATE BTGReferenceCategoriesOperand;uid[unique=true];code;categories(code, $productCatalogVersion);$contentCatalogVersion
+;powerdrillsCategoriesOperand;powertoolsPowerdrillsCategoriesOperand;1360,1593;
+
+INSERT_UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+;powerdrillViewedExpression;powerdrillCategoriesViewedOperand;powerdrillsCategoriesOperand;powertoolsContainsOperator;powerdrillViewedRule
+
+INSERT_UPDATE BTGAssignToGroupDefinition;uid[unique=true];code;target;userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+;assignToProspectivePowerdrill;Assign to Powerdrill Viewed Segment;assignToGroup;prospectivepowerdrill;powerdrillViewedSegment;
+
+#####################################################################
+# Pronto High Value Order Customer
+#####################################################################
+
+INSERT_UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=PERMANENT];$contentCatalogVersion
+;prontoHighValueOrderCustomerSegment;Pronto High Value Order Customer Segments;powertools;
+
+INSERT_UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+;powertoolsHighValueOrderRule;Powertools High Value Order Customer Rule;prontoHighValueOrderCustomerSegment;ORDER;
+
+INSERT_UPDATE BTGNumberOfOrdersAboveAmountRelativeDateOperand;uid[unique=true];$contentCatalogVersion;value;unit(code);amount;currency(isocode);orderStatus(code)
+;powertoolsNumberOfOrdersInTwelveMonthsOver10K;;12;MONTH;10000;USD;APPROVED;
+
+INSERT_UPDATE BTGIntegerLiteralOperand;uid[unique=true];literal;$contentCatalogVersion
+;fourIntegerOperand;4;
+
+INSERT_UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+;FourOrdersInPast12MonthsOver10KExpresssion;powertoolsNumberOfOrdersInTwelveMonthsOver10K;fourIntegerOperand;orderThresholdOrMoreOperator;powertoolsHighValueOrderRule;
+
+INSERT_UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+;prontoOrgMemberRule;Pronto Organization Member Customer Rule;prontoHighValueOrderCustomerSegment;USER;
+
+INSERT_UPDATE BTGOrganizationUIDOfUserOperand;uid[unique=true];$contentCatalogVersion;
+;powertoolsOrganizationUIDOfUserOperand;;
+
+INSERT_UPDATE BTGOrganizationUIDsOperand;uid[unique=true];code;organizationUids;$contentCatalogVersion
+;powertoolsOrganizationUIDsOperand;powertoolsOrganizationUIDsOperand;Pronto;
+
+INSERT_UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+;powertoolsUserInProntoOrganizationExpression;powertoolsOrganizationUIDOfUserOperand;powertoolsOrganizationUIDsOperand;powertoolsContainsAnyOperator;prontoOrgMemberRule;
+
+INSERT_UPDATE BTGAssignToGroupDefinition;uid[unique=true];code;target;userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+;assignToUSD750Off10KOrders;Assign to Pronto High Value Order Segment;assignToGroup;usd750off10korders;prontoHighValueOrderCustomerSegment;;
+
+##################################################################
+# Bronze Loyalty
+# Total value of Organization's Orders in the previous calendar year was larger than $100k
+##################################################################
+INSERT_UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=PERMANENT];$contentCatalogVersion
+;bronzeLoyaltySegment;Bronze Loyalty Segment;powertools;
+
+INSERT_UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+;bronzeLoyaltySegmentRule;Bronze Loyalty Customer Rule;bronzeLoyaltySegment;ORDER;
+
+INSERT_UPDATE BTGDoubleLiteralOperand;uid[unique=true];literal;$contentCatalogVersion
+;100KDoubleOperand;100000;
+
+INSERT_UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+;minimumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;100KDoubleOperand;orderThresholdOrMoreOperator;bronzeLoyaltySegmentRule;
+
+INSERT_UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+;maximumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdLessOperator;bronzeLoyaltySegmentRule;
+
+INSERT_UPDATE BTGAssignOrganizationToGroupDefinition;uid[unique=true];code;target;userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+;assignToBronzeLoyaltyDefinition;Assign Root Unit to Bronze Loyalty Segment;assignOrganizationToGroup;bronzeloyalty;bronzeLoyaltySegment;;
+
+##################################################################
+# Silver Loyalty
+# Total value of Organization's Orders in the previous calendar year was larger than $200k
+##################################################################
+INSERT_UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=PERMANENT];$contentCatalogVersion
+;silverLoyaltySegment;Silver Loyalty Segment;powertools;
+
+INSERT_UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+;silverLoyaltySegmentRule;Silver Loyalty Customer Rule;silverLoyaltySegment;ORDER;
+
+INSERT_UPDATE BTGDoubleLiteralOperand;uid[unique=true];literal;$contentCatalogVersion
+;200KDoubleOperand;200000;
+
+INSERT_UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+;minimumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdOrMoreOperator;silverLoyaltySegmentRule;
+
+INSERT_UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+;maximumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdLessOperator;silverLoyaltySegmentRule;
+
+INSERT_UPDATE BTGAssignOrganizationToGroupDefinition;uid[unique=true];code;target;userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+;unAssignBronzeLoyaltyForSilverDefinition;UnAssign Root Unit from Bronze Loyalty Segment;unassignOrganizationToGroup;bronzeloyalty;silverLoyaltySegment;;
+
+INSERT_UPDATE BTGAssignOrganizationToGroupDefinition;uid[unique=true];code;target;userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+;assignToSilverLoyaltyDefinition;Assign Root Unit to Silver Loyalty Segment;assignOrganizationToGroup;silverloyalty;silverLoyaltySegment;;
+
+##################################################################
+# Gold Loyalty
+# Total value of Organization's Orders in the previous calendar year was larger than $400k
+##################################################################
+INSERT_UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=PERMANENT];$contentCatalogVersion
+;goldLoyaltySegment;Gold Loyalty Segment;powertools;
+
+INSERT_UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+;goldLoyaltySegmentRule;Gold Loyalty Customer Rule;goldLoyaltySegment;ORDER;
+
+INSERT_UPDATE BTGDoubleLiteralOperand;uid[unique=true];literal;$contentCatalogVersion
+;400KDoubleOperand;400000;
+
+INSERT_UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+;powertoolsUserInGoldLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdOrMoreOperator;goldLoyaltySegmentRule;
+
+INSERT_UPDATE BTGAssignOrganizationToGroupDefinition;uid[unique=true];code;target;userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+;unAssignBronzeLoyaltyForGoldDefinition;UnAssign Root Unit from Silver Loyalty Segment;unassignOrganizationToGroup;bronzeloyalty;goldLoyaltySegment;;
+
+INSERT_UPDATE BTGAssignOrganizationToGroupDefinition;uid[unique=true];code;target;userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+;unAssignSilverLoyaltyForGoldDefinition;UnAssign Root Unit from Silver Loyalty Segment;unassignOrganizationToGroup;silverloyalty;goldLoyaltySegment;;
+
+INSERT_UPDATE BTGAssignOrganizationToGroupDefinition;uid[unique=true];code;target;userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+;assignToGoldLoyaltyDefinition;Assign Root Unit to Gold Loyalty Segment;assignOrganizationToGroup;goldloyalty;goldLoyaltySegment;;
+
+##################################################################
+# Premium Tool Org Segment
+# Organization has purchased more than 100k of products in Powertools category in past 8 months
+# Assign to USD50OffPowertools
+##################################################################
+INSERT_UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=PERMANENT];$contentCatalogVersion
+;premiumToolOrgSegment;Premium Tool Org Segment;powertools;
+
+INSERT_UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+;premiumToolOrgSegmentRule;Premium Tool Org Segment Rule;premiumToolOrgSegment;ORDER;
+
+INSERT_UPDATE BTGOrganizationTotalSpentInCurrencyRelativeDatesOperand;uid[unique=true];$contentCatalogVersion;currency(isocode);productCatalogId[default=$productCatalog];unit(code);value;categoryCode
+;powertoolsTotalDollarsSpentLast8Months;;USD;;MONTH;8;;
+
+INSERT_UPDATE BTGDoubleLiteralOperand;uid[unique=true];literal;$contentCatalogVersion
+;100KDoubleOperandForProducts;100000;
+
+INSERT_UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+;premiumToolOrgSegmentExpression;powertoolsTotalDollarsSpentLast8Months;100KDoubleOperandForProducts;orderThresholdOrMoreOperator;premiumToolOrgSegmentRule;
+
+INSERT_UPDATE BTGAssignOrganizationToGroupDefinition;uid[unique=true];code;target;userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+;assignToUSD50offpowertoolsDefinition;Assign Root Unit to Premium Tool Org Segment;assignOrganizationToGroup;usd50offpowertools;premiumToolOrgSegment;;

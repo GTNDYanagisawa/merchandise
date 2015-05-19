@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+			
+    <collectiontypes>
+        <collectiontype code="ProductEntitlementCollectionType" elementtype="ProductEntitlement" autocreate="true" generate="false"/>
+     </collectiontypes>
+    
+    <enumtypes>
+        <enumtype code="EntitlementTimeUnit" autocreate="true" generate="true" dynamic="false">
+            <value code="day"/>
+            <value code="month"/>
+        </enumtype>    
+    </enumtypes>   
+    
+	
+    <relations>
+	
+		<relation
+            generate="true"
+            localized="false"
+            code="Product2ProductEntitlementsRelation"
+            autocreate="true">
+            <sourceElement type="Product" qualifier="subscriptionProduct" cardinality="one">
+              <modifiers optional="false"/>
+            </sourceElement>
+            <targetElement type="ProductEntitlement" qualifier="productEntitlements" cardinality="many">
+              <modifiers partof="true"></modifiers>
+            </targetElement>
+        </relation>
+		
+		<relation
+            generate="true"
+            localized="false"
+            code="ProductEntitlement2EntitlementRelation"
+            autocreate="true">
+            <sourceElement type="ProductEntitlement" qualifier="productEntitlements" cardinality="many"/>
+            <targetElement type="Entitlement" qualifier="entitlement" cardinality="one">
+              <modifiers optional="false"/>
+            </targetElement>
+        </relation>
+    </relations>   
+    
+	<itemtypes>
+        <itemtype code="UsageUnit" generate="true" jaloclass="de.hybris.platform.entitlementservices.jalo.UsageUnit"
+            extends="GenericItem" 
+            autocreate="true" >
+            <deployment table="UsageUnits" typecode="6326"/>
+            <attributes>
+                <attribute type="java.lang.String" qualifier="id">
+                    <description>Identifier</description>
+                    <persistence type="property"/>
+                    <modifiers unique="true" initial="true" optional="false" write="false"/>
+                </attribute>
+                <attribute qualifier="name" type="localized:java.lang.String" >
+                    <description>Name</description>
+                    <persistence type="property"/>
+                </attribute> 
+                <attribute qualifier="namePlural" type="localized:java.lang.String" >
+                    <description>Name (Plural)</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="accumulative" type="java.lang.Boolean">
+                    <description>Accumulative</description>
+                    <persistence type="property" />
+                    <defaultvalue>Boolean.valueOf(false)</defaultvalue>
+                </attribute> 
+            </attributes>
+        </itemtype>	
+        
+        <itemtype code="Entitlement" generate="true" jaloclass="de.hybris.platform.entitlementservices.jalo.Entitlement"
+            extends="GenericItem"
+            autocreate="true">
+            <deployment table="Entitlements" typecode="6321"/>
+            <attributes>
+                <attribute type="java.lang.String" qualifier="id">
+                    <description>Identifier</description>
+                    <persistence type="property"/>
+                    <modifiers unique="true" initial="true" optional="false" write="false"/>
+                </attribute>
+                <attribute qualifier="name" type="localized:java.lang.String" >
+                    <description>Name</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="description" type="localized:java.lang.String" >
+                    <description>Description</description>
+                    <persistence type="property"/>
+                </attribute>
+				<attribute qualifier="usageUnit" type="UsageUnit" >
+					<description>Usage Unit</description>
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute qualifier="productEntitlements" type="ProductEntitlementCollectionType">
+					<persistence type="property" />
+				</attribute>
+            </attributes>
+        </itemtype>
+                        
+        <itemtype code="ProductEntitlement" generate="true" jaloclass="de.hybris.platform.entitlementservices.jalo.ProductEntitlement"
+            extends="GenericItem"
+            autocreate="true">
+            <deployment table="ProductEntitlements" typecode="6329"/>
+            <custom-properties>
+                <property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+                <property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+                <property name="uniqueKeyAttributeQualifier"><value>"id"</value></property>
+            </custom-properties>
+            <attributes>
+                <attribute type="java.lang.String" qualifier="id">
+                    <description>Identifier</description>
+                    <persistence type="property"/>
+                    <modifiers initial="true" optional="true" write="false"/>
+                </attribute>
+                <attribute type="localized:java.lang.String" qualifier="description">
+                    <description>Description</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="catalogVersion" type="CatalogVersion">
+                    <description>Catalog Version</description>
+                    <modifiers initial="true" write="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="timeUnit" type="EntitlementTimeUnit" >
+                    <description>Time Unit</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="timeUnitStart" type="java.lang.Integer" >
+                    <description>Start</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="timeUnitDuration" type="java.lang.Integer" >
+                    <description>Duration</description>
+                    <persistence type="property"/>
+                </attribute>
+				<attribute type="java.lang.String" qualifier="conditionString">
+                    <description>String Condition</description>
+                    <persistence type="property"/>
+                </attribute>
+				<attribute type="java.lang.String" qualifier="conditionPath">
+                    <description>Path Condition</description>
+                    <persistence type="property"/>
+                </attribute>
+				<attribute type="StringCollection" qualifier="conditionGeo">
+                    <description>Geo Condition</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="quantity" type="java.lang.Integer" >
+                    <description>Quantity</description>
+                    <persistence type="property"/>
+                    <modifiers optional="true"/>
+                </attribute>                
+            </attributes>
+        </itemtype>
+	</itemtypes>
+</items>

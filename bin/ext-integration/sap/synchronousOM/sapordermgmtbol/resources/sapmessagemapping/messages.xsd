@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.sap.com/rfcmessages/" xmlns="http://www.sap.com/rfcmessages/"
+	elementFormDefault="qualified">
+
+	<xs:element name="messages" type="messagesType" />
+	<xs:element name="message" type="messageType" />
+
+	<xs:complexType name="messagesType">
+		<xs:sequence>
+			<xs:element name="global_config" type="globalConfigType" />
+			<xs:element name="message" type="messageType" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="globalConfigType">
+		<xs:attribute name="hide_non_error_messages" type="xs:boolean"
+			use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="messageType">
+		<xs:sequence>
+			<xs:element name="source" type="messageSourceType"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="destination" type="messageDestinationType"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="hide" minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="messageSourceType">
+		<xs:attribute name="id" type="xs:string" use="required"></xs:attribute>
+		<xs:attribute name="number" type="xs:string" use="optional"></xs:attribute>
+		<xs:attribute name="type" type="msgType" use="optional"></xs:attribute>
+		<xs:attribute name="msgV1" type="xs:string" use="optional"></xs:attribute>
+		<xs:attribute name="msgV2" type="xs:string" use="optional"></xs:attribute>
+		<xs:attribute name="msgV3" type="xs:string" use="optional"></xs:attribute>
+		<xs:attribute name="msgV4" type="xs:string" use="optional"></xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="messageDestinationType">
+		<xs:attribute name="type" type="msgType" use="optional"></xs:attribute>
+		<xs:attribute name="resource_key" type="xs:string" use="optional"></xs:attribute>
+		<xs:attribute name="process_step" type="processStepType"
+			use="optional"></xs:attribute>
+		<xs:attribute name="callbackId" type="xs:string" use="optional"></xs:attribute>
+	</xs:complexType>
+
+	<xs:simpleType name="msgType">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="W" />
+			<xs:enumeration value="S" />
+			<xs:enumeration value="E" />
+			<xs:enumeration value="I" />
+			<xs:enumeration value="A" />
+			<xs:enumeration value="*" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="processStepType">
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="CH" />
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

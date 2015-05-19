@@ -1,0 +1,30 @@
+*** Settings ***
+Library           de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Library			  de.hybris.platform.commerceservicesatddtests.keywords.CommerceServicesKeywordLibrary
+Library			  de.hybris.platform.configurablebundleatddtests.bundlecartfacade.keywords.BundleCartFacadeKeyWords
+
+*** Keywords ***
+
+##########
+### Add product to cart for new bundle (not existing in cart):
+##########
+
+add to cart product "${productCode:[^"]+}" for component "${bundleTemplateId:[^"]+}"
+	[Documentation]    Adds the product to the new bundle for the given component.
+	add product to new bundle    ${productCode}    ${bundleTemplateId}
+	
+add to cart product "${productCode1:[^"]+}" for component "${bundleTemplateId1:[^"]+}" and product "${productCode2:[^"]+}" for component "${bundleTemplateId2:[^"]+}" 
+	[Documentation]    Adds two products to the new bundle for the corresponding given components.
+	add two products to new bundle    ${productCode1}    ${bundleTemplateId1}    ${productCode2}    ${bundleTemplateId2}
+
+###########
+### Add product to cart for existing bundle (existing in cart):
+##########	
+
+add to cart product "${productCode:[^"]+}" for component "${bundleTemplateId:[^"]+}" to bundle with index "${bundleNo}"
+	[Documentation]    Adds the product to the existing bundle(bundleNo represents the bundle) for the given component.
+	add product to existing bundle    ${productCode}    ${bundleTemplateId}    ${bundleNo}
+		
+add to cart product "${productCode1:[^"]+}" for component "${bundleTemplateId1:[^"]+}" and product "${productCode2:[^"]+}" for component "${bundleTemplateId2:[^"]+}" to bundle with index "${bundleNo}"
+	[Documentation]    Adds two products to the existing bundle(bundleNo represents the bundle) for the corresponding given components.
+	add two products to existing bundle    ${productCode1}    ${bundleTemplateId1}    ${productCode2}    ${bundleTemplateId2}    ${bundleNo}

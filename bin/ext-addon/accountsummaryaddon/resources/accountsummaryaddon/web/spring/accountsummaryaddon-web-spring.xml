@@ -1,0 +1,55 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+        ">
+
+	<context:component-scan base-package="de.hybris.platform.accountsummaryaddon.controllers"
+		scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+
+
+	<bean id="listMergeBeanPostProcessor" class="de.hybris.platform.commerceservices.spring.config.ListMergeDirectiveBeanPostProcessor" />
+
+	<bean id="accountsummaryBeforeViewHandler" class="de.hybris.platform.addonsupport.interceptors.BeforeViewHandlerAdapter">
+		<property name="proxyInterfaceName" value="de.hybris.platform.yb2bacceleratorstorefront.interceptors.BeforeViewHandler" />
+		<property name="adaptee">
+			<bean class="de.hybris.platform.accountsummaryaddon.beforeview.AccountSummaryBeforeViewHandler">
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="accountsummaryBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="accountsummaryBeforeViewHandler" />
+	</bean>
+
+	<bean id="accountSummaryMyCompanyBreadcrumbBuilder" class="de.hybris.platform.accountsummaryaddon.breadcrumb.impl.AccountSummaryMyCompanyBreadcrumbBuilder">
+		<property name="messageSource" ref="storefrontMessageSource" />
+		<property name="i18nService" ref="i18nService" />
+	</bean>
+
+	<!-- Spring managed FilterChain for hybris Filter stack -->
+	<bean id="accountsummaryPlatformFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+		<constructor-arg>
+			<list>
+				<ref bean="log4jFilter" />
+				<ref bean="dynamicTenantActivationFilter" />
+				<ref bean="sessionFilter" />
+				<ref bean="accountsummarySecureMediaFilter" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="accountsummarySecureMediaFilter" class="de.hybris.platform.b2bdocumentsfilter.B2BDocumentsSecureMediaFilter">
+		<property name="mediaPermissionService" ref="mediaPermissionService" />
+		<property name="modelService" ref="modelService" />
+		<property name="userService" ref="userService" />
+		<property name="mediaService" ref="mediaService" />
+		<property name="secureMediaToken" value="securemedias" /><!-- securemedias is default but you may overwrite it -->
+		<aop:scoped-proxy />
+	</bean>
+</beans>

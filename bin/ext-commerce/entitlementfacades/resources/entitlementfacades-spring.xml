@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<import resource="classpath:/entitlementfacades/ycommercewebservices/spring/typealiasmappings.xml"/>
+    <import resource="classpath:/META-INF/entitlement-api-spring.xml"/>
+
+    <bean id="entitlementData" class="de.hybris.platform.entitlementfacades.data.EntitlementData" scope="prototype"/>
+	<bean id="defaultUsageUnitPopulator" class="de.hybris.platform.entitlementfacades.product.converters.populator.UsageUnitPopulator" />
+	<alias name="defaultUsageUnitPopulator"	alias="usageUnitPopulator"/>
+
+	<alias name="defaultProductEntitlementCollectionPopulator" alias="productEntitlementCollectionPopulator"/>
+	<bean name="defaultProductEntitlementCollectionPopulator" parent="baseProductPopulator"
+			class="de.hybris.platform.entitlementfacades.product.converters.populator.ProductEntitlementCollectionPopulator">
+		<property name="entitlementConverter" ref="entitlementConverter"/>
+	</bean>
+	
+	<alias name="defaultEntitlementConverter" alias="entitlementConverter"/>
+	<bean id="defaultEntitlementConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="entitlementData"/>
+		<property name="populators">
+			<list>
+				<ref bean="productEntitlementPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="productBasicPopulatorList"/>
+		<property name="add" ref="productEntitlementCollectionPopulator"/>
+	</bean>
+	
+	<alias name="defaultProductEntitlementPopulator" alias="productEntitlementPopulator" />
+	<bean name="defaultProductEntitlementPopulator"
+			class="de.hybris.platform.entitlementfacades.product.converters.populator.ProductEntitlementPopulator">
+		<property name="usageUnitConverter" ref="usageUnitConverter" />
+	</bean>
+	
+	<alias name="defaultUsageUnitConverter"	alias="usageUnitConverter"/>
+	<bean id="usageUnitData" class="de.hybris.platform.entitlementfacades.data.UsageUnitData" scope="prototype"/>
+	<bean id="defaultUsageUnitConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="usageUnitData"/>
+		<property name="populators">
+			<list>
+				<ref bean="usageUnitPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultSearchResultProductPopulator" alias="searchResultProductPopulator"/>
+	<bean id="defaultSearchResultProductPopulator" class="de.hybris.platform.entitlementfacades.product.converters.populator.SearchResultProductPopulator">
+		<property name="productService" ref="productService"/>
+		<property name="productEntitlementCollectionPopulator" ref="productEntitlementCollectionPopulator"/>
+	</bean>
+
+    <alias name="defaultPathConditionEntitlementPopulator" alias="pathConditionEntitlementPopulator"/>
+    <bean id="defaultPathConditionEntitlementPopulator" class="de.hybris.platform.entitlementfacades.entitlement.populator.PathConditionEntitlementPopulator"/>
+
+    <alias name="defaultStringConditionEntitlementPopulator" alias="stringConditionEntitlementPopulator"/>
+    <bean id="defaultStringConditionEntitlementPopulator" class="de.hybris.platform.entitlementfacades.entitlement.populator.StringConditionEntitlementPopulator"/>
+
+    <alias name="defaultGeoConditionEntitlementPopulator" alias="geoConditionEntitlementPopulator"/>
+    <bean id="defaultGeoConditionEntitlementPopulator" class="de.hybris.platform.entitlementfacades.entitlement.populator.GeoConditionEntitlementPopulator"/>
+
+    <alias name="defaultMeteredConditionEntitlementPopulator" alias="meteredConditionEntitlementPopulator"/>
+    <bean id="defaultMeteredConditionEntitlementPopulator" class="de.hybris.platform.entitlementfacades.entitlement.populator.MeteredConditionEntitlementPopulator"/>
+
+    <alias name="defaultTimeframeConditionEntitlementPopulator" alias="timeframeConditionEntitlementPopulator"/>
+    <bean id="defaultTimeframeConditionEntitlementPopulator" class="de.hybris.platform.entitlementfacades.entitlement.populator.TimeframeConditionEntitlementPopulator"/>
+
+    <alias name="defaultGrantEntitlementPopulator" alias="grantEntitlementPopulator"/>
+    <bean id="defaultGrantEntitlementPopulator" class="de.hybris.platform.entitlementfacades.entitlement.populator.GrantEntitlementPopulator">
+        <property name="conditionPopulators">
+            <list>
+                <ref bean="pathConditionEntitlementPopulator"/>
+                <ref bean="stringConditionEntitlementPopulator"/>
+                <ref bean="geoConditionEntitlementPopulator"/>
+                <ref bean="meteredConditionEntitlementPopulator"/>
+                <ref bean="timeframeConditionEntitlementPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultEntitlementModelToDataPopulator" alias="entitlementModelToDataPopulator"/>
+    <bean id="defaultEntitlementModelToDataPopulator" class="de.hybris.platform.entitlementfacades.entitlement.populator.EntitlementModelToDataPopulator">
+                <property name="usageUnitConverter" ref="usageUnitConverter"/>
+    </bean>
+
+    <alias name="defaultCoreEntitlementConverter" alias="coreEntitlementConverter"/>
+    <bean id="defaultCoreEntitlementConverter" parent="abstractPopulatingConverter" >
+        <lookup-method name="createTarget" bean="entitlementData"/>
+        <property name="populators">
+            <list>
+                <ref bean="entitlementModelToDataPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultCoreEntitlementFacade" alias="coreEntitlementFacade"/>
+    <bean id="defaultCoreEntitlementFacade" class="de.hybris.platform.entitlementfacades.impl.DefaultCoreEntitlementFacade">
+        <property name="grantFacade" ref="apiEntitlementFacade"/>
+        <property name="entitlementService" ref="entitlementService"/>
+        <property name="grantEntitlementPopulator" ref="grantEntitlementPopulator"/>
+        <property name="entitlementModelToDataConverter" ref="coreEntitlementConverter"/>
+    </bean>
+
+</beans>

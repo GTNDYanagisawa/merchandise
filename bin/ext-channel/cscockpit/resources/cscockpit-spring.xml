@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<!-- Service that provides promotions services if available via reflection -->
+	<alias alias="csPromotionService" name="defaultCsPromotionService"/>
+	<bean name="defaultCsPromotionService" class="de.hybris.platform.cscockpit.services.promotions.impl.DefaultCsPromotionService"
+	      parent="abstractBusinessService" autowire="byName" scope="tenant">
+		<!-- 
+		 ! Property 'promotionsService' must be auto-wired by name as it may be undefined
+		 ! <property name="promotionsService" ref="promotionsService"/>
+		 -->
+	</bean>
+
+	<!-- Service that provides checkout functionality -->
+	<alias alias="csCheckoutService" name="defaultCsCheckoutService"/>
+	<bean name="defaultCsCheckoutService" class="de.hybris.platform.cscockpit.services.checkout.impl.DefaultCsCheckoutService"
+	      parent="abstractBusinessService" scope="tenant">
+
+		<!-- Checkout validation -->
+		<property name="deliveryAddressRequired" value="true"/> <!-- default PaymentService requires a delivery address -->
+		<property name="paymentAddressRequired" value="true"/>
+		<property name="deliveryModeRequired" value="true"/>
+		<property name="customerAccountService" ref="customerAccountService"/>
+		<property name="deliveryService" ref="deliveryService"/>
+		<property name="orderCodeGenerator" ref="orderCodeGenerator"/>
+		<property name="orderService" ref="orderService"/>
+		<property name="csOrderUnauthorizedTotalStrategy" ref="csOrderUnauthorizedTotalStrategy"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="commerceCheckoutService" ref="commerceCheckoutService"/>
+		<property name="csCardPaymentService" ref="csCardPaymentService"/>
+		<property name="orderFulfillmentProcessService" ref="orderFulfillmentProcessService"/>
+		<property name="transactionInfoService" ref="transactionInfoService"/>
+	</bean>
+
+	<!-- Strategy for working out how much remains to be authorised on an order -->
+	<alias alias="csOrderUnauthorizedTotalStrategy" name="defaultCsOrderUnauthorizedTotalStrategy"/>
+	<bean name="defaultCsOrderUnauthorizedTotalStrategy" class="de.hybris.platform.cscockpit.services.payment.strategy.impl.DefaultCsOrderUnauthorizedTotalStrategy"
+	      parent="abstractBusinessService" scope="tenant">
+		<property name="transactionInfoService" ref="transactionInfoService"/>
+	</bean>
+
+	<!-- Service that provides payment functionality -->
+	<alias alias="csCardPaymentService" name="defaultCsCardPaymentService"/>
+	<bean name="defaultCsCardPaymentService" class="de.hybris.platform.cscockpit.services.payment.impl.DefaultCsCardPaymentService"
+	      parent="abstractBusinessService" scope="tenant">
+		<property name="cardValidator" ref="csCardValidator"/>
+		<property name="transactionInfoService" ref="transactionInfoService"/>
+		<property name="transactionCodeGenerator" ref="transactionCodeGenerator"/>
+		<property name="csOrderUnauthorizedTotalStrategy" ref="csOrderUnauthorizedTotalStrategy"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="paymentService" ref="paymentService"/>
+	</bean>
+
+	<alias alias="csCardValidator" name="defaultCsCardValidator"/>
+	<bean name="defaultCsCardValidator" class="de.hybris.platform.cscockpit.services.payment.impl.DefaultCardValidator" scope="tenant">
+		<property name="enumerationService" ref="enumerationService"/>
+
+		<!-- Force luhnCheck on the CardNumber, can be either true or false. Leave set to NULL to fallback to the "validation.luhncheck" config setting.
+		<property name="luhnCheckCardNumber" value="true"/>
+		 -->
+	</bean>
+
+
+	<!-- Dao that provides item lookup for the handle url events -->
+	<alias alias="csUrlActivationDao" name="defaultCsUrlActivationDao"/>
+	<bean name="defaultCsUrlActivationDao" parent="abstractItemDao" scope="tenant" class="de.hybris.platform.cscockpit.dao.impl.DefaultCsUrlActivationDao">
+		<property name="ticketService" ref="ticketService"/>
+	</bean>
+
+	<!-- Service that provides customer functionality -->
+	<alias alias="csCustomerService" name="defaultCsCustomerService"/>
+	<bean name="defaultCsCustomerService" class="de.hybris.platform.cscockpit.services.customer.impl.DefaultCsCustomerService"
+	      parent="abstractBusinessService" scope="tenant">
+	</bean>
+
+</beans>

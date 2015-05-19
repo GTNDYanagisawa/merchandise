@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+
+	<bean id="filterChainProxy" class="org.acegisecurity.util.FilterChainProxy">
+		<property name="filterInvocationDefinitionSource">
+			<value>
+				CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+				PATTERN_TYPE_APACHE_ANT
+				/zkau/**=httpSessionContextIntegrationFilter,logoutFilter,rememberMeProcessingFilter,anonymousProcessingFilter
+				/**=httpSessionContextIntegrationFilter,logoutFilter,rememberMeProcessingFilter,authenticationProcessingFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor
+			</value>
+		</property>
+	</bean>
+
+	<!-- used for acegi authentication -->
+	<bean id="SessionProxy" class="de.hybris.platform.cockpit.util.SessionProxy" scope="session">
+    	<aop:scoped-proxy />
+    	<property name="session" ref="UICockpitSession" />
+	</bean>
+
+
+	<bean id="httpSessionContextIntegrationFilter" class="org.acegisecurity.context.HttpSessionContextIntegrationFilter"/>
+
+	<bean id="logoutFilter" class="org.acegisecurity.ui.logout.LogoutFilter">
+		<constructor-arg value="/index.zul"/> <!-- URL redirected to after logout -->
+		<constructor-arg>
+			<list>
+				<ref bean="rememberMeServices"/>
+				<bean class="org.acegisecurity.ui.logout.SecurityContextLogoutHandler"/>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="authenticationProcessingFilter" class="de.hybris.platform.cockpit.security.UIAuthenticationProcessingFilter">
+		<property name="authenticationManager" ref="authenticationManager"/>
+		<property name="authenticationFailureUrl" value="/login.zul?login_error=1"/>
+		<property name="defaultTargetUrl" value="/index.zul"/>
+		<property name="filterProcessesUrl" value="/j_acegi_security_check"/>
+		<property name="rememberMeServices" ref="rememberMeServices"/>
+	</bean>
+   
+	<bean id="securityContextHolderAwareRequestFilter" class="org.acegisecurity.wrapper.SecurityContextHolderAwareRequestFilter"/>
+
+	<bean id="rememberMeProcessingFilter" class="org.acegisecurity.ui.rememberme.RememberMeProcessingFilter">
+		<property name="authenticationManager" ref="authenticationManager"/>
+		<property name="rememberMeServices" ref="rememberMeServices"/>
+	</bean>
+
+	<bean id="anonymousProcessingFilter" class="org.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
+		<property name="key" value="changeThis"/>
+		<property name="userAttribute" value="anonymousUser,ROLE_ANONYMOUS"/>
+	</bean>
+
+	<bean id="exceptionTranslationFilter" class="org.acegisecurity.ui.ExceptionTranslationFilter">
+		<property name="authenticationEntryPoint">
+			<bean class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
+				<property name="loginFormUrl" value="/login.zul"/>
+				<property name="forceHttps" value="false"/>
+			</bean>
+		</property>
+		<property name="accessDeniedHandler">
+			<bean class="org.acegisecurity.ui.AccessDeniedHandlerImpl">
+				<property name="errorPage" value="/accessDenied.zul"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="filterInvocationInterceptor" class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
+		<property name="authenticationManager" ref="authenticationManager"/>
+		<property name="accessDecisionManager">
+			<bean class="org.acegisecurity.vote.AffirmativeBased">
+				<property name="allowIfAllAbstainDecisions" value="false"/>
+				<property name="decisionVoters">
+					<list>
+						<bean class="org.acegisecurity.vote.RoleVoter"/>
+						<bean class="org.acegisecurity.vote.AuthenticatedVoter"/>
+					</list>
+				</property>
+			</bean>
+		</property>
+		<property name="objectDefinitionSource">
+			<!-- 
+			<value>
+				CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+				PATTERN_TYPE_APACHE_ANT
+				/secure/extreme/**=ROLE_SUPERVISOR
+				/secure/**=IS_AUTHENTICATED_REMEMBERED
+				/**=IS_AUTHENTICATED_ANONYMOUSLY
+			</value>
+			-->
+			<value>
+				CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+				PATTERN_TYPE_APACHE_ANT
+				/login.zul=IS_AUTHENTICATED_ANONYMOUSLY
+				/**=IS_AUTHENTICATED_REMEMBERED
+			</value>
+		</property>
+	</bean>
+
+	<bean id="hybrisAuthenticationProvider" class="de.hybris.platform.cockpit.security.HybrisAuthenticationProvider">
+		<property name="userDetailsService" ref="userDetailsService"/> 
+	</bean>
+
+	<bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
+		<property name="userDetailsService" ref="userDetailsService"/>
+	</bean>
+
+	<!-- UserDetailsService is the most commonly frequently Acegi Security interface implemented by end users -->
+	<bean id="userDetailsService" class="de.hybris.platform.cockpit.security.HybrisUserDetailsService">  
+	<!-- <property name="passwordEncoder"><ref bean="passwordEncoder"/></property> -->
+	</bean>
+
+	<!-- This bean is optional; it isn't used by any other bean as it only listens and logs -->
+	<bean id="loggerListener" class="org.acegisecurity.event.authentication.LoggerListener"/>
+
+
+	<!-- Support ZK modal login window when access secured method call -->
+	<bean id="zkFilterChainProxy" class="org.acegisecurity.util.FilterChainProxy">
+		<property name="filterInvocationDefinitionSource">
+			<value>
+				CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+				PATTERN_TYPE_APACHE_ANT
+				/zkau/**=zkAuthenticationProcessingFilter,zkExceptionTranslationFilter,zkEventExceptionFilter
+			</value>
+		</property>
+	</bean>
+
+	<bean id="zkAuthenticationProcessingFilter" class="org.zkoss.zkplus.acegi.ZkAuthenticationProcessingFilter">
+		<property name="authenticationManager" ref="authenticationManager"/>
+		<property name="authenticationFailureUrl" value="/zklogin.zul?login_error=1"/>
+		<property name="defaultTargetUrl" value="/"/>
+		<property name="filterProcessesUrl" value="/j_acegi_security_check"/>
+		<property name="rememberMeServices" ref="zkRememberMeServices"/>
+	</bean>
+
+	<bean id="zkExceptionTranslationFilter" class="org.acegisecurity.ui.ExceptionTranslationFilter">
+		<property name="authenticationEntryPoint">
+			<bean class="org.zkoss.zkplus.acegi.ZkAuthenticationEntryPoint">
+				<property name="loginFormUrl" value="/zklogin.zul"/>
+				<property name="forceHttps" value="false"/>
+			</bean>
+		</property>
+		<property name="accessDeniedHandler">
+			<bean class="org.zkoss.zkplus.acegi.ZkAccessDeniedHandler">
+				<property name="errorPage" value="/zkAccessDenied.zul"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="zkEventExceptionFilter" class="org.zkoss.zkplus.acegi.ZkEventExceptionFilter"/>
+
+	<bean id="zkRememberMeServices" class="org.zkoss.zkplus.acegi.ZkTokenBasedRememberMeServices">
+		<property name="userDetailsService" ref="userDetailsService"/>
+		<property name="key" value="changeThis"/>
+	</bean>
+
+	<bean id="httpRequestAccessDecisionManager" class="org.acegisecurity.vote.AffirmativeBased">
+	   <property name="allowIfAllAbstainDecisions"><value>false</value></property>
+	   <property name="decisionVoters">
+	       <list>
+	           <ref bean="roleVoter"/>
+	       </list>
+	   </property>
+	</bean>
+	
+	<bean id="roleVoter" class="org.acegisecurity.vote.RoleVoter"/>
+</beans>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:h="http://www.w3.org/1999/xhtml" 
+		xmlns:zk="http://www.zkoss.org/2005/zk"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd ">
+		<zscript>
+			Object[] typeNameAsArray = new Object[] {wizardBean.getSelectedTypeName()};
+		</zscript>
+		
+		<div style="text-align: left;">
+			<div sclass="wizardPageDescription">
+				<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.otherUserComponent.description')}"/>
+			</div>
+			<div style="margin: 30px; margin-top: 20px; font-size: 10px;" >
+				<radiogroup onCheck='altCompEditor.setVisible(self.getSelectedIndex()==1);
+											setAttr("altComponentSelected",self.getSelectedIndex()==1)'>
+					<div>
+						<hbox>
+							<radio onCreate='self.setChecked(!Boolean.TRUE.equals(getAttr("altComponentSelected")));'/>
+							<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.inverseHandling.cloneComponent')}"/>
+						</hbox>
+					</div>
+					<div style="margin-top: 20px;">
+						<hbox>
+							<radio onCreate='self.setChecked(Boolean.TRUE.equals(getAttr("altComponentSelected")));'/>
+							<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.inverseHandling.selectComponent')}"/>
+						</hbox>
+						<div height="10px"/>
+						<div style="margin-left: 30px">
+							<div id="altCompEditor" use="de.hybris.platform.cockpit.components.editor.CockpitEditorContainer" 
+									valueTypeCode="AbstractCMSComponent" editorCode="single"
+									onValueChange='setAttr("altComponent",self.getEditorValue())'
+									onCreate='self.setVisible(Boolean.TRUE.equals(getAttr("altComponentSelected")));
+												 self.setEditorValue(getAttr("altComponent"))'>
+								<custom-attributes allowCreate="true" displaySubtypes="true" allowActivate="false"
+										predefinedPropertyValues="${wizardBean.predefinedValuesForAltComponent}"/>
+							</div>
+						</div>
+					</div>
+				</radiogroup>
+			</div>
+		</div>
+</zk>

@@ -1,0 +1,18 @@
+#
+# Import Sample CMS Cockpit User
+# 
+
+$passwordEncoding=md5
+$defaultPassword=1234
+$setPassword=@password[translator=de.hybris.platform.impex.jalo.translators.ConvertPlaintextToEncodedUserPasswordTranslator][default='$passwordEncoding:$defaultPassword']
+$classificationCatalog=TelcoClassification
+
+INSERT_UPDATE Employee;UID[unique=true];$setPassword;description;name;groups(uid)[mode=append];sessionLanguage(isocode);sessionCurrency(isocode)
+;cmsmanager;;CMS manager;CMS Manager;cmsmanagergroup;en;USD
+
+UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];writePrincipals(uid);
+;telcoContentCatalog;Online;cmsmanagergroup,cmsmanager;
+;telcoContentCatalog;Staged;cmsmanagergroup,cmsmanager;
+
+UPDATE ClassificationSystemVersion;catalog(id)[unique=true];version[unique=true];writePrincipals(uid);readPrincipals(uid)
+;$classificationCatalog;1.0;cmsmanagergroup;cmsmanagergroup

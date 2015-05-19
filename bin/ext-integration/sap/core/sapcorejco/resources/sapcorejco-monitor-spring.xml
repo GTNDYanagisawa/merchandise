@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans            http://www.springframework.org/schema/beans/spring-beans-3.1.xsd            http://www.springframework.org/schema/aop            http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<!-- ========= -->
+	<!-- JMX MBean -->
+	<!-- ========= -->
+	<bean id="sapCoreJCoConnectionMBean" class="de.hybris.platform.sap.core.jco.jmx.impl.JCoConnectionMBeanImpl" scope="tenant">
+		<property name="beanInterface" value="de.hybris.platform.sap.core.jco.jmx.JCoConnectionMBean" />
+		<property name="localMonitorProvider" ref="sapCoreJCoConnectionMonitorLocalProvider" />
+		<property name="jmxPath" value="root=SAP Integration, jcoconnections=JCo Connections - local" />
+	</bean>
+
+	<bean id="sapCoreJCoConnectionClusterMBean" class="de.hybris.platform.sap.core.jco.jmx.impl.JCoConnectionClusterMBeanImpl"
+		scope="tenant">
+		<property name="beanInterface" value="de.hybris.platform.sap.core.jco.jmx.JCoConnectionClusterMBean" />
+		<property name="snapshotClusterHandler" ref="sapCoreJCoConnectionsSnapshotClusterHandler" />
+		<property name="jmxPath" value="root=SAP Integration, jcoconnectionscluster=JCo Connections - cluster-wide" />
+	</bean>
+
+	<!-- =================== -->
+	<!-- JCo Monitor Provider -->
+	<!-- =================== -->
+	<alias alias="sapCoreJCoConnectionMonitorLocalContext" name="sapCoreDefaultJCoConnectionMonitorLocalContext" />
+	<bean id="sapCoreDefaultJCoConnectionMonitorLocalContext" class="de.hybris.platform.sap.core.jco.monitor.provider.JCoConnectionMonitorLocalContext"
+		scope="singleton" />
+
+	<bean id="sapCoreAbstractJCoConnectionMonitorProvider" scope="singleton" abstract="true">
+		<property name="rfcDestinationService" ref="sapCoreRFCDestinationService" />
+		<property name="jaxbHandler" ref="sapCoreJCoMonitorJAXBHandler" />
+		<property name="clusterService" ref="clusterService" />
+		<property name="longLifetimeThresholdInSeconds" value="${sapcorejco.monitor.jcoconnection.lifetime.threshold.seconds:3600}" /> 
+	</bean>
+
+	<alias alias="sapCoreJCoConnectionMonitorLocalProvider" name="sapCoreDefaultJCoConnectionMonitorLocalProvider" />
+	<bean id="sapCoreDefaultJCoConnectionMonitorLocalProvider" class="de.hybris.platform.sap.core.jco.monitor.provider.JCoConnectionMonitorLocalProvider"
+		scope="singleton" parent="sapCoreAbstractJCoConnectionMonitorProvider">
+		<property name="localContext" ref="sapCoreJCoConnectionMonitorLocalContext" />
+	</bean>
+
+	<alias alias="sapCoreJCoConnectionMonitorClusterProvider" name="sapCoreDefaultJCoConnectionMonitorClusterProvider" />
+	<bean id="sapCoreDefaultJCoConnectionMonitorClusterProvider" class="de.hybris.platform.sap.core.jco.monitor.provider.JCoConnectionMonitorClusterProvider"
+		scope="singleton" parent="sapCoreAbstractJCoConnectionMonitorProvider">
+	</bean>
+
+	<!-- ======================== -->
+	<!-- JCo Monitor JAXB Handler -->
+	<!-- ======================== -->
+	<alias alias="sapCoreJCoMonitorJAXBHandler" name="sapCoreDefaultJCoMonitorJAXBHandler" />
+	<bean id="sapCoreDefaultJCoMonitorJAXBHandler" class="de.hybris.platform.sap.core.jco.monitor.jaxb.JCoMonitorJAXBHandler"
+		scope="singleton" />
+
+	<!-- =============================================== -->
+	<!-- JCo Connections Cluster Snapshot Event Handling -->
+	<!-- =============================================== -->
+	<bean id="sapCoreJCoConnectionsSnapshotClusterEventListener" class="de.hybris.platform.sap.core.jco.monitor.event.JCoConnectionsSnapshotClusterEventListener">
+		<property name="eventService"   ref="eventService" />
+		<property name="localProvider"  ref="sapCoreJCoConnectionMonitorLocalProvider" />
+	</bean>
+
+	<bean id="sapCoreJCoConnectionsSnapshotClusterHandler" class="de.hybris.platform.sap.core.jco.monitor.event.JCoConnectionsSnapshotClusterHandler">
+		<property name="eventService" ref="eventService" />
+		<property name="JCoConnectionMonitorClusterProvider" 	ref="sapCoreJCoConnectionMonitorClusterProvider" />
+		<property name="collectionTimeoutInSeconds" 				value="${sapcorejco.monitor.cluster.collection.timeout.seconds:60}" />
+		<property name="cacheLifetimeInSeconds" 					value="${sapcorejco.monitor.cluster.cache.lifetime.seconds:900}" />
+	</bean>
+
+</beans>

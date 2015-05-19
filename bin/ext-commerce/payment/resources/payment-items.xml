@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+	[y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights
+	reserved. This software is the confidential and proprietary
+	information of hybris ("Confidential Information"). You shall not
+	disclose such Confidential Information and shall use it only in
+	accordance with the terms of the license agreement you entered into
+	with hybris.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according
+	to your needs.
+-->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+
+		<enumtype code="CreditCardType" autocreate="false" generate="false">
+			<value code="maestro"/>
+			<value code="switch"/>
+			<value code="mastercard_eurocard"/>
+		</enumtype>
+		<enumtype code="PaymentTransactionType" autocreate="true"
+		          generate="true">
+			<value code="AUTHORIZATION"/>
+			<value code="CAPTURE"/>
+			<value code="PARTIAL_CAPTURE"/>
+			<value code="REFUND_FOLLOW_ON"/>
+			<value code="REFUND_STANDALONE"/>
+			<value code="CANCEL"/>
+			<value code="CREATE_SUBSCRIPTION"/>
+			<value code="UPDATE_SUBSCRIPTION"/>
+			<value code="GET_SUBSCRIPTION_DATA"/>
+			<value code="DELETE_SUBSCRIPTION"/>
+		</enumtype>
+
+	</enumtypes>
+
+	<relations>
+		<relation generate="true" localized="false"
+		          code="PaymentTransaction2PaymentTransactionEntry" autocreate="true">
+			<sourceElement type="PaymentTransaction" qualifier="paymentTransaction"
+			               cardinality="one"></sourceElement>
+			<targetElement type="PaymentTransactionEntry"
+			               qualifier="entries" cardinality="many" collectiontype="list">
+				<modifiers read="true" write="true" optional="true"
+				           partof="true"/>
+			</targetElement>
+		</relation>
+		<relation generate="true" localized="false"
+		          code="Order2PaymentTransaction" autocreate="true">
+			<sourceElement type="AbstractOrder" qualifier="order"
+			               cardinality="one"></sourceElement>
+			<targetElement type="PaymentTransaction" qualifier="paymentTransactions"
+			               cardinality="many" collectiontype="list">
+				<modifiers read="true" write="true" optional="true"
+				           partof="true"/>
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+
+		<itemtype code="PaymentTransaction" autocreate="true"
+		          generate="true" jaloclass="de.hybris.platform.payment.jalo.PaymentTransaction">
+			<deployment table="PaymentTransactions" typecode="2100"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers read="true" write="true" search="true"
+					           optional="false"/>
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="requestId" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="requestToken" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="paymentProvider" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="plannedAmount" type="java.math.BigDecimal">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="currency" type="Currency">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="info" type="PaymentInfo">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="versionID" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers write="false" initial="true"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="transUniqueIdx" unique="true">
+					<key attribute="code"/>
+					<key attribute="order"/>
+					<key attribute="versionID"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="PaymentTransactionEntry" autocreate="true"
+		          generate="true" jaloclass="de.hybris.platform.payment.jalo.PaymentTransactionEntry">
+			<deployment table="PaymntTrnsctEntries" typecode="2101"/>
+			<attributes>
+				<attribute qualifier="type" type="PaymentTransactionType">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="amount" type="java.math.BigDecimal">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="currency" type="Currency">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="time" type="java.util.Date">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="transactionStatus" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="transactionStatusDetails" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="requestToken" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="requestId" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="subscriptionID" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers read="true" write="true" search="true"
+					           optional="false"/>
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="versionID" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers write="false" initial="true"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="transcodeIdx">
+					<key attribute="code"/>
+				</index>
+				<index name="transEntryUniqueIdx" unique="true">
+					<key attribute="code"/>
+					<key attribute="paymentTransaction"/>
+					<key attribute="type"/>
+					<key attribute="versionID"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="PaymentInfo" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="billingAddress" type="Address">
+					<modifiers read="true" write="true" partof="true" search="true"
+					           optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CreditCardPaymentInfo" autocreate="false"
+		          generate="false">
+			<description>Extending CreditCardPaymentInfo type with additional attributes.</description>
+			<attributes>
+				<attribute qualifier="subscriptionId" type="java.lang.String">
+					<persistence type="property"/>
+					<description>Subscription ID is the reference information for the credit cart data stored in the external payment provider.</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+
+</items>

@@ -1,0 +1,57 @@
+*** Settings ***
+Library         de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Library         de.hybris.platform.subscriptionatddtests.keywords.commerceservices.SubscriptionCommerceKeywordLibrary
+Resource		impex/Impex_Keywords.txt
+
+*** Keywords ***
+for subscription priceplan "${pricePlanName}" add "${billingEventCode}" one time price of "${price}"
+    [Documentation]    Creates a onetime price entry for a given priceplan
+    @{binding}    create list    pricePlanName    ${pricePlanName}    billingEventCode    ${billingEventCode}    price    ${price}    
+    ${templateName}=    Set Variable    impex-templates/subscription-priceplan/onetimechargeentry-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+
+for product "${productCode}" add subscription priceplan "${pricePlanName:[^"]+}" with currency "${currencyCode}"
+    [Documentation]    Creates a price plan for a given product and currency
+    @{binding}    create list    productCode    ${productCode}    pricePlanName    ${pricePlanName}    userUID    ${EMPTY}    userPriceGroupCode    ${EMPTY}    currencyCode    ${currencyCode}
+    ${templateName}=    Set Variable    impex-templates/subscription-priceplan/subscriptionpriceplan-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+    
+for product "${productCode}" add subscription priceplan "${pricePlanName:[^"]+}" for user "${userUID}"
+    [Documentation]    Creates a price plan for a given product and user
+    ${currencyCode}=    Set Variable    USD
+    @{binding}    create list    productCode    ${productCode}    pricePlanName    ${pricePlanName}    userUID    ${userUID}    userPriceGroupCode    ${EMPTY}    currencyCode    ${currencyCode}
+    ${templateName}=    Set Variable    impex-templates/subscription-priceplan/subscriptionpriceplan-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+
+for product "${productCode}" add subscription priceplan "${pricePlanName:[^"]+}" for user price group "${userPriceGroupCode}"
+    [Documentation]    Creates a price plan for a given product and user price group
+    ${currencyCode}=    Set Variable    USD
+    @{binding}    create list    productCode    ${productCode}    pricePlanName    ${pricePlanName}    userUID    ${EMPTY}    userPriceGroupCode    ${userPriceGroupCode}    currencyCode    ${currencyCode}
+    ${templateName}=    Set Variable    impex-templates/subscription-priceplan/subscriptionpriceplan-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+
+for subscription priceplan "${pricePlanName}" add recurring charge of "${price}" with cycle start "${start:[^"]+}"
+    [Documentation]    Creates a recurring charge with cycle start only for a given priceplan
+    for subscription priceplan "${pricePlanName}" add recurring charge of "${price}" with cycle start "${start}" and cycle end "${EMPTY}"   
+    
+for subscription priceplan "${pricePlanName}" add recurring charge of "${price}" with cycle start "${start}" and cycle end "${end}"
+    [Documentation]    Creates a recurring charge with cycle start and cycle end for a given priceplan
+    @{binding}    create list    pricePlanName    ${pricePlanName}    price    ${price}    cycleStart    ${start}    cycleEnd    ${end}  
+    ${templateName}=    Set Variable    impex-templates/subscription-priceplan/recurringchargeentry-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+    
+for product "${productCode}" verify that the XML for recurring charges matches "${expectedXml}"
+	[Documentation]   Verifies that XML for recurring charges the expected XML 
+    for product "${productCode}" verify that "product/price[@class='subscriptionPricePlan']/recurringChargeEntries" evaluates to "${expectedXml}"
+
+for product "${productCode}" verify that the XML for one time charges matches "${expectedXml}"
+	[Documentation]   Verifies that XML for one time charges the expected XML 
+    for product "${productCode}" verify that "product/price[@class='subscriptionPricePlan']/oneTimeChargeEntries" evaluates to "${expectedXml}"
+
+for billing event "${billingEventCode}" verify discount price of "${discountPrice}"
+	get discount price    ${billingEventCode}     ${discountPrice}

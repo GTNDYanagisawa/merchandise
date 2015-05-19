@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+            jxb:version="2.0">
+
+    <xsd:element name="root" type="SectionsListType"/>
+
+    <xsd:complexType name="SectionsListType">
+        <xsd:sequence>
+            <!-- usually of type: SectionType but might be custom dom object -->
+            <xsd:element name="section" type="xsd:anyType" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="SectionType">
+        <xsd:sequence>
+            <!-- usually of type: RowType but might be custom dom object -->
+            <xsd:element name="row" type="xsd:anyType" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="type" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="RowType">
+        <xsd:choice>
+            <xsd:element name="attribute" type="AttributeType" minOccurs="1" maxOccurs="1"/>
+            <xsd:group ref="TableGroup"/>
+            <xsd:sequence>
+                <xsd:element name="reference" type="ReferenceType" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
+            <xsd:element name="attributes" type="AttributesType" minOccurs="1" maxOccurs="1"/>
+        </xsd:choice>
+        <xsd:attribute name="type" type="xsd:string"/>
+        <xsd:attribute name="name" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="ReferenceType">
+        <xsd:group ref="TableGroup"/>
+        <xsd:attribute name="name" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:group name="TableGroup">
+        <xsd:sequence>
+            <xsd:element name="columnsTitles" type="ColumnsTitlesType" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="rows" type="TableRowsType" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:group>
+
+    <xsd:complexType name="AttributeType">
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:string"/>
+            <xsd:element name="value" type="xsd:string"/>
+            <xsd:element name="imgUrl" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="ColumnsTitlesType">
+        <xsd:sequence>
+            <xsd:element name="title" type="TitleType" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="TitleType">
+        <xsd:attribute name="columnID" type="xsd:string"/>
+        <xsd:attribute name="value" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="TableRowsType">
+        <xsd:sequence>
+            <xsd:element name="tableRow" type="TableRowType" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="TableRowType">
+        <xsd:sequence>
+            <xsd:element name="column" type="TableColumnType" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="TableColumnType">
+        <xsd:attribute name="type" type="xsd:string"/>
+        <xsd:attribute name="id" type="xsd:string"/>
+        <xsd:attribute name="value" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="AttributesType">
+        <xsd:sequence>
+            <xsd:element name="attribute" type="AttributeType" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" />
+    </xsd:complexType>
+</xsd:schema>

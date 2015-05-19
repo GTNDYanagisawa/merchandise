@@ -1,0 +1,774 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype code="MediaContainerList" elementtype="MediaContainer"
+			autocreate="true" generate="true" type="list" />
+	</collectiontypes>
+
+	<enumtypes>
+
+		<enumtype code="SolrIndexedPropertyFacetSort" generate="true"
+			autocreate="true">
+			<description>
+				This enumeration defines sorting order of the facet values within a facet.
+				Count: The facet values can be sorted by facet value count, with the highest count first.
+				Alpha: Sorted lexically by facet display name (A to Z)
+				Custom: A custom sort must be provided via the SolrIndexedProperty.customFacetSortProvider.
+			</description>
+			<value code="Count" />
+			<value code="Alpha" />
+			<value code="Custom" />
+		</enumtype>
+
+		<enumtype code="SiteTheme" generate="true" autocreate="true"
+			dynamic="true">
+			<description>This is dynamic enumeration that contains available themes used in the frontend.</description>
+			<!-- This enum is deliberately empty as the available themes are not known 
+				at this point -->
+		</enumtype>
+
+		<enumtype code="SiteChannel" generate="true" autocreate="true"
+			dynamic="false">
+			<description>This enumeration denotes the channel for the BaseSite - B2B or B2C</description>
+			<value code="B2B" />
+			<value code="B2C" />
+		</enumtype>
+
+		<enumtype code="StockLevelStatus" dynamic="true" autocreate="false"
+			generate="true">
+			<value code="lowStock" />
+		</enumtype>
+
+		<enumtype code="SalesApplication" generate="true" autocreate="true"
+			dynamic="true">
+			<description>
+				This enumeration defines the application which created the sale.
+			</description>
+			<value code="Web" />
+			<value code="WebMobile" />
+			<value code="CallCenter" />
+		</enumtype>
+
+		<enumtype code="OrderStatus" autocreate="false" generate="true" dynamic="true">
+			<!-- Extend the OrderStatus with values used during fulfilment -->
+			<!-- TODO: Move to basecommerce -->
+			<value code="CHECKED_VALID"/>
+			<value code="CHECKED_INVALID"/>
+			<value code="PAYMENT_AUTHORIZED"/>
+			<value code="PAYMENT_NOT_AUTHORIZED"/>
+			<value code="PAYMENT_AMOUNT_RESERVED"/>
+         	<value code="PAYMENT_AMOUNT_NOT_RESERVED"/>
+         	<value code="PAYMENT_CAPTURED"/>
+         	<value code="PAYMENT_NOT_CAPTURED"/>
+         	<value code="FRAUD_CHECKED"/>
+         	<value code="ORDER_SPLIT"/>
+         	<value code="PROCESSING_ERROR"/>
+         	<value code="WAIT_FRAUD_MANUAL_CHECK"/>
+		</enumtype>
+
+      	<enumtype code="ConsignmentStatus" autocreate="false" generate="true" dynamic="true">
+      		<!-- Extend the ConsignmentStatus with values used during fulfilment -->
+      		<!-- TODO: Move to basecommerce -->
+			<value code="READY_FOR_PICKUP" />
+			<value code="PICKUP_COMPLETE" />
+		</enumtype>
+		
+		<enumtype code="WarehouseConsignmentState" autocreate="true" generate="true" dynamic="false">
+			<!-- TODO: Move to basecommerce -->
+			<value code="COMPLETE"/>
+			<value code="CANCEL"/>
+			<value code="PARTIAL"/>
+		</enumtype>	
+		
+		<enumtype code="PickupInStoreMode" generate="true" autocreate="true" dynamic="true">
+			<description>Mode of pickup for a particular point of service</description>
+			<value code="DISABLED" />
+			<value code="BUY_AND_COLLECT" />
+			<value code="RESERVE_AND_COLLECT" />
+		</enumtype>
+
+		<enumtype code="PaymentTransactionType" autocreate="false" generate="false">
+			<!-- TODO: Move to the payment extension -->
+			<value code="REVIEW_DECISION" />
+		</enumtype>
+
+		<enumtype code="CustomerType" generate="true"  autocreate="true" dynamic="true">
+			<description>Customer types for checkout</description>
+			<value code="GUEST" />
+		</enumtype>
+
+		<enumtype code="UiExperienceLevel" generate="true"
+			autocreate="true" dynamic="false">
+			<description>This enumeration denotes different user interface experiences</description>
+			<value code="Mobile" />
+			<!-- <value code="Tablet" /> -->
+			<!-- <value code="TV" /> -->
+			<value code="Desktop" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		<relation generate="true" localized="false"
+			code="StoreLocation2StoreLocatorFeature" autocreate="true">
+			<description>This relation connects point of service with store locator feature, so store locator features
+				are reusable.
+			</description>
+			<deployment table="StoreLocation2Locator" typecode="6209" />
+			<sourceElement type="PointOfService" cardinality="many"
+				qualifier="pointOfServices" />
+			<targetElement type="StoreLocatorFeature" cardinality="many"
+				qualifier="features" collectiontype="set" />
+		</relation>
+
+		<relation code="BaseStore2CurrencyRel" localized="false"
+			generate="true" autocreate="true">
+			<description>This relation determines available currencies for the base store.</description>
+			<deployment table="BaseStore2CurrencyRel" typecode="6201" />
+			<sourceElement qualifier="baseStores" type="BaseStore"
+				cardinality="many" />
+			<targetElement qualifier="currencies" type="Currency"
+				cardinality="many" collectiontype="set" ordered="true" />
+		</relation>
+
+		<relation code="BaseStore2LanguageRel" localized="false"
+			generate="true" autocreate="true">
+			<description>This relation determines available languages for the base store.</description>
+			<deployment table="BaseStore2LanguageRel" typecode="6212" />
+			<sourceElement qualifier="baseStores" type="BaseStore"
+				cardinality="many" />
+			<targetElement qualifier="languages" type="Language"
+				cardinality="many" collectiontype="set" ordered="true" />
+		</relation>
+
+		<relation code="BaseStore2CountryRel" localized="false"
+			generate="true" autocreate="true">
+			<description>This relation determines delivery countries for the base store.</description>
+			<deployment table="BaseStore2CountryRel" typecode="6213" />
+			<sourceElement qualifier="deliveryCountries" type="Country"
+				cardinality="many" />
+			<targetElement qualifier="baseStores" type="BaseStore"
+				cardinality="many" collectiontype="set" ordered="true" />
+		</relation>
+
+		<relation code="PoS2WarehouseRel" localized="false"
+			generate="true" autocreate="true">
+			<description>This relation determines available warehouses for the point of service.</description>
+			<deployment table="PoS2WarehouseRel" typecode="6217" />
+			<sourceElement qualifier="pointsOfService" type="PointOfService"
+				cardinality="many" />
+			<targetElement qualifier="warehouses" type="Warehouse"
+				cardinality="many" collectiontype="list" />				
+		</relation>
+
+		<relation code="BaseStore2WarehouseRel" localized="false"
+			generate="true" autocreate="true">
+			<description>This relation determines available warehouses for the base store.</description>
+			<deployment table="BaseStore2WarehouseRel" typecode="6215" />
+			<sourceElement qualifier="baseStores" type="BaseStore"
+				cardinality="many" />
+			<targetElement qualifier="warehouses" type="Warehouse"
+				cardinality="many" collectiontype="list" />
+		</relation>
+
+		<relation code="SolrIndexedType2SolrSortRel" localized="false"
+			generate="true" autocreate="true">
+			<description>This relation connects solr indexed type and available way of sorting this property.
+			</description>
+			<sourceElement qualifier="indexedType" type="SolrIndexedType"
+				cardinality="one">
+				<modifiers unique="true" optional="false" />
+			</sourceElement>
+			<targetElement qualifier="sorts" type="SolrSort"
+				cardinality="many" collectiontype="list" ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="SolrSort2SolrSortFieldRel" localized="false"
+			generate="true" autocreate="true">
+			<description>This relation connects solr sort with the fields that can be sorted.</description>
+			<sourceElement qualifier="sort" type="SolrSort"
+				cardinality="one">
+				<modifiers unique="true" optional="false" />
+			</sourceElement>
+			<targetElement qualifier="fields" type="SolrSortField"
+				cardinality="many" collectiontype="list" ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+		
+		<relation code="StoreEmplGroup2POSRel" localized="false"
+			generate="true" autocreate="true">
+			<description>This relation connects store employee group with the point of service</description>
+			<sourceElement qualifier="storeEmployeeGroups" type="StoreEmployeeGroup" cardinality="many" collectiontype="set"/>
+			<targetElement qualifier="store" type="PointOfService" cardinality="one" />
+		</relation>
+		
+		<relation code="BaseStore2DeliveryModeRel" autocreate="true"
+			generate="true" localized="false">
+			<deployment table="BaseStore2DelModeRel" typecode="6220" />
+			<sourceElement type="BaseStore" qualifier="stores" cardinality="many" collectiontype="set" ordered="false">
+				<modifiers read="true" write="true" search="true" />
+			</sourceElement>
+			<targetElement type="DeliveryMode" qualifier="deliveryModes" collectiontype="set" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="PromotionRestriction2OrderRel"
+			autocreate="true"
+			generate="true"
+			localized="false">
+			<deployment table="PromRestr2OrderRel" typecode="6221"/>
+			
+			<sourceElement qualifier="orders" type="AbstractOrder" cardinality="many">
+				<description>Orders</description>
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</sourceElement>
+			
+			<targetElement qualifier="promotionOrderRestrictions" type="PromotionOrderRestriction" cardinality="many">
+				<description>Promotion restrictions for order</description>
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</targetElement>
+			
+		</relation>
+
+	</relations>
+
+	<itemtypes>
+	
+		<typegroup name="Product">
+			<itemtype code="Product" autocreate="false" generate="false">
+				<description>Extending the Product from core with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="summary" type="localized:java.lang.String">
+						<description>Additional text attribute that holds localized brief description.</description>
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+					</attribute>
+					<attribute qualifier="galleryImages" type="MediaContainerList">
+						<description>A list of additional images for the product.</description>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+
+		<typegroup name="Order">
+		
+			<itemtype code="AbstractOrder" autocreate="false" generate="false">
+				<description>Extending AbstractOrder type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="site" type="BaseSite">
+						<description>The site on which the cart was created and the order was placed.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="store" type="BaseStore">
+						<description>The store for which the cart was created and the order was placed.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="guid" type="java.lang.String">
+						<description>
+							The guid for the anonymous cart used to lookup stored carts.
+							The order guid is used as a non-authenticated deep link to the order history page.
+						</description>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="guidIndex">
+						<key attribute="guid" />
+					</index>
+				</indexes>
+			</itemtype>
+			
+			<itemtype code="AbstractOrderEntry" autocreate="false" generate="false">
+				<description>Extending AbstractOrderEntry type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="deliveryPointOfService" type="PointOfService">
+						<description>The point of service to deliver to/collect from.</description>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="Order" autocreate="false" generate="false">
+				<description>Extending Order type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="salesApplication" type="SalesApplication">
+						<description>The sales application for which the order was placed.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="language" type="Language">
+						<description>The language used when the order is placed.</description>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+			
+			<itemtype code="Consignment" autocreate="false" generate="false">
+				<description>Extending Consignment type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="deliveryPointOfService" type="PointOfService">
+						<description>The point of service to deliver to/collect from.</description>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="PaymentInfo" autocreate="false" generate="false">
+				<description>Extending PaymentInfo type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="saved" type="boolean">
+						<persistence type="property" />
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+						<description>Indicates the item is saved for reuse.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="CreditCardPaymentInfo" autocreate="false"
+				generate="false">
+				<description>Extending CreditCardPaymentInfo type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="issueNumber" type="java.lang.Integer">
+						<persistence type="property" />
+						<description>Issue number is the reference information for the credit cart data.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+
+
+		<typegroup name="Customer">
+
+			<itemtype code="Customer" autocreate="false" generate="false">
+				<description>Extending Customer type with additional attributes.</description>
+				<attributes>
+					<attribute autocreate="true" qualifier="title" type="Title">
+						<modifiers read="true" write="true" search="true"
+							optional="true" />
+						<persistence type="property" />
+						<description>It holds information about customer title (i.e. Mr, Dr, etc.)</description>
+					</attribute>
+					<attribute qualifier="defaultPaymentInfo" type="PaymentInfo">
+						<persistence type="property" />
+						<description>It holds information about default payment that is used by the customer.
+						</description>
+					</attribute>
+					<attribute type="java.lang.String" qualifier="token">
+						<modifiers optional="true" />
+						<persistence type="property" >
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>						
+						</persistence>
+						<description>Attribute is used during forgotten password to ensure that the link can be used
+							only once.
+						</description>
+					</attribute>
+					<attribute qualifier="contactEmail" type="java.lang.String">
+						<persistence type="dynamic" attributeHandler="contactEmailAttribute" />
+						<modifiers write="false" />
+						<description>Contact email is a dynamic attribute that is used to determine contact email
+							address.
+						</description>
+					</attribute>
+					<attribute autocreate="true" qualifier="originalUid"
+						type="java.lang.String">
+						<modifiers read="true" write="true" search="true"
+							optional="true" />
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="type" type="CustomerType">
+						<modifiers read="true" write="true" search="true"
+									optional="true" />
+						<description>Customer type</description>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="Address" autocreate="false" generate="false">
+				<description>Extending Address type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="visibleInAddressBook" type="java.lang.Boolean">
+						<persistence type="property" />						
+						<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+						<description>Indicates if the address will be displayed to the user in the address book.
+						</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+		
+
+		<typegroup name="Address">
+
+			<itemtype code="Region" autocreate="false" generate="false">
+				<description>Extending Region type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="isocodeShort" type="java.lang.String" generate="false">
+						<description>2 character isocode</description>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>		
+
+		<typegroup name="BaseCommerce">
+
+			<itemtype code="BaseSite" autocreate="false" generate="false">
+				<description>Extending BaseSite type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="theme" type="SiteTheme">
+						<description>The site theme that is used in this site.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="defaultLanguage" type="Language">
+						<description>The default language for the site.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="locale" type="localized:java.lang.String">
+						<description>The locale to use for each language.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="channel" type="SiteChannel">
+						<description>The channel for this site.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="defaultPromotionGroup" type="PromotionGroup">
+						<description>The default promotion group for the site.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute type="SolrFacetSearchConfig" qualifier="solrFacetSearchConfiguration">
+						<description>Solr search configuration for this site.</description>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="BaseStore" autocreate="false" generate="false">
+				<description>Extending BaseStore type with additional attributes.</description>
+				<attributes>
+					<attribute type="boolean" qualifier="net">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+						<description>Determines if the prices are treated as net or gross prices in the given base
+							store.
+						</description>
+					</attribute>
+					<attribute qualifier="taxGroup" type="UserTaxGroup">
+						<description>The site specific tax group.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="defaultLanguage" type="Language">
+						<description>The default language for the site.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="defaultCurrency" type="Currency">
+						<description>The default currency for the site.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="defaultDeliveryOrigin" type="PointOfService">
+						<description>The default delivery origin for the site.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute type="SolrFacetSearchConfig" qualifier="solrFacetSearchConfiguration">
+						<description>Solr search configuration for this store.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute type="java.lang.String" qualifier="submitOrderProcessCode">
+						<description>The process name for fullfilment business process.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute type="java.lang.Boolean" qualifier="externalTaxEnabled">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+						<description>Determines whether the site should use external tax calculation</description>
+					</attribute>
+					<attribute type="PickupInStoreMode" qualifier="pickupInStoreMode">
+						<description>The pickup mode for this store.</description>
+						<persistence type="property"/>
+					</attribute>
+					<attribute type="java.lang.Double" qualifier="maxRadiusForPoSSearch">
+						<description>The max radius when searching for PoS for a basestore.</description>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+			
+			<itemtype code="PickUpDeliveryMode" autocreate="true" generate="true" extends="DeliveryMode">
+				<description>A Delivery Mode that represents a collection from a PointOfService.</description>
+				<attributes>
+					<attribute qualifier="supportedMode" type="PickupInStoreMode" >
+						<description>The mode supported by the pickup delivery mode</description>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+		
+			<itemtype code="PointOfService" autocreate="false" generate="false">
+				<attributes>
+					<attribute qualifier="displayName" type="java.lang.String" >
+						<description>Used as the display name for search results etc.</description>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="nearbyStoreRadius" type="java.lang.Double" >
+						<description>Overrides the default search radius when performing a search for nearby PoS from this PoS. 
+							Unit is BaseStore's StorelocatorDistanceUnit.</description>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+			
+		</typegroup>
+
+
+		<typegroup name="Solr">
+
+			<itemtype code="SolrIndexedProperty" autocreate="false"
+				generate="false">
+				<description>Extending SolrIndexedProperty type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="classAttributeAssignment" type="ClassAttributeAssignment">
+						<description>The classification system category feature for this property.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="categoryField" type="boolean">
+						<description>True if this is a category field.</description>
+						<persistence type="property" />
+					</attribute>
+
+					<!-- The following attributes are specific for facet properties -->
+					<attribute qualifier="displayName" type="localized:java.lang.String">
+						<description>The display name for this property in the list of facet.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="facetSort" type="SolrIndexedPropertyFacetSort">
+						<description>Deprecated - please use custom sort providers. The sort option to use to order the
+							facet values.
+						</description>
+						<persistence type="property" />
+						<model>
+							<getter name="facetSort" deprecated="true" default="true" />
+							<setter name="facetSort" deprecated="true" default="true" />
+						</model>
+					</attribute>
+					<attribute qualifier="topValuesProvider" type="java.lang.String">
+						<description>topValuesProvider used by this property</description>
+						<persistence type="property" />
+						<modifiers optional="true" />
+					</attribute>
+					<attribute qualifier="visible" type="boolean">
+						<description>This property is used to define whether a facet should be visible for frontend users or not.</description>
+						<modifiers unique="false" optional="false" />
+						<defaultvalue>Boolean.TRUE</defaultvalue>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="SolrSort" autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.commerceservices.jalo.solrsearch.config.SolrSort">
+				<description>Extending SolrSort type with additional attributes.</description>
+				<deployment table="SolrSort" typecode="6205" />
+				<attributes>
+					<attribute qualifier="code" type="java.lang.String">
+						<description>The unique code used to identify the solr sort.</description>
+						<modifiers unique="true" optional="false" initial="true"/>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="name" type="localized:java.lang.String">
+						<description>The display name for this sort.</description>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="useBoost" type="boolean">
+						<description>The property specifies whether a sort should apply SOLR boost rules.</description>
+						<modifiers optional="false" initial="true" />
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="SolrSortField" autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.commerceservices.jalo.solrsearch.config.SolrSortField">
+				<description>Extending SolrSortField type with additional attributes.</description>
+				<deployment table="SolrSortField" typecode="6206" />
+				<attributes>
+					<attribute qualifier="fieldName" type="java.lang.String">
+						<description>The field name to sort with.</description>
+						<modifiers unique="true" optional="false" initial="true" />
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="ascending" type="boolean">
+						<description>Is this field sorted ascending.</description>
+						<modifiers unique="true" optional="false"  initial="true"/>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+
+
+		<typegroup name="Processes">
+			<itemtype code="StoreFrontProcess" extends="BusinessProcess"
+				autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.commerceservices.jalo.process.StoreFrontProcess">
+				<description>It represents storefront business process.</description>
+				<attributes>
+					<attribute qualifier="site" type="BaseSite">
+						<persistence type="property" />
+						<description>Attribute contains base site object that will be used in the process.</description>
+					</attribute>
+					<attribute qualifier="store" type="BaseStore">
+						<persistence type="property" />
+						<description>Attribute contains base store object that will be used in the process.
+						</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="StoreFrontCustomerProcess" extends="StoreFrontProcess"
+				autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.commerceservices.jalo.process.StoreFrontCustomerProcess">
+				<description>Represents customer related store front business process.</description>
+				<attributes>
+					<attribute qualifier="customer" type="Customer">
+						<persistence type="property" />
+						<description>Attribute contains customer object that will be used in the process.</description>
+					</attribute>
+					<attribute qualifier="language" type="Language">
+						<persistence type="property" />
+						<description>Attribute contains language that will be used in the process.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="ForgottenPasswordProcess" extends="StoreFrontCustomerProcess"
+				autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.commerceservices.jalo.process.ForgottenPasswordProcess">
+				<description>Represents process that is used for retrieving forgotten password.</description>
+				<attributes>
+					<attribute qualifier="token" type="java.lang.String">
+						<persistence type="property" />
+						<description>Attribute contains token that is used in this process.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+
+
+		<typegroup name="Store Locator">
+
+			<itemtype code="StoreLocatorFeature" autocreate="true"
+				generate="true" extends="GenericItem"
+				jaloclass="de.hybris.platform.commerceservices.jalo.storelocator.StoreLocatorFeature">
+				<description>Store locator feature describes single feature that store point of service supports
+				</description>
+				<deployment table="StoreLocatorFeature" typecode="6210" />
+				<attributes>
+					<attribute type="java.lang.String" qualifier="code">
+						<persistence type="property" />
+						<description>Unique code of store locator feature.</description>
+						<modifiers unique="true" />
+					</attribute>
+					<attribute type="localized:java.lang.String" qualifier="name">
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+						<modifiers search="false" />
+						<description>Description of the store locator feature</description>
+					</attribute>
+					<attribute type="Media" qualifier="icon">
+						<persistence type="property" />
+						<description>Icon that can represent the feature</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>
+		
+		<typegroup name="Employee">
+			<itemtype code="StoreEmployeeGroup" autocreate="true"
+				generate="true" extends="UserGroup"
+				jaloclass="de.hybris.platform.commerceservices.jalo.user.StoreEmployeeGroup">
+				<description>Group of Employees working in a particular store.</description>
+			</itemtype>
+		</typegroup>
+
+		<typegroup name="BaseStore">
+
+			<itemtype code="BaseStore" autocreate="false" generate="false">
+				<description>Extending BaseStore type with additional attributes.</description>
+				<attributes>
+					<attribute type="boolean" qualifier="customerAllowedToIgnoreSuggestions">
+						<description>Determines whether the customer is allowed to bypass the list of suggested addresses and proceed with their unverified entry.</description>
+						<persistence type="property"/>
+						<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					</attribute>
+					<attribute type="java.lang.String" qualifier="paymentProvider">
+						<description>The name of the payment provider that will get used for credit card subscriptions and any psp interaction</description>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+
+		<typegroup name="Promotions">
+			<itemtype code="PromotionOrderRestriction"
+				extends="AbstractPromotionRestriction"
+				jaloclass="de.hybris.platform.commerceservices.jalo.promotions.PromotionOrderRestriction"
+				autocreate="true"
+				generate="true">
+ 			</itemtype>			
+		</typegroup>
+		
+		<!-- Performance improvements -->
+		<typegroup name="Performance" >
+		
+			<itemtype code="ProductFeature" autocreate="false" generate="false">
+				<indexes>
+					<index name="featureIDX4">
+							<key attribute="product"/>
+							<key attribute="classificationAttributeAssignment"/>
+							<key attribute="featurePosition"/>
+							<key attribute="language"/>
+							<key attribute="valuePosition"/>
+						</index>
+					</indexes>
+			</itemtype>
+			
+			<itemtype code="StockLevel" autocreate="false" generate="false">
+				<indexes>
+					<index name="warehouseIndex">
+					    <key attribute="warehouse"/>
+					</index>
+					<index name="productCodeWarehouseIndex">
+					    <key attribute="productCode"/>
+					    <key attribute="warehouse"/>
+					</index>
+				</indexes>
+			</itemtype>
+			
+		</typegroup>
+
+	</itemtypes>
+</items>

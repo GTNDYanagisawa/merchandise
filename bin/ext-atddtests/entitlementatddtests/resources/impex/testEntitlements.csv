@@ -1,0 +1,67 @@
+$currencies=USD,EUR
+$defaultCurrency=USD
+$defaultLanguage=en
+$deliveryCountries=US
+$paymentProvider=Mockup
+;;;;;;;;;;;;;;;;;;;;;;
+$catalog-id=testCatalog;;;;;;;;;;;;;;;;;;;;;;
+$catalog-version=Online;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+$testCategory0-id=testCategory0;;;;;;;;;;;;;;;;;;;;;;
+$testCategory1-id=testCategory1;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version];;;;;;;;;;;;;;;;;;;;;;
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]));;;;;;;;;;;;;;;;;;;;;;
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator];;;;;;;;;;;;;;;;;;;;;;
+$billingFrequency=billingFrequency(code)[default='monthly']
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;;;;;;;;;;;;;;;
+;de;true;;;;;;;;;;;;;;;;;;;;
+;en;true;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];;;;;;;;;;;;;;;;;;;
+;de;Deutsch;German;;;;;;;;;;;;;;;;;;;
+;en;Englisch;English;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=de];name[lang=en];conversion;;;;;;;;;;;;;;;;;
+;pieces;pieces;pieces;pieces;1;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol;;;;;;;;;;;;;;
+;EUR;Euro;Euro;true;true;1;2;E;;;;;;;;;;;;;;
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog;;;;;;;;;;;;;;;;;;
+;$catalog-id;$catalog-id;$catalog-id;true;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode);;;;;;;;;;;;;;;;;;
+;$catalog-id;$catalog-version;true;USD;de,en;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Category;code[unique=true];$catalogversion;name[lang=de];name[lang=en];$supercategories;;;;;;;;;;;;;;;;;
+;$testCategory0-id;;$testCategory0-id;$testCategory0-id;;;;;;;;;;;;;;;;;;
+;$testCategory1-id;;$testCategory1-id;$testCategory1-id;$testCategory0-id;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE UsageUnit;id[unique=true];name[lang=$defaultLanguage];namePlural[lang=$defaultLanguage];accumulative[default=false]
+;minute;Minute;Minutes
+;video;Video;Videos
+;textMessage;Text Message;Text Message
+;usageUnitTest1;usageUnitTest1;usageUnitTest1
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Entitlement;id[unique=true];name[lang=$defaultLanguage];usageUnit(id);description[lang=$defaultLanguage]
+;ME1;Metered Entitlement 1;minute; Access to Metered Entitlement 1 
+;ME2;Metered Entitlement 2;textMessage; Access to Metered Entitlement 2
+;MEmin1;Metered Entitlement min1;minute; Access to Metered Entitlement min1
+;MEmin2;Metered Entitlement min2;minute; Access to Metered Entitlement min2
+;MEmin3;Metered Entitlement min3;minute; Access to Metered Entitlement min3
+;MEtext1;Metered Entitlement text1;textMessage; Access to Metered Entitlement text1
+;MEtext2;Metered Entitlement text2;textMessage; Access to Metered Entitlement text2
+;METU1;Metered Entitlement TimeUnits1;minute; Access to Metered Entitlement TimeUnits1
+;METU2;Metered Entitlement TimeUnits2;minute; Access to Metered Entitlement TimeUnits2
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Entitlement;id[unique=true];name[lang=$defaultLanguage];description[lang=$defaultLanguage]
+;NME1;Non-Metered Entitlement 1; Access to Non-Metered Entitlement 1
+;NME2;Non-Metered Entitlement 2; Access to Non-Metered Entitlement 2
+;NME3;Non-Metered Entitlement 3; Access to Non-Metered Entitlement 3
+;NME4;Non-Metered Entitlement 4; Access to Non-Metered Entitlement 4
+;NMETU1;Non-Metered Entitlement TimeUnits1; Access to Non-Metered Entitlement TimeUnits1
+;NMETU2;Non-Metered Entitlement TimeUnits2; Access to Non-Metered Entitlement TimeUnits2
+;;;;;;;;;;;;;;;;;;;;;;

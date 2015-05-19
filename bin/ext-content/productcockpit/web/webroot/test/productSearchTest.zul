@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?init 				class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+<?taglib 			uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+
+<?page title="RowTest"?>
+
+
+<window xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:h="http://www.w3.org/1999/xhtml" 
+		xmlns:zk="http://www.zkoss.org/2005/zk"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd "
+		mode="embedded" width="98%" height="95%" shadow="false">
+
+	<panel id="panel" framable="true" width="600px" height="550px"
+    	   title="Panel component" floatable="true" movable="true"
+    	   maximizable="true" minimizable="true" border="normal"
+    	   collapsible="true" closable="true" onCreate="ProductSearchPanel.initView(self)">
+		<toolbar>
+			<div width="570px" style="white-space:nowrap;">
+	        	<textbox value="@{ProductSearchPanel.query, load-when='onCreate,onSearchResult'}" onOK="ProductSearchPanel.doSearch()"/>
+	          	<button label="Search" onClick="ProductSearchPanel.doSearch()"/>
+	          	<label value="advanced">
+	          		<attribute name="onCreate">
+	          		{
+	          			if( ProductSearchPanel.isAdvanced() ) self.setValue("Simple");
+	          			else self.setValue("Advanced");
+	          		}
+	          		</attribute>
+	          		<attribute name="onClick">
+	          		{
+	          			if( ProductSearchPanel.isAdvanced() )
+	          			{
+	          				self.setValue("Advanced");
+		          			ProductSearchPanel.goSimple();
+		          			parameters.setVisible(false);
+		          			panel.invalidate();
+	          			}
+	          			else 
+	          			{
+	          				self.setValue("Simple");
+		          			ProductSearchPanel.goAdvanced(parameters);
+		          			parameters.setVisible(true);
+		          			panel.invalidate();
+	          			}
+	          		}
+	          		</attribute>
+	          	</label>
+	        </div>
+          	<grid id="parameters" fixedLayout="true" visible="false" width="570px">
+          		<columns sizable="true" >
+          			<column width="7em" label="Attribute"/>
+          			<column width="7em" label="Operator"/>
+          			<column width="90%" label="Value"/>
+          		</columns>
+          	</grid>
+        </toolbar>
+        <panelchildren>
+			<grid vflex="true" fixedLayout="true" onCreate="ProductSearchPanel.initList(self)"/>
+        </panelchildren>
+        <toolbar>
+	    	<hbox width="580px" align="center">
+	    		<div>
+		        	<label id="lblCount" value="@{ProductSearchPanel.count, load-when='onCreate,panel.onSearchResult'}"/> 
+		        	of 
+		        	<label id="lblTotal" value="@{ProductSearchPanel.totalCount, load-when='onCreate,panel.onSearchResult'}"/>
+		        </div>
+	        	<hbox width="100%" align="center" pack="end">
+	        		<div>
+		        		<label value="Sort:"/>
+				        <combobox cols="5" model="@{ProductSearchPanel.sortCriteria}" selectedItem="@{ProductSearchPanel.selectedSort}" value="@{ProductSearchPanel.selectedSort.qualifier}" onSelect="ProductSearchPanel.doSearch()">
+				        	<comboitem self="@{each=sort}" label="@{sort.qualifier}" value="@{sort}"/>
+				        </combobox>
+				    </div>
+	        	</hbox>
+			</hbox>
+        </toolbar>
+	</panel>
+	
+</window>

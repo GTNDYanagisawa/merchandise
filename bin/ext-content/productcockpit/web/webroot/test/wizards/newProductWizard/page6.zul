@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<?taglib 			uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+
+<vbox 	xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd" 
+		>
+
+	<label value="Operation in progress, please wait."/>
+	
+	<space orient="vertical" height="1em"/>
+	<div align="center">
+		<progressmeter id="pm" width="280px" value="${pageBean.progress}"/>
+		<timer id="timer" delay="100" repeats="true">
+			<attribute name="onTimer">
+			{
+				int progress = pageBean.getProgress();
+				if( progress >= 100 )
+				{
+					timer.stop();
+					wizardBean.doNext();
+				}
+				else
+				{
+					pm.setValue(progress);
+				}
+			}
+			</attribute>
+		</timer>
+	</div>
+</vbox>

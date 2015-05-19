@@ -1,0 +1,117 @@
+############ Default Variables ############
+$contentCatalog=apparel-deContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$jarResourceCms=jar:de.hybris.platform.sap.sappostransactionaddon.constants.SappostransactionaddonConstants&/sappostransactionaddon/import/cockpit/cmscockpit
+$catalogHeader=catalogVersion(catalog(id),version)
+
+################################################
+############ Staged Content Catalog ############
+################################################
+
+$catalog=$contentCatalog:Staged
+ 
+############ Create POS Transaction Links ############
+INSERT_UPDATE CMSLinkComponent;&impexLinkId;uid[unique=true];name;linkName[lang=de];$catalogHeader[unique=true];url
+;1;AccountPOSHistoryLink;AccountPOSHistoryLink;Filialkäufe;$catalog;/my-account/postransactions
+;2;AccountViewPOSHistoryLink;AccountViewPOSHistoryLink;Filialkäufe anzeigen;$catalog;/my-account/postransactions
+ 
+############ Add POS Transaction Links to My Account Page (to Your Account and Order History) ############
+INSERT_UPDATE CMSLinksForNavNodes;Source(&impexLinkId)[unique=true];Target($catalogHeader,uid)[unique=true];reverseSequenceNumber
+;1;$catalog:AccountLeftNavNode;4
+;2;$catalog:AccountOrderHistoryNavNode;0
+
+############ Create View POS Transaction Action ############
+INSERT_UPDATE ViewOrderAction;&impexActionId;uid[unique=true];name;$catalogHeader[unique=true];url
+;3;ViewPOSTransactionAction;ViewPOSTransactionAction;$catalog;/my-account/postransaction/{orderCode}
+
+############ Create POS Transaction History Component ############
+INSERT_UPDATE JspIncludeComponent;uid[unique=true];name;$catalogHeader[unique=true];page;actions(&impexActionId)
+;AccountPOSTransactionHistoryComponent;Account POS Transaction History Component;$catalog;/WEB-INF/views/addons/sappostransactionaddon/desktop/pages/account/posTransactions.jsp;3;
+
+#---- Create POS Transaction Title Component ----
+;AccountPOSTransactionTitleComponent;Account POS Transaction Title Component;$catalog;/WEB-INF/views/addons/sappostransactionaddon/desktop/pages/account/posTransactionTitle.jsp;;
+
+#---- Create POS Transaction Header Component ----
+;AccountPOSTransactionHeaderComponent;Account POS Transaction Header Component;$catalog;/WEB-INF/views/addons/sappostransactionaddon/desktop/pages/account/posTransactionHeader.jsp;;
+
+#---- Create POS Transaction Items Component ----
+;AccountPOSTransactionItemsComponent;Account POS Transaction Items Component;$catalog;/WEB-INF/views/addons/sappostransactionaddon/desktop/pages/account/posTransactionItems.jsp;;
+
+#---- Create POS Transaction Store Info Component ----
+;AccountPOSTransactionStoreInfoComponent;Account POS Transaction Store Info Component;$catalog;/WEB-INF/views/addons/sappostransactionaddon/desktop/pages/account/posTransactionStoreInfo.jsp;;
+
+############ Create POS Transactions Page ############
+INSERT_UPDATE ContentPage;&impexPageId;uid[unique=true];label;name;title[lang=de];$catalogHeader[unique=true];masterTemplate($catalogHeader,uid);approvalStatus(code);defaultPage
+;4;postransactions;postransactions;POS Transaction History Page;Filialkäufe;$catalog;$catalog:AccountPageTemplate;approved;true
+#---- Create POS Transaction Page ----
+;5;postransaction;postransaction;POS Transaction Details Page;Details zu Filialkäufen;$catalog;$catalog:AccountPageTemplate;approved;true
+
+############ CMS Config : Create Content Slots for POS Transaction Pages ############
+INSERT_UPDATE ContentSlot;&impexSlotId;uid[unique=true];name;$catalogHeader[unique=true];cmsComponents($catalogHeader,uid)
+;6;SideContent-postransactions;Side Content Slot for My Account POS Transaction History;$catalog;$catalog:AccountLeftNavigationComponent
+;7;BodyContent-postransactions;Body Content Slot for My Account POS Transaction History;$catalog;$catalog:AccountPOSTransactionHistoryComponent
+;8;SideContent-postransaction;Side Content Slot for My Account POS Transaction Details;$catalog;$catalog:AccountLeftNavigationComponent
+;9;BodyContent-postransaction;Body Content Slot for My Account POS Transaction Details;$catalog;$catalog:AccountPOSTransactionTitleComponent,$catalog:AccountPOSTransactionHeaderComponent,$catalog:AccountPOSTransactionStoreInfoComponent,$catalog:AccountPOSTransactionItemsComponent
+
+############ CMS Config : Add Content Slots to POS Transaction Pages ############
+INSERT_UPDATE ContentSlotForPage;uid[unique=true];$catalogHeader[unique=true];position;page(&impexPageId);contentSlot(&impexSlotId)
+;SideContent-postransactions;$catalog;SideContent;4;6
+;BodyContent-postransactions;$catalog;BodyContent;4;7
+;SideContent-postransaction;$catalog;SideContent;5;8
+;BodyContent-postransaction;$catalog;BodyContent;5;9
+
+################################################
+############ Online Content Catalog ############
+################################################
+
+$catalog=$contentCatalog:Online
+ 
+############ Create POS Transaction Links ############
+INSERT_UPDATE CMSLinkComponent;&impexLinkId;uid[unique=true];name;linkName[lang=de];$catalogHeader[unique=true];url
+;10;AccountPOSHistoryLink;AccountPOSHistoryLink;Filialkäufe;$catalog;/my-account/postransactions
+;20;AccountViewPOSHistoryLink;AccountViewPOSHistoryLink;Filialkäufe anzeigen;$catalog;/my-account/postransactions
+ 
+############ Add POS Transaction Links to My Account Page (to Your Account and Order History) ############
+INSERT_UPDATE CMSLinksForNavNodes;Source(&impexLinkId)[unique=true];Target($catalogHeader,uid)[unique=true];reverseSequenceNumber
+;10;$catalog:AccountLeftNavNode;4
+;20;$catalog:AccountOrderHistoryNavNode;0
+
+############ Create View POS Transaction Action ############
+INSERT_UPDATE ViewOrderAction;&impexActionId;uid[unique=true];name;$catalogHeader[unique=true];url
+;30;ViewPOSTransactionAction;ViewPOSTransactionAction;$catalog;/my-account/postransaction/{orderCode}
+
+############ Create POS Transaction History Component ############
+INSERT_UPDATE JspIncludeComponent;uid[unique=true];name;$catalogHeader[unique=true];page;actions(&impexActionId)
+;AccountPOSTransactionHistoryComponent;Account POS Transaction History Component;$catalog;/WEB-INF/views/addons/sappostransactionaddon/desktop/pages/account/posTransactions.jsp;30;
+
+#---- Create POS Transaction Title Component ----
+;AccountPOSTransactionTitleComponent;Account POS Transaction Title Component;$catalog;/WEB-INF/views/addons/sappostransactionaddon/desktop/pages/account/posTransactionTitle.jsp;;
+
+#---- Create POS Transaction Header Component ----
+;AccountPOSTransactionHeaderComponent;Account POS Transaction Header Component;$catalog;/WEB-INF/views/addons/sappostransactionaddon/desktop/pages/account/posTransactionHeader.jsp;;
+
+#---- Create POS Transaction Items Component ----
+;AccountPOSTransactionItemsComponent;Account POS Transaction Items Component;$catalog;/WEB-INF/views/addons/sappostransactionaddon/desktop/pages/account/posTransactionItems.jsp;;
+
+#---- Create POS Transaction Store Info Component ----
+;AccountPOSTransactionStoreInfoComponent;Account POS Transaction Store Info Component;$catalog;/WEB-INF/views/addons/sappostransactionaddon/desktop/pages/account/posTransactionStoreInfo.jsp;;
+
+############ Create POS Transactions Page ############
+INSERT_UPDATE ContentPage;&impexPageId;uid[unique=true];label;name;title[lang=de];$catalogHeader[unique=true];masterTemplate($catalogHeader,uid);approvalStatus(code);defaultPage
+;40;postransactions;postransactions;POS Transaction History Page;Filialkäufe;$catalog;$catalog:AccountPageTemplate;approved;true
+#---- Create POS Transaction Page ----
+;50;postransaction;postransaction;POS Transaction Details Page;Details zu Filialkäufen;$catalog;$catalog:AccountPageTemplate;approved;true
+
+############ CMS Config : Create Content Slots for POS Transaction Pages ############
+INSERT_UPDATE ContentSlot;&impexSlotId;uid[unique=true];name;$catalogHeader[unique=true];cmsComponents($catalogHeader,uid)
+;60;SideContent-postransactions;Side Content Slot for My Account POS Transaction History;$catalog;$catalog:AccountLeftNavigationComponent
+;70;BodyContent-postransactions;Body Content Slot for My Account POS Transaction History;$catalog;$catalog:AccountPOSTransactionHistoryComponent
+;80;SideContent-postransaction;Side Content Slot for My Account POS Transaction Details;$catalog;$catalog:AccountLeftNavigationComponent
+;90;BodyContent-postransaction;Body Content Slot for My Account POS Transaction Details;$catalog;$catalog:AccountPOSTransactionTitleComponent,$catalog:AccountPOSTransactionHeaderComponent,$catalog:AccountPOSTransactionStoreInfoComponent,$catalog:AccountPOSTransactionItemsComponent
+
+############ CMS Config : Add Content Slots to POS Transaction Pages ############
+INSERT_UPDATE ContentSlotForPage;uid[unique=true];$catalogHeader[unique=true];position;page(&impexPageId);contentSlot(&impexSlotId)
+;SideContent-postransactions;$catalog;SideContent;40;60
+;BodyContent-postransactions;$catalog;BodyContent;40;70
+;SideContent-postransaction;$catalog;SideContent;50;80
+;BodyContent-postransaction;$catalog;BodyContent;50;90

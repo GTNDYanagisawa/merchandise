@@ -1,0 +1,24 @@
+*** Settings ***
+Test Setup        import commercecart sampledata
+Test Teardown     reset system
+Resource          commerce/CommerceServices_Keywords.txt
+Resource		  commerce/SubscriptionCommerce_Keywords.txt
+Resource          cissubscription/CisSubscription_Keywords.txt
+Resource          subscriptionservices/SubscriptionTerm_Keywords.txt
+Resource          subscriptionservices/SubscriptionProduct_Keywords.txt
+Resource          subscriptionservices/SubscriptionPricePlan_Keywords.txt
+
+*** Test Cases ***
+Test_CisSubscription_Integration_Create_Subscription
+    [Documentation]    Create new subscription for a customer using the facade layer and check if the subscriptions have been created
+	register and login customer "John" "Doe" with login "john.doe@test.com"
+	create default payment method
+	# create a subscription product and add it to the cart
+	create subscription term "T1" with renewal type "auto_renewing" and term frequency "monthly" and term number "10"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"     
+    add product "P1" to cart
+	place order and create subscriptions
+	verify current customer has subscriptions
+
+    

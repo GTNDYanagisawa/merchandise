@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title> YOUR ORDER - #$ctx.orderNumber </title>
+</head>
+<body>
+
+YOUR ORDER - #$ctx.orderNumber has been Rejected
+<table width="600" cellpadding="0" cellspacing="0">
+	#foreach($permissionResult in $ctx.permissionResults)
+		<tr>
+			<td width="250" align="left"><font style="font-family:Arial, Helvetica, sans-serif; color:#606060; font-size:11px;">
+				Approver: $permissionResult.Approver.uid #if($permissionResult.permission.message) comment: ($permissionResult.permission.message) #end
+				#if($permissionResult.note) comment: $permissionResult.note #end
+			</font></td>
+		</tr>
+	#end
+</table>
+
+
+<table width="600" cellpadding="0" cellspacing="0">
+	<tr>
+		<td width="250" align="left"><font style="font-family:Arial, Helvetica, sans-serif; color:#606060; font-size:11px;"><strong>Product</strong></font></td>
+		<td width="65" align="center"><font style="font-family:Arial, Helvetica, sans-serif; color:#606060; font-size:11px;"><strong>Status</strong></font></td>
+		<td width="75" align="center"><font style="font-family:Arial, Helvetica, sans-serif; color:#606060; font-size:11px;"><strong>Item #</strong></font></td>
+		<td width="60" align="center"><font style="font-family:Arial, Helvetica, sans-serif; color:#606060; font-size:11px;"><strong>Price</strong></font></td>
+		<td width="30" align="center"><font style="font-family:Arial, Helvetica, sans-serif; color:#606060; font-size:11px;"><strong>Qty</strong></font></td>
+		<td width="60" align="center"><font style="font-family:Arial, Helvetica, sans-serif; color:#606060; font-size:11px;"><strong>Item Total</strong></font></td>
+
+	</tr>
+	<tr>
+		<td colspan="6" height="1" style="border-bottom:#dadada 1px solid;"><img src="$ctx.baseUrl/images/border_1px.gif" width="600" height="1"/></td>
+	</tr>
+	#foreach($orderInfoEntry in $ctx.orderInfoEntries)
+		<tr bgcolor="#ffffff">
+			<td align="center"><font style="color:#c90000; font-size:12px; font-family:Arial, Helvetica, sans-serif;">$orderInfoEntry.productName</font></td>
+			<td align="center"><font style="color:#696969; font-size:12px; font-family:Arial, Helvetica, sans-serif;">$orderInfoEntry.orderEntryStatus</font></td>
+			<td align="center"><font style="color:#696969; font-size:12px; font-family:Arial, Helvetica, sans-serif;">$orderInfoEntry.orderEntryNumber</font></td>
+			<td align="center"><font style="color:#696969; font-size:12px; font-family:Arial, Helvetica, sans-serif;">$orderInfoEntry.basePrice</font></td>
+			<td align="center"><font style="color:#696969; font-size:12px; font-family:Arial, Helvetica, sans-serif;">$orderInfoEntry.orderEntry.quantity</font></td>
+			<td align="center"><font style="color:#696969; font-size:12px; font-family:Arial, Helvetica, sans-serif;">$orderInfoEntry.totalPrice</font></td>
+		</tr>
+	#end
+
+</table>
+
+<table cellpadding="0" cellspacing="0" width="290">
+	<tr height="28" valign="bottom">
+		<td align="right"><font style="color:#696969; font-size:12px; font-family:Arial, Helvetica, sans-serif; padding:0 88px 0 0;">Subtotal:</font></td>
+		<td align="right"><font style="color:#696969; font-size:12px; font-family:Arial, Helvetica, sans-serif;">$ctx.subtotalAmount</font></td>
+	</tr>
+	<tr>
+		<td align="right"><font style="color:#696969; font-size:12px; font-family:Arial, Helvetica, sans-serif; padding:0 88px 0 0;">Shipping:</font></td>
+		<td align="right"><font style="color:#696969; font-size:12px; font-family:Arial, Helvetica, sans-serif;">$ctx.deliveryCost</font></td>
+	</tr>
+	<tr height="28" valign="top">
+		<td align="right"><font style="color:#696969; font-size:12px; font-family:Arial, Helvetica, sans-serif; padding:0 88px 0 0;">Tax:</font></td>
+		<td align="right"><font style="color:#696969; font-size:12px; font-family:Arial, Helvetica, sans-serif;">$ctx.taxAmount</font></td>
+	</tr>
+	<tr>
+		<td style="border-top:#dadada 1px solid;border-bottom:#dadada 1px solid;border-left:#dadada 1px solid; padding:0 0 0 10px;" align="left"><font style="color:#696969; font-size:18px; font-family:Arial, Helvetica, sans-serif;">Total:</font></td>
+		<td align="right" style="border-top:#dadada 1px solid;border-bottom:#dadada 1px solid;border-right:#dadada 1px solid; padding:0 5px 0 0;"><font style="color:#696969; font-size:18px; font-family:Arial, Helvetica, sans-serif;"><i>$ctx.totalAmount</i></font></td>
+		<td width="70"></td>
+	</tr>
+</table>
+</body>
+</html>
+
+
+

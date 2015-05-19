@@ -1,0 +1,176 @@
+#
+# Import Two Sample B2B Organizations
+#
+
+$passwordEncoding=md5
+$defaultPassword=12341234
+$setPassword=@password[translator=de.hybris.platform.impex.jalo.translators.ConvertPlaintextToEncodedUserPasswordTranslator][default='$passwordEncoding:$defaultPassword']
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid);locname[lang=en];
+;b2bapprovergroup;b2bgroup;
+;SuperAccountMangers;;
+
+INSERT_UPDATE Employee;uid[unique=true];name;groups(uid)[mode=append];$setPassword;
+;AcctMgrA;Alistair Thompson;employeegroup,acctmgrgroup,cockpitgroup,SuperAccountMangers,admingroup;
+;AcctMgrB;Elke Vogel;employeegroup,acctmgrgroup,cockpitgroup,admingroup;
+;AcctMgrC;Sergio Vega;employeegroup,acctmgrgroup,cockpitgroup,admingroup;
+;AcctMgrD;Bruce Rivers;employeegroup,acctmgrgroup,cockpitgroup,admingroup;
+
+###############################
+# Rustic Hardware ORGANIZATION (Hierarchy)
+
+INSERT_UPDATE B2BCreditLimit;code[unique=true];alertRateType(code,itemtype(code));alertThreshold;amount;currency(isocode);dateRange(code,itemtype(code));datePeriod[dateformat=dd.MM.yyyy hh:mm:ss];
+;Monthly40KAlert10Percent;PERCENTAGE:B2BRateType;10;40000;USD;MONTH:B2BPeriodRange;;
+;Monthly30KAlert3K;CURRENCY:B2BRateType;3000;30000;USD;MONTH:B2BPeriodRange;;
+;Monthly15KAlert3K;CURRENCY:B2BRateType;3000;15000;USD;MONTH:B2BPeriodRange;;
+
+INSERT_UPDATE B2BUnit;description;uid[unique=true];name;locName[lang=en];groups(uid);reportingOrganization(uid);Addresses(&addId);&B2BUnitID;accountManager(uid);creditLimit(code);approvalProcessCode;
+;Hierarchical;Rustic;Rustic;Rustic;;Rustic;RusticAddrID1;RusticID1;AcctMgrA;Monthly40KAlert10Percent;accApproval;
+;Unit A;Rustic Retail;Rustic Retail;Rustic Retail;Rustic;Rustic;RusticAddrID2;RusticID3;;;
+;Unit B;Rustic Services;Rustic Services;Rustic Services;Rustic;Rustic;;RusticID2;AcctMgrB;Monthly15KAlert3K
+;Unit C;Custom Retail;Custom Retail;Custom Retail;Rustic Retail;Rustic;RusticAddrID5;RusticID4;
+;Unit D;Services East;Services East;Services East;Rustic Services;Rustic;RusticAddrID3;RusticID5;
+;Unit E;Services West;Services West;Services West;Rustic Services;Rustic;RusticAddrID4;RusticID6;AcctMgrC;
+
+INSERT_UPDATE Address;streetname[unique=true];postalcode[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;title(code);&addId;owner(&B2BUnitID)[unique=true];
+;999 South Wacker Drive;60606;Chicago;US;TRUE;TRUE;TRUE;TRUE;Akiro;Nakamura;akiro.nakamura@rustic-hw.com;mr;RusticAddrID1;RusticID1;
+;3000 Lombard Street;94123;San Francisco;US;TRUE;TRUE;TRUE;TRUE;Anil;Gupta;anil.gupta@rustic-hw.com;mr;RusticAddrID2;RusticID3;
+;700 E 50th Street;10022;New York;US;TRUE;TRUE;TRUE;TRUE;Mingmei;Wang;mingmei.wang@rustic-hw.com;ms;RusticAddrID3;RusticID5;
+;3000 Canyon Lake Drive;90068;Los Angeles;US;TRUE;TRUE;TRUE;TRUE;Matheu;Silva;matheu.silva@rustic-hw.com;mr;RusticAddrID4;RusticID6;
+;1000 Bagby Street;Texas;Houston;US;TRUE;TRUE;TRUE;TRUE;Carla;Torres;carla.torres@rustic-hw.com;ms;RusticAddrID5;RusticID4;
+
+INSERT_UPDATE B2BUserGroup;uid[unique=true];name;unit(uid);permissions(code,unit(uid));
+;premiumPermissions;Premium Permissions;Rustic;Rustic 7K USD ORDER:Rustic,Rustic 25K USD MONTH:Rustic;
+;standardPermissions;Standard Permissions;Rustic;Rustic 5K USD ORDER:Rustic,Rustic 15K USD MONTH:Rustic;
+;limitedPermissions;Limited Permissions;Rustic;Rustic 0K USD ORDER:Rustic,Rustic 25K USD MONTH:Rustic;
+
+INSERT_UPDATE B2BCustomer;description;uid[unique=true];originalUid;email;name;title(code);groups(uid);permissionGroups(uid);sessionCurrency(isocode)[default='USD'];$setPassword;
+;Admin A;linda.wolf@rustic-hw.com;linda.wolf@rustic-hw.com;linda.wolf@rustic-hw.com;Linda Wolf;ms;Rustic,b2badmingroup;;;;;
+;AdminB;lars.bauer@rustic-hw.com;lars.bauer@rustic-hw.com;lars.bauer@rustic-hw.com;Lars Bauer;mr;Rustic Services, b2badmingroup;;;;;;
+;Approver A;hanna.schmidt@rustic-hw.com;hanna.schmidt@rustic-hw.com;hanna.schmidt@rustic-hw.com;Hanna Schmidt;ms;Rustic, b2bapprovergroup;;;;;;
+;Approver B;james.bell@rustic-hw.com;james.bell@rustic-hw.com;james.bell@rustic-hw.com;James Bell;mr;Rustic Services, b2bapprovergroup;;;;;;
+;Approver C;carla.torres@rustic-hw.com;carla.torres@rustic-hw.com;carla.torres@rustic-hw.com;Carla Torres;ms;Custom Retail, b2bapprovergroup;;;;;;
+;Approver D;matheu.silva@rustic-hw.com;matheu.silva@rustic-hw.com;matheu.silva@rustic-hw.com;Matheu Silva;mr;Services West, b2bapprovergroup, b2bcustomergroup, b2bmanagergroup, standardPermissions;;;;;;
+;Approver E;mingmei.wang@rustic-hw.com;mingmei.wang@rustic-hw.com;mingmei.wang@rustic-hw.com;Mingmei Wang;ms;Services East, b2bapprovergroup, b2bcustomergroup;;;;;;
+;Customer A;mark.rivers@rustic-hw.com;mark.rivers@rustic-hw.com;mark.rivers@rustic-hw.com;Mark Rivers;mr;Custom Retail, b2bcustomergroup, premiumPermissions;;;;;;
+;Customer B;anthony.lombardi@rustic-hw.com;anthony.lombardi@rustic-hw.com;anthony.lombardi@rustic-hw.com;Anthony Lombardi;mr;Custom Retail, b2bcustomergroup,limitedPermissions;;;;;;
+;Customer C;william.hunter@rustic-hw.com;william.hunter@rustic-hw.com;william.hunter@rustic-hw.com;William Hunter;mr;Custom Retail, b2bcustomergroup, limitedPermissions, standardPermissions;;;;;;
+;Customer D;marie.dubois@rustic-hw.com;marie.dubois@rustic-hw.com;marie.dubois@rustic-hw.com;Marie Dubois;ms;Custom Retail, b2bcustomergroup,standardPermissions;;;;;;
+;Customer E;axel.krause@rustic-hw.com;axel.krause@rustic-hw.com;axel.krause@rustic-hw.com;Axel Krause;mr;Custom Retail, b2bcustomergroup,standardPermissions;;;;;;
+;Customer F;ulf.becker@rustic-hw.com;ulf.becker@rustic-hw.com;ulf.becker@rustic-hw.com;Ulf Becker;mr;Services East, b2bcustomergroup,standardPermissions;;;;;;
+;Customer G;alejandro.navarro@rustic-hw.com;alejandro.navarro@rustic-hw.com;alejandro.navarro@rustic-hw.com;Alejandro Navarro;mr;Services East, b2bcustomergroup,standardPermissions;;;;;;
+;Customer H;lucas.kowalski@rustic-hw.com;lucas.kowalski@rustic-hw.com;lucas.kowalski@rustic-hw.com;Lucas Kowalski;mr;Services East, b2bcustomergroup,standardPermissions;;;;;;
+;Customer I;byung-soon.lee@rustic-hw.com;byung-soon.lee@rustic-hw.com;byung-soon.lee@rustic-hw.com;Byung-soon Lee;ms;Services West, b2bcustomergroup,standardPermissions;;;;;;
+;Customer J;gi.sun@rustic-hw.com;gi.sun@rustic-hw.com;gi.sun@rustic-hw.com;Gi Sun;mr;Services West, b2bcustomergroup,standardPermissions;;;;;;
+;Manager A;akiro.nakamura@rustic-hw.com;akiro.nakamura@rustic-hw.com;akiro.nakamura@rustic-hw.com;Akiro Nakamura;mr;Rustic, b2bmanagergroup;;;;;;
+;Manager B;anil.gupta@rustic-hw.com;anil.gupta@rustic-hw.com;anil.gupta@rustic-hw.com;Anil Gupta;mr;Rustic Retail, b2bmanagergroup, b2bcustomergroup, premiumPermissions;;;;;;
+;Manager C;salome.levi@rustic-hw.com;salome.levi@rustic-hw.com;salome.levi@rustic-hw.com;Salome Levi;ms;Rustic Services, b2bmanagergroup;;;;;;
+
+INSERT_UPDATE B2BCostCenter;code[unique=true];name[lang=en];Unit(uid);budgets(code);currency(isocode)[default='USD']
+;Rustic Global;Rustic Global;Rustic;Monthly 50K USD;
+;Rustic Retail;Retail;Rustic Retail;Monthly 2.5K USD;
+;Custom Retail;Custom Retail;Custom Retail;Monthly 4K USD;
+;Services East;Services East;Services East;Weekly 2.5K USD;
+;Services West;Services West;Services West;Monthly 20K USD;
+
+INSERT_UPDATE B2BBudget;code[unique=true];Unit(uid);budget;currency(isocode)[allownull=true];dateRange[dateformat=dd.MM.yyyy hh:mm:ss,allownull=true];name[lang=en];;
+;Monthly 50K USD;Rustic;50000;USD;01.01.2010 00:00:00,12.31.2032 12:59:59;Monthly 50K USD;
+;Monthly 20K USD;Services West;20000;USD;01.01.2010 00:00:00,12.31.2032 12:59:59;Monthly 20K USD;
+;Monthly 4K USD;Custom Retail;4000;USD;01.01.2010 00:00:00,12.31.2032 12:59:59;Monthly 4K USD;
+;Monthly 2.5K USD;Rustic Retail;2500;USD;01.01.2010 00:00:00,12.31.2032 12:59:59;Monthly 2.5K USD;
+;Weekly 2.5K USD;Services East;2500;USD;01.01.2010 00:00:00,12.31.2032 12:59:59;Weekly 2.5K USD;
+
+INSERT_UPDATE B2BOrderThresholdPermission;code[unique=true];Unit(uid);threshold;currency(isocode)[default='USD'];
+;Rustic 0K USD ORDER;Rustic;0;
+;Rustic 1K USD ORDER;Rustic;1000;
+;Rustic 2K USD ORDER;Rustic;2000;
+;Rustic 4K USD ORDER;Rustic;4000;
+;Rustic 5K USD ORDER;Rustic;5000;
+;Rustic 7K USD ORDER;Rustic;7000;
+;Rustic 15K USD ORDER;Rustic;15000;
+;Rustic 20K USD ORDER;Rustic;20000;
+
+INSERT_UPDATE B2BOrderThresholdTimespanPermission;code[unique=true];Unit(uid);threshold;currency(isocode);range(code,itemtype(code));
+;Rustic 3K USD MONTH;Rustic;3000;USD;MONTH:B2BPeriodRange;
+;Rustic 10K USD MONTH;Rustic;10000;USD;MONTH:B2BPeriodRange;
+;Rustic 15K USD MONTH;Rustic;15000;USD;MONTH:B2BPeriodRange;
+;Rustic 20K USD MONTH;Rustic;20000;USD;MONTH:B2BPeriodRange;
+;Rustic 25K USD MONTH;Rustic;25000;USD;MONTH:B2BPeriodRange;
+;Rustic Unlimited Timespan;Rustic;999999999;USD;MONTH:B2BPeriodRange;
+
+INSERT_UPDATE B2BBudgetExceededPermission;code[unique=true];Unit(uid);
+;Rustic Budget Exceeded;Rustic;
+
+UPDATE B2BUnit;uid[unique=true];approvers(uid);
+;Rustic;hanna.schmidt@rustic-hw.com;
+;Rustic Retail;james.bell@rustic-hw.com;
+;Custom Retail;carla.torres@rustic-hw.com;
+;Services West;matheu.silva@rustic-hw.com,mingmei.wang@rustic-hw.com;
+;Services East;mingmei.wang@rustic-hw.com;
+
+UPDATE B2BCustomer;originalUid[unique=true];uid[unique=true];permissions(code,Unit(uid));
+;hanna.schmidt@rustic-hw.com;hanna.schmidt@rustic-hw.com;Rustic 20K USD ORDER:Rustic,Rustic Unlimited Timespan:Rustic,Rustic Budget Exceeded:Rustic;
+;salome.levi@rustic-hw.com;salome.levi@rustic-hw.com;Rustic 10K USD MONTH:Rustic,Rustic Unlimited Timespan:Rustic,Rustic Budget Exceeded:Rustic;
+;carla.torres@rustic-hw.com;carla.torres@rustic-hw.com;Rustic 4K USD ORDER:Rustic;
+;matheu.silva@rustic-hw.com;matheu.silva@rustic-hw.com;Rustic 5K USD ORDER:Rustic;
+;mingmei.wang@rustic-hw.com;mingmei.wang@rustic-hw.com;Rustic 2K USD ORDER:Rustic,Rustic 15K USD ORDER:Rustic;
+;mark.rivers@rustic-hw.com;mark.rivers@rustic-hw.com;Rustic 3K USD MONTH:Rustic;
+;ulf.becker@rustic-hw.com;ulf.becker@rustic-hw.com;Rustic 7K USD ORDER:Rustic;
+;gi.sun@rustic-hw.com;gi.sun@rustic-hw.com;Rustic 20K USD MONTH:Rustic;
+
+###############################
+#  Pronto Hardware ORGANIZATION (KIS)
+
+INSERT_UPDATE B2BCreditLimit;code[unique=true];alertRateType(code,itemtype(code));alertThreshold;amount;currency(isocode);dateRange(code,itemtype(code));datePeriod[dateformat=dd.MM.yyyy hh:mm:ss];
+;Monthly30KAlert3K;CURRENCY:B2BRateType;3000;30000;USD;MONTH:B2BPeriodRange;;
+
+INSERT_UPDATE B2BUnit;description;uid[unique=true];name;locName[lang=en];groups(uid);reportingOrganization(uid);Addresses(&addId);&B2BUnitID;accountManager(uid);accountManagerGroups(uid);creditLimit(code);approvalProcessCode;
+;KIS;Pronto;Pronto;Pronto;;Pronto;ProntoAddrID1;ProntoID1;AcctMgrD;SuperAccountMangers;Monthly30KAlert3K;accApproval;
+;Unit A;Pronto Goods;Pronto Goods;Pronto Goods;Pronto;Pronto;ProntoAddrID2;ProntoID2;;;;
+;Unit B;Pronto Services;Pronto Services;Pronto Services;Pronto;Pronto;ProntoAddrID3;ProntoID3;;;;
+
+INSERT_UPDATE Address;streetname[unique=true];postalcode[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;title(code);&addId;owner(&B2BUnitID)[unique=true];
+;3000 Lombard Street;94123;San Francisco;US;TRUE;TRUE;TRUE;TRUE;Akiro;Nakamura;akiro.nakamura@pronto-hw.com;mr;ProntoAddrID1;ProntoID1;
+;700 E 50th Street;10022;New York;US;TRUE;TRUE;TRUE;TRUE;Gi;Sun;gi.sun@pronto-hw.com;mr;ProntoAddrID2;ProntoID2;
+;11000 Bagby Street Houston;Texas;Houston;US;TRUE;TRUE;TRUE;TRUE;James;Bell;james.bell@Pronto-hw.com;mr;ProntoAddrID3;ProntoID3;
+
+INSERT_UPDATE B2BUserGroup;uid[unique=true];name;unit(uid);permissions(code,unit(uid));
+;enhancedPermissions;Enhanced Permissions;Pronto;Pronto 12K USD ORDER:Pronto,Pronto 15K USD MONTH:Pronto;
+;commonPermissions;Common Permissions;Pronto;Pronto 6K USD ORDER:Pronto,Pronto 12K USD MONTH:Pronto;
+
+INSERT_UPDATE B2BCustomer;description;uid[unique=true];email;name;title(code);groups(uid);permissionGroups(uid);sessionCurrency(isocode)[default='USD'];$setPassword
+;Admin A;linda.wolf@pronto-hw.com;linda.wolf@pronto-hw.com;Linda Wolf;ms;Pronto, b2badmingroup;
+;Approver A;hanna.schmidt@pronto-hw.com;hanna.schmidt@pronto-hw.com;Hanna Schmidt;ms;Pronto, b2bapprovergroup;
+;Approver B;james.bell@pronto-hw.com;james.bell@pronto-hw.com;James Bell;mr;Pronto Services, b2bapprovergroup;
+;Customer A;mark.rivers@pronto-hw.com;mark.rivers@pronto-hw.com;Mark Rivers;mr;Pronto Goods, b2bcustomergroup,enhancedPermissions;;
+;Customer B;mingmei.wang@pronto-hw.com;mingmei.wang@pronto-hw.com;Mingmei Wang;ms;Pronto Goods, b2bcustomergroup, commonPermissions;;
+;Customer C;william.hunter@pronto-hw.com;william.hunter@pronto-hw.com;William Hunter;mr;Pronto Services, b2bcustomergroup, enhancedPermissions;
+;Customer D;gi.sun@pronto-hw.com;gi.sun@pronto-hw.com;Gi Sun;mr;Pronto Services, b2bcustomergroup, commonPermissions;;
+;Manager A;akiro.nakamura@pronto-hw.com;akiro.nakamura@pronto-hw.com;Akiro Nakamura;mr;Pronto, b2bmanagergroup;
+;Manager B;anil.gupta@pronto-hw.com;anil.gupta@pronto-hw.com;Anil Gupta;mr;Pronto Goods, b2bmanagergroup;
+
+INSERT_UPDATE B2BBudget;code[unique=true];Unit(uid);budget;currency(isocode)[allownull=true];dateRange[dateformat=dd.MM.yyyy hh:mm:ss,allownull=true];name[lang=en];
+;30K USD/MONTH;Pronto;30000;USD;01.01.2010 00:00:00,12.31.2012 12:59:59;30K USD/MONTH;
+;20K USD/MONTH;Pronto;20000;USD;01.01.2010 00:00:00,12.31.2012 12:59:59;20K USD/MONTH;
+
+INSERT_UPDATE B2BCostCenter;code[unique=true];Unit(uid);currency(isocode);budgets(code);name[lang=en];
+;Pronto Goods;Pronto Goods;USD;30K USD/MONTH;Pronto Goods;
+;Pronto Services;Pronto Services;USD;20K USD/MONTH;Pronto Services;
+
+INSERT_UPDATE B2BOrderThresholdPermission;code[unique=true];Unit(uid);threshold;currency(isocode);
+;Pronto 5K USD ORDER;Pronto;5000;USD; -
+;Pronto 6K USD ORDER;Pronto;6000;USD; -
+;Pronto 10K USD ORDER;Pronto;10000;USD; -
+;Pronto 12K USD ORDER;Pronto;12000;USD; -
+
+INSERT_UPDATE B2BOrderThresholdTimespanPermission;code[unique=true];Unit(uid);threshold;currency(isocode);range(code,itemtype(code));
+;Pronto 15K USD MONTH;Pronto;15000;USD;MONTH:B2BPeriodRange;
+;Pronto 12K USD MONTH;Pronto;12000;USD;MONTH:B2BPeriodRange;
+;Pronto Unlimited Threshold Timespan;Pronto;999999999;USD;MONTH:B2BPeriodRange;
+
+UPDATE B2BUnit;uid[unique=true];creditLimit(code);accountManager(uid);approvers(uid)
+;Pronto;Monthly30KAlert3K;AcctMgrD;hanna.schmidt@pronto-hw.com;
+;Pronto Services;;;james.bell@pronto-hw.com;
+
+UPDATE B2BCustomer;uid[unique=true];permissions(code,unit(uid));
+;hanna.schmidt@pronto-hw.com;Pronto Unlimited Threshold Timespan:Pronto,Pronto 10K USD ORDER:Pronto;
+;james.bell@pronto-hw.com;Pronto 5K USD ORDER:Pronto;

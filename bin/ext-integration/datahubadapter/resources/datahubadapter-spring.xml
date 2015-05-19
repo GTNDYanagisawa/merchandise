@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias name="datahubImpexResourceFactory" alias="impexResourceFactory"/>
+	<bean id="datahubImpexResourceFactory" class="com.hybris.datahub.core.services.impl.DataHubImpExResourceFactory">
+		<property name="fragmentReader">
+			<bean class="com.hybris.datahub.core.services.impl.DefaultFragmentReader">
+				<property name="dataHubFacade">
+					<bean class="com.hybris.datahub.core.rest.client.ImpexDataImportClient" />
+				</property>
+	    </bean>
+	  </property>
+	</bean>
+
+	<alias name="defaultImportFacade" alias="importFacade"/>
+	<bean id="defaultImportFacade" class="com.hybris.datahub.core.facades.impl.DefaultItemImportFacade">
+		<property name="importService" ref="importService" />
+	  <property name="resourceFactory" ref="impexResourceFactory" />
+	  <property name="eventService" ref="eventService" />
+	  <property name="resultConverter">
+		  <bean class="com.hybris.datahub.core.facades.impl.converter.SourceAndErrorCombiningConverter" />
+	  </property>
+		<property name="dataHubFacade">
+			<bean class="com.hybris.datahub.core.rest.client.ImpexDataImportClient" />
+		</property>
+	</bean>
+
+	<alias name="defaultItemImportTaskRunningFacade" alias="itemImportTaskRunningFacade" />
+	<bean id="defaultItemImportTaskRunningFacade" class="com.hybris.datahub.core.facades.impl.DefaultItemImportTaskRunningFacade" >
+		<property name="modelService" ref="modelService" />
+		<property name="taskService" ref="taskService" />
+	</bean>
+
+	<bean name="itemImportTaskRunner" class="com.hybris.datahub.core.tasks.ItemImportTaskRunner" >
+		<property name="importFacade" ref="importFacade" />
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+	<bean id ="dataHubOutboundService" class="com.hybris.datahub.core.services.impl.DefaultDataHubOutboundService" >
+		<property name="dataHubOutboundClient" ref="dataHubOutboundClient" />
+		<property name="csvUtils" ref="csvUtils" />
+	</bean>
+
+    <alias name="defaultDataHubOutboundClient" alias="dataHubOutboundClient" />
+	<bean name="defaultDataHubOutboundClient" class="com.hybris.datahub.core.rest.client.DefaultDataHubOutboundClient">
+		<property name="dataHubUrl" value="${datahubadapter.datahuboutbound.url}" />
+	</bean>
+
+	<bean name="csvUtils" class="com.hybris.datahub.core.util.OutboundServiceCsvUtils">
+		<property name="datePattern" value="${datahubadapter.datahuboutbound.date.pattern}" />
+	</bean>
+</beans>

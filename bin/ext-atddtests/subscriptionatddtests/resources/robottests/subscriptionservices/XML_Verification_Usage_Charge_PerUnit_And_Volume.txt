@@ -1,0 +1,579 @@
+*** Settings ***
+Test Setup        import commercecart sampledata
+Test Teardown     reset system
+Resource          commerce/CommerceServices_Keywords.txt
+Resource		  commerce/SubscriptionCommerce_Keywords.txt
+Resource          subscriptionservices/SubscriptionProduct_Keywords.txt
+Resource          subscriptionservices/SubscriptionPricePlan_Keywords.txt
+Resource          subscriptionservices/SubscriptionUsageCharge_Keywords.txt
+Resource          entitlements/Product_Keywords.txt
+
+
+*** Test Cases ***
+# VOLUME OVERAGE 1unit:
+Test_XML_Verification_Usage_Charge_PerUnit_Overage_Video_Volume_Overage_Minute
+    [Documentation]    Creates a product with a volume usage charge and verifies the product XML (including usage charge entry order)
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    for subscription priceplan "PP1" add per unit usage charge "PUC1" with usage unit "video" and usage charge type "each_respective_tier"
+    for subscription priceplan "PP1" add volume usage charge "VC1" with usage unit "minute"
+	for usage charge "PUC1" add overage charge entry "OC1" with price of "15"
+	for usage charge "VC1" add overage charge entry "OC2" with price of "25"
+	add product "P1" to cart
+	for product "P1" verify that the XML for per unit usage charge "PUC1" matches "<perUnitUsageCharge>
+																			        <usageChargeEntries>
+																			          <overageUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>15.0</value>
+																			              <formattedValue>$15.00</formattedValue>
+																			            </price>
+																			          </overageUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>video</id>
+																			          <namePlural>Videos</namePlural>
+																			          <name>Video</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>PUC1</name>
+																			        <usageChargeType>
+																			          <code>each_respective_tier</code>
+																			        </usageChargeType>
+																			      </perUnitUsageCharge>"																			      																	        																			      
+	for product "P1" verify that the XML for volume usage charge "VC1" matches "<volumeUsageCharge>
+																			        <usageChargeEntries>
+																			          <overageUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>25.0</value>
+																			              <formattedValue>$25.00</formattedValue>
+																			            </price>
+																			          </overageUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>minute</id>
+																			          <namePlural>Minutes</namePlural>
+																			          <name>Minute</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>VC1</name>
+																			      </volumeUsageCharge>"																			        
+      
+Test_XML_Verification_Usage_Charge_PerUnit_Overage_Video_Volume_TierFrom1To2_Minute
+    [Documentation]    Creates a product with a volume usage charge and verifies the product XML (including usage charge entry order)
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    for subscription priceplan "PP1" add per unit usage charge "PUC1" with usage unit "video" and usage charge type "each_respective_tier"
+    for subscription priceplan "PP1" add volume usage charge "VC1" with usage unit "minute"
+	for usage charge "PUC1" add overage charge entry "OC1" with price of "15"
+	for usage charge "VC1" add tiered charge entry "TC1" with price of "12" with start "1" and end "2"
+	add product "P1" to cart
+	for product "P1" verify that the XML for per unit usage charge "PUC1" matches "<perUnitUsageCharge>
+																			        <usageChargeEntries>
+																			          <overageUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>15.0</value>
+																			              <formattedValue>$15.00</formattedValue>
+																			            </price>
+																			          </overageUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>video</id>
+																			          <namePlural>Videos</namePlural>
+																			          <name>Video</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>PUC1</name>
+																			        <usageChargeType>
+																			          <code>each_respective_tier</code>
+																			        </usageChargeType>
+																			      </perUnitUsageCharge>"
+	for product "P1" verify that the XML for volume usage charge "VC1" matches "<volumeUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>12.0</value>
+																			              <formattedValue>$12.00</formattedValue>
+																			            </price>
+																			            <tierEnd>2</tierEnd>
+																			            <tierStart>1</tierStart>
+																			          </tierUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>minute</id>
+																			          <namePlural>Minutes</namePlural>
+																			          <name>Minute</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>VC1</name>
+																			      </volumeUsageCharge>"
+	
+Test_XML_Verification_Usage_Charge_PerUnit_TierFrom1To2_Video_Volume_Overage_Minute
+    [Documentation]    Creates a product with a volume usage charge and verifies the product XML (including usage charge entry order)
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    for subscription priceplan "PP1" add per unit usage charge "PUC1" with usage unit "video" and usage charge type "each_respective_tier"
+    for subscription priceplan "PP1" add volume usage charge "VC1" with usage unit "minute"
+    for usage charge "PUC1" add tiered charge entry "TC1" with price of "12" with start "1" and end "2"
+	for usage charge "VC1" add overage charge entry "OC1" with price of "15"
+	add product "P1" to cart
+	for product "P1" verify that the XML for per unit usage charge "PUC1" matches "<perUnitUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>12.0</value>
+																			              <formattedValue>$12.00</formattedValue>
+																			            </price>
+																			            <tierEnd>2</tierEnd>
+																			            <tierStart>1</tierStart>
+																			          </tierUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>video</id>
+																			          <namePlural>Videos</namePlural>
+																			          <name>Video</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>PUC1</name>
+																			        <usageChargeType>
+																			          <code>each_respective_tier</code>
+																			        </usageChargeType>
+																			      </perUnitUsageCharge>"
+	for product "P1" verify that the XML for volume usage charge "VC1" matches "<volumeUsageCharge>
+																			        <usageChargeEntries>
+																			          <overageUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>15.0</value>
+																			              <formattedValue>$15.00</formattedValue>
+																			            </price>
+																			          </overageUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>minute</id>
+																			          <namePlural>Minutes</namePlural>
+																			          <name>Minute</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>VC1</name>
+																			      </volumeUsageCharge>"	
+	
+Test_XML_Verification_Usage_Charge_PerUnit_TierFrom1To2_Video_Volume_TierFrom1To2_Minute
+    [Documentation]    Creates a product with a volume usage charge and verifies the product XML (including usage charge entry order)
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    for subscription priceplan "PP1" add per unit usage charge "PUC1" with usage unit "video" and usage charge type "each_respective_tier"
+    for subscription priceplan "PP1" add volume usage charge "VC1" with usage unit "minute"
+    for usage charge "PUC1" add tiered charge entry "TC1" with price of "12" with start "1" and end "2"
+	for usage charge "VC1" add tiered charge entry "TC2" with price of "22" with start "1" and end "2"
+	add product "P1" to cart
+	for product "P1" verify that the XML for per unit usage charge "PUC1" matches "<perUnitUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>12.0</value>
+																			              <formattedValue>$12.00</formattedValue>
+																			            </price>
+																			            <tierEnd>2</tierEnd>
+																			            <tierStart>1</tierStart>
+																			          </tierUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>video</id>
+																			          <namePlural>Videos</namePlural>
+																			          <name>Video</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>PUC1</name>
+																			        <usageChargeType>
+																			          <code>each_respective_tier</code>
+																			        </usageChargeType>
+																			      </perUnitUsageCharge>"
+	for product "P1" verify that the XML for volume usage charge "VC1" matches "<volumeUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>22.0</value>
+																			              <formattedValue>$22.00</formattedValue>
+																			            </price>
+																			            <tierEnd>2</tierEnd>
+																			            <tierStart>1</tierStart>
+																			          </tierUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>minute</id>
+																			          <namePlural>Minutes</namePlural>
+																			          <name>Minute</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>VC1</name>
+																			      </volumeUsageCharge>"
+	
+Test_XML_Verification_Usage_Charge_PerUnit_TierFrom1To2_From3To5_Video_Volume_TierFrom1To2_From3To9_Minute
+    [Documentation]    Creates a product with a volume usage charge and verifies the product XML (including usage charge entry order)
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    for subscription priceplan "PP1" add per unit usage charge "PUC1" with usage unit "video" and usage charge type "each_respective_tier"
+    for subscription priceplan "PP1" add volume usage charge "VC1" with usage unit "minute"
+    for usage charge "PUC1" add tiered charge entry "TC1" with price of "12" with start "1" and end "2"
+    for usage charge "PUC1" add tiered charge entry "TC2" with price of "22" with start "3" and end "5"
+	for usage charge "VC1" add tiered charge entry "TC3" with price of "32" with start "1" and end "2"
+    for usage charge "VC1" add tiered charge entry "TC4" with price of "42" with start "3" and end "9"
+	add product "P1" to cart
+	for product "P1" verify that the XML for per unit usage charge "PUC1" matches "<perUnitUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>12.0</value>
+																			              <formattedValue>$12.00</formattedValue>
+																			            </price>
+																			            <tierEnd>2</tierEnd>
+																			            <tierStart>1</tierStart>
+																			          </tierUsageChargeEntry>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>22.0</value>
+																			              <formattedValue>$22.00</formattedValue>
+																			            </price>
+																			            <tierEnd>5</tierEnd>
+																			            <tierStart>3</tierStart>
+																			          </tierUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>video</id>
+																			          <namePlural>Videos</namePlural>
+																			          <name>Video</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>PUC1</name>
+																			        <usageChargeType>
+																			          <code>each_respective_tier</code>
+																			        </usageChargeType>
+																			      </perUnitUsageCharge>"
+	for product "P1" verify that the XML for volume usage charge "VC1" matches "<volumeUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>32.0</value>
+																			              <formattedValue>$32.00</formattedValue>
+																			            </price>
+																			            <tierEnd>2</tierEnd>
+																			            <tierStart>1</tierStart>
+																			          </tierUsageChargeEntry>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>42.0</value>
+																			              <formattedValue>$42.00</formattedValue>
+																			            </price>
+																			            <tierEnd>9</tierEnd>
+																			            <tierStart>3</tierStart>
+																			          </tierUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>minute</id>
+																			          <namePlural>Minutes</namePlural>
+																			          <name>Minute</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>VC1</name>
+																			      </volumeUsageCharge>"
+	
+Test_XML_Verification_Usage_Charge_PerUnit_TierFrom1To2_From3To5_Video_Volume_TierFrom8To9_From10To10_Minute
+    [Documentation]    Creates a product with a volume usage charge and verifies the product XML (including usage charge entry order)
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    for subscription priceplan "PP1" add per unit usage charge "PUC1" with usage unit "video" and usage charge type "each_respective_tier"
+    for subscription priceplan "PP1" add volume usage charge "VC1" with usage unit "minute"
+    for usage charge "PUC1" add tiered charge entry "TC1" with price of "12" with start "1" and end "2"
+    for usage charge "PUC1" add tiered charge entry "TC2" with price of "22" with start "3" and end "5"
+	for usage charge "VC1" add tiered charge entry "TC3" with price of "32" with start "8" and end "9"
+    for usage charge "VC1" add tiered charge entry "TC4" with price of "42" with start "10" and end "10"
+	add product "P1" to cart
+	for product "P1" verify that the XML for per unit usage charge "PUC1" matches "<perUnitUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>12.0</value>
+																			              <formattedValue>$12.00</formattedValue>
+																			            </price>
+																			            <tierEnd>2</tierEnd>
+																			            <tierStart>1</tierStart>
+																			          </tierUsageChargeEntry>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>22.0</value>
+																			              <formattedValue>$22.00</formattedValue>
+																			            </price>
+																			            <tierEnd>5</tierEnd>
+																			            <tierStart>3</tierStart>
+																			          </tierUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>video</id>
+																			          <namePlural>Videos</namePlural>
+																			          <name>Video</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>PUC1</name>
+																			        <usageChargeType>
+																			          <code>each_respective_tier</code>
+																			        </usageChargeType>
+																			      </perUnitUsageCharge>"
+	for product "P1" verify that the XML for volume usage charge "VC1" matches "<volumeUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>32.0</value>
+																			              <formattedValue>$32.00</formattedValue>
+																			            </price>
+																			            <tierEnd>9</tierEnd>
+																			            <tierStart>8</tierStart>
+																			          </tierUsageChargeEntry>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>42.0</value>
+																			              <formattedValue>$42.00</formattedValue>
+																			            </price>
+																			            <tierEnd>10</tierEnd>
+																			            <tierStart>10</tierStart>
+																			          </tierUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>minute</id>
+																			          <namePlural>Minutes</namePlural>
+																			          <name>Minute</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>VC1</name>
+																			      </volumeUsageCharge>"		
+	
+Test_XML_Verification_Usage_Charge_PerUnit_Overage_TierFrom1To2_Video_Volume_TierFrom3To5_Minute
+    [Documentation]    Creates a product with a volume usage charge and verifies the product XML (including usage charge entry order)
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    for subscription priceplan "PP1" add per unit usage charge "PUC1" with usage unit "video" and usage charge type "each_respective_tier"
+    for subscription priceplan "PP1" add volume usage charge "VC1" with usage unit "minute"
+	for usage charge "PUC1" add overage charge entry "OC1" with price of "15"
+	for usage charge "PUC1" add tiered charge entry "TC1" with price of "12" with start "1" and end "2"
+	for usage charge "VC1" add tiered charge entry "TC2" with price of "32" with start "3" and end "5"
+	add product "P1" to cart
+	for product "P1" verify that the XML for per unit usage charge "PUC1" matches "<perUnitUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>12.0</value>
+																			              <formattedValue>$12.00</formattedValue>
+																			            </price>
+																			            <tierEnd>2</tierEnd>
+																			            <tierStart>1</tierStart>
+																			          </tierUsageChargeEntry>
+																			          <overageUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>15.0</value>
+																			              <formattedValue>$15.00</formattedValue>
+																			            </price>
+																			          </overageUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>video</id>
+																			          <namePlural>Videos</namePlural>
+																			          <name>Video</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>PUC1</name>
+																			        <usageChargeType>
+																			          <code>each_respective_tier</code>
+																			        </usageChargeType>
+																			      </perUnitUsageCharge>"
+	for product "P1" verify that the XML for volume usage charge "VC1" matches "<volumeUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>32.0</value>
+																			              <formattedValue>$32.00</formattedValue>
+																			            </price>
+																			            <tierEnd>5</tierEnd>
+																			            <tierStart>3</tierStart>
+																			          </tierUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>minute</id>
+																			          <namePlural>Minutes</namePlural>
+																			          <name>Minute</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>VC1</name>
+																			      </volumeUsageCharge>"	
+
+Test_XML_Verification_Usage_Charge_PerUnit_TierFrom1To2_Video_Volume_Overage_TierFrom3To5_Minute
+    [Documentation]    Creates a product with a volume usage charge and verifies the product XML (including usage charge entry order)
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    for subscription priceplan "PP1" add per unit usage charge "PUC1" with usage unit "video" and usage charge type "each_respective_tier"
+    for subscription priceplan "PP1" add volume usage charge "VC1" with usage unit "minute"    
+    for usage charge "PUC1" add tiered charge entry "TC1" with price of "12" with start "1" and end "2"
+    for usage charge "VC1" add overage charge entry "OC1" with price of "15"
+	for usage charge "VC1" add tiered charge entry "TC2" with price of "22" with start "3" and end "5"
+	add product "P1" to cart
+	for product "P1" verify that the XML for per unit usage charge "PUC1" matches "<perUnitUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>12.0</value>
+																			              <formattedValue>$12.00</formattedValue>
+																			            </price>
+																			            <tierEnd>2</tierEnd>
+																			            <tierStart>1</tierStart>
+																			          </tierUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>video</id>
+																			          <namePlural>Videos</namePlural>
+																			          <name>Video</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>PUC1</name>
+																			        <usageChargeType>
+																			          <code>each_respective_tier</code>
+																			        </usageChargeType>
+																			      </perUnitUsageCharge>"
+	for product "P1" verify that the XML for volume usage charge "VC1" matches "<volumeUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>22.0</value>
+																			              <formattedValue>$22.00</formattedValue>
+																			            </price>
+																			            <tierEnd>5</tierEnd>
+																			            <tierStart>3</tierStart>
+																			          </tierUsageChargeEntry>
+																			          <overageUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>15.0</value>
+																			              <formattedValue>$15.00</formattedValue>
+																			            </price>
+																			          </overageUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>minute</id>
+																			          <namePlural>Minutes</namePlural>
+																			          <name>Minute</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>VC1</name>
+																			      </volumeUsageCharge>"		
+	
+Test_XML_Verification_Usage_Charge_PerUnit_Overage_TierFrom1To2_Video_Volume_Overage_TierFrom3To5_Minute
+    [Documentation]    Creates a product with a volume usage charge and verifies the product XML (including usage charge entry order)
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    for subscription priceplan "PP1" add per unit usage charge "PUC1" with usage unit "video" and usage charge type "each_respective_tier"
+    for subscription priceplan "PP1" add volume usage charge "VC1" with usage unit "minute"    
+    for usage charge "PUC1" add overage charge entry "OC1" with price of "15"
+    for usage charge "PUC1" add tiered charge entry "TC1" with price of "12" with start "1" and end "2"
+    for usage charge "VC1" add overage charge entry "OC2" with price of "25"
+    for usage charge "VC1" add tiered charge entry "TC2" with price of "22" with start "3" and end "5"
+	add product "P1" to cart
+	for product "P1" verify that the XML for per unit usage charge "PUC1" matches "<perUnitUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>12.0</value>
+																			              <formattedValue>$12.00</formattedValue>
+																			            </price>
+																			            <tierEnd>2</tierEnd>
+																			            <tierStart>1</tierStart>
+																			          </tierUsageChargeEntry>
+																			          <overageUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>15.0</value>
+																			              <formattedValue>$15.00</formattedValue>
+																			            </price>
+																			          </overageUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>video</id>
+																			          <namePlural>Videos</namePlural>
+																			          <name>Video</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>PUC1</name>
+																			        <usageChargeType>
+																			          <code>each_respective_tier</code>
+																			        </usageChargeType>
+																			      </perUnitUsageCharge>"
+	for product "P1" verify that the XML for volume usage charge "VC1" matches "<volumeUsageCharge>
+																			        <usageChargeEntries>
+																			          <tierUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>22.0</value>
+																			              <formattedValue>$22.00</formattedValue>
+																			            </price>
+																			            <tierEnd>5</tierEnd>
+																			            <tierStart>3</tierStart>
+																			          </tierUsageChargeEntry>
+																			          <overageUsageChargeEntry>
+																			            <price>
+																			              <currencyIso>USD</currencyIso>
+																			              <priceType>BUY</priceType>
+																			              <value>25.0</value>
+																			              <formattedValue>$25.00</formattedValue>
+																			            </price>
+																			          </overageUsageChargeEntry>
+																			        </usageChargeEntries>
+																			        <usageUnit>
+																			          <id>minute</id>
+																			          <namePlural>Minutes</namePlural>
+																			          <name>Minute</name>
+																			          <accumulative>false</accumulative>
+																			        </usageUnit>
+																			        <name>VC1</name>
+																			      </volumeUsageCharge>"	

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="acceleratorCmsSystemSetup" class="de.hybris.platform.acceleratorcms.setup.AcceleratorCmsSystemSetup" parent="abstractCoreSystemSetup" />
+	
+	<!-- Dynamic Attributes -->
+	<bean id="uiExperienceRestrictionDynamicDescription" class="de.hybris.platform.acceleratorcms.model.UiExperienceRestrictionDynamicDescription" >
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<!-- Restriction Evaluators -->
+	<bean id="cmsUiExperienceRestrictionEvaluator" class="de.hybris.platform.acceleratorcms.evaluator.CMSUiExperienceRestrictionEvaluator" >
+		<property name="uiExperienceService" ref="uiExperienceService"/>
+	</bean>
+
+	<!-- Restriction Evaluator Mappings -->
+	<bean id="cmsUiExperienceRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping" >
+		<property name="restrictionTypeCode" value="CMSUiExperienceRestriction" />
+		<property name="restrictionEvaluator" ref="cmsUiExperienceRestrictionEvaluator" />
+	</bean>
+
+	<alias alias="cmsRestrictionService" name="rankingCMSRestrictionService" />
+	<bean id="rankingCMSRestrictionService" parent="defaultCMSRestrictionService" class="de.hybris.platform.acceleratorcms.services.impl.RankingCMSRestrictionService"/>
+
+	<bean id="cmsActionRestrictionDynamicDescription" class="de.hybris.platform.acceleratorcms.model.CMSActionRestrictionDynamicDescription" >
+	</bean>
+	<!-- Restriction Evaluators -->
+	<bean id="cmsActionRestrictionEvaluator" class="de.hybris.platform.acceleratorcms.evaluator.CMSActionRestrictionEvaluator" >
+		<property name="typeService" ref="typeService"/>
+	</bean>
+	<!-- Restriction Evaluator Mappings -->
+	<bean id="cmsActionRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping" >
+		<property name="restrictionTypeCode" value="CMSActionRestriction" />
+		<property name="restrictionEvaluator" ref="cmsActionRestrictionEvaluator" />
+	</bean>
+</beans>

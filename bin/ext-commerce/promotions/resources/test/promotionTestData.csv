@@ -1,0 +1,54 @@
+$catalogVersion=catalogVersion(catalog(id[default='hwcatalog']),version[default='Online'])[unique=true,default='hwcatalog:Online'];;;;;;;;
+$productBanner=productBanner(code);;;;;;;;
+#Some Banner Items;;;;;;;;
+
+INSERT_UPDATE Media;code[unique=true];$catalogVersion;mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];;;;
+;productbanner_item1;;image/jpg;productbanner_dummy_01.jpg;jar:/test/media/productbanner_dummy_01.jpg;;;;
+
+INSERT_UPDATE PromotionPriceRow;Currency[unique=true](isocode);price[unique=true];;;;;;
+;EUR;10;;;;;;
+;EUR;30;;;;;;
+;EUR;40;;;;;;
+;EUR;100;;;;;;
+;EUR;110;;;;;;
+;USD;11;;;;;;
+;USD;111;;;;;;
+;USD;150;;;;;;
+
+INSERT PromotionQuantityAndPricesRow;&row;quantity;prices(price,currency(isocode));;;;;
+;1;3;30:EUR;;;;;
+;2;4;40:EUR;;;;;
+
+INSERT_UPDATE PromotionGroup;Identifier[unique=true];
+;prGroup1;
+;prGroup2;
+;prGroup3;
+;prGroup4;
+;prGroup5;
+;prGroup6;
+;independentGroup;
+;emptyGroup;
+
+INSERT_UPDATE ProductFixedPricePromotion;code[unique=true];title;description;enabled;products(code,$catalogVersion);productFixedUnitPrice(price,currency(isocode));$productBanner;PromotionGroup(Identifier);priority;
+;FixedPriceGr1;clearance sale;Fixed Price for group1;true;HW1210-3411;10:EUR,11:USD;productbanner_item1;prGroup1;2000
+;FixedPriceGr2;clearance sale;Fixed Price for group2;true;HW1210-3411;110:EUR,111:USD;productbanner_item1;prGroup2;1500
+
+INSERT_UPDATE ProductPercentageDiscountPromotion;code[unique=true];title;description;enabled;products(code,$catalogVersion);percentageDiscount;$productBanner;PromotionGroup(Identifier);priority;
+;PercentageDiscount_19;Percentage discount 19%;19% off on HW1210-3411;true;HW1210-3411;19;productbanner_item1;prGroup3;1000
+;PercentageDiscount_10;Percentage discount 10%;10% off on HW1230-0001;true;HW1230-0001;10;productbanner_item1;prGroup1;2000
+
+INSERT_UPDATE ProductPercentageDiscountPromotion;code[unique=true];title;description;enabled;categories(code,$catalogVersion);percentageDiscount;$productBanner;PromotionGroup(Identifier);priority;
+;PercentageDiscount_15;Percentage discount 15%;15% off on Canon;true;HW1210;15;productbanner_item1;prGroup4;1500
+;PercentageDiscount_18;Percentage discount 18%;18% off on Photography;true;HW1200;18;productbanner_item1;prGroup4;1000
+
+INSERT_UPDATE ProductSteppedMultiBuyPromotion;code[unique=true];title;description;enabled;products(code,$catalogVersion);qualifyingCountsAndBundlePrices(&row);$productBanner;PromotionGroup(Identifier);priority;
+;Product_Stepped_Multi_Buy;Product Stepped Multi Buy;Buy any 3 for 30.00, buy 4 for 40.00;true;HW1210-3411;1,2;productbanner_item1;prGroup3;1001
+
+INSERT_UPDATE Product;code[unique=true];$catalogVersion;approvalStatus(code);
+;independentProduct;;approved;
+
+INSERT_UPDATE ProductFixedPricePromotion;code[unique=true];title;description;enabled;products(code,$catalogVersion);productFixedUnitPrice(price,currency(isocode));$productBanner;PromotionGroup(Identifier);priority;
+;independentProductPromotion;clearance sale;Fixed Price for independentGroup;true;independentProduct;10:EUR,11:USD;productbanner_item1;independentGroup;1000;
+
+INSERT_UPDATE OrderThresholdDiscountPromotion;code[unique=true];title;enabled;thresholdTotals(price,currency(isocode));discountPrices(price,currency(isocode));PromotionGroup(Identifier);priority;
+;Order Threshold Discount Promotion 10 EUR;10 EUR Discount for Orders more than 100 EUR or 150 USD;true;100:EUR,150:USD;10:EUR;prGroup5;1000;

@@ -1,0 +1,38 @@
+INSERT_UPDATE WorkflowTemplate;code[unique=true];name[lang=en];owner(uid);description[lang=en];visibleForPrincipals(uid);
+;B2BUserRegistration;B2B Registration;admin;;b2bregistrationapprovergroup;
+
+
+INSERT_UPDATE WorkflowActionTemplate;code[unique=true];name[lang=en];description[lang=en];principalAssigned(uid);workflow(code)[unique=true];actionType(code)
+;B2BRegistrationApproval;B2B Registration Approval;Manual step where a "B2B Registration Approver" can approve OR reject a request;b2bregistrationapprovergroup;B2BUserRegistration;normal;
+;B2BRegistrationEnd;B2B Registration End;End action of the B2B registration process;b2bregistrationapprovergroup;B2BUserRegistration;end;
+
+
+INSERT_UPDATE AutomatedWorkflowActionTemplate;code[unique=true];name[lang=en];principalAssigned(uid);workflow(code)[unique=true];actionType(code);jobHandler;description[lang=en];
+;B2BRSendEmailPendingApproval;Send Pending Approval Email;b2bregistrationapprovergroup;B2BUserRegistration;start;b2bRegistrationPendingApprovalSendEmailAutomatedWorkflowTemplateJob;Sends an email to all members of "B2B Registration Approver" user groups that a registration request is pending approval;
+;B2BRSendEmailRequestReceived;Send Request Received Email;b2bregistrationapprovergroup;B2BUserRegistration;normal;b2bRegistrationReceivedSendEmailAutomatedWorkflowTemplateJob;Sends an email to the customer who is trying to register to confirm reception of request;
+;B2BRRegistrationApproved;Registration Approved;b2bregistrationapprovergroup;B2BUserRegistration;normal;b2bRegistrationApprovedAutomatedWorkflowTemplateJob;Executed whenever the registration is approved;
+;B2BRRegistrationRejected;Registration Rejected;b2bregistrationapprovergroup;B2BUserRegistration;normal;b2bRegistrationRejectedAutomatedWorkflowTemplateJob;Executed whenever the registration is rejected;
+;B2BRSendEmailApproved;Send Approved Email;b2bregistrationapprovergroup;B2BUserRegistration;normal;b2bRegistrationApprovedSendEmailAutomatedWorkflowTemplateJob;Sends an email to indicate that the registration was approved;
+;B2BRSendEmailRejected;Send Rejected Email;b2bregistrationapprovergroup;B2BUserRegistration;normal;b2bRegistrationRejectedSendEmailAutomatedWorkflowTemplateJob;Sends an email to indicate that the registration was rejected;
+  
+  
+INSERT_UPDATE WorkflowDecisionTemplate;code[unique=true];name[lang=en];actionTemplate(code);description[allownull=true];
+;B2BRSentEmailPendingApproval;Sent Pending Approval Email;B2BRSendEmailPendingApproval;Sent the email "Registration pending approval";
+;B2BRSentEmailRequestReceived;Sent Request Received Email;B2BRSendEmailRequestReceived;Sent the email "Request received";
+;B2BRSendEmailApproved;Send Approved Email;B2BRRegistrationApproved;Sent the email "Registration approved";
+;B2BRSendEmailRejected;Send Rejected Email;B2BRRegistrationRejected;Sent the email "Registration rejected";
+;B2BRRegistrationApproved;Approve;B2BRegistrationApproval;Approve the registration request;
+;B2BRRegistrationRejected;Reject;B2BRegistrationApproval;Decline the registration request;
+;B2BRSentEmailApproved;Sent Registration Approved Email;B2BRSendEmailApproved;End of registration;
+;B2BRSentEmailRejected;Sent Registration Rejected Email;B2BRSendEmailRejected;End of registration;
+
+
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation;source(code)[unique=true];target(code)[unique=true];andConnectionTemplate;qualifier;
+;B2BRSentEmailPendingApproval;B2BRSendEmailRequestReceived;false;WorkflowActionTemplateLinkTemplateRelation;
+;B2BRSentEmailRequestReceived;B2BRegistrationApproval;false;WorkflowActionTemplateLinkTemplateRelation;
+;B2BRRegistrationApproved;B2BRRegistrationApproved;false;WorkflowActionTemplateLinkTemplateRelation;
+;B2BRRegistrationRejected;B2BRRegistrationRejected;false;WorkflowActionTemplateLinkTemplateRelation;
+;B2BRSendEmailApproved;B2BRSendEmailApproved;false;WorkflowActionTemplateLinkTemplateRelation;
+;B2BRSendEmailRejected;B2BRSendEmailRejected;false;WorkflowActionTemplateLinkTemplateRelation;
+;B2BRSentEmailApproved;B2BRegistrationEnd;false;WorkflowActionTemplateLinkTemplateRelation;
+;B2BRSentEmailRejected;B2BRegistrationEnd;false;WorkflowActionTemplateLinkTemplateRelation;

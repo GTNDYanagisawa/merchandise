@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	default-autowire="byName"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+		
+		<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="ENUM"/>
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultEnumUIEditor" />
+					<property name="defaultMode" value="single"/>
+					<property name="editors">
+						<map>
+							<entry key="multi" value="de.hybris.platform.cockpit.model.editor.impl.GenericCollectionUIEditor"/>
+							<entry key="range" value="de.hybris.platform.cockpit.model.editor.impl.GenericRangeUIEditor"/>
+							<entry key="printEnumEditorNotifier" value="de.hybris.platform.printcockpit.model.editor.impl.PrintEnumUIEditorNotifier"/>
+						</map>
+					</property>
+					<property name="label" value="enumEditor"/>
+		</bean>
+		
+		<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="REFERENCE"/>
+					<property name="defaultMode" value="single"/>
+					<!-- 
+						Note:
+						In 4.1.1 version as a default simple reference selector is use new Simple Reference Selector 
+					-->
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.referenceeditor.simple.impl.DefaultSimpleReferenceUIEditor" />
+					<property name="editors">
+						<map>
+							<!-- 
+								Note:
+								Version 4.5 comes with new simplistic collection reference editor which is default editor.  
+							-->
+							<entry key="multi" value="de.hybris.platform.cockpit.model.referenceeditor.collection.CollectionUIEditor"/>
+							<entry key="multiDeprecated" value="de.hybris.platform.cockpit.model.referenceeditor.impl.DefaultReferenceCollectionUIEditor"/>
+							<entry key="listViewReferenceEditor" value="de.hybris.platform.cockpit.model.referenceeditor.impl.ListViewCollectionEditor"/>
+							<entry key="browserContextEditor" value="de.hybris.platform.cockpit.model.referenceeditor.impl.ContextAreaReferenceCollectionUIEditor"/>
+							<entry key="mediaReferenceSelector" value="de.hybris.platform.cockpit.model.referenceeditor.impl.DefaultMediaReferenceUIEditor"/>
+							<!-- 
+								Note:
+								Version 4.5 comes with new simplistic media collection reference editor which is default editor.  
+							-->
+							<entry key="mediaReferenceCollectionSelector" value="de.hybris.platform.cockpit.model.referenceeditor.collection.CollectionUIEditorMedia"/> 
+							<entry key="mediaReferenceCollectionSelectorDeprecated" value="de.hybris.platform.cockpit.model.referenceeditor.impl.DefaultMediaReferenceCollectionUIEditor"/>
+							<!-- 
+								Note:
+								Version 4.5 comes with new simplistic celum media collection reference editor which is default editor.
+							 -->
+							<entry key="celumMediaReferenceCollectionSelector" value="de.hybris.platform.cockpit.model.referenceeditor.celum.impl.CelumMediaCollectionUIEditor"/>
+							<entry key="celumMediaReferenceCollectionSelectorDeprecated" value="de.hybris.platform.cockpit.model.referenceeditor.celum.impl.CelumMediaReferenceCollectionUIEditor"/>
+							
+							<entry key="simple" value="de.hybris.platform.cockpit.model.referenceeditor.impl.SimpleReferenceUIEditor"/>
+							<entry key="shortListEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultSelectUIEditor"/>
+							<!-- 
+								Note:
+								Version 4.1.1 comes with new simple reference selectors. Beside that a default reference selector was change to new type. 
+							-->
+							<entry key="simpleMediaReferenceSelector" value="de.hybris.platform.cockpit.model.referenceeditor.simple.impl.DefaultSimpleMediaReferenceUIEditor"/>
+							<entry key="simpleCelumReferenceSelector" value="de.hybris.platform.cockpit.model.referenceeditor.celum.impl.CelumSimpleMediaReferenceUIEditor"/>
+							
+							<entry key="printShortListEditorNotifier" value="de.hybris.platform.printcockpit.model.editor.impl.PrintSelectUIEditorNotifier"/>
+							
+						</map>
+					</property>
+					<property name="label" value="referenceEditor"/>
+			</bean>
+		
+		<alias alias="LookupEditorFactory" name="defaultLookupEditorFactory" /> 
+		<bean id="defaultLookupEditorFactory" class="de.hybris.platform.cockpit.model.meta.LookupEditorFactory">
+			<property name="editorFactory" ref="EditorFactory"></property>
+		</bean>
+</beans>

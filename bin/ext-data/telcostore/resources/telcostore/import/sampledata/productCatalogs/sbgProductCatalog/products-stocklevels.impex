@@ -1,0 +1,24 @@
+# ImpEx for Importing Products Stock Levels and Warehouses
+
+# Macros / Replacement Parameter definitions
+$productCatalog=sbgProductCatalog
+
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$vendor=sbg
+
+INSERT_UPDATE Vendor;code[unique=true]
+;$vendor
+
+INSERT_UPDATE StockLevel;warehouse(code)[unique=true];productCode[unique=true];inStockStatus(code);available;maxPreOrder;maxStockLevelHistoryCount;overSelling;preOrder;reserved
+
+INSERT_UPDATE StockLevel;productCode[unique=true];available[default=10];warehouse(code)[unique=true,default=warehouse_telco];inStockStatus(code)[default=notSpecified];maxPreOrder[default=0];maxStockLevelHistoryCount[default=-1];overSelling[default=0];preOrder[default=0];reserved[default=0]
+;BASIC_TV;
+;BIG_TV;
+;PREMIUM_TV;
+;DELUXE_TV;
+
+INSERT_UPDATE Product;code[unique=true];stockLevels(productCode,warehouse(code));vendors(code)[default=$vendor];$catalogVersion;europe1pricefactory_ptg(code)[default='us-sales-tax-full']
+;BASIC_TV;BASIC_TV:warehouse_telco
+;BIG_TV;BIG_TV:warehouse_telco
+;PREMIUM_TV;PREMIUM_TV:warehouse_telco
+;DELUXE_TV;DELUXE_TV:warehouse_telco

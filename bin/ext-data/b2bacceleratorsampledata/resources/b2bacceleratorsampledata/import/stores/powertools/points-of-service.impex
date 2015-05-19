@@ -1,0 +1,147 @@
+# ImpEx for Powertools Points of Service
+#% impex.setLocale( Locale.GERMAN );
+
+$storeUid=powertools
+$productCatalog=powertoolsProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$storeImage=storeImage(qualifier, $catalogVersion)
+
+$oklahomaHours=oklahoma-standard-hours
+$indianaHours=indiana-standard-hours
+$floridaHours=florida-standard-hours
+$californiaHours=california-standard-hours
+$washingtonHours=washington-standard-hours
+
+INSERT_UPDATE OpeningSchedule;code[unique=true]
+;$oklahomaHours
+;$indianaHours
+;$floridaHours
+;$californiaHours
+;$washingtonHours
+
+INSERT_UPDATE WeekdayOpeningDay;openingSchedule(code)[unique=true];dayOfWeek(code)[unique=true];openingTime[dateformat=hh:mm];closingTime[dateformat=hh:mm]
+;$oklahomaHours;MONDAY   ; 08:00; 17:00
+;$oklahomaHours;TUESDAY  ; 08:00; 17:00
+;$oklahomaHours;WEDNESDAY; 08:00; 17:00
+;$oklahomaHours;THURSDAY ; 08:00; 17:00
+;$oklahomaHours;FRIDAY   ; 08:00; 17:00
+;$oklahomaHours;SATURDAY ; 08:00; 12:00
+
+;$indianaHours;MONDAY   ; 08:30; 17:00
+;$indianaHours;TUESDAY  ; 08:30; 17:00
+;$indianaHours;WEDNESDAY; 08:30; 17:00
+;$indianaHours;THURSDAY ; 08:30; 17:00
+;$indianaHours;FRIDAY   ; 08:30; 17:00
+;$indianaHours;SATURDAY ; 08:30; 12:00
+
+;$floridaHours;MONDAY   ; 08:00; 17:00
+;$floridaHours;TUESDAY  ; 08:00; 17:00
+;$floridaHours;WEDNESDAY; 08:00; 17:00
+;$floridaHours;THURSDAY ; 08:00; 17:00
+;$floridaHours;FRIDAY   ; 08:00; 17:00
+;$floridaHours;SATURDAY ; 08:00; 12:00
+
+;$californiaHours;MONDAY   ; 08:00; 21:00
+;$californiaHours;TUESDAY  ; 08:00; 21:00
+;$californiaHours;WEDNESDAY; 08:00; 21:00
+;$californiaHours;THURSDAY ; 08:00; 21:00
+;$californiaHours;FRIDAY   ; 08:00; 21:00
+;$californiaHours;SATURDAY ; 08:00; 21:00
+;$californiaHours;SUNDAY   ; 19:00; 18:00
+
+;$washingtonHours;MONDAY   ; 08:00; 21:00
+;$washingtonHours;TUESDAY  ; 08:00; 21:00
+;$washingtonHours;WEDNESDAY; 08:00; 21:00
+;$washingtonHours;THURSDAY ; 08:00; 21:00
+;$washingtonHours;FRIDAY   ; 08:00; 21:00
+;$washingtonHours;SATURDAY ; 08:00; 21:00
+;$washingtonHours;SUNDAY   ; 19:00; 18:00
+
+INSERT_UPDATE SpecialOpeningDay;openingSchedule(code)[unique=true];date[unique=true,dateformat=dd.MM.yyyy];closed[default=true];openingTime[dateformat=hh:mm];closingTime[dateformat=hh:mm]
+;$oklahomaHours;	01.01.2013
+;$oklahomaHours;	04.07.2013
+;$oklahomaHours;	02.09.2013
+;$oklahomaHours;	11.11.2013
+;$oklahomaHours;	21.01.2013
+;$oklahomaHours;	18.02.2013
+;$oklahomaHours;	27.11.2013
+;$oklahomaHours;	28.11.2013
+;$oklahomaHours;	25.12.2013
+;$oklahomaHours;	27.05.2013
+
+;$indianaHours;		01.01.2013
+;$indianaHours;		04.07.2013
+;$indianaHours;		02.09.2013
+;$indianaHours;		05.11.2013
+;$indianaHours;		14.10.2013
+;$indianaHours;		11.11.2013
+;$indianaHours;		21.01.2013
+;$indianaHours;		18.02.2013
+;$indianaHours;		27.11.2013
+;$indianaHours;		12.02.2013
+;$indianaHours;		25.12.2013
+;$indianaHours;		27.05.2013
+                     
+;$floridaHours;		01.01.2013
+;$floridaHours;		03.06.2013
+;$floridaHours;		02.04.2013
+;$floridaHours;		04.07.2013
+;$floridaHours;		02.09.2013
+;$floridaHours;		12.10.2013
+;$floridaHours;		11.11.2013
+;$floridaHours;		12.02.2013
+;$floridaHours;		14.06.2013
+;$floridaHours;		15.02.2013
+;$floridaHours;		21.01.2013
+;$floridaHours;		19.01.2013
+;$floridaHours;		18.02.2013
+;$floridaHours;		05.11.2013
+;$floridaHours;		27.11.2013
+;$floridaHours;		25.12.2013
+;$floridaHours;		22.04.2013
+;$floridaHours;		27.05.2013
+
+;$californiaHours;	01.01.2013
+;$californiaHours;	04.07.2013
+;$californiaHours;	02.09.2013
+;$californiaHours;	11.11.2013
+;$californiaHours;	21.01.2013
+;$californiaHours;	18.02.2013
+;$californiaHours;	27.11.2013
+;$californiaHours;	25.12.2013
+;$californiaHours;	27.05.2013
+;$californiaHours;	31.03.2013
+
+;$washingtonHours;	01.01.2013
+;$washingtonHours;	04.07.2013
+;$washingtonHours;	02.09.2013
+;$washingtonHours;	11.11.2013
+;$washingtonHours;	21.01.2013
+;$washingtonHours;	18.02.2013
+;$washingtonHours;	27.11.2013
+;$washingtonHours;	25.12.2013
+;$washingtonHours;	27.05.2013
+
+INSERT_UPDATE StoreLocatorFeature;code[unique=true]
+
+INSERT_UPDATE PointOfService;name[unique=true];type(code);address(&addrID);latitude;longitude;geocodeTimestamp[dateformat=dd-MM-yyyy];$storeImage;openingSchedule(code);basestore(uid)[default=$storeUid];features(code)
+;Hybris Powertools Tulsa1		;STORE;addr1;36,08383;-95,86570;01-10-2011;powertools_store_01;$oklahomaHours
+;Hybris Powertools Tulsa2		;STORE;addr2;36,08486;-95,86670;01-10-2011;powertools_store_01;$oklahomaHours
+;Hybris Powertools Tulsa3		;STORE;addr3;36,08589;-95,86770;01-10-2011;powertools_store_01;$oklahomaHours
+;Hybris Powertools Tulsa4		;STORE;addr4;36,08692;-95,86870;01-10-2011;powertools_store_01;$oklahomaHours
+;Hybris Powertools Tulsa5		;STORE;addr5;36,08795;-95,86970;01-10-2011;powertools_store_01;$oklahomaHours
+;Hybris Powertools Indianapolis	;STORE;addr6;39,70681;-86,14597;01-10-2011;powertools_store_02;$indianaHours
+;Hybris Powertools Tampa		;STORE;addr7;27,94997;-82,35097;01-10-2011;powertools_store_06;$floridaHours
+;Hybris Powertools El Cajon		;STORE;addr8;32,79505;-116,94078;01-10-2011;powertools_store_04;$californiaHours
+;Hybris Powertools Tacoma		;STORE;addr9;47,25541;-122,50914;01-10-2011;powertools_store_05;$washingtonHours
+
+INSERT_UPDATE Address;&addrID;streetnumber[unique=true];streetname;town;region(country(isocode),isocode);country(isocode);postalcode[unique=true];phone1;owner(PointOfService.name)[unique=true]
+;addr1;9909;East 55th Place;Tulsa;US:US-OK;US;74146;1-800-331-3333 (Customer Service);Hybris Powertools Tulsa1
+;addr2;9909;East 56th Place;Tulsa;US:US-OK;US;74146;1-800-331-3334 (Customer Service);Hybris Powertools Tulsa2
+;addr3;9909;East 57th Place;Tulsa;US:US-OK;US;74146;1-800-331-3335 (Customer Service);Hybris Powertools Tulsa3
+;addr4;9909;East 58th Place;Tulsa;US:US-OK;US;74146;1-800-331-3336 (Customer Service);Hybris Powertools Tulsa4
+;addr5;9909;East 59th Place;Tulsa;US:US-OK;US;74146;1-800-331-3337 (Customer Service);Hybris Powertools Tulsa5
+;addr6;601;East Hanna;Indianapolis;US:US-IN;US;46227;1-800-551-5555 (Customer Service);Hybris Powertools Indianapolis
+;addr7;9212;Adamo Drive;Tampa;US:US-FL;US;33619;1-800-237-0000 (Customer Service);Hybris Powertools Tampa
+;addr8;1196;E MAIN STREET;El Cajon;US:US-CA;US;92021;(619) 444-3333;Hybris Powertools El Cajon
+;addr9;5401;6TH AVE;Tacoma;US:US-WA;US;98406;(253) 777-5555;Hybris Powertools Tacoma

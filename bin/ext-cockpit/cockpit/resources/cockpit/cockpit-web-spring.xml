@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+
+	<bean id="BasePerspective" class="de.hybris.platform.cockpit.session.impl.BaseUICockpitPerspective" abstract="true" scope="session">
+		<property name="viewURI" value="/cockpit/basePerspective.zul"/>
+		<property name="activationEffectEnabled" value="false"/>
+		<property name="effectDuration" value="0.7"/>
+		<property name="moveTargetX" value="130"/>
+		<property name="moveTargetY" value="50"/>
+		<property name="effectBorderColor" value="#BCD2EF"/>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="uiConfigurationService" ref="uiConfigurationService"/>
+		
+		<property name="popupEditorArea">
+			<bean id="DefaultPopupEditor" parent="BasePopupEditor"/>
+		</property>
+	</bean>
+	
+	<bean id="BaseEditorAreaModel" class="de.hybris.platform.cockpit.session.impl.EditorArea" abstract="true"  scope="session">
+		<property name="viewURI" value="/cockpit/baseEditorArea.zul"/>
+		<property name="systemService" ref="systemService"/>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="undoManager" ref="undoManager"/>
+		<property name="valueService" ref="valueService"/>
+	</bean>	
+	
+	<bean id="BaseSearchBrowserArea" class="de.hybris.platform.cockpit.session.impl.DefaultSearchBrowserArea" abstract="true" scope="session" >
+		<property name="viewURI" value="/cockpit/baseSearchBrowserArea.zul"/>
+	</bean>
+	
+	<bean id="BasePopupEditor" class="de.hybris.platform.cockpit.session.impl.EditorArea" abstract="true" scope="session">
+		<property name="viewURI" value="/cockpit/basePopupEditor.zul"/>
+		<property name="editorAreaController">
+			<bean id="DefaultPopupEditorAreaController" parent="BasePopupEditorAreaController"/>
+		</property>
+  	</bean>
+	
+	<bean id="BasePopupEditorAreaController" class="de.hybris.platform.cockpit.session.impl.DefaultPopupEditorAreaController" scope="prototype">
+		<property name="sectionRowRenderer">
+			<ref bean="EditorSectionRowRenderer"/>
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory"/>
+		</property>
+	</bean>	
+	
+	<!-- Base navigation area -->
+	<bean id="BaseNavigationArea" class="de.hybris.platform.cockpit.session.impl.BaseUICockpitNavigationArea" scope="session" abstract="true">
+		<property name="viewURI" value="/cockpit/baseNavigation.zul"/>
+		<property name="headerURI" value="/cockpit/left_section_header.zul"/>
+		<property name="sectionModel">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.DefaultNavigationAreaModel"/>
+		</property>
+		
+		<property name="contentSlotRenderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.OpenBoxesSectionRenderer" />
+		</property>
+		<property name="infoSlotRenderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.InfoBoxRenderer"/>
+		</property>		
+		<property name="contentSlotI3Label">
+			<value>navigationarea.openbrowsers</value>
+		</property>
+		<property name="infoSlotI3Label">
+			<value>navigationarea.infobox</value>
+		</property>		
+		<property name="pushInfoBox" value="true"/>
+		<property name="pushInfoBoxEventClassName" value="de.hybris.platform.cockpit.events.impl.InfoboxCockpitEvent"/>
+	</bean>
+				
+	<bean id="LoginForm" class="de.hybris.platform.cockpit.forms.login.LoginForm" scope="session">
+		<property name="viewComponentURI" value="/cockpit/dialog/loginDialog.zul"/>
+		<property name="exceptionToLabelConverter" ref="authenticationExceptionToLabelConverter"/>
+	</bean>
+
+	<alias name="defaultAuthenticationExceptionToLabelConverter" alias="authenticationExceptionToLabelConverter"/>
+	<bean id="defaultAuthenticationExceptionToLabelConverter" class="de.hybris.platform.cockpit.security.AuthenticationExceptionToLabelConverter" scope="prototype">
+		<property name="defaultLabel" value="wrong_credentials"/>
+		<property name="authenticationExceptionMessageMapping">
+			<map key-type="java.lang.Class" value-type="java.lang.String">
+				<entry key="de.hybris.platform.cockpit.security.exceptions.PerspectivePermissionsDeniedException" value="no_perspectives_available"/>
+			</map>
+		</property>
+		<property name="warningExceptions">
+			<list value-type="java.lang.Class">
+				<value>de.hybris.platform.cockpit.security.exceptions.PerspectivePermissionsDeniedException</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="fckEditor" class="org.zkforge.fckez.FCKeditor" scope="prototype"/>
+	
+	<!-- _________________________ RENDERERS _________________________ -->
+
+	<bean id="EditorSectionRowRenderer" class="de.hybris.platform.cockpit.session.impl.EditorRowRenderer" scope="session">
+		<property name="editorFactory">
+			<ref bean="EditorFactory"/>
+		</property>
+	</bean>
+	
+	<!-- ListView menu popup builder -->
+	<bean id="listViewMenuPopupBuilder" class="de.hybris.platform.cockpit.model.listview.impl.DefaultListViewMenuPopupBuilder" scope="prototype"/>	
+
+
+	<bean id="CommentsSection" class="de.hybris.platform.cockpit.services.config.impl.CommentsSectionConfiguration" scope="session">
+		<property name="sectionRenderer">
+			<ref bean="CommentsSectionRenderer"/>
+		</property>
+	</bean>
+	
+	<bean id="CommentsSectionRenderer" class="de.hybris.platform.cockpit.components.editorarea.renderer.CommentsSectionRenderer" scope="session" >
+		<property name="widths" value="auto,25px,100px,45px,20px"/>
+		<property name="communicationBrowserModel" ref="CommunicationBrowserModel"/>
+		<property name="tooltipRenderer" ref="commentTooltipRenderer"/>
+	</bean>
+	
+	<bean id="commentTooltipRenderer" class="de.hybris.platform.cockpit.components.editorarea.renderer.CommentTooltipRenderer" scope="session" />
+
+
+	<bean id="CockpitProductContentBrowserActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="ExportCsvAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="WorkflowContentBrowserActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="DeleteAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="WorkflowItemsContentBrowserActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list />
+		</property>
+	</bean>
+	
+	<bean id="workflowHelper" class="de.hybris.platform.cockpit.helpers.impl.DefaultWorkflowHelper" scope="tenant">
+		<property name="workflowFacade" ref="workflowFacade"/>
+	</bean>
+
+    <alias name="defaultLocaleHelper" alias="localeHelper"/>
+    <bean id="defaultLocaleHelper" class="de.hybris.platform.cockpit.helpers.impl.DefaultLocaleHelper"/>
+		
+	<bean id="ExportCsvAction" class="de.hybris.platform.cockpit.components.listview.impl.ExportCsvAction" scope="prototype" />
+	<bean id="AddMultiItemCommentAction" class="de.hybris.platform.cockpit.components.listview.impl.AddMultiItemCommentAction" scope="prototype" />
+	<bean id="CoverageInfoAction" class="de.hybris.platform.cockpit.components.listview.impl.CoverageInfoAction" scope="prototype" />
+	
+
+	<bean id="uid2UrlMap" class="org.springframework.beans.factory.config.MapFactoryBean" scope="singleton">
+		<property name="sourceMap">
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="urlarea.hmc" value="/hmc/hybris"/>
+				<entry key="urlarea.hybris" value="http://www.hybris.de/"/>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="CommunicationBrowserModel" class="de.hybris.platform.cockpit.session.impl.CommunicationBrowserModel" scope="prototype" />
+
+	<bean id="CommentActionColumnsCommunicationBrowser" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="AnswerCommentAction" />
+				<ref bean="EditCommentAction" />
+				<ref bean="AddAttachmentCommentAction" />
+				<ref bean="DeleteCommentAction" />
+			</list>
+		</property>
+	</bean>
+	
+
+	
+	<bean id="CommentActionColumnsEditorArea" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="AnswerCommentAction" />
+			</list>
+		</property>
+	</bean>
+	
+
+	
+	<bean id="AnswerCommentAction" class="de.hybris.platform.cockpit.components.listview.impl.AnswerCommentAction" scope="prototype" />
+	<bean id="DeleteCommentAction" class="de.hybris.platform.cockpit.components.listview.impl.DeleteCommentAction" scope="prototype" />
+	<bean id="EditCommentAction" class="de.hybris.platform.cockpit.components.listview.impl.EditCommentAction" scope="prototype" />
+	<bean id="AddAttachmentCommentAction" class="de.hybris.platform.cockpit.components.listview.impl.AddAttachmentCommentAction" scope="prototype" />
+
+	<bean id="ItemContentBrowserActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+			</list>
+		</property>
+	</bean>
+	
+	<!--
+		Report perspective.
+	 -->
+	<bean id="ReportPerspective" scope="session" parent="BasePerspective" class="de.hybris.platform.cockpit.reports.components.perspective.ReportPerspective">
+		<property name="uid" value="cockpit.perspective.reports" />  <!-- unique ID of the perspective -->
+		<property name="label" value="cockpit.perspective.reports" />  <!-- localization key for the label of the perspective -->
+		<property name="modelService" ref="modelService"/>
+		<property name="jasperReportsCache" ref="jasperReportCache"></property>
+		
+		<property name="navigationArea">
+			<bean parent="BaseNavigationArea" >
+				<property name="sections">
+					<list>
+						<!-- UNDO section -->
+						<bean class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection">
+							<property name="localizedLabel" value="navigationarea.history" />
+							<property name="visible" value="true" />
+							<property name="renderer">
+								<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.UndoSectionRenderer" />
+							</property>
+						</bean>
+					</list>
+				</property>
+			</bean>
+		</property>
+		<property name="browserArea">
+			<bean class="de.hybris.platform.cockpit.session.impl.DefaultConfigurableBrowserArea">
+				<property name="viewURI" value="/cockpit/baseSearchBrowserArea.zul"/>
+				<property name="defaultBrowserId"><idref bean="ReportBrowserModel"/></property>
+				<property name="showCreateDefaultBrowserButton" value="false" />
+				<property name="supportedBrowserIds">
+					<list>
+						<idref bean="ReportBrowserModel"/>
+					</list>
+				</property>
+			</bean>
+		</property>
+		<property name="editorArea">
+			<bean parent="BaseEditorAreaModel"/>
+		</property>
+		<property name="popupEditorArea">
+			<bean parent="BasePopupEditor"/>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+	</bean>
+	
+	<bean id="ReportBrowserModel" class="de.hybris.platform.cockpit.widgets.browsers.WidgetDashboardBrowserModel" scope="prototype">
+		<property name="browserCode" value="cockpit.browser.report"/>
+		<property name="initiallyOpen" value="true"/>
+		<property name="viewClass"  value="de.hybris.platform.cockpit.reports.components.contentbrowser.ReportDashboardContentBrowser"/>	
+		<property name="containerLayoutConfiguration" ref="widgetDashboardConfig"/>	
+		<property name="widgetMapProvider">
+			<bean class="de.hybris.platform.cockpit.reports.widgets.util.ReportWidgetMapProvider">
+				<property name="reportWidgetFactory" ref="reportWidgetFactory"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="widgetDashboardConfig" class="de.hybris.platform.cockpit.widgets.util.impl.DefaultContainerLayoutConfiguration" scope="tenant">
+		<property name="containerLayouts">
+			<list>
+				<bean class="de.hybris.platform.cockpit.widgets.portal.impl.DefaultContainerLayout">
+					<property name="ID" value="one_column"/>
+					<property name="i3LabelKey" value="cockpit.dashboard.containerlayout.one_column"/>
+					<property name="previewURL" value="/cockpit/images/dashboard_onecolumn.gif"/>
+					<property name="widths" value="100%"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.widgets.portal.impl.DefaultContainerLayout">
+					<property name="ID" value="two_column"/>
+					<property name="i3LabelKey" value="cockpit.dashboard.containerlayout.two_column"/>
+					<property name="previewURL" value="/cockpit/images/dashboard_twocolumn.gif"/>
+					<property name="widths" value="50%,50%"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.widgets.portal.impl.DefaultContainerLayout">
+					<property name="ID" value="two_column_30_70"/>
+					<property name="i3LabelKey" value="cockpit.dashboard.containerlayout.two_column_30_70"/>
+					<property name="previewURL" value="/cockpit/images/dashboard_twocolumn_30_70.gif"/>
+					<property name="widths" value="30%,70%"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.widgets.portal.impl.DefaultContainerLayout">
+					<property name="ID" value="two_column_70_30"/>
+					<property name="i3LabelKey" value="cockpit.dashboard.containerlayout.two_column_70_30"/>
+					<property name="previewURL" value="/cockpit/images/dashboard_twocolumn_70_30.gif"/>
+					<property name="widths" value="70%,30%"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.widgets.portal.impl.DefaultContainerLayout">
+					<property name="ID" value="three_column"/>
+					<property name="i3LabelKey" value="cockpit.dashboard.containerlayout.three_column"/>
+					<property name="previewURL" value="/cockpit/images/dashboard_threecolumn.gif"/>
+					<property name="widths" value="33%,33%,33%"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+
+	<bean id="reportWidgetFactory" class="de.hybris.platform.cockpit.reports.widgets.factory.impl.ReportWidgetFactoryImpl" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"></property>
+		<property name="widgets">
+			<list>
+				<ref bean="jasperWidget"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="reportWidgetConverter" class="de.hybris.platform.cockpit.reports.widgets.converter.impl.ReportWidgetConverterImpl" scope="tenant">
+		<property name="jasperReportPdfExporter" ref="jasperReportPdfExporter"></property>
+		<property name="jasperReportXlsExporter" ref="jasperReportXlsExporter"></property>
+		<property name="jasperReportsCache" ref="jasperReportCache"></property>
+		<property name="jasperReportsRefresh" ref="jasperReportsRefresh"></property>
+		<property name="reportWidgetFactory" ref="reportWidgetFactory"></property>
+	</bean>
+	
+	<!-- Deprecated. Please use 'jasperReportCompileService' -->
+	<bean id="jasperReportCompiler" class="de.hybris.platform.cockpit.reports.jasperreports.DefaultJasperReportCompiler" scope="tenant">
+		<property name="mediaService" ref="mediaService"></property>
+		<property name="userService" ref="userService"></property>
+		<property name="i18NService" ref="i18nService"></property>
+		<property name="tenantService" ref="tenantService"></property>
+	</bean>
+	
+	<bean id="jasperReportCache" class="de.hybris.platform.cockpit.reports.jasperreports.DefaultJasperReportsCache" scope="session">
+		<property name="jasperReportCompiler" ref="jasperReportCompiler"></property>
+		<property name="mediaService" ref="mediaService"></property>
+		<aop:scoped-proxy/>
+	</bean>
+	
+	
+	<bean id="jasperReportsRefresh" class="de.hybris.platform.cockpit.reports.jasperreports.DefaultJasperReportsRefresh" scope="session">
+		<property name="jasperReportsCache" ref="jasperReportCache"></property>
+		<aop:scoped-proxy/>
+	</bean>
+	
+	<bean id="jasperReportPdfExporter" class="de.hybris.platform.cockpit.reports.jasperreports.JasperReportExporter" scope="tenant">
+		<property name="jasperReportsCache" ref="jasperReportCache"></property>
+		<property name="jasperReportCompiler" ref="jasperReportCompiler"></property>
+		<property name="exporter">
+			<bean class="net.sf.jasperreports.engine.export.JRPdfExporter"></bean>
+		</property>
+	</bean>
+	
+	<bean id="jasperReportXlsExporter" class="de.hybris.platform.cockpit.reports.jasperreports.JasperReportExporter" scope="prototype">
+		<property name="jasperReportsCache" ref="jasperReportCache"></property>
+		<property name="jasperReportCompiler" ref="jasperReportCompiler"></property>
+		<property name="exporter">
+			<bean class="net.sf.jasperreports.engine.export.JRXlsExporter"></bean>
+		</property>
+		<aop:scoped-proxy/>
+	</bean>
+		
+	<bean id="jasperWidget" class="de.hybris.platform.cockpit.reports.widgets.JasperWidget"/>
+
+	<!-- 
+		PDF preview of editor area
+	 -->
+	<bean id="ExportEditorArea2PdfAction" class="de.hybris.platform.cockpit.components.editorarea.export.ExportEditorArea2PdfAction" scope="tenant">
+		<property name="editorAreaExporter" ref="editorArea2PdfExporter"/>
+		<property name="uIConfigurationService" ref="uiConfigurationService"/>
+	</bean>
+	
+	<bean id="ExportEditorArea2XLSAction" class="de.hybris.platform.cockpit.components.editorarea.export.ExportEditorArea2XlsAction" scope="tenant">
+		<property name="editorAreaExporter" ref="editorArea2XLSExporter"/>
+		<property name="uIConfigurationService" ref="uiConfigurationService"/>
+		<property name="imageURI" value="/cockpit/images/xlsexport_action.png"/>
+		<property name="tooltip" value="editorarea.xls.preview.tooltip"/>
+	</bean>
+	
+	<bean id="editorArea2PdfExporter" class="de.hybris.platform.cockpit.services.exporter.impl.EditorArea2PdfExporter" scope="tenant">
+		<property name="preferencesTitle" value="EditorAreaPdfPreviewPreferences"/>
+		<property name="dataSourceExpParamName" value="MAIN_REPORT_DS_EXP"/>
+	</bean>
+	
+	<bean id="editorArea2XLSExporter" class="de.hybris.platform.cockpit.services.exporter.impl.EditorArea2XLSExporter" scope="tenant">
+		<property name="preferencesTitle" value="EditorAreaPdfPreviewPreferences"/>
+		<property name="dataSourceExpParamName" value="MAIN_REPORT_DS_EXP"/>
+	</bean>
+	
+	<!--  ListView dynamic column providers -->
+	<bean id="workflowAttachmentItemDynamicColumnProvider" class="de.hybris.platform.cockpit.model.listview.impl.WorkflowAttachmentItemDynamicColumnProvider" />
+	
+	
+	
+	
+	<!-- Admin perspective -->
+	
+	<alias alias="AdminPerspective" name="DefaultAdminPerspective"/>
+	<bean id="DefaultAdminPerspective" scope="session" parent="BasePerspective" class="de.hybris.platform.cockpit.session.impl.AdminPerspective">
+		<property name="uid" value="cockpit.perspective.admin" />  <!-- unique ID of the perspective -->
+		<property name="label" value="cockpit.perspective.admin" />  <!-- localization key for the label of the perspective -->
+<!--		<property name="customCsaURI" value="/cockpit/adminCSA.zul" />   file with optional custom client side actions -->
+
+		<property name="navigationArea">
+			<bean parent="BaseNavigationArea" >
+				<property name="sections">
+					<list>
+						<ref bean="AdminTypeSelectorSection"/>						
+						
+						<!-- UNDO section -->
+						<bean class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection">
+							<property name="localizedLabel" value="navigationarea.history" />
+							<property name="visible" value="true" />
+							<property name="renderer">
+								<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.UndoSectionRenderer" />
+							</property>
+						</bean>				
+					</list>
+				</property>
+			</bean>
+		</property>
+		<property name="browserArea">
+			<ref bean="AdminBrowserArea"/>
+		</property>
+		<property name="editorArea">
+			<bean parent="BaseEditorAreaModel"/>
+		</property>
+		<property name="popupEditorArea">
+			<bean parent="BasePopupEditor"/>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>		
+	</bean>
+	
+	<alias alias="AdminBrowserArea" name="DefaultAdminBrowserArea"/>
+	<bean id="DefaultAdminBrowserArea" class="de.hybris.platform.cockpit.session.impl.DefaultSearchBrowserArea" scope="session">
+		<property name="rootSearchTypeCode" value="Employee"/>
+		<property name="viewURI" value="/cockpit/baseSearchBrowserArea.zul"/>
+		<property name="extendedSearchBrowser" value="true"/>
+	</bean>
+	
+	<alias alias="AdminTypeSelectorSection" name="DefaultAdminTypeSelectorSection" />
+	<bean id="DefaultAdminTypeSelectorSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection" scope="prototype">
+		<property name="localizedLabel" value="navigationarea.types" />
+		<property name="visible" value="true" />
+		<property name="renderer" ref="AdminTypeSelectorSectionRenderer"/>
+	</bean>
+		
+	<alias alias="AdminTypeSelectorSectionRenderer" name="DefaultAdminTypeSelectorSectionRenderer"/>
+	<bean id="DefaultAdminTypeSelectorSectionRenderer" class="de.hybris.platform.cockpit.components.navigationarea.renderer.TypeSelectorSectionRenderer" scope="prototype">
+		<property name="typeCodes" value="GenericItem"/>
+		<property name="inactiveTypeCodes" value="GenericItem"/>
+		<property name="includeSubtypes" value="true"/>
+		<property name="displayType" value="TREE"/>
+		<property name="allowDuplicates" value="false"/>
+		<!--				<property name="pageSize" value="20" />-->
+		<property name="searchable" value="true" />
+		<property name="typeDefinitionDao" ref="typeDefinitionDao"/>
+	</bean>
+	
+	<alias alias="extendedSearchBrowserModel" name="defaultExtendedSearchBrowserModel"/>
+	<bean id="defaultExtendedSearchBrowserModel" class="de.hybris.platform.cockpit.model.browser.impl.DefaultExtendedSearchBrowserModel" scope="prototype">
+		<property name="showCreateButton" value="true"/>
+		<property name="allowDelete" value="true"/>
+	</bean>
+	
+	<!-- Comment Layer -->
+	
+
+	<alias alias="commentLayerComponentController" name="defaultCommentLayerComponentController"/>
+	<bean id="defaultCommentLayerComponentController" class="de.hybris.platform.cockpit.components.mvc.commentlayer.controller.impl.DefaultCommentLayerComponentController" scope="session">
+		<property name="uiAccessRightService" ref="uiAccessRightService"/>
+	</bean>
+	
+	<alias alias="contextAreaCommentTreeController" name="defaultContextAreaCommentTreeController"/>
+	<bean id="defaultContextAreaCommentTreeController" class="de.hybris.platform.cockpit.components.mvc.commentlayer.controller.impl.DefaultContextAreaCommentTreeController" scope="session">
+		<property name="commentLayerComponentController" ref="commentLayerComponentController"/>
+		<property name="commentService" ref="commentService"/>
+		<property name="modelHelper" ref="cockpitModelHelper"/>
+	</bean>
+	
+	<bean id="CommentLayerActionColumnsCommunicationBrowser" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="AnswerCommentFromCommenLayerAction" />
+				<ref bean="EditCommentFromCommentLayerAction" />
+				<ref bean="AddAttachmentCommentAction" />
+				<ref bean="DeleteCommentFromCommentLayerAction" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="AnswerCommentFromCommenLayerAction" class="de.hybris.platform.cockpit.components.listview.impl.AnswerCommentFromCommenLayerAction" scope="prototype" />
+	<bean id="DeleteCommentFromCommentLayerAction" class="de.hybris.platform.cockpit.components.listview.impl.DeleteCommentFromCommentLayerAction" scope="prototype" />
+	<bean id="EditCommentFromCommentLayerAction" class="de.hybris.platform.cockpit.components.listview.impl.EditCommentFromCommentLayerAction" scope="prototype" />
+	
+	<!-- Comment Layer END -->
+	
+	<alias name="deafaultBrowserFilterFactory" alias="browserFilterFactory"/>
+	<bean id="deafaultBrowserFilterFactory" class="de.hybris.platform.cockpit.session.BrowserFilterFactory" scope="tenant"/>
+	
+	<import resource="classpath:/cockpit/cockpit-spring-uitest.xml"/>
+	
+	<bean id="NewItemAction" class="de.hybris.platform.cockpit.components.listview.impl.NewItemAction" scope="prototype" />
+	<bean id="SplitterDummyAction" class="de.hybris.platform.cockpit.components.listview.impl.SplitterDummyAction" scope="prototype" />
+</beans>

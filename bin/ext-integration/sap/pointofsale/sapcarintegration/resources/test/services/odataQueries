@@ -1,0 +1,28 @@
+--- Hint : the root service is configurable: ex. http://ldcird1.wdf.sap.corp:8002/sap/is/retail/car/int/odata/CARServices.xsodata
+
+---- overall odata service definition
+http://ldcird1.wdf.sap.corp:8002/tmp/i827395/hybris/odata/Services.xsodata
+
+--- fetch car orders
+http://ldcird1.wdf.sap.corp:8002/tmp/i827395/hybris/odata/Services.xsodata/POSSalesQuery(P_SAPClient='800')/Results?$select=TransactionNumber,RetailStoreID,OperatorID,OrderChannel,OrderChannelName,Location,LocationName,RetailStoreID,BusinessDayDate,TransactionIndex,TransactionCurrency,CustomerNumber,SalesUnit,SalesAmount,TaxExcludedAmount,DistributedHeaderTaxAmount&$filter=CustomerNumber eq '0000001000'&$top=2&$format=json
+
+--- fetch car order : key : BusinessDayDate = '20120101', RetailStoreID = 'R100', TransactionIndex = 8, CustomerNumber = '0000001000'
+http://ldcird1.wdf.sap.corp:8002/tmp/i827395/hybris/odata/Services.xsodata/POSSalesQuery(P_SAPClient='800')/Results?$select=TransactionNumber,RetailStoreID,OperatorID,OrderChannel,OrderChannelName,Location,LocationName,RetailStoreID,BusinessDayDate,TransactionIndex,TransactionCurrency,CustomerNumber,SalesUnit,SalesAmount,TaxExcludedAmount,DistributedHeaderTaxAmount&$filter=BusinessDayDate eq '20120101' and RetailStoreID eq 'R100' and TransactionIndex eq 8 and CustomerNumber eq '0000001000'&$format=json
+
+
+--- fetch car order items : key BusinessDayDate = '20120101', RetailStoreID = 'R100', TransactionIndex = 8, CustomerNumber = '0000001000'
+http://ldcird1.wdf.sap.corp:8002/tmp/i827395/hybris/odata/Services.xsodata/POSSalesQuery(P_SAPClient='800')/Results?$select=Article,ArticleName,SalesUnit,SalesQuantityInSalesUnit,TransactionNumber,RetailStoreID,OperatorID,OrderChannel,OrderChannelName,Location,LocationName,RetailStoreID,BusinessDayDate,TransactionIndex,TransactionCurrency,CustomerNumber,SalesUnit,SalesAmount,TaxExcludedAmount,DistributedHeaderTaxAmount&$filter=BusinessDayDate eq '20120101' and RetailStoreID eq 'R100' and TransactionIndex eq 8 and CustomerNumber eq '0000001000'&$format=json
+
+---- fetch location for store : location = 'R100'
+http://ldcird1.wdf.sap.corp:8002/tmp/i827395/hybris/odata/Services.xsodata/RetailLocationQuery(P_SAPClient='800')/Results?$select=HouseNumber,Location,StreetName,POBox,PostalCode,CityName,Country&$filter=Location eq 'R100'&$format=json
+
+---- fetch multichannel orders: CustomerNumber='0000001000'
+http://ldcird1.wdf.sap.corp:8002/tmp/i827395/hybris/odata/Services.xsodata/MultiChannelPurchasesQuery(P_SAPClient='800')/Results?$select=SAPClient,CustomerNumber,TransactionNumber,SalesDocumentType,RetailStoreID,BusinessDayDate,TransactionIndex,TransactionDate,OrderChannel,OrderChannelName,SalesOrganization,DistributionChannel,OrganizationDivision,OverallOrderProcessStatus,OverallOrderProcessStatusDesc,TransactionCurrency,TaxAmount,TotalNetAmount&$filter=CustomerNumber eq '0000001000'&$top=10&$format=json
+
+
+--- fetch multi channel order : CustomerNumber='0000001000' and TransactionNumber='0000000115' and RetailStoreID eq ''
+http://ldcird1.wdf.sap.corp:8002/tmp/i827395/hybris/odata/Services.xsodata/MultiChannelPurchasesQuery(P_SAPClient='800')/Results?$select=SAPClient,CustomerNumber,TransactionNumber,SalesDocumentType,RetailStoreID,BusinessDayDate,TransactionIndex,TransactionDate,OrderChannel,OrderChannelName,SalesOrganization,DistributionChannel,OrganizationDivision,OverallOrderProcessStatus,OverallOrderProcessStatusDesc,TransactionCurrency,TaxAmount,TotalNetAmount&$filter=CustomerNumber eq '0000001000' and TransactionNumber eq '0000000115' and RetailStoreID eq ''&$format=json
+
+
+--- fetch multi channel order items: CustomerNumber='0000001000' and TransactionNumber='0000000115' and RetailStoreID eq ''
+http://ldcird1.wdf.sap.corp:8002/tmp/i827395/hybris/odata/Services.xsodata/MultiChannelPurchasesQuery(P_SAPClient='800')/Results?$select=SAPClient,CustomerNumber,TransactionNumber,SalesDocumentType,TransactionDate,Article,ArticleName,OrderChannel,OrderChannelName,SalesOrganization,DistributionChannel,OrganizationDivision,OrderQuantityUnit,UnitOfMeasureName,UnitOfMeasure_E,PaymentMethod,OverallOrderProcessStatus,OverallOrderProcessStatusDesc,TransactionCurrency,OrderQuantity,TaxAmount,TotalNetAmount&$filter=CustomerNumber eq '0000001000' and TransactionNumber eq '0000000115' and RetailStoreID eq ''&$format=json

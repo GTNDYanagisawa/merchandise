@@ -1,0 +1,110 @@
+*** Settings ***
+Library        	de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Library         de.hybris.platform.entitlementatddtests.keywords.EntitlementKeywordLibrary
+Resource		impex/Impex_Keywords.txt
+Resource        entitlements/Product_Keywords.txt
+
+*** Keywords ***
+
+###### TIMEFRAME CONDITION:
+for product "${productCode:[^"]*}" add non metered entitlement "${entitlementType:[^"]*}" with conditionTimeframe having timeUnit "${timeUnit:[^"]*}", start "${startTime:[^"]*}" and duration "${duration:[^"]*}" 
+	[Documentation]      Create non-metered  entitlement with timeframe condition
+	for product "${productCode}" add non metered entitlement "${entitlementType}" having stringCondition "" and pathCondition "" and geoCondition "" and timeunit "${timeUnit}" and starttime "${startTime}" and duration "${duration}"
+
+
+###### NO CONDITION:
+for product "${productCode:[^"]*}" add non metered entitlement "${entitlementType:[^"]*}" without conditions
+	[Documentation]      Create non-metered entitlement
+	for product "${productCode}" add non metered entitlement "${entitlementType}" with stringCondition "" and pathCondition "" and geoCondition ""
+
+###### STRING CONDITION:
+for product "${productCode:[^"]*}" add non metered entitlement "${entitlementType:[^"]*}" with stringCondition "${stringCondition:[^"]*}"
+	[Documentation]      Create non-metered  entitlement with string condition
+	for product "${productCode}" add non metered entitlement "${entitlementType}" with stringCondition "${stringCondition}" and pathCondition "" and geoCondition ""
+
+###### PATH CONDITION:
+for product "${productCode:[^"]*}" add non metered entitlement "${entitlementType:[^"]*}" with pathCondition "${pathCondition:[^"]*}"
+	[Documentation]      Create non-metered  entitlement with path condition
+	for product "${productCode}" add non metered entitlement "${entitlementType}" with stringCondition "" and pathCondition "${pathCondition}" and geoCondition ""
+
+###### GEO CONDITION:
+for product "${productCode:[^"]*}" add non metered entitlement "${entitlementType:[^"]*}" with geoCondition "${geoCondition:[^"]*}"
+	[Documentation]      Create non-metered  entitlement with geo condition
+	for product "${productCode}" add non metered entitlement "${entitlementType}" with stringCondition "" and pathCondition "" and geoCondition "${geoCondition}"
+
+###### STRING + PATH CONDITION:
+for product "${productCode:[^"]*}" add non metered entitlement "${entitlementType:[^"]*}" with stringCondition "${stringCondition:[^"]*}" and pathCondition "${pathCondition:[^"]*}"
+	[Documentation]      Create non-metered  entitlement with string and path condition
+	for product "${productCode}" add non metered entitlement "${entitlementType}" with stringCondition "${stringCondition}" and pathCondition "${pathCondition}" and geoCondition ""
+
+###### STRING + PATH + GEO + TIMEFRAME CONDITION:
+for product "${productCode:[^"]*}" add non metered entitlement "${entitlementType:[^"]*}" having stringCondition "${stringCondition:[^"]*}" and pathCondition "${pathCondition:[^"]*}" and geoCondition "${geoCondition:[^"]*}" and timeunit "${timeUnit:[^"]*}" and starttime "${startTime:[^"]*}" and duration "${duration:[^"]*}"
+    [Documentation]      Create non-metered  entitlement with all (string, path, geo and timeframe) conditions
+    for product "${productCode}" add metered entitlement "${entitlementType}" with quantity "" with stringCondition "${stringCondition}" and pathCondition "${pathCondition}" and geoCondition "${geoCondition}" and timeunit "${timeUnit}" andd starttime "${startTime}" and duration "${duration}"
+
+###### STRING + PATH + GEO CONDITION:
+for product "${productCode:[^"]*}" add non metered entitlement "${entitlementType:[^"]*}" with stringCondition "${stringCondition:[^"]*}" and pathCondition "${pathCondition:[^"]*}" and geoCondition "${geoCondition:[^"]*}"
+	[Documentation]      Create non-metered  entitlement with string condition
+	for product "${productCode}" add non metered entitlement "${entitlementType}" having stringCondition "${stringCondition}" and pathCondition "${pathCondition}" and geoCondition "${geoCondition}" and timeunit "" and starttime "" and duration ""
+
+### METERED:
+for product "${productCode:[^"]*}" add metered entitlement "${entitlementType:[^"]*}" with quantity "${count:[^"]*}"
+	[Documentation]      Create metered entitlement
+	for product "${productCode}" add metered entitlement "${entitlementType}" with quantity "${count}" with stringCondition "" and pathCondition "" and geoCondition ""
+
+###### METERED + STRING CONDITION:
+for product "${productCode:[^"]*}" add metered entitlement "${entitlementType:[^"]*}" with quantity "${count:[^"]*}" with stringCondition "${stringCondition:[^"]*}"
+	[Documentation]      Create metered  entitlement with string condition
+	for product "${productCode}" add metered entitlement "${entitlementType}" with quantity "${count}" with stringCondition "${stringCondition}" and pathCondition "" and geoCondition ""
+
+###### METERED + PATH CONDITION:
+for product "${productCode:[^"]*}" add metered entitlement "${entitlementType:[^"]*}" with quantity "${count:[^"]*}" with pathCondition "${pathCondition:[^"]*}"
+	[Documentation]      Create metered  entitlement with path condition
+	for product "${productCode}" add metered entitlement "${entitlementType}" with quantity "${count}" with stringCondition "" and pathCondition "${pathCondition}" and geoCondition ""
+
+###### METERED + GEO CONDITION:
+for product "${productCode:[^"]*}" add metered entitlement "${entitlementType:[^"]*}" with quantity "${count:[^"]*}" with geoCondition "${geoCondition:[^"]*}"
+	[Documentation]      Create metered  entitlement with path condition
+	for product "${productCode}" add metered entitlement "${entitlementType}" with quantity "${count}" with stringCondition "" and pathCondition "" and geoCondition "${geoCondition}"
+
+###### METERED + TIME CONDITION
+for product "${productCode:[^"]*}" add metered entitlement "${entitlementType:[^"]*}" with quantity "${count:[^"]*}" and timeunit values timeunit "${timeUnit:[^"]*}" start time "${startTime:[^"]*}" and duration "${duration:[^"]*}"
+	[Documentation]      Create metered entitlement with timeframe condition
+	for product "${productCode}" add metered entitlement "${entitlementType}" with quantity "${count}" with stringCondition "" and pathCondition "" and geoCondition "" and timeunit "${timeUnit}" andd starttime "${startTime}" and duration "${duration}"
+
+###### METERED + STRING + PATH CONDITION:
+for product "${productCode:[^"]*}" add metered entitlement "${entitlementType:[^"]*}" with quantity "${count:[^"]*}" with stringCondition "${stringCondition:[^"]*}" and pathCondition "${pathCondition:[^"]*}"
+	[Documentation]      Create metered  entitlement with string and path conditions
+	for product "${productCode}" add metered entitlement "${entitlementType}" with quantity "${count}" with stringCondition "${stringCondition}" and pathCondition "${pathCondition}" and geoCondition ""
+
+###### METERED + STRING + PATH + GEO CONDITION:
+for product "${productCode:[^"]*}" add metered entitlement "${entitlementType:[^"]*}" with quantity "${count:[^"]*}" with stringCondition "${stringCondition:[^"]*}" and pathCondition "${pathCondition:[^"]*}" and geoCondition "${geoCondition:[^"]*}"
+	[Documentation]      Create metered  entitlement with string, path anf geo conditions
+	for product "${productCode}" add metered entitlement "${entitlementType}" with quantity "${count}" with stringCondition "${stringCondition}" and pathCondition "${pathCondition}" and geoCondition "${geoCondition}" and timeunit "" andd starttime "" and duration ""
+
+###### METERED + TIMEFRAME CONDITION:
+for product "${productCode:[^"]*}" add metered entitlement "${entitlementType:[^"]*}" with quantity "${count:[^"]*}" and timeunit "${timeUnit:[^"]*}" and starttime "${startTime:[^"]*}" and duration "${duration:[^"]*}"
+	[Documentation]      Create metered  entitlement with timeframe condition
+	for product "${productCode}" add metered entitlement "${entitlementType}" with quantity "${count}" with stringCondition "" and pathCondition "" and geoCondition "" and timeunit "${timeUnit}" andd starttime "${startTime}" and duration "${duration}"
+
+###### METERED + STRING + PATH + GEO + TIMEFRAME CONDITION:
+for product "${productCode:[^"]*}" add metered entitlement "${entitlementType:[^"]*}" with quantity "${count:[^"]*}" with stringCondition "${stringCondition:[^"]*}" and pathCondition "${pathCondition:[^"]*}" and geoCondition "${geoCondition:[^"]*}" and timeunit "${timeUnit:[^"]*}" andd starttime "${startTime:[^"]*}" and duration "${duration:[^"]*}"
+	[Documentation]      Create metered  entitlement with all conditions
+	${id} =              Evaluate        random.randint(0, sys.maxint)    random,sys
+	${id} =              Convert to string    ${id}
+	@{binding}           create list     productCode        ${productCode}        entitlementType    ${entitlementType}
+	...                                  quantity           ${count}              id                 ${id}
+	...                                  conditionPath      ${pathCondition}
+	...                                  conditionString    ${stringCondition}
+	...                                  conditionGeo       ${geoCondition}
+	...                                  timeUnit           ${timeUnit}           timeUnitStart      ${startTime}          timeUnitDuration    ${duration}
+	${templateName} =    Set Variable    impex-templates/entitlement-insert.impex.vm
+	${impEx} =           generate impex from template       ${templateName}       @{binding}
+	${legacyMode}=       Set Variable    false
+	import impex "${impEx}" use template "${templateName}"
+	reset impex legacy mode
+
+###### Verify XML:
+for product "${productCode}" verify that the XML for entitlements matches "${expectedXml}"
+	[Documentation]   Verifies that XML for product entitlements match the expected XML
+	for product "${productCode}" verify that "/product/entitlements" evaluates to "${expectedXml}"

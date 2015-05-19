@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans            http://www.springframework.org/schema/beans/spring-beans-3.1.xsd            http://www.springframework.org/schema/aop            http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<!-- ========== -->
+	<!-- Populators -->
+	<!-- ========== -->
+	<alias name="sapCoreDefaultGenericModel2MapPopulator" alias="sapCoreGenericModel2MapPopulator" />
+	<bean id="sapCoreDefaultGenericModel2MapPopulator" class="de.hybris.platform.sap.core.configuration.populators.GenericModel2MapPopulator"
+		scope="prototype" />
+
+	<alias name="sapCoreDefaultBaseStoreConfigurationMappingPopulator" alias="sapCoreBaseStoreConfigurationMappingPopulator" />
+	<bean id="sapCoreDefaultBaseStoreConfigurationMappingPopulator" class="de.hybris.platform.sap.core.configuration.populators.SAPBaseStoreConfigurationMappingPopulator"
+		scope="prototype" />
+
+	<!-- ========== -->
+	<!-- Converters -->
+	<!-- ========== -->
+	<bean id="sapCoreDataHubPropertyMap" class="java.util.HashMap" scope="prototype">
+		<constructor-arg>
+			<map key-type="java.lang.String" value-type="java.lang.Object" />
+		</constructor-arg>
+	</bean>
+
+	<alias name="sapCoreDefaultSAPBaseStoreConfigurationMappingConverter" alias="sapCoreSAPBaseStoreConfigurationMappingConverter" />
+	<bean id="sapCoreDefaultSAPBaseStoreConfigurationMappingConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreBaseStoreConfigurationMappingPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapCoreDefaultSAPBaseStoreConfigurationConverter" alias="sapCoreSAPBaseStoreConfigurationConverter" />
+	<bean id="sapCoreDefaultSAPBaseStoreConfigurationConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapCoreDefaultSAPGlobalConfigurationConverter" alias="sapCoreSAPGlobalConfigurationConverter" />
+	<bean id="sapCoreDefaultSAPGlobalConfigurationConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapCoreDefaultSAPHTTPDestinationConverter" alias="sapCoreSAPHTTPDestinationConverter" />
+	<bean id="sapCoreDefaultSAPHTTPDestinationConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- ===================== -->
+	<!-- DataHub Configuration -->
+	<!-- ===================== -->
+	<alias alias="sapCoreDataHubTransferConfigurationManager" name="sapCoreDefaultDataHubTransferConfigurationManager" />
+	<bean id="sapCoreDefaultDataHubTransferConfigurationManager" class="de.hybris.platform.sap.core.configuration.datahub.DataHubTransferConfigurationManager"
+		scope="singleton" />
+
+	<alias alias="sapCoreDataHubTransferConfiguration" name="sapCoreDefaultDataHubTransferConfiguration" />
+	<bean id="sapCoreDefaultDataHubTransferConfiguration" class="de.hybris.platform.sap.core.configuration.datahub.DataHubTransferConfiguration"
+		init-method="addToDataHubConfigurations" abstract="true">
+		<property name="dataHubManager" ref="sapCoreDataHubTransferConfigurationManager" />
+	</bean>
+
+	<bean id="sapCoreSAPBaseStoreConfigurationMappingDataHubTransferConfiguration" parent="sapCoreDataHubTransferConfiguration">
+		<property name="itemCode"  value="BaseStore" />
+		<property name="rawType"   value="RawSAPBaseStoreConfigurationMapping" />
+		<property name="converter" ref="sapCoreSAPBaseStoreConfigurationMappingConverter" />
+	</bean>
+
+	<bean id="sapCoreSAPBaseStoreDataHubTransferConfiguration" parent="sapCoreDataHubTransferConfiguration">
+		<property name="itemCode"  value="SAPConfiguration" />
+		<property name="rawType"   value="RawSAPBaseStoreConfiguration" />
+		<property name="converter" ref="sapCoreSAPBaseStoreConfigurationConverter" />
+	</bean>
+
+	<bean id="sapCoreSAPGlobalDataHubTransferConfiguration" parent="sapCoreDataHubTransferConfiguration">
+		<property name="itemCode"  value="SAPGlobalConfiguration" />
+		<property name="rawType"   value="RawSAPGlobalConfiguration" />
+		<property name="converter" ref="sapCoreSAPGlobalConfigurationConverter" />
+	</bean>
+
+	<bean id="sapCoreSAPHTTPDestinationDataHubTransferConfiguration" parent="sapCoreDataHubTransferConfiguration">
+		<property name="itemCode"  value="SAPHTTPDestination" />
+		<property name="rawType"   value="RawSAPHTTPDestination" />
+		<property name="converter" ref="sapCoreSAPHTTPDestinationConverter" />
+	</bean>
+
+	<!-- =========================== -->
+	<!-- Configuration Save Listener -->
+	<!-- =========================== -->
+	<alias alias="sapCoreConfigurationSaveListener" name="sapCoreDefaultConfigurationSaveListener" />
+	<bean id="sapCoreDefaultConfigurationSaveListener" class="de.hybris.platform.sap.core.configuration.datahub.ConfigurationSaveListener">
+		<property name="modelService"           ref="modelService" />
+		<property name="dataHubManager"         ref="sapCoreDataHubTransferConfigurationManager" />
+		<property name="dataHubTransferHandler" ref="sapCoreDataHubTransferHandler" />
+		<property name="removeModelMap" 			 ref="sapCoreDefaultRemoveModelMap" />
+	</bean>
+
+	<!-- ========================= -->
+	<!-- Data Hub Transfer Handler -->
+	<!-- ========================= -->
+	<alias alias="sapCoreDataHubTransferHandler" name="sapCoreDefaultDataHubTransferHandler" />
+	<bean id="sapCoreDefaultDataHubTransferHandler" class="de.hybris.platform.sap.core.configuration.datahub.DataHubTransferHandler">
+		<property name="dataHubOutboundService" ref="dataHubOutboundService" />
+	</bean>
+
+</beans>

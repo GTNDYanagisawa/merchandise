@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+	<tx:annotation-driven/>
+	<mvc:default-servlet-handler />
+	<mvc:annotation-driven />
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/" />
+			<mvc:mapping path="/tenants/**" />
+			<mvc:mapping path="/platform/**" />
+			<mvc:mapping path="/monitoring/**" />
+			<mvc:mapping path="/maintain/**" />
+			<mvc:mapping path="/console/**" />
+			<bean class="de.hybris.platform.hac.interceptors.FlashHandlerInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+	<context:annotation-config  />
+	<context:component-scan base-package="de.hybris.platform.hac" />
+	<context:property-placeholder properties-ref="hybrisProperties" />
+	<!-- resources exclusions from servlet mapping -->
+	<!-- cache-period="31556926" -> we can later add caching to this -->
+	<mvc:resources mapping="/login" location="/login.jsp" />
+
+
+	<!-- activates annotation driven binding -->
+	<bean id="pathMatcher" class="org.springframework.util.AntPathMatcher" />
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<property name="order" value="0" />
+		<!-- Set whether to register paths using the default suffix pattern as 
+			well: i.e. whether "/users" should be registered as "/users.*" and "/users/" 
+			too. Default is "true". Turn this convention off if you intend to interpret 
+			your @RequestMapping paths strictly. Note that paths which include a ".xxx" 
+			suffix or end with "/" already will not be transformed using the default 
+			suffix pattern in any case. -->
+		<property name="useDefaultSuffixPattern" value="true" />
+		<property name="pathMatcher" ref="pathMatcher" />
+	</bean>
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="pathMatcher" ref="pathMatcher" />
+		<property name="messageConverters">
+			<list>
+				<bean
+					class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.StringHttpMessageConverter">
+					<property name="writeAcceptCharset" value="false" />
+				</bean>
+				<bean
+					class="org.springframework.http.converter.ResourceHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.xml.SourceHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.xml.XmlAwareFormHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter" />
+				<!-- <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" 
+					/> <bean class="org.springframework.http.converter.feed.AtomFeedHttpMessageConverter" 
+					/> <bean class="org.springframework.http.converter.feed.RssChannelHttpMessageConverter" 
+					/> -->
+			</list>
+		</property>
+	</bean>
+
+	<!-- Tell Spring MVC how to find its jsp files -->
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<!-- Message sources -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>/WEB-INF/messages</value>
+			</list>
+		</property>
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="cacheSeconds" value="1" />
+	</bean>
+
+	<!-- Form file uploads feature -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- one of the properties available; the maximum file size in bytes -->
+		<!-- property name="maxUploadSize" value="100000" -->
+	</bean>
+	
+	<!-- System tray notifier -->
+	<bean id="systemTrayNotifierFactory" class="de.hybris.bootstrap.osnotify.impl.SystemTrayNotifierFactory" />
+	<bean id="systemTrayNotifier" factory-bean="systemTrayNotifierFactory" factory-method="createNotifier">
+		<constructor-arg value="#{new java.io.File(systemProperties['HYBRIS_BIN_DIR'] + '/platform')}"/>
+	</bean>	
+</beans>

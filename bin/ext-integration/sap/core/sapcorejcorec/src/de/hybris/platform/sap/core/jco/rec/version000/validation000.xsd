@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<xsd:element name="FunctionRepository" type="FunctionRepositoryType">
+	</xsd:element>
+	<xsd:complexType name="FunctionRepositoryType">
+		<xsd:sequence>
+			<xsd:element name="MetaData">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="FunctionTemplate" minOccurs="0">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="MFunc" minOccurs="0" maxOccurs="unbounded">
+										<xsd:complexType>
+											<xsd:sequence>
+												<xsd:element name="MIn">
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element ref="MField" minOccurs="0" maxOccurs="unbounded" />
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element name="MOut">
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element ref="MField" minOccurs="0" maxOccurs="unbounded" />
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element name="MChan">
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element ref="MField" minOccurs="0" maxOccurs="unbounded" />
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+												<xsd:element name="MTab">
+													<xsd:complexType>
+														<xsd:sequence>
+															<xsd:element ref="MField" minOccurs="0" maxOccurs="unbounded" />
+														</xsd:sequence>
+													</xsd:complexType>
+												</xsd:element>
+											</xsd:sequence>
+											<xsd:attribute ref="functionName" />
+										</xsd:complexType>
+									</xsd:element>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="RecordMetaData" minOccurs="0">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="MRec" minOccurs="0" maxOccurs="unbounded">
+										<xsd:complexType>
+											<xsd:sequence>
+												<xsd:element ref="MField" minOccurs="0" maxOccurs="unbounded" />
+											</xsd:sequence>
+											<xsd:attribute ref="mFN" />
+										</xsd:complexType>
+									</xsd:element>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="Functions" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="RFC" minOccurs="0" maxOccurs="unbounded">
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="INPUT" minOccurs="0">
+										<!-- Can't be defined with xsd -->
+									</xsd:element>
+									<xsd:element name="OUTPUT" minOccurs="0">
+										<!-- Can't be defined with xsd -->
+									</xsd:element>
+									<xsd:element name="TABLES" minOccurs="0">
+										<!-- Can't be defined with xsd -->
+									</xsd:element>
+									<xsd:element name="CHANGING" minOccurs="0">
+										<!-- Can't be defined with xsd -->
+									</xsd:element>
+									<xsd:element name="EXCEPTION" minOccurs="0">
+										<!-- Can't be defined with xsd -->
+									</xsd:element>
+								</xsd:sequence>
+								<xsd:attribute ref="functionName" />
+								<xsd:attribute name="key" type="KeyType" />
+								<xsd:attribute name="recordTime" type="xsd:long" />
+								<xsd:attribute name="repoKey" type="RepoKeyType" />
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="Records" minOccurs="0">
+				<!-- Can't be defined with xsd -->
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+	<xsd:element name="MField" type="MFieldType" />
+	<!-- xsd:element name="MRec" type="MFieldType" /> <xsd:element name="MTab" type="MFieldType" / -->
+
+	<xsd:complexType name="MFieldType">
+		<xsd:attribute name="mDEC" type="xsd:nonNegativeInteger" />
+		<xsd:attribute name="mDESC" type="xsd:string" />
+		<xsd:attribute ref="mFN" />
+		<xsd:attribute name="mFT" type="xsd:nonNegativeInteger" />
+		<xsd:attribute name="mRT" type="FunctionType" />
+		<xsd:attribute name="nucBL" type="xsd:nonNegativeInteger" />
+		<xsd:attribute name="ucBL" type="xsd:nonNegativeInteger" />
+		<xsd:attribute name="nucBO" type="xsd:nonNegativeInteger" />
+		<xsd:attribute name="ucBO" type="xsd:nonNegativeInteger" />
+	</xsd:complexType>
+
+	<xsd:attribute name="mFN" type="FunctionType" />
+	<xsd:attribute name="functionName" type="FunctionType" />
+
+	<xsd:simpleType name="FunctionType">
+		<xsd:restriction base="xsd:string">
+			<!-- xsd:pattern value="[A-Z][A-Z0-9_]*" /-->
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="KeyType">
+		<xsd:restriction base="xsd:string">
+			<!-- xsd:pattern value="[A-Z][A-Z0-9_]*[:]{2}[0-9]+" /-->
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="RepoKeyType">
+		<xsd:restriction base="xsd:string">
+			<!-- xsd:pattern value="[[a-z]+[\.]]+[A-Z][A-Za-z]*[\.][a-z_]+" / -->
+		</xsd:restriction>
+	</xsd:simpleType>
+
+</xsd:schema>

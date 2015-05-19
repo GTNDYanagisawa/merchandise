@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+<?taglib 			uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+
+<window xmlns="http://www.zkoss.org/2005/zul"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xmlns:h="http://www.w3.org/1999/xhtml"
+			xmlns:zk="http://www.zkoss.org/2005/zk"
+			xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd "
+			use="de.hybris.platform.importcockpit.components.welcomepage.WelcomeComponent" closable="false" > 
+			
+	<zscript>
+		Object [] taskCntTab = new Object[]{spaceOwner.getTaskCount()};
+	</zscript>
+	<div style="text-align: left; padding: 20px 8px 20px 8px;" sclass="z-groupbox-hm welcome_group">
+		<hbox height="100%">
+			<div align="left" height="55px" style="text-align:left;" use="de.hybris.platform.importcockpit.components.welcomepage.NewJobButtonWelcomePageComponent">
+			</div>
+			<div align="left" height="35px" style="text-align:left;" onClick="spaceOwner.openImportJobsBrowser()">
+				<button label="${c:l('importcockpit.welcom.label.view.jobs')} (${spaceOwner.cronJobsCount})" onClick="spaceOwner.openImportJobsBrowser()" class="z-button"/>
+			</div>
+		</hbox>
+		<div class="welcome_page_taskbox">
+			<div>
+				<image src="/cockpit/images/icon_func_note.png" style="vertical-align: middle;"/>
+				<label value="${c:l2('importcockpit.welcom.label.you.have.currently', taskCntTab)}"/>
+				<toolbarbutton label="Show tasks" onClick="spaceOwner.openTaskBrowser()" sclass="welcome_link"/>
+			</div>
+		</div>
+	</div>
+	<div style="text-align: left; padding: 20px 8px 20px 8px;" sclass="z-groupbox-hm welcome_group">
+		<div>
+			<label value="${c:l('importcockpit.welcom.label.last.edited.jobs')}" style="font-weight: bold;"/>
+		</div>
+		<div style="width: 100%;" onCreate="spaceOwner.injectRecentlyModifiedCronJobs(self)" />
+	</div>
+</window>

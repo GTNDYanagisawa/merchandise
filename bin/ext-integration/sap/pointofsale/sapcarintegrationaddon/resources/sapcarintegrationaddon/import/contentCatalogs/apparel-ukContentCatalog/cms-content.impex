@@ -1,0 +1,194 @@
+$contentCatalog=apparel-ukContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$jarResourceCms=jar:de.hybris.platform.sap.sapcarintegrationaddon.constants.SapcarintegrationaddonConstants&/sapcarintegrationaddon/import/cockpit/cmscockpit
+$catalogHeader=catalogVersion(catalog(id),version)
+
+################################################
+############ Staged Content Catalog ############
+################################################
+
+$catalog=$contentCatalog:Staged
+
+#---------------------------------------------------# 
+###### Delete Standard Order History Links  #########
+#---------------------------------------------------#
+REMOVE CMSLinksForNavNodes;Source($catalogHeader,uid)[unique=true];Target($catalogHeader,uid)[unique=true]
+;$catalog:AccountOrderHistoryLink;$catalog:AccountLeftNavNode
+;$catalog:AccountViewOrderHistoryLink;$catalog:AccountOrderHistoryNavNode
+
+#---------------------------------------------------# 
+###### Delete Instore Purchases Link  #########
+#---------------------------------------------------#
+
+REMOVE CMSLinksForNavNodes;Source($catalogHeader,uid)[unique=true];Target($catalogHeader,uid)[unique=true]
+;$catalog:AccountPOSHistoryLink;$catalog:AccountLeftNavNode
+;$catalog:AccountViewPOSHistoryLink;$catalog:AccountOrderHistoryNavNode
+
+REMOVE CMSLinkComponent;uid[unique=true];$catalogHeader[unique=true]
+;AccountPOSHistoryLink;$catalog
+;AccountViewPOSHistoryLink;$catalog
+
+#---------------------------------------------------# 
+############ Create MC Transaction Links ############
+#---------------------------------------------------#
+INSERT_UPDATE CMSLinkComponent;&impexLinkId;uid[unique=true];name;linkName[lang=en];$catalogHeader[unique=true];url
+;1;AccountMCHistoryLink;AccountMCHistoryLink;Order History;$catalog;/my-account/purchases
+;2;AccountViewMCHistoryLink;AccountViewMCHistoryLink;View order history;$catalog;/my-account/purchases
+ 
+#-------------------------------------------------------------------------------------------------------------#
+############ Add MC Transaction Links to My Account Page (Your Account and Order History sections) ############
+#-------------------------------------------------------------------------------------------------------------#
+INSERT_UPDATE CMSLinksForNavNodes;Source(&impexLinkId)[unique=true];Target($catalogHeader,uid)[unique=true];reverseSequenceNumber
+;1;$catalog:AccountLeftNavNode;4
+;2;$catalog:AccountOrderHistoryNavNode;0
+
+#---------------------------------------------------------#
+############ Create View MC Transaction Action ############
+#---------------------------------------------------------#
+INSERT_UPDATE ViewOrderAction;&impexActionId;uid[unique=true];name;$catalogHeader[unique=true];url
+;3;ViewSDTransactionAction;ViewSDTransactionAction;$catalog;/my-account/salesdocument/{orderCode}
+;4;ViewMCPOSTransactionAction;ViewMCPOSTransactionAction;$catalog;/my-account/instorepurchase/{orderCode}
+;5;ViewWEBTransactionAction;ViewWEBTransactionAction;$catalog;/my-account/weborder/{orderCode}
+
+#----------------------------------------------------------------#
+############ Create MC Transactions History Component ############
+#----------------------------------------------------------------#
+INSERT_UPDATE JspIncludeComponent;uid[unique=true];name;$catalogHeader[unique=true];page;actions(&impexActionId)
+;AccountMCTransactionHistoryComponent;Account MC Transaction History Component;$catalog;/WEB-INF/views/addons/sapcarintegrationaddon/desktop/pages/orderhistory/crossChannelPurchases.jsp;3,4,5
+
+#---------------------------------------------------------------#
+############ Create SD Transaction History Component ############
+#---------------------------------------------------------------#
+INSERT_UPDATE JspIncludeComponent;uid[unique=true];name;$catalogHeader[unique=true];page;actions(&impexActionId)
+#---- Create SD Transaction Title Component ----
+;AccountSDTransactionTitleComponent;Account SD Transaction Title Component;$catalog;/WEB-INF/views/addons/sapcarintegrationaddon/desktop/pages/salesdocument/salesDocumentTitle.jsp;;
+#---- Create SD Transaction Header Component ----
+;AccountSDTransactionHeaderComponent;Account SD Transaction Header Component;$catalog;/WEB-INF/views/addons/sapcarintegrationaddon/desktop/pages/salesdocument/salesDocumentHeader.jsp;;
+#---- Create SD Transaction Items Component ----
+;AccountSDTransactionItemsComponent;Account SD Transaction Items Component;$catalog;/WEB-INF/views/addons/sapcarintegrationaddon/desktop/pages/salesdocument/salesDocumentItems.jsp;;
+
+#---------------------------------------------------#
+############ Create MC Transaction Pages ############
+#---------------------------------------------------#
+INSERT_UPDATE ContentPage;&impexPageId;uid[unique=true];label;name;title[lang=en];$catalogHeader[unique=true];masterTemplate($catalogHeader,uid);approvalStatus(code);defaultPage
+#---- Create MC Transactions Page ----
+;6;mctransactions;mctransactions;MC Transaction History Page;Order History;$catalog;$catalog:AccountPageTemplate;approved;true
+#---- Create MC SD Transaction Page ----
+;7;mcsdtransaction;mcsdtransaction;MC SD Transaction Details Page;Order Details;$catalog;$catalog:AccountPageTemplate;approved;true
+
+#-----------------------------------------------------------------------------------------#
+############ CMS Configuration : Create Content Slots for MC Transaction Pages ############
+#-----------------------------------------------------------------------------------------#
+INSERT_UPDATE ContentSlot;&impexSlotId;uid[unique=true];name;$catalogHeader[unique=true];cmsComponents($catalogHeader,uid)
+#---- Create MC Transactions Page ----
+;8;SideContent-mctransactions;Side Content Slot for My Account MC Transaction History;$catalog;$catalog:AccountLeftNavigationComponent
+;9;BodyContent-mctransactions;Body Content Slot for My Account MC Transaction History;$catalog;$catalog:AccountMCTransactionHistoryComponent
+#---- Create MC SD Transaction Page ----
+;10;SideContent-mcsdtransaction;Side Content Slot for My Account MC SD Transaction Details;$catalog;$catalog:AccountLeftNavigationComponent
+;11;BodyContent-mcsdtransaction;Body Content Slot for My Account MC SD Transaction Details;$catalog;$catalog:AccountSDTransactionTitleComponent,$catalog:AccountSDTransactionHeaderComponent,$catalog:AccountSDTransactionItemsComponent
+
+#-------------------------------------------------------------------------------------#
+############ CMS Configuration : Add Content Slots to MC Transaction Pages ############
+#-------------------------------------------------------------------------------------#
+INSERT_UPDATE ContentSlotForPage;uid[unique=true];$catalogHeader[unique=true];position;page(&impexPageId);contentSlot(&impexSlotId)
+#---- MC Transactions Page ----
+;SideContent-mctransactions;$catalog;SideContent;6;8
+;BodyContent-mctransactions;$catalog;BodyContent;6;9
+#---- MC SD Transaction Page ----
+;SideContent-mcsdtransaction;$catalog;SideContent;7;10
+;BodyContent-mcsdtransaction;$catalog;BodyContent;7;11
+
+################################################
+############ Online Content Catalog ############
+################################################
+
+$catalog=$contentCatalog:Online
+
+#---------------------------------------------------# 
+###### Delete Standard Order History Links  #########
+#---------------------------------------------------#
+REMOVE CMSLinksForNavNodes;Source($catalogHeader,uid)[unique=true];Target($catalogHeader,uid)[unique=true]
+;$catalog:AccountOrderHistoryLink;$catalog:AccountLeftNavNode
+;$catalog:AccountViewOrderHistoryLink;$catalog:AccountOrderHistoryNavNode
+
+#---------------------------------------------------# 
+###### Delete Instore Purchases Link  #########
+#---------------------------------------------------#
+
+REMOVE CMSLinksForNavNodes;Source($catalogHeader,uid)[unique=true];Target($catalogHeader,uid)[unique=true]
+;$catalog:AccountPOSHistoryLink;$catalog:AccountLeftNavNode
+;$catalog:AccountViewPOSHistoryLink;$catalog:AccountOrderHistoryNavNode
+
+REMOVE CMSLinkComponent;uid[unique=true];$catalogHeader[unique=true]
+;AccountPOSHistoryLink;$catalog
+;AccountViewPOSHistoryLink;$catalog
+
+#---------------------------------------------------# 
+############ Create MC Transaction Links ############
+#---------------------------------------------------#
+INSERT_UPDATE CMSLinkComponent;&impexLinkId;uid[unique=true];name;linkName[lang=en];$catalogHeader[unique=true];url
+;100;AccountMCHistoryLink;AccountMCHistoryLink;Order History;$catalog;/my-account/purchases
+;200;AccountViewMCHistoryLink;AccountViewMCHistoryLink;View order history;$catalog;/my-account/purchases
+ 
+#-------------------------------------------------------------------------------------------------------------#
+############ Add MC Transaction Links to My Account Page (Your Account and Order History sections) ############
+#-------------------------------------------------------------------------------------------------------------#
+INSERT_UPDATE CMSLinksForNavNodes;Source(&impexLinkId)[unique=true];Target($catalogHeader,uid)[unique=true];reverseSequenceNumber
+;100;$catalog:AccountLeftNavNode;4
+;200;$catalog:AccountOrderHistoryNavNode;0
+
+#---------------------------------------------------------#
+############ Create View MC Transaction Action ############
+#---------------------------------------------------------#
+INSERT_UPDATE ViewOrderAction;&impexActionId;uid[unique=true];name;$catalogHeader[unique=true];url
+;300;ViewSDTransactionAction;ViewSDTransactionAction;$catalog;/my-account/salesdocument/{orderCode}
+;400;ViewMCPOSTransactionAction;ViewMCPOSTransactionAction;$catalog;/my-account/instorepurchase/{orderCode}
+;500;ViewWEBTransactionAction;ViewWEBTransactionAction;$catalog;/my-account/weborder/{orderCode}
+
+#----------------------------------------------------------------#
+############ Create MC Transactions History Component ############
+#----------------------------------------------------------------#
+INSERT_UPDATE JspIncludeComponent;uid[unique=true];name;$catalogHeader[unique=true];page;actions(&impexActionId)
+;AccountMCTransactionHistoryComponent;Account MC Transaction History Component;$catalog;/WEB-INF/views/addons/sapcarintegrationaddon/desktop/pages/orderhistory/crossChannelPurchases.jsp;300,400,500
+
+#---------------------------------------------------------------#
+############ Create SD Transaction History Component ############
+#---------------------------------------------------------------#
+INSERT_UPDATE JspIncludeComponent;uid[unique=true];name;$catalogHeader[unique=true];page;actions(&impexActionId)
+#---- Create SD Transaction Title Component ----
+;AccountSDTransactionTitleComponent;Account SD Transaction Title Component;$catalog;/WEB-INF/views/addons/sapcarintegrationaddon/desktop/pages/salesdocument/salesDocumentTitle.jsp;;
+#---- Create SD Transaction Header Component ----
+;AccountSDTransactionHeaderComponent;Account SD Transaction Header Component;$catalog;/WEB-INF/views/addons/sapcarintegrationaddon/desktop/pages/salesdocument/salesDocumentHeader.jsp;;
+#---- Create SD Transaction Items Component ----
+;AccountSDTransactionItemsComponent;Account SD Transaction Items Component;$catalog;/WEB-INF/views/addons/sapcarintegrationaddon/desktop/pages/salesdocument/salesDocumentItems.jsp;;
+
+#---------------------------------------------------#
+############ Create MC Transaction Pages ############
+#---------------------------------------------------#
+INSERT_UPDATE ContentPage;&impexPageId;uid[unique=true];label;name;title[lang=en];$catalogHeader[unique=true];masterTemplate($catalogHeader,uid);approvalStatus(code);defaultPage
+#---- Create MC Transactions Page ----
+;600;mctransactions;mctransactions;MC Transaction History Page;Order History;$catalog;$catalog:AccountPageTemplate;approved;true
+#---- Create MC SD Transaction Page ----
+;700;mcsdtransaction;mcsdtransaction;MC SD Transaction Details Page;Order Details;$catalog;$catalog:AccountPageTemplate;approved;true
+
+#-----------------------------------------------------------------------------------------#
+############ CMS Configuration : Create Content Slots for MC Transaction Pages ############
+#-----------------------------------------------------------------------------------------#
+INSERT_UPDATE ContentSlot;&impexSlotId;uid[unique=true];name;$catalogHeader[unique=true];cmsComponents($catalogHeader,uid)
+#---- Create MC Transactions Page ----
+;800;SideContent-mctransactions;Side Content Slot for My Account MC Transaction History;$catalog;$catalog:AccountLeftNavigationComponent
+;900;BodyContent-mctransactions;Body Content Slot for My Account MC Transaction History;$catalog;$catalog:AccountMCTransactionHistoryComponent
+#---- Create MC SD Transaction Page ----
+;1000;SideContent-mcsdtransaction;Side Content Slot for My Account MC SD Transaction Details;$catalog;$catalog:AccountLeftNavigationComponent
+;1100;BodyContent-mcsdtransaction;Body Content Slot for My Account MC SD Transaction Details;$catalog;$catalog:AccountSDTransactionTitleComponent,$catalog:AccountSDTransactionHeaderComponent,$catalog:AccountSDTransactionItemsComponent
+
+#-------------------------------------------------------------------------------------#
+############ CMS Configuration : Add Content Slots to MC Transaction Pages ############
+#-------------------------------------------------------------------------------------#
+INSERT_UPDATE ContentSlotForPage;uid[unique=true];$catalogHeader[unique=true];position;page(&impexPageId);contentSlot(&impexSlotId)
+#---- MC Transactions Page ----
+;SideContent-mctransactions;$catalog;SideContent;600;800
+;BodyContent-mctransactions;$catalog;BodyContent;600;900
+#---- MC SD Transaction Page ----
+;SideContent-mcsdtransaction;$catalog;SideContent;700;1000
+;BodyContent-mcsdtransaction;$catalog;BodyContent;700;1100

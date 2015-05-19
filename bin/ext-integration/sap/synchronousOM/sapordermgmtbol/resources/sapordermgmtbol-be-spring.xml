@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd"  >
+
+	<!-- Backend Objects (BE) -->
+	<bean id="sapOrdermgmtDefaultCartBeERP"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.basket.backend.impl.erp.BasketERP" parent="sapCoreBackendObjectJCo"	>
+		<property name="itemBuffer" ref="sapOrdermgmtItemBuffer" />
+		<property name="defaultConnectionName" value="JCoStatefulServiceUser" />		
+		<property name="getAllStrategy" ref="sapOrdermgmtReadStrategy" />
+		<property name="lrdActionsStrategy" ref="sapOrdermgmtActionsStrategy" />
+		<property name="setStrategy" ref="sapOrdermgmtWriteStrategy" />
+		<property name="closeStrategy" ref="sapOrdermgmtCloseStrategy"/>
+		<property name="additionalPricing" ref="sapOrdermgmtAdditionalPricing" />
+		<property name="moduleConfigurationAccess" ref="sapOrdermgmtConfigurationAccess" />					
+		<property name="productConfigurationStrategy" ref="sapOrdermgmtProductConfigurationStrategy" />					
+	</bean>
+	
+	<bean id="sapOrdermgmtDefaultOrderBeERP"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.order.backend.impl.erp.OrderERP" parent="sapCoreBackendObjectJCo"	>
+		<property name="itemBuffer" ref="sapOrdermgmtItemBuffer" />
+		<property name="defaultConnectionName" value="JCoStatefulServiceUser" />		
+		<property name="getAllStrategy" ref="sapOrdermgmtReadStrategy" />
+		<property name="lrdActionsStrategy" ref="sapOrdermgmtActionsStrategy" />
+		<property name="setStrategy" ref="sapOrdermgmtWriteStrategy" />
+		<property name="additionalPricing" ref="sapOrdermgmtAdditionalPricing" />
+		<property name="moduleConfigurationAccess" ref="sapOrdermgmtConfigurationAccess" />		
+		<property name="productConfigurationStrategy" ref="sapOrdermgmtProductConfigurationStrategy" />					
+	</bean>	
+	
+	<bean id="sapOrdermgmtDefaultOrderHistoryBeERP"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.order.backend.impl.erp.OrderHistoryERP" parent="sapOrdermgmtDefaultOrderBeERP"	>
+		<property name="defaultConnectionName" value="JCoStatefulServiceUserSecond" />
+	</bean>		
+	
+	<bean id="sapOrdermgmtDefaultSearchBeERP"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.salesdocument.search.backend.impl.SearchBackendERP" parent="sapCoreBackendObjectJCo"	>
+		<property name="moduleConfigurationAccess" ref="sapOrdermgmtConfigurationAccess" />					
+	</bean>	
+	
+	<bean id="sapOrdermgmtDefaultTransactionConfigurationBeERP"
+		class="de.hybris.platform.sap.sapordermgmtbol.transaction.misc.backend.impl.erp.TransactionConfigurationERP" parent="sapCoreBackendObjectJCo"	>
+	</bean>
+	
+</beans>

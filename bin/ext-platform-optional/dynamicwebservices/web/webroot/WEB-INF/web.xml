@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<web-app id="dynamicwebservices" version="3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" 
+         metadata-complete="true">
+  <absolute-ordering />
+  
+	<display-name>dynamicwebservices</display-name>
+	
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+
+	<filter>
+   		<filter-name>XSSFilter</filter-name>
+		<filter-class>de.hybris.platform.servicelayer.web.XSSFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>XSSFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<filter>
+		 <filter-name>HttpPutFormContentFilter</filter-name>
+		 <filter-class>org.springframework.web.filter.HttpPutFormContentFilter</filter-class>
+	</filter>
+	
+	
+	<filter>
+	   	<filter-name>characterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+
+	<filter>
+		<filter-name>dynamicwebservicesPlatformFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		 <filter-name>HttpPutFormContentFilter</filter-name>
+		 <url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>characterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>dynamicwebservicesPlatformFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<servlet>
+      <servlet-name>SpringGroovyServlet</servlet-name>
+      <servlet-class>de.hybris.platform.spring.SpringAwareGroovyServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+      <servlet-name>SpringGroovyServlet</servlet-name>
+      <url-pattern>/groovy/*</url-pattern>
+    </servlet-mapping>
+
+	<servlet>
+      <servlet-name>ScriptServlet</servlet-name>
+      <servlet-class>de.hybris.platform.dynamicwebservices.servlet.ScriptServlet</servlet-class>
+      <init-param>
+      	<param-name>domain</param-name>
+      	<param-value>dws</param-value>
+      </init-param>
+    </servlet>
+
+    <servlet-mapping>
+      <servlet-name>ScriptServlet</servlet-name>
+      <url-pattern>/dynamic/*</url-pattern>
+    </servlet-mapping>
+
+	
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>WEB-INF/dynamicwebservices-web-spring.xml</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>de.hybris.platform.spring.HybrisContextLoaderListener</listener-class>
+	</listener>
+	
+	<listener>
+    	<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
+	
+	<session-config>
+		<session-timeout>120</session-timeout>
+	</session-config>
+	
+</web-app> 

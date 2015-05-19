@@ -1,0 +1,49 @@
+*** Settings ***
+Library         com.hybris.services.entitlements.atdd.keywords.EntitlementsExecuteKeywordLibrary
+
+
+*** Keywords ***
+### USE AND VERIFY IF TRUE/FALSE
+use entitlement with entitlementType "${entitlementType:[^"]+}" for user "${user:[^"]+}" is "${exists_boolean:[^"]+}"
+    [Documentation]    Checks entitlements for user
+    execute entitlement    use    ${entitlementType}     ${user}     ${exists_boolean}
+
+use entitlement with entitlementType "${entitlementType:[^"]+}" and conditions "${condition:[^"]+}" for user "${user:[^"]+}" is "${exists_boolean:[^"]+}"
+    [Documentation]    Checks entitlements with conditions for user
+    ...                "entitlement type" condition with parameters {"key1":"value", "key2":"value"}
+    execute entitlement with condition    use    ${entitlementType}     ${user}     ${condition}    ${exists_boolean}
+
+### USE
+use entitlement with entitlementType "${entitlementType:[^"]+}" and conditions "${condition:[^"]+}" for user "${user:[^"]+}" and verify that grantSourceId is "${grantSourceId:[^"]+}"
+    [Documentation]    Checks entitlements with conditions for user and grantSourceId
+    ...                Executes use for given entitlement type with conditions and given grantSourceId. The grantSourceId assertion doesn't verify if given grantSourceId exists for given
+    ...                entitlement type and conditions for user, but verifies if the grantSourceId was proper for entitlement that was used.
+    ...                In case that no entitlement exists at all with given conditions, KW will throw that grantSourceId assertion was failed
+    ...                KW is used especially to verify if the usage strategy was executed properly (for expected entitlement)
+    execute entitlement with condition and has grant source id    use    ${entitlementType}     ${user}     ${condition}     ${grantSourceId}
+
+use entitlement with entitlementType "${entitlementType:[^"]+}" for user "${user:[^"]+}" and verify that grantSourceId is "${grantSourceId:[^"]+}"
+    [Documentation]    Checks entitlements without conditions for user and grantSourceId
+    ...                Executes use for given entitlement type and given grantSourceId. The grantSourceId assertion doesn't verify if given grantSourceId exists for given
+    ...                entitlement type  for user, but verifies if the grantSourceId was proper for entitlement that was used.
+    ...                In case that no entitlement exists at all with given conditions, KW will throw that grantSourceId assertion was failed
+    ...                KW is used especially to verify if the usage strategy was executed properly (for expected entitlement)
+    execute entitlement with condition and has grant source id    use    ${entitlementType}     ${user}     ${null}     ${grantSourceId}
+
+use entitlement with entitlementType "${entitlementType:[^"]+}" if retrieve details set to "${details_boolean:[^"]+}" for user "${user:[^"]+}" is "${result_boolean:[^"]+}" and has "${grantCount:[^"]+}" grants
+    [Documentation]    Checks entitlements (without conditions) with details for user
+    ...                ${details_boolean} - true/false - must be set to "true" if ${grantCount} needs to be retrieved (in other case grantCount = 0)
+    ...                ${grantCount} is not the number of grants that user has or number of grants that user has valid for given use condition,
+    ...                but this is how many entitlements were processed for use execution that returns true or false. Currently only one grant is supported per use
+    ...                (quantity can be decreased from one grant only due to single use call), so ${grantCount} value can be 0 or 1 only.
+    ...                In future it is possible that quantity for more than 1 grant will be used.
+    execute entitlement with details    use    ${entitlementType}     ${user}     ${details_boolean}    ${result_boolean}    ${grantCount}
+
+use entitlement with entitlementType "${entitlementType:[^"]+}" and conditions "${condition:[^"]+}" if retrieve details set to "${details_boolean:[^"]+}" for user "${user:[^"]+}" is "${result_boolean:[^"]+}" and has "${grantCount:[^"]+}" grants
+    [Documentation]    Checks entitlements (with conditions) with details for user
+    ...                ${details_boolean} - true/false - must be set to "true" if ${grantCount} needs to be retrieved (in other case grantCount = 0)
+    ...                ${grantCount} is not the number of grants that user has or number of grants that user has valid for given use condition,
+    ...                but this is how many entitlements were processed for use execution that returns true or false. Currently only one grant is supported per use
+    ...                (quantity can be decreased from one grant only due to single use call), so ${grantCount} value can be 0 or 1 only.
+    ...                In future it is possible that quantity for more than 1 grant will be used.
+    execute entitlement with condition and details    use    ${entitlementType}     ${user}     ${condition}    ${result_boolean}    ${details_boolean}    ${grantCount}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<bean id="Task_executionDateAttributeHandler"
+			class="de.hybris.platform.servicelayer.dynamic.TaskExecutionDateAttributeHandler"/>
+
+	<bean id="Task_expirationDateAttributeHandler"
+			class="de.hybris.platform.servicelayer.dynamic.TaskExpirationDateAttributeHandler"/>
+
+	<bean id="TaskCondition_expirationDateAttributeHandler"
+			class="de.hybris.platform.servicelayer.dynamic.TaskConditionExpirationDateAttributeHandler"/>
+
+	<bean id="TaskPrepareInterceptor" class="de.hybris.platform.servicelayer.interceptor.TaskPrepareInterceptor" />
+
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="TaskPrepareInterceptor"/>
+		<property name="typeCode" value="Task"/>
+	</bean>
+
+	<bean id="TaskConditionPrepareInterceptor" class="de.hybris.platform.servicelayer.interceptor.TaskConditionPrepareInterceptor" />
+
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="TaskConditionPrepareInterceptor"/>
+		<property name="typeCode" value="TaskCondition"/>
+	</bean>
+
+</beans>

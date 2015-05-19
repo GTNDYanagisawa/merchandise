@@ -1,0 +1,87 @@
+$contentCatalog=electronicsContentCatalog
+$contentCatalogName=Electronics Content Catalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$productCatalog=electronicsProductCatalog
+$productCatalogName=Electronics Product Catalog
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$siteResource=jar:de.hybris.platform.electronicsstore.constants.ElectronicsstoreConstants&/electronicsstore/import/sampledata/contentCatalogs/$contentCatalog
+
+##  Remove the language currency component from the search and place a tag in the footer
+# CMS SearchBox Components
+INSERT_UPDATE SearchBoxComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;SearchBox;Search Box;SearchBox
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;SearchBoxSlot;SearchBox
+
+INSERT_UPDATE FooterComponent;$contentCV[unique=true];uid[unique=true];wrapAfter;showLanguageCurrency
+;;FooterComponent;2;true
+
+###  Home page splash Slot 1  #######
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageSplashBannerComponent;Electronics Homepage Splash Banner Component;/Open-Catalogue/Cameras/Camera-Accessories-%26-Supplies/Camera-Lenses/c/588;ElectronicsHompageSplashBannerComponent
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageDiscountBannerComponent;Electronics Homepage Discount Banner Component;/Open-Catalogue/Cameras/Digital-Cameras/c/575;ElectronicsHompageDiscountBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section1Slot-Homepage;true;ElectronicsHompageSplashBannerComponent,ElectronicsHompageDiscountBannerComponent
+
+###  Home page slot 2A  ####
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageLightFamBannerComponent;Electronics Homepage Light Family Banner Component;Open-Catalogue/Cameras/Camera-Accessories-%26-Supplies/Camera-Flashes/c/586;ElectronicsHompageLightFamBannerComponent
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageLightFamTextBannerComponent;Electronics Homepage Light Family Text Banner Component;Open-Catalogue/Cameras/Camera-Accessories-%26-Supplies/Camera-Flashes/c/586;ElectronicsHompageLightFamTextBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section2ASlot-Homepage;true;ElectronicsHompageLightFamBannerComponent,ElectronicsHompageLightFamTextBannerComponent
+
+#### Home section 2B #######
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageCamcordersBannerComponent;Electronics Homepage Camcorders Banner Component;Open-Catalogue/Cameras/Hand-held-Camcorders/c/584;ElectronicsHompageCamcordersBannerComponent
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ElectronicsHompageCamcordersChildBannerComponent;Electronics Homepage Light Family Banner Component Child;Open-Catalogue/Cameras/Hand-held-Camcorders/c/584;ElectronicsHompageCamcordersChildBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section2BSlot-Homepage;true;ElectronicsHompageCamcordersChildBannerComponent,ElectronicsHompageCamcordersBannerComponent
+## Home section 2C
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;Section2CSlot-Homepage;
+
+## Home section 3
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];&componentRef
+;;ElectronicsHomepageProductCarouselComponent;ElectronicsHomepageProductCarouselComponent
+
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;products(code,$productCV);scroll(code);popup;&componentRef
+;;NewElectronicsHomepageProductCarouselComponent;What's New Electronics Homepage Product Carousel;2278102,1992693,1981415,1934796,1776948,1641905,1532809,932577;allVisible;false;NewElectronicsHomepageProductCarouselComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;Section3Slot-Homepage;ElectronicsHomepageProductCarouselComponent,NewElectronicsHomepageProductCarouselComponent
+
+#### Section 4
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ElectronicsHompageSmDiscountBannerComponent;Electronics Homepage Small Discount Banner Component;ElectronicsHompageSmDiscountBannerComponent
+;;ElectronicsHompageShopBannerComponent;Electronics Homepage Shop Banner Component;ElectronicsHompageShopBannerComponent
+;;ElectronicsHompageShipmentBannerComponent;Electronics Homepage Shipment Banner Component;ElectronicsHompageShipmentBannerComponent
+;;ElectronicsHompageServiceBannerComponent;Electronics Homepage Service Banner Component;ElectronicsHompageServiceBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section4Slot-Homepage;true;ElectronicsHompageSmDiscountBannerComponent,ElectronicsHompageShopBannerComponent,ElectronicsHompageShipmentBannerComponent,ElectronicsHompageServiceBannerComponent
+
+### Section 5
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ElectronicsHompageFreeDelBannerComponent;Electronics Homepage Free Delivery Banner Component;ElectronicsHompageFreeDelBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section5Slot-Homepage;true;ElectronicsHompageFreeDelBannerComponent
+
+#### END HOMEPAGE
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(uid, $contentCV)
+;;TopContent-cartPage;Top Slot for Cart Page;true;CartComponent
+
+# Site Logo
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText;folder(qualifier)[default='images']
+;;/images/theme/logo-hybris-responsive.png;logo-hybris-responsive.png;$siteResource/images/theme/logo-hybris-responsive.png;image/png;hybris Accelerator;

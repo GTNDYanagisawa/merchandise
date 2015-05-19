@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2013 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:file="http://www.springframework.org/schema/integration/file"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/file
+		http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<!-- Generic pipeline service -->
+	<alias name="defaultExportDataProcessorService" alias="exportDataProcessorService"/>
+	<bean id="defaultExportDataProcessorService" class="de.hybris.platform.acceleratorservices.dataexport.generic.impl.DefaultExportDataProcessorService" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias name="defaultExportDataHistoryService" alias="exportDataHistoryService"/>
+	<bean id="defaultExportDataHistoryService" class="de.hybris.platform.acceleratorservices.dataexport.generic.impl.DefaultExportDataHistoryService" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="cronJobDao" ref="cronJobDao"/>
+		<aop:scoped-proxy/>
+	</bean>
+
+	<!-- generic pipeline services -->
+	<alias name="defaultExportConvertObjectsToCSV" alias="exportConvertObjectsToCSV"/>
+	<bean id="defaultExportConvertObjectsToCSV" class="de.hybris.platform.acceleratorservices.dataexport.generic.output.csv.ConvertObjectsToCSV" scope="tenant"/>
+
+	<!-- generic data pipeline start -->
+
+	<int:channel id="exportDataEventChannel"/>
+
+	<!-- Listen for ExportDataEvent and inject it into channel queryDataChannel -->
+	<bean id="exportDataEventListener" class="de.hybris.platform.acceleratorservices.dataexport.generic.event.ExportMessageSendingEventListener">
+		<property name="eventClass" value="de.hybris.platform.acceleratorservices.dataexport.generic.event.ExportDataEvent"/>
+		<property name="channel" ref="exportDataEventChannel"/>
+		<property name="errorHandler">
+			<bean class="org.springframework.integration.channel.MessagePublishingErrorHandler"/>
+		</property>
+	</bean>
+
+	<!-- define custom error channel for messages from this chain -->
+	<int:channel id="exportDataErrorChannel"/>
+	<int:header-enricher input-channel="exportDataEventChannel" output-channel="exportPreChainChannel">
+		<int:error-channel ref="exportDataErrorChannel"/>
+	</int:header-enricher>
+
+	<int:channel id="exportPreChainChannel"/>
+
+	<int:publish-subscribe-channel id="exportDataCompleteChannel"/>
+
+	<int:chain id="exportDataQueryConverterChain" input-channel="exportPreChainChannel" output-channel="exportDataCompleteChannel">
+		<int:service-activator ref="exportDataHistoryService" method="recordExportStart"/>
+		<int:header-enricher>
+			<int:header name="event" expression="payload"/>
+			<int:header name="pipelineConfig" expression="@exportDataProcessorService.lookupBean(payload.dataGenerationPipeline)"/>
+		</int:header-enricher>
+		<int:header-enricher>
+			<int:header name="targetFilename" ref="exportDataProcessorService" method="computeFilename"/>
+		</int:header-enricher>
+		<int:service-activator ref="exportDataProcessorService" method="search"/>
+		<int:splitter/>
+		<int:transformer ref="exportDataProcessorService" method="lookupItemForPk"/>
+		<int:transformer ref="exportDataProcessorService" method="convertItem"/>
+		<int:aggregator/>
+		<int:header-enricher>
+			<int:header name="processedCount" expression="payload.size()"/>
+		</int:header-enricher>
+		<int:transformer ref="exportDataProcessorService" method="convertOutput"/>
+	</int:chain>
+
+	<!-- write the output from the chain to file -->
+	<file:outbound-channel-adapter
+			id="exportDataOutputFileAdapter"
+			directory="#{exportDataBaseDirectory}"
+			auto-create-directory="true"
+			temporary-file-suffix="_temp"
+			filename-generator-expression="headers.targetFilename"
+			channel="exportDataCompleteChannel"
+			order="1"/>
+
+	<int:service-activator ref="exportDataHistoryService" method="recordExportEnd" input-channel="exportDataCompleteChannel" output-channel="nullChannel" order="2"/>
+
+	<int:service-activator ref="exportDataHistoryService" method="handleError" input-channel="exportDataErrorChannel" output-channel="nullChannel"/>
+
+	<!-- generic data pipeline end -->
+
+
+	<!-- OMS locations pipeline -->
+
+	<alias name="defaultExportOMSLocationConverter" alias="exportOMSLocationConverter"/>
+	<bean id="defaultExportOMSLocationConverter" class="de.hybris.platform.integration.oms.ats.dataexport.converter.OmsStockLocationConverter" scope="tenant"/>
+
+	<alias name="defaultExportOMSLocationQuery" alias="exportOMSLocationQuery"/>
+	<bean id="defaultExportOMSLocationQuery" class="de.hybris.platform.acceleratorservices.dataexport.generic.query.impl.FlexibleSearchExportQuery" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="query" value="
+			SELECT x.pk FROM (
+			{{SELECT {pos.pk} AS pk
+				FROM
+				{
+					PointOfService AS pos
+					JOIN PoS2WarehouseRel AS ps2wh ON {ps2wh.source}={pos.pk}
+					JOIN BaseStore2WarehouseRel AS bs2wh ON {bs2wh.target}={ps2wh.target}
+				}
+				WHERE {bs2wh.source}=?baseStore
+			}}
+			UNION
+			{{SELECT {pos.pk} AS pk
+				FROM
+				{
+					PointOfService AS pos
+					JOIN PoS2WarehouseRel AS ps2wh ON {ps2wh.source}={pos.pk}
+					JOIN EnumerationValue AS posType ON {posType.pk}={pos.type}
+				}
+				WHERE {posType.code}='STORE' AND {pos.baseStore}=?baseStore
+			}}) x"/>
+		<property name="parameters">
+			<map>
+				<entry key="baseStore" value="payload.baseStore"/>
+			</map>
+		</property>
+		<property name="impersonationService" ref="impersonationService"/>
+	</bean>
+
+	<bean id="exportOMSLocationPipeline" class="de.hybris.platform.acceleratorservices.dataexport.generic.config.PipelineConfig" scope="tenant">
+		<property name="query" ref="exportOMSLocationQuery"/>
+		<property name="itemConverter" ref="exportOMSLocationConverter"/>
+		<property name="outputConverter" ref="exportConvertObjectsToCSV"/>
+		<!-- Example file name: code-timestamp.tsv -->
+		<property name="filename" value="headers.event.code + '-' + headers.timestamp + '.tsv'"/>
+	</bean>
+
+
+	<!-- OMS init-app locations pipeline -->
+
+	<bean id="initAppExportOMSLocationConverter" class="de.hybris.platform.integration.oms.ats.dataexport.converter.OmsInitAppLocationConverter" scope="tenant">
+		<property name="idPrefix" value="LocationData|"/>
+		<property name="priority" value="1"/>
+		<property name="type" value="WAREHOUSE"/>
+	</bean>
+
+	<bean id="exportOMSLocationPipelineInitApp" class="de.hybris.platform.acceleratorservices.dataexport.generic.config.PipelineConfig" scope="tenant">
+		<property name="query" ref="exportOMSLocationQuery"/>
+		<property name="itemConverter" ref="initAppExportOMSLocationConverter"/>
+		<property name="outputConverter" ref="exportConvertObjectsToCSV"/>
+		<!-- Example file name: code-timestamp.tsv -->
+		<property name="filename" value="headers.event.code + '-' + headers.timestamp + '.tsv'"/>
+	</bean>
+
+
+	<!-- OMS BaseStores pipeline -->
+
+	<alias name="defaultExportOMSBaseStoreConverter" alias="exportOMSBaseStoreConverter"/>
+	<bean id="defaultExportOMSBaseStoreConverter" class="de.hybris.platform.integration.oms.ats.dataexport.converter.OmsBaseStoreConverter" scope="tenant"/>
+
+	<alias name="defaultExportOMSBaseStoreQuery" alias="exportOMSBaseStoreQuery"/>
+	<bean id="defaultExportOMSBaseStoreQuery" class="de.hybris.platform.acceleratorservices.dataexport.generic.query.impl.FlexibleSearchExportQuery" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="query" value="SELECT {pk} FROM {BaseStore}"/>
+		<property name="parameters">
+			<map/>
+		</property>
+		<property name="impersonationService" ref="impersonationService"/>
+	</bean>
+
+	<bean id="exportOMSBaseStorePipeline" class="de.hybris.platform.acceleratorservices.dataexport.generic.config.PipelineConfig" scope="tenant">
+		<property name="query" ref="exportOMSBaseStoreQuery"/>
+		<property name="itemConverter" ref="exportOMSBaseStoreConverter"/>
+		<property name="outputConverter" ref="exportConvertObjectsToCSV"/>
+		<!-- Example file name: code-timestamp.tsv -->
+		<property name="filename" value="headers.event.code + '-' + headers.timestamp + '.tsv'"/>
+	</bean>
+
+	<!-- OMS inventory pipeline -->
+
+	<alias name="defaultExportOmsInventoryConverter" alias="exportOmsInventoryConverter"/>
+	<bean id="defaultExportOmsInventoryConverter" class="de.hybris.platform.integration.oms.ats.dataexport.converter.OmsStockLevelConverter" scope="tenant">
+		<property name="statusCode" value="ON_HAND"/>
+	</bean>
+
+	<alias name="defaultExportOmsInventoryQuery" alias="exportOmsInventoryQuery"/>
+	<bean id="defaultExportOmsInventoryQuery" class="de.hybris.platform.acceleratorservices.dataexport.generic.query.impl.FlexibleSearchExportQuery" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="query" value="
+			SELECT x.pk FROM
+			({{SELECT {sl.pk} AS pk
+			  FROM {
+			      StockLevel AS sl 
+			      JOIN Warehouse AS wh ON {wh.pk}={sl.warehouse}
+			      JOIN BaseStore2WarehouseRel AS bs2wh ON {bs2wh.target}={wh.pk}
+			  }
+			  WHERE {bs2wh.source}=?baseStore
+			}} UNION {{
+			SELECT {sl.pk} AS pk
+			  FROM {
+			      StockLevel AS sl 
+			      JOIN Warehouse AS wh ON {wh.pk}={sl.warehouse}
+			      JOIN PoS2WarehouseRel AS ps2wh ON {ps2wh.target}={wh.pk}
+			      JOIN PointOfService AS pos ON {ps2wh.source}={pos.pk}
+			      JOIN EnumerationValue AS posType ON {posType.pk}={pos.type}
+			  }
+			  WHERE {posType.code}='STORE' AND {pos.baseStore}=?baseStore}}) x"/>
+		<property name="parameters">
+			<map>
+				<entry key="baseStore" value="payload.baseStore"/>
+			</map>
+		</property>
+		<property name="impersonationService" ref="impersonationService"/>
+	</bean>
+
+	<bean id="exportOmsInventoryPipeline" class="de.hybris.platform.acceleratorservices.dataexport.generic.config.PipelineConfig" scope="tenant">
+		<property name="query" ref="exportOmsInventoryQuery"/>
+		<property name="itemConverter" ref="exportOmsInventoryConverter"/>
+		<property name="outputConverter" ref="exportConvertObjectsToCSV"/>
+		<!-- Example file name: code-timestamp.tsv -->
+		<property name="filename" value="headers.event.code + '-' + headers.timestamp + '.tsv'"/>
+	</bean>
+
+
+	<!-- OMS init-app inventory pipeline -->
+
+	<bean id="initAppExportOmsInventoryConverter" class="de.hybris.platform.integration.oms.ats.dataexport.converter.OmsInitAppLevelConverter" scope="tenant">
+		<property name="idPrefix" value="CurrentItemQuantityData|"/>
+		<property name="statusCode" value="ON_HAND"/>
+		<property name="ownerPrefix" value="ItemLocationCurrentData|"/>
+		<property name="version" value="1"/>
+		<property name="unitCode" value="U"/>
+	</bean>
+
+	<bean id="exportOmsInventoryPipelineInitApp" class="de.hybris.platform.acceleratorservices.dataexport.generic.config.PipelineConfig" scope="tenant">
+		<property name="query" ref="exportOmsInventoryQuery"/>
+		<property name="itemConverter" ref="initAppExportOmsInventoryConverter"/>
+		<property name="outputConverter" ref="exportConvertObjectsToCSV"/>
+		<!-- Example file name: code-timestamp.tsv -->
+		<property name="filename" value="headers.event.code + '-' + headers.timestamp + '.tsv'"/>
+	</bean>
+
+
+	<!-- OMS init-app inventory locations pipeline -->
+
+	<bean id="initAppExportOmsInventoryLocationsConverter" class="de.hybris.platform.integration.oms.ats.dataexport.converter.OmsInitAppInventoryLocationsConverter" scope="tenant">
+		<property name="idPrefix" value="ItemLocationData|"/>
+		<property name="locationPrefix" value="LocationData|"/>
+		<property name="future" value="false"/>
+	</bean>
+
+	<bean id="exportOmsInventoryLocationsPipelineInitApp" class="de.hybris.platform.acceleratorservices.dataexport.generic.config.PipelineConfig" scope="tenant">
+		<property name="query" ref="exportOmsInventoryQuery"/>
+		<property name="itemConverter" ref="initAppExportOmsInventoryLocationsConverter"/>
+		<property name="outputConverter" ref="exportConvertObjectsToCSV"/>
+		<!-- Example file name: code-timestamp.tsv -->
+		<property name="filename" value="headers.event.code + '-' + headers.timestamp + '.tsv'"/>
+	</bean>
+</beans>

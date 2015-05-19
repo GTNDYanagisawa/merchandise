@@ -1,0 +1,35 @@
+# ImpEx for Points of Service
+#% impex.setLocale( Locale.GERMAN );
+
+# Macros / Replacement Parameter definitions
+$storeUid=telco
+$productCatalog=telcoProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$storeImage=storeImage(qualifier, $catalogVersion)
+$standardHours=telco-us-standard-hours
+
+INSERT_UPDATE OpeningSchedule;code[unique=true];
+;$standardHours;
+
+INSERT_UPDATE WeekdayOpeningDay;openingSchedule(code)[unique=true];dayOfWeek(code)[unique=true];openingTime[dateformat=hh:mm];closingTime[dateformat=hh:mm];
+;$standardHours;MONDAY   ; 10:00; 21:00
+;$standardHours;TUESDAY  ; 10:00; 21:00
+;$standardHours;WEDNESDAY; 10:00; 21:00
+;$standardHours;THURSDAY ; 10:00; 21:00
+;$standardHours;FRIDAY   ; 10:00; 21:00
+;$standardHours;SATURDAY ; 10:00; 19:00
+
+INSERT_UPDATE PointOfService;name[unique=true];type(code);address(&addrID);$storeImage;openingSchedule(code);latitude;longitude;geocodeTimestamp[dateformat=dd-MM-yyyy];basestore(uid)[default=$storeUid];features(code)
+;Hybris Telco - Chicago Premium Outlets;STORE;addr01;telco_store_01;$standardHours;41,8013;-88,27789;21-05-2013
+;Hybris Telco - Chrysler Building;STORE;addr02;telco_store_01;$standardHours;40,75147;-73,97528;21-05-2013
+;Hybris Telco - San Francisco Center;STORE;addr03;telco_store_01;$standardHours;37,78395;-122,40716;21-05-2013
+;Hybris Telco - Seattle Premium Outlets;STORE;addr04;telco_store_01;$standardHours;48,09679;-122,19137;21-05-2013
+;Hybris Telco - Riverwalk Marketplace;STORE;addr05;telco_store_01;$standardHours;29,94818;-90,06486;21-05-2013
+
+
+INSERT_UPDATE Address;&addrID;streetname;streetnumber;postalcode[unique=true];town[unique=true];country(isocode);region(isocode);phone1;owner(PointOfService.name)[unique=true]
+;addr01;Premium Outlets Blvd.                         ;1650;60504;Aurora;US;;630.585.9566;Hybris Telco - Chicago Premium Outlets
+;addr02;East 42nd Street                              ;139;10017;New York;US;;212.661.0208;Hybris Telco - Chrysler Building
+;addr03;Market Street                                 ;865;94103;San Francisco;US;;949.347.8392;Hybris Telco - San Francisco Center
+;addr04;Quil-Ceda Blvd.                               ;10600;98271;Tulalip;US;;360.657.2690;Hybris Telco - Seattle Premium Outlets
+;addr05;Poydras Street                                ;1;70130;New Orleans;US;;504.525.9052;Hybris Telco - Riverwalk Marketplace

@@ -1,0 +1,523 @@
+/*
+	Script           :	1013
+	Description      :	Script library
+*/
+
+
+/*********************************************************************
+*********************************************************************/
+int saveTOCInfo (char * stringid, ItemRef frame)
+{
+	char * buffer = alloc (gBufferSize);
+	int err = 0;
+	Query qu = sql::query (soap::connection());
+
+	if(qu)
+	{
+		gTOCPage = page::get (frame) + 1;
+		if (gFirst) gTOCPage = 2;
+		
+		if(query::set_method (qu, "GET_attribute") == 0)
+		{
+			if(	query::send (qu, "qualifier = tocStyle\n") &&
+				query::send (qu, "id = ?\n") &&
+				query::input (qu, kString, stringid)) && 
+				query::output (qu, kString, buffer, gBufferSize))
+			{
+				if(query::exec (qu))
+				{
+					query::fetch (qu);
+
+					strcpy (gTOCStringID, stringid);	// keep this
+					strcpy (gTOCStyle, buffer);			// keep this
+					wlog ("", "tocPage = %d tocStyle = %s\n", gTOCPage, gTOCStyle);
+				}
+				else
+				{
+					wlog("", "There was a query::exec error in 1013.crpt, method saveTOCInfo(). \n");
+					err = 1;
+				}
+			}
+			else
+			{
+				wlog("", "There was a query send/input/output error in 1013.crpt, method saveTOCInfo(). \n");
+				err = 2;
+			}
+		}
+		else
+		{
+			wlog("", "There was a query::set_method error in 1013.crpt, method saveTOCInfo(). \n");
+			err = 3;
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful! error in method saveTOCInfo() in 1013.crpt. \n");
+		err = 4;
+	}
+
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in script 1013.crpt, method saveTOCInfo(). \n");
+	}
+
+	// Cleanup
+	release( buffer );
+	return err;
+}
+
+/*********************************************************************
+ Creates a page, a text frame in it and a table of contents in that new frame.
+*********************************************************************/
+int createTOC ()
+{
+	ItemRef tmpFrame = item::alloc();
+	ItemRef tmpFrame2 = item::alloc();
+	char * buffer = alloc (gBufferSize);
+	int err;
+
+	if (gTOCPage == 0)
+	{
+		wlog ("", "No TOC data found.");
+	}
+	else
+	{
+		wlog ("", "Now create TOC on page %d with style %s.\n", gTOCPage, gTOCStyle);
+
+		if (gTOCPage > document::pages())
+			page::create (1,-1,gMasterPage);
+		else
+			page::create (1,gTOCPage,gMasterPage);
+
+		err = frame::create2 (tmpFrame,kRectangle,mm2pt(19.),mm2pt(27.),mm2pt(191.),mm2pt(37.),gTOCPage,"en.GB");
+		if( err != 0 )
+		{
+			wlog ("", "Error while createing frame: %d, %s \n", err, serror(err) );
+      }
+
+		sprintf (buffer, "%%!TT<ParaStyle:TocHeading>");
+		addLink (buffer, 79, 1, 0, 0, gTOCStringID);
+		frame::replace (tmpFrame, buffer);
+
+		err = frame::create2 (tmpFrame,kRectangle,mm2pt(19.),mm2pt(37.),mm2pt(191.),mm2pt(258.),gTOCPage,"en.GB");
+		if( err != 0 )
+		{
+			wlog ("", "Error while createing frame: %d, %s \n", err, serror(err) );
+      }
+
+		document::table_of_content (tmpFrame,gTOCStyle,0);
+
+		// if TOC frame has overset make new pages
+		wlog ("","before makePages for Table of contents");
+		makePages (&tmpFrame, tmpFrame2);
+
+		wlog ("", "Ready with TOC.\n");
+   }
+
+	// Cleanup
+	release( buffer );
+	item::release( tmpFrame );
+	item::release( tmpFrame2 );
+
+	return 0;
+}
+
+/*********************************************************************
+ Creates/defines a placeholder and fills it with a dummy text
+*********************************************************************/
+int addLink (char * buffer, int linkid, int id, int id2, int id3, char * stringid)
+{
+	char * tmp = alloc (512);
+
+	sprintf (tmp, "<w2: %d, %d, %d, %d, '", linkid, id, id2, id3);
+	strcat (tmp, stringid);
+	strcat (tmp, "'>dummy</w2>");
+	wlog ("", "addLink: %s\n", tmp);
+
+	strcat (buffer, tmp);
+
+	// Cleanup
+	release( tmp );
+	return 0;
+}
+
+
+/*********************************************************************
+ Dispatches the build process for text/image/table blocks
+*********************************************************************/
+int buildContents (ItemRef frame, int startPos, int id1, int id2, int id3, char * stringid)
+{
+	if (id1 == 1) // Text block
+		insertTextBlock (frame, -1, id1, id2, id3, stringid);
+
+	else if (id1 == 2) // Image block
+		insertImageBlock (frame, -1, id1, id2, id3, stringid);
+
+	else if (id1 == 3) // Table block
+		insertTableBlock (frame, -1, id1, id2, id3, stringid);
+
+	else // for testing
+//		showmessage ("wrong node: id=%d id2=%d id3=%d sid=%s", id1, id2, id3, stringid);
+
+	return 0;
+}
+
+
+/*********************************************************************
+ Inserts a text in a frame and surrounds it with a placeholder (id=50)
+*********************************************************************/
+int insertTextBlock (ItemRef frame, int startPos, int id1, int id2, int id3, char * stringid)
+{
+	char * buffer = alloc (gBufferSize);
+
+	sprintf (buffer, "%%!TT<ParaStyle:%s>", gTextStyle);
+	addLink (buffer, 262, id1, id2, id3, stringid);
+	strcat (buffer, "<nl>");
+
+	frame::insert (frame, buffer, startPos, 1);
+
+	// Cleanup
+	release( buffer );
+	return 0;
+}
+
+
+/*********************************************************************
+ Inserts a table in a frame
+*********************************************************************/
+int insertTableBlock (ItemRef frame, int startPos, int id1, int id2, int id3, char * stringid)
+{
+	char * buffer = alloc (gBufferSize);
+	// comment start here if using placeholder 80
+	Query qu = sql::query (soap::connection());
+	char * layer = alloc (100);
+	int err = 0;
+
+	if(qu)
+	{
+		strcpy (layer, "en.GB");
+
+		if(	query::set_method (qu, "GET_attribute") &&
+			query::send (qu, "qualifier = TableBlock.text\n") &&
+			query::send (qu, "id = ?\n") &&
+			query::send (qu, "language = ?\n") &&
+			query::input (qu, kString, stringid) &&
+			query::input (qu, kString, layer) &&
+			query::output (qu, kString, buffer, gBufferSize))
+		{
+			if(query::exec (qu))
+			{
+				query::fetch (qu);
+
+				wlog ("", "insertTableBlock: stringID = %s \n result = %s\n", stringid, buffer);
+				err = frame::insert (frame, buffer, startPos, 0);
+				if( err != 0 )
+				{
+					wlog("", "Error while insert table block text: %d, %s \n", err, serror(err) );
+				}
+			
+			}
+			else
+			{
+				wlog("", "There was a query::exec error in 1013.crpt, method insertTableBlock(). \n");
+				err = 1;
+			}
+		}
+		else
+		{
+			wlog("", "There was a query::set_method error in 1013.crpt, method insertTableBlock(). \n");
+			err = 2;
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful! error in method insertTableBlock() in 1013.crpt. \n");
+		err = 4;
+	}
+
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in script 1013.crpt, method insertTableBlock(). \n");
+	}
+	
+/* //this could be used if placeholder load might give table
+	sprintf (buffer, "%%!TT<ParaStyle:%s>", gTableStyle);
+	addLink (buffer, 280, id1, id2, id3, stringid);
+	strcat (buffer, "<nl>");
+	frame::insert (frame, buffer, startPos, 1);
+*/
+
+	// Cleanup
+	release( buffer );
+	release( layer );
+	return err;
+}
+
+/*********************************************************************
+ Inserts an image by using an inline frame
+*********************************************************************/
+int insertImageBlock (ItemRef frame, int startPos, int id1, int id2, int id3, char * stringid)
+{
+	char * buffer = alloc (gBufferSize);
+
+	sprintf (buffer, "%%!TT<ParaStyle:%s>", gImageStyle);
+//	addPageItemInline (buffer, gImagePageItem, id1, id2, id3, stringid);
+//	if (id2 == 1 || id2 == 2) {
+		addPageItemInline (buffer, itoa(id2), id1, id2, id3, stringid);
+		wlog("", "addPageItemInline ([buf], %d...)\n", id2);
+//	} else {
+//		addPageItemInline (buffer, itoa(1), id1, id2, id3, stringid);
+//		wlog("", "ERROR: addPageItemInline ([buf], %d...) -> default to 1\n", id2);	
+//	}
+//	addPageItemInline (buffer, itoa(1), id1, id2, id3, stringid);
+	strcat (buffer, "<nl>");
+
+	frame::insert (frame, buffer, startPos, 0);
+
+	// Cleanup
+	release( buffer );
+	return 0;
+}
+
+
+/*********************************************************************
+ Creates an inline frame
+*********************************************************************/
+int addPageItemInline (char * buffer, char * pageitemid, int id, int id2, int id3, char * stringid)
+{
+	char * tmp = alloc (512);
+
+	sprintf (tmp, "<in: 30., 30., 0, %d, %d, %d, '", id, id2, id3);
+	strcat (tmp, stringid);
+	strcat (tmp, "', attribute data, table pageitems, ID ");
+	strcat (tmp, pageitemid);
+	strcat (tmp, ", classID 3></in>");
+	wlog ("", "addPageItemInline: %s\n", tmp);
+
+	strcat (buffer, tmp);
+
+	// Cleanup
+	release( tmp );
+	return 0;
+}
+
+
+/*********************************************************************
+Creates Pages as long as the content of the masterFrame is overset.
+Each new page gets a new frame that is linked with the masterFrame
+(so the content of the masterFrame flows into the new frames too)
+masterFrame = The exiting frame that contains possibly overset content
+newFrame = An item reference that contains the last created frame 
+           (if additional pages have to be created)
+*********************************************************************/
+int makePages (ItemRef * masterFrame, ItemRef newFrame)
+{
+	int result = 0;
+	int numPages = 1, page = 0;
+	float left=0., top=0., right=0., bottom=0.;
+	int cols = 0;
+	char * layer = alloc (100);
+
+	wlog ("", "started makepages with overset = %d\n", frame::overset(*masterFrame));
+	
+	if( frame::overset(*masterFrame) == 0 )
+	{
+		wlog ("", "makePages does not do anything.\n");
+		result = 1;
+	}
+	else
+	{
+		page = page::get(*masterFrame)+1;
+		wlog("", "page::get makePages (page %d)\n", page);
+		frame::bbox (*masterFrame, &left, &top, &right, &bottom);
+		wlog("", "frame::bbox makePages (%.1f, %.1f, %.1f, %.1f)\n", pt2mm(left), pt2mm(top), pt2mm(right), pt2mm(bottom));
+		cols = frame::count_columns (*masterFrame);
+		wlog("", "frame::count_columns makePages (%d)\n", cols);
+		//strcpy (layer, layer::get_name (masterFrame));
+		strcpy (layer, "en.GB");
+
+		while (frame::overset(*masterFrame) > 0 && numPages <= gMaxNumPages)
+		{
+			wlog ("", "makePages numpages: %d page: %d\n", numPages, page);
+			if (page < document::pages()) // frame is not on last page
+				page::create (1, page, gMasterPage, 0., 0., 0., 0., 1);
+			else
+				page::create (1, -1, gMasterPage, 0., 0., 0., 0., 1);
+
+			frame::create2 (newFrame, kRectangle, left, top, right, bottom, page, layer, cols);
+
+			frame::link (*masterFrame,newFrame);
+
+			item::release (*masterFrame);
+
+			// 27.06.2007 tr (d'après Paul Seidel)
+//			masterFrame = newFrame;
+			*masterFrame = item::alloc(newFrame);
+//			newFrame = item::alloc ();
+			
+			page++;
+			numPages++;
+		}
+   }
+
+	// Cleanup
+	release( layer );
+
+	return result;
+}
+
+
+/*********************************************************************
+Creates a new Page after the page, the given masterFrame is placed on.
+Creates a new frame containing <style> cols on this new page
+and returns its reference in newFrame.
+masterFrame = The existing frame that shall be extended with a new frame
+newFrame = An item reference that contains the new created frame
+style = the amount of columns of the new frame
+*********************************************************************/
+int startNewChain (ItemRef masterFrame, ItemRef newFrame, int style)
+{
+	int	numPages = 1, page = 0;
+	float	left=0., top=0., right=0., bottom=0.;
+	int	cols = 0;
+	char	*layer = alloc (100);
+
+	wlog("", "BEGIN startNewChain (style %d)\n", style);
+	wlog("", "masterFrame %d, newFrame %d\n", item::defined(masterFrame), item::defined(newFrame));
+	//showmessage ("1");
+	frame::bbox (masterFrame, &left, &top, &right, &bottom);
+	//showmessage ("2");
+	wlog("", "frame::bbox startNewChain (%.1f, %.1f, %.1f, %.1f)\n", pt2mm(left), pt2mm(top), pt2mm(right), pt2mm(bottom));
+	//showmessage ("3");
+	page = page::get(masterFrame)+1;
+	wlog("", "page::get startNewChain (page %d)\n", page);
+	if (style == 1 || style == 2) {
+		wlog("", "style 1 or 2 startNewChain (cols %d)\n", cols);
+		cols = style;
+	} else {
+		cols = 1;
+		wlog("", "style not 1 or 2 startNewChain (cols %d)\n", cols);
+	}
+	//strcpy (layer, layer::get_name (masterFrame));
+	strcpy (layer, "en.GB");
+
+	wlog ("", "startNewChain make new page %d (doc pages now = %d))\n", page, document::pages());
+
+	if (page < document::pages()) // frame is not on last page
+		page::create (1, page, gMasterPage, 0., 0., 0., 0., 1);
+	else
+		page::create (1, -1, gMasterPage, 0., 0., 0., 0., 1);
+
+	wlog ("", "startNewChain make new frame %f %f\n", pt2mm(left), pt2mm(top));
+	frame::create2 (newFrame, kRectangle, left, top, right, bottom, page, layer, cols);
+
+	// Cleanup
+	release( layer );
+	return 0;
+}
+
+/*********************************************************************
+*********************************************************************/
+int linkFirstPageFrames (int id1, int id2, int id3, char * stringid)
+{
+	int	plid = 0;
+	ItemRef	frame = item::alloc();
+	ItemList frames	= 0;
+	int len = 0, i = 0;
+
+	frames=itemlist::pageframes (1); // all frames on first page
+	len = itemlist::length(frames);
+	if (len < 1)
+	{
+		wlog ("", "No frames founs on first page.\n");
+	}
+	else
+	{
+		while (i < len)
+		{
+			itemlist::get(frames,frame,i++);
+	
+			plid = placeholder::get_value(frame,"Placeholder");
+			wlog ("", "linkFirstPageFrames found frame with plid = %d\n", plid);
+			if (plid > 0)
+				placeholder::define (frame, plid, id1, id2, id3, stringid); // frame placeholder
+			placeholder::link (frame, 3, id1, id2, id3, 0, kEnd, stringid); // link text placeholder inside frame
+			placeholder::load (frame, 3); // load all placeholder
+		}
+   }
+
+	// Cleanup
+	itemlist::release( frames );
+	item::release( frame );
+
+	return 0;
+}
+
+/*********************************************************************
+Checks wether the two given master page layout names differ or not
+(this is the case if the layout has changed).
+Returns 1 if the names differ.
+*********************************************************************/
+int masterpageHasChanged( char * previousMasterpage, char * currentMasterpage )
+{
+	wlog ("", "Comparing previousMasterpage [%s], currentMasterpage[%s]\n", previousMasterpage, currentMasterpage);
+	if( strcmp(previousMasterpage, currentMasterpage) == 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
+/*********************************************************************
+Writes debug information to the single frame of a document
+message - could contain variable markers like %d, %f, %c, %s
+id		- will be filled into the markers in the order of the function signature
+id2
+id3
+stringid
+name
+description
+*********************************************************************/
+int debugToFrame( char * message )
+{
+	int result = 1;
+	int	frameCount = 0;
+	char * buffer;
+
+ 	ItemRef	frame = item::alloc();
+	ItemList frames	= itemlist::alloc ();
+
+	wlog( "", "Debug to Frame... \n" );
+
+	if (!frame) return 0;
+
+	frames = itemlist::allframes();
+	frameCount = itemlist::length( frames );
+
+ 	// check if there is only one frame in the document
+	if( frameCount != 1 )
+	{
+		showmessage ( "There should be at least one and exactly one text frame in this document!" );
+		result = 0;
+	}
+	else
+	{
+		// get single frame
+		itemlist::get( frames, frame, 0 );
+	
+		// Write to the single frame
+		buffer = alloc( 100005 );		// +5 because of the following '%%!TT'
+		sprintf( buffer, "%%!TT%s", message );
+		frame::append( frame, buffer, 1 );
+   }
+
+	// Cleanup
+	release( buffer );
+	itemlist::release( frames );
+	item::release( frame );
+
+	return result;
+}

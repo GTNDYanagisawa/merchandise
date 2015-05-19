@@ -1,0 +1,850 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:noNamespaceSchemaLocation="items.xsd">
+ 
+	<collectiontypes>
+		<collectiontype elementtype="BTGRuleType" code="BTGRuleTypeCollection" autocreate="true"/>
+		<collectiontype elementtype="ComposedType" code="BTGOperandTypeCollection" autocreate="true"/>		
+	</collectiontypes>
+ 
+	<enumtypes>
+	      <enumtype code="BTGConditionEvaluationScope" autocreate="true" generate="true" dynamic="true">
+	      	<value code="ONLINE"/>
+	      	<value code="OFFLINE"/>
+	      </enumtype>
+	      <enumtype code="BTGUserAddressOperandMode" autocreate="true" generate="true">
+	      	<value code="PAYMENTADDRESS"/>
+	      	<value code="SHIPPINGADDRESS"/>
+	      </enumtype>
+	      <enumtype code="BTGEvaluationMethod" generate="true" autocreate="true" dynamic="true">
+	      	<value code="FULL"/>
+	      	<value code="OPTIMIZED"/>
+	      </enumtype>
+	      <enumtype code="BTGRuleType" autocreate="true" generate="true" dynamic="true">
+	      	<value code="ORDER"/>
+	      	<value code="CART"/>
+	      	<value code="USER"/>
+	      	<value code="SCRIPT"/>
+	      	<value code="WCMS"/>	      	
+	      </enumtype>
+	      <enumtype code="BTGResultScope" generate="true" autocreate="true" dynamic="true">
+	      	<value code="SESSION"/>
+	      	<value code="PERMANENT"/>
+	      </enumtype>
+
+	</enumtypes>
+
+ 	<maptypes>
+ 		<maptype argumenttype="BTGRuleType" returntype="BTGOperandTypeCollection" code="BTGOperandMapping" autocreate="true"/>
+ 	</maptypes>
+ 	
+	<relations>
+		<relation code="BTGSegmentToCMSSite" autocreate="true" generate="true" localized="false">
+		<deployment table="Segment2Site" typecode="2411"/>
+			<sourceElement qualifier="segments" type="BTGSegment" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+			</sourceElement>
+			<targetElement qualifier="sites" type="CMSSite" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</targetElement>
+		</relation>
+		<relation code="BTGSegmentToBTGRulesRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="segment" type="BTGSegment" cardinality="one" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="rules" type="BTGRule" cardinality="many" ordered="true">
+				<modifiers read="true" write="true" search="true" optional="true"  partof="true"/>
+			</targetElement>
+		</relation>
+		<relation code="BTGSegmentToAbstractActionsRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="segment" type="BTGSegment" cardinality="one" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</sourceElement>
+			<targetElement qualifier="outputActions" type="AbstractAction" cardinality="many" ordered="true">
+				<modifiers read="true" write="true" search="true" optional="true"  partof="true"/>
+			</targetElement>
+		</relation>
+		<relation code="BTGSegmentBTGSegmentResultRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="segment" type="BTGSegment" cardinality="one" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="false"/>
+			</sourceElement>
+			<targetElement qualifier="results" type="BTGSegmentResult" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true"  partof="true"/>
+			</targetElement>
+		</relation>
+		<relation code="UserBTGSegmentResultRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="user" type="User" cardinality="one" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</sourceElement>
+			<targetElement qualifier="segmentResults" type="BTGSegmentResult" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true"  partof="true"/>
+			</targetElement>
+		</relation>
+		<relation code="BTGRuleToBTGConditionsRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="rule" type="BTGRule" cardinality="one" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="conditions" type="BTGCondition" cardinality="many" ordered="true">
+				<modifiers read="true" write="true" search="true" optional="true"  partof="true"/>
+			</targetElement>
+		</relation>
+		<relation code="BTGConditionBTGConditionResultRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="condition" type="BTGCondition" cardinality="one" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="false"/>
+			</sourceElement>
+			<targetElement qualifier="results" type="BTGConditionResult" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true"  partof="true"/>
+			</targetElement>
+		</relation>
+		<relation code="UserBTGConditionResultRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="user" type="User" cardinality="one" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</sourceElement>
+			<targetElement qualifier="conditionResults" type="BTGConditionResult" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true"  partof="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="BTGRuleBTGRuleResultRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="rule" type="BTGRule" cardinality="one" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="false"/>
+			</sourceElement>
+			<targetElement qualifier="results" type="BTGRuleResult" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true"  partof="true"/>
+			</targetElement>
+		</relation>
+		<relation code="UserBTGRuleResultRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="user" type="User" cardinality="one" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</sourceElement>
+			<targetElement qualifier="ruleResults" type="BTGRuleResult" cardinality="many" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+		<relation generate="true" localized="false" code="BTGAssignToGroupDefinitionGroup" autocreate="true">
+			<deployment table="assignGrActionGrRel" typecode="2412"/>
+			<sourceElement type="BTGAssignToGroupDefinition" qualifier="BTGAssignToGroup" cardinality="many" >
+				<modifiers read="true" write="true" search="true" optional="true"/>
+			</sourceElement>
+			<targetElement type="UserGroup" qualifier="userGroups" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="false"/>
+			</targetElement>
+		</relation>
+		
+		<relation generate="true" localized="false" code="BTGReferenceOperandToContentPages" autocreate="true">
+			<deployment table="btgRefOpToPages" typecode="2413"/>
+			<sourceElement type="BTGReferenceContentpagesOperand" cardinality="many" navigable="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="ContentPage" qualifier="contentpages" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</targetElement>
+		</relation>
+		
+		<relation generate="true" localized="false" code="BTGReferenceOperandToProducts" autocreate="true">
+			<deployment table="btgRefOpToProducts" typecode="2414"/>
+			<sourceElement type="BTGReferenceProductsOperand" cardinality="many" navigable="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="Product" qualifier="products" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</targetElement>
+		</relation>
+		
+		<relation generate="true" localized="false" code="BTGReferenceOperandToCategories" autocreate="true">
+			<deployment table="btgRefOpToCategories" typecode="2415"/>
+			<sourceElement type="BTGReferenceCategoriesOperand" cardinality="many" navigable="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="Category" qualifier="categories" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</targetElement>
+		</relation>		
+		
+		<relation generate="true" localized="false" code="BTGReferenceOperandToCountries" autocreate="true">
+			<deployment table="btgRefOpToCountries" typecode="2416"/>
+			<sourceElement type="BTGReferenceCountriesOperand" cardinality="many" navigable="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="Country" qualifier="countries" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</targetElement>
+		</relation>
+		
+		<relation generate="true" localized="false" code="BTGReferenceOperandToPrincipalGroups" autocreate="true">
+			<deployment table="btgRefOpToPrincGroups" typecode="2417"/>
+			<sourceElement type="BTGReferencePrincipalGroupsOperand" cardinality="many" navigable="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="PrincipalGroup" qualifier="groups" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="RestrictionActionDefinitionToSegmentRestriction" autocreate="true">
+			<sourceElement type="CmsRestrictionActionDefinition" cardinality="one" qualifier="outputActionDefinition">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement type="BtgSegmentRestriction" cardinality="many" qualifier="segmentRestrictions">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+			</targetElement> 
+		</relation>
+		
+	</relations>
+
+	<itemtypes>
+		<itemtype code="BTGItem" abstract="true" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGItem">
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"uid"</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="uid" generate="true" autocreate="true" type="java.lang.String">
+					<persistence type="property" />
+				  		<modifiers optional="false" unique="true" />
+				  	</attribute>
+				  	<attribute qualifier="catalogVersion" type="CatalogVersion">
+				  		<modifiers optional="false" unique="true"/>
+				  		<persistence type="property" />
+				  	</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGSegment" extends="BTGItem" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGSegment">
+			<deployment table="BTGSegments" typecode="2400"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="name">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="java.lang.Boolean" qualifier="active">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute type="BTGConditionEvaluationScope" qualifier="scope">
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="java.util.Date" qualifier="activeFrom">
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="java.util.Date" qualifier="activeTo">
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="BTGResultScope" qualifier="defaultResultScope">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+		            <defaultvalue>
+		            		em().getEnumerationValue("BTGResultScope","PERMANENT")
+		            </defaultvalue>					
+				</attribute>
+				
+				<attribute type="BTGEvaluationMethod" qualifier="defaultEvaluationMethod">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+		            <defaultvalue>
+		            		em().getEnumerationValue("BTGEvaluationMethod","OPTIMIZED")
+		            </defaultvalue>					
+				</attribute>
+				
+			</attributes>
+		</itemtype>
+
+		<!-- Generic Action Definition for BTG. Complies the action framework from servicelayer. Introduces fields for synchronization purposes  -->
+		<itemtype code="BTGOutputActionDefinition" extends="AbstractAction" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGOutputActionDefinition" abstract="true">
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"uid"</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="uid" generate="true" autocreate="true" type="java.lang.String">
+					<persistence type="property" />
+				  		<modifiers optional="false" unique="true" />
+				  	</attribute>
+				  	<attribute qualifier="catalogVersion" type="CatalogVersion">
+				  		<modifiers optional="false" unique="true" />
+				  		<persistence type="property" />
+				  	</attribute>
+				  	<attribute qualifier="type" type="ActionType" autocreate="true" generate="true" redeclare="true">
+		            <modifiers read="true" write="false" optional="false" initial="true"/>
+		            <persistence type="property"/>
+		            <defaultvalue>
+		            		em().getEnumerationValue("ActionType","PLAIN")
+		            </defaultvalue>
+		         </attribute>
+		    </attributes>
+		</itemtype>
+
+		<itemtype code="BTGAssignToGroupDefinition" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGAssignToGroupDefinition" extends="BTGOutputActionDefinition">
+			<attributes>
+					<attribute qualifier="target" type="java.lang.String" autocreate="true" generate="true" redeclare="true">
+		               <modifiers read="true" write="false" optional="false" initial="true"/>
+		               <persistence type="property"/>
+		               <defaultvalue>"assignToGroup"</defaultvalue>
+		         </attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="CmsRestrictionActionDefinition" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.CmsRestrictionActionDefinition" extends="BTGOutputActionDefinition">
+			<attributes>
+				<attribute qualifier="inverted" type="java.lang.Boolean" autocreate="true" generate="true">
+		               <modifiers read="true" write="true" optional="false" initial="true"/>
+		               <persistence type="property"/>
+		               <defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+		         </attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="BtgSegmentRestriction" jaloclass="de.hybris.platform.btg.jalo.restrictions.BtgSegmentRestriction"
+			extends="AbstractRestriction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="description" type="java.lang.String" redeclare="true">
+						<persistence type="dynamic"/>
+						<modifiers write="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<!--
+			BTGRule
+		 -->
+		<itemtype code="BTGRule" extends="BTGItem" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGRule">
+			<deployment table="BTGRules" typecode="2401"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="code">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<description>rule text</description>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="BTGRuleType" qualifier="ruleType">
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+	  		</attributes>
+  		</itemtype>
+
+
+		<itemtype code="BTGAbstractResult" autocreate="true" generate="true"  jaloclass="de.hybris.platform.btg.jalo.BTGAbstractResult" abstract="true">
+			<deployment table="BTGResult" typecode="2406"/>
+			<attributes>
+				<attribute type="boolean" qualifier="fulfilled">
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="boolean" qualifier="forced">
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="boolean" qualifier="invalidated">
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="BTGResultScope" qualifier="resultScope">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="sessionId">
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="sequence">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>		
+
+		<itemtype code="BTGSegmentResult" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGSegmentResult"  extends="BTGAbstractResult">
+			<indexes>
+				<index name="btgSegResIDX" unique="false">
+	         		<key attribute="user"/>
+	         		<key attribute="segment"/>
+	         		<key attribute="resultScope"/>
+	         	</index>
+         	</indexes>
+		</itemtype>
+
+		<itemtype code="BTGRuleResult" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGRuleResult" extends="BTGAbstractResult">
+			<indexes>
+				<index name="btgRulResIDX" unique="false">
+	         		<key attribute="user"/>
+	         		<key attribute="rule"/>
+	         		<key attribute="resultScope"/>
+	         		<key attribute="sessionId"/>
+	         	</index>
+         	</indexes>
+		</itemtype>
+
+		<!--
+			A BTGCondition holds a spring-beanId which must be resolvable to an instance of ConditionEvaluator.
+			Method of interest is ConditionEvaluator#evaluate(btgCondition): boolean.
+		 -->
+		<itemtype code="BTGCondition" extends="BTGItem" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGCondition">
+			<deployment table="BTGConditions" typecode="2402"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="beanId">
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="BTGConditionEvaluationScope" qualifier="evaluationScope">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGConditionResult" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGConditionResult"  extends="BTGAbstractResult">
+			<indexes>
+				<index name="btgConResIDX" unique="false">
+	         		<key attribute="user"/>
+	         		<key attribute="condition"/>
+	         		<key attribute="resultScope"/>
+	         	</index>
+         	</indexes>
+		</itemtype>
+
+		<!--
+			A BTGExpression is a special kind of a condition which works with two Operands and one Operator.
+		 -->
+		<itemtype code="BTGExpression" extends="BTGCondition" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGExpression">
+			<attributes>
+				<attribute type="BTGOperand" qualifier="leftOperand">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="BTGOperand" qualifier="rightOperand">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute type="BTGOperator" qualifier="operator">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<!--
+			An Operator belongs to a BTGExpression and specifies, how left and right operand are evaluated.
+		-->
+		<itemtype code="BTGOperator" extends="BTGItem" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGOperator">
+			<deployment table="BTGOperators" typecode="2403"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="code">
+					<persistence type="property"/><modifiers unique="true"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="description">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!--
+			An Operand belongs to a BTGExpression and provides the value for left and/or right side of the condition.
+			This definition is abstract.
+		-->
+		<itemtype code="BTGOperand" extends="BTGItem" autocreate="true" generate="true" abstract="true"  jaloclass="de.hybris.platform.btg.jalo.BTGOperand">
+			<deployment table="BTGOperands" typecode="2404"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="code">
+					<persistence type="property"/><modifiers unique="true"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="description">
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="BTGConditionEvaluationScope" qualifier="scope">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!--
+			A BTGGenericOperand may provide any value. Referenced bean id gets resolved by spring to a GenericOperand instance.
+		 -->
+		<itemtype code="BTGGenericOperand"  extends="BTGOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGGenericOperand">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="beanId">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<!-- SCRIPT RULES -->
+
+		<itemtype code="ScriptMedia" autocreate="true" generate="true" extends="Media" jaloclass="de.hybris.platform.btg.jalo.ScriptMedia">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="scriptLanguage">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGAbstractScriptOperand" extends="BTGGenericOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGAbstractScriptOperand">
+		</itemtype>
+
+		<itemtype code="BTGMediaScriptOperand" extends="BTGAbstractScriptOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGMediaScriptOperand">
+			<attributes>
+				<attribute type="ScriptMedia" qualifier="scriptMedia">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="boolean" qualifier="collection">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="java.lang.Class" qualifier="returnType">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+			</attributes>
+
+		</itemtype>
+
+		<itemtype code="BTGStringScriptOperand" extends="BTGAbstractScriptOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGStringScriptOperand">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="script">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="scriptLanguage">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="boolean" qualifier="collection">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="java.lang.Class" qualifier="returnType">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+			</attributes>
+
+		</itemtype>
+
+		<!-- SCRIPT RULES -->
+
+		<!--  ORDER RULES -->
+		<itemtype code="BTGAbstractOrderOperand" extends="BTGGenericOperand" autocreate="true" generate="true" abstract="true" jaloclass="de.hybris.platform.btg.jalo.BTGAbstractOrderOperand">
+		</itemtype>
+
+		<itemtype code="BTGLastOrdersOperand" extends="BTGAbstractOrderOperand" autocreate="true" generate="true" abstract="true" jaloclass="de.hybris.platform.btg.jalo.BTGLastOrdersOperand">
+			<attributes>
+				<attribute type="java.lang.Integer" qualifier="lastOrders">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGLastOrdersPriceOperand" extends="BTGLastOrdersOperand" autocreate="true" generate="true" abstract="true" jaloclass="de.hybris.platform.btg.jalo.BTGLastOrdersPriceOperand">
+			<attributes>
+				<attribute type="boolean" qualifier="net">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGNumberOfOrdersOperand" extends="BTGAbstractOrderOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGNumberOfOrdersOperand">
+			<attributes>
+				<attribute type="java.util.Date" qualifier="from">
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="java.util.Date" qualifier="to">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGNumberOfOrdersRelativeDateOperand" extends="BTGAbstractOrderOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGNumberOfOrdersRelativeDateOperand">
+			<attributes>
+				<attribute type="java.lang.Integer" qualifier="value">
+					<persistence type="property"/>
+				</attribute>			
+				<attribute type="IntervalResolution" qualifier="unit">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>			
+		</itemtype>
+
+		<itemtype code="BTGLastOrderDateOperand" extends="BTGAbstractOrderOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGNumberOfOrdersOperand">
+		</itemtype>
+
+
+		<itemtype code="BTGOrderTotalSumOperand" extends="BTGLastOrdersPriceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGOrderTotalSumOperand">
+		</itemtype>
+
+		<itemtype code="BTGEachOrderTotalSumOperand" extends="BTGLastOrdersPriceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGEachOrderTotalSumOperand">
+		</itemtype>
+
+		<itemtype code="BTGProductsInOrdersOperand" extends="BTGLastOrdersOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGProductsInOrdersOperand">
+		</itemtype>
+
+		<itemtype code="BTGCategoriesInOrdersOperand" extends="BTGLastOrdersOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGCategoriesInOrdersOperand">
+			<attributes>
+				<attribute type="java.lang.Boolean" qualifier="withSupercategories">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<!--  ORDER RULES END-->
+
+
+		<!--  CART RULES -->
+		<itemtype code="BTGAbstractCartOperand" extends="BTGGenericOperand" autocreate="true" generate="true" abstract="true" jaloclass="de.hybris.platform.btg.jalo.BTGAbstractCartOperand">
+		</itemtype>
+
+		<itemtype code="BTGCartTotalSumOperand" extends="BTGAbstractCartOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGCartTotalSumOperand">
+			<attributes>
+				<attribute type="boolean" qualifier="net">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGProductsInCartOperand" extends="BTGAbstractCartOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGProductsInCartOperand">
+		</itemtype>
+
+		<itemtype code="BTGCategoriesInCartOperand" extends="BTGAbstractCartOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGCategoriesInCartOperand">
+			<attributes>
+				<attribute type="java.lang.Boolean" qualifier="withSupercategories">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>			
+			</attributes>			
+		</itemtype>
+
+		<itemtype code="BTGQuantityOfProductInCartOperand" extends="BTGAbstractCartOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGQuantityOfProductInCartOperand">
+			<attributes>
+				<attribute type="Product" qualifier="product">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGCartIsEmptyOperand" extends="BTGAbstractCartOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGCartIsEmptyOperand">
+		</itemtype>
+		<!--  CART RULES END-->
+
+
+		<!-- CUSTOMER RULES -->
+
+		<itemtype code="BTGAbstractCustomerOperand" extends="BTGGenericOperand" autocreate="true" generate="true" abstract="true" jaloclass="de.hybris.platform.btg.jalo.BTGAbstractCustomerOperand">
+		</itemtype>
+		<itemtype code="BTGUserMemberOfGroupsOperand" extends="BTGAbstractCustomerOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGUserMemberOfGroupsOperand">
+		</itemtype>		
+		<itemtype code="BTGUserGenderOperand" extends="BTGAbstractCustomerOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGUserGenderOperand">
+		</itemtype>
+		<itemtype code="BTGUserAddressPostalCodeOperand" extends="BTGAbstractCustomerOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGUserAddressPostalCodeOperand">
+		</itemtype>
+		<itemtype code="BTGUserCountryOperand" extends="BTGAbstractCustomerOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGUserCountryOperand">
+		</itemtype>
+			
+		<!-- CUSTOMER RULES END-->
+
+		<!-- WCMS RULE -->
+		<itemtype code="BTGAbstractWCMSOperand" extends="BTGGenericOperand" autocreate="true" generate="true" abstract="true" jaloclass="de.hybris.platform.btg.jalo.BTGAbstractWCMSOperand" />
+		<itemtype code="BTGVisitedContentpagesOperand" extends="BTGAbstractWCMSOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGVisitedContentpagesOperand" />		
+		<itemtype code="BTGViewedProductsOperand" extends="BTGAbstractWCMSOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGViewedProductsOperand" />		
+		<itemtype code="BTGViewedCategoriesOperand" extends="BTGAbstractWCMSOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGViewedCategoriesOperand" />
+		<itemtype code="BTGReferalUrlOperand" extends="BTGAbstractWCMSOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGReferalUrlOperand" />
+		<itemtype code="BTGUrlParameterOperand" extends="BTGAbstractWCMSOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGUrlParameterOperand" />
+		
+		<!-- WCMS RULE END -->
+		
+		<!-- REFERENCE DATA OPERANDS -->
+		<itemtype code="BTGAbstractReferenceOperand" extends="BTGGenericOperand" autocreate="true" generate="true" abstract="true" jaloclass="de.hybris.platform.btg.jalo.BTGAbstractReferenceOperand">
+		</itemtype>
+
+		<itemtype code="BTGAbstractLiteralOperand" extends="BTGAbstractReferenceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGAbstractLiteralOperand">
+
+		</itemtype>
+
+
+		<itemtype code="BTGIntegerLiteralOperand" extends="BTGAbstractLiteralOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGIntegerLiteralOperand">
+			<attributes>
+				<attribute type="java.lang.Integer" qualifier="literal">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGDoubleLiteralOperand" extends="BTGAbstractLiteralOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGDoubleLiteralOperand">
+			<attributes>
+				<attribute type="java.lang.Double" qualifier="literal">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGStringLiteralOperand" extends="BTGAbstractLiteralOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGStringLiteralOperand">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="literal">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGBooleanLiteralOperand" extends="BTGAbstractLiteralOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGBooleanLiteralOperand">
+			<attributes>
+				<attribute type="java.lang.Boolean" qualifier="literal">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGGenderEnumLiteralOperand" extends="BTGAbstractLiteralOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGGenderEnumLiteralOperand">
+			<attributes>
+				<attribute type="Gender" qualifier="literal" >
+					<persistence type="property"/>
+					<modifiers optional="false" />
+				</attribute>
+			</attributes>				
+		</itemtype>
+
+		<itemtype code="BTGReferencePriceOperand" extends="BTGAbstractReferenceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGReferencePriceOperand">
+			<attributes>
+				<attribute type="java.lang.Double" qualifier="value">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="Currency" qualifier="currency">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGReferenceProductsOperand" extends="BTGAbstractReferenceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGReferenceProductsOperand">
+			<!--  see also relations section -->
+		</itemtype>
+
+		<itemtype code="BTGReferenceCategoriesOperand" extends="BTGAbstractReferenceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGReferenceCategoriesOperand">
+			<!--  see also relations section -->
+		</itemtype>
+
+		<itemtype code="BTGReferenceDateOperand" extends="BTGAbstractReferenceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGReferenceDateOperand">
+			<attributes>
+				<attribute type="java.lang.Integer" qualifier="value">
+					<persistence type="property"/>
+				</attribute>			
+				<attribute type="IntervalResolution" qualifier="unit">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="BTGReferenceExactDateOperand" extends="BTGAbstractReferenceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGReferenceExactDateOperand">
+			<attributes>
+				<attribute type="java.util.Date" qualifier="referenceDate">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>		
+		
+		<itemtype code="BTGReferenceContentpagesOperand" extends="BTGAbstractReferenceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGReferenceContentpagesOperand">
+			<!--  see also relations section -->			
+		</itemtype>
+
+		<itemtype code="BTGReferenceRegExpListOperand" extends="BTGAbstractReferenceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGReferenceRegExpListOperand">
+			<attributes>
+				<attribute type="StringCollection" qualifier="regularExpressions">
+					<persistence type="property"/>
+					<modifiers optional="false" dontOptimize="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGReferenceKeyValuePairListOperand" extends="BTGAbstractReferenceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGReferenceKeyValuePairListOperand">
+			<attributes>
+				<attribute type="StringCollection" qualifier="keyValuePairs">
+					<persistence type="property"/>
+					<modifiers optional="false" dontOptimize="true" />
+				</attribute>
+			</attributes>						
+		</itemtype>
+		
+		<itemtype code="BTGReferenceStringListOperand" extends="BTGAbstractReferenceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGReferenceStringListOperand">
+			<attributes>
+				<attribute type="StringCollection" qualifier="stringList">
+					<persistence type="property"/>
+					<modifiers optional="false" dontOptimize="true" />
+				</attribute>
+			</attributes>						
+		</itemtype>
+
+		<itemtype code="BTGReferenceCountriesOperand" extends="BTGAbstractReferenceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGReferenceCountriesOperand">
+			<!--  see also relations section -->
+		</itemtype>
+		
+		<itemtype code="BTGReferencePrincipalGroupsOperand" extends="BTGAbstractReferenceOperand" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGReferencePrincipalGroupsOperand">
+			<!--  see also relations section -->
+		</itemtype>
+
+		<!-- REFERENCE DATA OPERANDS END-->		
+		<itemtype code="BTGConfig" singleton="true" autocreate="true" generate="true" jaloclass="de.hybris.platform.btg.jalo.BTGConfig">
+			<deployment table="BTGConfigs" typecode="2407"/>		
+			<attributes>
+			  	<attribute qualifier="defaultCatalogVersion" type="CatalogVersion">
+			  		<persistence type="property" />
+			  	</attribute>
+				<attribute qualifier="defaultTimeUnit" type="IntervalResolution">
+			  		<modifiers optional="false" />				
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="usedRuleTypes" type="BTGRuleTypeCollection">
+			  		<modifiers optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="operandMapping" type="BTGOperandMapping">
+			  		<modifiers optional="false" dontOptimize="true" />
+					<persistence type="property"/>				
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

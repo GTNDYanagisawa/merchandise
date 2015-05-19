@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias alias="CatalogAbstractContentElementSectionListActionColumn" name="defaultCatalogAbstractContentElementSectionListActionColumn" />
+	<bean id="defaultCatalogAbstractContentElementSectionListActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="SynchronizationAction" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultObjectTemplates4ContentSlotFilter" alias="objectTemplates4ContentSlotFilter"/>
+	<bean id="defaultObjectTemplates4ContentSlotFilter" class="de.hybris.platform.cms2.services.meta.impl.ObjectTemplates4ContentSlotFilter" scope="tenant">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+	
+	<alias name="defaultObjectTemplates4PageFilter" alias="objectTemplates4PageFilter"/>
+	<bean id="defaultObjectTemplates4PageFilter" class="de.hybris.platform.cms2.services.meta.impl.ObjectTemplates4AbstractPageFilter" scope="tenant">
+		<property name="typeService" ref="typeService"/>
+		<property name="cmsAdminRestrictionService" ref="cmsAdminRestrictionService"/>
+	</bean>
+	
+	<bean id="cmscockpitLocalizationLabelLocator" class="de.hybris.platform.cockpit.util.ConfigurableCockpitLabelLocator" scope="singleton" lazy-init="false">
+		<property name="resourceFolder" value="/i3localization/"/>
+	</bean>
+	
+</beans>

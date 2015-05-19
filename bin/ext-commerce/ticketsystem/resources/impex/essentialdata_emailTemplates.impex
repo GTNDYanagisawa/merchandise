@@ -1,0 +1,107 @@
+$lang='en'
+
+INSERT_UPDATE CsTicketEventEmailConfiguration;code[unique=true];recipientType(code);alteredAttributes(qualifier,enclosingType(ComposedType.code));eventType(code);subject;plainTextTemplate(code);htmlTemplate(code);
+;1;Customer;;ticketCreationEvent;Ticket Created;TickSystem_Customer_TicketCreated_Text;TickSystem_Customer_TicketCreated_HTML;
+;2;Customer;;ticketResolutionEvent;Ticket Resolved;TickSystem_Customer_TicketResolved_Text;TickSystem_Customer_TicketResolved_HTML;
+;3;Customer;;customerEmail;${ctx.subject};TickSystem_Customer_CustomerEmail_Text;TickSystem_Customer_CustomerEmail_HTML;
+;4;AssignedAgent;assignedAgent:CsTicket;ticketChangeEvent;Ticket Assigned;TickSystem_AssignedAgent_Assigned_Text;TickSystem_AssignedAgent_Assigned_HTML;
+
+INSERT_UPDATE RendererTemplate;code[unique=true];contextClass;description[lang=$lang];rendererType(code)[default='velocity'];templateScript[lang=$lang];
+
+###################################################################################################
+##
+## Email sent to customer when a new ticket is created
+##
+;TickSystem_Customer_TicketCreated_Text;de.hybris.platform.ticket.email.context.AbstractTicketContext;Ticket System Ticket Created Customer Plain Text Email;;"
+Dear ${ctx.name},
+
+A new ticket has been created with reference ${ctx.ticketId}.
+
+Please quote this reference in all emails and communications with.
+
+Thank you.
+";
+;TickSystem_Customer_TicketCreated_HTML;de.hybris.platform.ticket.email.context.AbstractTicketContext;Ticket System Ticket Created Customer HTML Email;;"
+<html>
+	<head></head>
+	<body>
+		<div>
+			<p>Dear ${ctx.name},</p>
+			<p>A new ticket has been created with reference ${ctx.ticketId}.</p>
+			<p>Please quote this reference in all emails and communications with.</p>
+			<p>Thank you</p>
+		</div>
+	</body>
+</html>
+";
+
+###################################################################################################
+##
+## Email sent to customer when a ticket is resolved
+##
+;TickSystem_Customer_TicketResolved_Text;de.hybris.platform.ticket.email.context.AbstractTicketContext;Ticket System Ticket Resolved Customer Plain Text Email;;"
+Dear ${ctx.name},
+
+Your ticket with reference ${ctx.ticketId} has been resolved with status ${ctx.event.resolutionType}.
+
+Thank you.
+";
+;TickSystem_Customer_TicketResolved_HTML;de.hybris.platform.ticket.email.context.AbstractTicketContext;Ticket System Ticket Resolved Customer HTML Email;;"
+<html>
+	<head></head>
+	<body>
+		<div>
+			<p>Dear ${ctx.name},</p>
+			<p>Your ticket with reference ${ctx.ticketId} has been resolved with status ${ctx.event.resolutionType}.</p>
+			<p>Thank you</p>
+		</div>
+	</body>
+</html>
+";
+
+###################################################################################################
+##
+## Email sent to customer when the CSR sends them an email
+##
+;TickSystem_Customer_CustomerEmail_Text;de.hybris.platform.ticket.email.context.AbstractTicketContext;Ticket System Customer Email Plain Text Email;;"
+Dear ${ctx.name},
+
+The following message referencing ticket ${ctx.ticketId} has been written:
+
+${ctx.text}
+";
+;TickSystem_Customer_CustomerEmail_HTML;de.hybris.platform.ticket.email.context.AbstractTicketContext;Ticket System Customer Email HTML Email;;"
+<html>
+	<head></head>
+	<body>
+		<div>
+			<p>Dear ${ctx.name},</p>
+			<p>The following message referencing ticket ${ctx.ticketId} has been written:</p>
+			<p>${ctx.htmlText}</p>
+		</div>
+	</body>
+</html>
+";
+
+
+###################################################################################################
+##
+## Email sent to assigned agent when the CSR reassigns a ticket
+##
+;TickSystem_AssignedAgent_Assigned_Text;de.hybris.platform.ticket.email.context.AbstractTicketContext;Ticket System Ticket Assigned Plain Text Email;;"
+Dear ${ctx.name},
+
+The following ticket has been assigned to you: ${ctx.ticketId}
+";
+;TickSystem_AssignedAgent_Assigned_HTML;de.hybris.platform.ticket.email.context.AbstractTicketContext;Ticket System Ticket Assigned HTML Email;;"
+<html>
+	<head></head>
+	<body>
+		<div>
+			<p>Dear ${ctx.name},</p>
+			<p>The following ticket has been assigned to you: ${ctx.ticketId}</p>
+		</div>
+	</body>
+</html>
+";
+

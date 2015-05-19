@@ -1,0 +1,39 @@
+"#% import de.hybris.platform.printsampledata.jalo.PrintsampledataManager";
+"#% impex.enableExternalImpExSyntaxParsing( true )";
+"#% impex.enableExternalDataCodeExecution( true )";
+"#% impex.setDumpingAllowed( false )";
+
+
+##############################################################################################################################
+### Import settings for the Print Sample data import
+
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/importparameters.csv""), ""utf-8"", 0, 0 );";
+
+$publicationID=electronics$publicationYear;
+
+
+##############################################################################################################################
+### Macros for the CometConfiguration import
+
+$pagePublication=Page.publication(code[default='$publicationID']);
+
+
+
+
+REMOVE Comment;code[unique=true];
+;print_comment1;
+;print_comment2;
+
+
+
+INSERT_UPDATE CommentGroup;code[unique=true];user(uid);name[lang=de];name[lang=en]; date[dateformat=dd.MM.yyyy hh:mm:ss];
+;print_commentgroup1;print_publisher; Kommentargruppe 1; comment group 1;23.08.2014 10:46:25
+
+INSERT Comment;code[unique=true];author(uid)[forceWrite=true];commentType(code)[forceWrite=true];component(code)[forceWrite=true];subject;text[forceWrite=true];relatedItems(Page.code, $pagePublication);commentGroup(code)
+;print_comment1;print_publisher;comment;cockpit;;<p>Verify media assigned to pages</p>;digitalcompacts,digitalslr;print_commentgroup1
+
+INSERT Comment;code[unique=true];author(uid)[forceWrite=true];commentType(code)[forceWrite=true];component(code)[forceWrite=true];subject;text[forceWrite=true];relatedItems(ItemPlacement.pagePos, ItemPlacement.page(code[default='digitalslr'], $pagePublication));commentGroup(code)
+;print_comment2;print_publisher;comment;cockpit;;<p>Verify placeholder content</p>;1,2;print_commentgroup1
+
+INSERT Reply;comment(code)[forceWrite=true];parent(&replyID);subject;text;author(uid);&replyID
+;print_comment1;;;<p>Media were assigned properly</p>;print_editor;print_comment1_reply1

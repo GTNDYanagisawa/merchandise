@@ -1,0 +1,15 @@
+#if($class=='')
+#set($text='<ParaStyle:'+$DefaultParastyleName+'>')
+#else
+#set($text='<ParaStyle:'+$class+'>')
+#end
+${utility.initializeParaStyle($node,$text)}
+#set($counter=0)
+#if($class=='')<ParaStyle:$DefaultParastyleName>
+#else<ParaStyle:$class>
+#end
+#foreach($child in $node.getChildNodes())
+#set($counter=$counter+1)$translator.renderTextFromNode($child)
+#end
+#if($counter==0)$node.nodeText
+#end

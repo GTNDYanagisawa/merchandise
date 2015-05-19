@@ -1,0 +1,20 @@
+$supportedPaymentModes=supportedPaymentModes(code)
+
+INSERT_UPDATE StandardPaymentMode;code[unique=true];name[lang=en];description[lang=en];active;paymentinfotype(code);
+;alipay;AliPay;Payment via alipay payment provider;true;AdvancePaymentInfo;
+;express;Express Alipay;Express payment via alipay payment provider;true;AdvancePaymentInfo;
+
+INSERT_UPDATE StandardPaymentModeValue;paymentmode(code)[unique=true];currency(isoCode)[unique=true];value;;;;
+;alipay;CNY;0;;;;
+;express;CNY;0;;;;
+
+INSERT_UPDATE StandardPaymentMode;code[unique=true];name[lang=zh];description[lang=zh];
+;alipay;支付宝;Payment via alipay payment provider;
+;express;快捷支付;Express payment via alipay payment provider;
+
+# Zone Delivery Modes
+UPDATE ZoneDeliveryMode;code[unique=true];$supportedPaymentModes
+;premium-gross;alipay;
+;premium-net;alipay;
+;standard-gross;alipay;
+;standard-net;alipay;

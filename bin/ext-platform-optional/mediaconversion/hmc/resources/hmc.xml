@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+               
+    <explorertree>
+    	<group name="medias" mode="append">
+    		<typeref type="ConversionGroup" description="typeref.conversiongroup.description" 
+    			position="3"/>
+    	</group>
+    </explorertree>
+
+
+	<!-- Configuration for extension mediaconversion -->
+
+    <type name="ConversionMediaFormat" mode="append">
+        <organizer>
+            <search mode="append">
+                <condition attribute="mimeType"/>
+            </search>
+            <result>
+                <listview mode="append">
+                    <itemlayout>
+                        <attribute name="mimeType" width="160"/>
+                    </itemlayout>
+                </listview>
+            </result>
+            <editor mode="append">
+                <tab name="tab.mediaformat.commons">
+                    <section name="tab.mediaformat.properties" mode="append">
+	                    <listlayout>
+	                        <attribute name="mimeType"/>
+	                        <attribute name="inputFormat"/>
+	                        <attribute name="conversionStrategy"/>
+                            <attribute name="conversion"/>
+                            <attribute name="mediaAddOns"/>
+	                    </listlayout>
+                    </section>
+                </tab>
+            </editor>
+        </organizer>
+    </type>
+    
+    <type name="Media" mode="append">
+        <organizer>
+            <editor mode="append">
+                <tab name="tab.media.metadata" mode="append">
+                    <section name="section.media.metadata" mode="append">
+                        <listlayout>
+                            <attribute name="metadata">
+                                <referencecollectioneditor editable="false">
+                                    <itemlayout>
+                                        <attribute name="groupName" width="100"/>
+                                        <attribute name="code" width="150"/>
+                                        <attribute name="value" width="250"/>
+                                    </itemlayout>
+                                </referencecollectioneditor>
+                             </attribute>
+                             <action
+                                      classname="de.hybris.platform.mediaconversion.hmc.DeleteMetaDataAction"
+                                      name="media.deletemetadataaction"
+                                      icon="images/icons/list_menu_remove.gif"
+                                      disabledicon="images/icons/list_menu_remove_inactive.gif"
+                                      type="item"
+                                   />
+                             <action
+                                      classname="de.hybris.platform.mediaconversion.hmc.ExtractMetaDataAction"
+                                      name="media.extractmetadataaction"
+                                      icon="images/icons/list_menu_clone.gif"
+                                      disabledicon="images/icons/list_menu_clone_inactive.gif"
+                                      type="item"
+                                   />
+                        </listlayout>
+                    </section>
+                </tab>
+                <tab name="administration" mode="append">
+                     <section name="section.media.conversion" position="2">
+                        <listlayout>
+                           <attribute name="metaDataDataPk"/>
+                           <attribute name="original">
+                           	<referenceeditor />
+                           </attribute>
+                           <attribute name="originalDataPk"/>
+                           <attribute name="convertedMedias"/>
+                        </listlayout>
+                     </section>
+               </tab>
+            </editor>
+        </organizer>
+    </type>
+    
+    <type name="ConversionGroup" icon="ext/mediaconversion/images/conversiongroup.gif">
+        <organizer>
+        	<search>
+            	<condition attribute="code" operator="contains"/>
+            	<condition attribute="name" operator="contains"/>
+        	</search>
+	        <result>
+	            <listview>
+	               <itemlayout>
+	                  <attribute name="code" width="250" position="1"/>
+	                  <attribute name="name" width="250" position="2"/>
+	               </itemlayout>
+	            </listview>
+	        </result>
+            <editor>
+                <essentials>
+	               <listlayout>
+	                  <attribute name="code"/>
+	               </listlayout>
+                </essentials>
+                <tab name="tab.conversiongroup.commons">
+                    <section name="section.conversiongroup.properties" mode="replace">
+                        <listlayout>
+                            <attribute name="name"/>
+                            <attribute name="supportedFormats">
+                                <referencecollectioneditor>
+                                    <itemlayout>
+                                        <attribute name="qualifier"/>
+                                        <attribute name="name"/>
+                                        <attribute name="mimetype"/>
+                                    </itemlayout>
+                                </referencecollectioneditor>
+                            </attribute>
+                        </listlayout>
+                    </section>
+                </tab>
+            </editor>
+       </organizer>
+    	<defaultreference>
+    		<itemlayout>
+    			<attribute name="name" fallback="code"/>
+    		</itemlayout>
+    	</defaultreference>
+    </type>
+    
+    <type name="MediaContainer" mode="append">
+        <organizer>
+            <editor mode="append">
+                <essentials mode="replace">
+	               <columnlayout>
+	                  <row>
+		                  <attribute name="qualifier"/>
+	                      <attribute name="catalogVersion"/>
+	                  </row>
+	                  <row>
+		                  <attribute name="conversionGroup">
+		                  	<referenceeditor autocomplete="true">
+							    <parameter key="searchattributes" value="code, name"/>
+							    <parameter key="resultattributes" value="code, name"/>
+							    <parameter key="range" value="10"/>
+							    <parameter key="condition" value="startswith"/>
+							</referenceeditor>
+		                  </attribute>
+	                      <attribute name="conversionStatus"/>
+	                  </row>
+	               </columnlayout>
+                </essentials>
+                <tab name="tab.mediacontainer.commons">
+                    <section name="tab.mediacontainer.properties" mode="replace">
+                        <listlayout>
+                            <attribute name="name"/>
+                            <attribute name="medias">
+                                <referencecollectioneditor resortable="true">
+                                    <itemlayout>
+                                    	<!-- 
+                                        <attribute name="url" title="title.image" width="50">
+                                           <display classname="de.hybris.platform.hmc.attribute.UrlAsImageDisplayChip">
+                                              <parameter key="height" value="30"/>
+                                           </display>
+                                        </attribute>
+                                         -->
+                                        <attribute name="code" />
+                                        <attribute name="catalogVersion"/>
+                                        <attribute name="mediaFormat"/>
+                                    </itemlayout>
+                                </referencecollectioneditor>
+                            </attribute>
+							<action
+							          classname="de.hybris.platform.mediaconversion.hmc.DeleteConvertedMediasAction"
+							          name="mediacontainer.deleteconvertedmediasaction"
+							          icon="images/icons/list_menu_remove.gif"
+							          disabledicon="images/icons/list_menu_remove_inactive.gif"
+							          type="item"
+							       />
+							<action
+							          classname="de.hybris.platform.mediaconversion.hmc.MediaConversionAction"
+							          name="mediacontainer.mediaconversionaction"
+                                      icon="images/icons/list_menu_clone.gif"
+                                      disabledicon="images/icons/list_menu_clone_inactive.gif"
+							          type="item"
+							       />
+                        </listlayout>
+                    </section>
+                    <section name="section.mediacontainer.conversionerrors" mode="replace">
+                        <listlayout>
+                            <attribute name="conversionErrorLog">
+                                <referencecollectioneditor resortable="true" editable="false">
+                                    <itemlayout>
+                                        <attribute name="creationtime"/>
+                                        <attribute name="targetFormat"/>
+                                        <attribute name="sourceMedia"/>
+                                    </itemlayout>
+                                </referencecollectioneditor>
+                            </attribute>
+                        </listlayout>
+                    </section>
+                </tab>
+                <tab name="tab.mediacontainer.master">
+                    <section name="section.mediacontainer.master">
+                        <listlayout>
+                            <attribute name="master"/>
+                        </listlayout>
+                    </section>
+                </tab>
+                <tab name="tab.mediacontainer.metadata" mode="append">
+                    <section name="section.mediacontainer.metadata" mode="append">
+                        <listlayout>
+                            <attribute name="metadata">
+                                <referencecollectioneditor editable="false">
+                                    <itemlayout>
+                                        <attribute name="groupName" width="100"/>
+                                        <attribute name="code" width="150"/>
+                                        <attribute name="value" width="250"/>
+                                    </itemlayout>
+                                </referencecollectioneditor>
+                             </attribute>
+                             <action
+                                      classname="de.hybris.platform.mediaconversion.hmc.DeleteMetaDataAction"
+                                      name="media.deletemetadataaction"
+                                      icon="images/icons/list_menu_remove.gif"
+                                      disabledicon="images/icons/list_menu_remove_inactive.gif"
+                                      type="item"
+                                   />
+                             <action
+                                      classname="de.hybris.platform.mediaconversion.hmc.ExtractMetaDataAction"
+                                      name="media.extractmetadataaction"
+                                      icon="images/icons/list_menu_clone.gif"
+                                      disabledicon="images/icons/list_menu_clone_inactive.gif"
+                                      type="item"
+                                   />
+                        </listlayout>
+                    </section>
+                </tab>
+            </editor>
+        </organizer>
+    </type>
+    
+    <type name="MediaMetaData" mode="append">
+        <organizer>
+        	<result mode="replace">
+        		<listview>
+        			<itemlayout>
+                         <attribute name="groupName" width="100"/>
+                         <attribute name="code" width="150"/>
+                         <attribute name="value" width="250"/>
+        			</itemlayout>
+        		</listview>
+        	</result>
+            <editor mode="append">
+            	<essentials>
+        			<listlayout>
+                         <attribute name="media">
+                            	<referenceeditor/>
+                         </attribute>
+                         <attribute name="groupName"/>
+                         <attribute name="code"/>
+                    </listlayout>
+            	</essentials>
+                <tab name="tab.mediametadata.common" mode="append">
+                    <section name="section.mediametadata.common" mode="replace">
+                        <listlayout>
+	                        <attribute name="value" width="400"/>
+                        </listlayout>
+                    </section>
+                </tab>
+            </editor>
+        </organizer>
+    </type>
+    
+    <type name="ConversionErrorLog" mode="append">
+        <organizer>
+        	<search mode="replace">
+            	<condition attribute="container" operator="equal"/>
+	            <condition attribute="targetFormat" operator="equal"/>
+	            <condition attribute="sourceMedia" operator="equal"/>
+	            <condition attribute="errorMessage" operator="contains"/>
+        	</search>
+        	<result mode="replace">
+        		<listview>
+        			<itemlayout>
+                         <attribute name="container" width="120"/>
+                         <attribute name="targetFormat" width="120"/>
+                         <attribute name="sourceMedia" width="120"/>
+        			</itemlayout>
+        		</listview>
+        	</result>
+            <editor mode="append">
+            	<essentials>
+        			<listlayout>
+                         <attribute name="container"/>
+                         <attribute name="targetFormat">
+                          	<referenceeditor/>
+                         </attribute>
+                    </listlayout>
+            	</essentials>
+                <tab name="tab.conversionerrorlog.common" mode="append">
+                    <section name="section.conversionerrorlog.common" mode="replace">
+                        <listlayout>
+                            <attribute name="sourceMedia">
+                            	<referenceeditor/>
+                            </attribute>
+                            <attribute name="errorMessage">
+                            	<textareaeditor rows="40" cols="120" wrap="false"/>
+                            </attribute>
+                        </listlayout>
+                    </section>
+                </tab>
+            </editor>
+        </organizer>
+    </type>
+    
+
+    <type name="AbstractMediaCronJob" mode="append">
+        <organizer>
+            <editor>
+                <tab name="tab.cronjob.common" mode="append">
+                    <section name="section.cronjob.common" mode="replace">
+                        <listlayout>
+                            <attribute name="maxThreads"/>
+                            <attribute name="catalogVersion"/>
+                        </listlayout>
+                    </section>
+                </tab>
+            </editor>
+        </organizer>
+    </type>
+    
+    <type name="MediaConversionCronJob" mode="append">
+        <organizer>
+            <editor>
+                <tab name="tab.cronjob.common" mode="append">
+                    <section name="section.cronjob.common" mode="replace">
+                        <listlayout>
+                            <attribute name="maxThreads"/>
+                            <attribute name="asynchronous"/>
+                            <attribute name="catalogVersion"/>
+                            <attribute name="includedFormats">
+                                <referencecollectioneditor editable="true" externalcreate="true" showsearcheditor="true">
+                                    <itemlayout>
+                                        <attribute name="qualifier" width="170"/>
+                                        <attribute name="name" width="170"/>                                        
+                                        <attribute name="mimeType" width="170"/>
+                                    </itemlayout>
+                                </referencecollectioneditor>
+                            </attribute>
+                        </listlayout>
+                    </section>
+                </tab>
+            </editor>
+        </organizer>
+    </type>
+    
+    <type name="ExtractMediaMetaDataCronJob" mode="append">
+        <organizer>
+            <editor>
+                <tab name="tab.cronjob.common" mode="append">
+                    <section name="section.cronjob.common" mode="append">
+                        <listlayout>
+                            <attribute name="includeConverted"/>
+                            <attribute name="containerMediasOnly"/>
+                        </listlayout>
+                    </section>
+                </tab>
+            </editor>
+        </organizer>
+    </type>
+
+</configuration>

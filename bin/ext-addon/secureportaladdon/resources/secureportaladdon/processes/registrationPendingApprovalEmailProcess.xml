@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+<process xmlns="http://www.hybris.de/xsd/processdefinition"
+        start="generateEmail"
+        name="b2bRegistrationPendingApprovalEmailProcess"
+        processClass="de.hybris.platform.secureportaladdon.model.B2BRegistrationProcessModel"
+        onError="error">
+
+    <action id="generateEmail" bean="b2bRegistrationPendingApprovalGenerateEmailAction">
+   		<transition name="OK" to="sendEmail"/>
+   		<transition name="NOK" to="error"/>
+   	</action>
+
+   	<action id="sendEmail" bean="sendEmail">
+   		<transition name="OK" to="removeSentEmail"/>
+   		<transition name="NOK" to="failed"/>
+   	</action>
+
+   	<action id="removeSentEmail" bean="removeSentEmail">
+   		<transition name="OK" to="success"/>
+   		<transition name="NOK" to="failed"/>
+   	</action>
+
+   	<end id="error" state="ERROR">An error occured during this process</end>
+   	<end id="failed" state="FAILED">Failed to send 'registration pending approval' email</end>
+   	<end id="success" state="SUCCEEDED">Sent 'registration pending approval' email(s)</end>
+
+</process>

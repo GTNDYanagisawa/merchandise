@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  [y] hybris Platform
+ 
+  Copyright (c) 2000-2014 hybris AG
+  All rights reserved.
+ 
+  This software is the confidential and proprietary information of hybris
+  ("Confidential Information"). You shall not disclose such Confidential
+  Information and shall use it only in accordance with the terms of the
+  license agreement you entered into with hybris.
+ 
+  
+--><beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans            http://www.springframework.org/schema/beans/spring-beans-3.1.xsd            http://www.springframework.org/schema/aop            http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<!-- Central connection manager -->
+	<alias alias="sapCoreConnectionManager" name="sapCoreDefaultConnectionManager"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.ConnectionManager" id="sapCoreDefaultConnectionManager" scope="singleton">
+	</bean>
+
+	<!-- Connection Factory -->
+	<alias alias="sapCoreConnectionFactory" name="sapCoreDefaultConnectionFactory"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.ConnectionFactory" id="sapCoreDefaultConnectionFactory" scope="prototype">
+		<property name="connectionManager" ref="sapCoreConnectionManager"/>
+		<property name="backendSession" ref="sapCoreBackendSession"/>
+	</bean>
+
+	<!-- Access to backend configuration -->
+	<alias alias="sapCoreBackendConfigManager" name="sapCoreDefaultBackendConfigManager"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.BackendConfigManager" id="sapCoreDefaultBackendConfigManager" scope="sapSession">
+		<property name="backendConnectionConfig" ref="sapCoreBackendConnectionConfig"/>
+	</bean>
+
+	<!-- Backend configuration -->
+	<alias alias="sapCoreBackendConnectionConfig" name="sapCoreDefaultBackendConnectionConfig"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.BackendConnectionConfig" id="sapCoreDefaultBackendConnectionConfig" scope="sapSession">
+		<constructor-arg>
+			<map>
+				<entry key="managedConnectionFactories" value-ref="sapCoreManagedConnectionFactoryConfigs"/>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<!-- Managed connection factory configurations -->
+	<alias alias="sapCoreManagedConnectionFactoryConfigs" name="sapCoreDefaultManagedConnectionFactoryConfigs"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.ManagedConnectionFactoryConfigs" id="sapCoreDefaultManagedConnectionFactoryConfigs" scope="sapSession">
+		<constructor-arg>
+			<map>
+				<entry key="JCo" value-ref="sapCoreManagedConnectionFactoryConfigJCo"/>
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<!-- Factory configuration for JCo -->
+	<alias alias="sapCoreManagedConnectionFactoryConfigJCo" name="sapCoreDefaultManagedConnectionFactoryConfigJCo"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.ManagedConnectionFactoryConfig" id="sapCoreDefaultManagedConnectionFactoryConfigJCo" scope="sapSession">
+		<constructor-arg>
+			<map>
+				<entry key="connectionFactory"     value-ref="sapCoreManagedConnectionFactoryJCo"/>
+				<entry key="connectionDefinitions" value-ref="sapCoreConnectionDefinitions"/>
+				<entry key="connectionConfigs"     value-ref="sapCoreConnectionConfigs"/>
+				<entry key="connectionParameters"  value-ref="sapCoreConnectionParametersJCo"/>
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<!-- Connection definitions -->
+	<alias alias="sapCoreConnectionDefinitions" name="sapCoreDefaultConnectionDefinitions"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.ConnectionDefinitions" id="sapCoreDefaultConnectionDefinitions" scope="sapSession">
+		<property name="ConnectionDefinitionsMap">
+			<map>
+				<entry key="JCoComplete" value-ref="sapCoreJCoCompleteConnectionDefinition"/>
+			</map>
+		</property>
+	</bean>
+	
+	<!-- Connection with complete definition -->
+	<alias alias="sapCoreJCoCompleteConnectionDefinition" name="sapCoreDefaultJCoCompleteConnectionDefinition"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.ConnectionDefinition" id="sapCoreDefaultJCoCompleteConnectionDefinition" scope="sapSession">
+		<property name="name" value="JCoComplete"/>
+		<property name="properties">
+			<props>
+			<prop key="destination">#{sapCoreConfigurationService.getRFCDestination().getRfcDestinationName()}</prop>  	
+				<!-- <prop key="destination">SAP_DEFAULT</prop> -->
+			</props>
+		</property>
+	</bean>
+
+	<!-- Connection definitions -->
+	<alias alias="sapCoreConnectionConfigs" name="sapCoreDefaultConnectionConfigs"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.ConnectionConfigs" id="sapCoreDefaultConnectionConfigs" scope="sapSession">
+		<constructor-arg>
+			<map>
+				<entry key="JCoStatefulServiceUser" value-ref="sapCoreJCoStatefulServiceUserConnectionConfig"/>
+				<entry key="JCoStateless" value-ref="sapCoreJCoStatelessConnectionConfig"/>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<!-- Connection definition for stateful connection with service user -->
+	<alias alias="sapCoreJCoStatefulServiceUserConnectionConfig" name="sapCoreDefaultJCoStatefulServiceUserConnectionConfig"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.ConnectionConfig" id="sapCoreDefaultJCoStatefulServiceUserConnectionConfig" scope="sapSession">
+		<property name="name" value="JCoStatefulServiceUser"/>
+		<property name="connectionName" value="sapCoreJCoConnectionStateful"/>
+		<property name="connectionDefinitionName" value="JCoComplete"/>
+	</bean>
+
+	<!-- Connection definition for stateless connection with service user -->
+	<alias alias="sapCoreJCoStatelessConnectionConfig" name="sapCoreDefaultJCoStatelessConnectionConfig"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.ConnectionConfig" id="sapCoreDefaultJCoStatelessConnectionConfig" scope="sapSession">
+		<property name="name" value="JCoStateless"/>
+		<property name="connectionName" value="sapCoreJCoConnectionStateless"/>
+		<property name="connectionDefinitionName" value="JCoComplete"/>
+	</bean>
+
+	<!-- JCo connection factory -->
+	<alias alias="sapCoreManagedConnectionFactoryJCo" name="sapCoreDefaultManagedConnectionFactoryJCo"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.jco.JCoManagedConnectionFactory" id="sapCoreDefaultManagedConnectionFactoryJCo" scope="sapSession">
+		<property name="genericFactory" ref="sapCoreGenericFactory"/>
+		<property name="factoryName" value="JCo"/>
+	</bean>
+	
+	<!-- Connection type stateless -->
+	<alias alias="sapCoreJCoConnectionStateless" name="sapCoreDefaultJCoConnectionStateless"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.jco.JCoConnectionStateless" id="sapCoreDefaultJCoConnectionStateless" scope="prototype">
+	</bean>
+
+	<!-- Connection type stateful -->
+	<alias alias="sapCoreJCoConnectionStateful" name="sapCoreDefaultJCoConnectionStateful"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.jco.JCoConnectionStateful" id="sapCoreDefaultJCoConnectionStateful" scope="prototype">
+	</bean>
+
+	<!-- Connection Parameters for JCo -->
+	<alias alias="sapCoreConnectionParametersJCo" name="sapCoreDefaultConnectionParametersJCo"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.jco.impl.JCoConnectionParametersImpl" id="sapCoreDefaultConnectionParametersJCo" scope="singleton">
+		<!-- Use sapCoreConnectionParameterConfigurerJCo in order to define JCo connection parameters -->
+	</bean>
+	
+	<!-- Connection Parameter Configurer for JCo -->
+	<alias alias="sapCoreConnectionParameterConfigurerJCo" name="sapCoreDefaultConnectionParameterConfigurerJCo"/>
+	<bean class="de.hybris.platform.sap.core.bol.backend.jco.impl.JCoConnectionParameterConfigurerImpl" id="sapCoreDefaultConnectionParameterConfigurerJCo" 
+			abstract="true" init-method="init" scope="singleton">
+		<property name="connectionParameters" ref="sapCoreConnectionParametersJCo"/>
+		<!-- Possible properties to be set 
+		<property name="functionModule"             value="FUNCTION_MODULE_NAME" />
+		<property name="cacheType"                  value="Standard" />
+		<property name="eventListener"              value="myJCoConnectionEventListenerBeanName" />
+		<property name="traceBefore"                value="true/false" />
+		<property name="traceAfter"                 value="true/false" />
+		<property name="functionModuleToBeReplaced" value="ORIGINAL_FUNCTION_MODULE_NAME" />
+		-->
+	</bean>
+
+</beans>

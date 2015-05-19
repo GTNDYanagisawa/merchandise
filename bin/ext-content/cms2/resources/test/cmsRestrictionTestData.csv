@@ -1,0 +1,30 @@
+$catalog-id=cms_Catalog
+$catalog-name=Cms_Catalog_Name
+$catalog-online=Online
+$contentCatVersion=catalogVersion(catalog(id[default=$catalog-id]),version[default=$catalog-online])[default=$catalog-id:$catalog-online]
+
+INSERT_UPDATE ContentCatalog;id[unique=true];name[lang=en];
+;$catalog-id;$catalog-name;
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;
+;$catalog-id;$catalog-online;true;
+
+INSERT_UPDATE Category;code[unique=true];$contentCatVersion;
+;category01;;
+;category02;;
+;category05;;
+;category06;;
+
+INSERT_UPDATE Product;code[unique=true];$contentCatVersion;
+;product01;;
+;product02;;
+;product05;;
+;product06;;
+
+INSERT_UPDATE CMSCategoryRestriction;uid[unique=true];$contentCatVersion;categories(code);
+;restriction01;;category01,category02;
+;restriction02;;category05,category06;
+
+INSERT_UPDATE CMSProductRestriction;uid[unique=true];$contentCatVersion;products(code);
+;restriction91;;product01,product02;
+;restriction92;;product05,product06;

@@ -1,0 +1,447 @@
+# ImpEx for Importing BTG configuration into Powertools Store
+
+#Macros / Replacement Parameter definitions
+$contentCatalog=powertoolsContentCatalog
+$contentCatalogVersion=catalogVersion(catalog(id[default=$contentCatalog]),version[default='Staged'])[unique=true]
+$productCatalog=powertoolsProductCatalog
+$productCatalogVersion=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true]
+
+#     Making the new Operands accessible to cms cockpit
+# - BTGOrganizationTotalSpentInCurrencyRelativeDatesOperand	Order
+# - BTGOrganizationTotalSpentInCurrencyLastYearOperand		Order
+# - BTGOrganizationUIDOfUserOperand							User
+# - BTGNumberOfOrdersAboveAmountRelativeDateOperand			Order
+UPDATE BTGConfig[unique=true];defaultTimeUnit(code);usedRuleTypes(code);operandMapping(key(code),value(code))[map-delimiter=|]
+ ;WEEK;ORDER,CART,USER,WCMS;ORDER->BTGOrganizationTotalSpentInCurrencyRelativeDatesOperand,BTGOrganizationTotalSpentInCurrencyLastYearOperand,BTGNumberOfOrdersAboveAmountRelativeDateOperand,BTGCategoriesInOrdersOperand,BTGEachOrderTotalSumOperand,BTGOrderTotalSumOperand,BTGProductsInOrdersOperand,BTGNumberOfOrdersOperand,BTGNumberOfOrdersRelativeDateOperand,BTGLastOrderDateOperand|CART->BTGCartIsEmptyOperand,BTGCartTotalSumOperand,BTGCategoriesInCartOperand,BTGProductsInCartOperand,BTGQuantityOfProductInCartOperand|WCMS->BTGViewedProductsOperand,BTGViewedCategoriesOperand,BTGVisitedContentpagesOperand,BTGReferalUrlOperand,BTGUrlParameterOperand|USER->BTGOrganizationUIDOfUserOperand,BTGUserAddressPostalCodeOperand,BTGUserCountryOperand,BTGUserGenderOperand,BTGUserMemberOfGroupsOperand|SCRIPT->BTGMediaScriptOperand,BTGStringScriptOperand;
+
+
+# Common Operators
+UPDATE BTGOperator;uid[unique=true];code;$contentCatalogVersion
+
+UPDATE BTGNumberOfOrdersOperand;uid[unique=true];$contentCatalogVersion
+ ;powerToolsNumberOfOrdersOperand;;
+
+UPDATE BTGUserMemberOfGroupsOperand;uid[unique=true];$contentCatalogVersion
+ ;powertoolsUserMemberOfGroupsOperand;;
+
+UPDATE BTGOrganizationTotalSpentInCurrencyLastYearOperand;uid[unique=true];$contentCatalogVersion;currency(isocode);productCatalogId[default=$productCatalog]
+ ;powertoolsTotalDollarsSpentLastYear;;USD;;
+
+UPDATE BTGOperator;uid[unique=true];code;$contentCatalogVersion
+
+UPDATE BTGOperator;uid[unique=true];code;$contentCatalogVersion
+
+# Premium Tool Buyer Segment
+# A member of prospectivepowerdrill will see an alternative Product Carousel Component
+# A user who is not a member of prospectivepowerdrill will see the default Carousel Component
+UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];$contentCatalogVersion
+
+UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+ ;bronzeLoyaltySegmentRule;Bronze Loyalty Customer Rule;bronzeLoyaltySegment;ORDER;;
+ ;goldLoyaltySegmentRule;Gold Loyalty Customer Rule;goldLoyaltySegment;ORDER;;
+ ;powerdrillViewedRule;Powerdrill Viewed Rule;powerdrillViewedSegment;WCMS;;
+ ;powertoolsHighValueOrderRule;Powertools High Value Order Customer Rule;prontoHighValueOrderCustomerSegment;ORDER;;
+ ;premiumToolBuyerRule;Premium Tool Buyer Rule;premiumToolBuyerSegment;USER;;
+ ;premiumToolOrgSegmentRule;Premium Tool Org Segment Rule;premiumToolOrgSegment;ORDER;;
+ ;prontoOrgMemberRule;Pronto Organization Member Customer Rule;prontoHighValueOrderCustomerSegment;USER;;
+ ;prospectivePowerdrillPromotionRule;Prospective Powerdrill Promotion Rule;prospectivePowerdrillPromotionSegment;USER;;
+ ;regularCustomerRule;Regular Customer Rule;regularCustomerSegment;USER;;
+ ;silverLoyaltySegmentRule;Silver Loyalty Customer Rule;silverLoyaltySegment;ORDER;;
+
+UPDATE BTGReferencePrincipalGroupsOperand;uid[unique=true];groups(uid);$contentCatalogVersion
+ ;powertoolsUserGroupsOperand;prospectivepowerdrill;;
+
+UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;FourOrdersInPast12MonthsOver10KExpresssion;powertoolsNumberOfOrdersInTwelveMonthsOver10K;fourIntegerOperand;orderThresholdOrMoreOperator;powertoolsHighValueOrderRule;;
+ ;maximumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdLessOperator;bronzeLoyaltySegmentRule;;
+ ;maximumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdLessOperator;silverLoyaltySegmentRule;;
+ ;minimumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;100KDoubleOperand;orderThresholdOrMoreOperator;bronzeLoyaltySegmentRule;;
+ ;minimumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdOrMoreOperator;silverLoyaltySegmentRule;;
+ ;powerdrillViewedExpression;powerdrillCategoriesViewedOperand;powerdrillsCategoriesOperand;powertoolsContainsOperator;powerdrillViewedRule;;
+ ;powertoolsPremiumBuyerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;premiumToolBuyerRule;;
+ ;powertoolsRegularCustomerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsNotContainsOperator;regularCustomerRule;;
+ ;powertoolsUserInGoldLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdOrMoreOperator;goldLoyaltySegmentRule;;
+ ;powertoolsUserInProntoOrganizationExpression;powertoolsOrganizationUIDOfUserOperand;powertoolsOrganizationUIDsOperand;powertoolsContainsAnyOperator;prontoOrgMemberRule;;
+ ;premiumToolOrgSegmentExpression;powertoolsTotalDollarsSpentLast8Months;100KDoubleOperandForProducts;orderThresholdOrMoreOperator;premiumToolOrgSegmentRule;;
+ ;prospectivePowerdrillProductDetailExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;prospectivePowerdrillPromotionRule;;
+
+UPDATE CmsRestrictionActionDefinition;uid[unique=true];inverted;segment(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;premiumToolBuyerRestrictionAction;false;premiumToolBuyerSegment;;
+ ;prospectivePowerdrillPromotionRestrictionAction;false;prospectivePowerdrillPromotionSegment;;
+ ;regularCustomerRestrictionAction;false;regularCustomerSegment;;
+
+UPDATE BtgSegmentRestriction;uid[unique=true];name;outputActionDefinition(uid, $contentCatalogVersion);components(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;powertoolsHomepageProductCarouselComponentRestriction;Regular Customer Carousel;regularCustomerRestrictionAction;PowertoolsHomepageProductCarouselComponent;;
+ ;premiumToolBuyerProductDetailPagePromotionBannerRestriction;Premium Tool Buyer Product Detail Page Promotion Banner Restriction;prospectivePowerdrillPromotionRestrictionAction;BTGBannerProductDetail;;
+ ;premiumToolBuyerProductcarouselRestriction;Premium Tool Buyer Carousel Restriction;premiumToolBuyerRestrictionAction;PremiumbuyersgroupHomepageProductCarouselComponent;;
+
+# Prospective Powerdrill Promotion Segment
+# Product Detail
+# Include promotion banner component to promote Bosch PSR 14.4 LI-2
+UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=PERMANENT];$contentCatalogVersion
+
+UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+ ;bronzeLoyaltySegmentRule;Bronze Loyalty Customer Rule;bronzeLoyaltySegment;ORDER;;
+ ;goldLoyaltySegmentRule;Gold Loyalty Customer Rule;goldLoyaltySegment;ORDER;;
+ ;powerdrillViewedRule;Powerdrill Viewed Rule;powerdrillViewedSegment;WCMS;;
+ ;powertoolsHighValueOrderRule;Powertools High Value Order Customer Rule;prontoHighValueOrderCustomerSegment;ORDER;;
+ ;premiumToolBuyerRule;Premium Tool Buyer Rule;premiumToolBuyerSegment;USER;;
+ ;premiumToolOrgSegmentRule;Premium Tool Org Segment Rule;premiumToolOrgSegment;ORDER;;
+ ;prontoOrgMemberRule;Pronto Organization Member Customer Rule;prontoHighValueOrderCustomerSegment;USER;;
+ ;prospectivePowerdrillPromotionRule;Prospective Powerdrill Promotion Rule;prospectivePowerdrillPromotionSegment;USER;;
+ ;regularCustomerRule;Regular Customer Rule;regularCustomerSegment;USER;;
+ ;silverLoyaltySegmentRule;Silver Loyalty Customer Rule;silverLoyaltySegment;ORDER;;
+
+UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;FourOrdersInPast12MonthsOver10KExpresssion;powertoolsNumberOfOrdersInTwelveMonthsOver10K;fourIntegerOperand;orderThresholdOrMoreOperator;powertoolsHighValueOrderRule;;
+ ;maximumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdLessOperator;bronzeLoyaltySegmentRule;;
+ ;maximumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdLessOperator;silverLoyaltySegmentRule;;
+ ;minimumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;100KDoubleOperand;orderThresholdOrMoreOperator;bronzeLoyaltySegmentRule;;
+ ;minimumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdOrMoreOperator;silverLoyaltySegmentRule;;
+ ;powerdrillViewedExpression;powerdrillCategoriesViewedOperand;powerdrillsCategoriesOperand;powertoolsContainsOperator;powerdrillViewedRule;;
+ ;powertoolsPremiumBuyerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;premiumToolBuyerRule;;
+ ;powertoolsRegularCustomerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsNotContainsOperator;regularCustomerRule;;
+ ;powertoolsUserInGoldLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdOrMoreOperator;goldLoyaltySegmentRule;;
+ ;powertoolsUserInProntoOrganizationExpression;powertoolsOrganizationUIDOfUserOperand;powertoolsOrganizationUIDsOperand;powertoolsContainsAnyOperator;prontoOrgMemberRule;;
+ ;premiumToolOrgSegmentExpression;powertoolsTotalDollarsSpentLast8Months;100KDoubleOperandForProducts;orderThresholdOrMoreOperator;premiumToolOrgSegmentRule;;
+ ;prospectivePowerdrillProductDetailExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;prospectivePowerdrillPromotionRule;;
+
+UPDATE CmsRestrictionActionDefinition;uid[unique=true];inverted;segment(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;premiumToolBuyerRestrictionAction;false;premiumToolBuyerSegment;;
+ ;prospectivePowerdrillPromotionRestrictionAction;false;prospectivePowerdrillPromotionSegment;;
+ ;regularCustomerRestrictionAction;false;regularCustomerSegment;;
+
+UPDATE BtgSegmentRestriction;uid[unique=true];name;outputActionDefinition(uid, $contentCatalogVersion);components(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;powertoolsHomepageProductCarouselComponentRestriction;Regular Customer Carousel;regularCustomerRestrictionAction;PowertoolsHomepageProductCarouselComponent;;
+ ;premiumToolBuyerProductDetailPagePromotionBannerRestriction;Premium Tool Buyer Product Detail Page Promotion Banner Restriction;prospectivePowerdrillPromotionRestrictionAction;BTGBannerProductDetail;;
+ ;premiumToolBuyerProductcarouselRestriction;Premium Tool Buyer Carousel Restriction;premiumToolBuyerRestrictionAction;PremiumbuyersgroupHomepageProductCarouselComponent;;
+
+
+# Powerdrill Viewed Segments
+
+UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=SESSION];$contentCatalogVersion
+
+UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+ ;bronzeLoyaltySegmentRule;Bronze Loyalty Customer Rule;bronzeLoyaltySegment;ORDER;;
+ ;goldLoyaltySegmentRule;Gold Loyalty Customer Rule;goldLoyaltySegment;ORDER;;
+ ;powerdrillViewedRule;Powerdrill Viewed Rule;powerdrillViewedSegment;WCMS;;
+ ;powertoolsHighValueOrderRule;Powertools High Value Order Customer Rule;prontoHighValueOrderCustomerSegment;ORDER;;
+ ;premiumToolBuyerRule;Premium Tool Buyer Rule;premiumToolBuyerSegment;USER;;
+ ;premiumToolOrgSegmentRule;Premium Tool Org Segment Rule;premiumToolOrgSegment;ORDER;;
+ ;prontoOrgMemberRule;Pronto Organization Member Customer Rule;prontoHighValueOrderCustomerSegment;USER;;
+ ;prospectivePowerdrillPromotionRule;Prospective Powerdrill Promotion Rule;prospectivePowerdrillPromotionSegment;USER;;
+ ;regularCustomerRule;Regular Customer Rule;regularCustomerSegment;USER;;
+ ;silverLoyaltySegmentRule;Silver Loyalty Customer Rule;silverLoyaltySegment;ORDER;;
+
+UPDATE BTGOperator;uid[unique=true];code;$contentCatalogVersion
+
+UPDATE BTGViewedCategoriesOperand;uid[unique=true];$contentCatalogVersion;
+ ;powerdrillCategoriesViewedOperand;;{uid=powerdrillCategoriesViewedOperand}.
+;
+
+UPDATE BTGReferenceCategoriesOperand;uid[unique=true];code;categories(code, $productCatalogVersion);$contentCatalogVersion
+ ;powerdrillsCategoriesOperand;powertoolsPowerdrillsCategoriesOperand;1360,1593;;
+
+UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;FourOrdersInPast12MonthsOver10KExpresssion;powertoolsNumberOfOrdersInTwelveMonthsOver10K;fourIntegerOperand;orderThresholdOrMoreOperator;powertoolsHighValueOrderRule;;
+ ;maximumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdLessOperator;bronzeLoyaltySegmentRule;;
+ ;maximumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdLessOperator;silverLoyaltySegmentRule;;
+ ;minimumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;100KDoubleOperand;orderThresholdOrMoreOperator;bronzeLoyaltySegmentRule;;
+ ;minimumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdOrMoreOperator;silverLoyaltySegmentRule;;
+ ;powerdrillViewedExpression;powerdrillCategoriesViewedOperand;powerdrillsCategoriesOperand;powertoolsContainsOperator;powerdrillViewedRule;;
+ ;powertoolsPremiumBuyerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;premiumToolBuyerRule;;
+ ;powertoolsRegularCustomerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsNotContainsOperator;regularCustomerRule;;
+ ;powertoolsUserInGoldLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdOrMoreOperator;goldLoyaltySegmentRule;;
+ ;powertoolsUserInProntoOrganizationExpression;powertoolsOrganizationUIDOfUserOperand;powertoolsOrganizationUIDsOperand;powertoolsContainsAnyOperator;prontoOrgMemberRule;;
+ ;premiumToolOrgSegmentExpression;powertoolsTotalDollarsSpentLast8Months;100KDoubleOperandForProducts;orderThresholdOrMoreOperator;premiumToolOrgSegmentRule;;
+ ;prospectivePowerdrillProductDetailExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;prospectivePowerdrillPromotionRule;;
+
+UPDATE BTGAssignToGroupDefinition;uid[unique=true];userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;assignToProspectivePowerdrill;prospectivepowerdrill;powerdrillViewedSegment;;
+ ;assignToUSD750Off10KOrders;usd750off10korders;prontoHighValueOrderCustomerSegment;;
+
+# Pronto High Value Order Customer
+
+UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=PERMANENT];$contentCatalogVersion
+
+UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+ ;bronzeLoyaltySegmentRule;Bronze Loyalty Customer Rule;bronzeLoyaltySegment;ORDER;;
+ ;goldLoyaltySegmentRule;Gold Loyalty Customer Rule;goldLoyaltySegment;ORDER;;
+ ;powerdrillViewedRule;Powerdrill Viewed Rule;powerdrillViewedSegment;WCMS;;
+ ;powertoolsHighValueOrderRule;Powertools High Value Order Customer Rule;prontoHighValueOrderCustomerSegment;ORDER;;
+ ;premiumToolBuyerRule;Premium Tool Buyer Rule;premiumToolBuyerSegment;USER;;
+ ;premiumToolOrgSegmentRule;Premium Tool Org Segment Rule;premiumToolOrgSegment;ORDER;;
+ ;prontoOrgMemberRule;Pronto Organization Member Customer Rule;prontoHighValueOrderCustomerSegment;USER;;
+ ;prospectivePowerdrillPromotionRule;Prospective Powerdrill Promotion Rule;prospectivePowerdrillPromotionSegment;USER;;
+ ;regularCustomerRule;Regular Customer Rule;regularCustomerSegment;USER;;
+ ;silverLoyaltySegmentRule;Silver Loyalty Customer Rule;silverLoyaltySegment;ORDER;;
+
+UPDATE BTGNumberOfOrdersAboveAmountRelativeDateOperand;uid[unique=true];$contentCatalogVersion;value;unit(code);amount;currency(isocode);orderStatus(code)
+ ;powertoolsNumberOfOrdersInTwelveMonthsOver10K;;12;MONTH;10000;USD;APPROVED;
+
+UPDATE BTGIntegerLiteralOperand;uid[unique=true];literal;$contentCatalogVersion
+ ;fourIntegerOperand;4;;
+
+UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;FourOrdersInPast12MonthsOver10KExpresssion;powertoolsNumberOfOrdersInTwelveMonthsOver10K;fourIntegerOperand;orderThresholdOrMoreOperator;powertoolsHighValueOrderRule;;
+ ;maximumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdLessOperator;bronzeLoyaltySegmentRule;;
+ ;maximumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdLessOperator;silverLoyaltySegmentRule;;
+ ;minimumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;100KDoubleOperand;orderThresholdOrMoreOperator;bronzeLoyaltySegmentRule;;
+ ;minimumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdOrMoreOperator;silverLoyaltySegmentRule;;
+ ;powerdrillViewedExpression;powerdrillCategoriesViewedOperand;powerdrillsCategoriesOperand;powertoolsContainsOperator;powerdrillViewedRule;;
+ ;powertoolsPremiumBuyerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;premiumToolBuyerRule;;
+ ;powertoolsRegularCustomerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsNotContainsOperator;regularCustomerRule;;
+ ;powertoolsUserInGoldLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdOrMoreOperator;goldLoyaltySegmentRule;;
+ ;powertoolsUserInProntoOrganizationExpression;powertoolsOrganizationUIDOfUserOperand;powertoolsOrganizationUIDsOperand;powertoolsContainsAnyOperator;prontoOrgMemberRule;;
+ ;premiumToolOrgSegmentExpression;powertoolsTotalDollarsSpentLast8Months;100KDoubleOperandForProducts;orderThresholdOrMoreOperator;premiumToolOrgSegmentRule;;
+ ;prospectivePowerdrillProductDetailExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;prospectivePowerdrillPromotionRule;;
+
+UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+ ;bronzeLoyaltySegmentRule;Bronze Loyalty Customer Rule;bronzeLoyaltySegment;ORDER;;
+ ;goldLoyaltySegmentRule;Gold Loyalty Customer Rule;goldLoyaltySegment;ORDER;;
+ ;powerdrillViewedRule;Powerdrill Viewed Rule;powerdrillViewedSegment;WCMS;;
+ ;powertoolsHighValueOrderRule;Powertools High Value Order Customer Rule;prontoHighValueOrderCustomerSegment;ORDER;;
+ ;premiumToolBuyerRule;Premium Tool Buyer Rule;premiumToolBuyerSegment;USER;;
+ ;premiumToolOrgSegmentRule;Premium Tool Org Segment Rule;premiumToolOrgSegment;ORDER;;
+ ;prontoOrgMemberRule;Pronto Organization Member Customer Rule;prontoHighValueOrderCustomerSegment;USER;;
+ ;prospectivePowerdrillPromotionRule;Prospective Powerdrill Promotion Rule;prospectivePowerdrillPromotionSegment;USER;;
+ ;regularCustomerRule;Regular Customer Rule;regularCustomerSegment;USER;;
+ ;silverLoyaltySegmentRule;Silver Loyalty Customer Rule;silverLoyaltySegment;ORDER;;
+
+UPDATE BTGOrganizationUIDOfUserOperand;uid[unique=true];$contentCatalogVersion;
+ ;powertoolsOrganizationUIDOfUserOperand;;{uid=powertoolsOrganizationUIDOfUserOperand}.
+;
+
+UPDATE BTGOrganizationUIDsOperand;uid[unique=true];code;organizationUids;$contentCatalogVersion
+ ;powertoolsOrganizationUIDsOperand;powertoolsOrganizationUIDsOperand;Pronto;;
+
+UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;FourOrdersInPast12MonthsOver10KExpresssion;powertoolsNumberOfOrdersInTwelveMonthsOver10K;fourIntegerOperand;orderThresholdOrMoreOperator;powertoolsHighValueOrderRule;;
+ ;maximumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdLessOperator;bronzeLoyaltySegmentRule;;
+ ;maximumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdLessOperator;silverLoyaltySegmentRule;;
+ ;minimumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;100KDoubleOperand;orderThresholdOrMoreOperator;bronzeLoyaltySegmentRule;;
+ ;minimumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdOrMoreOperator;silverLoyaltySegmentRule;;
+ ;powerdrillViewedExpression;powerdrillCategoriesViewedOperand;powerdrillsCategoriesOperand;powertoolsContainsOperator;powerdrillViewedRule;;
+ ;powertoolsPremiumBuyerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;premiumToolBuyerRule;;
+ ;powertoolsRegularCustomerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsNotContainsOperator;regularCustomerRule;;
+ ;powertoolsUserInGoldLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdOrMoreOperator;goldLoyaltySegmentRule;;
+ ;powertoolsUserInProntoOrganizationExpression;powertoolsOrganizationUIDOfUserOperand;powertoolsOrganizationUIDsOperand;powertoolsContainsAnyOperator;prontoOrgMemberRule;;
+ ;premiumToolOrgSegmentExpression;powertoolsTotalDollarsSpentLast8Months;100KDoubleOperandForProducts;orderThresholdOrMoreOperator;premiumToolOrgSegmentRule;;
+ ;prospectivePowerdrillProductDetailExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;prospectivePowerdrillPromotionRule;;
+
+UPDATE BTGAssignToGroupDefinition;uid[unique=true];userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;assignToProspectivePowerdrill;prospectivepowerdrill;powerdrillViewedSegment;;
+ ;assignToUSD750Off10KOrders;usd750off10korders;prontoHighValueOrderCustomerSegment;;
+
+# Bronze Loyalty
+# Total value of Organization's Orders in the previous calendar year was larger than $100k
+UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=PERMANENT];$contentCatalogVersion
+
+UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+ ;bronzeLoyaltySegmentRule;Bronze Loyalty Customer Rule;bronzeLoyaltySegment;ORDER;;
+ ;goldLoyaltySegmentRule;Gold Loyalty Customer Rule;goldLoyaltySegment;ORDER;;
+ ;powerdrillViewedRule;Powerdrill Viewed Rule;powerdrillViewedSegment;WCMS;;
+ ;powertoolsHighValueOrderRule;Powertools High Value Order Customer Rule;prontoHighValueOrderCustomerSegment;ORDER;;
+ ;premiumToolBuyerRule;Premium Tool Buyer Rule;premiumToolBuyerSegment;USER;;
+ ;premiumToolOrgSegmentRule;Premium Tool Org Segment Rule;premiumToolOrgSegment;ORDER;;
+ ;prontoOrgMemberRule;Pronto Organization Member Customer Rule;prontoHighValueOrderCustomerSegment;USER;;
+ ;prospectivePowerdrillPromotionRule;Prospective Powerdrill Promotion Rule;prospectivePowerdrillPromotionSegment;USER;;
+ ;regularCustomerRule;Regular Customer Rule;regularCustomerSegment;USER;;
+ ;silverLoyaltySegmentRule;Silver Loyalty Customer Rule;silverLoyaltySegment;ORDER;;
+
+UPDATE BTGDoubleLiteralOperand;uid[unique=true];literal;$contentCatalogVersion
+ ;100KDoubleOperand;100000;;
+ ;100KDoubleOperandForProducts;100000;;
+ ;200KDoubleOperand;200000;;
+ ;400KDoubleOperand;400000;;
+
+UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;FourOrdersInPast12MonthsOver10KExpresssion;powertoolsNumberOfOrdersInTwelveMonthsOver10K;fourIntegerOperand;orderThresholdOrMoreOperator;powertoolsHighValueOrderRule;;
+ ;maximumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdLessOperator;bronzeLoyaltySegmentRule;;
+ ;maximumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdLessOperator;silverLoyaltySegmentRule;;
+ ;minimumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;100KDoubleOperand;orderThresholdOrMoreOperator;bronzeLoyaltySegmentRule;;
+ ;minimumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdOrMoreOperator;silverLoyaltySegmentRule;;
+ ;powerdrillViewedExpression;powerdrillCategoriesViewedOperand;powerdrillsCategoriesOperand;powertoolsContainsOperator;powerdrillViewedRule;;
+ ;powertoolsPremiumBuyerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;premiumToolBuyerRule;;
+ ;powertoolsRegularCustomerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsNotContainsOperator;regularCustomerRule;;
+ ;powertoolsUserInGoldLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdOrMoreOperator;goldLoyaltySegmentRule;;
+ ;powertoolsUserInProntoOrganizationExpression;powertoolsOrganizationUIDOfUserOperand;powertoolsOrganizationUIDsOperand;powertoolsContainsAnyOperator;prontoOrgMemberRule;;
+ ;premiumToolOrgSegmentExpression;powertoolsTotalDollarsSpentLast8Months;100KDoubleOperandForProducts;orderThresholdOrMoreOperator;premiumToolOrgSegmentRule;;
+ ;prospectivePowerdrillProductDetailExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;prospectivePowerdrillPromotionRule;;
+
+UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;FourOrdersInPast12MonthsOver10KExpresssion;powertoolsNumberOfOrdersInTwelveMonthsOver10K;fourIntegerOperand;orderThresholdOrMoreOperator;powertoolsHighValueOrderRule;;
+ ;maximumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdLessOperator;bronzeLoyaltySegmentRule;;
+ ;maximumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdLessOperator;silverLoyaltySegmentRule;;
+ ;minimumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;100KDoubleOperand;orderThresholdOrMoreOperator;bronzeLoyaltySegmentRule;;
+ ;minimumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdOrMoreOperator;silverLoyaltySegmentRule;;
+ ;powerdrillViewedExpression;powerdrillCategoriesViewedOperand;powerdrillsCategoriesOperand;powertoolsContainsOperator;powerdrillViewedRule;;
+ ;powertoolsPremiumBuyerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;premiumToolBuyerRule;;
+ ;powertoolsRegularCustomerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsNotContainsOperator;regularCustomerRule;;
+ ;powertoolsUserInGoldLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdOrMoreOperator;goldLoyaltySegmentRule;;
+ ;powertoolsUserInProntoOrganizationExpression;powertoolsOrganizationUIDOfUserOperand;powertoolsOrganizationUIDsOperand;powertoolsContainsAnyOperator;prontoOrgMemberRule;;
+ ;premiumToolOrgSegmentExpression;powertoolsTotalDollarsSpentLast8Months;100KDoubleOperandForProducts;orderThresholdOrMoreOperator;premiumToolOrgSegmentRule;;
+ ;prospectivePowerdrillProductDetailExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;prospectivePowerdrillPromotionRule;;
+
+UPDATE BTGAssignOrganizationToGroupDefinition;uid[unique=true];userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;assignToBronzeLoyaltyDefinition;bronzeloyalty;bronzeLoyaltySegment;;
+ ;assignToGoldLoyaltyDefinition;goldloyalty;goldLoyaltySegment;;
+ ;assignToSilverLoyaltyDefinition;silverloyalty;silverLoyaltySegment;;
+ ;assignToUSD50offpowertoolsDefinition;usd50offpowertools;premiumToolOrgSegment;;
+ ;unAssignBronzeLoyaltyForGoldDefinition;bronzeloyalty;goldLoyaltySegment;;
+ ;unAssignBronzeLoyaltyForSilverDefinition;bronzeloyalty;silverLoyaltySegment;;
+ ;unAssignSilverLoyaltyForGoldDefinition;silverloyalty;goldLoyaltySegment;;
+
+# Silver Loyalty
+# Total value of Organization's Orders in the previous calendar year was larger than $200k
+UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=PERMANENT];$contentCatalogVersion
+
+UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+ ;bronzeLoyaltySegmentRule;Bronze Loyalty Customer Rule;bronzeLoyaltySegment;ORDER;;
+ ;goldLoyaltySegmentRule;Gold Loyalty Customer Rule;goldLoyaltySegment;ORDER;;
+ ;powerdrillViewedRule;Powerdrill Viewed Rule;powerdrillViewedSegment;WCMS;;
+ ;powertoolsHighValueOrderRule;Powertools High Value Order Customer Rule;prontoHighValueOrderCustomerSegment;ORDER;;
+ ;premiumToolBuyerRule;Premium Tool Buyer Rule;premiumToolBuyerSegment;USER;;
+ ;premiumToolOrgSegmentRule;Premium Tool Org Segment Rule;premiumToolOrgSegment;ORDER;;
+ ;prontoOrgMemberRule;Pronto Organization Member Customer Rule;prontoHighValueOrderCustomerSegment;USER;;
+ ;prospectivePowerdrillPromotionRule;Prospective Powerdrill Promotion Rule;prospectivePowerdrillPromotionSegment;USER;;
+ ;regularCustomerRule;Regular Customer Rule;regularCustomerSegment;USER;;
+ ;silverLoyaltySegmentRule;Silver Loyalty Customer Rule;silverLoyaltySegment;ORDER;;
+
+UPDATE BTGDoubleLiteralOperand;uid[unique=true];literal;$contentCatalogVersion
+ ;100KDoubleOperand;100000;;
+ ;100KDoubleOperandForProducts;100000;;
+ ;200KDoubleOperand;200000;;
+ ;400KDoubleOperand;400000;;
+
+UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;FourOrdersInPast12MonthsOver10KExpresssion;powertoolsNumberOfOrdersInTwelveMonthsOver10K;fourIntegerOperand;orderThresholdOrMoreOperator;powertoolsHighValueOrderRule;;
+ ;maximumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdLessOperator;bronzeLoyaltySegmentRule;;
+ ;maximumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdLessOperator;silverLoyaltySegmentRule;;
+ ;minimumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;100KDoubleOperand;orderThresholdOrMoreOperator;bronzeLoyaltySegmentRule;;
+ ;minimumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdOrMoreOperator;silverLoyaltySegmentRule;;
+ ;powerdrillViewedExpression;powerdrillCategoriesViewedOperand;powerdrillsCategoriesOperand;powertoolsContainsOperator;powerdrillViewedRule;;
+ ;powertoolsPremiumBuyerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;premiumToolBuyerRule;;
+ ;powertoolsRegularCustomerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsNotContainsOperator;regularCustomerRule;;
+ ;powertoolsUserInGoldLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdOrMoreOperator;goldLoyaltySegmentRule;;
+ ;powertoolsUserInProntoOrganizationExpression;powertoolsOrganizationUIDOfUserOperand;powertoolsOrganizationUIDsOperand;powertoolsContainsAnyOperator;prontoOrgMemberRule;;
+ ;premiumToolOrgSegmentExpression;powertoolsTotalDollarsSpentLast8Months;100KDoubleOperandForProducts;orderThresholdOrMoreOperator;premiumToolOrgSegmentRule;;
+ ;prospectivePowerdrillProductDetailExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;prospectivePowerdrillPromotionRule;;
+
+UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;FourOrdersInPast12MonthsOver10KExpresssion;powertoolsNumberOfOrdersInTwelveMonthsOver10K;fourIntegerOperand;orderThresholdOrMoreOperator;powertoolsHighValueOrderRule;;
+ ;maximumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdLessOperator;bronzeLoyaltySegmentRule;;
+ ;maximumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdLessOperator;silverLoyaltySegmentRule;;
+ ;minimumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;100KDoubleOperand;orderThresholdOrMoreOperator;bronzeLoyaltySegmentRule;;
+ ;minimumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdOrMoreOperator;silverLoyaltySegmentRule;;
+ ;powerdrillViewedExpression;powerdrillCategoriesViewedOperand;powerdrillsCategoriesOperand;powertoolsContainsOperator;powerdrillViewedRule;;
+ ;powertoolsPremiumBuyerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;premiumToolBuyerRule;;
+ ;powertoolsRegularCustomerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsNotContainsOperator;regularCustomerRule;;
+ ;powertoolsUserInGoldLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdOrMoreOperator;goldLoyaltySegmentRule;;
+ ;powertoolsUserInProntoOrganizationExpression;powertoolsOrganizationUIDOfUserOperand;powertoolsOrganizationUIDsOperand;powertoolsContainsAnyOperator;prontoOrgMemberRule;;
+ ;premiumToolOrgSegmentExpression;powertoolsTotalDollarsSpentLast8Months;100KDoubleOperandForProducts;orderThresholdOrMoreOperator;premiumToolOrgSegmentRule;;
+ ;prospectivePowerdrillProductDetailExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;prospectivePowerdrillPromotionRule;;
+
+UPDATE BTGAssignOrganizationToGroupDefinition;uid[unique=true];userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;assignToBronzeLoyaltyDefinition;bronzeloyalty;bronzeLoyaltySegment;;
+ ;assignToGoldLoyaltyDefinition;goldloyalty;goldLoyaltySegment;;
+ ;assignToSilverLoyaltyDefinition;silverloyalty;silverLoyaltySegment;;
+ ;assignToUSD50offpowertoolsDefinition;usd50offpowertools;premiumToolOrgSegment;;
+ ;unAssignBronzeLoyaltyForGoldDefinition;bronzeloyalty;goldLoyaltySegment;;
+ ;unAssignBronzeLoyaltyForSilverDefinition;bronzeloyalty;silverLoyaltySegment;;
+ ;unAssignSilverLoyaltyForGoldDefinition;silverloyalty;goldLoyaltySegment;;
+
+# Gold Loyalty
+# Total value of Organization's Orders in the previous calendar year was larger than $400k
+UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=PERMANENT];$contentCatalogVersion
+
+UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+ ;bronzeLoyaltySegmentRule;Bronze Loyalty Customer Rule;bronzeLoyaltySegment;ORDER;;
+ ;goldLoyaltySegmentRule;Gold Loyalty Customer Rule;goldLoyaltySegment;ORDER;;
+ ;powerdrillViewedRule;Powerdrill Viewed Rule;powerdrillViewedSegment;WCMS;;
+ ;powertoolsHighValueOrderRule;Powertools High Value Order Customer Rule;prontoHighValueOrderCustomerSegment;ORDER;;
+ ;premiumToolBuyerRule;Premium Tool Buyer Rule;premiumToolBuyerSegment;USER;;
+ ;premiumToolOrgSegmentRule;Premium Tool Org Segment Rule;premiumToolOrgSegment;ORDER;;
+ ;prontoOrgMemberRule;Pronto Organization Member Customer Rule;prontoHighValueOrderCustomerSegment;USER;;
+ ;prospectivePowerdrillPromotionRule;Prospective Powerdrill Promotion Rule;prospectivePowerdrillPromotionSegment;USER;;
+ ;regularCustomerRule;Regular Customer Rule;regularCustomerSegment;USER;;
+ ;silverLoyaltySegmentRule;Silver Loyalty Customer Rule;silverLoyaltySegment;ORDER;;
+
+UPDATE BTGDoubleLiteralOperand;uid[unique=true];literal;$contentCatalogVersion
+ ;100KDoubleOperand;100000;;
+ ;100KDoubleOperandForProducts;100000;;
+ ;200KDoubleOperand;200000;;
+ ;400KDoubleOperand;400000;;
+
+UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;FourOrdersInPast12MonthsOver10KExpresssion;powertoolsNumberOfOrdersInTwelveMonthsOver10K;fourIntegerOperand;orderThresholdOrMoreOperator;powertoolsHighValueOrderRule;;
+ ;maximumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdLessOperator;bronzeLoyaltySegmentRule;;
+ ;maximumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdLessOperator;silverLoyaltySegmentRule;;
+ ;minimumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;100KDoubleOperand;orderThresholdOrMoreOperator;bronzeLoyaltySegmentRule;;
+ ;minimumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdOrMoreOperator;silverLoyaltySegmentRule;;
+ ;powerdrillViewedExpression;powerdrillCategoriesViewedOperand;powerdrillsCategoriesOperand;powertoolsContainsOperator;powerdrillViewedRule;;
+ ;powertoolsPremiumBuyerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;premiumToolBuyerRule;;
+ ;powertoolsRegularCustomerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsNotContainsOperator;regularCustomerRule;;
+ ;powertoolsUserInGoldLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdOrMoreOperator;goldLoyaltySegmentRule;;
+ ;powertoolsUserInProntoOrganizationExpression;powertoolsOrganizationUIDOfUserOperand;powertoolsOrganizationUIDsOperand;powertoolsContainsAnyOperator;prontoOrgMemberRule;;
+ ;premiumToolOrgSegmentExpression;powertoolsTotalDollarsSpentLast8Months;100KDoubleOperandForProducts;orderThresholdOrMoreOperator;premiumToolOrgSegmentRule;;
+ ;prospectivePowerdrillProductDetailExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;prospectivePowerdrillPromotionRule;;
+
+UPDATE BTGAssignOrganizationToGroupDefinition;uid[unique=true];userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;assignToBronzeLoyaltyDefinition;bronzeloyalty;bronzeLoyaltySegment;;
+ ;assignToGoldLoyaltyDefinition;goldloyalty;goldLoyaltySegment;;
+ ;assignToSilverLoyaltyDefinition;silverloyalty;silverLoyaltySegment;;
+ ;assignToUSD50offpowertoolsDefinition;usd50offpowertools;premiumToolOrgSegment;;
+ ;unAssignBronzeLoyaltyForGoldDefinition;bronzeloyalty;goldLoyaltySegment;;
+ ;unAssignBronzeLoyaltyForSilverDefinition;bronzeloyalty;silverLoyaltySegment;;
+ ;unAssignSilverLoyaltyForGoldDefinition;silverloyalty;goldLoyaltySegment;;
+
+# Premium Tool Org Segment
+# Organization has purchased more than 100k of products in Powertools category in past 8 months
+# Assign to USD50OffPowertools
+UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];defaultResultScope(code)[default=PERMANENT];$contentCatalogVersion
+
+UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+ ;bronzeLoyaltySegmentRule;Bronze Loyalty Customer Rule;bronzeLoyaltySegment;ORDER;;
+ ;goldLoyaltySegmentRule;Gold Loyalty Customer Rule;goldLoyaltySegment;ORDER;;
+ ;powerdrillViewedRule;Powerdrill Viewed Rule;powerdrillViewedSegment;WCMS;;
+ ;powertoolsHighValueOrderRule;Powertools High Value Order Customer Rule;prontoHighValueOrderCustomerSegment;ORDER;;
+ ;premiumToolBuyerRule;Premium Tool Buyer Rule;premiumToolBuyerSegment;USER;;
+ ;premiumToolOrgSegmentRule;Premium Tool Org Segment Rule;premiumToolOrgSegment;ORDER;;
+ ;prontoOrgMemberRule;Pronto Organization Member Customer Rule;prontoHighValueOrderCustomerSegment;USER;;
+ ;prospectivePowerdrillPromotionRule;Prospective Powerdrill Promotion Rule;prospectivePowerdrillPromotionSegment;USER;;
+ ;regularCustomerRule;Regular Customer Rule;regularCustomerSegment;USER;;
+ ;silverLoyaltySegmentRule;Silver Loyalty Customer Rule;silverLoyaltySegment;ORDER;;
+
+UPDATE BTGOrganizationTotalSpentInCurrencyRelativeDatesOperand;uid[unique=true];$contentCatalogVersion;currency(isocode);productCatalogId[default=$productCatalog];unit(code);value;categoryCode
+ ;powertoolsTotalDollarsSpentLast8Months;;USD;;MONTH;8;powertools
+;
+
+UPDATE BTGDoubleLiteralOperand;uid[unique=true];literal;$contentCatalogVersion
+ ;100KDoubleOperand;100000;;
+ ;100KDoubleOperandForProducts;100000;;
+ ;200KDoubleOperand;200000;;
+ ;400KDoubleOperand;400000;;
+
+UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;FourOrdersInPast12MonthsOver10KExpresssion;powertoolsNumberOfOrdersInTwelveMonthsOver10K;fourIntegerOperand;orderThresholdOrMoreOperator;powertoolsHighValueOrderRule;;
+ ;maximumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdLessOperator;bronzeLoyaltySegmentRule;;
+ ;maximumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdLessOperator;silverLoyaltySegmentRule;;
+ ;minimumThresholdForBronzeLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;100KDoubleOperand;orderThresholdOrMoreOperator;bronzeLoyaltySegmentRule;;
+ ;minimumThresholdForSilverLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;200KDoubleOperand;orderThresholdOrMoreOperator;silverLoyaltySegmentRule;;
+ ;powerdrillViewedExpression;powerdrillCategoriesViewedOperand;powerdrillsCategoriesOperand;powertoolsContainsOperator;powerdrillViewedRule;;
+ ;powertoolsPremiumBuyerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;premiumToolBuyerRule;;
+ ;powertoolsRegularCustomerExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsNotContainsOperator;regularCustomerRule;;
+ ;powertoolsUserInGoldLoyaltyExpression;powertoolsTotalDollarsSpentLastYear;400KDoubleOperand;orderThresholdOrMoreOperator;goldLoyaltySegmentRule;;
+ ;powertoolsUserInProntoOrganizationExpression;powertoolsOrganizationUIDOfUserOperand;powertoolsOrganizationUIDsOperand;powertoolsContainsAnyOperator;prontoOrgMemberRule;;
+ ;premiumToolOrgSegmentExpression;powertoolsTotalDollarsSpentLast8Months;100KDoubleOperandForProducts;orderThresholdOrMoreOperator;premiumToolOrgSegmentRule;;
+ ;prospectivePowerdrillProductDetailExpression;powertoolsUserMemberOfGroupsOperand;powertoolsUserGroupsOperand;powertoolsContainsOperator;prospectivePowerdrillPromotionRule;;
+
+UPDATE BTGAssignOrganizationToGroupDefinition;uid[unique=true];userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+ ;assignToBronzeLoyaltyDefinition;bronzeloyalty;bronzeLoyaltySegment;;
+ ;assignToGoldLoyaltyDefinition;goldloyalty;goldLoyaltySegment;;
+ ;assignToSilverLoyaltyDefinition;silverloyalty;silverLoyaltySegment;;
+ ;assignToUSD50offpowertoolsDefinition;usd50offpowertools;premiumToolOrgSegment;;
+ ;unAssignBronzeLoyaltyForGoldDefinition;bronzeloyalty;goldLoyaltySegment;;
+ ;unAssignBronzeLoyaltyForSilverDefinition;bronzeloyalty;silverLoyaltySegment;;
+ ;unAssignSilverLoyaltyForGoldDefinition;silverloyalty;goldLoyaltySegment;;

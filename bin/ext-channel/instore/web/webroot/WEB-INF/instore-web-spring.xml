@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+		   http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	
+	<import resource="classpath:META-INF/backoffice-core-spring.xml"/>
+	
+
+	<import resource="instore-spring-filter.xml"/>
+	<import resource="instore-spring-security.xml"/>
+	
+	<alias name="backofficeOPWidgetLibUtils" alias="widgetLibUtils"/>
+	<bean id="backofficeOPWidgetLibUtils" parent="backofficeWidgetLibUtils">
+		<property name="rootDirectory" value='#{ T(de.hybris.platform.util.Utilities).getPlatformConfig().getSystemConfig().getDataDir() + "/instore" }'/>
+	</bean>
+	
+	<alias name="onPremiseSystemPropertyResolver" alias="cockpitProperties"/>
+	<bean id="onPremiseSystemPropertyResolver" class="com.hybris.instore.cockpitng.util.impl.PlatformSystemPropertyResolver" 
+		lazy-init="false" init-method="initProperties" parent="defaultCockpitProperties">
+		<property name="prefix" value="instore."/>
+	</bean>
+	
+	<alias alias="widgetPersistenceService" name="backofficeWidgetPersistenceService"/>
+	<bean id="backofficeWidgetPersistenceService" parent="cockpitModuleWidgetPersistenceService" >
+		<property name="cockpitProperties" ref="cockpitProperties"/>
+		<property name="defaultWidgetConfig" value="/instore-widgets.xml"/>
+	</bean>
+	
+	<alias alias="cockpitWidgetEngine" name="instoreAdminmodeWidgetEngine" />
+	<bean id="instoreAdminmodeWidgetEngine" parent="adminmodeWidgetEngine">
+		<property name="cockpitThreadContextCreator" ref="cockpitThreadContextCreator"/>
+	</bean>
+	
+	<alias alias="cockpitThreadContextCreator" name="instoreThreadContextCreator"/>
+	<bean id="instoreThreadContextCreator" class="com.hybris.instore.impl.InstoreCockpitThreadContextCreator"/>
+	
+	<alias name="instoreLocaleService" alias="cockpitLocaleService"/>
+	<bean id="instoreLocaleService" class="com.hybris.instore.cockpitng.i18n.InstoreLocaleService">
+		<property name="i18nService" ref="i18nService"/>
+	</bean>
+	
+	<alias name="instoreCockpitUserService" alias="cockpitUserService"/>
+	<bean id="instoreCockpitUserService" class="com.hybris.instore.cockpitng.user.InstoreCockpitUserService">
+		<property name="userService" ref="userService"/>
+	</bean>
+	
+	
+	<!-- product details "nearby stores" renderer -->
+	<alias alias="productDetailStoreListRenderer" name="defaultProductDetailStoreListRenderer"/>
+	<bean id="defaultProductDetailStoreListRenderer" class="com.hybris.instore.widgets.productdetail.renderers.StoreListRenderer"/>
+	
+	<alias name="defaultSearchStateResolver" alias="searchStateResolver"/>
+	<bean name="defaultSearchStateResolver" class="com.hybris.instore.widgets.solrsearch.facade.impl.DefaultSolrSearchStateResolver">
+		<property name="solrSearchQueryEncoder" ref="solrSearchQueryEncoder"/>
+		<property name="solrSearchQueryDecoder" ref="solrSearchQueryDecoder"/>
+	</bean>
+	
+	
+	
+	
+	
+	<!--  commercelayer bean alias replacements, beans are defined in instore-spring.xml -->
+	<alias alias="productSearchFacade" name="instoreSolrProductSearchFacade"/>
+	<alias alias="storeFinderStockFacade" name="instoreStoreFinderStockFacade"/>
+	<alias alias="productFacade" name="inStoreProductFacade"/>
+	
+</beans>

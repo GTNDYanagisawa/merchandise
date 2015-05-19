@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/mvc
+			http://www.springframework.org/schema/mvc/spring-mvc.xsd
+			http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd">
+
+  <mvc:annotation-driven>
+		<mvc:message-converters register-defaults="false">
+			<bean id="xStreamJSONConverter"
+				class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+				<constructor-arg ref="jsonXStreamMarshallerFactory" />
+				<property name="supportedMediaTypes">
+					<util:list id="mimeJSonTypesList">
+						<util:constant id="json"
+							static-field="org.springframework.http.MediaType.APPLICATION_JSON" />
+					</util:list>
+				</property>
+			</bean>
+			<bean id="xStreamXmlConverter"
+				class="org.springframework.http.converter.xml.MarshallingHttpMessageConverter">
+				<constructor-arg ref="xmlXStreamMarshallerFactory" />
+				<property name="supportedMediaTypes">
+					<util:list id="mimeXmlTypesList">
+						<util:constant id="xml"
+							static-field="org.springframework.http.MediaType.APPLICATION_XML" />
+					</util:list>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+	
+	<bean id="xmlXStreamMarshallerFactory"
+		  class="com.hybris.datahub.core.xstream.XmlXStreamMarshallerFactory">
+		<property name="XStream">
+			<bean
+					class="com.hybris.datahub.core.xstream.XmlXStreamFactory" />
+		</property>
+	</bean>
+	<bean id="jsonXStreamMarshallerFactory"
+		  class="com.hybris.datahub.core.xstream.JsonXStreamMarshallerFactory">
+		<property name="XStream">
+			<bean
+					class="com.hybris.datahub.core.xstream.JsonXStreamFactory" />
+		</property>
+	</bean>
+
+  <bean id="xmlXStreamFactory"
+		class="com.hybris.datahub.core.xstream.XmlXStreamFactory" />
+	<bean id="jsonXStreamFactory"
+		  class="com.hybris.datahub.core.xstream.JsonXStreamFactory" />
+
+	<!-- custom converters configuration -->
+
+  <bean id="converterPostProcessor"
+		class="com.hybris.datahub.core.conv.ConverterPostProcessor">
+	  <constructor-arg name="xStream">
+      <bean
+			  class="com.hybris.datahub.core.xstream.XmlXStreamFactory" />
+	  </constructor-arg>
+  </bean>
+
+
+  <!-- type aliases -->
+  <bean
+    class="de.hybris.platform.commercefacades.xstream.alias.TypeAliasMapping">
+    <property name="alias" value="result" />
+    <property name="aliasedClass"
+			  value="com.hybris.datahub.core.facades.ItemImportResult" />
+  </bean>
+
+  <!-- attribute converters -->
+  <!-- 
+  <bean
+    class="de.hybris.platform.commercefacades.xstream.conv.AttributeConverterMapping">
+    <property name="aliasedClass"
+      value="de.hybris.platform.commercefacades.product.data.ProductData" />
+    <property name="converter">
+      <bean
+        class="com.hybris.datahub.core.conv.StringValueConverter" />
+    </property>
+    <property name="attributeName" value="description" />
+  </bean>
+-->
+
+  <!-- field aliases -->
+  <bean
+    class="de.hybris.platform.commercefacades.xstream.alias.FieldAliasMapping">
+    <property name="alias" value="exportErrorDatas" />
+    <property name="fieldName" value="importErrors" />
+	  <property name="aliasedClass" value="com.hybris.datahub.core.facades.ItemImportResult" />
+  </bean>
+  <bean
+    class="de.hybris.platform.commercefacades.xstream.alias.FieldAliasMapping">
+    <property name="alias" value="crashReport" />
+    <property name="fieldName" value="importException" />
+	  <property name="aliasedClass" value="com.hybris.datahub.core.facades.ItemImportResult" />
+  </bean>
+
+  <!-- attribute aliases -->
+  <!-- Sample mapping which moves element url from ProductData and places 
+    it as attribute urlAttr !!!!!!!!!!!!!!!!!Warning!!!!!!!!!!!!!!!!!!! This 
+    setup will affect a JSON and XML notations Beware that JSON implementation 
+    does not support correctly attribute element as XML notation does. !!!!!!!!!!!!!!!!!Warning!!!!!!!!!!!!!!!!!!! 
+    bean class="de.hybris.platform.commercefacades.xstream.alias.AttributeAliasMapping"> 
+    <property name="alias" value="urlAttr" /> <property name="attributeName" 
+    value="url" /> <property name="aliasedClass" value="de.hybris.platform.commercefacades.product.data.ProductData" 
+    /> </bean -->
+
+  <!-- omitted fields -->
+<!-- 
+  <bean
+    class="de.hybris.platform.commercefacades.xstream.alias.AttributeOmitMapping">
+    <property name="attributeName" value="freeTextSearch" />
+    <property name="aliasedClass"
+      value="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchQueryData" />
+  </bean>
+ -->
+
+  <!-- CategoryData omit fields -->
+  <!-- 
+  <bean
+    class="de.hybris.platform.commercefacades.xstream.alias.AttributeOmitMapping">
+    <property name="attributeName" value="defaultBillingAddress" />
+    <property name="aliasedClass"
+      value="de.hybris.platform.commercefacades.user.data.CustomerData" />
+  </bean>
+   -->
+  
+  <!-- Implicit collections -->
+<!-- 
+  <bean
+    class="de.hybris.platform.commercefacades.xstream.alias.ImplicitCollection">
+    <property name="ownerType"
+      value="de.hybris.platform.commercefacades.order.data.CCPaymentInfoDatas" />
+    <property name="fieldName" value="paymentInfos" />
+  </bean>
+ -->
+
+<!-- 
+  <alias name="defaultWsDateFormatter" alias="wsDateFormatter" />
+  <bean id="defaultWsDateFormatter"
+    class="com.hybris.datahub.core.formatters.impl.DefaultWsDateFormatter" />
+ -->
+</beans>

@@ -1,0 +1,853 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd
+						http://www.springframework.org/schema/util
+           				http://www.springframework.org/schema/util/spring-util.xsd"
+	default-autowire="byName">	
+
+	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
+
+	
+	<bean id="loginService" class="de.hybris.platform.cockpit.services.login.impl.LoginServiceImpl" scope="tenant">
+		<property name="i18nService" ref="i18nService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<bean id="systemService" class="de.hybris.platform.cockpit.services.impl.SystemServiceImpl" scope="tenant">
+	<property name="userRightsCache" ref="userRightsCache" />
+	</bean>
+
+	<bean id="userRightsCache" class="de.hybris.platform.cockpit.services.impl.UserRightsCache" scope="session" destroy-method="clear">
+		<constructor-arg value="1000" />
+		<aop:scoped-proxy/>
+	</bean>
+
+	<!-- Use this service if you want the basic functionality of the cockpits new item service -->
+	<!--<bean id="newItemService" class="de.hybris.platform.cockpit.services.impl.NewItemServiceImpl" scope="tenant" />-->
+		
+	<!-- Use this service if you want to extend the basic functionality of the cockpits new item service with the evaluation of 
+	the workflow activation scripts for the automatic creation of workflows -->
+	<bean id="newItemService" class="de.hybris.platform.cockpit.services.impl.WorkflowNewItemServiceImpl" scope="tenant">
+		<property name="modelService" ref="modelService" />
+		<property name="systemService" ref="systemService" />
+		<property name="i18nService" ref="i18nService"/>
+		<property name="useServiceLayer" value="true"/>
+        <property name="scriptEvaluationService" ref="scriptEvaluationService"/>
+	</bean>
+
+	<bean id="savedValuesService" class="de.hybris.platform.cockpit.services.SavedValuesServiceImpl" scope="tenant" />
+
+
+<!-- *************************************************************
+     *** Types & Value Handler                                 ***
+     ************************************************************* -->
+	<alias alias="cockpitTypeService" name="extensibleCockpitTypeService"/>
+	
+	<bean id="extensibleCockpitTypeService" class="de.hybris.platform.cockpit.services.meta.impl.ExtensibleTypeService" scope="tenant" init-method="init" destroy-method="clear">
+		<property name="typeService" ref="typeService" />
+		<property name="modelService" ref="modelService" />
+		<property name="baseTypeCache" ref="baseTypeCache" />
+		<property name="objectTemplateCache" ref="objectTemplateCache" />
+		
+		<property name="extendedTypeChain" ref="cockpitTypeLoaderChain"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="propertyService" ref="cockpitPropertyService"/>
+		
+	</bean>
+
+	
+	<alias alias="cockpitPropertyService" name="defaultCockpitPropertyService" />
+	<bean id="defaultCockpitPropertyService" class="de.hybris.platform.cockpit.services.meta.impl.DefaultPropertyService" scope="tenant"/>
+	
+	<alias alias="cockpitTypeLoaderChain" name="defaultCockpitTypeLoaderChain"/>
+	<bean id="defaultCockpitTypeLoaderChain" class="de.hybris.platform.cockpit.services.meta.impl.DefaultExtendedTypeChain" scope="tenant">
+		<property name="extendedTypeLoaders">
+			<list>
+				<bean class="de.hybris.platform.cockpit.services.meta.impl.WidgetTypeLoader" />
+				<bean class="de.hybris.platform.cockpit.services.meta.impl.ClassificationTypeLoader">
+					<property name="extendedTypeCache" ref="extendedTypeCache" />
+					<property name="propertyDescriptorCodeResolver" ref="classificationPropertyPathResolver"/>
+				</bean>
+			</list>
+		</property>
+		<property name="defaultClearCacheTypeCodes">
+			<list>
+				<!-- Cache keys to be cleared -->
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultClassificationPropertyPathResolver" alias="classificationPropertyPathResolver"/>
+	<bean id="defaultClassificationPropertyPathResolver" class="de.hybris.platform.cockpit.services.meta.impl.DefaultPropertyDescriptorCodeResolver" scope="tenant"/>
+	
+	
+	<bean id="baseTypeCache" class="de.hybris.platform.cockpit.services.meta.impl.TypeCache" scope="tenant" destroy-method="clear">
+		<constructor-arg value="2000" />	
+	</bean>
+
+	<bean id="baseTypePropertyCache" class="de.hybris.platform.cockpit.services.meta.impl.PropertyCache" scope="tenant" destroy-method="clear">
+		<constructor-arg value="4000" />	
+	</bean>
+
+	<bean id="extendedTypeCache" class="de.hybris.platform.cockpit.services.meta.impl.TypeCache" scope="session" destroy-method="clear">
+		<constructor-arg value="50" />
+		<aop:scoped-proxy/>
+	</bean>
+	
+	<bean id="objectTemplateCache" class="de.hybris.platform.cockpit.services.meta.impl.TypeCache" scope="session" destroy-method="clear">
+		<constructor-arg value="100" />
+		<aop:scoped-proxy/>	
+	</bean>
+
+	
+	
+<!-- *** Handlers ******************************************************************** -->
+	<!-- Use this service if you want the basic functionality of the cockpits item object handler -->
+	<!-- 
+	<bean id="genericItemValueHandler" class="de.hybris.platform.cockpit.services.values.impl.GenericItemObjectValueHandler" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="i18NService" ref="i18NService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	 -->	
+		
+	<!-- Use this service if you want to extend the basic functionality of the cockpits item object handler with the evaluation of 
+	the workflow activation scripts for the automatic creation of workflows -->
+	<bean id="genericItemValueHandler" class="de.hybris.platform.cockpit.services.values.impl.WorkflowGenericItemObjectHandler" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="i18nService" ref="i18nService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="uiAccessRightService" ref="uiAccessRightService"/>
+        <property name="scriptEvaluationService" ref="scriptEvaluationService"/>
+	</bean>
+
+	<bean id="classificationValueHandler" class="de.hybris.platform.cockpit.services.values.impl.ClassificationObjectValueHandler" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="i18nService" ref="i18nService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<bean id="widgetparamValueHandler" class="de.hybris.platform.cockpit.services.values.impl.WidgetParamObjectValueHandler" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<bean id="valueService" class="de.hybris.platform.cockpit.services.values.impl.DefaultValueService" scope="tenant">
+		<property name="valueHandlerRegistry" ref="valueHandlerRegistry"/>
+		<property name="systemService" ref="systemService"/>
+	</bean>
+	
+	
+	<bean id="cockpitModelHelper" class="de.hybris.platform.cockpit.helpers.impl.DefaultModelHelper" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="typeService" ref="cockpitTypeService"/>
+		<property name="systemService" ref="systemService"/>
+		<property name="uiAccessRightService" ref="uiAccessRightService"/>
+		<property name="i18nService" ref="i18nService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="undoManager" ref="undoManager"/>
+	</bean>
+
+	<!-- browser model factory and their default mapping  -->
+
+	<alias alias="browserModelFactory" name="BrowserModelFactory"/>
+	<bean id="BrowserModelFactory" class="de.hybris.platform.cockpit.model.browser.impl.DefaultBrowserModelFactory" scope="tenant" init-method="initBrowserModelsMappings"/>
+	
+	<!-- browser models -->
+
+	<bean id="AbstractPageableBrowserModel" class="de.hybris.platform.cockpit.session.impl.AbstractPageableBrowserModel" scope="prototype" abstract="true">
+		<property name="pageSizes">
+			<list>
+				<value type="java.lang.Integer">4</value>
+				<value type="java.lang.Integer">12</value>
+				<value type="java.lang.Integer">30</value>
+				<value type="java.lang.Integer">60</value>
+				<value type="java.lang.Integer">100</value>
+<!--				<value type="java.lang.Integer">250</value>-->
+			</list>
+		</property>	
+		<property name="pageSize" value="30"/>
+		<property name="maxPageSize" value="250"/>
+	</bean>
+	
+	<!-- *** Registry ******************************************************************** -->
+
+	<bean id="valueHandlerRegistry" class="de.hybris.platform.cockpit.services.values.impl.DefaultObjectValueHandlerRegistry" scope="tenant" init-method="initHandlerMappings">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+	</bean>
+	
+	<bean id="genericIemValueHandlerMapping" class="de.hybris.platform.cockpit.services.values.impl.ObjectValueHandlerMapping" scope="tenant">
+		<property name="typeCode" value="Item"/>
+		<property name="valueHandler" ref="genericItemValueHandler"/>
+	</bean>
+	
+	<bean id="classificationValueHandlerMapping" class="de.hybris.platform.cockpit.services.values.impl.ObjectValueHandlerMapping" scope="tenant">
+		<property name="typeCode" value="Product"/>
+		<property name="valueHandler" ref="classificationValueHandler"/>
+	</bean>
+
+	<bean id="widgetparamValueHandlerMapping" class="de.hybris.platform.cockpit.services.values.impl.ObjectValueHandlerMapping" scope="tenant">
+		<property name="typeCode" value="Item"/>
+		<property name="valueHandler" ref="widgetparamValueHandler"/>
+	</bean>
+
+<!-- *************************************************************
+	 *** Search 	                                           ***
+   	 ************************************************************* -->
+
+	<alias alias="searchService" name="defaultSearchService"/>
+	<bean id="defaultSearchService" class="de.hybris.platform.cockpit.services.search.impl.DefaultSearchService" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="uiConfigurationService" ref="uiConfigurationService"/>
+		<property name="searchProvider" ref="genericSearchProvider"/>
+	</bean>
+
+	<!-- Generic search -->
+	<bean id="genericSearchProvider" class="de.hybris.platform.cockpit.services.search.impl.GenericQuerySearchProvider" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="conditionTranslatorRegistry" ref="conditionTranslatorRegistry"/>
+	</bean>	
+	
+	
+<!-- *************************************************************
+	 *** Condition translator mapping                          ***
+   	 ************************************************************* -->
+	<bean id="conditionTranslatorRegistry" class="de.hybris.platform.cockpit.services.search.impl.ConditionTranslatorRegistry" 
+			init-method="initTranslatorMappings" scope="tenant" />
+	
+	<bean id="genericQueryConditionTranslator"  scope="tenant"  
+		class="de.hybris.platform.cockpit.services.search.impl.DefaultGenericQueryConditionTranslator" >
+	</bean>
+	
+	<bean id="referenceGenericQueryConditionTranslator"  scope="tenant"  
+		class="de.hybris.platform.cockpit.services.search.impl.ReferenceGenericQueryConditionTranslator">
+		<property name="typeService" ref="cockpitTypeService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<bean id="featureGenericQueryConditionTranslator"  scope="tenant"  
+		class="de.hybris.platform.cockpit.services.search.impl.FeatureGenericQueryConditionTranslator">
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<bean class="de.hybris.platform.cockpit.services.search.impl.ConditionTranslatorRegistry.ConditionTranslatorMapping" scope="tenant" >
+		<property name="attributeType" value="TEXT"/>
+		<property name="operatorQualifiers">
+			<set>
+				<value>equals</value>
+				<value>between</value>
+				<value>contains</value>
+				<value>startswith</value>
+				<value>endswith</value>
+				<value>greater</value>
+				<value>less</value>
+				<value>greaterOrEquals</value>
+				<value>lessOrEquals</value>
+				<value>isEmpty</value>
+			</set>
+		</property>
+		<property name="translator" ref="genericQueryConditionTranslator"/>
+	</bean>
+	<bean class="de.hybris.platform.cockpit.services.search.impl.ConditionTranslatorRegistry.ConditionTranslatorMapping" scope="tenant" >
+		<property name="attributeTypes">
+			<set>
+				<value>INTEGER</value>
+				<value>LONG</value>
+				<value>DECIMAL</value>
+			</set>
+		</property>
+		<property name="operatorQualifiers">
+			<set>
+				<value>equals</value>
+				<value>between</value>
+				<value>greater</value>
+				<value>less</value>
+				<value>greaterOrEquals</value>
+				<value>lessOrEquals</value>
+				<value>isEmpty</value>
+			</set>
+		</property>
+		<property name="translator" ref="genericQueryConditionTranslator"/>
+	</bean>
+	<bean class="de.hybris.platform.cockpit.services.search.impl.ConditionTranslatorRegistry.ConditionTranslatorMapping" scope="tenant" >
+		<property name="attributeType" value="PK"/>
+		<property name="operatorQualifiers">
+			<set>
+				<value>equals</value>
+			</set>
+		</property>
+		<property name="translator" ref="genericQueryConditionTranslator"/>
+	</bean>
+	<bean class="de.hybris.platform.cockpit.services.search.impl.ConditionTranslatorRegistry.ConditionTranslatorMapping" scope="tenant" >
+		<property name="attributeType" value="DATE"/>
+		<property name="operatorQualifiers">
+			<set>
+				<value>equals</value>
+				<value>between</value>
+				<value>greater</value>
+				<value>less</value>
+				<value>greaterOrEquals</value>
+				<value>lessOrEquals</value>
+				<value>isEmpty</value>
+			</set>
+		</property>
+		<property name="translator" ref="genericQueryConditionTranslator"/>
+	</bean>
+	<bean class="de.hybris.platform.cockpit.services.search.impl.ConditionTranslatorRegistry.ConditionTranslatorMapping" scope="tenant" >
+		<property name="attributeType" value="REFERENCE"/>
+		<property name="operatorQualifiers">
+			<set>
+				<value>equals</value>
+			</set>
+		</property>
+		<property name="translator" ref="genericQueryConditionTranslator"/>
+	</bean>
+	<bean class="de.hybris.platform.cockpit.services.search.impl.ConditionTranslatorRegistry.ConditionTranslatorMapping" scope="tenant" >
+		<property name="attributeType" value="ENUM"/>
+		<property name="operatorQualifiers">
+			<set>
+				<value>equals</value>
+			</set>
+		</property>
+		<property name="translator" ref="genericQueryConditionTranslator"/>
+	</bean>
+	<bean class="de.hybris.platform.cockpit.services.search.impl.ConditionTranslatorRegistry.ConditionTranslatorMapping" scope="tenant" >
+		<property name="attributeType" value="BOOLEAN"/>
+		<property name="operatorQualifiers">
+			<set>
+				<value>equals</value>
+			</set>
+		</property>
+		<property name="translator" ref="genericQueryConditionTranslator"/>
+	</bean>
+	
+	
+	<bean id="specialDateConditionTranslator"  scope="tenant"  
+		class="de.hybris.platform.cockpit.services.search.impl.SpecialDateConditionTranslator" />
+	
+	<bean class="de.hybris.platform.cockpit.services.search.impl.ConditionTranslatorRegistry.ConditionTranslatorMapping" scope="tenant" >
+		<property name="attributeType" value="DATE"/>
+		<property name="operatorQualifiers">
+			<set>
+				<value>today</value>
+				<value>tomorrow</value>
+				<value>yesterday</value>
+				<value>thisweek</value>
+				<value>lastweek</value>
+				<value>thismonth</value>
+				<value>lastmonth</value>
+				<value>thisyear</value>
+				<value>lastyear</value>
+			</set>
+		</property>
+		<property name="translator" ref="specialDateConditionTranslator"/>
+	</bean>
+	<bean class="de.hybris.platform.cockpit.services.search.impl.ConditionTranslatorRegistry.ConditionTranslatorMapping" scope="tenant" >
+		<property name="attributeType" value="REFERENCE"/>
+		<property name="operatorQualifiers">
+			<set>
+				<value>in</value>
+			</set>
+		</property>
+		<property name="translator" ref="referenceGenericQueryConditionTranslator"/>
+	</bean>
+	<bean class="de.hybris.platform.cockpit.services.search.impl.ConditionTranslatorRegistry.ConditionTranslatorMapping" scope="tenant" >
+		<property name="attributeType" value="FEATURE"/>
+		<property name="operatorQualifiers">
+			<set>
+				<value>equals</value>
+				<value>between</value>
+			</set>
+		</property>
+		<property name="translator" ref="featureGenericQueryConditionTranslator"/>
+	</bean>
+	
+<!-- *************************************************************
+	 *** Configuration                                         ***
+   	 ************************************************************* -->
+	<bean id="orderEntryLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.OrderLabelProvider" scope="tenant"/>
+		
+	<bean id="categoryLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.CategoryLabelProvider" scope="tenant"/>
+	
+	<bean id="currencyLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.CurrencyLabelProvider" scope="tenant"/>
+	
+	<bean id="countryLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.CountryLabelProvider" scope="tenant"/>
+
+	<bean id="enumerationValueLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.EnumerationValueLabelProvider" scope="tenant"/>
+
+	<bean id="mediaLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.MediaLabelProvider" scope="tenant"/>
+
+	<bean id="productLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.ProductLabelProvider" scope="tenant"/>
+
+	<bean id="productReferenceLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.ProductReferenceLabelProvider" scope="tenant"/>
+		
+	<bean id="unitLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.UnitLabelProvider" scope="tenant"/>
+	
+	<bean id="priceRowLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.PriceRowLabelProvider" scope="tenant"/>
+	
+	<bean id="languageLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.LanguageLabelProvider" scope="tenant"/>
+	
+	<bean id="catalogVersionLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.CatalogVersionLabelProvider" scope="tenant"/>
+
+	<bean id="workflowLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.WorkflowLabelProvider" scope="tenant"/>
+	
+	<bean id="workflowTemplateLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.WorkflowTemplateLabelProvider" scope="tenant"/>
+
+	<bean id="workflowActionTemplateLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.WorkflowActionTemplateLabelProvider" scope="tenant"/>
+
+	<bean id="commentLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.CommentLabelProvider" scope="tenant"/>
+	
+	<bean id="commentAttachmentLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.CommentAttachmentLabelProvider" scope="tenant"/>
+	
+	<bean id="principalLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.PrincipalLabelProvider" scope="tenant"/>
+	
+	<bean id="abstractModelLabelProvider" class="de.hybris.platform.cockpit.services.label.AbstractModelLabelProvider" scope="tenant" abstract="true">
+		<property name="modelService" ref="modelService" />
+	</bean>
+	<bean id="catalogAwareModelLabelProvider" class="de.hybris.platform.cockpit.services.label.CatalogAwareModelLabelProvider" scope="tenant" abstract="true"  parent="abstractModelLabelProvider"/>
+
+	<bean id="catalogVersionModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.CatalogVersionModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="categoryModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.CategoryModelLabelProvider" scope="tenant" parent="catalogAwareModelLabelProvider"/>
+	<bean id="commentAttachmentModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.CommentAttachmentModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="commentModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.CommentModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="countryModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.CountryModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="currencyModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.CurrencyModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="enumerationValueModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.EnumerationValueModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="languageModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.LanguageModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="mediaModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.MediaModelLabelProvider" scope="tenant" parent="catalogAwareModelLabelProvider"/>
+	<bean id="orderModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.OrderModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="priceRowModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.PriceRowModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="principalModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.PrincipalModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="productModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.ProductModelLabelProvider" scope="tenant" parent="catalogAwareModelLabelProvider"/>
+	<bean id="productReferenceModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.ProductReferenceModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="unitModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.UnitModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="workflowActionTemplateModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.WorkflowActionTemplateModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="workflowModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.WorkflowModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<bean id="workflowTemplateModelLabelProvider" class="de.hybris.platform.cockpit.services.label.impl.WorkflowTemplateModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+
+	<bean id="labelService" class="de.hybris.platform.cockpit.services.label.impl.DefaultLabelService" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="uiConfigurationService" ref="uiConfigurationService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+	
+	<bean id="mediaUpdateService" class="de.hybris.platform.cockpit.services.impl.MediaUpdateServiceImpl" scope="tenant"/>
+
+	<bean id="objectCompareService" class="de.hybris.platform.cockpit.services.values.impl.DefaultObjectCompareService" scope="tenant"/>
+
+	<bean id="uiConfigurationService" class="de.hybris.platform.cockpit.services.config.impl.DefaultUIConfigurationService" scope="tenant" init-method="init" destroy-method="clear">
+		<property name="fallbackRoleName" value="cockpitgroup"/>
+		<property name="loginService" ref="loginService"/>
+		<property name="userService" ref="userService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="cockpitConfigurationService" ref="cockpitConfigurationService"/>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="uiComponentCache" ref="uiComponentCache"/>
+		<property name="mediaService" ref="mediaService"/>
+	</bean>
+	
+	<alias name="defaultUIConfigurationPersistingStrategy" alias="uiConfigurationPersistingStrategy"/>
+	<bean id="defaultUIConfigurationPersistingStrategy" abstract="true" class="de.hybris.platform.cockpit.services.config.impl.DefaultConfigurationPersistingStrategy" scope="tenant">
+		<property name="jaxbContextCache" ref="jaxbContextCache"/>
+	</bean>
+	
+	<bean id="dashboardPersistingStrategy" class="de.hybris.platform.cockpit.services.config.impl.DashboardPersistingStrategy" parent="uiConfigurationPersistingStrategy" scope="tenant"/>
+	
+	<bean id="editorPersistingStrategy" class="de.hybris.platform.cockpit.services.config.impl.EditorConfigurationPersistingStrategy" parent="uiConfigurationPersistingStrategy" scope="tenant">
+		<property name="schemaResource" value="classpath:/editor.xsd"/>
+		<property name="jaxbClass" value="de.hybris.platform.cockpit.services.config.jaxb.editor.Editor"/>
+	</bean>
+	<bean id="advancedSearchPersistingStrategy" class="de.hybris.platform.cockpit.services.config.impl.AdvancedSearchConfigurationPersistingStrategy" parent="uiConfigurationPersistingStrategy" scope="tenant">
+		<property name="schemaResource" value="classpath:/advanced-search.xsd"/>
+		<property name="jaxbClass" value="de.hybris.platform.cockpit.services.config.jaxb.advancedsearch.AdvancedSearch"/>
+	</bean>
+	<bean id="listViewPersistingStrategy" class="de.hybris.platform.cockpit.services.config.impl.ListViewConfigurationPersistingStrategy" parent="uiConfigurationPersistingStrategy" scope="tenant">
+		<property name="schemaResource" value="classpath:/list-view.xsd"/>
+		<property name="jaxbClass" value="de.hybris.platform.cockpit.services.config.jaxb.listview.ListView"/>
+	</bean>
+	
+	<bean id="uiComponentCache" class="de.hybris.platform.cockpit.services.config.impl.UIComponentCache" scope="session" destroy-method="clear">
+		<aop:scoped-proxy/>		
+	</bean>
+	
+	<bean id="cockpitUIComponentConfigurationDao" class="de.hybris.platform.cockpit.daos.impl.DefaultCockpitUIComponentConfigurationDao" scope="tenant"/>
+
+	<bean id="jaxbBasedUIComponentConfigurationFactory" class="de.hybris.platform.cockpit.services.config.impl.JAXBBasedUIComponentConfigurationFactory" scope="tenant" abstract="true">
+		<property name="searchService" ref="searchService"/>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="propertyService" ref="cockpitPropertyService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="jaxbContextCache" ref="jaxbContextCache"/>
+	</bean>
+	
+	<bean id="listViewConfigurationFactory" class="de.hybris.platform.cockpit.services.config.impl.ListViewConfigurationFactory" scope="tenant" parent="jaxbBasedUIComponentConfigurationFactory">
+		<property name="jaxbClass" value="de.hybris.platform.cockpit.services.config.jaxb.listview.ListView"/>
+		<property name="schemaResource" value="classpath:/list-view.xsd"/>
+		<property name="systemService" ref="systemService"/>
+	</bean>
+	
+	<bean id="editorConfigurationFactory" class="de.hybris.platform.cockpit.services.config.impl.EditorConfigurationFactory" scope="tenant" parent="jaxbBasedUIComponentConfigurationFactory">
+		<property name="jaxbClass" value="de.hybris.platform.cockpit.services.config.jaxb.editor.Editor"/>
+		<property name="schemaResource" value="classpath:/editor.xsd"/>
+		<property name="systemService" ref="systemService"/>
+	</bean>
+	
+	<bean id="advancedSearchConfigurationFactory" class="de.hybris.platform.cockpit.services.config.impl.AdvancedSearchConfigurationFactory" scope="tenant"  parent="jaxbBasedUIComponentConfigurationFactory">
+		<property name="jaxbClass" value="de.hybris.platform.cockpit.services.config.jaxb.advancedsearch.AdvancedSearch"/>
+		<property name="schemaResource" value="classpath:/advanced-search.xsd"/>
+		<property name="systemService" ref="systemService"/>
+	</bean>
+	
+	<bean id="baseConfigurationFactory" class="de.hybris.platform.cockpit.services.config.impl.BaseConfigurationFactory" scope="tenant"  parent="jaxbBasedUIComponentConfigurationFactory">
+		<property name="jaxbClass" value="de.hybris.platform.cockpit.services.config.jaxb.base.Base"/>
+		<property name="schemaResource" value="classpath:/base.xsd"/>
+		<property name="labelFallbackPropertyQualifiers">
+			<list>
+				<value>code</value>
+				<value>qualifier</value>
+				<value>isoCode</value>
+				<value>uid</value>
+				<value>id</value>
+				<value>name</value>
+				<value>label</value>			
+			</list>
+		</property>
+	</bean>
+
+	<bean id="gridViewConfigurationFactory" class="de.hybris.platform.cockpit.services.config.impl.GridViewConfigurationFactory" scope="tenant" parent="jaxbBasedUIComponentConfigurationFactory">
+		<property name="jaxbClass" value="de.hybris.platform.cockpit.services.config.jaxb.gridview.GridView"/>
+		<property name="schemaResource" value="classpath:/grid-view.xsd"/>
+	</bean>
+	
+	<bean id="wizardConfigurationFactory" class="de.hybris.platform.cockpit.services.config.impl.WizardConfigurationFactory" scope="tenant" parent="jaxbBasedUIComponentConfigurationFactory">
+		<property name="jaxbClass" value="de.hybris.platform.cockpit.services.config.jaxb.wizard.WizardConfig"/>
+		<property name="schemaResource" value="classpath:/wizard-config.xsd"/>
+		<property name="systemService" ref="systemService"/>
+	</bean>
+
+	<bean id="widgetDashboardConfigurationFactory" class="de.hybris.platform.cockpit.services.config.impl.WidgetDashboardConfigurationFactory" scope="tenant" parent="jaxbBasedUIComponentConfigurationFactory">
+		<property name="jaxbClass" value="de.hybris.platform.cockpit.services.config.jaxb.dashboard.WidgetDashboard"/>
+		<property name="schemaResource" value="classpath:/widget-dashboard.xsd"/>
+	</bean>
+
+	
+	<bean id="uiAccessRightService" class="de.hybris.platform.cockpit.services.security.impl.DefaultUIAccessRightService" scope="tenant">
+		<property name="cockpitUIComponentAccessRightDao" ref="cockpitUIComponentAccessRightDao"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<bean id="cockpitUIComponentAccessRightDao" class="de.hybris.platform.cockpit.daos.impl.DefaultCockpitUIComponentAccessRightDao" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<alias name="defaultCockpitJaxbContextCache" alias="jaxbContextCache"/>
+	<bean id="defaultCockpitJaxbContextCache" class="de.hybris.platform.cockpit.util.jaxb.impl.DefaultJAXBContextCache" scope="tenant"/>
+	
+
+<!-- *************************************************************
+	 *** Drag & Drop                                           ***
+   	 ************************************************************* -->
+	<bean id="dragAndDropWrapperService" class="de.hybris.platform.cockpit.services.dragdrop.DragAndDropWrapperService" scope="tenant">
+		<property name="wrapper">
+			<bean class="de.hybris.platform.cockpit.services.dragdrop.impl.DefaultDragAndDropWrapper"/>
+		</property>
+	</bean>
+	
+<!-- *************************************************************
+	 *** Workflow                                         ***
+   	 ************************************************************* -->
+   	
+   	<!-- Please cahnge this alias at 5th version of platform when deprecated classes are removed, see PLA-10100 -->
+	<alias alias="workflowService" name="deprecatedWorkflowService"/>
+   	
+	<bean id="deprecatedWorkflowService" class="de.hybris.platform.cockpit.services.workflow.impl.WorkflowServiceImpl" scope="tenant">
+		<property name="newWorkflowService" ref="defaultWorkflowService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="workflowDao" ref="workflowDao"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+	
+	<bean id="workflowDao" class="de.hybris.platform.workflow.dao.impl.DefaultWorkflowDAO" scope="tenant">
+		<property name="userService" ref="userService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+<!-- *************************************************************
+	 *** Object collection and query services                  ***
+	 ************************************************************* -->
+	<alias name="savedQueryUserRightsDao" alias="savedQueryDao"/>
+	<bean id="defaultSavedQueryDao" class="de.hybris.platform.cockpit.services.query.daos.impl.DefaultSavedQueryDao" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	<bean id="savedQueryUserRightsDao" class="de.hybris.platform.cockpit.services.query.daos.impl.SavedQueryUserRightsDaoImpl" scope="tenant" parent="defaultSavedQueryDao" />
+
+	<bean id="objectCollectionService" class="de.hybris.platform.cockpit.services.impl.ObjectCollectionServiceImpl" scope="tenant">
+		<property name="objectCollectionDao" ref="objectCollectionDao"/>
+	</bean>
+	 
+	<bean id="savedQueryService" class="de.hybris.platform.cockpit.services.query.impl.SavedQueryServiceImpl" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="searchService" ref="searchService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="savedQueryDao" ref="savedQueryDao"/>
+		<property name="enumerationService" ref="enumerationService" />
+	</bean>
+
+	<bean id="dynamicQueryService" class="de.hybris.platform.cockpit.services.query.impl.EmptyDynamicQueryServiceImpl" scope="tenant" />
+
+<!-- *************************************************************
+	 *** Undo management                                       ***
+	 ************************************************************* -->
+	
+	<bean id="undoManager"
+      class="de.hybris.platform.cockpit.services.undo.impl.DefaultUndoManager" scope="session">
+      <constructor-arg value="20"/>
+        <aop:scoped-proxy />
+	</bean>
+
+<!-- *************************************************************
+	 *** Media Information                                      ***
+	 ************************************************************* -->
+	 
+	 <bean id="mediaInfoService" class="de.hybris.platform.cockpit.services.media.impl.DefaultMediaInfoService" scope="tenant">
+	 	<property name="fallbackIcon" value="cockpit/images/stop_klein.jpg" />
+	 	<property name="webMedias">
+	 		<set>
+	 			<bean class="de.hybris.platform.cockpit.services.media.MediaInfo">
+					<property name="fileExt" value="bmp" />
+					<property name="mime" value="image/bmp" />
+	 			</bean>
+	 			<bean class="de.hybris.platform.cockpit.services.media.MediaInfo">
+					<property name="fileExt" value="gif" />
+					<property name="mime" value="image/gif" />
+	 			</bean>
+	 			<bean class="de.hybris.platform.cockpit.services.media.MediaInfo">
+					<property name="fileExt" value="jpg" />
+					<property name="mime" value="image/jpeg" />
+	 			</bean>
+	 			<bean class="de.hybris.platform.cockpit.services.media.MediaInfo">
+					<property name="fileExt" value="png" />
+					<property name="mime" value="image/png" />
+	 			</bean>
+	 		</set>
+	 	</property>
+		<property name="nonWebMedias">
+			<set>
+				<bean class="de.hybris.platform.cockpit.services.media.MediaInfo">
+					<property name="fileExt" value="pdf" />
+					<property name="mime" value="application/pdf" />
+					<property name="icon" value="cockpit/images/pdf_small.jpg" />
+				</bean>
+				<bean class="de.hybris.platform.cockpit.services.media.MediaInfo">
+					<property name="fileExt" value="swf" />
+					<property name="mime" value="application/x-shockwave-flash" />
+					<property name="icon" value="cockpit/images/swf_small.jpg" />
+				</bean>	
+				<bean class="de.hybris.platform.cockpit.services.media.MediaInfo">
+					<property name="fileExt" value="xml" />
+					<property name="mime" value="application/xml" />
+					<property name="icon" value="cockpit/images/xml_small.jpg" />
+				</bean>								
+				<bean class="de.hybris.platform.cockpit.services.media.MediaInfo">
+					<property name="fileExt" value="xml" />
+					<property name="mime" value="text/xml" />
+					<property name="icon" value="cockpit/images/xml_small.jpg" />
+				</bean>								
+			</set>
+		</property>
+	 </bean>
+	 
+	<!-- Global data language handling when calling modelService.save() -->
+	<bean id="modelSaveDataLanguageInterceptor" class="de.hybris.platform.cockpit.aop.ModelSaveDataLanguageInterceptor"/>
+	
+	<aop:config>
+		<aop:aspect ref="modelSaveDataLanguageInterceptor">
+			<aop:pointcut id="valueHandlerDataLanguagePointcut" 
+                    expression="target(de.hybris.platform.cockpit.services.values.impl.GenericItemObjectValueHandler) and execution(* storeValues(..))"/>
+         <aop:around pointcut-ref="valueHandlerDataLanguagePointcut"
+                  method="intercept"/>
+		</aop:aspect>
+	</aop:config>
+	<aop:config>
+		<aop:aspect ref="modelSaveDataLanguageInterceptor">
+			<aop:pointcut id="modelHelperDataLanguagePointcut" 
+                    expression="target(de.hybris.platform.cockpit.helpers.impl.DefaultModelHelper) and execution(* saveModel*(..))"/>
+         <aop:around pointcut-ref="modelHelperDataLanguagePointcut"
+                  method="intercept"/>
+		</aop:aspect>
+	</aop:config>
+	<aop:config>
+		<aop:aspect ref="modelSaveDataLanguageInterceptor">
+			<aop:pointcut id="newItemDataLanguagePointcut" 
+                    expression="target(de.hybris.platform.cockpit.services.impl.NewItemServiceImpl) and execution(* createNewItem*(..))"/>
+         <aop:around pointcut-ref="newItemDataLanguagePointcut"
+                  method="intercept"/>
+		</aop:aspect>
+	</aop:config>
+	<aop:config>
+		<aop:aspect ref="modelSaveDataLanguageInterceptor">
+			<aop:pointcut id="validationServiceDataLanguagePointcut" 
+                    expression="target(de.hybris.platform.cockpit.services.validation.impl.DefaultCockpitValidationService) and execution(* validate*(..))"/>
+         <aop:around pointcut-ref="validationServiceDataLanguagePointcut"
+                  method="intercept"/>
+		</aop:aspect>
+	</aop:config>
+	 
+	 <!-- *************************************************************
+	 *** Validation Framework                                       ***
+	 ************************************************************* -->
+	 
+	 <bean id="cockpitValidationService" class="de.hybris.platform.cockpit.services.validation.impl.DefaultCockpitValidationService" scope="tenant">
+	 	<property name="cockpitTypeService" ref="cockpitTypeService" />
+	 	<property name="validationService" ref="validationService" />
+	 	<property name="validationUIHelper" ref="validationUIHelper" />
+	 </bean>
+	 
+	 <bean id="validationUIHelper" class="de.hybris.platform.cockpit.helpers.validation.ValidationUIHelper" scope="tenant" />
+	 
+<!-- *************************************************************
+	 *** Comment                                         ***
+   	 ************************************************************* -->
+	<bean id="cockpitCommentService" class="de.hybris.platform.cockpit.services.impl.DefaultCockpitCommentService" scope="tenant" />
+	 
+<!-- *************************************************************
+	 *** Editor area preview data providers and services	   ***
+   	 ************************************************************* -->	 
+	 
+	 <bean id="xmlDataProvider" class="de.hybris.platform.cockpit.services.xmlprovider.impl.DefaultXmlDataProvider" scope="tenant">
+	 	<property name="typeService" ref="cockpitTypeService"/>
+	 </bean>
+	 
+	 <bean id="customXmlDataProvider" class="de.hybris.platform.cockpit.services.xmlprovider.impl.CustomXmlDataProvider" scope="tenant"/>
+	 
+	 <bean id="localizedXmlDataProvider" class="de.hybris.platform.cockpit.services.xmlprovider.impl.LocalizedXmlDataProvider" scope="tenant">
+	 	<property name="i18service" ref="i18nService"/>
+	 </bean>
+	 
+	 <bean id="reportsService" class="de.hybris.platform.cockpit.services.reports.impl.DefaultReportsService" scope="tenant">
+	 	<property name="reportsDAO" ref="reportsDAO"/>
+	 	<property name="mediaService" ref="mediaService"/>
+	 </bean>
+	 
+	 <bean id="reportsDAO" class="de.hybris.platform.cockpit.daos.impl.DefaultReportsDAO" scope="tenant">
+	 	<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	 	<property name="localeService" ref="localizationService"/>
+	 </bean>
+	 
+	<!-- Comment layer -->
+	<alias  alias="commentLayerService" name="defaultCommentLayerService"/>	
+	<bean id="defaultCommentLayerService" class="de.hybris.platform.cockpit.services.comments.impl.DefaultCommentLayerService" scope="tenant" parent="abstractBusinessService">
+		<property name="commentsCommands" ref="commentsCommandsRegistry"/>
+		<property name="cockpitCommentService" ref="cockpitCommentService"/>
+		<property name="commentService" ref="commentService"/>
+		<property name="userCanEditCommentStrategy" ref="userCanEditCommentStrategy"/>
+		<property name="userCanReplyCommentStrategy" ref="userCanReplyCommentStrategy"/>
+		<property name="userCanDeleteCommentStrategy" ref="userCanDeleteCommentStrategy"/>
+		<property name="userCanMoveCommentStrategy" ref="userCanMoveCommentStrategy"/>
+		<property name="userCanCreateCommentStrategy" ref="userCanCreateCommentStrategy"/>
+	</bean>
+	
+	<alias alias="commentsCommandsRegistry" name="defaultCommentsCommandsRegistry" />
+	
+	<util:map id="defaultCommentsCommandsRegistry" scope="tenant">
+		<entry key="selectComment" value-ref="selectCommentExecutor"/>
+		<entry key="createComment" value-ref="createNewCommentExecutor"/>
+		<entry key="editComment" value-ref="editCommentExecutor"/>
+	</util:map>
+	
+	<alias alias="createNewCommentExecutor" name="defaultCreateNewCommentExecutor"/>
+	<bean id="defaultCreateNewCommentExecutor" class="de.hybris.platform.cockpit.services.comments.modes.impl.CreateNewCommentExecutor" scope="tenant"/>
+	
+	<alias alias="selectCommentExecutor" name="defaultSelectCommentExecutor"/>
+	<bean id="defaultSelectCommentExecutor" class="de.hybris.platform.cockpit.services.comments.modes.impl.SelectCommentExecutor" scope="tenant"/>
+	
+	<alias alias="editCommentExecutor" name="defaultEditCommentExecutor"/>
+	<bean id="defaultEditCommentExecutor" class="de.hybris.platform.cockpit.services.comments.modes.impl.EditCommentModeExecutor" scope="tenant"/>
+	
+	<bean id="abstractUserCommentsPermissionsCheckStrategy" class="de.hybris.platform.cockpit.comments.strategies.impl.AbstractUserCommentsPermissionsCheckStrategy" scope="tenant" abstract="true" >
+		<property name="typeService" ref="cockpitTypeService"/>
+		<property name="uiAccessRightService" ref="uiAccessRightService"/>
+		<property name="systemService" ref="systemService"/>
+		<property name="userService" ref="userService"/>
+	</bean>	
+		
+	<alias alias="userCanEditCommentStrategy" name="defaultUserCanEditCommentStrategy"/>
+	<bean id="defaultUserCanEditCommentStrategy" class="de.hybris.platform.cockpit.comments.strategies.impl.DefaultUserCanEditCommentStrategy" parent="abstractUserCommentsPermissionsCheckStrategy" scope="tenant"/>
+	
+	<alias alias="userCanReplyCommentStrategy" name="defaultUserCanReplyCommentStrategy"/>
+	<bean id="defaultUserCanReplyCommentStrategy" class="de.hybris.platform.cockpit.comments.strategies.impl.DefaultUserCanReplyCommentStrategy" parent="abstractUserCommentsPermissionsCheckStrategy" scope="tenant"/>
+
+	
+	<alias alias="userCanDeleteCommentStrategy" name="defaultUserCanDeleteCommentStrategy"/>
+	<bean id="defaultUserCanDeleteCommentStrategy" class="de.hybris.platform.cockpit.comments.strategies.impl.DefaultUserCanDeleteCommentStrategy" parent="abstractUserCommentsPermissionsCheckStrategy" scope="tenant"/>
+	
+	<alias alias="userCanMoveCommentStrategy" name="defaultUserCanMoveCommentStrategy"/>
+	<bean id="defaultUserCanMoveCommentStrategy" class="de.hybris.platform.cockpit.comments.strategies.impl.DefaultUserCanMoveCommentStrategy" scope="tenant" parent="abstractUserCommentsPermissionsCheckStrategy"/>
+	
+	<alias name="defaultUserCanCreateCommentStrategy" alias="userCanCreateCommentStrategy"/>
+	<bean id="defaultUserCanCreateCommentStrategy" class="de.hybris.platform.cockpit.comments.strategies.impl.DefaultUserCanCreateCommentStrategy" scope="tenant" parent="abstractUserCommentsPermissionsCheckStrategy"/>
+	
+	<alias alias="cockpitCelumDelegate" name="defaultCockpitCelumDelegate"/>
+	<bean id="defaultCockpitCelumDelegate" class="de.hybris.platform.cockpit.services.celum.impl.DefaultCockpitCelumDelegate" scope="session"/>    
+	
+	<bean id="workflowFacade" class="de.hybris.platform.cockpit.components.navigationarea.workflow.visualization.WorkflowFacade" scope="tenant">
+		<property name="typeService" ref="cockpitTypeService"></property>
+		<property name="userService" ref="userService"></property>
+		<property name="workflowActionService" ref="workflowActionService"></property>
+		<property name="workflowAttachmentService" ref="workflowAttachmentService"></property>
+		<property name="workflowProcessingService" ref="workflowProcessingService"></property>
+		<property name="workflowService" ref="newestWorkflowService"></property>
+		<property name="workflowTemplateService" ref="workflowTemplateService"></property>
+	</bean>
+	
+		<alias alias="tableValueRequestCache" name="defaultTableValueRequestCache"/>
+	<bean id="defaultTableValueRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="request">
+		<constructor-arg type="int"><value>65536</value></constructor-arg>
+	</bean>
+
+	<alias alias="uiAccessRightServiceWriteRequestCache" name="defaultUiAccessRightServiceWriteRequestCache"/>
+	<bean id="defaultUiAccessRightServiceWriteRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="request">
+		 <constructor-arg type="int"><value>1024</value></constructor-arg>
+	</bean>	 
+	
+	<alias alias="uiAccessRightServiceReadRequestCache" name="defaultUiAccessRightServiceReadRequestCache"/>
+	<bean id="defaultUiAccessRightServiceReadRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="request">
+ 	    <constructor-arg type="int"><value>1024</value></constructor-arg>
+ 	</bean>
+	
+	<alias alias="valueHandlerChainRequestCache" name="defaultValueHandlerChainRequestCache"/>
+	<bean id="defaultValueHandlerChainRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="request">
+		<constructor-arg type="int"><value>256</value></constructor-arg>
+	</bean>
+	
+	<alias alias="matchingDescriptorsRequestCache" name="defaultMatchingDescriptorsRequestCache"/>
+	<bean id="defaultMatchingDescriptorsRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="request">
+		<constructor-arg type="int"><value>8192</value></constructor-arg>
+	</bean>
+	
+	<alias alias="coverageInfoRequestCache" name="defaultCoverageInfoRequestCache"/>
+	<bean id="defaultCoverageInfoRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="request">
+ 		<constructor-arg type="int"><value>256</value></constructor-arg>
+	</bean>
+	
+ 	<bean id="classAttributeRequestCache" class="de.hybris.platform.cockpit.cache.RequestCache" scope="request">
+ 		<constructor-arg type="int"><value>1024</value></constructor-arg>
+ 	</bean>
+
+
+</beans>

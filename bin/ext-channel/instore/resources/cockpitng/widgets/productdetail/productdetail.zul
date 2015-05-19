@@ -1,0 +1,112 @@
+<widget xmlns="http://www.zkoss.org/2005/zul"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:zk="http://www.zkoss.org/2005/zk"
+	xmlns:w="http://www.zkoss.org/2005/zk/client"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.hybris.com/schema/cockpitng/zul/zul.xsd"
+	height="100%" width="100%">
+
+	<listbox sclass="yw-productdetail-listbox" height="100%" vflex="false">
+		<listhead/>
+		<listitem sclass="yw-productdetail-listitem" >
+			<listcell>
+				<div sclass="yw-productdetail-main">
+					<!-- Header -->
+					<div sclass="yw-productdetail-header clearfix">
+						<hlayout>
+							<button label="&#171;" id="backButton" sclass="yw-productdetail-back-button" if="${widgetSettings.backVisible}"/>
+							<div hflex="1" sclass="yw-productdetail-title-holder">
+								<label id="titleLabel" sclass="yw-productdetail-title"
+									value="" />
+								<label id="subtitleLabel" sclass="yw-productdetail-subtitle"
+									value="" />
+							</div>
+							<div class="pull-text-right yw-productdetail-price-holder">
+								<label id="priceLabel" sclass="yw-productdetail-price"
+									value="" />
+								<label id="priceInfoLabel"
+									sclass="yw-productdetail-priceinfo" />
+							</div>
+						</hlayout>
+					</div>
+					<div sclass="yw-productdetail-info clearfix">
+						<!-- Product image/gallery -->
+						<div sclass="grid-30">
+							<div sclass="yw-productdetail-image">
+								<image id="imageContainer"
+									src="${wr}/images/imageNotAvailable.png" />
+							</div>
+							<div sclass="yw-productdetail-ratingcontainer">
+								<div id="ratingPlaceHolder"	sclass="yw-productdetail-rating-na" >
+									<image src="${wr}/images/rating_default.png" sclass="yw-productdetail-rating-default"/>
+									<div id="ratingSizeableContainer" sclass="yw-productdetail-rating-mask-holder">
+										<image src="${wr}/images/rating_rate.png" sclass="yw-productdetail-rating-rate"/>
+									</div>
+								</div>
+							</div>
+							<div sclass="yw-productdetail-actioncontainer">
+								<button id="browseSimilarBtn"
+									label="${labels.show.similar}" />
+							</div>
+						</div>
+						<!-- Product info e.g. availability, rating, ... -->
+						<div id="atscontainer" onInvalidate="nearbyStoresList.invalidate()">
+							<div sclass="grid-70">
+								<widgetslot slotID="variantSelector" sclass="yw-productdetail-variantSelector"/>
+								<div sclass="yw-productdetail-atscontainer">
+									<div id="yw-productdetail-stockheader" sclass="yw-productdetail-stockheader clearfix">
+										<label value="Stock Information"
+											sclass="yw-prodcutdetail-stockheader-label pull-left" />
+										<button id="refreshStockBtn"  
+											sclass="yw-productdetail-refreshstock-btn pull-right" label="${labels.ats.refresh}" />
+									</div>
+									<groupbox
+										sclass="yw-productdetail-atsbox yw-productdetail-localatscontainer"
+										mold="3d" open="false" closable="false">
+										<caption label="${labels.ats.store}">
+											<label id="localAtsLabel"
+												sclass="yw-productdetail-ats" value="N/A" />
+										</caption>
+									</groupbox>
+									<div id="nearbyAtsCnt" sclass="yw-ats-open-false">
+										<groupbox id="nearbyAtsGroupbox"
+											sclass="yw-productdetail-atsbox yw-productdetail-nearbyatscontainer"
+											mold="3d" open="true" w:onOpen="this.$f('nearbyAtsCnt').setSclass('yw-ats-open-' + event.data.open);">
+											<caption label="${labels.ats.nearby}">
+												<label id="nearbyAtsLabel"
+													sclass="yw-productdetail-ats" value="N/A" />
+											</caption>
+						
+											<listbox id="nearbyStoresList" visible="false"
+												itemRenderer="${productDetailStoreListRenderer}"
+												sclass="yw-productdetail-storelist" 
+												xmlns:ca="client/attribute" ca:data-scrollable="false" ca:ytestid="nearbyStoresList">
+												<listhead>
+													<listheader label="${labels.header.store}" />
+													<listheader label="${labels.header.distance}" />
+													<listheader label="${labels.header.available}" />
+												</listhead>
+											</listbox>
+										</groupbox>
+									</div>
+									<groupbox
+										sclass="yw-productdetail-atsbox yw-productdetail-totalatscontainer"
+										mold="3d" open="false" closable="false">
+										<caption label="${labels.ats.enterprise}">
+											<div id="globalAtsStatus" sclass="yw-productdetail-ats-globalstatus-true"/>
+										</caption>
+									</groupbox>
+								</div>
+							</div>
+						</div>
+					</div>
+				
+					<!-- Other product details e.g. technical details, reviews, ... -->
+					<div id="classificationAttributes">
+						<widgetslot slotID="additionalInfo" />
+					</div>
+				</div>
+			</listcell>
+		</listitem>
+	</listbox>
+</widget>

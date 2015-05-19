@@ -1,0 +1,622 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions 
+	targetNamespace="http://werk-ii.de/soap/comet" 
+	xmlns="http://schemas.xmlsoap.org/wsdl/" 
+	xmlns:soapwsdl="http://schemas.xmlsoap.org/wsdl/soap/" 
+	xmlns:tns="http://werk-ii.de/soap/comet" 
+	xmlns:cometxsd="http://werk-ii.de/soap/comet/Schema"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/">
+	<types>
+		<schema 
+			xmlns="http://www.w3.org/2001/XMLSchema" 
+			targetNamespace="http://werk-ii.de/soap/comet/Schema" 
+			xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+			xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
+			<complexType name="LoginResult">
+				<sequence>
+					<element name="message" type="xsd:string" />
+					<element name="sessionId" type="xsd:string" />
+					<element name="resultCode" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="LogoutResult">
+				<sequence>
+					<element name="resultCode" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="SetLanguageResult">
+				<sequence>
+					<element name="message" type="xsd:string" />
+					<element name="resultCode" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="ArrayOfString">
+				<complexContent>
+					<restriction base="soapenc:Array">
+						<attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:string[]" />
+					</restriction>
+				</complexContent>
+			</complexType>
+
+			<complexType name="CallResult">
+				<sequence>
+					<element name="result" type="cometxsd:ArrayOfString" />
+					<element name="resultCode" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="GetMessageResult">
+				<sequence>
+					<element name="message" type="xsd:string" />
+					<element name="resultCode" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="CometCondition">
+				<sequence>
+					<element name="expr" type="xsd:string" />
+					<element name="op" type="xsd:string" />
+					<element name="value" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<complexType name="ArrayOfCometCondition">
+				<complexContent>
+					<restriction base="soapenc:Array">
+						<attribute ref="soapenc:arrayType" wsdl:arrayType="cometxsd:CometCondition[]" />
+					</restriction>
+				</complexContent>
+			</complexType>
+
+			<complexType name="CometProduct">
+				<sequence>
+					<element name="id" type="xsd:int" />
+					<element name="id2" type="xsd:int" />
+					<element name="id3" type="xsd:int" />
+					<element name="imageId" type="xsd:int" />
+					<element name="classId" type="xsd:int" />
+					<element name="num" type="xsd:string" />
+					<element name="name" type="xsd:string" />
+					<element name="forceDelete" type="xsd:boolean" />
+					<element name="panelStatementId" type="xsd:int" />
+					<element name="docId" type="xsd:int" />
+					<element name="masterpage" type="xsd:string" />
+					<element name="grid" type="xsd:string" />
+					<element name="gridelement" type="xsd:string" />
+					<element name="gridId" type="xsd:int" />
+					<element name="gridelementId" type="xsd:int" />
+					<element name="pageitemId" type="xsd:int" />
+					<element name="stringId" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<complexType name="ArrayOfCometProduct">
+				<complexContent>
+					<restriction base="soapenc:Array">
+						<attribute ref="soapenc:arrayType" wsdl:arrayType="cometxsd:CometProduct[]" />
+					</restriction>
+				</complexContent>
+			</complexType>
+
+			<complexType name="GetProductListResult">
+				<sequence>
+					<element name="productList" type="cometxsd:ArrayOfCometProduct" />
+					<element name="resultCode" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="CometBinary">
+				<sequence>
+					<element name="filename" type="xsd:string" />
+					<element name="mimetype" type="xsd:string" />
+					<element name="size" type="xsd:int" />
+					<element name="content" type="xsd:binary" />
+				</sequence>
+			</complexType>
+			<complexType name="GetBinaryFileResult">
+				<sequence>
+					<element name="file" type="cometxsd:CometBinary" />
+					<element name="resultCode" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="PutBinaryFileResult">
+				<sequence>
+					<element name="resultCode" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="CometElement">
+				<sequence>
+					<element name="id" type="xsd:int" />
+					<element name="id2" type="xsd:int" />
+					<element name="id3" type="xsd:int" />
+					<element name="classId" type="xsd:int" />
+					<element name="pageitemId" type="xsd:int" />
+					<element name="formatString" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<complexType name="ArrayOfCometElement">
+				<complexContent>
+					<restriction base="soapenc:Array">
+						<attribute ref="soapenc:arrayType" wsdl:arrayType="cometxsd:CometElement[]" />
+					</restriction>
+				</complexContent>
+			</complexType>
+
+			<complexType name="GetElementListResult">
+				<sequence>
+					<element name="elementList" type="cometxsd:ArrayOfCometElement" />
+					<element name="resultCode" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="ArrayOfArrayOfString">
+				<complexContent>
+					<restriction base="soapenc:Array">
+						<attribute ref="soapenc:arrayType" wsdl:arrayType="cometxsd:ArrayOfString[]" />
+					</restriction>
+				</complexContent>
+			</complexType>
+
+			<complexType name="GetListResult">
+				<sequence>
+					<element name="list" type="cometxsd:ArrayOfArrayOfString" />
+					<element name="resultCode" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="AutocometJob">
+				<sequence>
+					<element name="id" type="xsd:int" />
+					<element name="name" type="xsd:string" />
+					<element name="command" type="xsd:string" />
+					<element name="commandId" type="xsd:int" />
+					<element name="objectId" type="xsd:int" />
+					<element name="objectPath" type="xsd:string" />
+					<element name="templatePath" type="xsd:string" />
+					<element name="priority" type="xsd:int" />
+					<element name="doAgain" type="xsd:boolean" />
+					<element name="delay" type="xsd:int" />
+					<element name="starttime" type="xsd:dateTime" />
+					<element name="endtime" type="xsd:dateTime" />
+					<element name="statusId" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="AutocometGetNextJobResult">
+				<sequence>
+					<element name="resultCode" type="xsd:int" />
+					<element name="job" type="cometxsd:AutocometJob" />
+				</sequence>
+			</complexType>
+			<complexType name="AutocometSetStartResult">
+				<sequence>
+					<element name="resultCode" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="AutocometSetStatusResult">
+				<sequence>
+					<element name="resultCode" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="AutocometSetDoneResult">
+				<sequence>
+					<element name="resultCode" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<complexType name="AutocometHotfolder">
+				<sequence>
+					<element name="id" type="xsd:int" />
+					<element name="inFolder" type="xsd:string" />
+					<element name="outFolder" type="xsd:string" />
+					<element name="errorFolder" type="xsd:string" />
+					<element name="command" type="xsd:string" />
+					<element name="commandId" type="xsd:int" />
+					<element name="parameter" type="xsd:string" />
+				</sequence>
+			</complexType>
+			<complexType name="AutocometGetNextHotfolderResult">
+				<sequence>
+					<element name="resultCode" type="xsd:int" />
+					<element name="hotfolder" type="cometxsd:AutocometHotfolder" />
+				</sequence>
+			</complexType>
+		</schema>
+	</types>
+
+	<message name="login">
+		<part name="login" type="xsd:string" />
+		<part name="passwd" type="xsd:string" />
+		<part name="client" type="xsd:string" />
+		<part name="language" type="xsd:string" />
+	</message>
+
+	<message name="loginResponse">
+		<part name="loginResult" type="cometxsd:LoginResult" />
+	</message>
+
+	<message name="logout">
+		<part name="sessionId" type="xsd:string" />
+	</message>
+
+	<message name="logoutResponse">
+		<part name="logoutResult" type="cometxsd:LogoutResult" />
+	</message>
+
+	<message name="setLanguage">
+		<part name="sessionId" type="xsd:string" />
+		<part name="language" type="xsd:string" />
+	</message>
+
+	<message name="setLanguageResponse">
+		<part name="setLanguageResult" type="cometxsd:SetLanguageResult" />
+	</message>
+
+	<message name="call">
+		<part name="sessionId" type="xsd:string" />
+		<part name="method" type="xsd:string" />
+		<part name="arg" type="xsd:string" />
+	</message>
+
+	<message name="callResponse">
+		<part name="callResult" type="cometxsd:CallResult" />
+	</message>
+
+	<message name="getMessage">
+		<part name="sessionId" type="xsd:string" />
+		<part name="resultCode" type="xsd:int" />
+	</message>
+
+	<message name="getMessageResponse">
+		<part name="getMessageResult" type="cometxsd:GetMessageResult" />
+	</message>
+
+	<message name="getProductList">
+		<part name="sessionId" type="xsd:string" />
+		<part name="conditions" type="cometxsd:ArrayOfCometCondition" />
+		<part name="parentConditions" type="cometxsd:ArrayOfCometCondition" />
+	</message>
+
+	<message name="getProductListResponse">
+		<part name="getProductListResult" type="cometxsd:GetProductListResult" />
+	</message>
+
+	<message name="getBinaryFile">
+		<part name="sessionId" type="xsd:string" />
+		<part name="fileId" type="xsd:string" />
+	</message>
+
+	<message name="getBinaryFileResponse">
+		<part name="getBinaryFileResult" type="cometxsd:GetBinaryFileResult" />
+	</message>
+
+	<message name="putBinaryFile">
+		<part name="sessionId" type="xsd:string" />
+		<part name="fileId" type="xsd:string" />
+		<part name="file" type="cometxsd:CometBinary" />
+	</message>
+
+	<message name="putBinaryFileResponse">
+		<part name="putBinaryFileResult" type="cometxsd:PutBinaryFileResult" />
+	</message>
+
+	<message name="getElementList">
+		<part name="sessionId" type="xsd:string" />
+		<part name="method" type="xsd:string" />
+		<part name="arg" type="xsd:string" />
+	</message>
+
+	<message name="getElementListResponse">
+		<part name="getElementListResult" type="cometxsd:GetElementListResult" />
+	</message>
+
+	<message name="getList">
+		<part name="sessionId" type="xsd:string" />
+		<part name="method" type="xsd:string" />
+		<part name="arg" type="xsd:string" />
+	</message>
+
+	<message name="getListResponse">
+		<part name="getListResult" type="cometxsd:GetListResult" />
+	</message>
+
+	<message name="autocometGetNextJob">
+		<part name="sessionId" type="xsd:string" />
+		<part name="program" type="xsd:string" />
+		<part name="client" type="xsd:string" />
+		<part name="status" type="xsd:int" />
+	</message>
+
+	<message name="autocometGetNextJobResponse">
+		<part name="autocometGetNextJobResult" type="cometxsd:AutocometGetNextJobResult" />
+	</message>
+
+	<message name="autocometSetStart">
+		<part name="sessionId" type="xsd:string" />
+		<part name="id" type="xsd:int" />
+		<part name="starttime" type="xsd:dateTime" />
+		<part name="status" type="xsd:int" />
+		<part name="client" type="xsd:string" />
+	</message>
+
+	<message name="autocometSetStartResponse">
+		<part name="autocometSetStartResult" type="cometxsd:AutocometSetStartResult" />
+	</message>
+
+	<message name="autocometSetStatus">
+		<part name="sessionId" type="xsd:string" />
+		<part name="id" type="xsd:int" />
+		<part name="status" type="xsd:int" />
+	</message>
+
+	<message name="autocometSetStatusResponse">
+		<part name="autocometSetStatusResult" type="cometxsd:AutocometSetStatusResult" />
+	</message>
+
+	<message name="autocometSetDone">
+		<part name="sessionId" type="xsd:string" />
+		<part name="id" type="xsd:int" />
+		<part name="status" type="xsd:int" />
+		<part name="starttime" type="xsd:dateTime" />
+		<part name="endtime" type="xsd:dateTime" />
+		<part name="exitValue" type="xsd:int" />
+	</message>
+
+	<message name="autocometSetDoneResponse">
+		<part name="autocometSetDoneResult" type="cometxsd:AutocometSetDoneResult" />
+	</message>
+
+	<message name="autocometGetNextHotfolder">
+		<part name="sessionId" type="xsd:string" />
+		<part name="program" type="xsd:string" />
+		<part name="client" type="xsd:string" />
+		<part name="status" type="xsd:int" />
+		<part name="id" type="xsd:int" />
+	</message>
+
+	<message name="autocometGetNextHotfolderResponse">
+		<part name="autocometGetNextHotfolderResult" type="cometxsd:AutocometGetNextHotfolderResult" />
+	</message>
+
+	<portType name="CometPort">
+		<operation name="login">
+			<documentation>Initialisieren einer Sitzung</documentation>
+			<input message="tns:login" />
+			<output message="tns:loginResponse" />
+		</operation>
+		<operation name="logout">
+			<documentation>Beenden einer Sitzung</documentation>
+			<input message="tns:logout" />
+			<output message="tns:logoutResponse" />
+		</operation>
+		<operation name="setLanguage">
+			<documentation>Festlegen der Sprache</documentation>
+			<input message="tns:setLanguage" />
+			<output message="tns:setLanguageResponse" />
+		</operation>
+		<operation name="call">
+			<documentation>Benutzer / Anwendungsspezifische Funktionen</documentation>
+			<input message="tns:call" />
+			<output message="tns:callResponse" />
+		</operation>
+		<operation name="getMessage">
+			<documentation>Fehlerbeschreibung des Resultcodes</documentation>
+			<input message="tns:getMessage" />
+			<output message="tns:getMessageResponse" />
+		</operation>
+		<operation name="getProductList">
+			<documentation>Abruf der Produktliste</documentation>
+			<input message="tns:getProductList" />
+			<output message="tns:getProductListResponse" />
+		</operation>
+		<operation name="getBinaryFile">
+			<documentation>Anfordern einer Datei</documentation>
+			<input message="tns:getBinaryFile" />
+			<output message="tns:getBinaryFileResponse" />
+		</operation>
+		<operation name="putBinaryFile">
+			<documentation>Hochladen einer Datei</documentation>
+			<input message="tns:putBinaryFile" />
+			<output message="tns:putBinaryFileResponse" />
+		</operation>
+		<operation name="getElementList">
+			<documentation>Abruf der Elementliste für wiederholende Elemente</documentation>
+			<input message="tns:getElementList" />
+			<output message="tns:getElementListResponse" />
+		</operation>
+		<operation name="getList">
+			<documentation>Allgemeine Liste</documentation>
+			<input message="tns:getList" />
+			<output message="tns:getListResponse" />
+		</operation>
+		<operation name="autocometGetNextJob">
+			<documentation>Liefert die nächste Aufgabe</documentation>
+			<input message="tns:autocometGetNextJob" />
+			<output message="tns:autocometGetNextJobResponse" />
+		</operation>
+		<operation name="autocometSetStart">
+			<documentation>Meldet den Beginn der Ausführung einer Aufgabe</documentation>
+			<input message="tns:autocometSetStart" />
+			<output message="tns:autocometSetStartResponse" />
+		</operation>
+		<operation name="autocometSetStatus">
+			<documentation>Ändert den Status einer Aufgabe</documentation>
+			<input message="tns:autocometSetStatus" />
+			<output message="tns:autocometSetStatusResponse" />
+		</operation>
+		<operation name="autocometSetDone">
+			<documentation>Meldet das Ende der Ausführung einer Aufgabe</documentation>
+			<input message="tns:autocometSetDone" />
+			<output message="tns:autocometSetDoneResponse" />
+		</operation>
+		<operation name="autocometGetNextHotfolder">
+			<documentation>Liefert den nächsten Hotfolder</documentation>
+			<input message="tns:autocometGetNextHotfolder" />
+			<output message="tns:autocometGetNextHotfolderResponse" />
+		</operation>
+	</portType>
+
+	<binding name="Comet" type="tns:CometPort">
+		<soapwsdl:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http/" />
+
+		<operation name="login">
+			<soapwsdl:operation soapAction="login" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+
+		<operation name="logout">
+			<soapwsdl:operation soapAction="logout" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+
+		<operation name="setLanguage">
+			<soapwsdl:operation soapAction="setLanguage" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+
+		<operation name="call">
+			<soapwsdl:operation soapAction="call" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+
+		<operation name="getMessage">
+			<soapwsdl:operation soapAction="getMessage" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+
+		<operation name="getProductList">
+			<soapwsdl:operation soapAction="getProductList" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+
+		<operation name="getBinaryFile">
+			<soapwsdl:operation soapAction="getBinaryFile" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<mime:multipartRelated>
+
+					<mime:part>
+						<soapwsdl:body parts="getBinaryFileResult" use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+
+		<operation name="putBinaryFile">
+			<soapwsdl:operation soapAction="putBinaryFile" style="rpc" />
+			<input>
+				<mime:multipartRelated>
+
+					<mime:part>
+						<soapwsdl:body parts="sessionId fileId file" use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+					</mime:part>
+				</mime:multipartRelated>
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+
+		<operation name="getElementList">
+			<soapwsdl:operation soapAction="getElementList" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+
+		<operation name="getList">
+			<soapwsdl:operation soapAction="getList" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+
+		<operation name="autocometGetNextJob">
+			<soapwsdl:operation soapAction="autocometGetNextJob" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+
+		<operation name="autocometSetStart">
+			<soapwsdl:operation soapAction="autocometSetStart" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+
+		<operation name="autocometSetStatus">
+			<soapwsdl:operation soapAction="autocometSetStatus" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+
+		<operation name="autocometSetDone">
+			<soapwsdl:operation soapAction="autocometSetDone" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+
+		<operation name="autocometGetNextHotfolder">
+			<soapwsdl:operation soapAction="autocometGetNextHotfolder" style="rpc" />
+			<input>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</input>
+			<output>
+				<soapwsdl:body use="encoded" namespace="http://werk-ii.de/soap/comet" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+			</output>
+		</operation>
+	</binding>
+
+	<service name="CometService">
+		<documentation></documentation>
+		<port binding="tns:Comet" name="Comet">
+			<soapwsdl:address location="http://soapsdk.werk-ii.com/soap/?Comet" />
+		</port>
+	</service>
+
+</definitions>

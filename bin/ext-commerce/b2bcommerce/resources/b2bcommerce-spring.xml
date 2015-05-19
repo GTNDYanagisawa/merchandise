@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+        http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+	<!-- Signals the current application context to apply dependency injection 
+		to non-managed classes that are instantiated outside of the Spring bean factory 
+		(typically classes annotated with the @Configurable annotation). -->
+	<context:spring-configured/>
+	<!-- Activates various annotations to be detected in bean classes: Spring's 
+		@Required and @Autowired, as well as JSR 250's @PostConstruct, @PreDestroy 
+		and @Resource (if available), JAX-WS's @WebServiceRef (if available), EJB3's 
+		@EJB (if available), and JPA's @PersistenceContext and @PersistenceUnit (if 
+		available). Alternatively, you may choose to activate the individual BeanPostProcessors 
+		for those annotations. -->
+	<context:annotation-config/>
+	<context:component-scan base-package="de.hybris.platform.b2b" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver"/>
+	<!-- Enable the @AspectJ support -->
+	<aop:aspectj-autoproxy proxy-target-class="true"
+	                       expose-proxy="true"/>
+
+	<alias alias="genericDao" name="defaultGenericDao"/>
+	<alias alias="b2bUnitService" name="defaultB2BUnitService"/>
+	<alias alias="b2bCostCenterService" name="defaultB2BCostCenterService"/>
+	<alias alias="b2bOrderDao" name="defaultB2BOrderDao"/>
+	<alias alias="b2bCostCenterDao" name="defaultB2BCostCenterDao"/>
+	<alias alias="b2bUnitDao" name="defaultB2BUnitDao"/>
+	<alias alias="b2bBookingLineEntryDao" name="defaultB2BBookingLineEntryDao"/>
+	<alias alias="b2bBudgetDao" name="defaultB2BBudgetDao"/>
+	<alias alias="principalGroupMembersDao" name="defaultPrincipalGroupMembersDao"/>
+
+	<alias alias="b2bItemService" name="b2bItemService"/>
+	<alias alias="b2bCustomerService" name="b2bCustomerService"/>
+	<alias alias="b2bReportingService" name="b2bReportingService"/>
+	<alias alias="baseDao" name="defautlBaseDao"/>
+	<alias alias="b2BBudgetService" name="defaultB2BBudgetService"/>
+	<alias alias="b2bCommentDao" name="defaultB2BCommentDao"/>
+
+	<bean name="defautlBaseDao" class="de.hybris.platform.b2b.dao.impl.BaseDao">
+		<property name="modelService" ref="modelService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	<bean name="defaultB2BBudgetService" class="de.hybris.platform.b2b.services.impl.DefaultB2BBudgetService"
+	      parent="abstractBusinessService">
+		<property name="b2bBudgetDao" ref="b2bBudgetDao"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+	</bean>
+
+	<alias alias="b2bItemService" name="defaultB2BItemService"/>
+	<bean id="defaultB2BItemService"
+	      class="de.hybris.platform.b2b.services.impl.DefaultB2BItemService"
+	      parent="abstractBusinessService">
+		<property name="baseDao" ref="baseDao"/>
+		<property name="roles">
+			<list>
+				<value>b2badmingroup</value>
+				<value>b2bmanagergroup</value>
+				<value>b2bapprovergroup</value>
+				<value>b2bcustomergroup</value>
+			</list>
+		</property>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+	</bean>
+
+	<alias alias="b2bReportingService" name="defaultB2BReportingService"/>
+
+	<bean id="defaultB2BReportingService"
+	      class="de.hybris.platform.b2b.services.impl.DefaultB2BReportingService"
+	      parent="abstractBusinessService">
+		<property name="baseDao" ref="baseDao"/>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+	</bean>
+
+	<bean id="defaultB2BCostCenterService"
+	      class="de.hybris.platform.b2b.services.impl.DefaultB2BCostCenterService"
+	      parent="abstractBusinessService">
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="b2bBudgetDao" ref="b2bBudgetDao"/>
+		<property name="b2bBookingLineEntryDao" ref="b2bBookingLineEntryDao"/>
+		<property name="b2bCostCenterDao" ref="b2bCostCenterDao"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+	</bean>
+
+	<alias alias="b2bCurrencyConversionService" name="defaultB2BCurrencyConversionService"/>
+	<bean id="defaultB2BCurrencyConversionService"
+	      class="de.hybris.platform.b2b.services.impl.DefaultB2BCurrencyConversionService"
+	      parent="abstractBusinessService">
+	</bean>
+
+	<bean id="defaultBaseDao" class="de.hybris.platform.b2b.dao.impl.BaseDao"
+	      abstract="true">
+	</bean>
+
+	<bean id="defaultGenericDao" class="de.hybris.platform.b2b.dao.impl.GenericDao"
+	      abstract="true">
+		<property name="baseDao" ref="baseDao"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="defaultB2BBookingLineEntryDao"
+	      class="de.hybris.platform.b2b.dao.impl.DefaultB2BBookingLineEntryDao"
+			>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+
+	</bean>
+
+	<bean id="defaultB2BBudgetDao"
+	      class="de.hybris.platform.b2b.dao.impl.DefaultB2BBudgetDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="defaultPrincipalGroupMembersDao"
+	      class="de.hybris.platform.b2b.dao.impl.DefaultPrincipalGroupMembersDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<bean id="defaultB2BUnitService"
+	      class="de.hybris.platform.b2b.services.impl.DefaultB2BUnitService"
+	      parent="abstractBusinessService">
+		<property name="b2bUnitDao" ref="b2bUnitDao"/>
+		<property name="userService" ref="userService"/>
+		<property name="principalGroupMembersDao" ref="principalGroupMembersDao"/>
+		<property name="processDefinitionFactory" ref="processDefinitionFactory"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<alias alias="b2bCustomerService" name="defaultB2BCustomerService"/>
+	<bean id="defaultB2BCustomerService"
+	      class="de.hybris.platform.b2b.services.impl.DefaultB2BCustomerService"
+	      parent="abstractBusinessService">
+		<property name="userService" ref="userService"/>
+		<property name="baseDao" ref="baseDao"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+	</bean>
+
+	<bean id="afterSessionUserChangeListener"
+	      class="de.hybris.platform.b2b.listeners.AfterSessionUserChangeListener" parent="abstractEventListener">
+		<property name="b2BCostCenterService" ref="b2bCostCenterService"/>
+		<property name="b2BUnitService" ref="b2bUnitService"/>
+		<property name="userService" ref="userService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<bean id="afterSessionCreationListener"
+	      class="de.hybris.platform.b2b.listeners.AfterSessionCreationListener" parent="abstractEventListener">
+		<property name="b2BUnitService" ref="b2bUnitService"/>
+		<property name="userService" ref="userService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<bean id="defaultB2BOrderDao" class="de.hybris.platform.b2b.dao.impl.DefaultB2BOrderDao">
+		<property name="baseDao" ref="baseDao"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="defaultB2BCostCenterDao" class="de.hybris.platform.b2b.dao.impl.DefaultB2BCostCenterDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="defaultB2BUnitDao" class="de.hybris.platform.b2b.dao.impl.DefaultB2BUnitDao">
+	</bean>
+
+	<bean id="defaultCartToOrderCronJobModelDao" class="de.hybris.platform.b2b.dao.impl.DefaultCartToOrderCronJobModelDao">
+	</bean>
+
+	<alias alias="b2bCartFactory" name="defaultB2BCartFactory"/>
+	<bean id="defaultB2BCartFactory" class="de.hybris.platform.b2b.order.impl.DefaultB2BCartFactory">
+		<property name="modelService" ref="modelService"/>
+		<property name="cartFactory" ref="cartFactory"/>
+		<property name="i18nService" ref="i18nService"/>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<alias alias="b2bCartService" name="defaultB2BCartService"/>
+	<bean id="defaultB2BCartService"
+	      class="de.hybris.platform.b2b.services.impl.DefaultB2BCartService"
+	      parent="defaultCartService">
+		<property name="cartFactory" ref="b2bCartFactory"/>
+		<property name="keyGenerator" ref="orderCodeGenerator"/>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<bean id="B2BCostCenterModelValidateInterceptor"
+	      class="de.hybris.platform.b2b.interceptor.B2BCostCenterModelValidateInterceptor">
+		<property name="l10NService" ref="l10nService"/>
+	</bean>
+
+	<bean id="B2BCostCenterModelValidateInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="B2BCostCenterModelValidateInterceptor"/>
+		<property name="typeCode" value="B2BCostCenter"/>
+	</bean>
+
+	<bean id="B2BBudgetModelValidateInterceptor"
+	      class="de.hybris.platform.b2b.interceptor.B2BBudgetModelValidateInterceptor">
+		<property name="l10NService" ref="l10nService"/>
+	</bean>
+
+	<bean id="B2BBudgetModelValidateInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="B2BBudgetModelValidateInterceptor"/>
+		<property name="typeCode" value="B2BBudget"/>
+	</bean>
+	
+	<bean id="variantValueCategoryValidateInterceptor"
+	      class="de.hybris.platform.b2b.interceptor.VariantValueCategoryValidateInterceptor">
+		<property name="l10NService" ref="l10nService"/>
+	</bean>
+	
+	<bean id="variantValueCategoryValidateInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="variantValueCategoryValidateInterceptor"/>
+		<property name="typeCode" value="VariantValueCategory"/>
+	</bean>	
+
+	<bean id="genericVariantProductValidateInterceptor"
+	      class="de.hybris.platform.b2b.interceptor.GenericVariantProductValidateInterceptor">
+		<property name="l10NService" ref="l10nService"/>
+	</bean>
+
+	<bean id="genericVariantProductValidateInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="genericVariantProductValidateInterceptor"/>
+		<property name="typeCode" value="GenericVariantProduct"/>
+	</bean>	
+	
+	<bean id="variantCategoryValidateInterceptor"
+	      class="de.hybris.platform.b2b.interceptor.VariantCategoryValidateInterceptor">
+		<property name="l10NService" ref="l10nService"/>
+	</bean>
+
+	<bean id="variantCategoryValidateInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="variantCategoryValidateInterceptor"/>
+		<property name="typeCode" value="VariantCategory"/>
+	</bean>		
+	
+	<bean id="defaultB2BQuoteEvaluationStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.DefaultB2BQuoteEvaluationStrategy">
+		<property name="quoteLimit" value="1000"/>
+		<property name="quoteLimitCurrency" value="EUR"/>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="b2bCurrencyConversionService" ref="b2bCurrencyConversionService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<bean id="customerDefaultGroupInterceptor"
+	      class="de.hybris.platform.b2b.interceptor.B2BCustomerInitDefaultsInterceptor">
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<bean id="customerDefaultGroupInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="customerDefaultGroupInterceptor"/>
+		<property name="typeCode" value="B2BCustomer"/>
+	</bean>
+
+	<alias alias="b2bCommentService" name="defaultB2BCommentService"/>
+	<bean id="defaultB2BCommentService"
+	      class="de.hybris.platform.b2b.services.impl.DefaultB2BCommentService"
+	      parent="abstractBusinessService">
+		<property name="b2bCommentDao" ref="b2bCommentDao"/>
+	</bean>
+
+	<bean id="defaultB2BCommentDao"
+	      class="de.hybris.platform.b2b.dao.impl.DefaultB2BCommentDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="defaultDateRangeFactory"
+	      class="de.hybris.platform.b2b.util.impl.DefaultDateRangeFactory"/>
+
+	<alias name="defaultB2BDateUtils" alias="b2bDateUtils"/>
+
+	<bean id="defaultB2BDateUtils"
+	      class="de.hybris.platform.b2b.util.B2BDateUtils"/>
+	      
+	<bean id="modelFactory"
+	      class="de.hybris.platform.b2b.testframework.ModelFactory"/>
+
+</beans>

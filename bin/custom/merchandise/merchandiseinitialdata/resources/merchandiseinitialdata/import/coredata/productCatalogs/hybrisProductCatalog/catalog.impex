@@ -1,0 +1,20 @@
+#
+# Import the Product Catalog
+#
+$productCatalog=hybrisProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$languages=en,de
+# Product catalog
+INSERT_UPDATE Catalog;id[unique=true]
+;$productCatalog
+# Product versions for product catalogs
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;languages(isoCode);readPrincipals(uid)
+;$productCatalog;Staged;false;$languages;employeegroup
+;$productCatalog;Online;true;$languages;employeegroup
+# Create default tax row for all products in product catalog
+INSERT_UPDATE TaxRow;$catalogVersion;tax(code)[unique=true];pg(code)[unique=true];ug(code)[unique=true]
+;;de-vat-full;eu-vat-full;de-taxes
+;;de-vat-half;eu-vat-half;de-taxes
+;;uk-vat-full;eu-vat-full;uk-taxes
+;;uk-vat-half;eu-vat-half;uk-taxes
+;;jp-vat-full;jp-vat-full;jp-taxes

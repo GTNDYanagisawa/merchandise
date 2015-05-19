@@ -1,0 +1,53 @@
+/*
+	You may use one of the following special globals here :
+
+	int 		gScriptType	(one of kActionBefore, kActionAfterMove, kActionAfterResize, kActionAfter)
+	float 		gPageWidthOrg
+	float		gPageHeightOrg
+	float		gPageWidthNew
+	float		gPageHeightNew
+	float		gResizeX
+	float		gResizeY
+	int		gPage
+	ItemRef	gOrgFrame
+*/
+
+#include "internal/types.h"
+
+int main ()
+{
+	float       newWidth = 44.0;
+	float       newHeight = 22.0;
+	float       top, bottom, left, right;
+	float       horizontScale, verticalScale;
+	int          err;
+
+	// Anpassugn am Anfang durchfuehren
+
+	if (gScriptType != kActionBefore) return 0;
+
+	// Skalierungsfaktor Horizontal und Vertikal ermitteln
+	horizontScale = gPageWidthNew / gPageWidthOrg;
+	verticalScale = gPageHeightNew / gPageHeightOrg; 
+
+	// Ermitteln Box Koordinaten
+	err = frame::bbox(gFrame,&left,&top,&right, &bottom);
+	if (err != 0) 
+	{
+		wlog("", "Error [%i], message: [%s], while fetching frame coordination in script 20040.crpt", err, serror(err));	
+	}
+	else
+	{
+		// Ermitteln neue Breite und Hoehe
+		newWidth = (right - left ) * horizontScale ;
+		newHeight = (bottom - top) * verticalScale;
+
+		err = frame::resize(gFrame,newWidth,newHeight);
+		if (err != 0)
+		{
+			wlog("", "Error [%i], message: [%s], while resizing frame in script 20040.crpt", err, serror(err));	
+		}
+	}
+
+	return 0;
+}

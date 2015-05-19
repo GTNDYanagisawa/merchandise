@@ -1,0 +1,569 @@
+*** Settings ***
+Test Setup        import commercecart sampledata
+Test Teardown     reset system
+Resource          subscriptionservices/SubscriptionProduct_Keywords.txt
+Resource          subscriptionservices/SubscriptionPricePlan_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+Resource		  commerce/SubscriptionCommerce_Keywords.txt
+
+
+*** Test Cases ***
+Test_Cart_Calculation_OneTime_Charge_Onfirstbill_OneProductx1
+	create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_OneTime_Charge_Onfirstbill_OneProductx2
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "10"  
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "20"  
+    verify that cart total is "0"     
+		
+Test_Cart_Calculation_OneTime_Charge_Onfirstbill_TwoProducts_TwoPricePlans
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    add product "P1" to cart
+    create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "onfirstbill" one time price of "11"
+    verify that number of child carts is "1"
+	verify that cart total for "onfirstbill" is "10"
+    add product "P2" to cart
+    verify that number of child carts is "1"
+	verify that cart total for "onfirstbill" is "21"
+	verify that cart total is "0"
+
+#Test_Cart_Calculation_OneTime_Charge_Onfirstbill_TwoProducts_OnePricePlan
+#    create subscription product "P1"
+#    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+#    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+#    add product "P1" to cart
+#    create subscription product "P2"
+#    for product "P2" add subscription priceplan "PP1" with currency "EUR"
+#    add product "P2" to cart
+#    verify that number of child carts is "1"
+#	 verify that cart total for "onfirstbill" is "21"	
+#	 verify that cart total is "0"
+	
+Test_Cart_Calculation_OneTime_Charge_Oncancellation_OneProductx1
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "oncancellation" one time price of "10"
+    add product "P1" to cart
+    verify that number of child carts is "0"
+    verify that cart total is "0"    
+		
+Test_Cart_Calculation_OneTime_Charge_Oncancellation_TwoProducts
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "oncancellation" one time price of "10"
+    add product "P1" to cart
+    create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "oncancellation" one time price of "11"
+    add product "P2" to cart
+    verify that number of child carts is "0"
+	verify that cart total is "0"	
+	
+Test_Cart_Calculation_OneTime_Charge_Paynow_OneProductx1
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "paynow" one time price of "10"
+    add product "P1" to cart
+    verify that number of child carts is "0"
+    verify that cart total is "10"    
+		
+Test_Cart_Calculation_OneTime_Charge_Paynow_TwoProducts
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "paynow" one time price of "10"
+    add product "P1" to cart
+    create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "paynow" one time price of "11"
+    add product "P2" to cart
+    verify that number of child carts is "0"
+	verify that cart total is "21"		
+	
+Test_Cart_Calculation_OneTime_Charge_Onfirstbill_Oncancellation_OneProduct_OnePlan
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "oncancellation" one time price of "5"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_OneTime_Charge_Onfirstbill_Paynow_OneProduct_OnePlan
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "5"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total for "paynow" is "5"  
+    verify that cart total is "5"    
+	
+Test_Cart_Calculation_OneTime_Charge_Oncancellation_Paynow_OneProduct_OnePlan
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "oncancellation" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "5"
+    add product "P1" to cart
+    verify that number of child carts is "0"
+    verify that cart total for "paynow" is "5"  
+    verify that cart total is "5"
+        
+Test_Cart_Calculation_OneTime_Charge_Onfirstbill_Oncancellation_Paynow_OneProduct_OnePlan
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "oncancellation" one time price of "5"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total for "paynow" is "7"  
+    verify that cart total is "7"  
+    
+Test_Cart_Calculation_OneTime_Charge_Multi_Onfirstbill_Oncancellation_Paynow_MultipleProducts_MultiplePlans
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "1"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "1"
+    verify that cart total is "0"
+	create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "onfirstbill" one time price of "2"
+    add product "P2" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "3"
+    verify that cart total is "0" 
+    create subscription product "P3"
+    for product "P3" add subscription priceplan "PP3" with currency "USD"    
+    for subscription priceplan "PP3" add "onfirstbill" one time price of "2"
+    for subscription priceplan "PP3" add "oncancellation" one time price of "2"
+    add product "P3" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "5"
+    verify that cart total is "0" 
+    create subscription product "P4"
+    for product "P4" add subscription priceplan "PP4" with currency "USD"    
+    for subscription priceplan "PP4" add "paynow" one time price of "4"
+    for subscription priceplan "PP4" add "oncancellation" one time price of "2"
+    add product "P4" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "5"
+    verify that cart total for "paynow" is "4"  
+    verify that cart total is "4" 
+    create subscription product "P5"
+    for product "P5" add subscription priceplan "PP5" with currency "USD"    
+    for subscription priceplan "PP5" add "paynow" one time price of "6"
+    for subscription priceplan "PP5" add "onfirstbill" one time price of "8"
+    add product "P5" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "13"
+    verify that cart total for "paynow" is "10"  
+    verify that cart total is "10" 
+    create subscription product "P6"
+    for product "P6" add subscription priceplan "PP6" with currency "USD"    
+    for subscription priceplan "PP6" add "paynow" one time price of "6"
+    for subscription priceplan "PP6" add "onfirstbill" one time price of "7"
+    for subscription priceplan "PP6" add "oncancellation" one time price of "3"
+    add product "P6" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "20"
+    verify that cart total for "paynow" is "16"  
+    verify that cart total is "16"  
+    add product "P6" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "27"
+    verify that cart total for "paynow" is "22"  
+    verify that cart total is "22"  
+    
+Test_Cart_Calculation_OneTime_Charge_BillingEvent1Test_OneProductx1
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "billingEvent1Test" one time price of "10"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "billingEvent1Test" is "10"  
+    verify that cart total is "0"     
+  
+Test_Cart_Calculation_OneTime_Charge_Onfirstbill_BillingEvent1Test_OneProduct
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "10" 
+    for subscription priceplan "PP1" add "billingEvent1Test" one time price of "7"
+    add product "P1" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "20"
+    verify that cart total for "billingEvent1Test" is "7"
+    verify that cart total is "0"
+        
+Test_Cart_Calculation_OneTime_Charge_Onfirstbill_BillingEvent1Test_TwoProducts
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "10"
+    create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "billingEvent1Test" one time price of "7"
+    add product "P2" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total for "billingEvent1Test" is "7"
+    verify that cart total is "0"
+    
+
+Test_Cart_Calculation_OneTime_Charge_Onfirstbill_OneProduct_CustomerSpecificPricePlan
+	create customer "vipCustomer"
+	login as "vipCustomer"
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for product "P1" add subscription priceplan "PP_VIP_USER" for user "vipCustomer"    
+    for subscription priceplan "PP_VIP_USER" add "onfirstbill" one time price of "5"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "5"
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_OneTime_Charge_Onfirstbill_OneProduct_UserPriceGroupSpecificPricePlan
+	create user price group "VIP"
+	create customer "vipCustomer" with user price group "VIP"
+	login as "vipCustomer"
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for product "P1" add subscription priceplan "PP_VIP" for user price group "VIP"    
+    for subscription priceplan "PP_VIP" add "onfirstbill" one time price of "5"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "5"
+    verify that cart total is "0"
+
+Test_Cart_Calculation_OneTime_Charge_Onfirstbill_OneProduct_CurrencySpecificPricePlan
+	create customer "euroCustomer" with currency "EUR"
+	login as "euroCustomer"
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for product "P1" add subscription priceplan "PP_EURO" with currency "EUR"    
+    for subscription priceplan "PP_EURO" add "onfirstbill" one time price of "7.49"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "7.49"
+    verify that cart total is "0"	         
+       	
+########### removing from cart
+        
+Test_Cart_Calculation_OneTime_Charge_Onfirstbill_Removing_OneProductx1
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total is "0"
+    remove product "P1" from cart
+    verify that number of child carts is "0"
+    verify that cart total is "0"
+    remove product "P1" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    
+Test_Cart_Calculation_OneTime_Charge_Onfirstbill_Removing_OneProductx2
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    add product "P1" to cart
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "20"  
+    verify that cart total is "0"   
+    remove product "P1" from cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total is "0" 
+    remove product "P1" from cart
+    verify that number of child carts is "0"
+    verify that cart total is "0" 
+    remove product "P1" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    
+Test_Cart_Calculation_OneTime_Charge_Oncancellation_Removing_OneProductx1
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "oncancellation" one time price of "10"
+    add product "P1" to cart
+    verify that number of child carts is "0"
+    verify that cart total is "0"  
+    remove product "P1" from cart
+    verify that number of child carts is "0"
+    verify that cart total is "0"   
+    remove product "P1" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    
+Test_Cart_Calculation_OneTime_Charge_Paynow_Removing_OneProductx1
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "paynow" one time price of "10"
+    add product "P1" to cart
+    verify that number of child carts is "0"
+    verify that cart total is "10"   
+    remove product "P1" from cart
+    verify that number of child carts is "0"
+    verify that cart total is "0"   
+    remove product "P1" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    
+Test_Cart_Calculation_OneTime_Charge_Removing_Complex
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "1"    
+	create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "onfirstbill" one time price of "2"
+    create subscription product "P3"
+    for product "P3" add subscription priceplan "PP3" with currency "USD"    
+    for subscription priceplan "PP3" add "onfirstbill" one time price of "2"
+    for subscription priceplan "PP3" add "oncancellation" one time price of "2"  
+    create subscription product "P4"
+    for product "P4" add subscription priceplan "PP4" with currency "USD"    
+    for subscription priceplan "PP4" add "paynow" one time price of "4"
+    for subscription priceplan "PP4" add "oncancellation" one time price of "2"     
+    create subscription product "P5"
+    for product "P5" add subscription priceplan "PP5" with currency "USD"    
+    for subscription priceplan "PP5" add "paynow" one time price of "6"
+    for subscription priceplan "PP5" add "onfirstbill" one time price of "8"    
+    create subscription product "P6"
+    for product "P6" add subscription priceplan "PP6" with currency "USD"    
+    for subscription priceplan "PP6" add "paynow" one time price of "6"
+    for subscription priceplan "PP6" add "onfirstbill" one time price of "7"
+    for subscription priceplan "PP6" add "oncancellation" one time price of "3" 
+    create subscription product "P7"   
+    for product "P7" add subscription priceplan "PP7" with currency "USD"    
+    for subscription priceplan "PP7" add "oncancellation" one time price of "9" 
+    add product "P1" to cart
+    add product "P2" to cart
+    add product "P3" to cart
+    add product "P4" to cart
+    add product "P5" to cart
+    add product "P6" to cart
+    add product "P6" to cart    
+    add product "P7" to cart  
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "27"
+    verify that cart total for "paynow" is "22"  
+    verify that cart total is "22"         
+    remove product "P1" from cart 
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "26"
+    verify that cart total for "paynow" is "22"  
+    verify that cart total is "22"      
+    remove product "P6" from cart 
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "19"
+    verify that cart total for "paynow" is "16"  
+    verify that cart total is "16"    
+    remove product "P3" from cart 
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "17"
+    verify that cart total for "paynow" is "16"  
+    verify that cart total is "16"    
+    remove product "P2" from cart 
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "15"
+    verify that cart total for "paynow" is "16"  
+    verify that cart total is "16"
+    remove product "P4" from cart 
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "15"
+    verify that cart total for "paynow" is "12"  
+    verify that cart total is "12"    
+    remove product "P5" from cart 
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "7"
+    verify that cart total for "paynow" is "6"  
+    verify that cart total is "6"    
+    remove product "P6" from cart 
+    verify that number of child carts is "0"
+    verify that cart total for "onfirstbill" is "0"
+    verify that cart total for "paynow" is "0"  
+    verify that cart total is "0"    
+    remove product "P7" from cart 
+    verify that number of child carts is "0"
+    verify that cart total for "onfirstbill" is "0"
+    verify that cart total for "paynow" is "0"  
+    verify that cart total is "0"    
+    remove product "P1" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P2" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P3" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P4" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P5" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P6" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P7" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    
+Test_Cart_Calculation_OneTime_Charge_RemovingAddingRemoving_Complex
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "1"    
+	create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "onfirstbill" one time price of "2"
+    create subscription product "P3"
+    for product "P3" add subscription priceplan "PP3" with currency "USD"    
+    for subscription priceplan "PP3" add "onfirstbill" one time price of "2"
+    for subscription priceplan "PP3" add "oncancellation" one time price of "2"  
+    create subscription product "P4"
+    for product "P4" add subscription priceplan "PP4" with currency "USD"    
+    for subscription priceplan "PP4" add "paynow" one time price of "4"
+    for subscription priceplan "PP4" add "oncancellation" one time price of "2"     
+    create subscription product "P5"
+    for product "P5" add subscription priceplan "PP5" with currency "USD"    
+    for subscription priceplan "PP5" add "paynow" one time price of "6"
+    for subscription priceplan "PP5" add "onfirstbill" one time price of "8"    
+    create subscription product "P6"
+    for product "P6" add subscription priceplan "PP6" with currency "USD"    
+    for subscription priceplan "PP6" add "paynow" one time price of "6"
+    for subscription priceplan "PP6" add "onfirstbill" one time price of "7"
+    for subscription priceplan "PP6" add "oncancellation" one time price of "3" 
+    create subscription product "P7"   
+    for product "P7" add subscription priceplan "PP7" with currency "USD"    
+    for subscription priceplan "PP7" add "oncancellation" one time price of "9" 
+    add product "P1" to cart
+    add product "P2" to cart
+    add product "P3" to cart
+    add product "P4" to cart
+    add product "P5" to cart
+    add product "P6" to cart
+    add product "P6" to cart    
+    add product "P7" to cart  
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "27"
+    verify that cart total for "paynow" is "22"  
+    verify that cart total is "22"         
+    remove product "P1" from cart 
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "26"
+    verify that cart total for "paynow" is "22"  
+    verify that cart total is "22"      
+    remove product "P6" from cart 
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "19"
+    verify that cart total for "paynow" is "16"  
+    verify that cart total is "16"      
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "20"
+    verify that cart total for "paynow" is "16"  
+    verify that cart total is "16" 
+    remove product "P1" from cart   
+    remove product "P3" from cart 
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "17"
+    verify that cart total for "paynow" is "16"  
+    verify that cart total is "16"  
+    add product "P3" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "19"
+    verify that cart total for "paynow" is "16"  
+    verify that cart total is "16"      
+    remove product "P2" from cart 
+    remove product "P3" from cart 
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "15"
+    verify that cart total for "paynow" is "16"  
+    verify that cart total is "16"
+    remove product "P4" from cart 
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "15"
+    verify that cart total for "paynow" is "12"  
+    verify that cart total is "12"
+    remove product "P4" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    add product "P7" to cart  
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "15"
+    verify that cart total for "paynow" is "12"  
+    verify that cart total is "12"   
+    remove product "P5" from cart 
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "7"
+    verify that cart total for "paynow" is "6"  
+    verify that cart total is "6"    
+    add product "P4" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "7"
+    verify that cart total for "paynow" is "10"  
+    verify that cart total is "10"        
+    remove product "P6" from cart 
+    verify that number of child carts is "0"
+    verify that cart total for "onfirstbill" is "0"
+    verify that cart total for "paynow" is "4"  
+    verify that cart total is "4"   
+    remove product "P4" from cart  
+    verify that number of child carts is "0"
+    verify that cart total for "onfirstbill" is "0"
+    verify that cart total for "paynow" is "0"  
+    verify that cart total is "0" 
+    remove product "P7" from cart 
+    verify that number of child carts is "0"
+    verify that cart total for "onfirstbill" is "0"
+    verify that cart total for "paynow" is "0"  
+    verify that cart total is "0"    
+    remove product "P1" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P2" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P3" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    add product "P3" to cart 
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "2"
+    verify that cart total for "paynow" is "0"  
+    verify that cart total is "0" 
+    remove product "P3" from cart
+    verify that number of child carts is "0"
+    verify that cart total for "onfirstbill" is "0"
+    verify that cart total for "paynow" is "0"  
+    verify that cart total is "0" 
+    remove product "P3" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED 
+    remove product "P4" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P5" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P6" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P7" from cart
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED    
+    
+       

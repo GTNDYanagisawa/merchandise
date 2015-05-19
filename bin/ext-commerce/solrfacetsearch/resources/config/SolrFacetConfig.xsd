@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified">
+
+	<xs:complexType name="indexconfig">
+		<xs:sequence>
+			<xs:element name="exportpath" type="xs:string" minOccurs="0"
+				maxOccurs="1" />
+			<xs:element name="batchSize" type="xs:int" minOccurs="0"
+				maxOccurs="1" default="100" />
+			<xs:element name="numberOfThreads" type="xs:int" minOccurs="0"
+				maxOccurs="1" default="1" />
+			<xs:element nillable="false" name="indexMode" type="indexMode" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:complexType name="itemTypes">
+		<xs:sequence>
+			<xs:element name="itemType" type="itemType" minOccurs="0"
+				maxOccurs="100" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="properties">
+		<xs:sequence>
+			<xs:element name="property" type="property" minOccurs="0"
+				maxOccurs="100" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="itemType">
+		<xs:sequence>
+			<xs:element name="properties" type="properties" minOccurs="0"
+				maxOccurs="1" />
+			<xs:element name="flexibleSearchUpdateQueries" type="flexibleSearchUpdateQueries"
+				minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+
+		<xs:attribute name="code" type="xs:string" use="required" />
+
+		<xs:attribute name="variant" use="optional" default="false"
+			type="xs:boolean" />
+
+		<xs:attribute name="identityProvider" type="xs:string"
+			use="optional" />
+
+		<xs:attribute name="modelLoader" type="xs:string" use="optional" />
+		
+		<xs:attribute name="valuesProvider" type="xs:string" use="optional" />
+		
+		<xs:attribute name="indexName" type="xs:string" use="optional" />
+		
+		<xs:attribute name="solrResultConverter" type="xs:string" use="optional" />
+		
+
+	</xs:complexType>
+
+
+	<xs:complexType name="fsQuery">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="injectLastIndexTime" type="xs:boolean"
+					default="false" use="optional" />
+				<xs:attribute name="injectCurrentDate" type="xs:boolean"
+					default="false" use="optional" />
+				<xs:attribute name="injectCurrentTime" type="xs:boolean"
+					default="false" use="optional" />
+				<xs:attribute name="parameterProvider" type="xs:string"
+					use="optional" />
+				<xs:attribute name="user" type="xs:string" use="optional"
+					default="anonymous" />
+			</xs:extension>
+		</xs:simpleContent>
+
+	</xs:complexType>
+
+	<xs:complexType name="flexibleSearchUpdateQueries">
+		<xs:sequence>
+			<xs:element name="fullIndexQuery" type="fsQuery"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="updateIndexQuery" type="fsQuery"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="deleteFromIndexQuery" type="fsQuery"
+				minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+
+
+	<xs:complexType name="property">
+		<xs:sequence>
+			<xs:element name="rangeSets" type="rangeSets" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required" />
+		<xs:attribute name="type" use="required" type="propertyType" />
+		<xs:attribute name="sortableType" use="optional" type="propertyType" />
+		<xs:attribute name="valueProvider" type="xs:string" use="optional" />
+		<xs:attribute name="facet" type="xs:boolean" use="optional"
+			default="false" />
+		<xs:attribute name="localized" type="xs:boolean" use="optional"
+			default="false" />
+		<xs:attribute name="currency" type="xs:boolean" use="optional"
+			default="false" />
+		<xs:attribute name="multiValue" type="xs:boolean" use="optional"
+			default="false" />
+		<xs:attribute name="rangeSet" type="xs:string" use="optional" />
+		<xs:attribute name="facetDisplayNameProvider" type="xs:string" use="optional" />
+		<xs:attribute name="exportId" type="xs:string" use="optional"/>
+		<xs:attribute name="facetType" type="facetType" use="optional" />
+	</xs:complexType>
+
+	<xs:complexType name="endpointURL">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="master" type="xs:boolean" use="optional"
+					default="false" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<xs:complexType name="endpointURLs">
+		<xs:sequence>
+			<xs:element name="endpointURL" type="endpointURL"
+				minOccurs="1" maxOccurs="100" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="mode">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="standalone" />
+			<xs:enumeration value="embedded" />
+			<xs:enumeration value="xml_export" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="propertyType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="boolean" />
+			<xs:enumeration value="int" />
+			<xs:enumeration value="string" />
+			<xs:enumeration value="sortabletext" />
+			<xs:enumeration value="text" />
+			<xs:enumeration value="float" />
+			<xs:enumeration value="double" />
+			<xs:enumeration value="date" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="indexMode">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="DIRECT" />
+			<xs:enumeration value="TWO_PHASE" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="solrconfig">
+		<xs:sequence>
+			<xs:element name="mode" type="mode" maxOccurs="1"
+				minOccurs="1" />
+			<xs:element name="clusterconfig" type="clusterconfig"
+				maxOccurs="1" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="config">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="solrconfig" type="solrconfig"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="indexconfig" type="indexconfig"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="itemTypes" type="itemTypes" minOccurs="1"
+					maxOccurs="1" />
+			</xs:sequence>
+
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="clusterconfig">
+		<xs:sequence>
+			<xs:element name="aliveCheckInterval" type="timeoutValue"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="connectionTimeout" type="timeoutValue"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="readTimeout" type="timeoutValue"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="endpointURLs" type="endpointURLs"
+				minOccurs="0" maxOccurs="1" />
+		</xs:sequence>
+		<xs:attribute name="embeddedMaster" type="xs:boolean"
+			use="optional" default="false" />
+	</xs:complexType>
+
+	<xs:simpleType name="timeoutValue">
+		<xs:restriction base="xs:int">
+			<xs:minInclusive value="0" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:complexType name="rangeSets">
+		<xs:sequence>
+			<xs:element name="rangeSet" type="rangeSet" minOccurs="1" maxOccurs="100"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="rangeSet">
+		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	
+	<xs:simpleType name="facetType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="Refine" />
+			<xs:enumeration value="MultiSelectAnd" />
+			<xs:enumeration value="MultiSelectOr" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+</xs:schema>

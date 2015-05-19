@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<project name="cmscockpit_buildcallbacks" >
+	
+	<property name="cmscockpit.base.extension.name" value="cmscockpit"/>
+
+	<!-- 
+	    called whenever 'ant ear' is used. this callback can be used to modify the content of the ear file
+			you can for example put a custom ear.properties into the ear file (just use the <copy>-task to copy it 
+			to the ${ear.resources.path}
+	
+	     ${ear.path}: 					path to ear
+	     ${ear.libs.path}: 			path to libs inside ear (as default this comes to ear.path/libs)
+	     ${ear.resources.path}:	path to resources inside ear (as default this comes to ear.path/resources)
+	 -->
+	<macrodef name="cmscockpit_before_build">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<and>
+							<equals arg1="${ext.@{extname}.webmodule.available}" arg2="available" />
+							<contains string="${required.extensions.for.@{extname}}" substring="${cmscockpit.base.extension.name}"/>
+							<not>
+								<uptodate>
+					            <srcfiles dir="${ext.cmscockpit.path}/web/webroot">
+										<include name="cmscockpit/**/**.*" />
+									</srcfiles>
+									<globmapper from="*" to="${ext.@{extname}.path}/web/webroot/*"/>
+					        	</uptodate>
+							</not>
+						</and>
+						<then>
+							<echo level="info" message="Start copying cms cockpit files for extension @{extname}..."/>
+							<copy todir="${ext.@{extname}.path}/web/webroot">
+								<fileset dir="${ext.cmscockpit.path}/web/webroot">
+									<include name="cmscockpit/**/**.*" />
+								</fileset>
+							</copy>
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="cmscockpit_after_clean">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<and>
+							<equals arg1="${ext.@{extname}.webmodule.available}" arg2="available" />
+							<contains string="${required.extensions.for.@{extname}}" substring="${cmscockpit.base.extension.name}"/>
+						</and>
+						<then>
+							<echo level="info" message="Start cleaning up cms cockpit files for extension @{extname}"/>
+							<delete quiet="true" dir="${ext.@{extname}.path}/web/webroot/cmscockpit"/>
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+	
+	<target name="generate-cmscockpit-jaxb-files">
+		<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+			<classpath>
+				<fileset dir="${ext.core.path}/lib" includes="*.jar" />
+				<fileset dir="${ext.cockpit.path}/antlib" includes="*.jar" />
+			</classpath>
+		</taskdef>	
+		<echo>Generating JAXB files for content editor configuration</echo>
+		<xjc 
+			destdir="${ext.cmscockpit.path}/src" 
+			schema="${ext.cmscockpit.path}/resources/cmscockpit/content-editor.xsd"
+			package="de.hybris.platform.cmscockpit.services.config.jaxb.contenteditor">
+			<produces dir="${ext.cmscockpit.path}/src/de/hybris/platform/cmscockpit/services/config/jaxb/contenteditor">
+				<include name="*.java"/>
+			</produces>
+			<depends file="${ext.cmscockpit.path}/resources/cmscockpit/content-editor.xsd"/>
+		</xjc>	
+		<echo>Generating JAXB files for content elements configuration</echo>
+		<xjc 
+			destdir="${ext.cmscockpit.path}/src" 
+			schema="${ext.cmscockpit.path}/resources/cmscockpit/content-element.xsd"
+			package="de.hybris.platform.cmscockpit.services.config.jaxb.contentelement">
+			<produces dir="${ext.cmscockpit.path}/src/de/hybris/platform/cmscockpit/services/config/jaxb/contentelement">
+				<include name="*.java"/>
+			</produces>
+			<depends file="${ext.cmscockpit.path}/resources/cmscockpit/content-element.xsd"/>
+		</xjc>			
+	</target>		
+</project>

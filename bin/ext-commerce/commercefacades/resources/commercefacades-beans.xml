@@ -1,0 +1,717 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<!-- Address -->
+
+	<bean class="de.hybris.platform.commercefacades.address.data.AddressVerificationResult&lt;DECISION>">
+		<property name="decision" type="DECISION"/>
+		<property name="suggestedAddresses"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.user.data.AddressData>"/>
+		<property name="errors"
+		          type="java.util.Map&lt;String, de.hybris.platform.commercefacades.address.data.AddressVerificationErrorField>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.address.data.AddressVerificationErrorField">
+		<property name="name" type="String"/>
+		<property name="missing" type="boolean"/>
+		<property name="invalid" type="boolean"/>
+	</bean>
+
+	<!-- Catalog -->
+
+	<bean class="de.hybris.platform.commercefacades.catalog.data.AbstractCatalogItemData">
+		<property name="id" type="String"/>
+		<property name="lastModified" type="java.util.Date"/>
+		<property name="name" type="String"/>
+		<property name="url" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.catalog.data.CatalogData"
+	      extends="de.hybris.platform.commercefacades.catalog.data.AbstractCatalogItemData">
+		<property name="catalogVersions"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.catalog.data.CatalogVersionData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.catalog.data.CatalogsData">
+		<property name="catalogs"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.catalog.data.CatalogData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.catalog.data.CatalogVersionData"
+	      extends="de.hybris.platform.commercefacades.catalog.data.AbstractCatalogItemData">
+		<property name="categoriesHierarchyData"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.catalog.data.CategoryHierarchyData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.catalog.data.CategoryHierarchyData"
+	      extends="de.hybris.platform.commercefacades.catalog.data.AbstractCatalogItemData">
+		<property name="pageSize" type="Integer"/>
+		<property name="totalNumber" type="Integer"/>
+		<property name="currentPage" type="Integer"/>
+		<property name="numberOfPages" type="Integer"/>
+		<property name="subcategories"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.catalog.data.CategoryHierarchyData>"/>
+		<property name="products"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.ProductData>"/>
+	</bean>
+
+
+	<!-- Order -->
+
+	<bean class="de.hybris.platform.commercefacades.order.data.AbstractOrderData">
+		<property name="code" type="String"/>
+		<property name="net" type="boolean"/>
+		<property name="totalPriceWithTax" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="totalPrice" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="totalTax" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="subTotal" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="deliveryCost" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="entries"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.order.data.OrderEntryData>"/>
+		<property name="totalItems" type="Integer"/>
+		<property name="deliveryMode" type="de.hybris.platform.commercefacades.order.data.DeliveryModeData"/>
+		<property name="deliveryAddress" type="de.hybris.platform.commercefacades.user.data.AddressData"/>
+		<property name="paymentInfo" type="de.hybris.platform.commercefacades.order.data.CCPaymentInfoData"/>
+		<property name="appliedOrderPromotions"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.PromotionResultData>"/>
+		<property name="appliedProductPromotions"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.PromotionResultData>"/>
+		<property name="productDiscounts" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="orderDiscounts" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="totalDiscounts" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="site" type="String"/>
+		<property name="store" type="String"/>
+		<property name="guid" type="String"/>
+		<property name="calculated" type="boolean"/>
+		<property name="appliedVouchers"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.voucher.data.VoucherData>"/>
+		<property name="user" type="de.hybris.platform.commercefacades.user.data.PrincipalData"/>
+		<property name="pickupOrderGroups" type="java.util.List&lt;de.hybris.platform.commercefacades.order.data.PickupOrderEntryGroupData>" />
+		<property name="deliveryOrderGroups" type="java.util.List&lt;de.hybris.platform.commercefacades.order.data.DeliveryOrderEntryGroupData>" />
+		<property name="pickupItemsQuantity" type="java.lang.Long" />
+		<property name="deliveryItemsQuantity" type="java.lang.Long" />		
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.CardTypeData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.ConsignmentData">
+		<property name="code" type="String"/>
+		<property name="trackingID" type="String"/>
+		<property name="status" type="de.hybris.platform.basecommerce.enums.ConsignmentStatus"/>
+		<property name="statusDate" type="java.util.Date"/>
+		<property name="entries"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.order.data.ConsignmentEntryData>"/>
+		<property name="shippingAddress" type="de.hybris.platform.commercefacades.user.data.AddressData"/>
+		<property name="deliveryPointOfService"
+		          type="de.hybris.platform.commercefacades.storelocator.data.PointOfServiceData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.ConsignmentEntryData">
+		<property name="orderEntry" type="de.hybris.platform.commercefacades.order.data.OrderEntryData"/>
+		<property name="quantity" type="Long"/>
+		<property name="shippedQuantity" type="Long"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.CartData"
+	      extends="de.hybris.platform.commercefacades.order.data.AbstractOrderData">
+		<property name="totalUnitCount" type="Integer"/>
+		<property name="potentialOrderPromotions"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.PromotionResultData>"/>
+		<property name="potentialProductPromotions"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.PromotionResultData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.CartModificationData">
+		<property name="statusCode" type="String"/>
+		<property name="quantityAdded" type="long"/>
+		<property name="quantity" type="long"/>
+		<property name="entry" type="de.hybris.platform.commercefacades.order.data.OrderEntryData"/>
+		<property name="deliveryModeChanged" type="java.lang.Boolean"/>
+		<property name="cartCode" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.CartRestorationData">
+		<property name="modifications"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.order.data.CartModificationData&gt;"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.CCPaymentInfoData">
+		<property name="id" type="String"/>
+		<property name="accountHolderName" type="String"/>
+		<property name="cardType" type="String"/>
+		<property name="cardTypeData" type="de.hybris.platform.commercefacades.order.data.CardTypeData"/>
+		<property name="cardNumber" type="String"/>
+		<property name="startMonth" type="String"/>
+		<property name="startYear" type="String"/>
+		<property name="expiryMonth" type="String"/>
+		<property name="expiryYear" type="String"/>
+		<property name="issueNumber" type="String"/>
+		<property name="subscriptionId" type="String"/>
+		<property name="saved" type="boolean"/>
+		<property name="defaultPaymentInfo" type="boolean"/>
+		<property name="billingAddress" type="de.hybris.platform.commercefacades.user.data.AddressData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.CCPaymentInfoDatas">
+		<property name="paymentInfos"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.order.data.CCPaymentInfoData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.DeliveryModeData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="description" type="String"/>
+		<property name="deliveryCost" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.DeliveryModesData">
+		<property name="deliveryModes" type="java.util.List&lt;? extends DeliveryModeData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.OrderData"
+	      extends="de.hybris.platform.commercefacades.order.data.AbstractOrderData">
+		<property name="created" type="java.util.Date"/>
+		<property name="status" type="de.hybris.platform.core.enums.OrderStatus"/>
+		<property name="statusDisplay" type="String"/>
+		<property name="guestCustomer" type="boolean"/>
+		<property name="consignments"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.order.data.ConsignmentData>"/>
+		<property name="deliveryStatus" type="de.hybris.platform.core.enums.DeliveryStatus"/>
+		<property name="deliveryStatusDisplay" type="String"/>
+		<property name="unconsignedEntries"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.order.data.OrderEntryData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.OrderEntryData">
+		<property name="entryNumber" type="Integer"/>
+		<property name="quantity" type="Long"/>
+		<property name="basePrice" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="totalPrice" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="product" type="de.hybris.platform.commercefacades.product.data.ProductData"/>
+		<property name="updateable" type="boolean"/>
+		<property name="deliveryMode" type="de.hybris.platform.commercefacades.order.data.DeliveryModeData"/>
+		<property name="deliveryPointOfService"
+		          type="de.hybris.platform.commercefacades.storelocator.data.PointOfServiceData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.OrderHistoriesData">
+		<property name="orders"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.order.data.OrderHistoryData>"/>
+		<property name="sorts" type="java.util.List&lt;de.hybris.platform.commerceservices.search.pagedata.SortData>"/>
+		<property name="pagination" type="de.hybris.platform.commerceservices.search.pagedata.PaginationData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.OrderHistoryData">
+		<property name="code" type="String"/>
+		<property name="status" type="de.hybris.platform.core.enums.OrderStatus"/>
+		<property name="statusDisplay" type="String"/>
+		<property name="placed" type="java.util.Date"/>
+		<property name="guid" type="String"/>
+		<property name="total" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.PromotionOrderEntryConsumedData">
+		<property name="code" type="String"/>
+		<property name="adjustedUnitPrice" type="Double"/>
+		<property name="orderEntryNumber" type="Integer"/>
+		<property name="quantity" type="Long"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.ZoneDeliveryModeData"
+	      extends="de.hybris.platform.commercefacades.order.data.DeliveryModeData"/>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.OrderEntryGroupData">
+		<property name="totalPriceWithTax" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="entries" type="java.util.Collection&lt;de.hybris.platform.commercefacades.order.data.OrderEntryData>" />
+		<property name="quantity" type="java.lang.Long" />
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.PickupOrderEntryGroupData" 
+		  extends="de.hybris.platform.commercefacades.order.data.OrderEntryGroupData">
+		<property name="deliveryPointOfService" type="de.hybris.platform.commercefacades.storelocator.data.PointOfServiceData" />
+		<property name="distance" type="java.lang.Double" />
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.DeliveryOrderEntryGroupData" 
+			extends="de.hybris.platform.commercefacades.order.data.OrderEntryGroupData">
+		<property name="deliveryAddress" type="de.hybris.platform.commercefacades.user.data.AddressData" />
+	</bean>
+
+	<!-- Product -->
+
+	<bean class="de.hybris.platform.commercefacades.product.data.BaseOptionData">
+		<property name="variantType" type="String"/>
+		<property name="options"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.VariantOptionData>"/>
+		<property name="selected" type="de.hybris.platform.commercefacades.product.data.VariantOptionData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.CategoryData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="url" type="String"/>
+		<property name="description" type="String"/>
+		<property name="image" type="de.hybris.platform.commercefacades.product.data.ImageData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.ClassificationData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="features"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.product.data.FeatureData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.FeatureData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="description" type="String"/>
+		<property name="type" type="String"/>
+		<property name="range" type="boolean"/>
+		<property name="comparable" type="boolean"/>
+		<property name="featureUnit" type="de.hybris.platform.commercefacades.product.data.FeatureUnitData"/>
+		<property name="featureValues"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.product.data.FeatureValueData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.FeatureUnitData">
+		<property name="symbol" type="String"/>
+		<property name="name" type="String"/>
+		<property name="unitType" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.FeatureValueData">
+		<property name="value" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.ImageData">
+		<property name="imageType" type="de.hybris.platform.commercefacades.product.data.ImageDataType"/>
+		<property name="format" type="String"/>
+		<property name="url" type="String"/>
+		<property name="altText" type="String"/>
+		<property name="galleryIndex" type="Integer"/>
+	</bean>
+
+	<enum class="de.hybris.platform.commercefacades.product.data.ImageDataType">
+		<value>PRIMARY</value>
+		<value>GALLERY</value>
+	</enum>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.PriceData">
+		<property name="currencyIso" type="String"/>
+		<property name="value" type="java.math.BigDecimal"/>
+		<property name="priceType" type="de.hybris.platform.commercefacades.product.data.PriceDataType"/>
+		<property name="formattedValue" type="String"/>
+		<property name="minQuantity" type="Long"/>
+		<property name="maxQuantity" type="Long"/>
+	</bean>
+
+	<enum class="de.hybris.platform.commercefacades.product.data.PriceDataType">
+		<value>BUY</value>
+		<value>FROM</value>
+	</enum>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.ProductData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="url" type="String"/>
+		<property name="description" type="String"/>
+		<property name="purchasable" type="Boolean"/>
+		<property name="stock" type="de.hybris.platform.commercefacades.product.data.StockData"/>
+		<property name="futureStocks"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.FutureStockData>"/>
+		<property name="availableForPickup" type="java.lang.Boolean"/>
+		<property name="averageRating" type="Double"/>
+		<property name="numberOfReviews" type="Integer"/>
+		<property name="summary" type="String"/>
+		<property name="manufacturer" type="String"/>
+		<property name="variantType" type="String"/>
+		<property name="price" type="PriceData"/>
+		<property name="baseProduct" type="String"/>
+		<property name="images"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.product.data.ImageData>"/>
+		<property name="categories"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.product.data.CategoryData>"/>
+		<property name="reviews"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.product.data.ReviewData>"/>
+		<property name="classifications"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.product.data.ClassificationData>"/>
+		<property name="potentialPromotions"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.product.data.PromotionData>"/>
+		<property name="variantOptions"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.VariantOptionData>"/>
+		<property name="baseOptions"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.BaseOptionData>"/>
+		<property name="volumePricesFlag" type="Boolean"/>
+		<property name="volumePrices" type="List&lt;de.hybris.platform.commercefacades.product.data.PriceData>"/>
+		<property name="productReferences"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.ProductReferenceData>"/>
+		<property name="variantMatrix"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.VariantMatrixElementData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.StockData">
+		<property name="stockLevelStatus" type="de.hybris.platform.basecommerce.enums.StockLevelStatus"/>
+		<property name="stockLevel" type="Long"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.FutureStockData">
+		<property name="stock" type="de.hybris.platform.commercefacades.product.data.StockData"/>
+		<property name="date" type="java.util.Date"/>
+		<property name="formattedDate" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.VariantMatrixElementData">
+		<property name="variantValueCategory"
+		          type="de.hybris.platform.commercefacades.product.data.VariantValueCategoryData"/>
+		<property name="parentVariantCategory"
+		          type="de.hybris.platform.commercefacades.product.data.VariantCategoryData"/>
+		<property name="variantOption" type="de.hybris.platform.commercefacades.product.data.VariantOptionData"/>
+		<property name="elements"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.VariantMatrixElementData>"/>
+		<property name="isLeaf" type="Boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.VariantValueCategoryData">
+		<property name="name" type="String"/>
+		<property name="sequence" type="int"/>
+		<property name="superCategories"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.product.data.VariantCategoryData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.VariantCategoryData">
+		<property name="name" type="String"/>
+		<property name="hasImage" type="Boolean"/>
+		<property name="priority" type="int"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.ProductReferenceData"
+	      extends="de.hybris.platform.commerceservices.product.data.ReferenceData&lt;de.hybris.platform.catalog.enums.ProductReferenceTypeEnum, de.hybris.platform.commercefacades.product.data.ProductData>">
+		<property name="preselected" type="Boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.ProductReferencesData">
+		<property name="references"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.ProductReferenceData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.ProductResultData">
+		<property name="products"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.ProductData>"/>
+		<property name="totalCount" type="int"/>
+		<property name="count" type="int"/>
+		<property name="requestedCount" type="int"/>
+		<property name="requestedStart" type="int"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.PromotionData">
+		<property name="code" type="String"/>
+		<property name="title" type="String"/>
+		<property name="promotionType" type="String"/>
+		<property name="startDate" type="java.util.Date"/>
+		<property name="endDate" type="java.util.Date"/>
+		<property name="description" type="String"/>
+		<property name="couldFireMessages" type="java.util.List&lt;String>"/>
+		<property name="firedMessages" type="java.util.List&lt;String>"/>
+		<property name="productBanner" type="de.hybris.platform.commercefacades.product.data.ImageData"/>
+		<property name="enabled" type="Boolean"/>
+		<property name="priority" type="Integer"/>
+		<property name="promotionGroup" type="String"/>
+		<property name="restrictions"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.promotion.data.PromotionRestrictionData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.PromotionResultData">
+		<property name="description" type="String"/>
+		<property name="promotionData" type="de.hybris.platform.commercefacades.product.data.PromotionData"/>
+		<property name="consumedEntries"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.order.data.PromotionOrderEntryConsumedData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.promotion.data.PromotionRestrictionData">
+		<property name="restrictionType" type="String"/>
+		<property name="description" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.ReviewData">
+		<property name="id" type="String"/>
+		<property name="headline" type="String"/>
+		<property name="comment" type="String"/>
+		<property name="rating" type="Double"/>
+		<property name="date" type="java.util.Date"/>
+		<property name="alias" type="String"/>
+		<property name="principal" type="de.hybris.platform.commercefacades.user.data.PrincipalData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.SuggestionData">
+		<property name="value" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.VariantOptionData">
+		<property name="code" type="String"/>
+		<property name="stock" type="de.hybris.platform.commercefacades.product.data.StockData"/>
+		<property name="url" type="String"/>
+		<property name="priceData" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="variantOptionQualifiers"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.product.data.VariantOptionQualifierData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.VariantOptionQualifierData">
+		<property name="qualifier" type="String"/>
+		<property name="name" type="String"/>
+		<property name="value" type="String"/>
+		<property name="image" type="de.hybris.platform.commercefacades.product.data.ImageData"/>
+	</bean>
+
+	<enum class="de.hybris.platform.commercefacades.product.ProductOption">
+		<value>PRICE</value>
+		<value>BASIC</value>
+		<value>SUMMARY</value>
+		<value>DESCRIPTION</value>
+		<value>GALLERY</value>
+		<value>CATEGORIES</value>
+		<value>PROMOTIONS</value>
+		<value>STOCK</value>
+		<value>REVIEW</value>
+		<value>CLASSIFICATION</value>
+		<value>VARIANT_FULL</value>
+		<value>REFERENCES</value>
+		<value>DELIVERY_MODE_AVAILABILITY</value>
+	</enum>
+
+
+	<!-- Search -->
+
+	<bean class="de.hybris.platform.commercefacades.search.data.AutocompleteSuggestionData">
+		<property name="term" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.search.data.AutocompleteResultData">
+		<property name="suggestions"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.search.data.AutocompleteSuggestionData>"/>
+		<property name="products"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.ProductData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.search.data.SearchQueryData">
+		<property name="value" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.search.data.SearchStateData">
+		<property name="url" type="String"/>
+		<property name="query" type="de.hybris.platform.commercefacades.search.data.SearchQueryData"/>
+	</bean>
+
+
+	<!-- Store Locator -->
+
+	<bean class="de.hybris.platform.commercefacades.storelocator.data.OpeningDayData">
+		<property name="openingTime" type="de.hybris.platform.commercefacades.storelocator.data.TimeData"/>
+		<property name="closingTime" type="de.hybris.platform.commercefacades.storelocator.data.TimeData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.storelocator.data.OpeningScheduleData">
+		<property name="name" type="String"/>
+		<property name="code" type="String"/>
+		<property name="weekDayOpeningList"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.storelocator.data.WeekdayOpeningDayData>"/>
+		<property name="specialDayOpeningList"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.storelocator.data.SpecialOpeningDayData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.storelocator.data.PointOfServiceData">
+		<property name="name" type="String"/>
+		<property name="displayName" type="String"/>
+		<property name="url" type="String"/>
+		<property name="description" type="String"/>
+		<property name="openingHours" type="de.hybris.platform.commercefacades.storelocator.data.OpeningScheduleData"/>
+		<property name="storeContent" type="String"/>
+		<property name="features" type="java.util.Map&lt;String, String>"/>
+		<property name="geoPoint" type="de.hybris.platform.commerceservices.store.data.GeoPoint"/>
+		<property name="formattedDistance" type="String"/>
+		<property name="distanceKm" type="Double"/>
+		<property name="mapIcon" type="de.hybris.platform.commercefacades.product.data.ImageData"/>
+		<property name="address" type="de.hybris.platform.commercefacades.user.data.AddressData"/>
+		<property name="storeImages"
+		          type="java.util.Collection&lt;de.hybris.platform.commercefacades.product.data.ImageData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.storelocator.data.PointOfServiceStockData"
+	      extends="de.hybris.platform.commercefacades.storelocator.data.PointOfServiceData">
+		<property name="stockData" type="de.hybris.platform.commercefacades.product.data.StockData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.storelocator.data.StoreStockHolder">
+		<property name="product" type="de.hybris.platform.core.model.product.ProductModel"/>
+		<property name="pointOfService" type="de.hybris.platform.storelocator.model.PointOfServiceModel"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.storefinder.data.StoreFinderStockSearchPageData&lt;RESULT>"
+	      extends="de.hybris.platform.commerceservices.storefinder.data.StoreFinderSearchPageData&lt;RESULT>">
+		<property name="product" type="de.hybris.platform.commercefacades.product.data.ProductData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.storelocator.data.SpecialOpeningDayData"
+	      extends="de.hybris.platform.commercefacades.storelocator.data.OpeningDayData">
+		<property name="date" type="java.util.Date"/>
+		<property name="formattedDate" type="String"/>
+		<property name="closed" type="boolean"/>
+		<property name="name" type="String"/>
+		<property name="comment" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.storelocator.data.TimeData">
+		<property name="hour" type="byte"/>
+		<property name="minute" type="byte"/>
+		<property name="formattedHour" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.storelocator.data.WeekdayOpeningDayData"
+	      extends="de.hybris.platform.commercefacades.storelocator.data.OpeningDayData">
+		<property name="weekDay" type="String"/>
+		<property name="closed" type="boolean"/>
+	</bean>
+
+
+	<!-- Store Session -->
+
+	<bean class="de.hybris.platform.commercefacades.storesession.data.CurrencyData">
+		<property name="isocode" type="String"/>
+		<property name="name" type="String"/>
+		<property name="active" type="boolean"/>
+		<property name="symbol" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.storesession.data.LanguageData">
+		<property name="isocode" type="String"/>
+		<property name="name" type="String"/>
+		<property name="nativeName" type="String"/>
+		<property name="active" type="boolean"/>
+	</bean>
+
+
+	<!-- User -->
+
+	<bean class="de.hybris.platform.commercefacades.user.data.AddressData">
+		<property name="id" type="String"/>
+		<property name="title" type="String"/>
+		<property name="titleCode" type="String"/>
+		<property name="firstName" type="String"/>
+		<property name="lastName" type="String"/>
+		<property name="companyName" type="String"/>
+		<property name="line1" type="String"/>
+		<property name="line2" type="String"/>
+		<property name="town" type="String"/>
+		<property name="region" type="de.hybris.platform.commercefacades.user.data.RegionData"/>
+		<property name="postalCode" type="String"/>
+		<property name="phone" type="String"/>
+		<property name="email" type="String"/>
+		<property name="country" type="de.hybris.platform.commercefacades.user.data.CountryData"/>
+		<property name="shippingAddress" type="boolean"/>
+		<property name="billingAddress" type="boolean"/>
+		<property name="defaultAddress" type="boolean"/>
+		<property name="visibleInAddressBook" type="boolean"/>
+		<property name="formattedAddress" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.user.data.CountryData">
+		<property name="isocode" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.user.data.RegionData">
+		<property name="isocode" type="String"/>
+		<property name="isocodeShort" type="String"/>
+		<property name="countryIso" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.user.data.CustomerData"
+	      extends="de.hybris.platform.commercefacades.user.data.PrincipalData">
+		<property name="defaultBillingAddress" type="de.hybris.platform.commercefacades.user.data.AddressData"/>
+		<property name="defaultShippingAddress" type="de.hybris.platform.commercefacades.user.data.AddressData"/>
+		<property name="titleCode" type="String"/>
+		<property name="firstName" type="String"/>
+		<property name="lastName" type="String"/>
+		<property name="currency" type="de.hybris.platform.commercefacades.storesession.data.CurrencyData"/>
+		<property name="language" type="de.hybris.platform.commercefacades.storesession.data.LanguageData"/>
+		<property name="displayUid" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.user.data.PrincipalData">
+		<property name="uid" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.user.data.RegisterData">
+		<property name="login" type="String"/>
+		<property name="password" type="String"/>
+		<property name="titleCode" type="String"/>
+		<property name="firstName" type="String"/>
+		<property name="lastName" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.user.data.TitleData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.user.data.UserGroupData"
+	      extends="de.hybris.platform.commercefacades.user.data.PrincipalData">
+		<property name="members" type="java.util.List&lt;? extends PrincipalData>"/>
+		<property name="subGroups" type="java.util.List&lt;? extends UserGroupData>"/>
+		<property name="membersCount" type="Integer"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.user.data.UserGroupDataList">
+		<property name="userGroups"
+		          type="java.util.List&lt;de.hybris.platform.commercefacades.user.data.UserGroupData>"/>
+		<property name="totalNumber" type="Integer"/>
+		<property name="pageSize" type="Integer"/>
+		<property name="numberOfPages" type="Integer"/>
+		<property name="currentPage" type="Integer"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.user.data.CompanyData"
+	      extends="de.hybris.platform.commercefacades.user.data.UserGroupData"/>
+
+	<enum class="de.hybris.platform.commercefacades.user.UserGroupOption">
+		<value>BASIC</value>
+		<value>MEMBERS</value>
+		<value>SUBGROUPS</value>
+	</enum>
+
+	<enum class="de.hybris.platform.commercefacades.promotion.PromotionOption">
+		<value>BASIC</value>
+		<value>EXTENDED</value>
+	</enum>
+
+	<!-- Vouchers -->
+	<bean class="de.hybris.platform.commercefacades.voucher.data.VoucherData">
+		<property name="code" type="java.lang.String"/>
+		<property name="voucherCode" type="java.lang.String"/>
+		<property name="name" type="java.lang.String"/>
+		<property name="description" type="java.lang.String"/>
+		<property name="value" type="java.lang.Double"/>
+		<property name="valueFormatted" type="java.lang.String"/>
+		<property name="valueString" type="java.lang.String"/>
+		<property name="freeShipping" type="boolean"/>
+		<property name="currency" type="de.hybris.platform.commercefacades.storesession.data.CurrencyData"/>
+		<property name="appliedValue" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+	</bean>
+
+</beans>
+

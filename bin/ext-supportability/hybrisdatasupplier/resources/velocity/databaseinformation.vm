@@ -1,0 +1,94 @@
+<!-- ********************************************************************************************************* -->
+<!-- ****           Database Information  START                                                           **** -->
+<!-- ********************************************************************************************************* -->
+<!-- +++ Database Connection [$DatabaseComponent.deployment.databaseVersion.DatabaseName] +++-->
+
+   <group name="DatabaseInformation" group_type="GENERIC">
+		<rootclass name="SAP_DatabaseSystem" sync="TRUE" merge_roots="TRUE" merge_properties="TRUE" clean="NONE">
+			<instance>		
+				<property name="Caption">
+					<value>${DatabaseComponent.deployment.databaseVersion.DatabaseName} on ${DatabaseComponent.deployment.databaseVersion.DatabaseHost}</value>
+				</property>
+				<property name="CreationClassName">
+					<value>SAP_DatabaseSystem</value>
+				</property>
+				<property name="DBName">
+					<value>${DatabaseComponent.deployment.databaseVersion.DatabaseName}</value>
+				</property>
+				<property name="DBTypeForSAP">
+					<value>${DatabaseComponent.deployment.databaseVersion.DBTypeForSAP}</value>
+				</property>
+				<property name="Name">
+					<value>${DatabaseComponent.deployment.databaseVersion.DatabaseName}.DBTypeForSAP.${DatabaseComponent.deployment.databaseVersion.DBTypeForSAP}.SystemHome.${DatabaseComponent.deployment.databaseVersion.DatabaseHost}</value>
+				</property>
+				<property name="SystemHome">
+					<value>${DatabaseComponent.deployment.databaseVersion.DatabaseHost}</value>
+				</property>
+			</instance>
+		</rootclass>
+		<memberclass name="SAP_ComputerSystem" association_name="SAP_ApplicationSystemHost" root_role="Dependent" member_role="Antecedent" sync="TRUE" merge_members="FALSE" merge_properties="TRUE" clean="LONE" optional="FALSE">
+			<instance>
+				<property name="Caption">
+					<value>${DatabaseComponent.deployment.databaseVersion.DatabaseHost}</value>
+				</property>
+				<property name="CreationClassName">
+					<value>SAP_ComputerSystem</value>
+				</property>
+				<property name="FQDName">
+					<value>${DatabaseComponent.deployment.databaseVersion.DatabaseFQDName}</value>
+				</property>
+				<property name="IPAddress">
+					<value>${DatabaseComponent.deployment.databaseVersion.DatabaseIPAddress}</value>
+				</property>
+				<property name="Name">
+					<value>${DatabaseComponent.deployment.databaseVersion.DatabaseHost}</value>
+				</property>
+			</instance>
+		</memberclass>
+   </group>
+
+<!-- ********************************************************************************************************* -->
+<!-- ****           Database Information  END                                                             **** -->
+<!-- ********************************************************************************************************* -->
+
+<!-- ********************************************************************************************************* -->
+<!-- ****           Cluster Database Information  START                                                   **** -->
+<!-- ********************************************************************************************************* -->
+<!--      +++ Cluster Database [$DatabaseComponent.deployment.clusterSystem.ClusterSystemName] +++   -->
+<group name="ClusterSystem_DatabaseSystem" group_type="GENERIC">
+		<rootclass name="SAP_ATCServer" sync="FALSE" merge_roots="TRUE" merge_properties="TRUE" clean="NONE">
+			<instance>
+				<property name="CreationClassName">
+					<value>SAP_ATCServer</value>
+				</property>
+				<property name="Name">
+					<value>${DatabaseComponent.deployment.technicalName}</value>
+				</property>
+			</instance>
+		</rootclass>
+		<memberclass name="SAP_DatabaseSystem" association_name="SAP_ApplicationSystemUsingDB" root_role="Dependent" member_role="Antecedent" sync="FALSE" merge_members="FALSE" merge_properties="TRUE" clean="LONE" optional="FALSE">
+			<instance>
+				<property name="Caption">
+					<value>${DatabaseComponent.deployment.databaseVersion.DatabaseName} on ${DatabaseComponent.deployment.databaseVersion.DatabaseHost}</value>
+				</property>
+				<property name="CreationClassName">
+					<value>SAP_DatabaseSystem</value>
+				</property>
+				<property name="DBName">
+					<value>${DatabaseComponent.deployment.databaseVersion.DatabaseName}</value>
+				</property>
+				<property name="DBTypeForSAP">
+					<value>${DatabaseComponent.deployment.databaseVersion.DBTypeForSAP}</value>
+				</property>
+				<property name="Name">
+					<value>${DatabaseComponent.deployment.databaseVersion.DatabaseName}.DBTypeForSAP.${DatabaseComponent.deployment.databaseVersion.DBTypeForSAP}.SystemHome.${DatabaseComponent.deployment.databaseVersion.DatabaseHost}</value>
+				</property>
+				<property name="SystemHome">
+					<value>${DatabaseComponent.deployment.databaseVersion.DatabaseHost}</value>
+				</property>
+			</instance>
+		</memberclass>
+	</group>
+<!-- ********************************************************************************************************* -->
+<!-- ****           Cluster Database Information  END                                                      ****-->
+<!-- ********************************************************************************************************* -->

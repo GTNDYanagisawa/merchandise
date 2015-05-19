@@ -1,0 +1,81 @@
+# ImpEx for Importing Categories into Powertools Store
+
+# Macros / Replacement Parameter definitions
+$productCatalog=powertoolsProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$supercategories=source(code, $catalogVersion)[unique=true]
+$categories=target(code, $catalogVersion)[unique=true]
+$productCatalogName=Powertools Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$lang=de
+
+# Insert Categories
+INSERT_UPDATE Category;code[unique=true];allowedPrincipals(uid)[default='customergroup'];$catalogVersion
+;1
+;106
+;830
+;953
+;1355
+;1354
+;1356
+;1358
+;1359
+;1360
+;1386
+;1505
+;1593
+;1595
+;1596
+;1597
+;1598
+;1631
+;1641
+;1710
+;1711
+;1731
+
+INSERT_UPDATE CategoryCategoryRelation;$categories;$supercategories
+;106;1
+;830;106
+;953;830
+;1354;1355
+;1355;1
+;1356;1355
+;1358;1355
+;1359;1355
+;1360;1355
+;1386;1355
+;1505;830
+;1593;1355
+;1595;1355
+;1596;1355
+;1597;1355
+;1598;1355
+;1631;1355
+;1641;1355
+;1710;1355
+;1711;1355
+;1731;1355
+
+UPDATE Category;$catalogVersion;code[unique=true];name[lang=$lang];description[lang=$lang]
+;;1;Open Catalogue;
+;;106;Components;
+;;830;Cables For Computers And Peripherals;
+;;1354;Hand Saws;
+;;1355;Tools;
+;;1356;Hammers;
+;;1358;Measuring & Layout Tools;
+;;1359;Tongs;
+;;1360;Power Drills;
+;;1386;Tag Guns;labeling gun
+;;1505;Cable Crimpers/Cutters/Strippers;
+;;1593;Screwdrivers;
+;;1595;Angle Grinders;
+;;1596;Sanders;
+;;1597;Punches Or Nail Sets;
+;;1598;Stripping Tools;
+;;1631;Circular Saws;
+;;1641;Nut Drivers;
+;;1710;Jigsaws;
+;;1711;Rotary Hammers;
+;;1731;Universal Cutters;

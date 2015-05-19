@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+-->
+
+<project name="acceleratorservices_buildcallbacks">
+
+	<!-- Import the acceleratorservices and macros -->
+	<import file="${ext.acceleratorservices.path}/resources/acceleratorservices/ant/acc-ant.xml" />
+
+	<macrodef name="acceleratorservices_before_build">
+		<sequential>
+			<impexGenerate extname="acceleratorservices"/>
+			
+			<copy todir="${ext.acceleratorservices.path}/web/webroot/WEB-INF/messages" overwrite="true" verbose="true">
+				<fileset dir="${ext.acceleratorservices.path}/web/webroot/WEB-INF/messages/" includes="*_en.properties" />
+				<mapper>
+					<mapper type="regexp" from="^(.*)_en.properties$$" to="\1.properties" />
+				</mapper>
+			</copy>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="acceleratorservices_after_clean">
+		<sequential>
+			<delete file="${ext.acceleratorservices.path}/resources-lang/touch_impexgen" failonerror="false" />
+		</sequential>
+	</macrodef>
+
+	<target name="syncaddons" description="Synchronize addons without touching the appserver">
+		<containsExact string="${extension.names}" substring="addonsupport" separator=";">
+			<do>
+				<syncaddons addonlist="${addons}" />
+			</do>
+		</containsExact>
+	</target>
+	
+</project>

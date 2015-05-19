@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+
+<!-- 
+  WARNING: This is the Spring WEB configuration file. If you want to replace
+  items or managers you have to do this from the extensions core configuration 
+  file (admincockpit/resources/admincockpit-spring.xml) 
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+	
+	<!-- 
+		UICockpitSession represents session in an cockpit application. It manages e.g. the available cockpit perspectives.
+	 -->
+	
+	<alias alias="UICockpitSession" name="AdminCockpitSession"/>
+	<bean id="AdminCockpitSession" class="de.hybris.platform.cockpit.session.impl.UISessionImpl" scope="session" init-method="registerAdditionalPerspectives">
+		<property name="initialSessionListeners">
+			<list></list>
+		</property>
+		<property name="availablePerspectives">
+			<list>
+				<ref bean="AdminPerspective"/>
+				<ref bean="ValidationPerspective"/>				
+			</list>
+		</property>
+		<property name="usingTestIDs" value="false" />
+		<property name="dragOverPerspectivesEnabled" value="true" />
+		<property name="cachePerspectivesEnabled" value="true" />
+		<property name="sendEventsImmediately" value="false" />
+		<property name="requestHandler" ref="RequestHandler" />
+	</bean>
+
+	<!-- 
+		Admincockpit perspective.
+	 -->
+	<bean id="ValidationPerspective" class=" de.hybris.platform.admincockpit.session.impl.AbstractConstraintPerspective"   scope="session" parent="BasePerspective">
+		<property name="uid" value="admincockpit.perspective.validation" />  <!-- unique ID of the perspective -->
+		<property name="label" value="admincockpit.perspective.validation" />  <!-- localization key for the label of the perspective -->
+		<property name="customCsaURI" value="/admincockpit/validationCSA.zul" />  <!-- file with optional custom client side actions -->
+
+		<property name="navigationArea">
+			<ref bean="ValidationNavigationArea" />
+		</property>
+		<property name="browserArea">
+			<bean class="de.hybris.platform.admincockpit.session.impl.AdmincockpitBrowserArea">
+				<property name="rootSearchTypeCode" value="AbstractConstraint"/>
+				<property name="viewURI" value="/cockpit/baseSearchBrowserArea.zul"/>
+				<property name="multiSelectActions">
+					<ref bean="AdmincockpitConstrainBrowserMultiSelectActionColumn" />
+				</property>
+			</bean>
+		</property>
+		<property name="editorArea">
+			<bean id="ValidationEditorAreaModel" class="de.hybris.platform.admincockpit.session.impl.AdmincockpitEditorArea" scope="session">
+				<property name="viewURI" value="/admincockpit/baseEditorArea.zul"/>
+				<property name="editorAreaController">
+					<ref bean="ValidationEditorAreaController"/>
+				</property>
+			</bean>	
+		</property>
+		<property name="popupEditorArea">		
+			<bean id="ValidationPopupEditor" parent="BasePopupEditor">
+				<property name="editorAreaController">
+					<ref bean="ValidationPopupEditorAreaController"/>
+				</property>
+			</bean>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="editorAreaTypes">
+			<set>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="AbstractConstraint" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="ConstraintGroup" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+			</set>
+		</property>	
+	</bean>
+	
+	<bean id="ValidationNavigationArea" class="de.hybris.platform.admincockpit.session.impl.AdmincockpitNavigationArea" scope="session" parent="BaseNavigationArea">
+		<property name="sectionModel">
+			<ref bean="ValidationNavigationAreaModel"/>	
+		</property>		
+		<property name="infoSlotRenderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.InfoBoxRenderer"/>
+		</property>
+		<property name="sections">
+			<list>
+				<ref bean="ValidationConstraintsSection" />
+				<ref bean="ValidationConstraintGroupsSection" />
+				<ref bean="AdmincockpitUndoSection" />
+			</list>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+	</bean>
+	
+	<bean id="ValidationNavigationAreaModel" class="de.hybris.platform.admincockpit.components.navigationarea.AdmincockpitNavigationAreaModel" scope="session">
+		<property name="specialCollectionTypes">
+			<list>
+				<value>blacklist</value>
+				<value>quickcollection</value>
+			</list>
+		</property>						
+	</bean>
+		
+	<bean id="AdmincockpitUndoSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection" scope="prototype">
+		<property name="localizedLabel" value="navigationarea.history" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.UndoSectionRenderer" />
+		</property>
+	</bean>
+	
+	<bean id="ValidationConstraintsSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection" scope="prototype">
+		<property name="localizedLabel" value="na.constrainedtypes" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean class="de.hybris.platform.admincockpit.components.navigationarea.renderer.ConstraintsSectionRenderer">
+				<property name="validationService" ref="validationService" />				
+			</bean>
+		</property>
+	</bean>
+	
+		<bean id="ValidationConstraintGroupsSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection" scope="prototype">
+		<property name="localizedLabel" value="na.constrainedgroups" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean class="de.hybris.platform.admincockpit.components.navigationarea.renderer.ConstraintGroupsSectionRenderer" />			
+		</property>
+	</bean>
+	
+	<bean id="ConstraintContentBrowserTypeColumn" class="de.hybris.platform.admincockpit.services.config.impl.IconTypeConstraintCustomColumnConfiguration"
+		scope="prototype">
+		<property name="typeAwareResourceResolver" ref="TypeAwareResourceResolver"/>		
+	</bean>
+	
+	<bean id="ConstraintContentBrowserActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="DeleteAction"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="OrderContentBrowserActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="recalculateOrderAction" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="recalculateOrderAction" class="de.hybris.platform.admincockpit.components.listview.impl.RecalculateOrderAction" scope="prototype">
+		<property name="calculationService" ref="calculationService"/>
+	</bean>
+	
+	<bean id="DeleteAction" class="de.hybris.platform.admincockpit.components.listview.impl.DeleteAction" scope="prototype">
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<bean id="ValidationEditorAreaController" class="de.hybris.platform.admincockpit.session.impl.AdmincockpitPopupEditorAreaControllerImpl" scope="session">
+		<property name="sectionRowRenderer">
+			<bean id="ValidationEditorSectionRowRenderer" parent="EditorSectionRowRenderer"/>
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory"/>
+		</property>
+	</bean>
+	
+	<bean id="ValidationPopupEditorAreaController" class="de.hybris.platform.admincockpit.session.impl.AdmincockpitPopupEditorAreaControllerImpl" scope="prototype">
+		<property name="sectionRowRenderer">
+			<bean id="ValidationPopupEditorSectionRowRenderer" parent="EditorSectionRowRenderer"/>
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory"/>
+		</property>
+	</bean>
+	
+	<bean id="RequestHandler" class="de.hybris.platform.cockpit.session.impl.DefaultRequestHandler" scope="session">
+		<property name="requestEventHandlers">
+			<map>
+				<entry key="activation">
+					<bean class="de.hybris.platform.cockpit.session.impl.ActivationEventHandler">
+						<property name="prefix" value="act" />
+					</bean>
+				</entry>
+				<entry key="search">
+					<bean class="de.hybris.platform.cockpit.session.impl.SearchEventHandler">
+						<property name="prefix" value="srch" />
+					</bean>
+				</entry>
+				<entry key="celum">
+					<bean class="de.hybris.platform.cockpit.session.impl.CelumEventHandler" />
+				</entry>
+				<entry key="msg">
+					<bean class="de.hybris.platform.cockpit.session.impl.NotificationEventHandler">
+						<property name="prefix" value="msg" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="TypeAwareResourceResolver" class="de.hybris.platform.admincockpit.services.impl.ImageUriTypeAwareResourceResolver" scope="tenant">
+		<property name="configuration">
+			<list> 
+				<ref bean="dynamicConfguration" />
+				<ref bean="attrConfguration" />
+				<ref bean="typeConfiguration" />
+			</list>
+		</property>	
+		<property name="defaultResource" value="/cockpit/images/defaultWizardNode.gif">
+			
+		</property>	
+	</bean>
+	
+	
+<!--	<bean id="ValidationTypeSelectorSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection" scope="prototype">-->
+<!--		<property name="localizedLabel" value="navigationarea.types" />-->
+<!--		<property name="visible" value="true" />-->
+<!--		<property name="renderer">-->
+<!--			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.TypeSelectorSectionRenderer" >-->
+<!--				<property name="typeCodes" value="GenericItem"/>-->
+<!--				<property name="includeSubtypes" value="true"/>-->
+<!--				<property name="displayType" value="TREE"/>-->
+<!--				<property name="pageSize" value="20" />-->
+<!--				<property name="searchable" value="true" />-->
+<!--				<property name="browserModelFactory" ref="browserModelFactory"/>-->
+<!--			</bean>-->
+<!--		</property>-->
+<!--	</bean>-->
+	
+	<bean id="dynamicConfguration" class="de.hybris.platform.admincockpit.services.impl.StringUriResourceConfiguration" scope="tenant">
+		<constructor-arg index="0" value="DynamicConstraint"/>			
+		<constructor-arg index="1" value="/admincockpit/images/icon_constraints_dynamic_constraints.gif" />
+	</bean>
+	
+	<bean id="typeConfiguration" class="de.hybris.platform.admincockpit.services.impl.StringUriResourceConfiguration" scope="tenant">
+		<constructor-arg index="0" value="TypeConstraint"/>			
+		<constructor-arg index="1" value="/admincockpit/images/icon_constraints_type_constraints.gif" />
+	</bean>
+	
+	<bean id="attrConfguration" class="de.hybris.platform.admincockpit.services.impl.StringUriResourceConfiguration" scope="tenant">
+		<constructor-arg index="0" value="AttributeConstraint"/>			
+		<constructor-arg index="1" value="/admincockpit/images/icon_constraints_attribute_constraints.gif" />
+	</bean>
+
+	<bean id="LookupEditorFactory" class="de.hybris.platform.cockpit.model.meta.LookupEditorFactory"  init-method="init" lazy-init="false">
+			<property name="editorFactory" ref="EditorFactory"></property>
+	</bean>
+	
+		<bean id="createExportWizard" class="de.hybris.platform.cockpit.wizards.Wizard" scope="prototype">
+	    <property name="title" value="Customer wizard"/>
+	    <property name="pages">
+	        <list>
+	            <bean class="de.hybris.platform.cockpit.wizards.impl.DefaultPage">
+	                <property name="id" value="dummyPage"/>
+	                <property name="title" value="Dummy page"/>
+	            </bean>
+	        </list>
+	    </property>
+	</bean>
+	
+	<!-- filter -->	
+	<bean id="adminCockpitFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+		<constructor-arg>
+			<list>
+				<ref bean="log4jFilter"/>
+				<ref bean="tenantActivationFilter"/>	
+				<ref bean="sessionFilter"/>
+				<ref bean="adminCockpitDataSourceSwitchingFilter"/>				
+				<ref bean="adminCockpitCatalogVersionActivationFilter"/>
+            <ref bean="adminCockpitSecureMediaFilter"/>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	
+	<bean id="adminCockpitDataSourceSwitchingFilter" class="de.hybris.platform.servicelayer.web.DataSourceSwitchingFilter">
+	</bean>
+	
+	 <bean id="adminCockpitCatalogVersionActivationFilter" class="de.hybris.platform.servicelayer.web.DynamicCatalogVersionActivationFilter" scope="tenant">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="catalogService" ref="catalogService"/>
+		<aop:scoped-proxy/>
+	</bean>
+ 
+  <bean id="adminCockpitSecureMediaFilter" class="de.hybris.platform.servicelayer.web.SecureMediaFilter">
+       <property name="mediaPermissionService" ref="mediaPermissionService"/>
+       <property name="modelService" ref="modelService"/>
+       <property name="userService" ref="userService"/>
+       <property name="mediaService" ref="mediaService"/>
+      <!-- <property name="secureMediaToken" value="securemedias"/>  securemedias is default but you may overwrite it -->
+       <aop:scoped-proxy/>
+     </bean>
+     
+  <bean id="AdmincockpitConstrainBrowserMultiSelectActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="DeleteAction" />
+				<ref bean="SplitterDummyAction" />
+			</list>
+		</property>
+	</bean>
+	
+</beans>
+	

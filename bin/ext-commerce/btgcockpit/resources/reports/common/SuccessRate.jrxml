@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OverallSummary" language="groovy" pageWidth="600" pageHeight="400" whenNoDataType="AllSectionsNoDetail" columnWidth="600" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" resourceBundle="localization/btgcockpit-locales">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="overallSummaryDS">
+		<parameter name="segment" class="java.lang.String"/>
+		<parameter name="catalogVersion" class="java.lang.String">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT {h.fulfilled} AS FULFILLED, count({s.PK}) AS AMOUNT
+FROM {BTGSegmentResult as h JOIN BTGSegment as s ON {s.PK}={h.segment} JOIN CatalogVersion as cv ON {cv.PK}={s.catalogVersion}}
+WHERE {s.uid}=$P{segment} AND {h.forced}=false AND {cv.version}=$P{catalogVersion}
+GROUP BY {h.fulfilled}]]>
+		</queryString>
+		<field name="FULFILLED" class="java.lang.Boolean"/>
+		<field name="AMOUNT" class="java.lang.Integer"/>
+		<variable name="variable1" class="java.lang.String">
+			<variableExpression><![CDATA[$F{FULFILLED}.booleanValue() == true ? "F" : "NF"]]></variableExpression>
+		</variable>
+		<group name="FULFILLED">
+			<groupExpression><![CDATA[$F{FULFILLED}]]></groupExpression>
+		</group>
+	</subDataset>
+	<parameter name="segment" class="java.lang.String"/>
+	<parameter name="catalogVersion" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT {code} FROM {Order}]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="50" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="600" height="50"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[new String($R{title.overallsummary}.getBytes("ISO-8859-1"), "UTF-8")]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<summary>
+		<band height="350" splitType="Stretch">
+			<pieChart>
+				<chart>
+					<reportElement x="0" y="0" width="600" height="350"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend position="Right"/>
+				</chart>
+				<pieDataset>
+					<dataset>
+						<datasetRun subDataset="overallSummaryDS">
+							<datasetParameter name="segment">
+								<datasetParameterExpression><![CDATA[$P{segment}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="catalogVersion">
+								<datasetParameterExpression><![CDATA[$P{catalogVersion}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+					</dataset>
+					<keyExpression><![CDATA[$F{FULFILLED}.booleanValue() == true ? new String($R{legend.fulfilled}.getBytes("ISO-8859-1"), "UTF-8") : new String($R{legend.notfulfilled}.getBytes("ISO-8859-1"), "UTF-8")]]></keyExpression>
+					<valueExpression><![CDATA[$F{AMOUNT}]]></valueExpression>
+					<labelExpression><![CDATA[$F{AMOUNT}]]></labelExpression>
+					<sectionHyperlink>
+						<hyperlinkTooltipExpression><![CDATA[$F{FULFILLED}.booleanValue() == true ? "Fulfilled" : "Not fulfilled"]]></hyperlinkTooltipExpression>
+					</sectionHyperlink>
+					<otherLabelExpression><![CDATA[$F{FULFILLED}.booleanValue() == true ? "Fulfilled" : "Not fulfilled"]]></otherLabelExpression>
+				</pieDataset>
+				<piePlot isCircular="true" labelFormat="{1}" legendLabelFormat="{0} ({2})">
+					<plot/>
+					<itemLabel color="#000000" backgroundColor="#FFFFFF">
+						<font size="14"/>
+					</itemLabel>
+				</piePlot>
+			</pieChart>
+		</band>
+	</summary>
+</jasperReport>

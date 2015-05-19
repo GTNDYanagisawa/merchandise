@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<process xmlns="http://www.hybris.de/xsd/processdefinition" start="createCSTicket" name="moveConsignmentToCustomerServicesProcess"
+		processClass="de.hybris.platform.ordersplitting.model.ConsignmentProcessModel" onError="error">
+
+    <action id="createCSTicket" bean="createConsignmentMovedToCSTicketAction">
+        <transition name="OK" to="generateConsignmentMovedToCSEmail" />
+        <transition name="NOK" to="error" />
+    </action>
+
+    <action id="generateConsignmentMovedToCSEmail" bean="generateConsignmentMovedToCSEmailAction">
+   		<transition name="OK" to="sendEmail"/>
+   		<transition name="NOK" to="error"/>
+   	</action>
+
+   	<action id="sendEmail" bean="sendEmail">
+   		<transition name="OK" to="removeSentEmail"/>
+   		<transition name="NOK" to="failed"/>
+   	</action>
+
+   	<action id="removeSentEmail" bean="removeSentEmail">
+   		<transition name="OK" to="success"/>
+   		<transition name="NOK" to="error"/>
+   	</action>
+
+   	<end id="error" state="ERROR">Something went wrong.</end>
+   	<end id="failed" state="FAILED">Could not create CS ticket or send notification email.</end>
+   	<end id="success" state="SUCCEEDED">Sent order moved to CS email.</end>
+
+</process>

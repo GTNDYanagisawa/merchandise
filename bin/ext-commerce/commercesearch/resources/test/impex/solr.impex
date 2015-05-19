@@ -1,0 +1,140 @@
+#
+# Import the Solr configuration for the Electronics store
+#
+$productCatalog=electronicsProductCatalog
+$catalogVersions=catalogVersions(catalog(id),version);
+$serverConfigName=electronicsSolrServerConfig
+$indexConfigName=electronicsSolrIndexConfig
+$searchConfigName=electronicsPageSize
+$facetSearchConfigName=electronicsIndex
+$facetSearchConfigDescription=Electronics Solr Index
+$searchIndexNamePrefix=electronics
+$solrIndexedType=electronicsProductType
+$indexBaseSite=electronics
+$indexLanguages=en
+$indexCurrencies=JPY,USD
+
+
+#
+# Setup the Solr server, indexer, and search configs
+#
+
+# Create the solr server configuration
+INSERT_UPDATE SolrServerConfig;name[unique=true];mode(code);embeddedMaster
+;$serverConfigName;embedded;true
+
+# Create the solr indexer configuration
+INSERT_UPDATE SolrIndexConfig;name[unique=true];batchSize;numberOfThreads;indexMode(code);
+;$indexConfigName;100;1;TWO_PHASE;
+
+# Create the faceted search configuration
+INSERT_UPDATE SolrSearchConfig;description[unique=true];pageSize
+;$searchConfigName;20
+
+#
+# Setup the indexed types, their properties, and the update queries
+#
+
+# Declare the indexed type Product
+INSERT_UPDATE SolrIndexedType;identifier[unique=true];type(code);variant;sorts(&sortRefID)
+;$solrIndexedType;Product;false;sortRef1,sortRef2,sortRef3,sortRef4,sortRef5,sortRef6
+
+INSERT_UPDATE SolrFacetSearchConfig;name[unique=true];description;indexNamePrefix;languages(isocode);currencies(isocode);solrServerConfig(name);solrSearchConfig(description);solrIndexConfig(name);solrIndexedTypes(identifier);enabledLanguageFallbackMechanism;$catalogVersions
+;$facetSearchConfigName;$facetSearchConfigDescription;$searchIndexNamePrefix;$indexLanguages;$indexCurrencies;$serverConfigName;$searchConfigName;$indexConfigName;$solrIndexedType;true;$productCatalog:Online,$productCatalog:Staged
+
+UPDATE BaseSite;uid[unique=true];solrFacetSearchConfiguration(name)
+;$indexBaseSite;$facetSearchConfigName
+
+# Define price range set
+INSERT_UPDATE SolrValueRangeSet;name[unique=true];qualifier;type;solrValueRanges(&rangeValueRefID)
+;electronicsPriceRangeUSD;USD;double;rangeRefUSD1,rangeRefUSD2,rangeRefUSD3,rangeRefUSD4,rangeRefUSD5
+;electronicsPriceRangeJPY;JPY;double;rangeRefJPY1,rangeRefJPY2,rangeRefJPY3,rangeRefJPY4,rangeRefJPY5
+
+# Define price ranges
+INSERT_UPDATE SolrValueRange;&rangeValueRefID;solrValueRangeSet(name)[unique=true];name[unique=true];from;to
+;rangeRefUSD1;electronicsPriceRangeUSD;      $0-$49.99;   0;  49.99
+;rangeRefUSD2;electronicsPriceRangeUSD;    $50-$199.99;  50; 199.99
+;rangeRefUSD3;electronicsPriceRangeUSD;   $200-$499.99; 200; 499.99
+;rangeRefUSD4;electronicsPriceRangeUSD;   $500-$999.99; 500; 999.99
+;rangeRefUSD5;electronicsPriceRangeUSD;$1,000-$100,000;1000; 100000
+
+;rangeRefJPY1;electronicsPriceRangeJPY;           ��0-��4,999;     0;    4999
+;rangeRefJPY2;electronicsPriceRangeJPY;      ��5,000-��19,999;  5000;   19999
+;rangeRefJPY3;electronicsPriceRangeJPY;     ��20,000-��49,999; 20000;   49999
+;rangeRefJPY4;electronicsPriceRangeJPY;     ��50,000-��99,999; 50000;   99999
+;rangeRefJPY5;electronicsPriceRangeJPY;��100,000-��10,000,000;100000;10000000
+
+
+# Non-facet properties
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);sortableType(code);currency[default=false];localized[default=false];multiValue[default=false];useForSpellchecking[default=false];useForAutocomplete[default=false];fieldValueProvider;valueProviderParameter
+;$solrIndexedType; itemtype               ;string ;            ;    ;    ;    ;    ;    ;
+;$solrIndexedType; code                   ;string ;            ;    ;    ;    ;true;true;springELValueProvider;code
+;$solrIndexedType; name                   ;text   ;sortabletext;    ;true;    ;true;true;springELValueProvider;getName(#lang)
+;$solrIndexedType; description            ;text   ;            ;    ;true;    ;    ;    ;;
+;$solrIndexedType; summary                ;text   ;            ;    ;true;    ;    ;    ;;
+;$solrIndexedType; manufacturerName       ;text   ;            ;    ;    ;    ;true;true;;
+;$solrIndexedType; manufacturerAID        ;string ;            ;    ;    ;    ;    ;    ;;
+;$solrIndexedType; ean                    ;string ;            ;    ;    ;    ;true;true;;
+;$solrIndexedType; priceValue             ;double ;            ;true;    ;    ;    ;    ;productPriceValueProvider;
+;$solrIndexedType; keywords               ;text   ;            ;    ;true;    ;true;true;productKeywordsValueProvider;
+;$solrIndexedType; reviewAvgRating        ;double ;            ;    ;true;    ;    ;    ;productReviewAverageRatingValueProvider;
+;$solrIndexedType; stockLevelStatus       ;string ;            ;    ;    ;    ;    ;    ;productStockLevelStatusValueProvider;
+;$solrIndexedType; inStockFlag            ;boolean;            ;    ;    ;    ;    ;    ;productInStockFlagValueProvider;
+;$solrIndexedType; pickupAvailableFlag    ;boolean;            ;    ;    ;    ;    ;    ;productPickupAvailabilityValueProvider
+
+# Category fields
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);localized[default=false];multiValue[default=true];categoryField[default=true];useForSpellchecking[default=false];useForAutocomplete[default=false];fieldValueProvider
+;$solrIndexedType; categoryName     ;text   ;true;;;true;true;atddElectronicsCategoryNameValueProvider
+;$solrIndexedType; brandName        ;text   ;true;;;    ;    ;atddElectronicsBrandCategoryNameValueProvider
+
+# Category facets
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);multiValue[default=true];facet[default=true];facetType(code);facetSort(code);priority;visible;categoryField[default=true];fieldValueProvider;facetDisplayNameProvider;topValuesProvider
+;$solrIndexedType; allCategories 	;string;;;Refine		;Alpha;-9999;false;;categoryCodeValueProvider;
+;$solrIndexedType; categoryPath  	;string;;;Refine		;Alpha;-9999;false;;categoryPathValueProvider;
+;$solrIndexedType; category      	;string;;;Refine		;Alpha; 6000;true;;atddElectronicsCategoryCodeValueProvider;categoryFacetDisplayNameProvider;defaultTopValuesProvider
+;$solrIndexedType; brand         	;string;;;Refine		;Alpha; 5000;true;;atddElectronicsBrandCategoryCodeValueProvider;categoryFacetDisplayNameProvider;defaultTopValuesProvider
+
+# Other facet properties
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);sortableType(code);currency[default=false];localized[default=false];multiValue[default=false];facet[default=true];facetType(code);facetSort(code);priority;visible;useForSpellchecking[default=false];useForAutocomplete[default=false];fieldValueProvider;facetDisplayNameProvider;customFacetSortProvider;topValuesProvider;rangeSets(name)
+;$solrIndexedType; price        	;double ;	 ;true ;     ;     ;     ;MultiSelectOr ;Alpha ; 4000;true;     ;     ;productPriceValueProvider 	;;;defaultTopValuesProvider;electronicsPriceRangeUSD,electronicsPriceRangeJPY                        ;
+
+# Create the queries that will be used to extract data for Solr
+INSERT_UPDATE SolrIndexerQuery;solrIndexedType(identifier)[unique=true];identifier[unique=true];type(code);injectCurrentDate[default=true];injectCurrentTime[default=true];injectLastIndexTime[default=true];query;user(uid)
+;$solrIndexedType;$searchIndexNamePrefix-fullQuery;full;;;false;"SELECT {PK} FROM {Product}";anonymous
+;$solrIndexedType;$searchIndexNamePrefix-updateQuery;update;;;;"
+SELECT DISTINCT tbl.pk, tbl.code FROM (
+	{{
+		SELECT DISTINCT {p:PK} AS pk, {p:code} AS code
+		FROM {Product AS p LEFT JOIN CustomerReview AS cr ON {cr:product}={p:PK} }
+		WHERE {p:varianttype} IS NULL AND ({p:modifiedtime} >= ?lastIndexTime OR {cr:modifiedtime} >= ?lastIndexTime)
+	}}
+	UNION
+	{{
+		SELECT {p:PK}  AS pk, {p:code} AS code FROM {Product AS p} WHERE {p:code} IN (
+			{{
+				SELECT DISTINCT {sl:productCode} FROM {StockLevel AS sl} WHERE {sl:modifiedtime} >= ?lastIndexTime
+			}}
+		)
+	}}
+) tbl ORDER BY tbl.code
+";anonymous
+
+# Define the available sorts
+INSERT_UPDATE SolrSort;&sortRefID;indexedType(identifier)[unique=true];code[unique=true];useBoost
+;sortRef1;$solrIndexedType;relevance;true
+;sortRef2;$solrIndexedType;topRated;false
+;sortRef3;$solrIndexedType;name-asc;false
+;sortRef4;$solrIndexedType;name-desc;false
+;sortRef5;$solrIndexedType;price-asc;false
+;sortRef6;$solrIndexedType;price-desc;false
+
+# Define the sort fields
+INSERT_UPDATE SolrSortField;sort(indexedType(identifier),code)[unique=true];fieldName[unique=true];ascending[unique=true]
+;$solrIndexedType:relevance;score;false
+;$solrIndexedType:topRated;inStockFlag;false
+;$solrIndexedType:topRated;reviewAvgRating;false
+;$solrIndexedType:name-asc;name;true
+;$solrIndexedType:name-desc;name;false
+;$solrIndexedType:price-asc;priceValue;true
+;$solrIndexedType:price-desc;priceValue;false
+

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	
+	<alias alias="sapOrdermgmtPartnerService" name="sapOrdermgmtDefaultPartnerService" />		
+	
+	<alias name="sapOrdermgmtDefaultCartService" alias="sapOrdermgmtCartService" />
+	<bean id="sapOrdermgmtDefaultCartService" class="de.hybris.platform.sap.sapordermgmtservices.cart.impl.DefaultCartService">
+		<property name="cartConverter" ref="sapOrdermgmtCartConverter" />
+		<property name="cartItemConverter" ref="sapOrdermgmtAbstractOrderEntryConverter" />		 
+		<property name="messageConverter" ref="sapOrdermgmtMessageConverter" />		 
+		<property name="bolCartFacade" ref="sapOrdermgmtBolCartFacade" />
+	</bean>
+	
+	<alias name="sapOrdermgmtDefaultAddToCartStrategy" alias="commerceAddToCartStrategy"/>
+		<bean id="sapOrdermgmtDefaultAddToCartStrategy" class="de.hybris.platform.sap.sapordermgmtservices.cart.impl.DefaultAddToCartStrategy" parent="defaultCommerceAddToCartStrategy">
+	</bean>	
+	
+	<alias name="sapOrdermgmtDefaultBackendAvailabilityService" alias="sapOrdermgmtBackendAvailabilityService" />
+	<bean id="sapOrdermgmtDefaultBackendAvailabilityService" class="de.hybris.platform.sap.sapordermgmtservices.impl.DefaultBackendAvailabilityService">
+		<property name="bolCartFacade" ref="sapOrdermgmtBolCartFacade" />
+	</bean>	
+	
+	<alias alias="sapOrdermgmtCartRestorationService" name="sapOrdermgmtDefaultCartRestorationService" />
+	<bean id="sapOrdermgmtDefaultCartRestorationService" class="de.hybris.platform.sap.sapordermgmtservices.cart.impl.DefaultCartRestorationService">
+		<property name="modelService" ref="modelService"/>
+		<property name="cartFactory" ref="cartFactory"/>
+		<property name="sessionService" ref="sessionService"/>		
+		<property name="cartService" ref="sapOrdermgmtDefaultCartService" />
+		<property name="productConfigurationService" ref="sapOrdermgmtProductConfigurationService" />				
+	</bean>	
+	
+	<alias name="sapOrdermgmtDefaultProductConfigurationService" alias="sapOrdermgmtProductConfigurationService"/>
+		<bean id="sapOrdermgmtDefaultProductConfigurationService" class="de.hybris.platform.sap.sapordermgmtservices.prodconf.impl.DefaultProductConfigurationService" >
+		<property name="sessionService" ref="sessionService"/>		
+		<property name="configurationProviderFactory" ref="sapProductConfigConfigurationProviderFactory" />		
+	</bean>
+	
+	<alias name="sapOrdermgmtDefaultCheckoutService" alias="sapOrdermgmtCheckoutService" />
+	<bean id="sapOrdermgmtDefaultCheckoutService" class="de.hybris.platform.sap.sapordermgmtservices.checkout.impl.DefaultCheckoutService">
+		<property name="orderConverter" ref="sapOrdermgmtOrderConverter" />
+		<property name="deliveryModeConverter" ref="sapOrdermgmtDeliveryModeConverter" />		
+		<property name="bolCartFacade" ref="sapOrdermgmtBolCartFacade" />
+		<property name="bolOrderFacade" ref="sapOrdermgmtBolOrderFacade" />
+		<property name="cartRestorationService" ref="sapOrdermgmtCartRestorationService" />
+	</bean>
+	
+	<alias name="sapOrdermgmtDefaultOrderService" alias="sapOrdermgmtOrderService" />
+	<bean id="sapOrdermgmtDefaultOrderService" class="de.hybris.platform.sap.sapordermgmtservices.order.impl.DefaultOrderService">
+		<property name="orderConverter" ref="sapOrdermgmtOrderConverter" />
+		<property name="orderHistoryConverter" ref="sapOrdermgmtOrderHistoryConverter" />
+		<property name="sapPartnerService" ref="sapOrdermgmtPartnerService" />			
+		<property name="bolOrderFacade" ref="sapOrdermgmtBolOrderFacade" />
+	</bean>		      
+	
+	<alias alias="sapOrdermgmtBolCartFacade" name="sapOrdermgmtDefaultBolCartFacade" />	
+	<bean id="sapOrdermgmtDefaultBolCartFacade"
+		class="de.hybris.platform.sap.sapordermgmtservices.bolfacade.impl.DefaultBolCartFacade">
+		<property name="genericFactory"
+			ref="sapCoreGenericFactory" />	
+		<property name="sapPartnerService" ref="sapOrdermgmtPartnerService" />		
+	</bean>
+			
+	<alias alias="sapOrdermgmtBolOrderFacade" name="sapOrdermgmtDefaultBolOrderFacade" />	
+	<bean id="sapOrdermgmtDefaultBolOrderFacade"
+		class="de.hybris.platform.sap.sapordermgmtservices.bolfacade.impl.DefaultBolOrderFacade">
+		<property name="genericFactory"
+			ref="sapCoreGenericFactory" />				
+		<property name="sapPartnerService" ref="sapOrdermgmtPartnerService" />	
+	</bean>		
+	
+		
+	<alias alias="sapOrdermgmtAbstractOrderPopulator" name="sapOrdermgmtDefaultAbstractOrderPopulator" />	
+	<bean id="sapOrdermgmtDefaultAbstractOrderPopulator"
+		class="de.hybris.platform.sap.sapordermgmtservices.converters.populator.DefaultAbstractOrderPopulator">
+		<property name="baseSiteService" ref="baseSiteService" />	
+		<property name="cartItemConverter" ref="sapOrdermgmtAbstractOrderEntryConverter" />		
+		<property name="priceFactory" ref="priceDataFactory" />		  
+		<property name="bolCartFacade" ref="sapOrdermgmtBolCartFacade" />
+		<property name="sapPartnerService" ref="sapOrdermgmtPartnerService" />
+		<property name="addressConverter" ref="addressConverter"/>
+	</bean>
+	
+	<alias alias="sapOrdermgmtCartPopulator" name="sapOrdermgmtDefaultCartPopulator" />	
+	<bean id="sapOrdermgmtDefaultCartPopulator" parent="sapOrdermgmtAbstractOrderPopulator"
+		class="de.hybris.platform.sap.sapordermgmtservices.converters.populator.DefaultCartPopulator">
+	</bean>
+	
+	<alias alias="sapOrdermgmtOrderPopulator" name="sapOrdermgmtDefaultOrderPopulator" />	
+	<bean id="sapOrdermgmtDefaultOrderPopulator" parent="sapOrdermgmtAbstractOrderPopulator"
+		class="de.hybris.platform.sap.sapordermgmtservices.converters.populator.DefaultOrderPopulator">
+		<property name="b2bCustomerConverter" ref="b2BCustomerConverter"/>
+	</bean>
+	
+	<alias alias="sapOrdermgmtAbstractOrderEntryPopulator" name="sapOrdermgmtDefaultAbstractOrderEntryPopulator" />	
+	<bean id="sapOrdermgmtDefaultAbstractOrderEntryPopulator"
+		class="de.hybris.platform.sap.sapordermgmtservices.converters.populator.DefaultAbstractOrderEntryPopulator">
+		<property name="scheduleLinesConverter" ref="sapOrdermgmtScheduleLineConverter" />		
+		<property name="priceFactory" ref="priceDataFactory" />		 
+	</bean>
+	
+	<alias alias="sapOrdermgmtScheduleLinePopulator" name="sapOrdermgmtDefaultScheduleLinePopulator" />	
+	<bean id="sapOrdermgmtDefaultScheduleLinePopulator"
+		class="de.hybris.platform.sap.sapordermgmtservices.converters.populator.DefaultScheduleLinePopulator">
+		<property name="i18NService" ref="i18NService" />		
+		<property name="genericFactory"	ref="sapCoreGenericFactory" />	
+	</bean>
+	
+	<alias alias="sapOrdermgmtDeliveryModePopulator" name="sapOrdermgmtDefaultDeliveryModePopulator" />	
+	<bean id="sapOrdermgmtDefaultDeliveryModePopulator"
+		class="de.hybris.platform.sap.sapordermgmtservices.converters.populator.DefaultDeliveryModePopulator">
+	</bean>
+	
+	<alias alias="sapOrdermgmtOrderHistoryPopulator" name="sapOrdermgmtDefaultOrderHistoryPopulator" />	
+	<bean id="sapOrdermgmtDefaultOrderHistoryPopulator"
+		class="de.hybris.platform.sap.sapordermgmtservices.converters.populator.DefaultOrderHistoryPopulator">
+	</bean>
+	
+	<alias alias="sapOrdermgmtMessagePopulator" name="sapOrdermgmtDefaultMessagePopulator" />	
+	<bean id="sapOrdermgmtDefaultMessagePopulator"
+		class="de.hybris.platform.sap.sapordermgmtservices.converters.populator.DefaultMessagePopulator">
+	</bean>
+	
+	
+	
+	<alias name="sapOrdermgmtDefaultCartConverter" alias="sapOrdermgmtCartConverter"/>
+	<bean id="sapOrdermgmtDefaultCartConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cartData"/>
+		<property name="populators">
+			<list>
+				<ref bean="sapOrdermgmtCartPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="sapOrdermgmtDefaultOrderConverter" alias="sapOrdermgmtOrderConverter"/>
+	<bean id="sapOrdermgmtDefaultOrderConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="orderData"/>
+		<property name="populators">
+			<list>
+				<ref bean="sapOrdermgmtOrderPopulator"/>
+			</list>
+		</property>
+	</bean>	
+	
+	<alias name="sapOrdermgmtDefaultAbstractOrderEntryConverter" alias="sapOrdermgmtAbstractOrderEntryConverter"/>
+	<bean id="sapOrdermgmtDefaultAbstractOrderEntryConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="orderEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="sapOrdermgmtAbstractOrderEntryPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="scheduleLineData" class="de.hybris.platform.sap.sapordermgmtservices.schedline.data.ScheduleLineData" scope="prototype"/>
+	
+	<alias name="sapOrdermgmtDefaultScheduleLineConverter" alias="sapOrdermgmtScheduleLineConverter"/>
+	<bean id="sapOrdermgmtDefaultScheduleLineConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="scheduleLineData"/>
+		<property name="populators">
+			<list>
+				<ref bean="sapOrdermgmtScheduleLinePopulator"/>
+			</list>
+		</property>
+	</bean>	
+	
+	<alias name="sapOrdermgmtDefaultDeliveryModeConverter" alias="sapOrdermgmtDeliveryModeConverter"/>
+	<bean id="sapOrdermgmtDefaultDeliveryModeConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="deliveryModeData"/>
+		<property name="populators">
+			<list>
+				<ref bean="sapOrdermgmtDeliveryModePopulator"/>
+			</list>
+		</property>
+	</bean>		
+	
+	<alias name="sapOrdermgmtDefaultOrderHistoryConverter" alias="sapOrdermgmtOrderHistoryConverter"/>
+	<bean id="sapOrdermgmtDefaultOrderHistoryConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="orderHistoryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="sapOrdermgmtOrderHistoryPopulator"/>
+			</list>
+		</property>
+	</bean>	
+	
+	<alias name="sapOrdermgmtDefaultMessageConverter" alias="sapOrdermgmtMessageConverter"/>
+	<bean id="sapOrdermgmtDefaultMessageConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cartModificationData"/>
+		<property name="populators">
+			<list>
+				<ref bean="sapOrdermgmtMessagePopulator"/>
+			</list>
+		</property>
+	</bean>		 	
+ 
+	
+	<alias name="sapOrdermgmtDefaultProductIdReplacementMsgMappingCallback" alias="sapOrdermgmtProductIdReplacementMsgMappingCallback"/>
+	<bean id="sapOrdermgmtDefaultProductIdReplacementMsgMappingCallback" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtservices.messagemappingcallback.DefaultSapProductIdReplacementMsgMappingCallback">
+		<property name="productService" ref="productService" />
+	</bean>
+	
+	<alias name="sapOrdermgmtDefaultProductIdReplacementForConfigurationErrorMsgMappingCallback" alias="sapOrdermgmtProductIdReplacementForConfigurationErrorMsgMappingCallback"/>
+	<bean id="sapOrdermgmtDefaultProductIdReplacementForConfigurationErrorMsgMappingCallback" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtservices.messagemappingcallback.DefaultSapProductIdReplacementForConfigurationErrorMsgMappingCallback">
+		<property name="productService" ref="productService" />
+	</bean>
+	
+	<alias name="sapOrdermgmtDefaultInternalNumberReplacementMsgMappingCallback" alias="sapOrdermgmtInternalNumberReplacementMsgMappingCallback"/>
+	<bean id="sapOrdermgmtDefaultInternalNumberReplacementMsgMappingCallback" scope="prototype"
+		class="de.hybris.platform.sap.sapordermgmtservices.messagemappingcallback.DefaultInternalNumberReplacementMsgMappingCallback">
+		<property name="productService" ref="productService" />
+		<property name="genericFactory"	ref="sapCoreGenericFactory" />	
+	</bean>
+
+</beans>

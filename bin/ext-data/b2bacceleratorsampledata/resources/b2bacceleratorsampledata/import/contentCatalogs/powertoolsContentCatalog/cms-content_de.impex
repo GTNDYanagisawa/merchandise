@@ -1,0 +1,179 @@
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$picture=media(code, $contentCV);
+$siteResource=jar:de.hybris.platform.b2bacceleratorsampledata.constants.B2BAcceleratorSampleDataConstants&/b2bacceleratorsampledata/import/contentCatalogs/$contentCatalog
+
+# Language
+$lang=de
+
+# Site Logo Component
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+;;SiteLogoComponent;/images/theme/logo-hybris.png
+
+# CMS Image Components
+UPDATE CMSImageComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+
+# CMS Link Components
+UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];linkName[lang=de]
+ ;;AboutAcceleratorLink;"Über Commerce Accelerator"
+ ;;AboutHybrisLink;"Über hybris"
+ ;;AgileCommerceBlogLink;"Agile Commerce Blog"
+ ;;AngleGrindersCategoryLink;"Winkelschleifer"
+ ;;CircularSawsCategoryLink;"Kreisssaege"
+ ;;ContactUsLink;"Kontakt"
+ ;;DocumentationLink;"Dokumentation"
+ ;;FacebookLink;"Facebook"
+ ;;HammersCategoryLink;"Hammer"
+ ;;HandSawsCategoryLink;"Handsägen"
+ ;;HandToolsCategoryLink;"Handwerkzeuge"
+ ;;HomepageNavLink;"Home"
+ ;;JigsawsCategoryLink;"Stichsägen"
+ ;;LinkedInLink;"Linked In"
+ ;;LogoutLink;"Abmelden"
+ ;;ManageBudgetsLink;"Budgets verwalten"
+ ;;ManageBusinessUnitsLink;"Geschäftseinheiten verwalten"
+ ;;ManageCostCentersLink;"Kostenstellen verwalten"
+ ;;ManagePermissionsLink;"Bestellberechtigungen verwalten"
+ ;;ManageUsergroupsLink;"Benutzergruppen verwalten"
+ ;;ManageUsersLink;"Benutzer verwalten"
+ ;;MeasuringLayoutToolsCategoryLink;"Mess- u. Planwerkzeuge"
+ ;;MyAccountLink;"Mein Konto"
+ ;;MyCompanyLink;"Meine Firma"
+ ;;NutDriversCategoryLink;"Steckschlüssel"
+ ;;PowerDrillsCategoryLink;"Bohrmaschinen"
+ ;;PunchesCategoryLink;"Stanzwerkzeug"
+ ;;RotaryHammersCategoryLink;"Bohrhämmer"
+ ;;SandersCategoryLink;"Bandschleifmaschine"
+ ;;ScrewdriversCategoryLink;"Schraubendreher"
+ ;;StoreFinderLink;"Händlersuche"
+ ;;StrippingToolsCategoryLink;"Abisolierwerkzeuge"
+ ;;TwitterLink;"Twitter"
+ ;;UserLoginLink;"Anmelden"
+
+# Lightbox Banner for Mini Cart (banner is not localizable so we must create a separate banner per language)
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];&imageRef;altText
+ ;;Powertools_358x45_HomeDeliveryBanner_DE_01.gif;$siteResource/images/banners/site/Powertools_358x45_HomeDeliveryBanner_DE_01.gif;image/gif;Powertools_358x45_HomeDeliveryBanner_DE_01.gif;"Bestellen Sie vor 18 Uhr und Sie erhalten Ihre Lieferung am nächsten Tag"
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+ ;;LightboxHomeDeliveryBannerComponent;Powertools_358x45_HomeDeliveryBanner_DE_01.gif;
+
+# CMS Mini Cart Component
+UPDATE MiniCartComponent;$contentCV[unique=true];uid[unique=true];title[lang=de]
+ ;;MiniCart;"Ihr Warenkorb"
+
+# CMS tabs components
+UPDATE CMSTabParagraphComponent;$contentCV[unique=true];uid[unique=true];title[lang=de];content[lang=de]
+ ;;deliveryTab;Lieferung;"<table border=""0"" cellspacing=""0"" cellpadding=""10"" style=""border-collapse: collapse empty-cells: show font-size: 12px padding: 0px margin: 0px border: 0px initial initial""><tbody><tr style=""padding: 0px margin: 0px""><td colspan=""4"" style=""vertical-align: top text-align: left font-weight: normal padding: 0px margin: 0px""><div style=""padding-top: 10px padding-right: 0px padding-bottom: 0px padding-left: 0px border-bottom-width: 1px border-bottom-style: solid border-bottom-color: #8edf75 height: 30px border-top-width: 1px border-top-style: solid border-top-color: #8edf75 margin: 0px""><strong style=""font-weight: bold padding: 0px margin: 0px""><span style=""color: #285190 font-size: 14px padding: 0px margin: 0px"">Versand und Lieferung</span></strong></div></td></tr><tr style=""padding: 0px margin: 0px""><td colspan=""4"" style=""vertical-align: top text-align: left font-weight: normal padding: 0px margin: 0px""><strong style=""font-weight: bold padding: 0px margin: 0px""><br />2.1 Wie hoch sind die Versandkosten?<br /></strong>Für Lieferungen innerhalb der USA (außer Alaska und Hawaii) fallen keinerlei Versandkosten an. Der Versand nach Alaska, Hawaii, Puerto Rico, Guam und als Feldpost an militärische Stützpunkte ist gratis für alle Produkte außer für Ferngläser und Teleskope. Für weitere Informationen klicken Sie hier.<br /><br /><strong style=""font-weight: bold padding: 0px margin: 0px"">2.2 Wie wird meine Bestellung versandt?<br /></strong>Teleskope und Ferngläser werden innerhalb der USA (außer Alaska und Hawaii) mit UPS oder Fedex mit Rückverfolgungsmöglichkeit und voller Versicherung versendet.<br /><br />Alle anderen Artikel werden per USPS (US Postal Service) versendet. Abhängig von Ihrer Bestellung werden Artikel möglicherweise per First Class Mail (Pakete unter ca. 370 g), Priority Mail (Pakete über ca. 370 g), Media Mail (Karten, Software, Bücher) oder einer Kombination dieser Versandarten versendet. Eine Lieferbestätigung ist in den meisten Bestellungen gratis enthalten. Die Paketversicherung hingegen ist optional.<br /><br /><strong style=""font-weight: bold padding: 0px margin: 0px"">2.3 Wann wird meine Bestellung versendet?</strong><br />Der Versand erfolgt in der Regel täglich von Montag bis Freitag. Bestellungen vor 9 Uhr PST (12 Uhr EST) werden in der Regel am selben Tag versendet.<br /><br /><strong style=""font-weight: bold padding: 0px margin: 0px"">2.4 Wurde meine Bestellung versendet?</strong><br />Sie erhalten automatisch eine Benachrichtigung per E-Mail, sobald Ihre Bestellung versendet wurde. Wenn Sie einen Online-Account bei uns einrichten, können Sie sich jederzeit dort anmelden, um den Status Ihrer Bestellung zu überprüfen. Im Falle eines Problems oder einer Verzögerung bei der Lieferung werden wir Sie umgehend kontaktieren.<br /><br /></td></tr></tbody></table>";
+
+# CMS Footer Component
+UPDATE FooterComponent;$contentCV[unique=true];uid[unique=true];notice[lang=de]
+ ;;FooterComponent;"© 2014 hybris GmbH"
+
+# CMS Paragraph Component (Contact information)
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=de]
+ ;;ContactInfo;"Hotline: +1 302 295 5067"
+ ;;NewCustomerContactCenterParagraphComponent;"Sind Sie daran interessiert, ein neuer Kunde zu werden? Rufen Sie unseren Kundendienst unter 888-888-8888 an, um sich anzumelden!"
+
+# CMS ProductReferences Components
+UPDATE ProductReferencesComponent;$contentCV[unique=true];uid[unique=true];title[lang=de]
+ ;;AccessoriesProductReferencesComponent;"Beliebteste Produkte"
+ ;;CrossSellingProductReferencesComponent;"Zubehör"
+
+# Category Pages
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];title[lang=de]
+
+# CMS Navigation Nodes
+UPDATE CMSNavigationNode;$contentCV[unique=true];uid[unique=true];title[lang=de]
+ ;;AcceleratorNavNode;"Accelerator"
+ ;;AngleGrindersNavNode;"Winkelschleifer"
+ ;;FollowUsNavNode;"Folgen Sie uns"
+ ;;HammersNavNode;"Hammer"
+ ;;HandToolsLinksNavNode;"Handwerkzeuge"
+ ;;HandToolsNavNode;"Handwerkzeuge"
+ ;;HybrisNavNode;"Hybris"
+ ;;MeasuringLayoutToolsNavNode;"Mess- u. Planwerkzeuge"
+ ;;MyCompanyLinksNavNode;"Meine Firma"
+ ;;PowerDrillsNavNode;"Bohrmaschinen"
+ ;;PowertoolsNavNode;"Powertools Site"
+ ;;SandersNavNode;"Bandschleifmaschine"
+ ;;ScrewdriversNavNode;"Screwdrivers"
+ ;;SiteRootNode;"SiteRoot"
+
+# Powertools Terms and Conditions Page
+
+# CMS Paragraph Component
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=de];
+
+#  Powertools Homepage
+
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];&imageRef;altText
+ ;;Powertools_228x228_Home_Banner_DE_01.jpg;$siteResource/images/banners/homepage/Powertools_228x228_Home_Banner_DE_01.jpg;;Powertools_228x228_Home_Banner_DE_01.jpg;"PSR 14.1 LI-2 - Leicht und stark - für jede Arbeit mit dem Schraubenzieher geeignet"
+ ;;Powertools_228x228_Home_Banner_DE_02.jpg;$siteResource/images/banners/homepage/Powertools_228x228_Home_Banner_DE_02.jpg;;Powertools_228x228_Home_Banner_DE_02.jpg;"Suche nach Schraubenzieher und Bit-Sets"
+ ;;Powertools_228x228_Home_Banner_DE_03.jpg;$siteResource/images/banners/homepage/Powertools_228x228_Home_Banner_DE_03.jpg;;Powertools_228x228_Home_Banner_DE_03.jpg;"Das leistungsfähigste Werkzeug seiner Preisklasse"
+ ;;Powertools_228x228_Home_Banner_DE_04.jpg;$siteResource/images/banners/homepage/Powertools_228x228_Home_Banner_DE_04.jpg;;Powertools_228x228_Home_Banner_DE_04.jpg;"Das Power-Paket für harte Arbeit"
+ ;;Powertools_468x418_Rotating_Image_DE_01.jpg;$siteResource/images/banners/homepage/Powertools_468x418_Rotating_Image_DE_01.jpg;;Powertools_468x418_Rotating_Image_DE_01.jpg;"Multischleifer – Die neue Produktlinie ist jetzt auf Lager"
+ ;;Powertools_468x418_Rotating_Image_DE_02.jpg;$siteResource/images/banners/homepage/Powertools_468x418_Rotating_Image_DE_02.jpg;;Powertools_468x418_Rotating_Image_DE_02.jpg;"Bosch für Handel und Industrie"
+ ;;Powertools_468x418_Rotating_Image_DE_03.jpg;$siteResource/images/banners/homepage/Powertools_468x418_Rotating_Image_DE_03.jpg;;Powertools_468x418_Rotating_Image_DE_03.jpg;"Erfahren Sie mehr über moderne Technologie und hohe Leistungsfähigkeit"
+ ;;Powertools_948x60_Home_Top_Banner_DE_01.jpg;$siteResource/images/banners/homepage/Powertools_948x60_Home_Top_Banner_DE_01.jpg;;Powertools_948x60_Home_Top_Banner_DE_01.jpg;"Bosch | Black & Decker | Einhall | Skil | Hitachi"
+ ;;Powertools_96x96_CatScrewdrivers_DE_01.jpg;$siteResource/images/banners/homepage/Powertools_96x96_CatScrewdrivers_DE_01.jpg;;Powertools_96x96_CatScrewdrivers_DE_01.jpg;"Screwdrivers"
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+ ;;BTGBannerProductDetail;;
+ ;;HomepageBanner1;Powertools_228x228_Home_Banner_DE_01.jpg;
+ ;;HomepageBanner2;Powertools_228x228_Home_Banner_DE_02.jpg;
+ ;;HomepageBanner3;Powertools_228x228_Home_Banner_DE_03.jpg;
+ ;;HomepageBanner4;Powertools_228x228_Home_Banner_DE_04.jpg;
+ ;;HomepageTopBanner;Powertools_948x60_Home_Top_Banner_DE_01.jpg;
+
+UPDATE BannerComponent;$contentCV[unique=true];uid[unique=true];headline[lang=de];$picture[lang=$lang];content[lang=de]
+ ;;RotatingImageBanner1;Multischleifer – Die neue Produktlinie ist jetzt auf Lager;Powertools_468x418_Rotating_Image_DE_01.jpg;;
+ ;;RotatingImageBanner2;Bosch für Handel und Industrie;Powertools_468x418_Rotating_Image_DE_02.jpg;;
+ ;;RotatingImageBanner3;Erfahren Sie mehr über moderne Technologie und hohe Leistungsfähigkeit;Powertools_468x418_Rotating_Image_DE_03.jpg;;
+
+UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];title[lang=de]
+ ;;PowertoolsHomepageProductCarouselComponent;"IHR EINKAUFSKORB"
+ ;;PremiumbuyersgroupHomepageProductCarouselComponent;"Beliebteste Produkte"
+
+UPDATE CategoryFeatureComponent;$contentCV[unique=true];uid[unique=true];title[lang=de];description[lang=de];$picture[lang=$lang]
+ ;;ScrewdriversFeatureComponent;Schrauber;;Powertools_96x96_CatScrewdrivers_DE_01.jpg;
+
+
+#  Powertools Search Results Page
+
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText
+ ;;Powertools_148x318_SearchResultsSideBanner_DE_01.jpg;$siteResource/images/banners/site/Powertools_148x318_SearchResultsSideBanner_DE_01.jpg;;
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+ ;;SearchResultsSideBanner;Powertools_148x318_SearchResultsSideBanner_DE_01.jpg;
+
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=de]
+ ;;NoSearchResultsParagraphComponent;<h2>Leider wurden für Ihre Suche keine Ergebnisse gefunden</h2><p>Vorschläge:</p><ul><li>Bitte überprüfen Sie die Rechtschreibung des eingegebenen Begriffs.</li><li>Ihre Eingabe war möglicherweise zu spezifisch. Verbessern Sie die Suchergebnisse, indem Sie weniger Begriffe eingeben.</li><li>Wählen Sie die Produkte über die Kategorien oben aus.</li></ul>;
+
+
+#  Powertools Cart Page
+
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText
+ ;;Powertools_148x300_HelpBanner_DE_01.jpg;$siteResource/images/banners/site/Powertools_148x300_HelpBanner_DE_01.jpg;;"Benötigen Sie Hilfe? Klicken Sie hier, wenn Sie Hilfe beim Bezahlen benötigen"
+ ;;Powertools_788x120_HomeDeliveryBanner_DE_01.jpg;$siteResource/images/banners/site/Powertools_788x120_HomeDeliveryBanner_DE_01.jpg;;"Bestellen Sie vor 18 Uhr und Sie erhalten Ihre Lieferung am nächsten Tag"
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+ ;;HelpBanner;Powertools_148x300_HelpBanner_DE_01.jpg;
+ ;;NextDayDeliveryBanner120;Powertools_788x120_HomeDeliveryBanner_DE_01.jpg;
+
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=de]
+ ;;EmptyCartParagraphComponent;<h2>Ihr Einkaufskorb ist leer</h2><p>Vorschläge</p><ul><li>Wählen Sie die Produkte über die Kategorien oben aus</li></ul>;
+
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=de]
+ ;;HelpParagraphComponent;"<div class=""helpBanner""><span class=""bannerHeadline"" >Benötigen Sie Hilfe?</span><span class=""bannerText"">Klicken Sie hier, wenn Sie Hilfe beim Bezahlen benötigen<a href=""#"" >GO > ></a></span></div>";
+
+# Powertools Store Finder Page
+
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText
+ ;;Powertools_148x318_StoreFinderSideBanner_DE_01.jpg;$siteResource/images/banners/site/Powertools_148x318_StoreFinderSideBanner_DE_01.jpg;;""
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+ ;;StoreFinderSideBanner;Powertools_148x318_StoreFinderSideBanner_DE_01.jpg;

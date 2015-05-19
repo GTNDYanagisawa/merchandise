@@ -1,0 +1,414 @@
+$contentCatalog=telcoContentCatalog
+$contentCatalogName=telco Content Catalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$productCatalog=telcoProductCatalog
+$productCatalogName=telco Product Catalog
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$picture=media(code, $contentCV);
+$image=image(code, $contentCV);
+$media=media(code, $contentCV);
+$page=page(uid, $contentCV);
+$contentPage=contentPage(uid, $contentCV);
+$siteResource=jar:de.hybris.platform.telcostore.constants.TelcostoreConstants&/telcostore/import/sampledata/contentCatalogs/$contentCatalog
+$productResource=jar:de.hybris.platform.telcostore.constants.TelcostoreConstants&/telcostore/import/sampledata/productCatalogs/$productCatalog
+$jarResourceCms=jar:de.hybris.platform.telcostore.constants.TelcostoreConstants&/telcostore/import/sampledata/cockpits/cmscockpit
+
+$classCatalogVersion=catalogversion(catalog(id[default='TelcoClassification']),version[default='1.0'])[unique=true,default='TelcoClassification:1.0']
+$classSystemVersion=systemVersion(catalog(id[default='TelcoClassification']),version[default='1.0'])[unique=true]
+$class=classificationClass(ClassificationClass.code,$classCatalogVersion)[unique=true]
+$attribute=classificationAttribute(code,$classSystemVersion)[unique=true]
+
+# Language (for dummy values)
+$defaultLang=en
+$placeholder=DUMMY
+
+# CMS Site Settings
+UPDATE CMSSite;uid[unique=true];defaultPreviewCategory(code, $productCV);defaultPreviewProduct(code, $productCV)
+;telco;smartphone;3417124
+
+# Site Logo
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpg'];altText;folder(qualifier)[default='images', forceWrite=true]
+;;/images/theme/logo-hybris.png;logo-hybris.png;$siteResource/images/theme/logo-hybris.png;image/png;hybris Accelerator;
+
+# Site Logo Component
+INSERT_UPDATE CMSImageComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;SiteLogoImage;Site Logo Image;SiteLogoImage
+
+# CMS Link Components
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;&componentRef;target(code)[default='sameWindow']
+;;HomepageNavLink;Home Page Nav Link;;HomepageNavLink;HomepageNavLink
+;;DeviceCategoryLink;Devices Category Link;/Open-Catalog/Devices/c/devices;DeviceCategoryLink;DeviceCategoryLink
+;;AccessoryCategoryLink;Accessories Category Link;/Open-Catalog/Accessories/c/accessories;AccessoryCategoryLink;AccessoryCategoryLink
+;;ServicePlanCategoryLink;Plans Category Link;/Open-Catalog/Plans/c/plans;ServicePlanCategoryLink;ServicePlanCategoryLink
+;;ServiceAddOnCategoryLink;Extras Category Link;/Open-Catalog/AddOns/c/addons;ServiceAddOnCategoryLink;ServiceAddOnCategoryLink
+;;SmartphoneCategoryLink;Smart phone Category Link;/Open-Catalog/Devices/Smartphone/c/smartphone;SmartphoneCategoryLink;SmartphoneCategoryLink
+;;BasicphoneCategoryLink;Basic phone Category Link;/Open-Catalog/Devices/Basicphone/c/basicphone;BasicphoneCategoryLink;BasicphoneCategoryLink
+;;TabletCategoryLink; Tablet Category Link;/Open-Catalog/Devices/Tablet/c/tablet;TabletCategoryLink;TabletCategoryLink
+;;BlueToothAndWiredCategoryLink;Headset Category Link;/Open-Catalog/Accessories/Headsets/c/bluetoothandwired;BlueToothAndWiredCategoryLink;BlueToothAndWiredCategoryLink
+;;ChargersAndDocksCategoryLink;Chargers&Docks phone Category Link;/Open-Catalog/Accessories/Chargers-and-Docs/c/chargersanddocs;ChargersAndDocksCategoryLink;ChargersAndDocksCategoryLink
+;;CasesAndCoversCategoryLink;Cases&Covers Category Link;/Open-Catalog/Accessories/Cases-and-Covers/c/casesandcovers;CasesAndCoversCategoryLink;CasesAndCoversCategoryLink
+;;BatteriesCategoryLink;Batteries Category Link;/Open-Catalog/Accessories/Batteries/c/batteries;BatteriesCategoryLink;BatteriesCategoryLink
+;;MemoryCardsCategoryLink;Memory Cards Category Link;/Open-Catalog/Accessories/Memory-Cards/c/memorycards;MemoryCardsCategoryLink;MemoryCardsCategoryLink
+;;ScreenProtetctorsCategoryLink;Screen protectors Category Link;/Open-Catalog/Accessories/Screen-Protectors/c/screenprotectors;ScreenProtetctorsCategoryLink;ScreenProtetctorsCategoryLink
+;;ClassicsCategoryLink;Classics Category Link;/Open-Catalog/Add-Ons/Classics/c/classics;ClassicsCategoryLink;ClassicsCategoryLink
+;;InternetCategoryLink;Internet Category Link;/Open-Catalog/Add-Ons/Internet/c/internet;InternetCategoryLink;InternetCategoryLink
+;;EntertainmentCategoryLink;Entertainment Category Link;/Open-Catalog/Add-Ons/Entertainment/c/entertainment;EntertainmentCategoryLink;EntertainmentCategoryLink
+;;TravellersCategoryLink;Travellers Category Link;/Open-Catalog/Add-Ons/Travellers/c/travellers;TravellersCategoryLink;TravellersCategoryLink
+;;MobileTVCategoryLink;MobileTV Category Link;/Open-Catalog/Add-Ons/Mobile-TV/c/mobiletv;MobileTVCategoryLink;MobileTVCategoryLink
+;;PAYGPackageLink;Pay as you go package;/bundle/view-plans/PAYG;PAYGPackageLink;PAYGPackageLink
+;;SMARPackageLink;Smartphone package;/bundle/view-plans/SMAR;SMARPackageLink;SMARPackageLink
+;;TABLPackageLink;Tablet go package;/bundle/view-plans/TABL;TABLPackageLink;TABLPackageLink
+;;STARPackageLink;Starter package;/bundle/view-plans/STAR;STARPackageLink;STARPackageLink
+;;SODPPackageLink;Sim only data package;/bundle/view-plans/SODP;SODPPackageLink;SODPPackageLink
+;;SOVPPackageLink;Sim only voice package;/bundle/view-plans/SOVP;SOVPPackageLink;SOVPPackageLink
+;;SpecialOffersLink;Special Offers Link;"/open-catalogue/c/1?q=:relevance:allPromotions:BOGOFtelco:allPromotions:10DiscountCanonEOS450D:allPromotions:MultiBuytelco:allPromotions:PerfectPartnertelco:allPromotions:ProductBundletelco";SpecialOffersLink;SpecialOffersLink;
+;;AboutAcceleratorLink;About Accelerator Link;"http://www.hybris.com/multichannel-accelerator";AboutAcceleratorLink;AboutAcceleratorLink;newWindow
+;;DocumentationLink;Documentation Link;"https://wiki.hybris.com/display/accdoc/hybris+Telco+Accelerator+-+Business+Guide";DocumentationLink;DocumentationLink;newWindow
+;;AboutHybrisLink;About Hybris Link;"http://www.hybris.com";AboutHybrisLink;AboutHybrisLink;newWindow
+;;ContactUsLink;Contact Us Link;"http://www.hybris.com/contact";ContactUsLink;ContactUsLink;newWindow
+;;FacebookLink;Facebook Link;"http://www.facebook.com/hybrissoftware";FacebookLink;FacebookLink;newWindow
+;;TwitterLink;Twitter Link;"http://twitter.com/#!/hybris_software";TwitterLink;TwitterLink;newWindow
+;;AgileCommerceBlogLink;Agile Commerce Blog Link;"http://www.agile-commerce.com/";AgileCommerceBlogLink;AgileCommerceBlogLink;newWindow
+;;LinkedInLink;Linked In Link;"http://www.linkedin.com/company/97435";LinkedInLink;LinkedInLink;newWindow
+
+
+# Lightbox Banner for Mini Cart
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+;;LightboxHomeDeliveryBannerComponent;Lightbox Home Delivery Banner Component;LightboxHomeDeliveryBannerComponent;
+
+# CMS Mini Cart Component
+INSERT_UPDATE MiniCartComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;totalDisplay(code);shownProductCount;lightboxBannerComponent(&componentRef)
+;;MiniCart;Mini Cart;MiniCart;SUBTOTAL;3;LightboxHomeDeliveryBannerComponent
+
+# Navigation Bar Component
+INSERT_UPDATE NavigationBarComponent;$contentCV[unique=true];uid[unique=true];name;wrapAfter;link(uid, $contentCV);styleClass;&componentRef
+;;DevicesBarComponent;Devices Bar Component;10;DeviceCategoryLink;;DevicesBarComponent
+;;AccessoriesBarComponent;Accessories Bar Component;10;AccessoryCategoryLink;;AccessoriesBarComponent
+;;PlansBarComponent;Plans Bar Component;10;ServicePlanCategoryLink;;PlansBarComponent
+;;AddOnsBarComponent;AddOns Bar Component;10;ServiceAddOnCategoryLink;;AddOnsBarComponent
+;;SpecialOffersBarComponent;Special Offers Bar Component;10;SpecialOffersLink;special_offer;SpecialOffersBarComponent
+
+# CMS tabs components
+INSERT_UPDATE CMSTabParagraphComponent;$contentCV[unique=true];uid[unique=true];name;visible;&componentRef;title[lang=$defaultLang,default=$placeholder];content[lang=$defaultLang,default=$placeholder]
+;;deliveryTab;Delivery tab;true;deliveryTab;;;
+
+INSERT_UPDATE CMSTabParagraphContainer;$contentCV[unique=true];uid[unique=true];name;visible;simpleCMSComponents(uid, $contentCV);&componentRef;;
+;;TabPanelContainer;Tab container;true;deliveryTab;TabPanelContainer;;
+
+# CMS Footer Component
+INSERT_UPDATE FooterComponent;$contentCV[unique=true];uid[unique=true];wrapAfter;&componentRef;;;
+;;FooterComponent;2;FooterComponent;;;
+
+# CMS Paragraph Component (Contact information)
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;;;;
+;;ContactInfo;Contact information;ContactInfo;;;;
+
+# CMS ProductReferences Components
+INSERT_UPDATE ProductReferencesComponent;$contentCV[unique=true];uid[unique=true];name;productReferenceTypes(code);maximumNumberProducts;&componentRef
+;;accessories;Accessories;ACCESSORIES;5;accessories
+;;Others;Others;OTHERS;5;Others
+;;Similar;Similar;SIMILAR;5;Similar
+
+# CMS ProductReferencesAndClassifications Components
+INSERT_UPDATE ProductReferencesAndClassificationsComponent;$contentCV[unique=true];uid[unique=true];name;productReferenceTypes(code);maximumNumberProducts;&componentRef;classAttributeAssignment(classificationAttribute(code));targetItemType(code)
+;;AccessoryContentComponent;AccessoryContentComponent;ACCESSORIES;20;AccessoryContentComponent;featurecompatibility;Device
+
+# CMS ProductReferencesAndClassificationsForDevices Components
+INSERT_UPDATE ProductReferencesAndClassificationsForDevicesComponent;$contentCV[unique=true];uid[unique=true];name;productReferenceTypes(code);maximumNumberProducts;&componentRef;classAttributeAssignment(classificationAttribute(code));targetItemType(code)
+;;DeviceContentComponent;DeviceContentComponent;ACCESSORIES;20;DeviceContentComponent;featurecompatibility;Accessory
+
+# Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;SiteLogoSlot;SiteLogoImage
+;;HomepageNavLinkSlot;HomepageNavLink
+;;MiniCartSlot;MiniCart
+;;NavigationBarSlot;DevicesBarComponent,AccessoriesBarComponent,PlansBarComponent,AddOnsBarComponent,SpecialOffersBarComponent
+;;TabsSlot;TabPanelContainer
+;;FooterSlot;FooterComponent
+;;HeaderLinksSlot;ContactInfo
+;;AccessoriesSlot;accessories
+;;DeviceContentSlot;DeviceContentComponent
+;;AccessoryContentSlot;AccessoryContentComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images',forceWrite=true];altText
+;;planListPagePreview;text/png;PlanListPage.png;$jarResourceCms/preview-images/telco/PlanListPage.png
+;;SMAR_PlanOverview;text/jpeg;plans_overview_1.jpeg;$siteResource/images/banners/site/plans_overview_1.jpeg;;"Smartphone plans. Starting at $24.25/month"
+;;PAYG_PlanOverview;text/jpeg;plans_overview_2.jpeg;$siteResource/images/banners/site/plans_overview_2.jpeg;;"Pay As You Go. Starting at $10.00/month"
+;;STAR_PlanOverview;text/jpeg;plans_overview_3.jpeg;$siteResource/images/banners/site/plans_overview_3.jpeg;;"Starter plans. Starting at $19.99/month"
+;;TABL_PlanOverview;text/jpeg;plans_overview_4.jpeg;$siteResource/images/banners/site/plans_overview_4.jpeg;;"Data Only. Starting at $14.95/month"
+;;SOVP_PlanOverview;text/jpeg;plans_overview_5.jpeg;$siteResource/images/banners/site/plans_overview_5.jpeg;;"Sim Only Voice. Starting at $9.95/month"
+;;SODP_PlanOverview;text/jpeg;plans_overview_6.jpeg;$siteResource/images/banners/site/plans_overview_6.jpeg;;"Sim Only Data. Starting at $24.95/month"
+
+# Category Pages
+INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved'];previewImage(code, $contentCV)
+;;PlansCategoryPage;Plans Category Page ;CategoryPageTemplate;false;;planListPagePreview
+
+# Category Page Restrictions
+INSERT_UPDATE CMSCategoryRestriction;$contentCV[unique=true];uid[unique=true];name;categories(code, $productCV);pages(uid, $contentCV)[unique=true]
+;;PlansCategory-LandingPageRestriction;Restriction for Plans;plans;PlansCategoryPage
+
+# CMS Navigation Nodes
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;SiteRootNode;;SiteRootNode;;;SiteRootNode
+;telcoNavNode;;telco Site;SiteRootNode;HomepageNavLink;telcoNavNode
+;DevicesNavNode;;Devices Category;telcoNavNode;DeviceCategoryLink;DevicesNavNode
+;AccessoriesNavNode;;Accessories Category;telcoNavNode;AccessoryCategoryLink;AccessoriesNavNode
+;PlansNavNode;;Plans Category;telcoNavNode;ServicePlanCategoryLink;PlansNavNode
+;AddOnsNavNode;;AddOns Category;telcoNavNode;ServiceAddOnCategoryLink;AddOnsNavNode
+;DeviceTypesNavNode;;Device Types Links;DevicesNavNode;SmartphoneCategoryLink,BasicphoneCategoryLink,TabletCategoryLink;DeviceTypesNavNode
+;AccessoryTypesNavNode;;Accessory Types Links;AccessoriesNavNode;BlueToothAndWiredCategoryLink,ChargersAndDocksCategoryLink,CasesAndCoversCategoryLink,BatteriesCategoryLink,MemoryCardsCategoryLink,ScreenProtetctorsCategoryLink;AccessoryTypesNavNode
+;AddOnTypesNavNode;;AddOn Types Links;AddOnsNavNode;ClassicsCategoryLink,InternetCategoryLink,EntertainmentCategoryLink,TravellersCategoryLink,MobileTVCategoryLink;AddOnTypesNavNode
+;PlansTypesNavNode;;Plan Types Links;PlansNavNode;PAYGPackageLink,SMARPackageLink,TABLPackageLink,STARPackageLink,SODPPackageLink,SOVPPackageLink;PlansTypesNavNode
+;AcceleratorNavNode;;Accelerator Pages;telcoNavNode;AboutAcceleratorLink,DocumentationLink;AcceleratorNavNode
+;HybrisNavNode;;Hybris Pages;telcoNavNode;AboutHybrisLink,ContactUsLink;HybrisNavNode
+;FollowUsNavNode;;Follow Us Pages;telcoNavNode;AgileCommerceBlogLink,LinkedInLink,FacebookLink,TwitterLink;FollowUsNavNode
+
+# Navigation Bar Component
+INSERT_UPDATE NavigationBarComponent;$contentCV[unique=true];uid[unique=true];navigationNode(&nodeRef);dropDownLayout(code)
+;;DevicesBarComponent;DevicesNavNode
+;;AccessoriesBarComponent;AccessoriesNavNode
+;;PlansBarComponent;PlansNavNode
+;;AddOnsBarComponent;AddOnsNavNode
+
+# Update CMS Footer Component with Nav Nodes
+INSERT_UPDATE FooterComponent;$contentCV[unique=true];uid[unique=true];navigationNodes(&nodeRef)
+;;FooterComponent;AcceleratorNavNode,HybrisNavNode,FollowUsNavNode
+
+# Preview Image for use in the CMS Cockpit for special ContentPages
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images',forceWrite=true]
+;;accountPagePreview;text/png;AccountPage.png;$jarResourceCms/preview-images/telco/AccountPage.png
+;;addEditAddressPagePreview;text/png;AddEditAddressPage.png;$jarResourceCms/preview-images/telco/AddEditAddressPage.png
+;;addressBookPagePreview;text/png;AddressBook.png;$jarResourceCms/preview-images/telco/AddressBookPage.png
+;;cartPagePreview;text/png;CartPage.png;$jarResourceCms/preview-images/telco/CartPage.png
+;;checkoutLoginPagePreview;text/png;CheckoutLoginPage.png;$jarResourceCms/preview-images/telco/CheckoutLoginPage.png
+;;singleStepCheckoutSummaryPagePreview;text/png;SingleStepCheckoutSummaryPage.png;$jarResourceCms/preview-images/telco/SingleStepCheckoutSummaryPage.png
+;;multiStepCheckoutSummaryPagePreview;text/png;MultiStepCheckoutSummaryPage.png;$jarResourceCms/preview-images/telco/MultiStepCheckoutSummaryPage.png
+;;forgottenPasswordPagePreview;text/png;ForgottenPasswordPage.png;$jarResourceCms/preview-images/telco/ForgottenPasswordPage.png
+;;homepagePreview;text/png;Homepage.png;$jarResourceCms/preview-images/telco/Homepage.png
+;;loginPagePreview;text/png;LoginPage.png;$jarResourceCms/preview-images/telco/LoginPage.png
+;;notFoundPagePreview;text/png;NotFoundPage.png;$jarResourceCms/preview-images/telco/NotFoundPage.png
+;;orderConfirmationPagePreview;text/png;OrderConfirmationPage.png;$jarResourceCms/preview-images/telco/OrderConfirmationPage.png
+;;orderDetailsPagePreview;text/png;OrderDetailsPage.png;$jarResourceCms/preview-images/telco/OrderDetailsPage.png
+;;orderHistoryPagePreview;text/png;OrderHistoryPage.png;$jarResourceCms/preview-images/telco/OrderHistoryPage.png
+;;paymentDetailsPagePreview;text/png;PaymentDetailsPage.png;$jarResourceCms/preview-images/telco/PaymentDetailsPage.png
+;;productDetailsPagePreview;text/png;ProductDetailsPage.png;$jarResourceCms/preview-images/telco/ProductDetailsPage.png
+;;productListPagePreview;text/png;ProductListPage.png;$jarResourceCms/preview-images/telco/ProductListPage.png
+;;profilePagePreview;text/png;ProfilePage.png;$jarResourceCms/preview-images/telco/ProfilePage.png
+;;searchResultsEmptyPagePreview;text/png;SearchResultsEmptyPage.png;$jarResourceCms/preview-images/telco/SearchResultsEmptyPage.png
+;;searchResultsPagePreview;text/png;SearchResultsPage.png;$jarResourceCms/preview-images/telco/SearchResultsPage.png
+;;storefinderPagePreview;text/png;StoreFinderPage.png;$jarResourceCms/preview-images/telco/StoreFinderPage.png
+;;updateForgottenPasswordPagePreview;text/png;UpdateForgottenPasswordPage.png;$jarResourceCms/preview-images/telco/UpdateForgottenPasswordPage.png
+;;productGridPagePreview;text/png;ProductGridPage.png;$jarResourceCms/preview-images/telco/ProductGridPage.png
+;;defaultCategoryPagePreview;text/png;DefaultCategoryPage.png;$jarResourceCms/preview-images/telco/DefaultCategoryPage.png
+;;bundleSelectorExtrasPagePreview;text/png;BundleSelectorExtrasPage.png;$jarResourceCms/preview-images/telco/BundleSelectorExtrasPage.png
+;;guidedSellingSelectDevicePagePreview;text/png;GuidedSellingSelectDevicePage.png;$jarResourceCms/preview-images/telco/GuidedSellingSelectDevicePage.png
+;;guidedSellingSelectPlanPagePreview;text/png;GuidedSellingSelectPlanPage.png;$jarResourceCms/preview-images/telco/GuidedSellingSelectPlanPage.png
+;;productDetailsForAccessoriesPagePreview;text/png;ProductDetailsForAccessoriesPage.png;$jarResourceCms/preview-images/telco/ProductDetailsForAccessoriesPage.png
+;;productDetailsForDevicesPagePreview;text/png;ProductDetailsForDevicesPage.png;$jarResourceCms/preview-images/telco/ProductDetailsForDevicesPage.png
+;;productDetailsForPlansPagePreview;text/png;ProductDetailsForPlansPage.png;$jarResourceCms/preview-images/telco/ProductDetailsForPlansPage.png
+;;productDetailsForAddOnsPagePreview;text/png;ProductDetailsForAddOnsPage.png;$jarResourceCms/preview-images/telco/ProductDetailsForAddOnsPage.png
+;;subscriptionsPagePreview;text/png;SubscriptionsPage.png;$jarResourceCms/preview-images/telco/SubscriptionsPage.png
+;;subscriptionDetailsPagePreview;text/png;SubscriptionDetailsPage.png;$jarResourceCms/preview-images/telco/SubscriptionDetailsPage.png
+
+
+# Site-wide Homepage
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;homepage;homepagePreview
+
+# Functional Content Pages
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;singleStepCheckoutSummaryPage;singleStepCheckoutSummaryPagePreview
+;;multiStepCheckoutSummaryPage;multiStepCheckoutSummaryPagePreview
+;;orderConfirmationPage;orderConfirmationPagePreview
+;;cartPage;cartPagePreview
+;;search;searchResultsPagePreview
+;;account;accountPagePreview
+;;profile;profilePagePreview
+;;address-book;addressBookPagePreview
+;;add-edit-address;addEditAddressPagePreview
+;;payment-details;paymentDetailsPagePreview
+;;order;orderDetailsPagePreview
+;;orders;orderHistoryPagePreview
+;;subscription;subscriptionDetailsPagePreview
+;;subscriptions;subscriptionsPagePreview
+;;storefinderPage;storefinderPagePreview
+;;checkout-login;checkoutLoginPagePreview
+;;login;loginPagePreview
+;;notFound;notFoundPagePreview
+;;searchEmpty;searchResultsEmptyPagePreview
+;;forgottenPassword;forgottenPasswordPagePreview
+;;updatePassword;updateForgottenPasswordPagePreview
+;;bundleselection-extra;bundleSelectorExtrasPagePreview
+;;guidedselling-select-device;guidedSellingSelectDevicePagePreview
+;;bundleselection-plan;guidedSellingSelectPlanPagePreview
+
+# Product Details Page
+UPDATE ProductPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;productDetails;productDetailsPagePreview
+;;productDetailsForAccessories;productDetailsForAccessoriesPagePreview
+;;productDetailsForDevices;productDetailsForDevicesPagePreview
+;;productDetailsForPlans;productDetailsForPlansPagePreview
+;;productDetailsForAddOns;productDetailsForAddOnsPagePreview
+
+# Category Pages
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;productList;productListPagePreview
+;;productGrid;productListPagePreview
+;;category;productListPagePreview
+
+###### telco Homepage ######
+
+INSERT_UPDATE BannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+;;CarouselIPhoneBanner;Carousel iPhone Banner;CarouselIPhoneBanner;/Open-Catalog/Devices/Smartphone/iPhone-3GS-32GB/p/3417123
+;;CarouselSamsonBanner;Carousel samson Banner;CarouselSamsonBanner;/Open-Catalog/Devices/Smartphone/Legend/p/5814834
+;;CarouselGuidedSellingBanner;Carousel Guided Selling Banner;CarouselGuidedSellingBanner;/Open-Catalog/Plans/c/plans
+;;CarouselToshibaBanner;Carousel Toshiba Banner;CarouselToshibaBanner;/Open-Catalog/Devices/Tablet/Kindle-Fire/p/1974125
+
+;;SMAR_HomepageBanner;Smartphone Plans Banner;SMAR_HomepageBanner;/bundle/view-plans/SMAR
+;;STAR_HomepageBanner;Starter Plans Banner;STAR_HomepageBanner;/bundle/view-plans/STAR
+;;PAYG_HomepageBanner;Pay As You Go Banner;PAYG_HomepageBanner;/bundle/view-plans/PAYG
+;;NokiaBanner;Nokia Banner;NokiaBanner;/Open-Catalog/Devices/Smartphone/N8/p/6241641
+
+
+INSERT_UPDATE RotatingImagesComponent;$contentCV[unique=true];uid[unique=true];name;banners(&componentRef);&componentRef
+;;telcoHomepageCarouselComponent;telco Homepage Carousel;CarouselIPhoneBanner,CarouselSamsonBanner,CarouselGuidedSellingBanner,CarouselToshibaBanner;telcoHomepageCarouselComponent
+
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;categoryCode;searchQuery;scroll(code);&componentRef
+;;telcoHomepageProductCarouselComponent;Telco Homepage Product Carousel;devices;iphone;allVisible;telcoHomepageProductCarouselComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;Section1Slot-Homepage;Section1 Slot for Homepage;true;telcoHomepageCarouselComponent
+
+;;Section3ASlot-Homepage;Section3A Slot for Homepage;true;SMAR_HomepageBanner
+;;Section3BSlot-Homepage;Section3B Slot for Homepage;true;STAR_HomepageBanner
+;;Section3CSlot-Homepage;Section3C Slot for Homepage;true;PAYG_HomepageBanner
+;;Section4Slot-Homepage;Section4 Slot for Homepage;true;telcoHomepageProductCarouselComponent
+;;Section5Slot-Homepage;Section5 Slot for Homepage;true;NokiaBanner
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='homepage'];contentSlot(uid,$contentCV)[unique=true]
+;;Section1-Homepage;Section1;;Section1Slot-Homepage
+
+;;Section3A-Homepage;Section3A;;Section3ASlot-Homepage
+;;Section3B-Homepage;Section3B;;Section3BSlot-Homepage
+;;Section3C-Homepage;Section3C;;Section3CSlot-Homepage
+;;Section4-Homepage;Section4;;Section4Slot-Homepage
+;;Section5-Homepage;Section5;;Section5Slot-Homepage
+
+###### telco Accessories and Supplies Category Landing Page ######
+
+
+
+INSERT_UPDATE CategoryFeatureComponent;$contentCV[unique=true];uid[unique=true];name;category(code, $productCV);&componentRef
+
+
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;BuyOnlineBanner;Buy Online Banner;BuyOnlineBanner
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='PlansCategoryPage'];contentSlot(uid,$contentCV)[unique=true]
+
+
+
+
+###### telco Search Results Page ######
+
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='search'];contentSlot(uid,$contentCV)[unique=true]
+
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;NoSearchResultsParagraphComponent;No Search Results Paragraph Component;NoSearchResultsParagraphComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;TopContent-searchEmpty;Top Slot for searchEmpty;true;
+;;MiddleContent-searchEmpty;Middle Slot for searchEmpty;true;NoSearchResultsParagraphComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='searchEmpty'];contentSlot(uid,$contentCV)[unique=true]
+;;Top-searchEmpty;TopContent;;TopContent-searchEmpty
+;;Middle-searchEmpty;MiddleContent;;MiddleContent-searchEmpty
+
+###### telco Cart Page ######
+
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+;;NextDayDeliveryBanner120;Next Day Delivery Banner (120);NextDayDeliveryBanner120;#
+;;HelpBanner;Help Banner;HelpBanner;#
+
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;EmptyCartParagraphComponent;Empty Cart Paragraph Component;EmptyCartParagraphComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;TopContent-cartPage;Top Slot for cartPage;true;NextDayDeliveryBanner120
+;;SideContent-cartPage;Side Slot for cartPage;true;HelpBanner
+;;MiddleContent-cartPage;Middle Slot for cartPage;true;EmptyCartParagraphComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='cartPage'];contentSlot(uid,$contentCV)[unique=true]
+;;Top-cartPage;TopContent;;TopContent-cartPage
+;;Side-cartPage;SideContent;;SideContent-cartPage
+;;Middle-cartPage;MiddleContent;;MiddleContent-cartPage
+
+###### telco Checkout Login Page ######
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;SideContent-checkoutLogin;Side Slot for Checkout Login Page;true;HelpBanner
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='checkout-login'];contentSlot(uid,$contentCV)[unique=true]
+;;Side-checkoutLogin;SideContent;;SideContent-checkoutLogin
+
+###### telco Checkout Summary / Proceed to Checkout Page ######
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;SideContent-singleStepCheckoutSummaryPage;Side Slot for singleStepCheckoutSummaryPage;true;HelpBanner
+;;SideContent-multiStepCheckoutSummaryPage;Side Slot for multiStepCheckoutSummaryPage;true;HelpBanner
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true];contentSlot(uid,$contentCV)[unique=true]
+;;Side-singleStepCheckoutSummaryPage;SideContent;singleStepCheckoutSummaryPage;SideContent-singleStepCheckoutSummaryPage
+;;Side-multiStepCheckoutSummaryPage;SideContent;multiStepCheckoutSummaryPage;SideContent-multiStepCheckoutSummaryPage
+
+###### telco Store Finder Page ######
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='storefinderPage'];contentSlot(uid,$contentCV)[unique=true]
+
+####################### Create category restriction for device details and accessory details ####################
+INSERT_UPDATE CMSCategoryRestriction;$contentCV[unique=true];uid[unique=true];name;categories(code, $productCV);recursive[default=true]
+;;Standard-ProductDetailsPageRestriction;Standard Restriction;addons
+;;Devices-ProductDetailsPageRestriction;Restriction for Devices;devices
+;;Accessories-ProductDetailsPageRestriction;Restriction for Accessories;accessories
+;;Plans-ProductDetailsPageRestriction;Restriction for Plans;plans
+;;AddOns-ProductDetailsPageRestriction;Restriction for AddOns;addons
+;;Products-ProductListRestriction;Restriction For Products;devices,addons,accessories
+
+
+UPDATE ProductPage;$contentCV[unique=true];uid[unique=true];restrictions(uid,$contentCV)
+;;productDetails;Standard-ProductDetailsPageRestriction
+;;productDetailsForAccessories;Accessories-ProductDetailsPageRestriction
+;;productDetailsForDevices;Devices-ProductDetailsPageRestriction
+;;productDetailsForPlans;Plans-ProductDetailsPageRestriction
+;;productDetailsForAddOns;AddOns-ProductDetailsPageRestriction
+
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];restrictions(uid,$contentCV)
+;;productList;Products-ProductListRestriction
+
+#Modify header to include preview previewImage(code, $contentCV)
+#INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+#;;device-ProductDetailsPage;Device Details Category Page;DeviceDetailsPageTemplate;false;;
+#;;accessory-ProductDetailsPage;Accessory Details Category Page;AccessoryDetailsPageTemplate;false;;
+
+INSERT_UPDATE BannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+;;SMAR_Banner;Smartphone Banner;SMAR_Banner;/bundle/view-plans/SMAR
+;;PAYG_Banner;Pay as you go Banner;PAYG_Banner;/bundle/view-plans/PAYG
+;;STAR_Banner;Starter plan Banner;STAR_Banner;/bundle/view-plans/STAR
+;;TABL_Banner;Data plan Banner;TABL_Banner;/bundle/view-plans/TABL
+;;SOVP_Banner;SOVP Banner;SOVP_Banner;/bundle/view-plans/SOVP
+;;SODP_Banner;SODP Banner;SODP_Banner;/bundle/view-plans/SODP
+
+#Associate Section with Banner Components 
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;Section2Slot-PlansCategory;Section2 Slot for Plans Category Page;true;SMAR_Banner,PAYG_Banner,STAR_Banner,TABL_Banner,SOVP_Banner,SODP_Banner
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='PlansCategoryPage'];contentSlot(uid,$contentCV)[unique=true]
+;;Section2-PlansCategory;Section2;;Section2Slot-PlansCategory

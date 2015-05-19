@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd"
+    default-autowire="byName">
+    
+   <alias alias="btgSegmentRestrictionWizard" name="defaultBtgSegmentRestrictionWizard" /> 
+	<bean id="defaultBtgSegmentRestrictionWizard" scope="prototype" class="de.hybris.platform.cockpit.wizards.Wizard">
+		<property name="title" value="btgcockpit.wizard.segmentRestriction.title"/>
+		<property name="defaultController" ref="btgSegmentRestrictionWizardController"/>
+		<property name="pages">
+			<list>
+				<ref bean="btgSegmentRestrictionWizard_chooseExistingOrCreatePage"/>
+				<ref bean="btgSegmentRestrictionWizard_chooseSegmentPage"/>
+				<ref bean="btgSegmentRestrictionWizard_createSegmentPage"/>
+				<bean class="de.hybris.platform.cockpit.wizards.impl.DefaultPage"><property name="id" value="ruleWizardForwardPage"/></bean>
+			</list>
+		</property>
+		<property name="pageRoot" value="/btgcockpit/wizards/segmentrestriction"/>
+	</bean>
+	
+	<alias alias="btgSegmentRestrictionWizardController" name="defaultBtgSegmentRestrictionWizardController" />
+	<bean id="defaultBtgSegmentRestrictionWizardController" class="de.hybris.platform.btgcockpit.wizard.controller.SegmentRestrictionController" scope="prototype">
+		<property name="transitions">
+			<list>
+				<bean class="de.hybris.platform.cockpit.wizards.Transition">
+					<property name="source" value="chooseExistingOrCreatePage"/>
+					<property name="ifAttributesFalse" value="createNew"/>
+					<property name="destination" value="chooseSegmentPage"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.wizards.Transition">
+					<property name="source" value="chooseExistingOrCreatePage"/>
+					<property name="ifAttributesTrue" value="createNew"/>
+					<property name="destination" value="createSegmentPage"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="btgSegmentRestrictionWizard_chooseExistingOrCreatePage" name="defaultBtgSegmentRestrictionWizard_chooseExistingOrCreatePage" />
+	<bean id="defaultBtgSegmentRestrictionWizard_chooseExistingOrCreatePage" class="de.hybris.platform.cockpit.wizards.impl.DefaultPage" scope="prototype">
+		<property name="id" value="chooseExistingOrCreatePage"/>
+		<property name="title" value="btgcockpit.wizard.segmentRestriction.chooseExistingOrCreatePage.title" />
+		<property name="componentURI" value="chooseExistingOrCreate.zul"/>
+	</bean>
+	<alias alias="btgSegmentRestrictionWizard_chooseSegmentPage" name="defaultBtgSegmentRestrictionWizard_chooseSegmentPage" />
+	<bean id="defaultBtgSegmentRestrictionWizard_chooseSegmentPage" class="de.hybris.platform.cockpit.wizards.impl.DefaultPage" scope="prototype">
+		<property name="id" value="chooseSegmentPage"/>
+		<property name="title" value="btgcockpit.wizard.segmentRestriction.chooseSegmentPage.title" />
+		<property name="componentURI" value="chooseSegment.zul"/>
+	</bean>
+	<alias alias="btgSegmentRestrictionWizard_createSegmentPage" name="defaultBtgSegmentRestrictionWizard_createSegmentPage" />
+	<bean id="defaultBtgSegmentRestrictionWizard_createSegmentPage" class="de.hybris.platform.cockpit.wizards.impl.DefaultPage" scope="prototype">
+		<property name="id" value="createSegmentPage"/>
+		<property name="title" value="btgcockpit.wizard.segmentRestriction.createSegmentPage.title" />
+		<property name="componentURI" value="createSegment.zul"/>
+	</bean>
+</beans>

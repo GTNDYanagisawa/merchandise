@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype code="SAPInitiativeCollection"
+			elementtype="java.lang.String" autocreate="true" />
+	</collectiontypes>
+
+	<itemtypes>
+		<itemtype code="BTGAssignToSAPInitiativeDefinition"
+			autocreate="true" generate="true"
+			jaloclass="com.sap.wec.adtreco.jalo.BTGAssignToSAPInitiativeDefinition"
+			extends="BTGOutputActionDefinition">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="initiative"
+					autocreate="true" generate="true">
+					<persistence type="property" />
+					<modifiers read="true" write="false" optional="false"
+						initial="true" />
+				</attribute>
+				<attribute type="SAPInitiativeCollection" qualifier="initiatives">
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BTGReferenceSAPInitiativeOperand" extends="BTGAbstractReferenceOperand"
+			autocreate="true" generate="true"
+			jaloclass="com.sap.wec.adtreco.jalo.BTGReferenceSAPInitiativeOperand">
+			<attributes>
+				<attribute type="SAPInitiativeCollection" qualifier="initiatives">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+<!-- 		<itemtype code="SAPConfiguration" autocreate="false" generate="false">
+			<attributes>
+		        <attribute qualifier="sapadtreco_customertype" type="java.lang.String" generate="true">
+		            <description>Customer Type</description>
+			        <persistence type="property" />
+			    </attribute>
+			  	<attribute qualifier="sapadtreco_httpdestination" type="java.lang.String" generate="true">
+		            <description>HTTP Destination</description>
+			        <persistence type="property" />
+			    </attribute>
+	    	</attributes>
+		</itemtype> -->
+
+		<typegroup name="BTG">
+			<itemtype code="BTGSAPInitiativeOperand" extends="BTGAbstractCustomerOperand"
+				autocreate="true" generate="true"
+				jaloclass="com.sap.wec.adtreco.jalo.BTGSAPInitiativeOperand">
+			</itemtype>
+		</typegroup>
+			
+	</itemtypes>
+	
+</items>
+

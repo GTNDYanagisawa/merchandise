@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RuleSuccessRate" language="groovy" pageWidth="600" pageHeight="400" whenNoDataType="AllSectionsNoDetail" columnWidth="600" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" resourceBundle="localization/btgcockpit-locales">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="rsrDS">
+		<parameter name="segment" class="java.lang.String"/>
+		<queryString>
+			<![CDATA[SELECT {r.code} AS RULE, {h.fulfilled} AS FULFILLED, 100*count({h.PK}) / ({{SELECT count({h1.PK}) AS AMOUNT
+FROM {BTGRuleResult as h1 JOIN BTGRule as r1 ON {h1.rule}={r1.PK}}
+WHERE {r1.PK}={r.PK}}}) AS AMOUNT
+FROM {BTGRuleResult as h JOIN BTGRule as r ON {h.rule}={r.PK} JOIN BTGSegment as s ON {s.PK}={r.segment}}
+WHERE {s.uid}=$P{segment} AND {h.forced}=false
+GROUP BY {r.code},{h.fulfilled}
+]]>
+		</queryString>
+		<field name="RULE" class="java.lang.String"/>
+		<field name="FULFILLED" class="java.lang.Boolean"/>
+		<field name="AMOUNT" class="java.math.BigDecimal"/>
+		<group name="RULE">
+			<groupExpression><![CDATA[$F{RULE}]]></groupExpression>
+		</group>
+		<group name="FULFILLED">
+			<groupExpression><![CDATA[$F{FULFILLED}]]></groupExpression>
+		</group>
+	</subDataset>
+	<parameter name="segment" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="50" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="600" height="50"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[new String($R{title.rulesuccessrate}.getBytes("ISO-8859-1"), "UTF-8")]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<summary>
+		<band height="350" splitType="Stretch">
+			<stackedBarChart>
+				<chart>
+					<reportElement x="13" y="0" width="575" height="350"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<dataset>
+						<datasetRun subDataset="rsrDS">
+							<datasetParameter name="segment">
+								<datasetParameterExpression><![CDATA[$P{segment}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+					</dataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{FULFILLED} == true ? new String($R{legend.passed}.getBytes("ISO-8859-1"), "UTF-8") : new String($R{legend.notpassed}.getBytes("ISO-8859-1"), "UTF-8")]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{RULE}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{AMOUNT}]]></valueExpression>
+						<labelExpression><![CDATA[$F{AMOUNT}]]></labelExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot isShowLabels="true">
+					<plot orientation="Horizontal"/>
+					<itemLabel color="#000000" backgroundColor="#FFFFFF"/>
+					<categoryAxisFormat>
+						<axisFormat>
+							<labelFont/>
+							<tickLabelFont/>
+						</axisFormat>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat tickLabelMask="#'%'">
+							<labelFont/>
+							<tickLabelFont/>
+						</axisFormat>
+					</valueAxisFormat>
+					<rangeAxisMinValueExpression><![CDATA[0]]></rangeAxisMinValueExpression>
+					<rangeAxisMaxValueExpression><![CDATA[100]]></rangeAxisMaxValueExpression>
+				</barPlot>
+			</stackedBarChart>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,110 @@
+# ImpEx for Promotions for Powertools Store
+#% impex.setLocale( Locale.GERMAN ); 
+
+$defaultPromoGrp=powertoolsPromoGrp
+$favCustomers=favoriteCustomers
+$bigSpenders=bigSpenders
+$delvieryMode=std-gross
+$freeDeliveryMode=free-standard-shipping
+$freeDeliveryUG=freedelivery
+$usd50offpowertools=usd50offpowertools
+$loyaltyBronzeGrp=bronzeloyalty
+$loyaltySilverGrp=silverloyalty
+$loyaltyGoldGrp=goldloyalty
+$usd750off10kordersGrp=usd750off10korders;
+$regulargroup=regulargroup
+
+$productCatalog=powertoolsProductCatalog
+$catalogVersion=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$productCatalog]),CatalogVersion.version[default=Online])[default=$productCatalog:Online]
+
+INSERT PromotionPriceRow;&tresholdId;Currency(isocode);price
+
+INSERT PromotionPriceRow;&priceId;Currency(isocode);price
+
+INSERT_UPDATE OrderThresholdDiscountPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true,unique=true];code[unique=true];title;description;messageFired[lang=en];messageFired[lang=de];messageFired[lang=ja];priority;thresholdTotals(&tresholdId);discountPrices(&priceId)
+
+INSERT_UPDATE PromotionUserRestriction;positive;promotion(code)[unique=true];users(uid)
+
+INSERT PromotionPriceRow;&tresholdId;Currency(isocode);price
+
+INSERT PromotionPriceRow;&priceId;Currency(isocode);price
+;40;USD;40
+;750;USD;750
+;50;USD;50
+
+INSERT PromotionPriceRow;&bundlePriceId;Currency(isocode);price
+;255;USD;255
+
+INSERT PromotionPriceRow;&thresholdPriceId;Currency(isocode);price
+;250;USD;250
+;10000;USD;10000
+;500;USD;500
+;ZEROPR;USD;0
+
+#3% off orders over $500
+INSERT_UPDATE OrderThresholdDiscountPercentagePromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;messageCouldHaveFired[lang=en];priority;thresholdTotals(&thresholdPriceId);percentageDiscount
+;;;3PercentDiscountOver500;3% off orders over $500;3% off orders over $500;3% off orders over $500;500;500;3
+
+#Buy 2 Power Drills, Get 1 Free
+INSERT_UPDATE AcceleratorProductBOGOFPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;messageCouldHaveFired[lang=en];messageFired[lang=en];priority;categories(code,$catalogVersion);qualifyingCount;freeCount
+;;;B2GOFPowerDrills;Buy 2 Power Drills, Get 1 Free;Buy 2 Power Drills, Get 1 Free;Buy 2 Power Drills, Get 1 Free;You get 1 Power Drill free for purchasing 2 Power Drills;900;1360;3;1
+
+#Buy this great power tool package by Black & Decker for $255! Save $39!
+INSERT_UPDATE ProductBundlePromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;messageCouldHaveFired[lang=en];messageFired[lang=en];priority;products(code,$catalogVersion);bundlePrices(&bundlePriceId)
+;;;ProductBundlePowertoolsPackage;Black & Decker package;Buy this great power tool package by Black & Decker for $255! Save $39!;Buy this great power tool package by Black & Decker for {2}! Save $39!;You saved {3} by buying this great power tool package by Black & Decker for {1}!;900;3794514,3881014,2116266;255
+
+#$40 off Hammer-Drills
+INSERT_UPDATE ProductPriceDiscountPromotionByPaymentType;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;messageCouldHaveFired[lang=en];productDiscountPrice(&priceId);priority;products(code,$catalogVersion);paymentType(code,itemtype(code));messageFired[lang=en]
+;;;40USDOffHammerDrills;$40 off Hammer-Drills ;$40 off Hammer-Drills;$40 off Hammer-Drills;40;900;3887130,3887123,3887513,3887483;ACCOUNT:CheckoutPaymentType;You save {0} off Hammer Drills!
+
+#10% off on Sanders
+INSERT_UPDATE ProductPercentageDiscountPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;messageFired[lang=en];percentageDiscount;priority;categories(code,$catalogVersion)
+;;;10DiscountSanders;10% off on Sanders;10% off on Sanders;10% off on Sanders;10;900;1596
+
+#Save $50 on all powertools over 250
+INSERT_UPDATE ProductThresholdPriceDiscountPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;messageCouldHaveFired[lang=en];messageFired[lang=en];productThresholdPrice(&thresholdPriceId);productPriceDiscount(&priceId);priority;categories(code,$catalogVersion)
+;;;50USDOFFPowertools250;50$ off on all powertools;Save $50 on all powertools over $250!;Save $50 on all powertools over $250!;You saved {0} for buying a powertool worth over $250;250;50;1000;1
+
+INSERT_UPDATE PromotionUserRestriction;positive;promotion(code)[unique=true];users(uid)
+;TRUE;50USDOFFPowertools250;$usd50offpowertools;
+
+#5% off orders for Bronze Loyality Club members
+INSERT_UPDATE OrderThresholdDiscountPercentagePromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;messageFired[lang=en];priority;thresholdTotals(&thresholdPriceId);percentageDiscount
+;;;5PercentBronzeLoyalityClub;5% off orders Bronze Loyality Club;5% off orders for Bronze Loyality Club members;As a member of a Bronze Loyalty Club organization you save 5% on all orders. Graduate to Silver Loyalty Club to save 7% on all orders.;600;ZEROPR;5
+
+INSERT_UPDATE PromotionUserRestriction;positive;promotion(code)[unique=true];users(uid)
+;TRUE;5PercentBronzeLoyalityClub;$loyaltyBronzeGrp;
+
+#7% off orders for Silver Loyality Club members
+INSERT_UPDATE OrderThresholdDiscountPercentagePromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;messageFired[lang=en];priority;thresholdTotals(&thresholdPriceId);percentageDiscount
+;;;7PercentSilverLoyalityClub;7% off orders for Silver Loyality Club members;7% off orders for Silver Loyality Club members;As a member of a Silver Loyalty Club organization you save 5% on all orders. Graduate to Gold Loyalty Club to save 7% on all orders. ;650;ZEROPR;7
+
+INSERT_UPDATE PromotionUserRestriction;positive;promotion(code)[unique=true];users(uid)
+;TRUE;7PercentSilverLoyalityClub;$loyaltySilverGrp;
+
+#10% off orders for Gold Loyality Club members
+INSERT_UPDATE OrderThresholdDiscountPercentagePromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;messageFired[lang=en];priority;thresholdTotals(&thresholdPriceId);percentageDiscount
+;;;10PercentGoldLoyalityClub;10% off orders for Gold Loyality Club members;10% off orders for Gold Loyality Club members;As a member of a Gold Loyalty Club organization you save 10% on all orders.;700;ZEROPR;10
+
+INSERT_UPDATE PromotionUserRestriction;positive;promotion(code)[unique=true];users(uid)
+;TRUE;10PercentGoldLoyalityClub;$loyaltyGoldGrp;
+
+#$750 off order for spending over $10,000
+INSERT_UPDATE OrderThresholdDiscountPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true,unique=true];code[unique=true];title;description;messageCouldHaveFired[lang=en];messageFired[lang=en];priority;thresholdTotals(&thresholdPriceId);discountPrices(&priceId)
+;;;OrderThreshold750Discount;$750 off order for spending over $10,000;Place an order for over $10,000 to get a $750 discount.;Place an order for over $10,000 to get a $750 discount.;You saved {3} for spending over {1} in one order with us.;500;10000;750
+
+INSERT_UPDATE PromotionUserRestriction;positive;promotion(code)[unique=true];users(uid)
+;TRUE;OrderThreshold750Discount;$usd750off10kordersGrp;
+
+INSERT_UPDATE ProductMultiBuyPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;priority;categories(code,$catalogVersion);qualifyingCount;bundlePrices(&priceId)
+
+INSERT_UPDATE AcceleratorProductBOGOFPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;priority;categories(code,$catalogVersion);qualifyingCount;freeCount
+
+INSERT PromotionPriceRow;&priceId;Currency(isocode);price
+
+INSERT_UPDATE ProductPerfectPartnerPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;priority;products(code,$catalogVersion);partnerProducts(code,$catalogVersion);partnerPrices(&priceId)
+
+INSERT PromotionPriceRow;&priceId;Currency(isocode);price
+
+INSERT_UPDATE ProductBundlePromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true,unique=true];code[unique=true];title;description;priority;products(code,$catalogVersion);bundlePrices(&priceId)
+

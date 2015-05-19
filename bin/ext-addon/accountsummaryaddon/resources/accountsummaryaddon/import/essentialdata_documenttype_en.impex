@@ -1,0 +1,14 @@
+# Add Document type
+
+INSERT_UPDATE B2BDocumentType;code[unique=true];name[lang=en];includeInOpenBalance;displayInAllList
+;Purchase Order;Purchase Order;true;true
+;Invoice;Invoice;true;true
+;Credit Note;Credit Note;true;true
+;Debit Note;Debit Note;true;true
+;Statement;Statement;false;true
+
+# Add restriction to only result documents link with b2bunit's user
+
+INSERT_UPDATE SearchRestriction;code[unique=true];name[lang=en];query;principal(UID);restrictedType(code);active;generate
+;b2busergroup_restriction;Restrict B2BDocument visibility;{item:Unit} IN (?session.branch);b2bcustomergroup;B2BDocument;true;true
+

@@ -1,0 +1,38 @@
+#
+# Import the CMS content for account status page
+# the user of this addon should change the value of "$contentCatalog" accordingly
+#
+
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(catalog(id[default=$contentCatalog]),version[default='Staged'])
+$jarResourceCms=jar:de.hybris.platform.accountsummaryaddon.setup.InitialDataSystemSetup
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];
+;;accountstatus;Account Status;CompanyPageTemplate;account status
+;;accountstatusdetail;Account Status Detail;CompanyPageTemplate;account status details
+
+
+$narrowContent=ProductFeatureComponent,CategoryFeatureComponent,CMSImageComponent,SimpleBannerComponent,BannerComponent,ImageMapComponent,RotatingImagesComponent,ProductCarouselComponent,CMSParagraphComponent
+INSERT_UPDATE AccountSummaryAccountStatusComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;AccountStatus;Account Status; AccountSummaryAccountStatusComponent
+
+INSERT_UPDATE AccountSummaryUnitTreeComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;UnitTree;Unit Tree; AccountSummaryUnitTreeComponent
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='CompanyPageTemplate'];validComponentTypes(code)
+;BodyContent;;$narrowContent,AccountSummaryUnitTreeComponent
+;BodyContent;;$narrowContent,AccountSummaryAccountStatusComponent
+
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;BodyContent-AccountStatusDetail;Content Slot for Account Summary Status Detail;true;AccountSummaryAccountStatusComponent
+;;BodyContent-AccountStatus;Content Slot for Account Summary Status;true;AccountSummaryUnitTreeComponent
+
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true];contentSlot(uid,$contentCV)[unique=true]
+;;BodyContent-AccountStatus;BodyContent;accountstatus;BodyContent-AccountStatus
+;;BodyContent-AccountStatusDetail;BodyContent;accountstatusdetail;BodyContent-AccountStatusDetail
+;;SideContent-AccountStatus;SideContent;accountstatus;SideContent-Company;;;
+;;SideContent-AccountStatusDetail;SideContent;accountstatusdetail;SideContent-Company;;;
+
+

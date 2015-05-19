@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<!--
+ All hybris buildcallbacks.xml macrodefinitions:
+ 
+ Build/Documentation
+ 
+	 before/after ant macro "clean"
+		 <macrodef name="ybackoffice_before_clean"/>
+		 <macrodef name="ybackoffice_after_clean"/>
+	 
+	 before/after ant macro "build"
+		 <macrodef name="ybackoffice_before_build"/>
+		 <macrodef name="ybackoffice_after_build"/>
+		 
+	 before/after ant macro "compile_core" - the core module of the extension
+		 <macrodef name="ybackoffice_before_compile_core">
+		 <macrodef name="ybackoffice_after_compile_core">
+	 
+	 before/after ant macro "compile_web" - the web module of the extension
+		 <macrodef name="ybackoffice_before_compile_web" />
+		 <macrodef name="ybackoffice_after_compile_web" />
+	 
+	 before/after ant macro "compile_hmc" - the hmc module of the extension
+		 <macrodef name="ybackoffice_before_compile_hmc" />
+		 <macrodef name="ybackoffice_after_compile_hmc" />
+ 
+ Preparing extension
+ 
+	 will be called in the beginning of the ant call and only once (also when using multiple 
+	 ant targets e.g. ant build yunittest)	
+		 <macrodef name="ybackoffice_only_once_prepare"/>
+ 
+ Creating ear module/production
+ 
+	 before/after ant macro "ear"
+		 <macrodef name="ybackoffice_before_ear"/>
+		 <macrodef name="ybackoffice_after_ear"/>
+
+	 before/after ant macro "production" - for hybris server only
+		 <macrodef name="ybackoffice_before_production" />
+		 <macrodef name="ybackoffice_after_production" />
+ 
+ JUnit Test
+ 
+	 before/after ant macro "yunitinit" 
+		 <macrodef name="ybackoffice_before_yunitinit" />
+		 <macrodef name="ybackoffice_after_yunitinit" />
+	 
+	 before/after ant macro "yunit"
+		 <macrodef name="ybackoffice_before_yunit" />
+		 <macrodef name="ybackoffice_after_yunit" /> 
+		 
+ Distribution package
+ 
+ 	 before/after ant macro "dist" - internal target; only for use when platform is available in source code
+		 <macrodef name="ybackoffice_after_dist"/>
+		 <macrodef name="ybackoffice_before_dist"/>
+	 
+	 before/after ant macro "dist_copy" - internal target; only for use when platform is available in source code
+		 <macrodef name="ybackoffice_before_dist_copy"/>
+		 <macrodef name="ybackoffice_after_dist_copy"/>
+		  
+ 	 With these filters you can override the default extension filters defined in platform/resources/ant/dist/filtersets.xml
+ 	  	 <patternset id="extension.ybackoffice.binary.filter">
+ 	  	  	 <patternset refid="extension.filter" />
+ 	  	  	 <exclude name="**/*-source.jar" />
+ 	  	 </patternset>
+ 	  	 <patternset id="extension.ybackoffice.source.filter">
+ 	  	  	 <exclude name="**/bin/**" />
+ 	  	 </patternset>
+ 
+ Backoffice module
+ 
+ 	 before/after ant macro "backoffice" - internal target; only for use when extensin is a backoffice module 
+		 <macrodef name="ybackoffice_before_clean_backoffice"/>
+		 <macrodef name="ybackoffice_after_clean_backoffice"/>
+		 <macrodef name="ybackoffice_before_compile_backoffice"/>
+		 <macrodef name="ybackoffice_after_compile_backoffice"/>
+	
+-->
+
+<project name="ybackoffice_buildcallbacks">
+
+	<macrodef name="ybackoffice_before_extgen">
+		<sequential>
+			<!-- asking some questions -->
+			<input validargs="true,false" defaultvalue="true" addproperty="extgen.ybackoffice.samplewidget">Create a sample widget?
+			</input>
+			<input validargs="false,true" defaultvalue="false" addproperty="extgen.ybackoffice.whitelabel">Create sample style sheets?</input>
+
+			<if>
+				<or>
+					<isfalse value="${extgen.ybackoffice.samplewidget}" />
+					<isfalse value="${extgen.ybackoffice.whitelabel}" />
+				</or>
+				<then>
+					<patternset id="extgen.ybackoffice.pattern">
+						<patternset refid="extgen.defaultpattern" />
+						<!-- exclude sample widget -->
+						<exclude name="backoffice/src**/*.java" unless="${extgen.ybackoffice.samplewidget}" />
+						<exclude name="backoffice/resources/widgets/**" unless="${extgen.ybackoffice.samplewidget}" />
+
+						<!-- exclude css -->
+						<exclude name="resources/cockpitng/cng/**" unless="${extgen.ybackoffice.whitelabel}" />
+					</patternset>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="ybackoffice_after_extgen">
+		<sequential>
+			<if>
+				<isfalse value="${extgen.ybackoffice.samplewidget}" />
+				<then>
+					<!-- delete widget definition -->
+					<xmltask source="${extension.directory.target}/resources/${extgen.extension.name}-backoffice-widgets.xml" dest="${extension.directory.target}/resources/${extgen.extension.name}-backoffice-widgets.xml">
+						<remove path="/widgets/widget-extension[1]" />
+					</xmltask>
+				</then>
+			</if>
+
+			<if>
+				<istrue value="${extgen.ybackoffice.whitelabel}" />
+				<then>
+					<!-- add css definition -->
+					<concat destfile="${extension.directory.target}/project.properties" append="true">
+backoffice.cockpitng.mainpage.css=./cng/css/${extgen.extension.name}.css
+backoffice.cockpitng.loginpage.css=./cng/css/loginpage_${extgen.extension.name}.css</concat>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+</project>

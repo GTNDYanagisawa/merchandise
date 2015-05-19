@@ -1,0 +1,38 @@
+*** Settings ***
+Library           de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Library			  de.hybris.platform.commerceservicesatddtests.keywords.CommerceServicesKeywordLibrary
+Library           de.hybris.platform.subscriptionatddtests.keywords.commerceservices.SubscriptionCommerceKeywordLibrary
+Resource		  entitlements/Product_Keywords.txt
+
+
+*** Keywords ***
+import commercecart sampledata
+    [Documentation]    Imports the commercecart test data
+    import impex from resource    /impex/testCommerceCart.csv
+    prepare session    testSite
+    prepare currency    USD
+
+reset system
+    [Documentation]    Resets the system attributes to the original values
+    reset system attributes
+    reset currency
+    
+verify that cart total for "${billingEvent}" is "${expectedTotal}"
+	[Documentation]    Verifies the cart total for the specified billing event
+	verify cart total for billing event    ${billingEvent}    ${expectedTotal}
+
+verify that number of child carts is "${expectedNumber}"
+    [Documentation]    Verifies the total number of carts
+    verify number of child carts    ${expectedNumber}
+    
+verify that for product "${productCode}" entitlements have consistent timeunits
+	[Documentation]    verifies validity of timeunits for entitlements
+	verify timeunits for entitlements of product    ${productCode}
+
+set cart currency to "${currency}"
+    [Documentation]    Changes the currency of the cart to the given one
+    set cart currency to    ${currency}
+
+for product "${productCode}" verify that the XML for prices matches "${expectedXml}"
+	[Documentation]   Verifies that XML for supscription term matches the expected XML
+    for product "${productCode}" verify that "product/price[@class='subscriptionPricePlan']" evaluates to "${expectedXml}"

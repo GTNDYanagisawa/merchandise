@@ -1,0 +1,48 @@
+$catalogVersion=catalogVersion(catalog(id),version)[unique=true]
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;
+;de;true;;;;;;
+;en;true;;;;;;
+
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];;;;;
+;de;Deutsch;German;;;;;
+;en;Englisch;English;;;;;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;€
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$
+INSERT_UPDATE Country;isocode[unique=true];name[lang=de];name[lang=en];active;
+;DE;Deutschland;Germany;true;
+;US;Vereinigte Staaten von Amerika;United States of America;true;
+
+
+INSERT_UPDATE UserGroup;UID[unique=true];locname[lang=de];locname[lang=en];
+;userAGroup;User A Group;User A Group;
+;userBGroup;User B Group;User B Group;
+
+INSERT_UPDATE User;uid[unique=true];name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password;authorizedToUnlockPages;
+;userA;A;userA;de;EUR;userAGroup;1234;false;
+;userB;B;userB;de;EUR;userBGroup;1234;true;
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en]
+;sampleCatalog;Sample Catalog;Sample Catalog
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode)
+;sampleCatalog;Staged;true;EUR;de,en
+
+INSERT_UPDATE Category;code[unique=true];$catalogVersion;name[lang=de];name[lang=en]
+;sampleCategoryA;sampleCatalog:Staged;Sample;Sample;
+;sampleCategoryB;sampleCatalog:Staged;Sample;Sample;
+
+INSERT_UPDATE Product;code[unique=true];$catalogVersion;name[lang=de];name[lang=en];unit(code);approvalStatus(code);owner(Principal.uid);startLineNumber;supercategories( code, catalogVersion(catalog(id),version))
+;productA;sampleCatalog:Staged;Sample product A;Sample product A;pieces;approved;admin;0;sampleCategoryA:sampleCatalog:Staged
+;productB;sampleCatalog:Staged;Sample product B;Sample product B;pieces;approved;admin;0;sampleCategoryB:sampleCatalog:Staged
+
+INSERT_UPDATE PageTemplate;uid[unique=true];$catalogVersion;name;
+;mainTemplate;sampleCatalog:Staged;Main template;
+
+INSERT_UPDATE ProductPage;uid[unique=true];$catalogVersion;name;approvalStatus(code);masterTemplate(uid);lockedBy(uid);
+;productPageA;sampleCatalog:Staged;Product page A;approved;mainTemplate;userA;
+;productPageB;sampleCatalog:Staged;Product page B;approved;mainTemplate;;
+;productPageC;sampleCatalog:Staged;Product page C;approved;mainTemplate;userB;
+

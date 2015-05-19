@@ -1,0 +1,65 @@
+# ImpEx for Importing BTG configuration into Electronics Store
+
+# Macros / Replacement Parameter definitions
+$productCatalog=electronicsProductCatalog
+$contentCatalog=electronicsContentCatalog
+$productCatalogName=Electronics Product Catalog
+$productCatalogVersion=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true]
+$contentCatalogVersion=catalogVersion(catalog(id[default=$contentCatalog]),version[default='Staged'])[unique=true]
+
+##################################################################
+# Configuration 1: Crossselling
+##################################################################
+
+INSERT_UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];$contentCatalogVersion
+;electronicsCameraSegment;Camera Cross Selling Segment;electronics
+
+INSERT_UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+;electronicsCameraRule;Camera Rule;electronicsCameraSegment;ORDER
+;electronicsCameraAccRule;Camera Accessory Rule;electronicsCameraSegment;ORDER
+
+INSERT_UPDATE BTGOperator;uid[unique=true];code;$contentCatalogVersion
+;electronicsContainsOperator;contains
+;electronicsNotContainsOperator;notContains
+
+INSERT_UPDATE BTGCategoriesInOrdersOperand;uid[unique=true];code;withSupercategories[default=false];scope(code)[default=ONLINE];$contentCatalogVersion
+;electronicsCatInOrderOperand;categoryInOrderOperand
+
+INSERT_UPDATE BTGReferenceCategoriesOperand;uid[unique=true];code;categories(code, $productCatalogVersion);$contentCatalogVersion
+;electronicsCameraCategoryOperand;CameraCategoryOperand;578
+;electronicsCameraAccCategoryOperand;CameraAccCategoryOperand;827
+
+INSERT_UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+;electronicsCameraOrderExpression;electronicsCatInOrderOperand;electronicsCameraCategoryOperand;electronicsContainsOperator;electronicsCameraRule
+;electronicsCameraOrderAccExpression;electronicsCatInOrderOperand;electronicsCameraAccCategoryOperand;electronicsNotContainsOperator;electronicsCameraAccRule
+
+INSERT_UPDATE CmsRestrictionActionDefinition;uid[unique=true];code;target;inverted;segment(uid, $contentCatalogVersion);$contentCatalogVersion;type(code)[default=PLAIN]
+;electronicsBtgCmsCameraRestrictionAction;Camera Cross Selling Action;btgDummyAction;false;electronicsCameraSegment;;
+
+INSERT_UPDATE BtgSegmentRestriction;uid[unique=true];outputActionDefinition(uid, $contentCatalogVersion);components(uid, $contentCatalogVersion);$contentCatalogVersion
+;electronicsBtgCmsCameraRestriction;electronicsBtgCmsCameraRestrictionAction;PurchasedCategorySuggestions
+
+##################################################################
+# Configuration 1: Regular Customer Segment
+##################################################################
+INSERT_UPDATE BTGSegment;uid[unique=true];name;sites(uid);active[default=true];scope(code)[default=ONLINE];$contentCatalogVersion
+;electronicsRegularCustomerSegment;Regular Customer Segment;electronics
+
+INSERT_UPDATE BTGRule;uid[unique=true];code;segment(uid, $contentCatalogVersion);ruleType(code);$contentCatalogVersion
+;electronicsRegularCustomerRule;Regular Customer Rule;electronicsRegularCustomerSegment;ORDER
+
+INSERT_UPDATE BTGOperator;uid[unique=true];code;$contentCatalogVersion
+;electronicsGreaterOperator;numGreaterThanOrEqual
+
+INSERT_UPDATE BTGNumberOfOrdersRelativeDateOperand;uid[unique=true];value;unit(code);$contentCatalogVersion
+;electronicsNumberOfOrdersOperand;6;MONTH
+
+INSERT_UPDATE BTGIntegerLiteralOperand;uid[unique=true];literal;$contentCatalogVersion
+;electronicsOrdersIntegerOperand;4
+
+INSERT_UPDATE BTGExpression;uid[unique=true];leftOperand(uid, $contentCatalogVersion);rightOperand(uid, $contentCatalogVersion);operator(uid, $contentCatalogVersion);rule(uid, $contentCatalogVersion);$contentCatalogVersion
+;electronicsRegularCustomerExpression;electronicsNumberOfOrdersOperand;electronicsOrdersIntegerOperand;electronicsGreaterOperator;electronicsRegularCustomerRule
+
+INSERT_UPDATE BTGAssignToGroupDefinition;uid[unique=true];code;target;userGroups(uid);segment(uid, $contentCatalogVersion);$contentCatalogVersion
+;electronicsBtgAssignToRegularGroup;Add to Regular Segment;assignToGroup;regulargroup;electronicsRegularCustomerSegment
+

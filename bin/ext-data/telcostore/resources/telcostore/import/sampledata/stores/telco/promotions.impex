@@ -1,0 +1,40 @@
+# ImpEx for Promotions
+
+$productCatalog=
+
+$defaultPromoGrp=default
+$favCustomers=favoriteCustomers
+$bigSpenders=bigSpenders
+$catalogVersion=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$productCatalog]),CatalogVersion.version[default=Staged])[default=$productCatalog:Staged]
+
+$regulargroup=regulargroup
+$defaultPromoGrp=default
+
+INSERT PromotionPriceRow;&priceId;Currency(isocode);price
+
+INSERT_UPDATE ProductPercentageDiscountPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;percentageDiscount;priority;products(code,$catalogVersion)
+
+INSERT_UPDATE ProductBundlePromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true,unique=true];code[unique=true];title;description;priority;products(code,$catalogVersion);bundlePrices(&priceId)
+
+INSERT_UPDATE ProductBOGOFPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;priority;categories(code,$catalogVersion);qualifyingCount;freeCount
+
+INSERT_UPDATE ProductPerfectPartnerPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;priority;products(code,$catalogVersion);partnerProducts(code,$catalogVersion);partnerPrices(&priceId)
+
+INSERT_UPDATE ProductMultiBuyPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true][unique=true];code[unique=true];title;description;priority;categories(code,$catalogVersion);qualifyingCount;bundlePrices(&priceId)
+
+#### Order Discount ####
+INSERT PromotionPriceRow;&priceId;Currency(isocode);price
+#;7;GBP;15
+#;8;USD;20
+#;9;JPY;1500
+
+INSERT_UPDATE OrderThresholdDiscountPromotion;PromotionGroup(Identifier[default=$defaultPromoGrp]);enabled[default=true,unique=true];code[unique=true];title;description;messageFired[lang=en];messageFired[lang=de];messageFired[lang=ja];messageFired[lang=zh];priority;thresholdTotals(&tresholdId);discountPrices(&priceId)
+#;;;OrderThreshold15Discount;You saved bunch of bucks for spending quite much;You saved bunch of bucks for spending quite much;You saved {3} for spending over {1};Sie haben {3} gespart, weil Sie mehr als {1} ausgegeben haben;{1} 以上の購入で {3} の節約;您的一份订单超过 {1}，节省了 {3}。;500;1,2,3;7,8,9
+
+INSERT_UPDATE PromotionUserRestriction;positive;promotion(code)[unique=true];users(uid)
+#;TRUE;OrderThreshold15Discount;$regulargroup
+
+INSERT PromotionPriceRow;&tresholdId;Currency(isocode);price
+#;4;GBP;200
+#;5;USD;300
+#;6;JPY;20000

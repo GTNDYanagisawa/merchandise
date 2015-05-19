@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2014 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns:aop="http://www.springframework.org/schema/aop"
+		 xmlns:context="http://www.springframework.org/schema/context"
+		 xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context
+		   http://www.springframework.org/schema/context/spring-context-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+
+	<context:component-scan base-package="de.hybris.platform.acceleratorwebservicesaddon.controllers"/>
+
+	<!-- Type Aliases -->
+
+	<bean class="de.hybris.platform.commercefacades.xstream.alias.TypeAliasMapping">
+		<property name="alias" value="pointOfServices"/>
+		<property name="aliasedClass" value="de.hybris.platform.commercefacades.storelocator.data.PointOfServiceDataList"/>
+	</bean>
+
+    <bean
+            class="de.hybris.platform.commercefacades.xstream.alias.TypeAliasMapping">
+        <property name="alias" value="userLocation"/>
+        <property name="aliasedClass"
+                  value="de.hybris.platform.acceleratorservices.store.data.UserLocationData"/>
+    </bean>
+
+	<!-- Implicit collections -->
+
+	<bean class="de.hybris.platform.commercefacades.xstream.alias.ImplicitCollection">
+		<property name="ownerType" value="de.hybris.platform.commercefacades.storelocator.data.PointOfServiceDataList"/>
+		<property name="fieldName" value="pointOfServices"/>
+	</bean>
+
+	<!-- Field set level mapping -->
+	
+		<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.store.PointOfServiceListWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="pointOfServices"/>
+				<entry key="DEFAULT" value="pointOfServices(DEFAULT)"/>
+				<entry key="FULL" value="pointOfServices(FULL)"/>
+			</map>
+		</property>
+	</bean>
+	
+</beans>

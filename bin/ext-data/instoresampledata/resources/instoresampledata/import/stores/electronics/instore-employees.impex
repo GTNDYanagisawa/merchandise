@@ -1,0 +1,15 @@
+$passwordEncoding=md5
+$defaultPassword=1234
+$setPassword=@password[translator=de.hybris.platform.impex.jalo.translators.ConvertPlaintextToEncodedUserPasswordTranslator][default='$passwordEncoding:$defaultPassword']
+
+# store employees  groups per store
+INSERT_UPDATE StoreEmployeeGroup;uid[unique=true];locname[lang=de];locname[lang=en];groups(uid);store(name)
+;nakanoStoreEmployees;Nakano Arbeiter Gruppe;Nakano Employees Group;instoreemployeesgroup;Nakano
+;shinbashiStoreEmployees;Shinbashi Arbeiter Gruppe;Shinbashi Employees Group;instoreemployeesgroup;Shinbashi
+;misatoStoreEmployees;Misato Arbeiter Gruppe;Misato Employees Group;instoreemployeesgroup;Misato
+
+# employees - members of store employees groups.
+INSERT_UPDATE Employee;UID[unique=true];$setPassword;description;name;groups(uid)[mode=append];sessionLanguage(isocode)
+;nakano-employee;;Nakano Employee;Nakano Employee;nakanoStoreEmployees;en;
+;shinbashi-employee;;Shinbashi Employee;Shinbashi Employee;shinbashiStoreEmployees;en;
+;misato-employee;;Misato Employee;Misato Employee;misatoStoreEmployees;en;

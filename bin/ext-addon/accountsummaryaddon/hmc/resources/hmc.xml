@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+	<!-- Configuration for extension accountsummaryaddon -->
+
+	<explorertree>
+		<group name="b2bcommercegroup" mode="append">
+			<typeref type="B2BDocument" />
+		</group>
+	</explorertree>
+
+	<type name="B2BDocument" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="pk" />
+				<condition attribute="documentType" />
+				<condition attribute="Unit" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="pk" width="125"/>
+						<attribute name="documentNumber"  width="125" />
+						<attribute name="date"  width="175"/>
+						<attribute name="dueDate"  width="175"/>
+						<attribute name="documentType"  width="125"/>
+						<attribute name="Unit"  width="125"/>
+						<attribute name="status"  width="75"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.b2bunit.b2bdocument">
+					<section name="section.general">
+						<listlayout>
+							<attribute name="Order" />
+							<attribute name="Unit" />
+						</listlayout>
+					</section>
+					<section name="section.content">
+						<listlayout>
+							<attribute name="documentNumber" />
+							<attribute name="date" />
+							<attribute name="dueDate" />
+							<attribute name="amount" />
+							<attribute name="openAmount" />
+							<attribute name="currency" />
+							<attribute name="documenttype" />
+							<attribute name="status" />
+							<attribute name="documentMedia">
+								<mediaeditor/>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="B2BDocumentType" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="pk" />
+				<condition attribute="name" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="pk" />
+						<attribute name="name" />
+						<attribute name="displayInAllList" />
+						<attribute name="includeInOpenBalance" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.b2bunit.b2bdocumenttype">
+					<section name="section.general">
+						<listlayout>
+							<attribute name="name" />
+							<attribute name="displayInAllList" />
+							<attribute name="includeInOpenBalance" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="name" mode="replace">
+			<itemlayout>
+				<attribute name="name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+</configuration>

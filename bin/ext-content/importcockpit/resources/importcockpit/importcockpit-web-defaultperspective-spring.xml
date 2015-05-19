@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+        [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary
+        information of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only
+        in accordance with the terms of the license agreement you entered into with hybris.
+    -->
+
+
+<!--
+        WARNING: This is the Spring WEB configuration file. If you want to replace items or managers you have to do this from the
+        extensions core configuration file (productcockpit/resources/productcockpit-spring.xml)
+    -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+       						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd"
+       default-autowire="byName">
+
+	<alias alias="listViewMenuPopupBuilder" name="defaultListViewMenuPopupBuilder" />
+	<bean id="defaultListViewMenuPopupBuilder" class="de.hybris.platform.cockpit.model.listview.impl.DefaultListViewMenuPopupBuilder" scope="prototype"/>
+
+    <!-- START: JOB PERSPECTIVE -->
+    <alias alias="importCockpitPerspective" name="defaultImportCockpitPerspective"/>
+    <bean id="defaultImportCockpitPerspective" class="de.hybris.platform.importcockpit.session.impl.ImportCockpitCronJobPerspective" scope="session"
+          parent="BasePerspective" autowire="byName">
+        
+        <!-- unique ID of the perspective -->
+        <property name="uid" value="importcockpit.perspective.importCockpit"/>
+        <!-- localization key for the label of the perspective -->
+        <property name="label" value="importcockpit.perspective.importcockpit"/>
+        <property name="navigationArea" ref="importCockpitNavigationArea"/>
+        <property name="browserArea" ref="importCockpitBrowserArea"/>
+		<property name="editorArea" ref="importCockpitEditorArea"/>
+        <property name="popupEditorArea" ref="importCockpitPopupEditorArea"/>
+        <property name="editorAreaTypes">
+			<set>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="ImportCockpitCronJob" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+			</set>
+		</property>
+    </bean>
+	
+	
+	<!-- Navigation Area and related beans -->
+	<alias alias="importCockpitNavigationArea" name="defaultImportCockpitNavigationArea"/>
+	<bean id="defaultImportCockpitNavigationArea" class="de.hybris.platform.importcockpit.session.impl.ImportCockpitNavigationArea" scope="session" parent="BaseNavigationArea">
+        <property name="sectionModel" ref="importCockpitNavigationAreaModel"/>
+        <property name="sections">
+            <list>
+                <ref bean="importCockpitJobHistoryNavSection"/>
+                <ref bean="importCockpitUndoSection"/>
+            </list>
+        </property>
+        <property name="pushInfoBoxEventClassName" value="de.hybris.platform.importcockpit.events.impl.StartStopEvent"/>
+        <property name="infoSlotRenderer" ref="importCockpitInfoBoxRenderer"/>
+    </bean>
+    
+	<alias alias="importCockpitNavigationAreaModel" name="defaultImportCockpitNavigationAreaModel"/>
+    <bean id="defaultImportCockpitNavigationAreaModel" class="de.hybris.platform.importcockpit.components.navigationarea.NavigationAreaModel" scope="session" parent="baseNavigationAreaModel">
+    	<property name="maxJobEvents" value="25"/>
+    </bean>
+    
+    <alias alias="baseNavigationAreaModel" name="defaultNavigationAreaModel"/>
+    <bean id="defaultNavigationAreaModel" class="de.hybris.platform.cockpit.components.navigationarea.DefaultNavigationAreaModel" scope="session"/>
+
+	<alias alias="importCockpitJobHistoryNavSection" name="defaultImportCockpitJobHistoryNavSection"/>
+    <bean id="defaultImportCockpitJobHistoryNavSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection" scope="prototype">
+        <property name="localizedLabel" value="importcockpit.navigationarea.jobhistory"/>
+        <property name="visible" value="true"/>
+        <property name="renderer" ref="jobHistoryNavSectionRenderer"/>
+    </bean>
+    
+    <alias alias="jobHistoryNavSectionRenderer" name="defaultJobHistoryNavSectionRenderer"/>
+    <bean id="defaultJobHistoryNavSectionRenderer" class="de.hybris.platform.importcockpit.components.navigationarea.renderer.JobHistoryNavSectionRenderer" scope="prototype"/>
+
+	<alias alias="importCockpitUndoSection" name="defaultImportCockpitUndoSection"/>
+    <bean id="defaultImportCockpitUndoSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection" scope="prototype">
+        <property name="localizedLabel" value="navigationarea.history" />
+        <property name="visible" value="true" />
+        <property name="renderer">
+            <bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.UndoSectionRenderer" />
+        </property>
+    </bean>
+    
+    <alias alias="importCockpitInfoBoxRenderer" name="defaultImportCockpitInfoBoxRenderer"/>
+    <bean id="defaultImportCockpitInfoBoxRenderer" class="de.hybris.platform.cockpit.components.navigationarea.renderer.InfoBoxRenderer" scope="session"/>
+
+
+	<!-- Browser Area Referenced Beans -->
+	<alias alias="importCockpitBrowserArea" name="defaultImportCockpitBrowserArea"/>
+    <bean id="defaultImportCockpitBrowserArea" class="de.hybris.platform.importcockpit.session.impl.ImportCockpitBrowserArea" scope="session">
+        <property name="viewURI" value="/importcockpit/importCockpitBrowserArea.zul"/>
+        <property name="welcomeBrowserModel" ref="importCockpitWelcomeBrowserModel"/>
+        <property name="mappingWizard" ref="mappingWizard"/>
+    </bean>
+            
+	<alias alias="importCockpitWelcomeBrowserModel" name="defaultImportCockpitWelcomeBrowserModel"/>
+	<bean id="defaultImportCockpitWelcomeBrowserModel" class="de.hybris.platform.importcockpit.session.impl.ImportCockpitWelcomeBrowserModel" scope="prototype">
+		<property name="welcomeTemplate" value="importcockpit/welcome/welcome.zul" />
+	</bean>
+	
+	<alias alias="importCockpitBrowserModel" name="defaultImportCockpitBrowserModel"/>
+	<bean id="defaultImportCockpitBrowserModel" class="de.hybris.platform.importcockpit.session.impl.ImportCockpitBrowserModel" scope="prototype">
+		<property name="modelService" value="modelService"/>
+	</bean>
+	
+	<alias alias="mappingBrowserModel" name="defaultMappingBrowserModel"/>
+	<bean id="defaultMappingBrowserModel" class="de.hybris.platform.importcockpit.session.mapping.impl.MappingBrowserModel" scope="prototype">
+		<property name="mappingService" value="mappingService"/>
+		<property name="modelValidationService" value="mappingModelValidationService"/>
+	</bean>
+	
+
+    <!-- editorArea Property and realated beans -->
+    <alias alias="importCockpitEditorArea" name="defaultImportCockpitEditorArea"/>
+	<bean id="defaultImportCockpitEditorArea" class="de.hybris.platform.importcockpit.session.impl.ImportCockpitEditorArea" scope="session" parent="BaseEditorAreaModel">
+		<property name="editorAreaController" ref="importCockpitEditorAreaController"/>
+	</bean>
+	
+	<alias alias="importCockpitEditorAreaController" name="defaultImportCockpitEditorAreaController"/>
+    <bean id="defaultImportCockpitEditorAreaController" class="de.hybris.platform.cockpit.session.impl.DefaultEditorAreaController" scope="session">
+        <property name="sectionRowRenderer" ref="importCockpitEditorSectionRowRenderer"/>
+        <property name="editorFactory" ref="EditorFactory"/>
+    </bean>
+    
+    <alias alias="importCockpitEditorSectionRowRenderer" name="defaultImportCockpitEditorSectionRowRenderer"/>
+    <bean id="defaultImportCockpitEditorSectionRowRenderer" parent="EditorSectionRowRenderer" scope="session"/>
+
+	<!-- popupEditorArea Propery Beans-->
+	<alias alias="importCockpitPopupEditorArea" name="defaultImportCockpitPopupEditorArea"/>
+	<bean id="defaultImportCockpitPopupEditorArea" parent="BasePopupEditor" scope="session">
+		<property name="editorAreaController" ref="importCockpitPopupEditorAreaController"/>
+	</bean>
+	
+	<alias alias="importCockpitPopupEditorAreaController" name="defaultImportCockpitPopupEditorAreaController"/>
+	<bean id="defaultImportCockpitPopupEditorAreaController" class="de.hybris.platform.importcockpit.session.impl.ImportCockpitPopupEditorAreaController" parent="BasePopupEditorAreaController" scope="prototype">
+		<property name="sectionRowRenderer" ref="importCockpitPopupEditorSectionRowRenderer"/>
+		<property name="editorFactory" ref="EditorFactory"/>
+	</bean>
+	
+	<alias alias="importCockpitPopupEditorSectionRowRenderer" name="defaultImportCockpitPopupEditorSectionRowRenderer"/>
+	<bean id="defaultImportCockpitPopupEditorSectionRowRenderer" parent="EditorSectionRowRenderer" scope="session"/>
+
+    <!-- action column for list view in job perspective -->
+    <alias alias="importCockpitCronJobActionColumn" name="defaultImportCockpitCronJobActionColumn"/>
+    <bean id="defaultImportCockpitCronJobActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration" scope="prototype">
+        <constructor-arg value="Actions"/>
+		<property name="actions">
+			<list>
+				<ref bean="jobStartStopAction" />
+				<ref bean="jobMappingAction" />
+				<ref bean="deleteJobAction" />
+			</list>
+		</property>
+    </bean>
+    
+    <alias name="defaultImportCockpitMappingInfoColumn" alias="importCockpitMappingInfoColumn"/>
+    <bean id="defaultImportCockpitMappingInfoColumn" class="de.hybris.platform.importcockpit.components.listview.impl.DefaultImportCockpitMappingInfoColumn" scope="tenant">
+    	<property name="mappingService" ref="importCockpitMappingService"/>
+    </bean>
+    
+    <alias alias="jobStartStopAction" name="defaultJobStartStopAction"/>
+	<bean id="defaultJobStartStopAction" class="de.hybris.platform.importcockpit.components.listview.impl.DefaultJobStartStopAction" scope="prototype">
+		<property name="importCockpitMediaService" ref="importCockpitMediaService"/>
+		<property name="importCockpitCronJobService" ref="importCockpitCronJobService"/>
+	</bean>
+	
+	<alias alias="jobMappingAction" name="defaultJobMappingAction"/>
+	<bean id="defaultJobMappingAction" class="de.hybris.platform.importcockpit.components.listview.impl.DefaultJobMappingAction" scope="prototype">
+		<property name="importCockpitMediaService" ref="importCockpitMediaService"/>
+		<property name="importCockpitCronJobService" ref="importCockpitCronJobService"/>
+	</bean>
+	
+	<alias alias="deleteJobAction" name="defaultDeleteJobAction"/>
+	<bean id="defaultDeleteJobAction" class="de.hybris.platform.importcockpit.components.listview.impl.DefaultDeleteJobAction" scope="prototype">
+		<property name="importCockpitCronJobService" ref="importCockpitCronJobService"/>
+	</bean>
+    
+</beans>

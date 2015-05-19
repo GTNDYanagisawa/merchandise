@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?init 				class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+<?taglib 			uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+
+<?page title="[y] hybris Product Cockpit : Test page for selector component [y]"?>
+
+<window xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:h="http://www.w3.org/1999/xhtml" 
+		xmlns:zk="http://www.zkoss.org/2005/zk"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd "
+		width="100%" height="100%" style="background-color: white" shadow="false">
+	
+	<!--  custom styles in here -->
+	<style src="/css/productcockpit.css" /> 
+	<style src="/css/defaultstyles.css"/>
+
+	<zscript>
+		import de.hybris.platform.productcockpit.util.UserRenderer;
+		import de.hybris.platform.productcockpit.util.UserSelectorSearchService;
+		
+		UserRenderer userRenderer = new UserRenderer();
+		UserSelectorSearchService userSearcher = new UserSelectorSearchService();
+	</zscript>
+
+	<separator height="24px"/>
+	<label value="Selector Component Test" style="font-weight: bold; font-size: large"/>	
+	<separator height="12px"/>
+	<label value="The selected items are displayed using the 'List editor' component. Please see the List editor component section for a more comprehensive example on how to use this component."/>
+	<separator height="24px"/>
+	<selector searchService="${userSearcher}" elementRenderer="${userRenderer}">
+		<attribute name="onChanged">
+			System.out.println("Event listener > Selector changed!");
+		</attribute>
+	</selector>	
+</window>	

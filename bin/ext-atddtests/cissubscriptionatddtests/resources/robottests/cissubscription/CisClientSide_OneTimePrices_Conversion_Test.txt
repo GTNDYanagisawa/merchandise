@@ -1,0 +1,130 @@
+*** Settings ***
+Resource          subscriptionservices/SubscriptionProduct_Keywords.txt
+Resource          subscriptionservices/SubscriptionPricePlan_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+Resource          commerce/SubscriptionCommerce_Keywords.txt
+Resource          cissubscription/CisSubscription_Keywords.txt
+Test Setup        import commercecart sampledata
+
+
+*** Test Cases ***
+Test_CisClientSide_OneTimePrices_Conversion_Onfirstbill
+	create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+Test_CisClientSide_OneTimePrices_Conversion_Paynow
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "paynow" one time price of "5"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"	
+    
+Test_CisClientSide_OneTimePrices_Conversion_Onfirstbill_Paynow
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "paynow" one time price of "5"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>1 Month contract - monthly billing</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>Monthly Plan</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"														

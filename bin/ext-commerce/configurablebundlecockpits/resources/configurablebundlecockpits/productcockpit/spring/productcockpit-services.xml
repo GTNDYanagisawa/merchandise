@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+
+<!-- . WARNING: This is the CUSTOM Spring WEB configuration file used for 
+	cmscockpit . web application. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+	default-autowire="byName">
+
+	<alias alias="synchronizationService" name="defaultSynchronizationService" />
+	<bean id="defaultSynchronizationService"
+		class="de.hybris.platform.cockpit.services.sync.impl.SynchronizationServiceImpl"
+		autowire="byName">
+		<property name="relatedReferencesTypesMap">
+			<map>
+				<entry key="Product">
+					<list>
+						<value>Product.galleryImages</value>
+					</list>
+				</entry>
+				<entry key="MediaContainer">
+					<list>
+						<value>MediaContainer.medias</value>
+					</list>
+				</entry>
+
+				<entry key="BundleTemplate">
+					<list>
+						<value>BundleTemplate.bundleSelectionCriteria</value>
+						<value>BundleTemplate.requiredBundleTemplates</value>
+						<value>BundleTemplate.dependentBundleTemplates</value>
+						<value>BundleTemplate.changeProductPriceBundleRules</value>
+						<value>BundleTemplate.disableProductBundleRules</value>
+						<value>BundleTemplate.products</value>
+						<value>BundleTemplate.childTemplates</value>
+						<value>BundleTemplate.status</value>
+					</list>
+				</entry>
+
+			</map>
+		</property>
+	</bean>
+</beans>

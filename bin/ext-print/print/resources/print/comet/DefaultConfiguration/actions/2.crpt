@@ -1,0 +1,316 @@
+//***************************************************************************
+/* 
+History:
+2008-02-18 GS Table width values from Hybris are always millimeters.
+*/
+//***************************************************************************
+#include "internal/types.h"
+#include "internal/text.h"
+#include "internal/table.h"
+//***************************************************************************
+int stError = 0;
+
+int kBufferSize = 8000;
+
+int gRootTableRecordID = -1;
+int gRootTableRecordID2 = -1;
+int gRootTableRecordID3 = -1;
+char * gRootTableRecordStringID = alloc (255);
+
+char * gLayer = alloc (kBufferSize);
+
+float gTableWidth = 0.;
+
+
+//***************************************************************************
+float power (float x, int n)
+{
+	float result = 1.;
+	int i = 0;
+
+	if (n<=0.)
+		return -1.; // error - this is not implemented
+
+	for (i=0; i<n; i++)
+		result = result * x;
+
+	return result;
+}
+
+
+//***************************************************************************
+float fvalue (char * str)
+{
+	float result = 0.;
+	int posDel = -1;
+
+	// translate string in float
+	posDel = strstrpos (str, ".");
+	if (posDel == -1) posDel = strstrpos (str, ",");
+
+	if (posDel != -1) str [posDel] = '\0'; // now we have two strings!
+	//wlog ("", "ganzer Teil: %s %d %f ", str, val (str), tofloat (val (str)));
+	result = tofloat (val (str));
+	if (posDel != -1)
+	{
+		//wlog ("", "Bruchteil: %s %d %f/%f %f ", str+posDel+1, val (str+posDel+1),
+		//	tofloat (val (str+posDel+1)), power (10., strlen (str+posDel+1)),
+		//	tofloat (val (str+posDel+1))/power (10., strlen (str+posDel+1)));
+		result = result + (tofloat (val (str+posDel+1)) / power (10., strlen (str+posDel+1)));
+	}
+	//else
+		//wlog ("", "Bruchteil leer.\n");
+	//wlog ("","fvalue (%s) = %f\n", str, result);
+
+	return result;
+}
+
+
+//***************************************************************************
+int callHybris (char * result, char * method, char * parameter)
+{
+	Query qu = sql::query (soap::connection());
+	int state = 0;
+
+	if(qu)
+	{
+		if(query::set_method (qu, method) == 0)
+		{
+			if(	query::send (qu, parameter) &&
+				query::output (qu, kString, result, kBufferSize))
+			{
+				if(query::exec(qu))
+				{
+					state = query::fetch (qu);				
+				}
+				else
+				{
+					wlog("", "There was a query::exec error in 2.crpt, method callHybris(). \n");
+				}
+			}
+			else
+			{
+				wlog("", "There was a query send/input/output error in 2.crpt, method callHybris(). \n");
+			}
+		}
+		else
+		{
+			wlog("", "There was a query::set_method error in 2.crpt, method callHybris(). \n");
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful! error in method callHybris() in 2.crpt. \n");
+	}	
+
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in script 2.crpt, method callHybris(). \n");
+	}
+
+	return state;
+}
+
+
+//***************************************************************************
+int getRootTableRecordIDs ()
+{
+	int start = -1;
+	int stop = -1;
+	char * idStr = alloc(100);
+	table::get_id (gTable, &gRootTableRecordID, &gRootTableRecordID, &gRootTableRecordID, gRootTableRecordStringID);
+
+	// Workaround for wrong table ID returned from the method above for comet R1144+ 
+	start = strstrpos(gRootTableRecordStringID, "'");
+	if(start > -1)
+	{
+		idStr = strsubstring(gRootTableRecordStringID, (start + 1), -1);
+		stop = strstrpos(idStr, "'");
+		if(stop > -1)
+		{
+			idStr = strsubstring(gRootTableRecordStringID, (start + 1), stop);
+			strcpy(gRootTableRecordStringID, idStr);
+		}
+	}
+	release(idStr);
+	return 0;
+}
+
+
+//***************************************************************************
+int getTableWidth ()
+{
+	float l,t,r,b;
+	char * parameter = alloc (kBufferSize);
+	char * result = alloc (kBufferSize);
+	int state = 0;
+
+	sprintf (parameter,"id = '%s'\nlanguage = '%s'", gRootTableRecordStringID, gLayer);
+	state = callHybris (result, "GET_tableWidth", parameter);
+
+	if (!state)
+	{
+		// call returned error
+		showerror ("GET_tableWidth");
+		stError = 1;
+		gTableWidth = 0.;
+	}
+	else
+	{
+		gTableWidth = fvalue (result);
+	
+		// user selected to fit table to frame
+		if (gTableWidth >= -1.01 && gTableWidth < -0.99) // -1.
+		{
+			frame::bbox (gFrame, &l, &t, &r, &b);
+			gTableWidth = r-l;
+		}
+		
+		if (gTableWidth < 0.) // safety first!
+			gTableWidth = 0.;
+		
+		wlog ("", "Table Width should be %f.\n", gTableWidth);
+   }
+
+	// Cleanup
+	release( parameter );
+	release( result );
+
+	return 0;
+}
+
+
+//***************************************************************************
+float getColWidth (int col)
+{
+	char * parameter = alloc (kBufferSize);
+	char * result = alloc (kBufferSize);
+	int state = 0;
+	float width = 0.;
+
+	sprintf (parameter,"index = %d\nid = '%s'\nlanguage = '%s'", col, gRootTableRecordStringID, gLayer);
+	state = callHybris (result, "GET_columnWidth", parameter);
+
+	width = fvalue (result);
+
+	wlog ("", "Set col %d to width %f (%s)\n", col, width, result);
+
+	// Cleanup
+	release( parameter );
+	release( result );
+
+	return width;
+}
+
+
+//***************************************************************************
+int 	getAndSetColWidths ()
+{
+	int col = 0, numCols = table::columns (gTable), compensationCol = -1, relCol = false;
+	float actTableWidth = 0., actColWidth = 0., colWidth = 0., tmp = 0.;
+	float relWidth [numCols];
+
+	for (col=0; col<numCols; col++)
+	{
+		relWidth[col]=-1.; // init array, means unused
+
+		colWidth = getColWidth (col);
+
+		if (colWidth >= 0. && colWidth <= 100.) // relative value in percent
+		{
+			if (gTableWidth > 0.)
+			{
+				relCol=true;
+				relWidth[col]=colWidth; // keep value for later
+			}
+			else
+			{
+				// we have a problem here!!!
+				showerror ("Relative col width but table width not fixed in col %d. Width will not be changed.", col);
+			}
+		}
+		else if (colWidth >= -1.01 && colWidth < -0.99) // colWidth = -1. means fit to content
+		{
+			table::fit_col (gTable, col, 1); // col can shrink
+			table::get_cellsize (gTable, col, 0, 0,	&actColWidth, &tmp);
+			actTableWidth = actTableWidth + actColWidth;
+			wlog ("","Setting col %d to content width: %f mm\n",col,pt2mm(actColWidth));
+		}
+		else if (colWidth >= -2.01 && colWidth < -1.99) // colWidth = -2. means fit to other columns and table width
+		{
+			if (compensationCol == -1)
+			{
+				compensationCol = col;
+			}
+			else
+			{
+				table::get_cellsize (gTable, col, 0, 0,	&actColWidth, &tmp);
+				actTableWidth = actTableWidth + actColWidth;
+
+				// we have a problem here!!!
+				// showerror ("More than one compensation cols: %d and %d. Width will not be changed.", col, compensationCol);
+			}
+		}
+		else if (colWidth >= -3.01 && colWidth < -2.99) // colWidth = -3. means column width was set using tagged text
+		{
+			table::get_cellsize (gTable, col, 0, 0,	&actColWidth, &tmp);
+			actTableWidth = actTableWidth + actColWidth;
+		}
+	}
+
+	// now we can set relative col widths
+	if (relCol)
+	{
+		tmp = (gTableWidth-actTableWidth) / 100.;
+		for (col=0; col<numCols; col++)
+		{
+			if (relWidth[col] >= 0.)
+			{
+				actColWidth = relWidth[col] * tmp;
+				table::resize_cols (gTable, col, 1, actColWidth, actColWidth, actColWidth);
+				actTableWidth = actTableWidth + actColWidth;
+			}
+		}
+	}
+
+	if (compensationCol != -1)
+	{
+		actColWidth = gTableWidth - actTableWidth;
+
+		if (actColWidth <= 0.)
+		{
+			// we have a problem here!!!
+			// showerror ("Compensation col must be smaller than 0.");
+		}
+		else
+		{
+			table::resize_cols (gTable, compensationCol, 1, actColWidth, actColWidth, actColWidth);
+			wlog ("","Setting col %d to compensate for table width: %f mm\n",col,pt2mm(actColWidth));
+		}
+	}
+	else
+	{
+		if ((gTableWidth > 0.01) && (gTableWidth - actTableWidth > 0.01 || actTableWidth - gTableWidth > 0.01))
+		{
+			// we have a problem here!!!
+			showerror ("Column width setting does not give correct table width.");
+		}
+	}
+
+	return 0;
+}
+
+
+//***************************************************************************
+int main ()
+{
+	frame::get_layer(gItem,gLayer);
+
+	getRootTableRecordIDs ();
+
+	getTableWidth ();
+
+	getAndSetColWidths ();
+
+	return stError;
+}

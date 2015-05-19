@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../config/SolrFacetConfig.xsd">
+  <solrconfig>
+    <mode>embedded</mode>
+    <clusterconfig embeddedMaster="true">
+    	<aliveCheckInterval>5000</aliveCheckInterval>
+    	<connectionTimeout>5000</connectionTimeout>
+    	<readTimeout>5000</readTimeout>
+    	<endpointURLs>
+      		<endpointURL master="true">http://localhost:8983/solr</endpointURL>
+    	</endpointURLs>
+    </clusterconfig>
+  </solrconfig>
+  <indexconfig>
+    <batchSize>100</batchSize>
+  </indexconfig>
+  <itemTypes>
+    <itemType code="Product" variant="false" identityProvider="itemIdentityProvider">
+      <properties>
+      	<property name="code" type="string"/>
+      	<property name="name" type="text" sortableType="sortabletext" localized="true"/>
+      </properties>
+      <flexibleSearchUpdateQueries>
+        <fullIndexQuery user="anonymous" parameterProvider="mockContextAwareParameterProvider">
+			SELECT {pk} FROM {Product}
+        </fullIndexQuery>
+        <updateIndexQuery user="anonymous" injectLastIndexTime="true">
+			SELECT {PK} FROM {Product} 
+			WHERE {modifiedtime} &gt;= ?lastIndexTime
+        </updateIndexQuery>
+        <deleteFromIndexQuery parameterProvider="simpleParameterProvider">
+        	SELECT {PK} FROM {Product} WHERE catalogVersion = ?catalogVersion1
+        </deleteFromIndexQuery>
+      </flexibleSearchUpdateQueries>
+    </itemType>
+  </itemTypes>
+</config>

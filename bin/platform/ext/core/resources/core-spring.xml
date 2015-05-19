@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor" />
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+	<bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor">
+		<property name="fallbackToDefaultTypeMatch" value="false" />
+	</bean>
+
+	<!-- the JaloSession instance The definition is currently disabled to guarantee backward compatibility to the definition of the class 
+		from project.properties. However if you define a bean called "jalosession", this definition will be used. This makes it possible to 
+		use for example AOP aspects to hook into the JaloSession We recommend this as the preferred way of replacing or overriding JaloSession 
+		methods. IMPORTANT: * Do not inject it somewhere. * Do not call getBean("jalosession") by yourself, always use JaloSession.getCurrentSession(). -->
+	<!-- <bean id="jalosession" class="de.hybris.platform.jalo.JaloSessionFactory"> <property name="targetClassName" value="de.hybris.platform.jalo.JaloSession"/> 
+		</bean> -->
+
+	<!-- Do only use autoproxying if you know what you do. We strongly recommend the use of XML-based configuration of AOP proxies (see 
+		for example the spring.xml of the yempty extension -->
+	<!-- <aop:aspectj-autoproxy proxy-target-class="true"/> -->
+
+
+	<!-- Legacy Tenant scope configuration. !!Warning!! this scope is registered only to make old implementation working. The scope itself 
+		has no effect and any method called out of it throws an UnsupportedOperationException Tenant -->
+	<alias name="legacyTenantScope" alias="scope.tenant" />
+	<alias name="legacyTenantScope" alias="tenant" />
+
+	<bean id="legacyTenantScope" class="de.hybris.platform.spring.TenantScope" />
+
+	<!-- Property support -->
+	<alias name="applicationHybrisProperties" alias="hybrisProperties"/>
+	<bean id="applicationHybrisProperties" class="de.hybris.platform.servicelayer.config.impl.TenantAwareHybrisPropertiesFactory" >
+		<property name="currentTenant" ref="tenantFactory" />
+	</bean>
+
+	<!-- per tenant PropertyPlaceholderConfigurer which has the tenant specific properties, see https://jira.hybris.com/browse/HOR-1810 -->
+	<alias name="corePropertyPlaceholderConfigurer" alias="platformPropertyPlaceHolder"/>
+	<bean  id="corePropertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  		<property name="properties" ref="hybrisProperties"/>
+  		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+  		<property name="order" value="-10"/>
+	</bean>
+
+	<bean id="lastResortPropertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="order" value="99999"/>
+		<property name="ignoreUnresolvablePlaceholders" value="false"/>
+	</bean>
+
+	<!-- Transaction support -->
+	<bean id="dataSource" class="de.hybris.platform.spring.DataSourceFactoryBean" />
+
+	<bean id="txManager" class="de.hybris.platform.spring.HybrisTransactionManager" />
+
+	<!-- Sample: We want to make the foo service object transactional -->
+	<!-- <bean id="fooService" class="x.y.service.DefaultFooService"/> <tx:advice id="txAdvice" transaction-manager="txManager"> <tx:attributes> 
+		<tx:method name="get*" read-only="true"/> <tx:method name="*"/> </tx:attributes> </tx:advice> <aop:config> <aop:pointcut id="fooServiceOperation" 
+		expression="execution(* x.y.service.FooService.*(..))"/> <aop:advisor advice-ref="txAdvice" pointcut-ref="fooServiceOperation"/> </aop:config> -->
+
+	<!-- Property support -->
+
+	<!-- Order -->
+
+	<bean id="core.orderManager" class="de.hybris.platform.jalo.order.OrderManager">
+		<property name="cloneOrderStrategy" ref="core.cloneorder.default" />
+		<property name="cloneCartStrategy" ref="core.clonecart.default" />
+		<property name="deliveryCostsStrategy" ref="core.deliverycostsstrategy.default" />
+		<property name="orderCodeGenerator" ref="orderCodeGenerator" />
+	</bean>
+	
+	<bean id="core.cloneorder.default" class="de.hybris.platform.jalo.order.DefaultCloneOrderStrategy" />
+
+	<bean id="core.clonecart.default" class="de.hybris.platform.jalo.order.DefaultCloneCartStrategy" />
+
+	<bean id="core.deliverycostsstrategy.default" class="de.hybris.platform.jalo.order.delivery.DefaultDeliveryCostsStrategy" />
+
+	<!-- for testing -->
+
+	<bean id="de.hybris.platform.test.MyUnit" class="de.hybris.platform.test.MySpringUnit" scope="prototype" />
+
+	<!-- AfterSaveEvent listener registry -->
+	<alias alias="afterSaveListenerRegistry" name="defaultAfterSaveListenerRegistry" />
+	<bean id="defaultAfterSaveListenerRegistry" class="de.hybris.platform.tx.DefaultAfterSaveListenerRegistry" autowire="byType" />
+
+	<!-- AUTO column-updater mappings -->
+
+	<bean id="changeColumnStrategy" class="de.hybris.platform.persistence.type.update.strategy.ChangeColumnStrategyContainer" scope="prototype">
+		<property name="commonStrategies">
+			<list>
+				<bean class="de.hybris.platform.persistence.type.update.strategy.common.SameColumnChangeStrategy" />
+			</list>
+		</property>
+		<property name="oracleStrategies">
+			<list>
+				<bean class="de.hybris.platform.persistence.type.update.strategy.oracle.RawToBlobChangeStrategy" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- bean id="modelUpdater" class="de.hybris.platform.persistence.type.update.ModelUpdater" scope="prototype"> <property name="strategy" 
+		ref="trivialAlterFinalizer" /> </bean -->
+	<!-- AUTO column-updater mappings -->
+
+
+	<!-- SystemSetup -->
+
+	<bean id="systemSetupCollector" class="de.hybris.platform.core.initialization.impl.SystemSetupCollectorImpl" />
+
+	<bean id="c2lDataCreator" class="de.hybris.platform.core.systemsetup.datacreator.impl.C2LDataCreator">
+	</bean>
+
+	<bean id="langPackDataCreator" class="de.hybris.platform.core.systemsetup.datacreator.impl.LangPackDataCreator">
+		<property name="langPackIsoCodes" value="${lang.packs}" />
+		<property name="c2lDataCreator" ref="c2lDataCreator" />
+	</bean>
+
+	<bean id="unitsDataCreator" class="de.hybris.platform.core.systemsetup.datacreator.impl.UnitsDataCreator" />
+
+	<bean id="userGroupsDataCreator" class="de.hybris.platform.core.systemsetup.datacreator.impl.UserGroupsDataCreator">
+	</bean>
+
+	<bean id="savedQueryDataCreator" class="de.hybris.platform.core.systemsetup.datacreator.impl.SavedQueryDataCreator">
+	</bean>
+
+	<bean id="encodingsDataCreator" class="de.hybris.platform.core.systemsetup.datacreator.impl.EncodingsDataCreator" />
+
+	<bean id="coreSystemSetup" class="de.hybris.platform.core.systemsetup.CoreSystemSetup">
+		<property name="mediaManager" ref="core.mediaManager" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="modelService" ref="modelService" />
+		<property name="dataCreators">
+			<util:set value-type="java.util.LinkedHashSet">
+				<ref bean="c2lDataCreator" />
+				<ref bean="unitsDataCreator" />
+				<ref bean="userGroupsDataCreator" />
+				<ref bean="savedQueryDataCreator" />
+				<ref bean="langPackDataCreator" />
+				<ref bean="encodingsDataCreator" />
+			</util:set>
+		</property>
+	</bean>
+
+	<!-- PasswordEncoder configuration -->
+	<!-- TODO document the default encoder here!!!! -->
+	<bean id="core.passwordEncoderFactory" class="de.hybris.platform.persistence.security.PasswordEncoderFactoryImpl">
+		<property name="encoders">
+			<map>
+				<entry>
+					<key>
+						<value>*</value>
+					</key>
+					<ref bean="${default.password.encoder}" />
+				</entry>
+				<entry>
+					<key>
+						<value>md5</value>
+					</key>
+					<ref bean="core.saltedMD5PasswordEncoder" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="core.plainTextEncoder" class="de.hybris.platform.persistence.security.PlainTextPasswordEncoder" />
+	<!-- deprecated -->
+	<bean id="core.saltedMD5PasswordEncoder" class="de.hybris.platform.persistence.security.SaltedMD5PasswordEncoder">
+		<property name="salt" value="hybris blue pepper can be used to prepare delicious noodle meals" />
+	</bean>
+
+	<!-- <bean id="core.saltedMD5PasswordEncoder" class="de.hybris.platform.persistence.security.SaltedPasswordEncoder"> <property name="salt" 
+		value="hybris blue pepper can be used to prepare delicious noodle meals" /> <property name="algorithmn" value="MD5" /> </bean> <bean 
+		id="core.saltedSHA256PasswordEncoder" class="de.hybris.platform.persistence.security.SaltedPasswordEncoder"> <property name="salt" 
+		value="hybris blue pepper can be used to prepare delicious noodle meals" /> <property name="algorithmn" value="SHA-256" /> </bean> -->
+	<!-- Sample bean which demonstrates usage of dynamic attribute for type -->
+	<bean id="dynamicAttributesStringSampleBean" class="de.hybris.platform.servicelayer.test.DynamicAttributesStringSampleBean" />
+	<bean id="dynamicAttributesEnumSampleBean" class="de.hybris.platform.servicelayer.test.DynamicAttributesEnumSampleBean" />
+	<bean id="dynamicAttributesIntSampleBean" class="de.hybris.platform.servicelayer.test.DynamicAttributesIntSampleBean" />
+	<bean id="redeclaredFooBarAttributeHandler" class="de.hybris.platform.servicelayer.test.TestItemTyp3FooBarAttributeHandler"/>
+	<bean id="dynamicLocalizedAttributesStringSampleBean" class="de.hybris.platform.servicelayer.test.DynamicLocalizedAttributesStringSampleBean">
+		<property name="i18NService" ref="i18nService" />
+	</bean>
+
+	<!-- common beans abstraction -->
+
+	<alias alias="core.numberSeriesManager" name="default.core.numberSeriesManager" />
+	<alias alias="core.metaInformationManager" name="default.core.metaInformationManager" />
+
+	<alias alias="core.userManager" name="default.core.userManager" />
+	<alias alias="core.c2lManager" name="default.core.c2lManager" />
+    <alias alias="core.enumerationManager" name="default.core.enumerationManager" />
+
+	<bean id="default.core.numberSeriesManager" class="de.hybris.platform.jalo.numberseries.NumberSeriesManager" />
+	<bean id="default.core.metaInformationManager" class="de.hybris.platform.jalo.meta.MetaInformationManager" />
+	<bean id="default.core.userManager" class="de.hybris.platform.jalo.user.UserManager" init-method="init" />
+	<bean id="default.core.c2lManager" class="de.hybris.platform.jalo.c2l.C2LManager" init-method="init" destroy-method="destroy" />
+    <bean id="default.core.enumerationManager" class="de.hybris.platform.jalo.enumeration.EnumerationManager" init-method="init"  />
+
+	<!-- code generators -->
+	
+	<!-- order -->
+	<bean id="orderCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.order.code.name}"/>
+		<property name="digits" value="${keygen.order.code.digits}"/>
+		<property name="start" value="${keygen.order.code.start}"/>
+		<property name="numeric" value="${keygen.order.code.numeric}"/>
+		<property name="template" value="${keygen.order.code.template}"/>
+	</bean>
+	
+	<!-- comments -->
+	<bean id="commentsCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.comments.code.name}"/>
+		<property name="digits" value="${keygen.comments.code.digits}"/>
+		<property name="start" value="${keygen.comments.code.start}"/>
+		<property name="numeric" value="${keygen.comments.code.numeric}"/>
+		<property name="template" value="${keygen.comments.code.template}"/>
+	</bean>
+	
+	<!-- media -->
+	<bean id="mediaCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.media.code.name}"/>
+		<property name="digits" value="${keygen.media.code.digits}"/>
+		<property name="start" value="${keygen.media.code.start}"/>
+		<property name="numeric" value="${keygen.media.code.numeric}"/>
+		<property name="template" value="${keygen.media.code.template}"/>
+	</bean>	
+	
+	<!-- cronjob -->
+	<bean id="cronJobCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.cronjob.code.name}"/>
+		<property name="digits" value="${keygen.cronjob.code.digits}"/>
+		<property name="start" value="${keygen.cronjob.code.start}"/>
+		<property name="numeric" value="${keygen.cronjob.code.numeric}"/>
+		<property name="template" value="${keygen.cronjob.code.template}"/>
+	</bean>
+	
+	<!-- process -->
+	<bean id="processCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.process.code.name}"/>
+		<property name="digits" value="${keygen.process.code.digits}"/>
+		<property name="start" value="${keygen.process.code.start}"/>
+		<property name="numeric" value="${keygen.process.code.numeric}"/>
+		<property name="template" value="${keygen.process.code.template}"/>
+	</bean>
+	
+	<!-- workflow -->
+	<bean id="workflowTemplateCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.workflow.code.name}"/>
+		<property name="digits" value="${keygen.workflow.code.digits}"/>
+		<property name="start" value="${keygen.workflow.code.start}"/>
+		<property name="numeric" value="${keygen.workflow.code.numeric}"/>
+		<property name="template" value="${keygen.workflow.code.template}"/>
+	</bean>
+	
+	<bean id="workflowActionCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.workflow_action.code.name}"/>
+		<property name="digits" value="${keygen.workflow_action.code.digits}"/>
+		<property name="start" value="${keygen.workflow_action.code.start}"/>
+		<property name="numeric" value="${keygen.workflow_action.code.numeric}"/>
+		<property name="template" value="${keygen.workflow_action.code.template}"/>		
+	</bean>
+	
+	<bean id="workflowDecisionCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.workflow_decision.code.name}"/>
+		<property name="digits" value="${keygen.workflow_decision.code.digits}"/>
+		<property name="start" value="${keygen.workflow_decision.code.start}"/>
+		<property name="numeric" value="${keygen.workflow_decision.code.numeric}"/>
+		<property name="template" value="${keygen.workflow_decision.code.template}"/>		
+	</bean>
+	
+	<bean id="workflowItemAttachmentCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" >
+		<property name="key" value="${keygen.workflow_attachment.code.name}"/>
+		<property name="digits" value="${keygen.workflow_attachment.code.digits}"/>
+		<property name="start" value="${keygen.workflow_attachment.code.start}"/>
+		<property name="numeric" value="${keygen.workflow_attachment.code.numeric}"/>
+		<property name="template" value="${keygen.workflow_attachment.code.template}"/>
+	</bean>
+	
+	<!-- user -->
+	<bean id="customerIDGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.customer.customer_id.name}"/>
+		<property name="digits" value="${keygen.customer.customer_id.digits}"/>
+		<property name="start" value="${keygen.customer.customer_id.start}"/>
+		<property name="numeric" value="${keygen.customer.customer_id.numeric}"/>
+		<property name="template" value="${keygen.customer.customer_id.template}"/>
+	</bean>
+
+	<bean id="contactInfoCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.contact_info.code.name}"/>
+		<property name="digits" value="${keygen.contact_info.code.digits}"/>
+		<property name="start" value="${keygen.contact_info.code.start}"/>
+		<property name="numeric" value="${keygen.contact_info.code.numeric}"/>
+		<property name="template" value="${keygen.contact_info.code.template}"/>
+	</bean>
+
+	<!-- dynamiccontent -->
+	<bean id="dynamicContentChecksumCalculator" class="de.hybris.platform.dynamiccontent.impl.DefaultDynamicContentChecksumCalculator" />
+
+	<bean id="AbstractOrder_globalDiscountValuesAttributeHandler" class="de.hybris.platform.jalo.order.GlobalDiscountValuesAttributeHandler" />
+
+	<bean id="AbstractOrder_totalTaxValuesAttributeHandler" class="de.hybris.platform.jalo.order.TotalTaxValuesAttributeHandler" />
+
+	<bean id="AbstractOrderEntry_discountValuesAttributeHandler" class="de.hybris.platform.jalo.order.AbstractOrderEntryDiscountValuesAttributeHandler" />
+
+	<bean id="AbstractOrderEntry_taxValuesAttributeHandler" class="de.hybris.platform.jalo.order.AbstractOrderTaxValuesAttributeHandler" />
+
+</beans>

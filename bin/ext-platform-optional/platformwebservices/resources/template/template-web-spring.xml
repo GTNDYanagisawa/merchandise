@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="
+			  http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security.xsd
+           http://cxf.apache.org/jaxws
+           http://cxf.apache.org/schemas/jaxws.xsd">
+
+	<!--
+	This is template of spring configuration for the webservice extension '@extension_name@' which takes over role of platformwebservice as webservice client.
+	Initially spring context imports all of configuration from platformwebservices-web-spring.xml, so any redefinition of the spring bean made here will overwrite
+	default from platformwebservices.
+	 -->
+
+	<import resource="classpath:platformwebservices-web-spring.xml"/>
+
+    <!--
+    	DTO model factory mapping
+    -->
+
+     <!-- declare DTO model factory mapping example ,please adjust it according to your needs  -->
+
+     <!--
+	<bean id="customModelFactoryMap"
+		class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="sourceMap">
+			<map>
+         	<entry>
+         		<key><bean class="de.hybris.platform.core.dto.user.AddressDTO"/></key>
+         		<bean class="de.hybris.platform.webservices.model.nodefactory.AddressModelFactory"/>
+         	</entry>
+         	<entry>
+         		<key><bean class="de.hybris.platform.core.dto.order.CartEntryDTO"/></key>
+         		<bean class="de.hybris.platform.webservices.model.nodefactory.CartEntryModelFactory"/></entry>
+         	<entry>
+         		<key><bean class="de.hybris.platform.core.dto.order.CartDTO"/></key>
+         		<bean class="de.hybris.platform.webservices.model.nodefactory.CartModelFactory"/>
+         	</entry>
+         </map>
+		</property>
+	</bean>
+	-->
+
+	 <!--
+	 	Dto classes which are not part of platform type system
+	 -->
+
+	<!-- set of default DTO outside of type system example,  please extend them accordingly to your needs  -->
+	<!-- bean id="platformNotFromSystemDtosClasses"
+		class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="sourceList">
+			<list>
+				<value type="java.lang.Class">com.sun.research.ws.wadl.Application</value>
+				<value type="java.lang.Class">de.hybris.platform.webservices.dto.AbstractItemDTO
+				</value>
+				<value type="java.lang.Class">de.hybris.platform.webservices.dto.AbstractCollectionDTO
+				</value>
+				<value type="java.lang.Class">de.hybris.platform.webservices.dto.credentials.PasswordDTO
+				</value>
+				<value type="java.lang.Class">de.hybris.platform.webservices.dto.price.PriceDTO
+				</value>
+				<value type="java.lang.Class">de.hybris.platform.webservices.dto.VariantAttributeDTO
+				</value>
+			</list>
+		</property>
+	</bean-->
+
+	 <!--
+	 	Resources
+	 -->
+
+	 <!-- declare custom resource example ,please adjust it according to your needs  -->
+
+	<!-- bean id="cronJobResource" class="de.hybris.platform.cronjob.resource.CronJobResource" scope="prototype" parent="abstractResource">
+		<property name="putCommandHandler" ref="cronJobResourcePutCommands"/>
+	</bean-->
+
+	<!--
+		Commands
+	-->
+
+	<!-- declare custom Command example ,please adjust it according to your needs  -->
+
+	<!-- bean id="cronJobResourcePutCommands" class="de.hybris.platform.webservices.DefaultCommandHandler">
+		<property name="allCommands">
+			<list>
+				<ref bean="startCronJobCommand"/>
+				<ref bean="abortCronJobCommand"/>
+			</list>
+		</property>
+	</bean-->
+
+
+
+</beans>

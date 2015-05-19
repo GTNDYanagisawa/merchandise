@@ -1,0 +1,25 @@
+# ImpEx for Entitlements
+
+# Macros / Replacement Parameter definitions
+$productCatalog=telcoProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default='$productCatalog:Staged']
+
+# Subscription pricing
+INSERT_UPDATE UsageUnit;id[unique=true];accumulative[default=false]
+;phone_minutes;
+;sms;
+;mobile_data;
+;music_pieces;
+;replacements;
+
+
+INSERT_UPDATE Entitlement;id[unique=true];productEntitlements(id, $catalogVersion)
+;NME_UNLIMITED_TEXT_MESSAGES;
+
+INSERT_UPDATE Entitlement;id[unique=true];usageUnit(id)
+;ME_PHONE_MIN;phone_minutes
+;ME_SMS_TEXTS;sms
+;ME_DATA_MB;mobile_data
+;ME_FREE_DOWNLOADS;music_pieces
+;ME_PAID_DOWNLOADS;music_pieces
+;ME_FREE_REPLACEMENTS;replacements

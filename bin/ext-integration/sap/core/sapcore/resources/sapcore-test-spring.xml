@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  [y] hybris Platform
+ 
+  Copyright (c) 2000-2014 hybris AG
+  All rights reserved.
+ 
+  This software is the confidential and proprietary information of hybris
+  ("Confidential Information"). You shall not disclose such Confidential
+  Information and shall use it only in accordance with the terms of the
+  license agreement you entered into with hybris.
+ 
+  
+--><beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans            http://www.springframework.org/schema/beans/spring-beans-3.1.xsd            http://www.springframework.org/schema/context            http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<!-- Override GenericFactory from sapcore-spring.xml -->
+	<alias alias="sapCoreGenericFactory" name="sapCoreTestGenericFactory"/>
+	<bean class="de.hybris.platform.sap.core.test.util.TestGenericFactory" id="sapCoreTestGenericFactory" scope="singleton"/>
+
+    <!--  the mocked i18n services  -->
+	<alias alias="l10nService" name="mockL10NService"/>
+	<bean id="mockL10NService" class="de.hybris.platform.sap.core.test.services.SAPMockL10NService">
+			<property name="globalConfigurationManager" ref="sapCoreGlobalConfigurationManager" />
+			<property name="localizationFolder"         value="test" />
+			<property name="languages">
+				<list>
+					<value>en</value>
+					<value>de</value>
+				</list>
+			</property>
+	</bean>
+
+</beans>

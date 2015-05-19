@@ -1,0 +1,23 @@
+# ImpEx for Importing Categories into Merchandise Store
+   
+# Macros / Replacement Parameter definitions
+$productCatalog=hybrisProductCatalog
+   
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$supercategories=source(code, $catalogVersion)[unique=true]
+$categories=target(code, $catalogVersion)[unique=true]
+   
+# Insert Categories
+INSERT_UPDATE Category;code[unique=true];allowedPrincipals(uid)[default='customergroup'];$catalogVersion
+ ;1
+ ;100
+ ;200
+ ;210
+ ;220
+   
+# Insert Category Structure
+INSERT_UPDATE CategoryCategoryRelation;$categories;$supercategories
+ ;100;1
+ ;200;1
+ ;210;200
+ ;220;200

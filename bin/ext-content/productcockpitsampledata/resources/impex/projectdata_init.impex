@@ -1,0 +1,28 @@
+INSERT_UPDATE UserGroup;UID[unique=true];groups(uid)[mode=append];locname[lang=de];locname[lang=en];description;
+;productmanagergroup;cockpitgroup;
+;productmanagergroup;employeegroup;
+;wfl_group;;"Workflow Group";"Workflow Gruppe";"Workflow Group";
+
+INSERT_UPDATE Employee;UID[unique=true];groups(uid)[mode=append];password
+;productmanager;productmanagergroup;1234;;
+
+INSERT_UPDATE CockpitItemTemplate;code[unique=true];name;description;relatedType(code);classificationClasses(catalogVersion(catalog(id),version),code)
+;"Hardware";"Hardware item template";"Hardware item template";Product;
+;"Clothes";"Clothes item template";"Clothes item template";Product;
+;"CPU";"CPU item template";"CPU item template";Product;
+
+$catalogVersion=Product.catalogVersion(catalog(id[default='clothescatalog']),version[default='Staged'])[unique=true,default='clothescatalog:Staged']
+
+INSERT_UPDATE Comment;code[unique=true];author(uid);commentType(code);component(code);subject;text;relatedItems(Product.code, $catalogVersion)
+;welcome;productmanager;comment;cockpit;Welcome to Product Cockpit;This is an automatically generated demo comment for Product Cockpit.;
+;item_comment1;productmanager;comment;cockpit;Productbild;This product has an awful product image - please change it!;
+;item_comment2;productmanager;comment;cockpit;Categories;Please check the categories!;
+;item_comment3;admin;comment;cockpit;Sales units;The sales units are bogus. Please change them.;
+
+INSERT Reply;comment(code);parent(&replyID);subject;text;author(uid);&replyID
+;item_comment1;;;Any suggestions for a new one?;admin;comment1_reply1
+;item_comment1;comment1_reply1;;We need more color;productmanager;comment1_reply1_2
+;item_comment1;;;I like the picture;productmanager;comment1_reply2
+
+
+

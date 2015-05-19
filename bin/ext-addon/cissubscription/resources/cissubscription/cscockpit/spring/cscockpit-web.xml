@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+	default-autowire="byName">
+	
+	<alias alias="csRequestHandler" name="defaultCsRequestHandler"/>
+	<bean id="defaultCsRequestHandler" class="de.hybris.platform.cockpit.session.impl.DefaultRequestHandler" scope="session">
+		<property name="requestEventHandlers">
+			<map>
+				<entry key="activation">
+					<bean class="de.hybris.platform.cockpit.session.impl.ActivationEventHandler">
+						<property name="prefix" value="act"/>
+					</bean>
+				</entry>
+				<entry key="search">
+					<bean class="de.hybris.platform.cockpit.session.impl.SearchEventHandler">
+						<property name="prefix" value="srch"/>
+					</bean>
+				</entry>
+				<entry key="celum">
+					<bean class="de.hybris.platform.cockpit.session.impl.CelumEventHandler">
+						<property name="mediaService" ref="mediaService"/>
+						<property name="modelService" ref="modelService"/>
+						<property name="cockpitTypeService" ref="cockpitTypeService"/>
+					</bean>
+				</entry>
+				<entry key="msg">
+					<bean class="de.hybris.platform.cockpit.session.impl.NotificationEventHandler">
+						<property name="prefix" value="msg"/>
+					</bean>
+				</entry>
+				<entry key="cs">
+					<bean class="de.hybris.platform.cscockpit.session.impl.CscockpitEventHandler">
+						<property name="callContextController" ref="csCallContextController"/>
+						<property name="basketController" ref="csBasketController"/>
+						<property name="prefix" value="cs"/>
+						<property name="csUrlActivationDao" ref="csUrlActivationDao"/>
+						<property name="cockpitTypeService" ref="cockpitTypeService"/>
+					</bean>
+				</entry>
+				<!-- CISSUBSCRIPTION_START -->
+				<entry key="sop">
+					<bean class="de.hybris.platform.integration.cis.subscription.cscockpit.session.impl.SopResponseEventHandler">
+						<property name="prefix" value="sop"/>
+						<property name="basketController" ref="csBasketController"/>
+						<property name="callContextController" ref="csCallContextController"/>
+						<property name="cardPaymentInfoReverseConverter" ref="cardPaymentInfoReverseConverter"/>
+						<property name="commerceCardTypeService" ref="commerceCardTypeService"/>
+						<property name="csCheckoutService" ref="csCheckoutService"/>
+						<property name="commonI18NService" ref="commonI18NService"/>
+						<property name="customerEmailResolutionService" ref="customerEmailResolutionService"/>
+						<property name="flexibleSearchService" ref="flexibleSearchService"/>
+						<property name="i18NService" ref="i18NService"/>
+						<property name="modelService" ref="modelService"/>
+						<property name="subscriptionFacade" ref="csSubscriptionFacade" />
+						<property name="sessionService" ref="sessionService"/>
+						<property name="customerNameStrategy" ref="customerNameStrategy"/>
+					</bean>
+				</entry>
+				<!-- This mock event handler is for demo purposes only and should be removed in productive systems! -->
+				<entry key="sop-mock">
+					<bean class="de.hybris.platform.integration.cis.subscription.cscockpit.session.impl.mock.SopMockEventHandler">
+						<property name="prefix" value="sop-mock"/>
+						<property name="basketController" ref="csBasketController"/>
+						<property name="callContextController" ref="csCallContextController"/>
+						<property name="cardPaymentInfoReverseConverter" ref="cardPaymentInfoReverseConverter"/>
+						<property name="commerceCardTypeService" ref="commerceCardTypeService"/>
+						<property name="csCheckoutService" ref="csCheckoutService"/>
+						<property name="commonI18NService" ref="commonI18NService"/>
+						<property name="customerEmailResolutionService" ref="customerEmailResolutionService"/>
+						<property name="flexibleSearchService" ref="flexibleSearchService"/>
+						<property name="i18NService" ref="i18NService"/>
+						<property name="modelService" ref="modelService"/>
+						<property name="subscriptionFacade" ref="csSubscriptionFacade" />
+						<property name="sessionService" ref="sessionService"/>
+						<property name="customerNameStrategy" ref="customerNameStrategy"/>
+					</bean>
+				</entry>
+				<!-- CISSUBSCRIPTION_END -->
+			</map>
+		</property>
+	</bean>
+
+</beans>

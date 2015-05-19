@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!--
+  [y] hybris Platform
+ 
+  Copyright (c) 2000-2014 hybris AG
+  All rights reserved.
+ 
+  This software is the confidential and proprietary information of hybris
+  ("Confidential Information"). You shall not disclose such Confidential
+  Information and shall use it only in accordance with the terms of the
+  license agreement you entered into with hybris.
+ 
+  
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+  <enumtypes>
+		<enumtype autocreate="true" code="HTTPAuthenticationType" dynamic="false" generate="true">
+			<description>This type determines the authentication type.</description>
+			<value code="NO_AUTHENTICATION"/>
+			<value code="BASIC_AUTHENTICATION"/>
+		</enumtype>
+		<enumtype autocreate="true" code="BackendType" dynamic="false" generate="true">
+			<description>This type determines the backend type.</description>
+			<value code="ERP"/>
+		</enumtype>
+		<enumtype autocreate="true" code="SncQoP" dynamic="false" generate="true">
+			<description>This type determines the SNC security level.</description>
+			<value code="AUTHENTICATION_ONLY"/>
+			<value code="INTEGRITY_PROTECTION"/>
+			<value code="PRIVACY_PROTECTION"/>
+<!-- 			<value code="Maximum_Protection" /> -->
+		</enumtype>
+		<enumtype autocreate="true" code="JCoCPICTrace" dynamic="false" generate="true">
+			<description>This type determines the CPIP trace level.</description>
+			<value code="NO_TRACE"/>
+			<value code="GLOBAL_TRACELEVEL"/>
+			<value code="MINIMAL_TRACELEVEL"/>
+			<value code="FULL_TRACELEVEL"/>
+			<value code="FULL_TRACELEVEL_DATA"/>
+		</enumtype>
+		<enumtype autocreate="true" code="JCoTraceLevel" dynamic="false" generate="true">
+			<description>This type determines the JCo trace level.</description>
+			<value code="NO_TRACE"/>
+			<value code="ERRORS"/>
+			<value code="ERRORS_WARNINGS"/>
+			<value code="INFOS_ERRORS_WARNINGS"/>
+			<value code="EXPATH_INFOS_ERRORS_WARNINGS"/>
+			<value code="VERBEXPATH_INFOS_ERRORS_WARNINGS"/>
+			<value code="VERBEXPATH_LIMDATADUMPS_INFOS_ERRORS_WARNINGS"/>
+			<value code="FULLEXPATH_DATADUMPS_VERBINFOS_ERRORS_WARNINGS"/>
+			<value code="FULLEXPATH_FULLDATADUMPS_VERBINFOS_ERRORS_WARNINGS"/>
+		</enumtype>
+	</enumtypes>
+	
+	<relations>
+		<relation autocreate="true" code="SAPConfigurationForBaseStore" generate="true" localized="false">
+			<sourceElement cardinality="many" qualifier="baseStores" type="BaseStore"/>
+			<targetElement cardinality="one" qualifier="SAPConfiguration" type="SAPConfiguration"/>
+		</relation>
+
+		<relation autocreate="true" code="JCODestinationForSAPConfiguration" generate="true" localized="false">
+			<sourceElement cardinality="many" qualifier="SAPConfigurations" type="SAPConfiguration"/>
+			<targetElement cardinality="one" qualifier="SAPRFCDestination" type="SAPRFCDestination"/>
+		</relation>
+
+		<relation autocreate="true" code="JCoAttrForJCODestination" generate="true" localized="false">
+			<sourceElement cardinality="one" qualifier="SAPRFCDestination" type="SAPRFCDestination"/>
+			<targetElement cardinality="many" qualifier="AdditionalAttributes" type="RFCDestinationAttribute"/>
+		</relation>
+
+	</relations>
+
+	<itemtypes>
+
+		<!-- Base Store Configuration -->
+		<itemtype autocreate="true" code="SAPConfiguration" generate="true">
+			<deployment table="SAPConfiguration" typecode="9300"/>
+			<attributes>
+				<attribute qualifier="core_name" type="java.lang.String">
+					<description>Name</description>
+					<persistence type="property"/>
+					<modifiers unique="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<!-- Global Configuration -->
+		<itemtype autocreate="true" code="SAPGlobalConfiguration" generate="true" singleton="true">
+			<deployment table="SAPGlobalConfiguration" typecode="9303"/>
+			<attributes>
+				<attribute qualifier="core_name" type="java.lang.String" >
+					<description>Name</description>
+					<persistence type="property"/>
+					<modifiers unique="true"/>
+					<defaultvalue>java.lang.String.valueOf("GLOBAL")</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- Administration -->
+		<itemtype autocreate="true" code="SAPAdministration" generate="true" singleton="true">
+			<deployment table="SAPAdministration" typecode="9304"/>
+			<attributes>
+				<attribute qualifier="core_lastDataHubInitialLoad" type="java.util.Date" >
+					<description>Last Data Hub Initial Load</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- RFC Destination -->
+		<itemtype autocreate="true" code="SAPRFCDestination" generate="true">
+			<deployment table="SAPRFCDestination" typecode="9301"/>
+			<attributes>
+				<attribute qualifier="rfcDestinationName" type="java.lang.String">
+					<description>RFC Destination name</description>
+					<persistence type="property"/>
+					<modifiers unique="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="offlineMode" type="java.lang.Boolean">
+					<description>Offline mode</description>
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="sid" type="java.lang.String">
+					<description>System ID (SID) of the target system</description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="client" type="java.lang.String">
+					<description>Client number (000-999)</description>
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="messageServer" type="java.lang.String">
+					<description>Message server (for group login)</description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="targetHost" type="java.lang.String">
+					<description>Hostname of the application server (for direct login)
+					</description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="connectionType" type="java.lang.Boolean">
+					<description>Way to connect to the SAP system (server or group connection)</description>
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="group" type="java.lang.String">
+					<description>Name of the logon group (only relevant for group
+						connect)
+					</description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="instance" type="java.lang.String">
+					<description>Instance number of the application server (only
+						relevant for server connect)
+					</description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="userid" type="java.lang.String">
+					<description>User ID for the logon to the SAP system</description>
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="password" type="java.lang.String">
+					<description>Password for the logon to the SAP system</description>
+					<persistence type="property"/>
+					<modifiers encrypted="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="pooledConnectionMode" type="java.lang.Boolean">
+					<description>Pooled connection mode</description>
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="maxConnections" type="java.lang.String">
+					<description>Maximal number of connections</description>
+					<persistence type="property"/>
+					<defaultvalue><![CDATA["10"]]></defaultvalue>
+				</attribute>
+				<attribute qualifier="poolSize" type="java.lang.String">
+					<description>Pool size</description>
+					<persistence type="property"/>
+					<defaultvalue><![CDATA["5"]]></defaultvalue>
+				</attribute>
+				<attribute qualifier="maxWaitTime" type="java.lang.String">
+					<description>Maximal wait time in ms</description>
+					<persistence type="property"/>
+					<defaultvalue><![CDATA["10000"]]></defaultvalue>
+				</attribute>
+				<attribute qualifier="jcoMsServ" type="java.lang.String">
+					<description>SAP message server service or port number</description>
+					<persistence type="property"/>
+				</attribute>				
+				<attribute qualifier="jcoSAPRouter" type="java.lang.String">
+					<description>SAP router string to use for networks being protected by a firewall</description>
+					<persistence type="property"/>
+				</attribute>				
+				<attribute qualifier="jcoTraceLevel" type="JCoTraceLevel">
+					<description>Turns on the JCo trace. Allowed levels are [0 .. 8].</description>
+					<persistence type="property"/>
+					<defaultvalue>em().getEnumerationValue("JCoTraceLevel","NO_TRACE")</defaultvalue>
+				</attribute>
+				<attribute qualifier="jcoTracePath" type="java.lang.String">
+					<description>As path value null, stdout, stderr or an existing path are allowed.</description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="jcoRFCTrace" type="java.lang.Boolean">
+					<description>JCo RFC Trace</description>
+					<persistence type="property"/> 
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="jcoCPICTrace" type="JCoCPICTrace">
+					<description>Enable/disable CPIC trace (-1 [take over environment value 'CPIC_TRACE'], 0 no trace, 1,2,3 different trace levels)</description>
+					<persistence type="property"/>
+ 					<defaultvalue>em().getEnumerationValue("JCoCPICTrace","GLOBAL_TRACELEVEL")</defaultvalue> 
+				</attribute>
+				<attribute qualifier="jcoClientDelta" type="java.lang.Boolean">
+					<description>Enable/disable table parameter delta management (1 - enable [default] or 0 - disable)</description>
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+					<modifiers optional="false"/>
+				</attribute>	
+				<attribute qualifier="backendType" type="BackendType">
+					<description>Backend Type</description>
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+					<defaultvalue>em().getEnumerationValue("BackendType","ERP")</defaultvalue>
+				</attribute>
+				<attribute qualifier="sncMode" type="java.lang.Boolean">
+					<description>SNC Mode</description>
+					<persistence type="property"/> 
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="sncQoP" type="SncQoP">
+					<description>SNC Level of Security</description>
+					<persistence type="property"/> 
+				</attribute>
+				<attribute qualifier="sncPartnerName " type="java.lang.String">
+					<description>SNC Partner Name</description>
+					<persistence type="property"/> 
+				</attribute>									
+			</attributes>
+		</itemtype>
+
+		<!-- JCo Table -->
+		<itemtype autocreate="true" code="RFCDestinationAttribute" generate="true" >
+			<deployment table="RFCDestinationAttribute" typecode="9306" />
+			<attributes>
+				<attribute qualifier="jcoattr_name" type="java.lang.String">
+					<description>Name</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" />
+				</attribute>
+				<attribute qualifier="jcoattr_value" type="java.lang.String">
+					<description>Value</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+      <!-- HTTP Destination -->
+		<itemtype autocreate="true" code="SAPHTTPDestination" generate="true">
+			<deployment table="SAPHTTPDestination" typecode="9302"/>
+			<attributes>
+				<attribute qualifier="httpDestinationName" type="java.lang.String">
+					<description>HTTP Destination name</description>
+					<persistence type="property"/>
+					<modifiers unique="true"/>
+				</attribute>
+				<attribute qualifier="targetURL" type="java.lang.String">
+					<description>URL of the target system</description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="authenticationType" type="HTTPAuthenticationType">
+				     <modifiers optional="false"/>
+				     <description>Authentication type</description>
+					<persistence type="property"/>
+					<defaultvalue>em().getEnumerationValue("HTTPAuthenticationType","NO_AUTHENTICATION")</defaultvalue>
+				</attribute>
+				<attribute qualifier="userid" type="java.lang.String">
+					<description>User ID for the logon to the SAP system</description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="password" type="java.lang.String">
+					<description>Password for the logon to the SAP system</description>
+					<persistence type="property"/>
+					<modifiers encrypted="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+
+</items>

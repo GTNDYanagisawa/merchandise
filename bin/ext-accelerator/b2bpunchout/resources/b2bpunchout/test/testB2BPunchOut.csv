@@ -1,0 +1,52 @@
+#
+# Import a Sample B2B Organization for Punchout
+#
+
+$passwordEncoding=md5;
+$defaultPassword=12341234;
+$setPassword=@password[translator=de.hybris.platform.impex.jalo.translators.ConvertPlaintextToEncodedUserPasswordTranslator][default='$passwordEncoding:$defaultPassword'];
+
+$b2bCustomer=B2BCustomer(uid);
+
+# Import Countries
+INSERT_UPDATE Country;isocode[unique=true];name[lang=en];active[default=true]
+;US;"United States"
+
+# ISO 3166-2:US
+INSERT_UPDATE Region;country(isocode);isocode[unique=true];name[lang=en];active[default=true]
+;US;US-CA;"California"
+
+INSERT_UPDATE Address;streetname[unique=true];postalcode[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;title(code);&addId;owner(&B2BUnitID)[unique=true];
+;999 South Wacker Drive;60606;Chicago;US;TRUE;TRUE;TRUE;TRUE;PunchOut;Customer;punchout.customer@punchoutorg.com;mr;PunchOutAddrID;PunchOutID;
+
+INSERT_UPDATE B2BUnit;description;uid[unique=true];name;locName[lang=en];groups(uid);reportingOrganization(uid);Addresses(&addId);&B2BUnitID;accountManager(uid);creditLimit(code);approvalProcessCode;
+;Hierarchical;PunchOut Organization;PunchOut Organization;PunchOut Organization;;PunchOut Organization;PunchOutAddrID;PunchOutID;;;;
+
+INSERT_UPDATE B2BCustomer;description;uid[unique=true];originalUid;email;name;title(code);groups(uid);permissionGroups(uid);sessionCurrency(isocode)[default='USD'];$setPassword;
+;PunchOut Sample Customer;punchout.customer@punchoutorg.com;punchout.customer@punchoutorg.com;punchout.customer@punchoutorg.com;PunchOut Customer;mr;PunchOut Organization,b2bcustomergroup;;;;;;
+;PunchOut Sample Customer 2;punchout.customer2@punchoutorg.com;punchout.customer2@punchoutorg.com;punchout.customer2@punchoutorg.com;PunchOut Customer 2;mr;PunchOut Organization,b2bcustomergroup;;;;;;
+
+INSERT_UPDATE B2BCostCenter;code[unique=true];name[lang=en];Unit(uid);budgets(code);currency(isocode)[default='USD'];
+;PunchOut Organization;PunchOut Organization;PunchOut Organization;;
+
+INSERT_UPDATE B2BOrderThresholdTimespanPermission;code[unique=true];Unit(uid);threshold;currency(isocode);range(code,itemtype(code));
+;PunchOut Org Unlimited Timespan;PunchOut Organization;999999999;USD;MONTH:B2BPeriodRange;
+
+INSERT_UPDATE B2BBudgetExceededPermission;code[unique=true];Unit(uid);
+;PunchOut Org Budget Exceeded;PunchOut Organization;
+
+INSERT_UPDATE B2BOrderThresholdPermission;code[unique=true];Unit(uid);threshold;currency(isocode)[default='USD'];
+;PunchOut Org Unlimited USD ORDER;PunchOut Organization;999999999;
+
+UPDATE B2BCustomer;originalUid[unique=true];uid[unique=true];permissions(code,Unit(uid));
+;punchout.customer@punchoutorg.com;punchout.customer@punchoutorg.com;PunchOut Org Unlimited USD ORDER:PunchOut Organization,PunchOut Org Unlimited Timespan:PunchOut Organization,PunchOut Org Budget Exceeded:PunchOut Organization;
+
+INSERT_UPDATE PunchOutCredential;code[unique=true];domain[unique=true];identity[unique=true];sharedsecret;
+;NetworkId1;NetworkID;AN01000002779-T;VerySecret1234; 
+;DUNS1;DUNS;123456789;VerySecret1234;
+;AribaNetworkUserId1;AribaNetworkUserId;sysadmin@ariba.com;VerySecret1234;
+;DUNS2;DUNS;123;VerySecret1234;
+
+INSERT_UPDATE B2BCustomerPunchOutCredentialMapping;$b2bCustomer[unique=true];credentials(code)
+;punchout.customer@punchoutorg.com;NetworkId1,DUNS1;
+;punchout.customer2@punchoutorg.com;AribaNetworkUserId1;

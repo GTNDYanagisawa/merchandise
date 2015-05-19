@@ -1,0 +1,23 @@
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$catalogversion=catalogversion(catalog(id[default='hwcatalog']),version[default='Online'])[unique=true,default='hwcatalog:Online']
+$supercategories=supercategories(code,catalogversion(catalog(id[default='hwcatalog']),version[default='Online']))
+$baseProduct=baseProduct(code, catalogVersion(catalog(id[default='hwcatalog']),version[default='Online']));
+
+INSERT_UPDATE category;code[unique=true];$catalogversion;name[lang=de];name[lang=en];$supercategories;;
+;Shoes;;;
+;Sales;;;
+;Alone;;;
+
+INSERT_UPDATE varianttype;code[unique=true];singleton;generate;catalogItemType;
+;ChildShoe;false;true;false;
+
+# BASEPRODUCTS SHOE;
+INSERT_UPDATE Product;code[unique=true];varianttype(code);approvalStatus(code);unit(code);$supercategories;catalogVersion(catalog(id),version)[default=hwcatalog:Online,virtual=true,unique=true]
+;ds453;ChildShoe;approved;pieces;Shoes;;
+
+# VARIANTS OF SHOES ds453;
+INSERT_UPDATE ChildShoe;code[unique=true];$baseProduct;$prices;approvalStatus(code);unit(code);$supercategories;catalogVersion(catalog(id),version)[default=hwcatalog:Online,virtual=true,unique=true]
+#00 with direct super-category
+;ds453-00;ds453;189,95 EUR;approved;pieces;Sales;;
+#01 without direct super-category
+;ds453-01;ds453;189,95 EUR;approved;pieces;;;

@@ -1,0 +1,20 @@
+/*
+	Script           :  503
+	Author           :  AB
+	Description      :  Starting previews creation
+*/
+
+#include "[soap]/actions/601.crpt"
+
+int main ()
+{
+	char * filename = alloc(4096);
+	document::name(filename);
+	
+	CREATE_FILL_PAGES = 0;						// disable fill page creation
+	createPreviews( filename, 1, document::pages(gDocument), -1 );
+	CREATE_FILL_PAGES = 1;						// enable fill page creation again
+	
+	release( filename );
+	return 0;
+}

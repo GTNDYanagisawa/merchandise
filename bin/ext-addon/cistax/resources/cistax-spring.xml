@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ~ [y] hybris Platform ~ ~ Copyright (c) 2000-2014 hybris AG ~ All rights 
+	reserved. ~ ~ This software is the confidential and proprietary information 
+	of hybris ~ ("Confidential Information"). You shall not disclose such Confidential 
+	~ Information and shall use it only in accordance with the terms of the ~ 
+	license agreement you entered into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="cisAddress" class="com.hybris.cis.api.model.CisAddress"
+		scope="prototype" />
+	<bean id="cisLineItem" class="com.hybris.cis.api.model.CisLineItem"
+		scope="prototype" />
+	<bean id="cisOrder" class="com.hybris.cis.api.model.CisOrder"
+		scope="prototype" />
+	<bean id="externalTaxDocument" class="de.hybris.platform.externaltax.ExternalTaxDocument"
+		scope="prototype" />
+
+	<!-- Configuration -->
+
+	<alias alias="taxCalculationCommandConfig" name="defaultTaxCalculationCommandConfig" />
+	<bean id="defaultTaxCalculationCommandConfig"
+		class="de.hybris.platform.integration.commons.hystrix.OndemandHystrixCommandConfiguration"
+		scope="tenant">
+		<property name="groupKey" value="${cistax.taxCalculation.groupKey}" />
+		<property name="threadTimeout" value="${cistax.taxCalculation.threadTimeout}" />
+		<property name="threadPoolSize" value="${cistax.taxCalculation.threadPoolSize}" />
+	</bean>
+
+
+	<!-- Strategies -->
+
+	<alias alias="cartHashCalculationStrategy" name="defaultCisCartHashCalculationStrategy" />
+	<bean id="defaultCisCartHashCalculationStrategy"
+		class="de.hybris.platform.integration.cis.tax.strategies.impl.DefaultCisCartHashCalculationStrategy" />
+		
+	<alias name="defaultCisShippingAddressStrategy" alias="cisShippingAddressStrategy" />
+	<bean id="defaultCisShippingAddressStrategy"
+		class="de.hybris.platform.integration.cis.tax.strategies.impl.DefaultCisShippingAddressStrategy"
+		scope="tenant">
+		<property name="cisAddressConverter" ref="cisAddressConverter" />
+		<property name="ondemandDeliveryAddressStrategy" ref="ondemandDeliveryAddressStrategy" />
+	</bean>
+
+	<alias name="defaultShippingIncludedStrategy" alias="shippingIncludedStrategy" />
+	<bean id="defaultShippingIncludedStrategy"
+		class="de.hybris.platform.integration.cis.tax.strategies.impl.DefaultCisShippingIncludedStrategy"
+		scope="tenant" />
+
+	<alias name="defaultShippingItemCodeStrategy" alias="shippingItemCodeStrategy" />
+	<bean id="defaultShippingItemCodeStrategy"
+		class="de.hybris.platform.integration.cis.tax.strategies.impl.DefaultCisShippingItemCodeStrategy"
+		scope="tenant" />
+
+	<alias name="defaultCisCalculateExternalTaxesStrategy" alias="calculateExternalTaxesStrategy" />
+	<bean id="defaultCisCalculateExternalTaxesStrategy"
+		class="de.hybris.platform.integration.cis.tax.strategies.impl.DefaultCisCalculateExternalTaxesStrategy"
+		scope="tenant">
+		<property name="cisTaxCalculationService" ref="cisTaxCalculationService" />
+	</bean>
+
+	<alias name="defaultCisEstimateTaxesStrategy" alias="commerceCartEstimateTaxesStrategy" />
+	<bean id="defaultCisEstimateTaxesStrategy"
+		class="de.hybris.platform.integration.cis.tax.strategies.impl.DefaultCisEstimateTaxesStrategy"
+		scope="tenant">
+		<property name="cisTaxCalculationService" ref="cisTaxCalculationService" />
+		<property name="modelService" ref="modelService" />
+		<property name="cartService" ref="cartService" />
+		<property name="estimatedDeliveryFromAddressStrategy" ref="estimatedDeliveryFromAddressStrategy" />
+		<property name="typeService" ref="typeService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+
+	<alias name="defaultCisCalculateExternalTaxesFallbackStrategy"
+		alias="calculateExternalTaxesFallbackStrategy" />
+	<bean id="defaultCisCalculateExternalTaxesFallbackStrategy"
+		class="de.hybris.platform.integration.cis.tax.strategies.impl.DefaultCisCalculateExternalTaxesFallbackStrategy"
+		scope="tenant">
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+	<alias name="defaultCisDecideExternalTaxesStrategy" alias="decideExternalTaxesStrategy" />
+	<bean id="defaultCisDecideExternalTaxesStrategy"
+		class="de.hybris.platform.integration.cis.tax.strategies.impl.DefaultCisDetermineExternalTaxStrategy"
+		scope="tenant">
+		<property name="ondemandDeliveryAddressStrategy" ref="ondemandDeliveryAddressStrategy" />
+	</bean>
+
+	<!-- Services -->
+
+	<alias name="defaultTaxValueConversionService" alias="taxValueConversionService" />
+	<bean id="defaultTaxValueConversionService"
+		class="de.hybris.platform.integration.cis.tax.service.impl.DefaultTaxValueConversionService"
+		scope="tenant" />
+
+	<alias alias="cisTaxCalculationService" name="defaultCisTaxCalculationService" />
+	<bean id="defaultCisTaxCalculationService"
+		class="de.hybris.platform.integration.cis.tax.service.impl.DefaultCisTaxCalculationService"
+		scope="tenant">
+		<property name="cisOrderConverter" ref="cisOrderConverter" />
+		<property name="externalTaxDocumentConverter" ref="externalTaxDocumentConverter" />
+		<property name="configurationService" ref="configurationService" />
+		<property name="taxClient" ref="taxClient" />
+		<property name="hystrixCommandConfig" ref="taxCalculationCommandConfig" />
+		<property name="calculateExternalTaxesFallbackStrategy" ref="calculateExternalTaxesFallbackStrategy" />
+		<property name="cisAddressConverter" ref="cisAddressConverter" />
+		<property name="ondemandHystrixCommandFactory" ref="ondemandHystrixCommandFactory"/>
+	</bean>
+
+
+	<!-- Populators -->
+
+	<alias name="defaultCisTaxAddressPopulator" alias="cisTaxAddressPopulator" />
+	<bean id="defaultCisTaxAddressPopulator"
+		class="de.hybris.platform.integration.cis.tax.populators.CisAddressPopulator"
+		scope="tenant">
+	</bean>
+
+	<alias name="defaultCisLineItemPopulator" alias="cisLineItemPopulator" />
+	<bean id="defaultCisLineItemPopulator"
+		class="de.hybris.platform.integration.cis.tax.populators.CisLineItemPopulator"
+		scope="tenant">
+		<property name="taxCodeStrategy" ref="taxCodeStrategy" />
+	</bean>
+
+	<alias name="defaultCisOrderPopulator" alias="cisOrderPopulator" />
+	<bean id="defaultCisOrderPopulator"
+		class="de.hybris.platform.integration.cis.tax.populators.CisOrderPopulator"
+		scope="tenant">
+		<property name="cisShippingAddressStrategy" ref="cisShippingAddressStrategy" />
+		<property name="ondemandPromotionService" ref="onDemandPromotionService" />
+		<property name="cisLineItemConverter" ref="cisLineItemConverter" />
+		<property name="deliveryCisLineItemConverter" ref="deliveryCisLineItemConverter" />
+	</bean>
+
+	<alias name="defaultExternalTaxDocumentPopulator" alias="externalTaxDocumentPopulator" />
+	<bean id="defaultExternalTaxDocumentPopulator"
+		class="de.hybris.platform.integration.cis.tax.populators.ExternalTaxDocumentPopulator"
+		scope="tenant">
+		<property name="taxValueConversionService" ref="taxValueConversionService" />
+		<property name="shippingIncludedStrategy" ref="shippingIncludedStrategy" />
+	</bean>
+
+	<alias name="defaultDeliveryCisLineItemPopulator" alias="deliveryCisLineItemPopulator" />
+	<bean id="defaultDeliveryCisLineItemPopulator"
+		class="de.hybris.platform.integration.cis.tax.populators.DeliveryCisLineItemPopulator"
+		scope="tenant">
+		<property name="taxCodeStrategy" ref="taxCodeStrategy" />
+		<property name="shippingItemCodeStrategy" ref="shippingItemCodeStrategy" />
+	</bean>
+
+	<!-- Converters -->
+
+	<alias name="defaultCisAddressConverter" alias="cisAddressConverter" />
+	<bean id="defaultCisAddressConverter" parent="abstractPopulatingConverter"
+		scope="tenant">
+		<lookup-method name="createTarget" bean="cisAddress" />
+		<property name="populators">
+			<list>
+				<ref bean="cisTaxAddressPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisLineItemConverter" alias="cisLineItemConverter" />
+	<bean id="defaultCisLineItemConverter" parent="abstractPopulatingConverter"
+		scope="tenant">
+		<lookup-method name="createTarget" bean="cisLineItem" />
+		<property name="populators">
+			<list>
+				<ref bean="cisLineItemPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisOrderConverter" alias="cisOrderConverter" />
+	<bean id="defaultCisOrderConverter" parent="abstractPopulatingConverter"
+		scope="tenant">
+		<lookup-method name="createTarget" bean="cisOrder" />
+		<property name="populators">
+			<list>
+				<ref bean="cisOrderPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultExternalTaxDocumentConverter" alias="externalTaxDocumentConverter" />
+	<bean id="defaultExternalTaxDocumentConverter" parent="abstractPopulatingConverter"
+		scope="tenant">
+		<lookup-method name="createTarget" bean="externalTaxDocument" />
+		<property name="populators">
+			<list>
+				<ref bean="externalTaxDocumentPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultDeliveryCisLineItemConverter" alias="deliveryCisLineItemConverter" />
+	<bean id="defaultDeliveryCisLineItemConverter" parent="abstractPopulatingConverter"
+		scope="tenant">
+		<lookup-method name="createTarget" bean="cisLineItem" />
+		<property name="populators">
+			<list>
+				<ref bean="deliveryCisLineItemPopulator" />
+			</list>
+		</property>
+	</bean>
+
+
+	<alias name="defaultCisAbstractOrderPrepareInterceptor" alias="abstractOrderPrepareInterceptor" />
+	<bean id="defaultCisAbstractOrderPrepareInterceptor"
+		class="de.hybris.platform.order.interceptors.DefaultAbstractOrderPrepareInterceptor">
+		<property name="keyGenerator" ref="orderCodeGenerator" />
+		<!-- define qualifiers of order attributes, which, when modified, the order 
+			and orderEntries need to be recalculated. -->
+		<property name="attributesForOrderEntriesRecalculation">
+			<list>
+				<value>date</value>
+				<value>user</value>
+				<value>currency</value>
+				<value>net</value>
+			</list>
+		</property>
+
+		<!-- define qualifiers of order attributes, which, when modified, the order 
+			needs to be recalculated. -->
+		<property name="attributesForOrderRecalculation">
+			<list>
+				<value>deliveryMode</value>
+				<value>deliveryCost</value>
+				<value>paymentMode</value>
+				<value>paymentCost</value>
+				<value>totalTaxValues</value>
+				<value>discounts</value>
+				<value>discountsIncludeDeliveryCost</value>
+				<value>discountsIncludePaymentCost</value>
+				<value>deliveryAddress</value>
+				<value>paymentAddress</value>
+				<value>paymentInfo</value>
+			</list>
+		</property>
+	</bean>
+</beans>

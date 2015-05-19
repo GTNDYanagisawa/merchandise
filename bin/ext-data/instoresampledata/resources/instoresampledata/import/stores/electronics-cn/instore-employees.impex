@@ -1,0 +1,11 @@
+$passwordEncoding=md5
+$defaultPassword=1234
+$setPassword=@password[translator=de.hybris.platform.impex.jalo.translators.ConvertPlaintextToEncodedUserPasswordTranslator][default='$passwordEncoding:$defaultPassword']
+
+# store employees  groups per store
+INSERT_UPDATE StoreEmployeeGroup;uid[unique=true];locname[lang=de];locname[lang=en];groups(uid);store(name)
+;cnElectronicsStoreEmployees;Electronics CN Arbeiter Gruppe;Electronics CN Employees Group;instoreemployeesgroup;亿达数码（龙岗店）
+
+# employees - members of store employees groups.
+INSERT_UPDATE Employee;UID[unique=true];$setPassword;description;name;groups(uid)[mode=append];sessionLanguage(isocode)
+;cn-employee;;CN Employee;CN Employee;cnElectronicsStoreEmployees;en;

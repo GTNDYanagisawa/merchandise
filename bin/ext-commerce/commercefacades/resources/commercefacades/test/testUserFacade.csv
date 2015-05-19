@@ -1,0 +1,66 @@
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$testCategory0-id=testCategory0
+$testCategory1-id=testCategory1
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$product=product(code, catalogVersion(catalog(id[default='testCatalog']),version[default='Online']));
+
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;
+;de;true;;;;;;
+;en;true;;;;;;
+
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];;;;;
+;de;Deutsch;German;;;;;
+;en;Englisch;English;;;;;
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=de];name[lang=en];conversion;;;
+;pieces;pieces;pieces;pieces;1
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;E
+
+INSERT_UPDATE Title;code[unique=true];name[lang=de];name[lang=en];;
+;dr;Dr.;dr.;;
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=de];name[lang=en];active;
+;US;Vereinigte Staaten von Amerika;United States of America;true;
+
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid);
+;cockpitgroup;;
+;customergroup;cockpitgroup;
+
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password;title(code)
+;dejol;K2006-C0007;Max de Jol;;en;EUR;customergroup;1234;dr
+
+INSERT_UPDATE Address;owner(Customer.uid)[unique=true];streetname[unique=true];streetnumber[unique=true];postalcode[unique=true];duplicate[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;gender(code);middlename;phone1;title(code);url;company;fax;department
+;dejol;Zennerstrasse;45;28277;false;Bremen;US;true;false;false;true;Anja;Hertz;ahertz@na-du.de;FEMALE;;;dr;;hybris GmbH;;
+;dejol;Schiller Allee;8;28277;false;Bremen;US;false;false;true;false;Anja;Hertz;ahertz@na-du.de;FEMALE;;;dr;;hybris GmbH;;
+
+INSERT_UPDATE Customer;uid[unique=true];defaultPaymentAddress(owner(Customer.uid), streetname, streetnumber, postalcode,duplicate);defaultShipmentAddress(owner(Customer.uid), streetname, streetnumber, postalcode, duplicate)
+;dejol;dejol:Schiller Allee:8:28277:false;dejol:Zennerstrasse:45:28277:false
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog
+;$catalog-id;$catalog-id;$catalog-id;true
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode)
+;$catalog-id;$catalog-version;true;EUR;de,en
+
+INSERT_UPDATE Category;code[unique=true];$catalogversion;name[lang=de];name[lang=en];$supercategories
+;$testCategory0-id;;$testCategory0-id;$testCategory0-id;
+;$testCategory1-id;;$testCategory1-id;$testCategory1-id;$testCategory0-id
+
+INSERT_UPDATE Product;code[unique=true];$catalogversion;name[lang=de];name[lang=en];unit(code);$prices;approvalStatus(code);owner(Principal.uid);startLineNumber;$supercategories;picture(code);thumbnail(code);normal(code);logo(code);averageRating;manufacturerName;
+;HW1210-3422;;testDE;testEN;pieces;57,95 EUR;approved;dejol;0;$testCategory0-id;;;;;;;
+;HW1210-3423;;test2DE;test2EN;pieces;67,95 EUR;approved;dejol;0;$testCategory1-id;;;;;;;
+;HW1210-3424;;test3DE;test3EN;pieces;32,95 EUR;approved;dejol;0;$testCategory1-id;;;;;90;testManufacturer;
+;HW1210-3425;;test3DE;test4EN;pieces;95 EUR;approved;dejol;0;$testCategory1-id;;;;;;;
+
+INSERT_UPDATE CustomerReview;$product[unique=true];rating[unique=true];user(uid)[unique=true];comment;headline;creationTime[dateformat='yyyy-MM-dd''T''HH:mm:ss'];approvalStatus(code);alias;language(isocode)
+;HW1210-3422;1;dejol;comment;headline;2009-01-01T00:00:00;approved;alias;en
+;HW1210-3423;2;dejol;comment;headline;2010-01-01T00:00:00;approved;alias;en
+;HW1210-3424;3;dejol;pending;headline;2010-01-01T00:00:00;pending;alias;en

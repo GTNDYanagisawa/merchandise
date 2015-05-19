@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security.xsd 
+        http://www.springframework.org/schema/util 
+        http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+
+	<security:http pattern="/cockpit/css/**" security="none" />
+	<security:http pattern="/cockpit/images/**" security="none" />
+
+	<security:http access-denied-page="/accessDenied.zul">
+		<security:session-management session-authentication-strategy-ref="fixation" />
+		<security:anonymous key="cockpitAnonymous" username="anonymousUser" granted-authority="ROLE_ANONYMOUS" />
+		<security:intercept-url pattern="/login.zul" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:intercept-url pattern="/zkau/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<security:intercept-url pattern="/**" access="IS_AUTHENTICATED_REMEMBERED" />
+		<security:remember-me services-ref="rememberMeServices" key="cockpit" />
+		<security:logout logout-success-url="/index.zul" />
+		<security:form-login always-use-default-target="false" login-page="/login.zul" authentication-failure-url="/login.zul?login_error=1" />
+	</security:http>
+
+	<bean id="fixation" class="de.hybris.platform.servicelayer.security.spring.HybrisSessionFixationProtectionStrategy" />
+
+	<security:authentication-manager alias="rememberMeAuthenticationManager">
+		<security:authentication-provider ref="coreAuthenticationProvider" />
+	</security:authentication-manager>
+
+	<!-- please be aware that you read this "https://jira.hybris.com/browse/PLA-9864", 
+		before enabling this feature -->
+	<!-- <bean id="rememberMeServices" class="de.hybris.platform.cockpit.security.CockpitRememberMeService" 
+		scope="tenant"> <property name="userDetailsService" ref="coreUserDetailsService"/> 
+		<property name="key" value="cockpit"/> <property name="cookieName" value="LoginToken"/> 
+		</bean> -->
+
+	<bean id="rememberMeServices" class="de.hybris.platform.spring.security.CoreRememberMeService">
+		<property name="key" value="cockpit" />
+		<property name="cookieName" value="LoginToken" />
+		<!-- avoiding hard reference to tenant-scoped 'coreUserDetailsService' -->
+		<lookup-method name="lookupUserDetailsService" bean="coreUserDetailsService" />
+	</bean>
+
+	<alias name="defaultCorePreAuthenticationChecks" alias="corePreAuthenticationChecks"/>
+	<bean id="defaultCorePreAuthenticationChecks" class="de.hybris.platform.spring.security.RejectUserPreAuthenticationChecks">
+		<property name="allowedUserGroups">
+			<list>
+				<value>Admingroup</value>
+				<value>Employeegroup</value>
+			</list>
+		</property>
+		<property name="allowedUserTypes">
+			<list>
+				<value>Employee</value>
+			</list>
+		</property>	
+	</bean>
+
+	<bean id="coreAuthenticationProvider" class="de.hybris.platform.cockpit.security.CockpitAuthenticationProvider" scope="tenant">
+		<property name="preAuthenticationChecks" ref="corePreAuthenticationChecks" />
+		<property name="userDetailsService" ref="coreUserDetailsService" />
+	</bean>
+
+	<bean id="coreUserDetailsService" class="de.hybris.platform.spring.security.CoreUserDetailsService" scope="tenant" />
+
+	<!-- -->
+	<!-- COCKPIT SPECIFIC -->
+	<!-- -->
+
+	<bean id="sessionProxy" class="de.hybris.platform.cockpit.util.SessionProxy" scope="session">
+		<aop:scoped-proxy />
+		<property name="session" ref="UICockpitSession" />
+	</bean>
+</beans>

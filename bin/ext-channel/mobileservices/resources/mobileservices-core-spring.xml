@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+		   http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- General -->
+
+	<!-- SMS message gateway for deliverying INCOMING messages
+	     (must be used by connector implementors to push messages INTO hybris) -->
+
+	<bean id="incomingSMSMessageGateway" 
+		class="de.hybris.platform.mobileservices.text.engine.impl.DefaultIncomingSMSMessageGateway" 
+		scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="messageScheduler" ref="messageScheduler"/>
+	</bean>
+	
+	<bean id="messageScheduler" 
+		class="de.hybris.platform.mobileservices.text.processing.impl.DefaultMessageScheduler" 
+		scope="tenant">
+		<property name="taskService" ref="taskService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="sendTaskId"> <value>sendTask</value> </property>
+		<property name="receiveTaskId"> <value>receiveTask</value> </property>
+	</bean>
+
+	<bean id="smsEngineRegistry"
+		class="de.hybris.platform.mobileservices.text.engine.impl.DefaultSMSEngineRegistry" 
+		scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<!-- INCOMING -->
+
+	<bean id="incomingMessageProcessor"
+		class="de.hybris.platform.mobileservices.text.processing.impl.DefaultIncomingMessageProcessor"
+		parent="abstractProcessor"
+		scope="tenant" >
+		<property name="phoneNumberService" ref="phoneNumberService" />
+		<property name="incomingMessageRouter" ref="incomingMessageRoutingStrategy" />
+		<property name="actionService" ref="actionService" />
+	</bean>
+	
+	<bean id="incomingMessageRoutingStrategy"
+		class="de.hybris.platform.mobileservices.text.processing.impl.DefaultIncomingMessageRoutingStrategy"
+		scope="tenant" >
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="i18nService" ref="i18nService" />
+	</bean>
+
+	<bean id="receiveTask"
+		class="de.hybris.platform.mobileservices.text.processing.impl.ReceiveTask"
+		parent="abstractProcessingTask"
+		scope="tenant" >
+		<property name="incomingMessageProcessor" ref="incomingMessageProcessor" />
+	</bean>
+
+	<!-- OUTGOING -->
+
+	<bean id="outgoingMessageProcessor"
+		class="de.hybris.platform.mobileservices.text.processing.impl.DefaultOutgoingMessageProcessor"
+		parent="abstractProcessor"
+		scope="tenant" >
+		<property name="outgoingMessageRouter" ref="outgoingMessageRoutingStrategy" />
+		<property name="smsEngineRegistry" ref="smsEngineRegistry" />
+		<property name="phoneNumberService" ref="phoneNumberService" />
+	</bean>
+
+	<bean id="sendTask"
+		class="de.hybris.platform.mobileservices.text.processing.impl.SendTask"
+		parent="abstractProcessingTask"
+		scope="tenant" >
+		<property name="outgoingMessageProcessor" ref="outgoingMessageProcessor" />
+	</bean>
+
+	<bean id="outgoingMessageRoutingStrategy"
+		class="de.hybris.platform.mobileservices.text.processing.impl.DefaultOutgoingMessageRoutingStrategy"
+		scope="tenant" >
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="smsEngineRegistry" ref="smsEngineRegistry" />
+	</bean>
+
+	<!--  general -->
+
+	<bean id="messagePricingStrategy"
+		class="de.hybris.platform.mobileservices.text.price.impl.DefaultMessagePricingStrategy"
+		scope="tenant" >
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<bean id="abstractProcessor" 
+		class="de.hybris.platform.mobileservices.text.processing.impl.AbstractMessageProcessor"
+		scope="tenant"
+		abstract="true">
+		<property name="modelService" ref="modelService" />
+		<property name="phoneListService" ref="phoneListService" />
+		<property name="messagePricingStrategy" ref="messagePricingStrategy" />
+	</bean>
+
+	<bean id="abstractProcessingTask" 
+		class="de.hybris.platform.mobileservices.text.processing.impl.AbstractProcessingTask"
+		scope="tenant"
+		abstract="true">
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+</beans>

@@ -1,0 +1,546 @@
+<?xml version="1.0"?>
+
+<project xmlns:jacoco="antlib:org.jacoco.ant" basedir="." name="SAP Standalone Build">
+
+
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<!-- Import/Set of property files                                       -->
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<property name="hybrishome.dir" value="C:\\hybris\\bin" />
+	<property name="jacoco.lib" value="C:/Codecoverage" />
+
+	<property file="test.ant.properties" />
+	<property name="productconfig.interface.dir" value="C:\\hybris\\bin\\sap\\sap.hybris.productconfig.runtime.interface\\" />
+	<property name="hybrisplatform.dir" value="..\\..\\platform\\"/>
+
+
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<!-- Definition of Jacoco task                                          -->
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+		<classpath path="${jacoco.lib}/jacocoant.jar" />
+	</taskdef>
+	
+	
+	
+	
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<!-- Definition of Nexus get                                            -->
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<macrodef name="nexus-get">
+		<attribute name="groupId" />
+		<attribute name="artifactId" />
+		<attribute name="version" />
+		<attribute name="repo" />
+		<attribute name="extension" />
+		<attribute name="dest" />
+
+		<sequential>
+			<get src="http://nexus.wdf.sap.corp:8081/nexus/service/local/artifact/maven/redirect?r=@{repo}&amp;g=@{groupId}&amp;a=@{artifactId}&amp;v=@{version}&amp;e=@{extension}" dest="@{dest}/@{artifactId}.@{extension}" usetimestamp="true" />
+		</sequential>
+	</macrodef>
+
+	
+	
+	
+
+
+
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<!-- Classpath definitions                                              -->
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+
+	<path id="junit.classpath">
+		<pathelement location="./test/testgen/testclasses" />
+		<pathelement location="./test" />
+		<pathelement location="./test/resources" />
+		<pathelement location="${productconfig.interface.dir}/test/testgen/classes" />
+		<pathelement location="${productconfig.interface.dir}/resources" />
+
+		<pathelement location="test/lib/saprepository/classes" />
+		<pathelement location="test/lib/saprepository/resources" />
+		<pathelement location="test/lib/sapcore/classes" />
+
+		<fileset dir="test/lib/sapcore/lib">
+			<include name="*.jar" />
+		</fileset>
+		<pathelement location="test/lib/sapcore/resources" />
+		<pathelement location="test/lib/sapcommon/classes" />
+		<pathelement location="test/lib/sapcommon/resources" />
+		<pathelement location="test/lib/sapuser/classes" />
+		<pathelement location="test/lib/sapuser/resources" />
+		<pathelement location="test/lib/wcfuser/classes" />
+		<pathelement location="test/lib/wcfuser/resources" />
+		<pathelement location="test/lib/saptestrecording/classes" />
+		<pathelement location="test/lib/sapipc/classes" />
+		<pathelement location="test/lib/sapipc/resources" />
+
+		<fileset dir="${productconfig.interface.dir}lib">
+			<include name="*.jar" />
+		</fileset>
+
+		<fileset dir="${hybrisplatform.dir}\\ext\\core\\bin\\">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${hybrisplatform.dir}\\ext\\core\\lib\\">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${hybrisplatform.dir}\\tomcat\\lib\\">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${hybrisplatform.dir}\\ext\\commons\\lib\\">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<path id="compile.classpath">
+		<fileset dir="${productconfig.interface.dir}lib">
+			<include name="*.jar" />
+		</fileset>
+		<dirset dir="test/lib/sapcore">
+			<include name="classes" />
+		</dirset>
+		<fileset dir="test/lib/sapcore/lib">
+			<include name="*.jar" />
+		</fileset>
+		<dirset dir="test/lib/saprepository">
+			<include name="classes" />
+		</dirset>
+		<dirset dir="test/lib/sapcommon">
+			<include name="classes" />
+		</dirset>
+		<dirset dir="test/lib/sapuser">
+			<include name="classes" />
+		</dirset>
+		<fileset dir="${hybrisplatform.dir}\\ext\\core\\bin\\">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${hybrisplatform.dir}\\ext\\core\\lib\\">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${hybrisplatform.dir}\\tomcat\\lib\\">
+			<include name="*.jar" />
+		</fileset>
+
+	</path>
+
+
+	<path id="compileTests.classpath">
+		<fileset dir="${productconfig.interface.dir}lib">
+			<include name="*.jar" />
+		</fileset>
+		<dirset dir="${productconfig.interface.dir}test/testgen">
+			<include name="classes" />
+		</dirset>
+		<dirset dir="test/lib/sapcore">
+			<include name="classes" />
+		</dirset>
+		<fileset dir="test/lib/sapcore/lib">
+			<include name="*.jar" />
+		</fileset>
+		<dirset dir="test/lib/saprepository">
+			<include name="classes" />
+		</dirset>
+		<dirset dir="test/lib/sapcommon">
+			<include name="classes" />
+		</dirset>
+		<dirset dir="test/lib/sapuser">
+			<include name="classes" />
+		</dirset>
+		<dirset dir="test/lib/saptestrecording">
+			<include name="classes" />
+		</dirset>
+		<dirset dir="test/lib/sapipc">
+			<include name="classes" />
+		</dirset>
+		<fileset dir="${hybrisplatform.dir}\\ext\\core\\bin\\">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${hybrisplatform.dir}\\ext\\core\\lib\\">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${hybrisplatform.dir}\\tomcat\\lib\\">
+			<include name="*.jar" />
+		</fileset>
+
+	</path>
+
+
+
+
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<!-- Standalone compilation-->
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<target name="compile" description="compile the source" depends="nexusCopyLibs">
+
+		<delete dir="test/testgen/classes" />
+		<mkdir dir="test/testgen/classes" />
+
+		<javac classpathref="compile.classpath" debug="true" includeantruntime="false" failonerror="true" srcdir="${productconfig.interface.dir}src;${productconfig.interface.dir}gensrc" destdir="./test/testgen/classes">
+			<compilerarg value="-Xlint" />
+		</javac>
+
+	</target>
+
+
+
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<!--Test Compilation                                                    -->
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<target name="compileTests" depends="compile" description="compile tests">
+
+		<delete dir="test/testgen/testclasses" />
+		<mkdir dir="test/testgen/testclasses" />
+
+		<javac classpathref="compileTests.classpath" includeantruntime="false" failonerror="true" srcdir="${productconfig.interface.dir}testsrc" destdir="./test/testgen/testclasses">
+		</javac>
+
+	</target>
+
+
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<!--Run Tests                                                           -->
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<target name="runTests" depends="compileTests" description="run tests">
+
+		<delete dir="test/testresults" />
+		<mkdir dir="test/testresults" />
+
+		<junit fork="yes" printsummary="yes" haltonfailure="yes">
+
+			<classpath refid="junit.classpath" />
+
+			<test name="com.sap.hybris.sapordermgmtbol.unittests.UnitTestSuite" outfile="test/testresults/UnitTestSuiterunTests">
+				<formatter type="xml" />
+			</test>
+		</junit>
+
+	</target>
+
+
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<!--Run Integration Tests                                               -->
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<target name="runIntegrationTests" depends="compileTests" description="run Integration tests">
+
+		<delete dir="test/testresults" />
+		<mkdir dir="test/testresults" />
+
+		<junit fork="yes" printsummary="yes" haltonfailure="yes" showoutput="true">
+
+			<classpath refid="junit.classpath" />
+
+			<test name="com.sap.hybris.sapordermgmtbol.integtests.IntegrationTestSuite" outfile="test/testresults/IntegTestSuiterunTests">
+				<formatter type="xml" />
+			</test>
+		</junit>
+
+	</target>
+
+
+
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<!--Code Coverage                                                       -->
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+	<property name="src.dir" location="src" />
+	<property name="result.dir" location="${productconfig.interface.dir}test/codecoverage" />
+	<property name="result.classes.dir" location="${productconfig.interface.dir}test/testgen/classes" />
+	<property name="result.report.dir" location="${productconfig.interface.dir}test/codecoverage/site/jacoco" />
+	<property name="result.exec.dir" location="${productconfig.interface.dir}test/testgen/jacocoresults" />
+
+
+	<path id="jacoco.classpath">
+		<fileset dir="${jacoco.lib}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+
+	<target name="jacoco.clean" depends="compileTests">
+		<delete dir="${result.dir}" />
+		<mkdir dir="${result.dir}" />
+
+		<delete dir="${result.exec.dir}" />
+		<mkdir dir="${result.exec.dir}" />
+
+		<delete dir="${result.dir}" />
+		<mkdir dir="${result.dir}" />
+
+		<delete dir="test/testresults" />
+		<mkdir dir="test/testresults" />
+	</target>
+
+
+	<target name="jacoco.testunit" depends="jacoco.clean">
+
+
+		<jacoco:coverage destfile="${result.exec.dir}/jacocoUnit.exec">
+			<junit fork="yes" printsummary="yes" haltonfailure="no">
+
+				<classpath refid="junit.classpath" />
+
+				<test name="com.sap.hybris.sapordermgmtbol.unittests.UnitTestSuite" outfile="test/testresults/UnitTestSuiterunTests">
+					<formatter type="xml" />
+				</test>
+			</junit>
+
+
+
+		</jacoco:coverage>
+
+	</target>
+
+	<target name="jacoco.testall" depends="jacoco.clean">
+
+
+		<jacoco:coverage destfile="${result.exec.dir}/jacocoUnit.exec">
+			<junit fork="yes" printsummary="yes" haltonfailure="no">
+
+				<classpath refid="junit.classpath" />
+
+				<test name="com.sap.hybris.sapordermgmtbol.unittests.UnitTestSuite" outfile="test/testresults/UnitTestSuiterunTests">
+					<formatter type="xml" />
+				</test>
+			</junit>
+
+
+
+		</jacoco:coverage>
+		<jacoco:coverage destfile="${result.exec.dir}/jacocoInteg.exec">
+			<junit fork="yes" printsummary="yes" haltonfailure="no">
+				<classpath refid="junit.classpath" />
+				<test name="com.sap.hybris.sapordermgmtbol.integtests.IntegrationTestSuite" outfile="test/testresults/IntegTestSuiterunTests">
+					<formatter type="xml" />
+				</test>
+			</junit>
+
+		</jacoco:coverage>
+	</target>
+
+
+	<target name="jacoco.reportunit" depends="jacoco.testunit">
+
+		<jacoco:report>
+
+			<executiondata>
+				<file file="${result.exec.dir}/jacocoUnit.exec" />
+			</executiondata>
+
+			<structure name="SalesTransactions Coverage Report">
+				<classfiles>
+					<fileset dir="${result.classes.dir}" />
+				</classfiles>
+				<sourcefiles encoding="UTF-8">
+					<fileset dir="${src.dir}" />
+				</sourcefiles>
+			</structure>
+
+			<html destdir="${result.report.dir}" />
+			<xml destfile="${result.report.dir}/report.xml" />
+		</jacoco:report>
+	</target>
+
+
+	<target name="jacoco.reportall" depends="jacoco.testall">
+
+		<jacoco:report>
+
+			<executiondata>
+				<file file="${result.exec.dir}/jacocoUnit.exec" />
+				<file file="${result.exec.dir}/jacocoInteg.exec" />
+			</executiondata>
+
+			<structure name="SalesTransactions Coverage Report">
+				<classfiles>
+					<fileset dir="${result.classes.dir}" />
+				</classfiles>
+				<sourcefiles encoding="UTF-8">
+					<fileset dir="${src.dir}" />
+				</sourcefiles>
+			</structure>
+
+			<html destdir="${result.report.dir}" />
+			<xml destfile="${result.report.dir}/report.xml" />
+		</jacoco:report>
+	</target>
+
+
+
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<!-- Delete folder                                                      -->
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<target name="delete.sapsalestransactions.sources">
+		<delete dir="${productconfig.interface.dir}/src" />
+
+	</target>
+
+
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	<!-- Delete folder                                                      -->
+	<!--++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+
+	<description>
+	                               simple example build file
+	</description>
+	<!-- set global properties for this build -->
+
+
+	<target name="nexusgetall">
+		<delete dir="test/lib" />
+		<mkdir dir="test/lib" />
+		<mkdir dir="test/nexusdownload" />
+
+		<nexus-get 
+			groupId="com.sap.hybris" 
+			artifactId="sapcoremaven" 
+			version="0.0.1-SNAPSHOT" 
+			repo="deploy.snapshots" 
+			extension="jar" 
+			dest="test/nexusdownload" />
+		<nexus-get 
+			groupId="com.sap.hybris" 
+			artifactId="sapcommonmaven" 
+			version="0.0.1-SNAPSHOT" 
+			repo="deploy.snapshots" 
+			extension="jar" 
+			dest="test/nexusdownload" />
+		<nexus-get 
+			groupId="com.sap.hybris" 
+			artifactId="sapusermaven" 
+			version="0.0.1-SNAPSHOT" 
+			repo="deploy.snapshots" 
+			extension="jar" 
+			dest="test/nexusdownload" />
+		<nexus-get 
+			groupId="com.sap.hybris" 
+			artifactId="wcfusermaven" 
+			version="0.0.1-SNAPSHOT" 
+			repo="deploy.snapshots" 
+			extension="jar" 
+			dest="test/nexusdownload" />
+		<nexus-get 
+			groupId="com.sap.hybris" 
+			artifactId="sapipcmaven" 
+			version="0.0.1-SNAPSHOT" 
+			repo="deploy.snapshots" 
+			extension="jar" 
+			dest="test/nexusdownload" />
+		<nexus-get 
+			groupId="com.sap.hybris" 
+			artifactId="saprepositorymaven" 
+			version="0.0.1-SNAPSHOT" 
+			repo="deploy.snapshots" 
+			extension="jar" 
+			dest="test/nexusdownload" />
+		<nexus-get 
+			groupId="com.sap.hybris" 
+			artifactId="saptestrecordingmaven" 
+			version="0.0.1-SNAPSHOT" 
+			repo="deploy.snapshots" 
+			extension="jar" 
+			dest="test/nexusdownload" />		
+	</target>
+
+	<target name="nexusunjar" depends="nexusgetall">
+		<unzip src="test/nexusdownload/sapcommonmaven.jar" dest="test/hybristmp/sapcommon" />
+		<unzip dest="test/hybristmp/custom">
+			<fileset dir="test/hybristmp/sapcommon">
+				<include name="**/*.zip" />
+			</fileset>
+		</unzip>
+		<move todir="test/hybristmp/custom/hybris/bin/custom/sapcommon/classes">
+			<fileset dir="test/hybristmp/sapcommon/classes" >
+				<include name="**/*.*" />
+			</fileset>	
+		</move>
+		
+		<unzip src="test/nexusdownload/sapcoremaven.jar" dest="test/hybristmp/sapcore" />
+		<unzip dest="test/hybristmp/custom">
+			<fileset dir="test/hybristmp/sapcore">
+				<include name="**/*.zip" />
+			</fileset>
+		</unzip>
+		<move todir="test/hybristmp/custom/hybris/bin/custom/sapcore/classes">
+			<fileset dir="test/hybristmp/sapcore/classes" >
+				<include name="**/*.*" />
+			</fileset>	
+		</move>
+
+		
+		<unzip src="test/nexusdownload/sapusermaven.jar" dest="test/hybristmp/sapuser" />
+		<unzip dest="test/hybristmp/custom">
+			<fileset dir="test/hybristmp/sapuser">
+				<include name="**/*.zip" />
+			</fileset>
+		</unzip>
+		<move todir="test/hybristmp/custom/hybris/bin/custom/sapuser/classes">
+			<fileset dir="test/hybristmp/sapuser/classes" >
+				<include name="**/*.*" />
+			</fileset>	
+		</move>
+		
+		
+		<unzip src="test/nexusdownload/wcfusermaven.jar" dest="test/hybristmp/wcfuser" />
+		<unzip dest="test/hybristmp/custom">
+			<fileset dir="test/hybristmp/wcfuser">
+				<include name="**/*.zip" />
+			</fileset>
+		</unzip>
+		<move todir="test/hybristmp/custom/hybris/bin/custom/wcfuser/classes">
+			<fileset dir="test/hybristmp/wcfuser/classes" >
+				<include name="**/*.*" />
+			</fileset>	
+		</move>
+
+
+		
+		<unzip src="test/nexusdownload/saprepositorymaven.jar" dest="test/hybristmp/saprepository" />
+		<unzip dest="test/hybristmp/custom">
+			<fileset dir="test/hybristmp/saprepository">
+				<include name="**/*.zip" />
+			</fileset>
+		</unzip>
+		<move todir="test/hybristmp/custom/hybris/bin/custom/saprepository/classes">
+			<fileset dir="test/hybristmp/saprepository/classes" >
+				<include name="**/*.*" />
+			</fileset>	
+		</move>
+		
+
+		<unzip src="test/nexusdownload/saptestrecordingmaven.jar" dest="test/hybristmp/saptestrecording" />
+		<unzip dest="test/hybristmp/custom">
+			<fileset dir="test/hybristmp/saptestrecording">
+				<include name="**/*.zip" />
+			</fileset>
+		</unzip>
+		<move todir="test/hybristmp/custom/hybris/bin/custom/saptestrecording/classes">
+			<fileset dir="test/hybristmp/saptestrecording/classes" >
+				<include name="**/*.*" />
+			</fileset>	
+		</move>
+		
+		<unzip src="test/nexusdownload/sapipcmaven.jar" dest="test/hybristmp/sapipc" />
+		<unzip dest="test/hybristmp/custom">
+			<fileset dir="test/hybristmp/sapipc">
+				<include name="**/*.zip" />
+			</fileset>
+		</unzip>
+		<move todir="test/hybristmp/custom/hybris/bin/custom/sapipc/classes">
+			<fileset dir="test/hybristmp/sapipc/classes" >
+				<include name="**/*.*" />
+			</fileset>	
+		</move>
+
+		
+	</target>
+	<target name="nexusCopyLibs" depends="nexusunjar">
+		<move todir="test/lib">
+			<fileset dir="test/hybristmp/custom/hybris/bin/custom" />
+		</move>
+	</target>
+
+
+
+</project>

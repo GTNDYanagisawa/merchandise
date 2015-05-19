@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="editorAreaTableAttributesReport" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="6.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="text" fontName="SansSerif" fontSize="8" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box topPadding="0" leftPadding="0">
+			<pen lineWidth="0.0"/>
+			<topPen lineWidth="0.0"/>
+			<leftPen lineWidth="0.0"/>
+			<bottomPen lineWidth="0.0"/>
+			<rightPen lineWidth="0.0"/>
+		</box>
+	</style>
+	<subDataset name="dataset1">
+		<queryString language="xPath">
+			<![CDATA[/root/section/row/rows/tableRow]]>
+		</queryString>
+		<field name="id" class="java.lang.String">
+			<fieldDescription><![CDATA[@id]]></fieldDescription>
+		</field>
+		<field name="value" class="java.lang.String">
+			<fieldDescription><![CDATA[@value]]></fieldDescription>
+		</field>
+		<field name="tableColumnType" class="java.lang.String">
+			<fieldDescription><![CDATA[@type]]></fieldDescription>
+		</field>
+	</subDataset>
+	<queryString language="xPath">
+		<![CDATA[/root/section/row/rows/tableRow]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<componentElement>
+				<reportElement style="text" stretchType="RelativeToBandHeight" x="0" y="0" width="555" height="12" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Horizontal">
+					<datasetRun subDataset="dataset1">
+						<dataSourceExpression><![CDATA[$P{REPORT_DATA_SOURCE}.subDataSource("tableRow/column")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="12" width="80">
+						<frame>
+							<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="80" height="12" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true"/>
+							<box>
+								<topPen lineWidth="0.25" lineStyle="Solid"/>
+								<leftPen lineWidth="0.25"/>
+								<bottomPen lineWidth="0.25"/>
+								<rightPen lineWidth="0.25" lineStyle="Solid"/>
+							</box>
+							<image vAlign="Middle">
+								<reportElement style="text" stretchType="RelativeToBandHeight" x="0" y="0" width="80" height="12" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true">
+									<printWhenExpression><![CDATA[$F{tableColumnType}.contains("media")]]></printWhenExpression>
+								</reportElement>
+								<imageExpression class="java.lang.String"><![CDATA[$F{value}]]></imageExpression>
+							</image>
+							<textField isStretchWithOverflow="true">
+								<reportElement style="text" stretchType="RelativeToBandHeight" x="0" y="0" width="80" height="12" isPrintInFirstWholeBand="true" isPrintWhenDetailOverflows="true">
+									<printWhenExpression><![CDATA[$F{tableColumnType}.contains("simple")]]></printWhenExpression>
+								</reportElement>
+								<box topPadding="1" leftPadding="1" bottomPadding="1">
+									<pen lineWidth="0.0"/>
+									<topPen lineWidth="0.25"/>
+									<leftPen lineWidth="0.25"/>
+									<bottomPen lineWidth="0.25"/>
+									<rightPen lineWidth="0.25"/>
+								</box>
+								<textElement>
+									<font fontName="SansSerif" size="8"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$F{value}]]></textFieldExpression>
+							</textField>
+						</frame>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+	</detail>
+</jasperReport>

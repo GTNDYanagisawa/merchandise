@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+	<!-- Configuration for extension b2bpunchoutaddon -->
+
+	<explorertree>
+		<group name="b2bcommercegroup" mode="append">
+			<typeref type="B2BCustomerPunchOutCredentialMapping" description="b2bpunchoutaddongroup.credentialmapping.description" />
+		</group>
+	</explorertree>
+	
+	<type name="B2BCustomerPunchOutCredentialMapping" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="b2bCustomer" operator="contains" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="b2bCustomer" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.b2bcustomerpunchoutcredentialmapping">
+					<section name="section.b2bcustomerpunchoutcredentialmapping">
+						<listlayout>
+							<attribute name="b2bCustomer" />
+							<attribute name="credentials">
+								<referencecollectioneditor editable="true"
+									externalcreate="true" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false" >
+									<itemlayout>
+										<attribute name="domain" />
+										<attribute name="identity" />
+										<attribute name="sharedsecret" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="PunchOutCredential" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code"/>
+                <condition attribute="domain"/>
+                <condition attribute="identity"/>
+                 <condition attribute="sharedsecret"/>
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code"/>
+                        <attribute name="domain"/>
+                        <attribute name="identity"/>
+                        <attribute name="sharedsecret"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+                    <listlayout>
+                        <attribute name="code"/>
+                    </listlayout>
+                </essentials>
+				<tab name="tab.punchoutcredential">
+					<section name="section.punchoutcredential">
+						<listlayout>
+							<attribute name="domain" />
+							<attribute name="identity" />
+							<attribute name="sharedsecret"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+</configuration>

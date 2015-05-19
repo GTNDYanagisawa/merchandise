@@ -1,0 +1,27 @@
+﻿"#% import de.hybris.platform.printsampledata.jalo.PrintsampledataManager";
+"#% impex.enableExternalImpExSyntaxParsing( true )";
+"#% impex.enableExternalDataCodeExecution( true )";
+"#% impex.setDumpingAllowed( false )";
+
+
+
+##############################################################################################################################
+### Import settings for the Print Sample data import
+
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/importparameters.csv""), ""utf-8"", 0, 0 );";
+
+$catalogID=apparelProductCatalog;
+$catalogVersionID=Online;
+
+
+##############################################################################################################################
+### Macros for the CometConfiguration import
+
+$catalogversion=catalogversion(catalog(id[default='$catalogID']),version[default='$catalogVersionID']);
+$superCategories=supercategories(code,$catalogversion);
+
+
+
+"#% impex.info(""Print sampledata basics import: Creating category structure for ContentBlocks...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/basics/contentblockcategories.csv""), ""utf-8"", 0, 0 );";
+

@@ -1,0 +1,508 @@
+$catalog-id=subscriptionSampleCatalog
+$catalog-version=Staged
+$systemName=subscriptionSampleClassification;
+$systemVersion=1.0;
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$catalogversionResolver=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+$syncJobCode=sync $catalog-id:Staged->Online
+$classificationCatalog=$systemName
+$classCatalogVersion=catalogversion(catalog(id[default=$classificationCatalog]),version[default=$systemVersion])[unique=true,default=$classificationCatalog:$systemVersion]
+$approved=approvalstatus(code)[default='approved']
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$billingFrequency=billingFrequency(code)[default='monthly']
+$termOfServiceRenewal=termOfServiceRenewal(code)[default='auto_renewing']
+$passwordEncoding=md5
+$defaultPassword=1234
+$setPassword=@password[translator=de.hybris.platform.impex.jalo.translators.ConvertPlaintextToEncodedUserPasswordTranslator][default='$passwordEncoding:$defaultPassword']
+$lang=en
+$storeUid=subscription
+$siteUid=subscription
+$currencies=USD
+$net=false
+$taxGroup=us-taxes
+$defaultCurrency=USD
+$languages=en
+$defaultLanguage=en
+$deliveryCountries=US
+$orderProcessCode=order-process
+$customerAllowedToIgnoreSuggestions=true
+
+$catalogVersions=catalogVersions(catalog(id),version);
+$serverConfigName=subscriptionSolrServerConfig
+$indexConfigName=subscriptionSolrIndexConfig
+$searchConfigName=subscriptionPageSize
+$facetSearchConfigName=subscriptionIndex
+$facetSearchConfigDescription=subscription Solr Index
+$searchIndexNamePrefix=subscription
+$solrIndexedType=subscriptionProductType
+$indexBaseSite=subscription
+$indexLanguages=en
+$indexCurrencies=USD
+$europe1pricefactory_ptg=Europe1PriceFactory_PTG(code)[default=us-sales-tax-full]
+
+INSERT_UPDATE Language;isocode[unique=true];active
+;en;true
+
+UPDATE Language;isocode[unique=true];name[lang=en]
+;en;English
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=en];conversion
+;pieces;pieces;pieces;1
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=en];active;base;conversion;digits;symbol
+;USD;US Dollar;true;false;1,38;2;$
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=en];active
+;US;United States of America;true
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];defaultCatalog
+;$catalog-id;$catalog-id;false
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode);languages(isoCode);readPrincipals(uid)
+;$catalog-id;Staged;true;USD;$lang;employeegroup
+;$catalog-id;Online;false;USD;$lang;employeegroup
+
+# Tax & Tax Groups
+INSERT_UPDATE UserTaxGroup;code[unique=true]
+;us-taxes
+
+INSERT_UPDATE ProductTaxGroup;code[unique=true]
+;us-sales-tax-full
+
+INSERT_UPDATE Tax;code[unique=true];value;currency(isocode)
+;us-sales-tax-full;10;
+
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);currencies(isocode);net;taxGroup(code);storelocatorDistanceUnit(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);deliveryCountries(isocode);submitOrderProcessCode;customerAllowedToIgnoreSuggestions
+;$storeUid;$catalog-id;$currencies;$net;$taxGroup;miles;$defaultCurrency;$languages;$defaultLanguage;$deliveryCountries;$orderProcessCode;$customerAllowedToIgnoreSuggestions
+
+INSERT_UPDATE BaseSite;uid[unique=true];channel(code);stores(uid);defaultLanguage(isoCode)
+;$siteUid;B2C;$storeUid;$defaultLanguage
+
+UPDATE BaseSite;uid[unique=true];name[lang=$lang];locale[lang=$lang]
+;$siteUid;Subscription;en_US
+
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid)[mode=append]
+;cockpitgroup;
+;customergroup;cockpitgroup
+;cmsmanagergroup;cockpitgroup,employeegroup
+;productmanagergroup;cockpitgroup,employeegroup
+
+INSERT_UPDATE Employee;UID[unique=true];$setPassword;description;name;groups(uid)[mode=append];sessionLanguage(isocode);sessionCurrency(isocode)
+;productmanager;;Product manager;Product Manager;productmanagergroup;en;USD
+;cmsmanager;;CMS manager;CMS Manager;cmsmanagergroup;en;USD
+
+INSERT_UPDATE Employee;UID[unique=true];groups(uid)[mode=append]
+;admin;employeegroup;
+;productmanager;employeegroup;
+
+# Insert Categories
+INSERT_UPDATE Category;code[unique=true];allowedPrincipals(uid)[default='customergroup'];$catalogversion
+;1
+;devices
+;subscriptions
+
+# Insert Category Structure
+$catalog_version=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+$source=source(code, $catalog_version)[unique=true]
+$target=target(code, $catalog_version)[unique=true]
+INSERT_UPDATE CategoryCategoryRelation;$target;$source
+;devices;1
+;subscriptions;1
+
+INSERT_UPDATE ClassificationSystem; id[unique=true]; name[lang=en];
+;$classificationCatalog;Sample ClassificationSystem;
+
+INSERT_UPDATE ClassificationSystemversion;catalog(id)[unique=true];version[unique=true];active;writeprincipals(uid);languages(isocode);inclPacking[virtual=true,default=true];inclDuty[virtual=true,default=true];inclFreight[virtual=true,default=true];inclAssurance[virtual=true,default=true]
+;$classificationCatalog;$systemVersion;true;employeegroup;en;
+
+# Insert Classifications
+INSERT_UPDATE ClassificationClass;$classCatalogVersion;code[unique=true];allowedPrincipals(uid)[default='customergroup']
+;;deviceclassification
+;;subscriptionclassification
+
+# Insert Classification Attributes
+$classSystemVersion=systemVersion(catalog(id[default=$classificationCatalog]),version[default=$systemVersion])[unique=true]
+INSERT_UPDATE ClassificationAttribute;$classSystemVersion;code[unique=true]
+;;featurecompatibility
+;;mobileplatform
+;;storage
+;;camera
+;;gps
+;;keyboard
+;;formfactor
+;;displayresolution
+;;displaysize
+;;touchscreen
+;;color
+;;height
+;;weight
+;;width
+;;depth
+;;bands
+;;vendorcompatibility
+
+UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];writePrincipals(uid)
+;$catalog-id;Online;productmanagergroup,productmanager,cmsmanagergroup,cmsmanager
+;$catalog-id;Staged;productmanagergroup,productmanager,cmsmanagergroup,cmsmanager
+
+UPDATE ClassificationSystemVersion;catalog(id)[unique=true];version[unique=true];writePrincipals(uid);readPrincipals(uid)
+;$classificationCatalog;1.0;productmanager;productmanager
+
+INSERT_UPDATE Vendor;code[unique=true];name[lang=en]
+;sampleVendor;Sample Vendor
+
+INSERT_UPDATE Warehouse;code[unique=true];name[lang=en];vendor(code);default
+;warehouse_telco;Warehouse Telco;sampleVendor;true
+
+INSERT_UPDATE BillingFrequency;code[unique=true];order;cartAware[default=true]
+;monthly;5
+;quarterly;6
+;yearly;7
+
+INSERT_UPDATE BillingEvent;code[unique=true];order;cartAware[default=true]
+;paynow;1
+;onfirstbill;2
+;oncancellation;0;false
+
+UPDATE BillingFrequency;code[unique=true];nameInCart[lang=$lang];nameInOrder[lang=$lang];description[lang=$lang]
+;monthly;Monthly;;Monthly
+;quarterly;Quarterly;;Quarterly
+;yearly;Annually;;Yearly
+
+UPDATE BillingEvent;code[unique=true];nameInCart[lang=$lang];nameInOrder[lang=$lang];description[lang=$lang]
+;paynow;Pay on Checkout;Paid on order;Pay Now
+;onfirstbill;On first bill;;On First Bill
+;oncancellation;On Cancellation;;Charged when subscription is canceled
+
+
+
+INSERT_UPDATE Product;code[unique=true];$supercategories;manufacturerName;manufacturerAID;description[lang=en];unit(code)[default=pieces];ean;variantType(code);$catalogversion;$europe1pricefactory_ptg
+;2047052;devices;Apple;MB496T/A;21.03.2009;;
+;2093587;devices;Apple;MB489T/A;09.04.2009;;
+;3417123;devices;Apple;MC133T/A;27.06.2009;;885909319237
+;3417124;devices;Apple;MC132T/A;27.06.2009;;885909318896
+;3417125;devices;Apple;MC131T/A;27.06.2009;;885909362059
+;3417130;devices;Apple;MC134T/A;27.06.2009;;885909319596
+;GALAXY_NEXUS;devices;Samsung;Samsung;27.06.2009;;8806071785585
+;GALAXY_S2;devices;Samsung;Samsung;27.06.2009;;8806071648507
+;APPLE_IPHONE_4S_16GB;devices;Apple;Apple;27.06.2009;;802971153485
+;APPLE_IPHONE_4S_32GB;devices;Apple;Apple;27.06.2009;;802971153486
+;MOTOROLA_RAZR;devices;Motorola;Motorola;27.06.2009;;6947681511507
+;HTC_INCREDIBLE_S;devices;htc;htc;27.06.2009;;843163074606
+
+UPDATE Product;code[unique=true];name[lang=en];description[lang=$lang];summary[lang=$lang];$catalogversion
+;2047052;iPhone 3G 16GB;iPhone 3G 16GB;iPhone 3G 16GB;
+;2093587;iPhone 3G 8GB;iPhone 3G 8GB;iPhone 3G 8GB;
+;3417123;iPhone 3GS 32GB;iPhone 3G 8GB;iPhone 3G 8GB;
+;3417124;iPhone 3GS 16GB;iPhone 3GS 16GB;iPhone 3GS 16GB;
+;3417125;iPhone 3GS 16GB;iPhone 3GS 16GB;iPhone 3GS 16GB;
+;3417130;iPhone 3GS 32GB;iPhone 3GS 32GB;iPhone 3GS 32GB;
+;GALAXY_NEXUS;Galaxy Nexus;Galaxy Nexus;Galaxy Nexus;
+;GALAXY_S2;Galaxy Nexus S2;Galaxy Nexus S2;Galaxy Nexus S2;
+;APPLE_IPHONE_4S_16GB;iPhone 4S 16GB;iPhone 4S 16GB;iPhone 4S 16GB;
+;APPLE_IPHONE_4S_32GB;iPhone 4S 32GB;iPhone 4S 32GB;iPhone 4S 32GB;
+;MOTOROLA_RAZR;Motorola Razr;Motorola Razr;Motorola Razr;
+;HTC_INCREDIBLE_S;HTC Incredible S;HTC Incredible S;HTC Incredible S;
+
+UPDATE Product;code[unique=true];$prices;$approved;$catalogversion;$europe1pricefactory_ptg
+;2047052;193 USD
+;2093587;200 USD
+;3417123;500 USD
+;3417124;300 USD
+;3417125;200 USD
+;3417130;300 USD
+;GALAXY_NEXUS;600 USD
+;GALAXY_S2;650 USD
+;APPLE_IPHONE_4S_16GB;850 USD
+;APPLE_IPHONE_4S_32GB;950 USD
+;MOTOROLA_RAZR;650 USD
+;HTC_INCREDIBLE_S;600 USD
+
+INSERT_UPDATE StockLevel;productCode[unique=true];available[default=10];warehouse(code)[unique=true,default=warehouse_telco];inStockStatus(code)[default=notSpecified];maxPreOrder[default=0];maxStockLevelHistoryCount[default=-1];overSelling[default=0];preOrder[default=0];reserved[default=0]
+;2047052
+;2093587
+;3417123
+;3417124
+;3417125
+;3417130
+;GALAXY_NEXUS
+;GALAXY_S2
+;APPLE_IPHONE_4S_16GB
+;APPLE_IPHONE_4S_32GB
+;MOTOROLA_RAZR
+;HTC_INCREDIBLE_S
+
+INSERT_UPDATE SubscriptionTerm;id[unique=true];termOfServiceFrequency(code);termOfServiceNumber(code);termOfServiceRenewal(code);billingPlan(id);cancellable
+;none;none;;auto_renewing;MonthlyPlan;true
+;monthly_1;monthly;1;auto_renewing;MonthlyPlan;false
+;monthly_12;monthly;12;auto_renewing;MonthlyPlan;false
+;monthly_18;monthly;18;auto_renewing;MonthlyPlan;false
+;monthly_24;monthly;24;auto_renewing;MonthlyPlan;false
+;monthly_36;monthly;36;auto_renewing;MonthlyPlan;false
+;annually_1;annually;1;auto_renewing;MonthlyPlan;false
+;annually_2;annually;2;auto_renewing;MonthlyPlan;false
+;annually_3;annually;3;auto_renewing;MonthlyPlan;false
+
+UPDATE SubscriptionTerm;id[unique=true];name[lang=$lang]
+;none;No contract
+;monthly_1;1 Month contract - monthly billing
+;monthly_12;12 Months contract - monthly billing
+;monthly_18;18 Months contract - monthly billing
+;monthly_24;24 Months contract - monthly billing
+;monthly_36;36 Months contract - monthly billing
+;annually_1;1 Year contract - monthly billing
+;annually_2;2 Years contract - monthly billing
+;annually_3;3 Years contract - monthly billing
+
+INSERT_UPDATE Entitlement;id[unique=true];usageUnit(id)
+;ME1;phone_minutes
+;ME2;sms
+;ME3;mobile_data
+;ME4;phone_minutes
+
+UPDATE Entitlement;id[unique=true];name[lang=$defaultLanguage]
+;ME1;Metered Entitlement 1
+;ME2;Metered Entitlement 2
+;ME3;Metered Entitlement 3
+;ME4;Metered Entitlement 4
+
+INSERT_UPDATE Entitlement;id[unique=true];name[lang=$defaultLanguage]
+;E1;Entitlement 1
+;E2;Entitlement 2
+;E3;Entitlement 3
+;E4;Entitlement 4
+
+INSERT_UPDATE Product;code[unique=true];stockLevels(productCode,warehouse(code)[default=default]);vendors(code)[default=sampleVendor];$catalogversion;$europe1pricefactory_ptg
+;2047052;2047052:warehouse_telco
+;2093587;2093587:warehouse_telco
+;3417123;3417123:warehouse_telco
+;3417124;3417124:warehouse_telco
+;3417125;3417125:warehouse_telco
+;3417130;3417130:warehouse_telco
+;GALAXY_NEXUS;GALAXY_NEXUS:warehouse_telco
+;GALAXY_S2;GALAXY_S2:warehouse_telco
+;APPLE_IPHONE_4S_16GB;APPLE_IPHONE_4S_16GB:warehouse_telco
+;APPLE_IPHONE_4S_32GB;APPLE_IPHONE_4S_32GB:warehouse_telco
+;MOTOROLA_RAZR;MOTOROLA_RAZR:warehouse_telco
+;HTC_INCREDIBLE_S;HTC_INCREDIBLE_S:warehouse_telco
+
+INSERT_UPDATE SubscriptionProduct;code[unique=true];$supercategories;manufacturerAID;subscriptionTerm(id);unit(code);ean;$approved;$catalogversion;$europe1pricefactory_ptg
+;SMART_STANDARD_1Y;subscriptions;SMART_STANDARD_1Y;annually_1;pieces;
+;SMART_STANDARD_2Y;subscriptions;SMART_STANDARD_2Y;annually_2;pieces;
+;SMART_STANDARD_3Y;subscriptions;SMART_STANDARD_3Y;annually_3;pieces;
+;SMART_ADVANCED_1000_12M;subscriptions;SMART_ADVANCED_1000_12M;monthly_12;pieces;
+;SMART_ADVANCED_1000_24M;subscriptions;SMART_ADVANCED_1000_24M;monthly_24;pieces;
+;SMART_ADVANCED_1000_36M;subscriptions;SMART_ADVANCED_1000_36M;monthly_36;pieces;
+;SMART_ADVANCED_2000_12M;subscriptions;SMART_ADVANCED_2000_12M;monthly_12;pieces;
+;SMART_ADVANCED_2000_24M;subscriptions;SMART_ADVANCED_2000_24M;monthly_24;pieces;
+;SMART_ADVANCED_2000_36M;subscriptions;SMART_ADVANCED_2000_36M;monthly_36;pieces;
+;SMART_ADVANCED_5000_12M;subscriptions;SMART_ADVANCED_5000_12M;monthly_12;pieces;
+;SMART_ADVANCED_5000_24M;subscriptions;SMART_ADVANCED_5000_24M;monthly_24;pieces;
+;SMART_ADVANCED_5000_36M;subscriptions;SMART_ADVANCED_5000_36M;monthly_36;pieces;
+;SMART_ADVANCED_NOLIM_12M;subscriptions;SMART_ADVANCED_NOLIM_12M;monthly_12;pieces;
+;SMART_ADVANCED_NOLIM_24M;subscriptions;SMART_ADVANCED_NOLIM_24M;monthly_24;pieces;
+;SMART_ADVANCED_NOLIM_36M;subscriptions;SMART_ADVANCED_NOLIM_36M;monthly_36;pieces;
+;INTERNET_PACK_1G;subscriptions;INTERNET_PACK_1G;annually_1;pieces;
+;INTERNET_PACK_MAX;subscriptions;INTERNET_PACK_MAX;annually_1;pieces;
+;FRIENDS_AND_FAMILY;subscriptions;FRIENDS_AND_FAMILY;annually_1;pieces;
+;WEEKENDER;subscriptions;WEEKENDER;annually_1;pieces;
+;HOTSPOT_OPTION;subscriptions;HOTSPOT_OPTION;annually_1;pieces;
+;TV_MOBILE_BASIC;subscriptions;TV_MOBILE_BASIC;annually_1;pieces;
+;TV_MOBILE_EXTRAS_NEWS;subscriptions;TV_MOBILE_EXTRAS_NEWS;annually_1;pieces;
+;TV_MOBILE_EXTRAS_DOCU;subscriptions;TV_MOBILE_EXTRAS_DOCU;annually_1;pieces;
+
+INSERT_UPDATE ProductEntitlement;id[unique=true];entitlement(id);subscriptionProduct(code);$catalogversion
+;PE1;E1;SMART_STANDARD_1Y;
+;PE2;E2;FRIENDS_AND_FAMILY;
+
+UPDATE ProductEntitlement;id[unique=true];description[lang=$defaultLanguage]
+;PE1;Product Entitlement 1
+
+UPDATE Product;code[unique=true];name[lang=en];description[lang=$lang];summary[lang=$lang];$catalogversion
+;SMART_STANDARD_1Y;Smart Stand 1Y;SmartPhone Plan Standard 1 Year;SmartPhone Plan Standard 1 Year;
+;SMART_STANDARD_2Y;Smart Stand 2Y;SmartPhone Plan Standard 2 Year;SmartPhone Plan Standard 2 Year;
+;SMART_STANDARD_3Y;Smart Stand 3Y;SmartPhone Plan Standard 3 Year;SmartPhone Plan Standard 3 Year;
+;SMART_ADVANCED_1000_12M;Smart Adv 1000 12M;SmartPhone Plan Advanced 1 GB 12 Months;SmartPhone Plan Advanced 1 GB 12 Months;
+;SMART_ADVANCED_1000_24M;Smart Adv 1000 24M;SmartPhone Plan Advanced 1 GB 24 Months;SmartPhone Plan Advanced 1 GB 24 Months;
+;SMART_ADVANCED_1000_36M;Smart Adv 1000 36M;SmartPhone Plan Advanced 1 GB 36 Months;SmartPhone Plan Advanced 1 GB 36 Months;
+;SMART_ADVANCED_2000_12M;Smart Adv 2000 12M;SmartPhone Plan Advanced 2 GB 12 Months;SmartPhone Plan Advanced 2 GB 12 Months;
+;SMART_ADVANCED_2000_24M;Smart Adv 2000 24M;SmartPhone Plan Advanced 2 GB 24 Months;SmartPhone Plan Advanced 2 GB 24 Months;
+;SMART_ADVANCED_2000_36M;Smart Adv 2000 36M;SmartPhone Plan Advanced 2 GB 36 Months;SmartPhone Plan Advanced 2 GB 36 Months;
+;SMART_ADVANCED_5000_12M;Smart Adv 5000 12M;SmartPhone Plan Advanced 5 GB 12 Months;SmartPhone Plan Advanced 5 GB 12 Months;
+;SMART_ADVANCED_5000_24M;Smart Adv 5000 24M;SmartPhone Plan Advanced 5 GB 24 Months;SmartPhone Plan Advanced 5 GB 24 Months;
+;SMART_ADVANCED_5000_36M;Smart Adv 5000 36M;SmartPhone Plan Advanced 5 GB 36 Months;SmartPhone Plan Advanced 5 GB 36 Months;
+;SMART_ADVANCED_NOLIM_12M;Smart Adv Unlim 12M;SmartPhone Plan Advanced Unlimited 12 Months;SmartPhone Plan Advanced Unlimited 12 Months;
+;SMART_ADVANCED_NOLIM_24M;Smart Adv Unlim 24M;SmartPhone Plan Advanced Unlimited 24 Months;SmartPhone Plan Advanced Unlimited 24 Months;
+;SMART_ADVANCED_NOLIM_36M;Smart Adv Unlim 36M;SmartPhone Plan Advanced Unlimited 36 Months;SmartPhone Plan Advanced Unlimited 36 Months;
+;INTERNET_PACK_1G;Internet Pack 1000;Internet Package 1 GB;Internet Package 1 GB;
+;INTERNET_PACK_MAX;Internet Pack Max;Internet Package Max;Internet Package Max;
+;FRIENDS_AND_FAMILY;Friends And Family;Friends And Family;Friends And Family;
+;WEEKENDER;Weekend Package;Weekend Pack;Weekend Package;
+;HOTSPOT_OPTION;Hotspot Option;Hotspot Option;Hotspot Option;
+;TV_MOBILE_BASIC;Mobile TV Basic;Mobile TV Basic Package;Mobile TV Basic Package;
+;TV_MOBILE_EXTRAS_NEWS;Mobile TV Extras News;Mobile TV Extras News;Mobile TV Extras News;
+;TV_MOBILE_EXTRAS_DOCU;Mobile TV Extras Documentation;Mobile TV Extras Documentation;Mobile TV Extras Documentation;
+
+UPDATE SubscriptionProduct;code[unique=true];$prices;$approved;$catalogversion;$europe1pricefactory_ptg
+;SMART_STANDARD_1Y;
+;SMART_STANDARD_2Y;
+;SMART_STANDARD_3Y;
+;SMART_ADVANCED_1000_12M;
+;SMART_ADVANCED_1000_24M;
+;SMART_ADVANCED_1000_36M;
+;SMART_ADVANCED_2000_12M;
+;SMART_ADVANCED_2000_24M;
+;SMART_ADVANCED_2000_36M;
+;SMART_ADVANCED_5000_12M;
+;SMART_ADVANCED_5000_24M;
+;SMART_ADVANCED_5000_36M;
+;SMART_ADVANCED_NOLIM_12M;
+;SMART_ADVANCED_NOLIM_24M;
+;SMART_ADVANCED_NOLIM_36M;
+;INTERNET_PACK_1G;
+;INTERNET_PACK_MAX;
+;FRIENDS_AND_FAMILY;
+;WEEKENDER;
+;HOTSPOT_OPTION;
+;TV_MOBILE_BASIC;
+;TV_MOBILE_EXTRAS_NEWS;
+;TV_MOBILE_EXTRAS_DOCU;
+
+# Subscription pricing
+INSERT_UPDATE UsageUnit;id[unique=true];accumulative[default=false];name[lang=$lang];namePlural[lang=$lang]
+;phone_minutes;;minute;minutes
+;sms;;text message;text messages
+;mobile_data;;MB;MBs
+
+INSERT_UPDATE BillingPlan;id[unique=true];name[lang=$lang];billingCycleDay(code);billingCycleType(code);$billingFrequency
+;MonthlyPlan;Monthly Plan;;subscription_start;monthly
+
+
+INSERT_UPDATE SubscriptionPricePlan;&pricePlan;product(code, $catalogversionResolver)[unique=true];name[lang=$lang];$catalogversionResolver;currency(isocode)[default=USD,unique=true];unit(code)[default=pieces]
+;pricePlan_SMART_STANDARD_1Y;       SMART_STANDARD_1Y;       Price Plan for SMART_STANDARD_1Y;       
+;pricePlan_SMART_STANDARD_2Y;       SMART_STANDARD_2Y;       Price Plan for SMART_STANDARD_2Y;       
+;pricePlan_SMART_STANDARD_3Y;       SMART_STANDARD_3Y;       Price Plan for SMART_STANDARD_3Y;       
+;pricePlan_SMART_ADVANCED_1000_12M; SMART_ADVANCED_1000_12M; Price Plan for SMART_ADVANCED_1000_12M; 
+;pricePlan_SMART_ADVANCED_1000_24M; SMART_ADVANCED_1000_24M; Price Plan for SMART_ADVANCED_1000_24M; 
+;pricePlan_SMART_ADVANCED_1000_36M; SMART_ADVANCED_1000_36M; Price Plan for SMART_ADVANCED_1000_36M; 
+;pricePlan_SMART_ADVANCED_2000_12M; SMART_ADVANCED_2000_12M; Price Plan for SMART_ADVANCED_2000_12M; 
+;pricePlan_SMART_ADVANCED_2000_24M; SMART_ADVANCED_2000_24M; Price Plan for SMART_ADVANCED_2000_24M; 
+;pricePlan_SMART_ADVANCED_2000_36M; SMART_ADVANCED_2000_36M; Price Plan for SMART_ADVANCED_2000_36M; 
+;pricePlan_SMART_ADVANCED_5000_12M; SMART_ADVANCED_5000_12M; Price Plan for SMART_ADVANCED_5000_12M; 
+;pricePlan_SMART_ADVANCED_5000_24M; SMART_ADVANCED_5000_24M; Price Plan for SMART_ADVANCED_5000_24M; 
+;pricePlan_SMART_ADVANCED_5000_36M; SMART_ADVANCED_5000_36M; Price Plan for SMART_ADVANCED_5000_36M; 
+;pricePlan_SMART_ADVANCED_NOLIM_12M;SMART_ADVANCED_NOLIM_12M;Price Plan for SMART_ADVANCED_NOLIM_12M;
+;pricePlan_SMART_ADVANCED_NOLIM_24M;SMART_ADVANCED_NOLIM_24M;Price Plan for SMART_ADVANCED_NOLIM_24M;
+;pricePlan_SMART_ADVANCED_NOLIM_36M;SMART_ADVANCED_NOLIM_36M;Price Plan for SMART_ADVANCED_NOLIM_36M;
+
+
+INSERT_UPDATE RecurringChargeEntry;id[unique=true];subscriptionPricePlanRecurring(&pricePlan);price;cycleStart;cycleEnd;$catalogversionResolver
+;RCE_SMART_STANDARD_1Y_MONTHLY;       pricePlan_SMART_STANDARD_1Y;40;1;
+;RCE_SMART_STANDARD_2Y_MONTHLY;       pricePlan_SMART_STANDARD_2Y;35;1;
+;RCE_SMART_STANDARD_3Y_MONTHLY;       pricePlan_SMART_STANDARD_3Y;30;1;
+;RCE_SMART_ADVANCED_1000_12M_MONTHLY; pricePlan_SMART_ADVANCED_1000_12M;50;1;
+;RCE_SMART_ADVANCED_1000_24M_MONTHLY; pricePlan_SMART_ADVANCED_1000_24M;50;1;
+;RCE_SMART_ADVANCED_1000_36M_MONTHLY; pricePlan_SMART_ADVANCED_1000_36M;50;1;
+;RCE_SMART_ADVANCED_2000_12M_MONTHLY; pricePlan_SMART_ADVANCED_2000_12M;60;1;
+;RCE_SMART_ADVANCED_2000_24M_MONTHLY; pricePlan_SMART_ADVANCED_2000_24M;60;1;
+;RCE_SMART_ADVANCED_2000_36M_MONTHLY; pricePlan_SMART_ADVANCED_2000_36M;60;1;
+;RCE_SMART_ADVANCED_5000_12M_MONTHLY; pricePlan_SMART_ADVANCED_5000_12M;70;1;
+;RCE_SMART_ADVANCED_5000_24M_MONTHLY; pricePlan_SMART_ADVANCED_5000_24M;70;1;
+;RCE_SMART_ADVANCED_5000_36M_MONTHLY; pricePlan_SMART_ADVANCED_5000_36M;70;1;
+;RCE_SMART_ADVANCED_NOLIM_12M_MONTHLY;pricePlan_SMART_ADVANCED_NOLIM_12M;80;1;
+;RCE_SMART_ADVANCED_NOLIM_24M_MONTHLY;pricePlan_SMART_ADVANCED_NOLIM_24M;80;1;
+;RCE_SMART_ADVANCED_NOLIM_36M_MONTHLY;pricePlan_SMART_ADVANCED_NOLIM_36M;80;1;
+
+#
+# Setup a synchronization
+# 
+$sourceversion=sourceversion(catalog(id[default=$catalog-id]),version[default=Staged])[unique=true,default=$catalog-id:Staged]
+$targetversion=targetversion(catalog(id[default=$catalog-id]),version[default=Online])[unique=true,default=$catalog-id:Online]
+INSERT_UPDATE CatalogVersionSyncJob;code[unique=true];enabletransactions;$sourceversion;$targetversion;
+;$syncJobCode;false;;;
+
+#
+# Import Constraints for Product Cockpit
+# 
+
+INSERT_UPDATE CoverageConstraintGroup;id[unique=true];coverageDomainID;dedicatedTypes(code);interfaceName
+;productCoverageConstraintGroup;defaultDomain;Product;de.hybris.platform.validation.groupinterfaces.ProductCoverageConstraintGroup
+;subscriptionCoverageConstraintGroup;defaultDomain;SubscriptionProduct;de.hybris.platform.validation.groupinterfaces.SubscriptionCoverageConstraintGroup
+;variantCoverageConstraintGroup;defaultDomain;VariantProduct;de.hybris.platform.validation.groupinterfaces.VariantCoverageConstraintGroup
+
+INSERT_UPDATE SizeConstraint;descriptor(enclosingType(code),qualifier);id[unique=true,allownull=true];max[allownull=true];min[allownull=true];qualifier[allownull=true];severity(code,itemtype(code));target[allownull=true];type(code);constraintGroups(id);message[lang=en]
+;Product:code;ProductCodeMinSizeCoverageConstraint;255;5;code;ERROR:Severity;de.hybris.platform.core.model.product.ProductModel;Product;productCoverageConstraintGroup
+;Product:name;ProductNameMinSizeCoverageConstraint;255;3;name;ERROR:Severity;de.hybris.platform.core.model.product.ProductModel;Product;productCoverageConstraintGroup
+;Product:description;ProductDescriptionMinSizeCoverageConstraint;10000;20;description;ERROR:Severity;de.hybris.platform.core.model.product.ProductModel;Product;productCoverageConstraintGroup
+;Product:europe1Prices;ProductPricesMinSizeCoverageConstraint;10000;1;europe1Prices;ERROR:Severity;de.hybris.platform.core.model.product.ProductModel;Product;productCoverageConstraintGroup;There must be at least one price assigned.
+;SubscriptionProduct:code;SubscriptionProductCodeMinSizeCoverageConstraint;255;5;code;ERROR:Severity;de.hybris.platform.subscriptionservices.model.SubscriptionProductModel;SubscriptionProduct;subscriptionCoverageConstraintGroup
+;SubscriptionProduct:name;SubscriptionProductNameMinSizeCoverageConstraint;255;3;name;ERROR:Severity;de.hybris.platform.subscriptionservices.model.SubscriptionProductModel;SubscriptionProduct;subscriptionCoverageConstraintGroup
+;SubscriptionProduct:description;SubscriptionProductDescriptionMinSizeCoverageConstraint;10000;20;description;ERROR:Severity;de.hybris.platform.subscriptionservices.model.SubscriptionProductModel;SubscriptionProduct;subscriptionCoverageConstraintGroup
+;SubscriptionProduct:europe1Prices;SubscriptionProductPricesMinSizeCoverageConstraint;10000;1;europe1Prices;ERROR:Severity;de.hybris.platform.subscriptionservices.model.SubscriptionProductModel;SubscriptionProduct;subscriptionCoverageConstraintGroup;There must be at least one price assigned.
+;VariantProduct:code;VariantProductCodeMinSizeCoverageConstraint;255;5;code;ERROR:Severity;de.hybris.platform.variants.model.VariantProductModel;VariantProduct;variantCoverageConstraintGroup
+;VariantProduct:name;VariantProductNameMinSizeCoverageConstraint;255;3;name;ERROR:Severity;de.hybris.platform.variants.model.VariantProductModel;VariantProduct;variantCoverageConstraintGroup
+;VariantProduct:description;VariantProductDescriptionMinSizeCoverageConstraint;10000;20;description;ERROR:Severity;de.hybris.platform.variants.model.VariantProductModel;VariantProduct;variantCoverageConstraintGroup
+;VariantProduct:europe1Prices;VariantProductPricesMinSizeCoverageConstraint;10000;1;europe1Prices;ERROR:Severity;de.hybris.platform.variants.model.VariantProductModel;VariantProduct;variantCoverageConstraintGroup;There must be at least one price assigned.
+
+INSERT_UPDATE NotEmptyConstraint;descriptor(enclosingType(code),qualifier);id[unique=true,allownull=true];qualifier[allownull=true];severity(code,itemtype(code));target[allownull=true];type(code);constraintGroups(id)
+;Product:ean;ProductEanNotEmptyConstraint;ean;ERROR:Severity;de.hybris.platform.core.model.product.ProductModel;Product;productCoverageConstraintGroup
+;SubscriptionProduct:ean;SubscriptionProductEanNotEmptyConstraint;ean;ERROR:Severity;de.hybris.platform.subscriptionservices.model.SubscriptionProductModel;SubscriptionProduct;subscriptionCoverageConstraintGroup
+;VariantProduct:ean;VariantProductEanNotEmptyConstraint;ean;ERROR:Severity;de.hybris.platform.variants.model.VariantProductModel;VariantProduct;variantCoverageConstraintGroup
+
+INSERT_UPDATE NotNullConstraint;descriptor(enclosingType(code),qualifier);id[unique=true,allownull=true];qualifier[allownull=true];severity(code,itemtype(code));target[allownull=true];type(code);constraintGroups(id)
+;Product:picture;ProductPictureNotNullConstraint;picture;ERROR:Severity;de.hybris.platform.core.model.product.ProductModel;Product;productCoverageConstraintGroup
+;Product:name;ProductNameNotNullConstraint;name;ERROR:Severity;de.hybris.platform.core.model.product.ProductModel;Product;productCoverageConstraintGroup
+;Product:description;ProductDescriptionNotNullConstraint;description;ERROR:Severity;de.hybris.platform.core.model.product.ProductModel;Product;productCoverageConstraintGroup
+;SubscriptionProduct:picture;SubscriptionProductPictureNotNullConstraint;picture;ERROR:Severity;de.hybris.platform.subscriptionservices.model.SubscriptionProductModel;SubscriptionProduct;subscriptionCoverageConstraintGroup
+;SubscriptionProduct:name;SubscriptionProductNameNotNullConstraint;name;ERROR:Severity;de.hybris.platform.subscriptionservices.model.SubscriptionProductModel;SubscriptionProduct;subscriptionCoverageConstraintGroup
+;SubscriptionProduct:description;SubscriptionProductDescriptionNotNullConstraint;description;ERROR:Severity;de.hybris.platform.subscriptionservices.model.SubscriptionProductModel;SubscriptionProduct;subscriptionCoverageConstraintGroup
+;VariantProduct:picture;VariantProductPictureNotNullConstraint;picture;ERROR:Severity;de.hybris.platform.variants.model.VariantProductModel;VariantProduct;variantCoverageConstraintGroup
+;VariantProduct:name;VariantProductNameNotNullConstraint;name;ERROR:Severity;de.hybris.platform.variants.model.VariantProductModel;VariantProduct;variantCoverageConstraintGroup
+;VariantProduct:description;VariantProductDescriptionNotNullConstraint;description;ERROR:Severity;de.hybris.platform.variants.model.VariantProductModel;VariantProduct;variantCoverageConstraintGroup
+
+INSERT_UPDATE PriceRowsValidConstraint;descriptor(enclosingType(code),qualifier);id[unique=true,allownull=true];qualifier[allownull=true];severity(code,itemtype(code));target[allownull=true];type(code);constraintGroups(id);priceRowType[default=PriceRow]
+;SubscriptionProduct:priceRowsValid;SubscriptionProductPriceRowsValidConstraint;priceRowsValid;ERROR:Severity;de.hybris.platform.subscriptionservices.model.SubscriptionProductModel;SubscriptionProduct;subscriptionCoverageConstraintGroup;SubscriptionPricePlan
+
+#
+# Setup the Solr server, indexer, and search configs
+#
+
+# Create the solr server configuration
+INSERT_UPDATE SolrServerConfig;name[unique=true];mode(code);embeddedMaster
+;$serverConfigName;embedded;true
+
+# Create the solr indexer configuration
+INSERT_UPDATE SolrIndexConfig;name[unique=true];batchSize;numberOfThreads;indexMode(code);
+;$indexConfigName;100;1;TWO_PHASE;
+
+# Create the faceted search configuration
+INSERT_UPDATE SolrSearchConfig;description[unique=true];pageSize
+;$searchConfigName;20
+
+#
+# Setup the indexed types, their properties, and the update queries
+#
+
+# Declare the indexed type Product
+INSERT_UPDATE SolrIndexedType;identifier[unique=true];type(code);variant;sorts(&sortRefID)
+;$solrIndexedType;Product;false;sortRef1,sortRef2,sortRef3,sortRef4,sortRef5,sortRef6
+
+INSERT_UPDATE SolrFacetSearchConfig;name[unique=true];description;indexNamePrefix;languages(isocode);currencies(isocode);solrServerConfig(name);solrSearchConfig(description);solrIndexConfig(name);solrIndexedTypes(identifier);$catalogVersions
+;$facetSearchConfigName;$facetSearchConfigDescription;$searchIndexNamePrefix;$indexLanguages;$indexCurrencies;$serverConfigName;$searchConfigName;$indexConfigName;$solrIndexedType;$catalog-id:Online,$catalog-id:Staged
+
+UPDATE BaseSite;uid[unique=true];solrFacetSearchConfiguration(name)
+;$indexBaseSite;$facetSearchConfigName
+
+# Define the available sorts
+INSERT_UPDATE SolrSort;&sortRefID;indexedType(identifier)[unique=true];code[unique=true]
+;sortRef0;$solrIndexedType;stockAvailability
+;sortRef1;$solrIndexedType;relevance
+;sortRef2;$solrIndexedType;topRated
+;sortRef3;$solrIndexedType;name-asc
+;sortRef4;$solrIndexedType;name-desc
+;sortRef5;$solrIndexedType;price-asc
+;sortRef6;$solrIndexedType;price-desc
+
+$de.hybris.platform.core.Registry.getApplicationContext().getBean(de.hybris.platform.validation.services.ValidationService.class).reloadValidationEngine()

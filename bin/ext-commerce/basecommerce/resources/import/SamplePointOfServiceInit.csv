@@ -1,0 +1,18 @@
+INSERT_UPDATE Country;isocode[unique=true];name;active;
+;DE;Germany;true;
+;;
+INSERT_UPDATE PointOfService;name[unique=true];description;type(code)
+;myShop;shop;STORE
+;myPOS;Point of Service;POS
+;myWarehouse;warehouse;WAREHOUSE
+;;
+INSERT_UPDATE Address;owner(PointOfService.name)[unique=true];streetname;streetnumber;postalcode;town;country(isocode);
+;myShop;arnulfstrasse;25;80636;Muenchen;DE;
+;myPOS;albrechtstrasse;21;80636;Muenchen;DE;
+;myWarehouse;Dachauer strasse;151;80636;Muenchen;DE;
+;;
+UPDATE PointOfService;name[unique=true];description;type(code);address(owner(PointOfService.name));
+;myShop;shop;STORE;myShop;
+;myPOS;Point of Service;POS;myPOS;
+;myWarehouse;warehouse;WAREHOUSE;myWarehouse;
+;;

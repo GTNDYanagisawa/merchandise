@@ -1,0 +1,89 @@
+/*
+ * [y] hybris Platform
+ * Script: %SCRIPT_ID%
+ * SYNC script to read the attribute value of a hybris item
+ */
+
+#include "internal/types.h"
+#include "internal/text.h"
+
+int kBufferSize = 50000;
+
+int main ()
+{
+	int err = 0;
+	int errorcode = 0;
+	char * result = alloc( kBufferSize );
+	Query qu = sql::query( soap::connection() );
+	char * layer = alloc( 8000 );
+	int linkID = 0;
+	String localvalue = string::alloc();
+
+	// Getting parameter values
+	frame::get_layer( gItem, layer );
+	frame::gettext( gFrame, localvalue, 0, kEnd, kExportPlain );
+	linkID = placeholder::get_value( gFrame, "Placeholder" );
+
+	if(qu)
+	{
+		// Creating query
+		if(query::set_method( qu, "SYNC_attribute" ) == 0)
+		{
+			if(	query::send( qu, "qualifier = %QUALIFIER%\n" ) &&
+				query::send( qu, "id = ?\n" ) &&
+				query::send( qu, "language = ?\n" ) &&
+				query::send( qu, "link = ?\n" ) &&
+				query::send( qu, "value = [VALUE]?[/VALUE]\n" ) &&
+				query::input( qu, kString, gRecordStringID ) &&
+				query::input( qu, kString, layer ) &&
+				query::input( qu, kInt, linkID ) &&
+				query::input( qu, kString, string::get(localvalue) ) &&
+				query::output( qu, kString, result, kBufferSize ))
+			{
+				// Executing query
+				if(query::exec( qu ) )
+				{
+					query::fetch( qu );
+					err = placeholder::set_sync( val(result) );
+					if( err != 1 )
+					{
+					  wlog( "", "Error [%d], message: [%s] in placeholder::set_sync, template sync_textframe.crpt. \n", err, serror(err) );
+					  errorcode = 5;
+					}
+				}
+				else
+				{
+					wlog("", "There was a query::exec error in template sync_textframe.crpt, method main(). \n");
+					errorcode = 1;
+				}
+			}
+			else
+			{
+				wlog("", "There was a query send/input/output error in template sync_textframe.crpt, method main(). \n");
+				errorcode = 2;
+			}
+		}
+		else
+		{
+			wlog("", "There was a query::set_method error in template sync_textframe.crpt, method main(). \n");
+			errorcode = 3;
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful! error in method main() in template sync_textframe.crpt. \n");
+		errorcode = 4;
+	}	
+
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in script template sync_textframe.crpt, method main(). \n");
+	}
+
+	// Cleanup
+	release( result );
+	release( layer );
+	string::release( localvalue );
+
+	return 0;
+}

@@ -1,0 +1,278 @@
+# ---------------------------------------------------------
+# --- proficlass 3.0
+# --- create system and version
+# ---------------------------------------------------------
+
+#% impex.info("creating classification system $systemName $systemVersion in language $systemLanguage ...");
+
+INSERT_UPDATE ClassificationSystem[cacheUnique=true]; id[unique=true]
+; $systemName ;
+
+INSERT_UPDATE ClassificationSystemversion[cacheUnique=true]; \
+								version[unique=true] ; \
+								catalog(id)[unique=true]; \
+								inclPacking[default=true]; \
+								inclDuty[default=true]; \
+								inclFreight[default=true]; \
+								inclAssurance[default=true];
+; $systemVersion ; $systemName; 
+
+
+# ---------------------------------------------------------
+# --- proficlass 3.0
+# --- create article classes 
+# --- from Klassen.csv
+# ---------------------------------------------------------
+$sysVer=catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$KLasse_ID=code
+$Parent_ID=superCategories(code,$sysVer)
+$Klassenbezeichnung=name[lang='$systemLanguage']
+$Hierarchieebene=
+$Klassifikationssystem_ID=revision
+
+# AAA000c003;AAA943h001;Abisolierzange;5;pc-3.0
+# AAA002c002;AAA943h001;Abisolier-Seitenschneider;5;pc-3.0
+# AAA004c003;AAA935h001;Flachzange;5;pc-3.0
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion article classes  ...");
+
+INSERT_UPDATE ClassificationClass[cacheUnique=true];\
+								$sysVer[unique=true,virtual=true];\
+								$KLasse_ID[unique=true];\
+								$Parent_ID;\
+								$Klassenbezeichnung;\
+								$Hierarchieebene;\
+								$Klassifikationssystem_ID
+
+#% impex.includeExternalDataMedia( "Klassen.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion classes");
+
+# ---------------------------------------------------------
+# --- proficlass 3.0
+# --- create keywords 
+# --- from Schlagworte.csv
+# ---------------------------------------------------------
+$sysVer=catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$language=language(isocode[default='$systemLanguage'])
+$Schlagwort_ID=externalID
+$Schlagwortbezeichnung=keyword
+$Klassifikationssystem_ID=
+
+# AAA000s001;Zangen;pc-3.0
+# AAA001s001;Abisolierzangen;pc-3.0
+# AAA004s001;Abisolier-Seitenschneider;pc-3.0
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion keywords ...");
+
+INSERT_UPDATE ClassificationKeyword[cacheUnique=true]; \
+								$sysVer[unique=true,virtual=true];\
+								$language[unique=true,virtual=true];\
+								$Schlagwort_ID[unique=true];\
+								$Schlagwortbezeichnung;\
+								$Klassifikationssystem_ID
+
+#% impex.includeExternalDataMedia( "Schlagworte.csv", 1, -1 );
+
+#% impex.info("done creating $systemName $systemVersion keywords");
+
+# ---------------------------------------------------------
+# --- proficlass 3.0
+# --- assign keywords 
+# --- from KlassenSchlagworte_rel.csv
+# ---------------------------------------------------------
+$language=language(isocode[default='$systemLanguage'])
+$KlasseSchlagwort_Nr=
+$KLasse_ID=source(ClassificationClass.code,ClassificationClass.catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$Schlagwort_ID=target(ClassificationKeyword.externalID,ClassificationKeyword.catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$Klassifikationssystem_ID=
+
+# 142;AAA017c001;AAA032s001;pc-3.0
+# 143;AAA017c001;AAA029s001;pc-3.0
+# 144;AAA017c001;AAA033s001;pc-3.0
+# ---------------------------------------------------------
+#% impex.info("assigning $systemName $systemVersion keywords ...");
+
+INSERT_UPDATE Category2KeywordRelation[cacheUnique=true]; \
+								$language[virtual=true,unique=true];\
+								$KlasseSchlagwort_Nr; \
+								$KLasse_ID[unique=true]; \
+								$Schlagwort_ID[unique=true]; \
+								$Klassifikationssystem_ID
+
+#% impex.includeExternalDataMedia( "KlassenSchlagworte_rel.csv", 1, -1 );
+
+#% impex.info("done assigning $systemName $systemVersion keywords");
+
+
+# ---------------------------------------------------------
+# --- proficlass 3.0
+# --- create attributes 
+# --- from Merkmale.csv
+# ---------------------------------------------------------
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$Merkmal_ID=code
+$Merkmalbezeichnung=name[lang='$systemLanguage']
+$Datentyp=
+$Klassifikationssystem_ID=
+# AAA000f001;Werkstoff;alphanumerisch;pc-3.0
+# AAA002f001;Länge;numerisch;pc-3.0
+# AAA003f001;Gewicht;numerisch;pc-3.0
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion attributes ...");
+
+INSERT_UPDATE ClassificationAttribute[cacheUnique=true];\
+								$sysVer[unique=true,virtual=true];\
+								$Merkmal_ID[unique=true];\
+								$Merkmalbezeichnung;\
+								$Datentyp;\
+								$Klassifikationssystem_ID
+
+#% impex.includeExternalDataMedia( "Merkmale.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion attributes");
+
+# ---------------------------------------------------------
+# --- proficlass 3.0
+# --- create values 
+# --- from Werte.csv
+# ---------------------------------------------------------
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$Wert_ID=code
+$Wertbezeichnung=name[lang='$systemLanguage']
+$Klassifikationssystem_ID=
+
+# AAA002v001;Kunststoffhüllen;pc-3.0
+# AAA003v001;kunststoffüberzogen;pc-3.0
+# AAA004v001;schwarz;pc-3.0
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion values ...");
+
+INSERT_UPDATE ClassificationAttributeValue[cacheUnique=true];\
+								$sysVer[virtual=true,unique=true];\
+								$Wert_ID[unique=true];\
+								$Wertbezeichnung;\
+								$Klassifikationssystem_ID
+
+#% impex.includeExternalDataMedia( "Werte.csv", 1, -1 );
+
+#% impex.info("done creating $systemName $systemVersion values");
+
+# ---------------------------------------------------------
+# --- proficlass 3.0
+# --- create units
+# --- from Einheiten.csv
+# ---------------------------------------------------------
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$Einheit_ID=externalID
+$Einheitcode=code
+$Einheitkurzbezeichnung=symbol
+$Einheitbezeichnung=name[lang='$systemLanguage']
+$Klassifikationssystem_ID=
+
+# AAA001u001;MMT;mm;Millimeter;pc-3.0
+# AAA002u001;GRM;g;Gramm;pc-3.0
+# AAA003u001;MMK;mm²;Quadratmillimeter;pc-3.0
+# ---------------------------------------------------------
+
+#% impex.info("creating $systemName $systemVersion units ...");
+
+INSERT_UPDATE ClassificationAttributeUnit[cacheUnique=true]; \
+								$sysVer[virtual=true,unique=true];\
+								$Einheit_ID[unique=true];\
+								$Einheitcode[allowNull=true];\
+								$Einheitkurzbezeichnung;\
+								$Einheitbezeichnung;\
+								$Klassifikationssystem_ID
+
+#% impex.includeExternalDataMedia( "Einheiten.csv", 1, -1 );
+
+#% impex.info("done creating $systemName $systemVersion units");
+
+# ---------------------------------------------------------
+# --- proficlass 3.0
+# --- assign classes to attributes 
+# --- from KlassenMerkmale_rel.csv
+# ---------------------------------------------------------
+$KlasseMerkmal_Nr=externalID
+$KLasse_ID=classificationClass(code,catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$Merkmal_ID=classificationAttribute(code,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$Einheit_ID=unit(externalID,$sysVer)
+$Sortier_Nr=position
+$Mussmerkmal=mandatory
+$Klassifikationssystem_ID=
+
+# 431;AAA017c001;AAA019f001;;1;TRUE;pc-3.0
+# 432;AAA017c001;AAA024f001;AAA001u001;4;TRUE;pc-3.0
+# 433;AAA017c001;AAA025f001;AAA001u001;3;TRUE;pc-3.0
+# ---------------------------------------------------------
+#% impex.info("assigning $systemName $systemVersion attributes ...");
+
+INSERT_UPDATE ClassAttributeAssignment[cacheUnique=true]; \
+								$sysVer[virtual=true,unique=true];\
+								$KlasseMerkmal_Nr;\
+								$KLasse_ID[unique=true];\
+								$Merkmal_ID[unique=true];\
+								$Einheit_ID;\
+								$Sortier_Nr;\
+								$Mussmerkmal;\
+								$Klassifikationssystem_ID
+
+#% impex.includeExternalDataMedia( "KlassenMerkmale_rel.csv", 1, -1 );
+
+#% impex.info("done assigning $systemName $systemVersion attributes");
+
+
+# ---------------------------------------------------------
+# --- proficlass 3.0
+# --- set attribute type in class-attribute-assignments
+# --- from Merkmale.csv
+# ---------------------------------------------------------
+$Merkmal_ID=classificationAttribute(code,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$Merkmalbezeichnung=
+$Datentyp=attributeType[translator=de.hybris.platform.catalog.jalo.classification.proficlass.ProfiClassAttributeTypeTranslator]
+$Klassifikationssystem_ID=
+# AAA000f001;Werkstoff;alphanumerisch;pc-3.0
+# AAA002f001;Länge;numerisch;pc-3.0
+# AAA003f001;Gewicht;numerisch;pc-3.0
+# ---------------------------------------------------------
+#% impex.info("setting $systemName $systemVersion attribute type ...");
+
+UPDATE ClassAttributeAssignment[cacheUnique=true,batchmode=true];\
+					$sysVer[virtual=true,unique=true];\
+					$Merkmal_ID[unique=true];\
+					$Merkmalbezeichnung;\
+					$Datentyp;\
+					$Klassifikationssystem_ID
+
+#% impex.includeExternalDataMedia( "Merkmale.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion attribute type");
+
+# ---------------------------------------------------------
+# --- proficlass 3.0
+# --- assign values to class-attribute-assignments
+# --- from KlassenMerkmaleWerte_rel.csv
+# ---------------------------------------------------------
+$KlasseMerkmalWert_Nr=externalID
+$KlasseMerkmal_Nr=attributeAssignment(externalID,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$Wert_ID=value(code,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$Klassifikationssystem_ID=
+
+# 422;435;AAA170v001;pc-3.0
+# 423;435;AAA171v001;pc-3.0
+# 424;431;AAA168v001;pc-3.0
+# ---------------------------------------------------------
+#% impex.info("assigning $systemName $systemVersion values ...");
+
+INSERT_UPDATE AttributeValueAssignment[cacheUnique=true];\
+								$sysVer[virtual=true,unique=true];\
+								$KlasseMerkmalWert_Nr;\
+								$KlasseMerkmal_Nr[unique=true];\
+								$Wert_ID[unique=true];\
+								$Klassifikationssystem_ID
+
+#% impex.includeExternalDataMedia( "KlassenMerkmaleWerte_rel.csv", 1, -1 );
+
+#% impex.info("completed $systemName - $systemVersion ");
+

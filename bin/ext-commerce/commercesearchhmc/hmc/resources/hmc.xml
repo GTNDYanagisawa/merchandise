@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+	<!-- Configuration for extension commercesearchhmc -->
+
+	<type name="SolrIndexedProperty" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.configuration.indexedproperty.facet" mode="append">
+					<section name="sec.configuration.indexedproperty.facet" mode="append">
+						<listlayout mode="append">
+							<attribute name="facetVisibilityRules" >
+								<referencecollectioneditor add="true" create="true" remove="true"  presetattribute="facet" resortable="false" editable="true">
+									<itemlayout>
+										<attribute name="code" width="100"/>
+										<attribute name="name" width="250" />
+										<attribute name="condition" width="100"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="solrFacetReconfigurations">
+								<referencecollectioneditor add="true" create="true" remove="true"  presetattribute="facet" resortable="false" editable="true">
+									<itemlayout>
+                              			<attribute name="facetType" />
+                              			<attribute name="priority"/>
+                              			<attribute name="visible"/>
+                              			<attribute name="description"/>									
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.configuration.boostrules.facet" mode="append">
+					<section name="sec.configuration.boostrules.facet" mode="append">
+						<listlayout mode="append">
+							<attribute name="boostRules" >
+								<referencecollectioneditor presetattribute="solrIndexedProperty" add="true" create="true" remove="true" resortable="false" editable="true">
+									<itemlayout>
+				                      <attribute name="operator" width="100"/>
+				                      <attribute name="propertyValue" width="200" />
+				                      <attribute name="boostFactor" width="100"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+
+		<defaultreference mode="append">
+			<itemlayout mode="append">
+				<attribute name="name"/>
+				<attribute name="type" />
+				<attribute name="facet" />
+				<attribute name="exportId" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="AbstractSolrFacetVisibilityRule" mode="replace">
+		<organizer>
+			<search>
+				<condition attribute="facet"/>
+				<condition attribute="code" />
+				<condition attribute="name" operator="starts with"/>
+				<condition attribute="condition" />
+				
+			</search>
+			<result>
+				<listview mode="append" scrollbar="true">
+					<itemlayout>
+						<attribute name="code" />
+						<attribute name="name" />
+						<attribute name="condition" />						
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.facetvisibilityrule.general" mode="append">
+					<section name="section.facetvisibilityrule.general" position="0" mode="append">
+						<columnlayout mode="append">
+							<row>
+								<attribute name="code"/>
+								<attribute name="name" />
+							</row>
+							<row>
+								<attribute name="condition" />
+								<attribute name="facet" editable="false" />			
+							</row>
+						</columnlayout>
+					
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		
+		<defaultreference>
+			<itemlayout >
+				<attribute name="code"/>
+				<attribute name="name"/>
+				<attribute name="facet"/>
+				<attribute name="condition"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="SolrBoostRule" mode="append">
+		<organizer>
+			<search>
+				<condition attribute="operator" />
+				<condition attribute="propertyValue" />
+				<condition attribute="boostFactor" />
+			</search>
+
+			<result>
+				<listview mode="append" scrollbar="true">
+					<itemlayout>
+						<attribute name="operator" />
+						<attribute name="propertyValue" />
+						<attribute name="boostFactor" />						
+					</itemlayout>
+				</listview>
+			</result>
+
+			<editor>
+				<tab name="tab.boostrule.config" mode="append">
+					<section name="section.boostrule.settings" position="0" mode="append">
+						<columnlayout mode="append">
+							<row>
+								<attribute name="operator" />
+								<attribute name="propertyValue" />
+							</row>
+							<row>
+								<attribute name="boostFactor" />
+								<attribute name="solrIndexedProperty" />			
+							</row>
+							<row>
+								<attribute name="solrsearchprofiles" >
+									<referencecollectioneditor presetattribute="solrBoostRule" add="true" create="true" remove="true" resortable="false" editable="true">
+										<itemlayout>
+					                      <attribute name="code" width="200"/>
+					                      <attribute name="indexedType" width="200" />
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		
+		<defaultreference>
+			<itemlayout >
+				<attribute name="operator"/>
+				<attribute name="propertyValue"/>
+				<attribute name="boostFactor"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="ValueCoverageSolrFacetVisibilityRule" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.facetvisibilityrule.general" mode="append">
+					<section name="section.facetvisibilityrule.configuration" mode="append">
+						<listlayout>
+							<attribute name="coveragePercentage"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="append">
+			<itemlayout  mode="append">
+				<attribute name="coveragePercentage" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="CategorySelectedSolrFacetVisibilityRule" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.facetvisibilityrule.general" mode="append">
+					<section name="section.facetvisibilityrule.configuration" mode="append">
+						<listlayout>
+							<attribute name="categories"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="append">
+			<itemlayout  mode="append">
+				<attribute name="categories" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="FacetValueCountSolrFacetVisibilityRule" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.facetvisibilityrule.general" mode="append">
+					<section name="section.facetvisibilityrule.configuration" mode="append">
+						<listlayout>
+							<attribute name="operator"/>
+							<attribute name="count"/>
+							<attribute name="selectedStates" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="append">
+			<itemlayout  mode="append">
+				<attribute name="operator" />
+				<attribute name="count" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="OtherFacetValueCountSolrFacetVisibilityRule" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.facetvisibilityrule.general" mode="append">
+					<section name="section.facetvisibilityrule.configuration" mode="replace">
+						<listlayout>
+							<attribute name="otherFacet"/>
+							<attribute name="operator"/>
+							<attribute name="count"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="append">
+			<itemlayout  mode="replace">
+				<attribute name="otherFacet"/>
+				<attribute name="operator" />
+				<attribute name="count" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="ConditionalSolrSort" mode="append">
+		<organizer mode="append">
+			<editor>
+				<tab name="tab.configuration.solrsort" mode="append">
+					<section name="sec.configuration.solrsort" mode="append">
+						<listlayout>
+							<attribute name="conditions">
+								<referencecollectioneditor   create="true" add="true" remove="true" resortable="true" >
+									<itemlayout>
+										<attribute width="300" name="description"/>
+										<attribute name="inverse" />
+									</itemlayout>
+								</referencecollectioneditor>	
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	
+	<type name="AbstractSolrSortCondition" mode="replace">
+		<organizer >
+			<search>
+				<condition attribute="inverse" />
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="description" />
+						<attribute name="inverse" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.configuration.solrsortcondition" mode="append">
+					<section name="sec.configuration.solrsortcondition" mode="append">
+						<listlayout>
+							<attribute name="description" />
+							<attribute name="inverse" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference>
+			<itemlayout>
+				<attribute name="description"/>
+				<attribute name="inverse" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SelectedCategoryHierarchySolrSortCondition" mode="append">
+		<organizer mode="append">
+			<search mode="append">
+				<condition attribute="rootCategory" />
+			</search>
+			<editor>
+				<tab name="tab.configuration.solrsortcondition" mode="append">
+					<section name="sec.configuration.solrsortcondition" mode="append">
+						<listlayout>
+							<attribute name="rootCategory" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="append">
+			<itemlayout>
+				<attribute name="rootCategory"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="SolrFacetReconfiguration" mode="append">
+		<organizer>
+			<search>
+				<condition attribute="facet"/>
+				<condition attribute="facetType" />
+				<condition attribute="priority" />
+			</search>
+			<result>
+				<listview mode="append" scrollbar="true">
+					<itemlayout>
+						<attribute name="facet" />
+						<attribute name="facetType" />
+						<attribute name="priority" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.solrfacetreconfiguration.general" mode="append">
+					<section name="section.solrfacetreconfiguration.general" position="0" mode="append">
+						<columnlayout mode="append">
+							<row>
+								<attribute name="facetType" />
+								<attribute name="facet"/>
+							</row>
+							<row>
+								<attribute name="customFacetSortProvider">
+									<customeditor classname="de.hybris.platform.solrfacetsearch.hmc.FacetSortProviderEditorChip"></customeditor>
+								</attribute>
+								<attribute name="priority" />
+							</row>
+							<row>
+								<attribute name="visible"/>
+							</row>
+							<row>
+								<attribute name="solrSearchProfiles" >
+									<referencecollectioneditor presetattribute="solrBoostRule" add="true" create="true" remove="true" resortable="false" editable="true">
+										<itemlayout>
+					                    	<attribute name="code" width="200"/>
+					                    	<attribute name="indexedType" width="200"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+
+		<defaultreference>
+			<itemlayout >
+				<attribute name="facet"/>
+				<attribute name="facetType"/>
+				<attribute name="customFacetSortProvider"/>
+				<attribute name="priority"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="GlobalSolrSearchProfile" mode="append">
+		<organizer mode="append">
+			<search mode="append">
+				<condition attribute="indexedType" />
+			</search>
+			<result>
+				<listview mode="append" scrollbar="true">
+					<itemlayout>
+						<attribute name="indexedType" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.abstractsolrsearchprofile.general" mode="append">
+					<section name="section.abstractsolrsearchprofile.general" position="0" mode="append">
+						<columnlayout mode="append">
+							<row>
+								<attribute name="code" />
+								<attribute name="indexedType" />
+							</row>
+							<row>
+								<attribute name="solrFacetReconfigurations" >
+									<referencecollectioneditor presetattribute="categorySolrSearchProfile" add="true" create="true" remove="true" resortable="false" editable="true">
+										<itemlayout>
+					                    	<attribute name="facet" width="280"/>
+					                    	<attribute name="priority" width="100"/>
+					                    	<attribute name="visible" width="150"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+							</row>
+							<row>
+								<attribute name="boostRules" >
+									<referencecollectioneditor presetattribute="categorySolrSearchProfile" add="true" create="true" remove="true" resortable="false" editable="true">
+										<itemlayout>
+					                    	<attribute name="operator" width="150"/>
+					                    	<attribute name="propertyValue" width="150"/>
+					                    	<attribute name="boostFactor" width="100"/>
+					                    	<attribute name="solrIndexedProperty" width="200"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CategorySolrSearchProfile" mode="append">
+		<organizer mode="append">
+			<search mode="append">
+				<condition attribute="categoryCode" />
+			</search>
+			<result>
+				<listview mode="append" scrollbar="true">
+					<itemlayout>
+						<attribute name="categoryCode" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.abstractsolrsearchprofile.general" mode="append">
+					<section name="section.abstractsolrsearchprofile.general" position="0" mode="append">
+						<columnlayout mode="append">
+							<row>
+								<attribute name="code" />
+								<attribute name="indexedType" />
+							</row>
+							<row>
+								<attribute name="categoryCode" />
+							</row>
+							<row>
+								<attribute name="solrFacetReconfigurations" >
+									<referencecollectioneditor presetattribute="categorySolrSearchProfile" add="true" create="true" remove="true" resortable="false" editable="true">
+										<itemlayout>
+					                    	<attribute name="facet" width="280"/>
+					                    	<attribute name="priority" width="100"/>
+					                    	<attribute name="visible" width="150"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+							</row>
+							<row>
+								<attribute name="boostRules" >
+									<referencecollectioneditor presetattribute="categorySolrSearchProfile" add="true" create="true" remove="true" resortable="false" editable="true">
+										<itemlayout>
+					                    	<attribute name="operator" width="150"/>
+					                    	<attribute name="propertyValue" width="150"/>
+					                    	<attribute name="boostFactor" width="100"/>
+					                    	<attribute name="solrIndexedProperty" width="200"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+</configuration>

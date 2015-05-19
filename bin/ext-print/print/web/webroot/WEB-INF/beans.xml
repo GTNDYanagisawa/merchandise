@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                  http://www.springframework.org/schema/aop 
+                  http://www.springframework.org/schema/aop/spring-aop-3.1.xsd 
+						http://cxf.apache.org/jaxws 
+						http://cxf.apache.org/schemas/jaxws.xsd">
+
+	<import resource="classpath:META-INF/cxf/cxf.xml"/>
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
+
+	<bean id="binaryDataInInterceptor" class="de.hybris.platform.print.comet.soap.BinaryDataInInterceptor"/>
+	<bean id="binaryDataOutInterceptor" class="de.hybris.platform.print.comet.soap.BinaryDataOutInterceptor"/>
+	<bean id="newLineOutInterceptor" class="de.hybris.platform.print.comet.soap.NewLineOutInterceptor"/>
+	<bean id="cxf" class="org.apache.cxf.bus.spring.SpringBus">
+	    <property name="outInterceptors">
+           <list>
+			  <ref bean="binaryDataOutInterceptor"/>
+              <ref bean="newLineOutInterceptor"/>
+           </list>
+        </property>
+        <property name="inInterceptors">
+           <list>
+              <ref bean="binaryDataInInterceptor"/>
+           </list>
+        </property>
+	</bean>
+    
+	<jaxws:endpoint
+		id="CometService"
+		implementor="de.hybris.platform.print.comet.soap.DefaultCometService"
+		address="/CometService">
+	</jaxws:endpoint>
+
+</beans>

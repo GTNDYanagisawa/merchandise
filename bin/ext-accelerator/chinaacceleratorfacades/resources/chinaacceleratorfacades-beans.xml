@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<bean class="de.hybris.platform.chinaaccelerator.facades.data.CityData" >
+		<property name="storeCount" type="Integer"/>
+		<property name="cityPK" type="Long"/>
+		<property name="cityName" type="String"/>
+		<property name="geoPoint" type="de.hybris.platform.commerceservices.store.data.GeoPoint"/>
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.chinaaccelerator.facades.StoreData" extends="de.hybris.platform.commercefacades.storelocator.data.PointOfServiceData" >
+		<property name="storePK" type="Long"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.commercefacades.order.data.InvoiceData" >
+		<property name="invoicedTitle" type="String"/>
+		<property name="invoicedName" type="String"/>
+		<property name="invoicedCategory" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.CartData" >
+		<property name="invoice" type="de.hybris.platform.commercefacades.order.data.InvoiceData"/>
+		<property name="requireInvoice" type="String" />
+		<property name="paymentMode" type="de.hybris.platform.chinaaccelerator.facades.data.PaymentModeData" />
+		<property name="deliveryTimeslot" type="de.hybris.platform.chinaaccelerator.services.enums.DeliveryTimeslot" />
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.user.data.AddressData" extends="de.hybris.platform.commercefacades.user.data.AddressData">
+		<property name="remarks" type="String"/>
+		<property name="city" type="String"></property>
+		<property name="cityData" type="de.hybris.platform.chinaaccelerator.facades.data.CityData"></property>
+		<property name="cityDistrict" type="String"></property>
+		<property name="cityDistrictData" type="de.hybris.platform.chinaaccelerator.facades.data.DistrictData"></property>
+		<property name="cellphone" type="String"/>
+		<property name="landlinePhonePart1" type="String"/>
+		<property name="landlinePhonePart2" type="String"/>
+		<property name="landlinePhonePart3" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.chinaaccelerator.facades.data.EnhancedCategoryData" extends="de.hybris.platform.commercefacades.product.data.CategoryData">
+		<property name="categories" type="java.util.List&lt;de.hybris.platform.chinaaccelerator.facades.data.EnhancedCategoryData>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.chinaaccelerator.facades.data.DistrictData" >
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.chinaaccelerator.facades.order.data.EnhancedPayentInfoData" extends="de.hybris.platform.commercefacades.order.data.CCPaymentInfoData">
+	</bean>
+	
+	<bean class="de.hybris.platform.chinaaccelerator.facades.order.data.OrderModificationRecordData" >
+		<property name="created" type="java.util.Date"/>
+		<property name="status" type="de.hybris.platform.core.enums.OrderStatus"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.chinaaccelerator.facades.order.data.ExOrderData"
+			extends="de.hybris.platform.commercefacades.order.data.OrderData">
+		<property name="statusUpdatedRecords" type="java.util.List&lt;de.hybris.platform.chinaaccelerator.facades.order.data.OrderModificationRecordData>"></property>
+		<property name="paymentMode" type="de.hybris.platform.chinaaccelerator.facades.data.PaymentModeData" />
+		<property name="deliveryTimeslot" type="de.hybris.platform.chinaaccelerator.services.enums.DeliveryTimeslot" />
+		<property name="invoice" type="de.hybris.platform.commercefacades.order.data.InvoiceData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.chinaaccelerator.facades.data.PaymentModeData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.commercefacades.user.data.RegisterData">
+		<property name="mobileNumber" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.commercefacades.user.data.CustomerData">
+		<property name="mobileNumber" type="String"/>
+	</bean>
+	
+</beans>

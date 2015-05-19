@@ -1,0 +1,1004 @@
+<?xml version="1.0"?>
+<!-- 
+	file:	 panelstatements.xml
+	See: Doku_deDE/InDesign/Plugins/products.html#Treeview_Panelstatements  (ATTENTION: escape brakets in this XML file)
+	See: Doku_deDE/InDesign/Plugins/products.html#Beispiele1_SOAP
+	
+	Possible calls of the SOAP method "getProductList"
+	- getProductList = Load the products of the top most level.
+	- getProductList1 = Load the products of the top most level. String parameters are not surrounded by quotes.
+	- getSubProductList = Load sub entries of a list entry
+	- getSubProductList1 = Load sub entries of a list entry. String parameters are not surrounded by quotes.
+
+	RESULT (product search):
+	id1						= int: ID1
+	id2						= int: ID2
+	id3						= int: ID3
+	stringid				= char*: String ID (if hasstringids is 1)
+	class					= int: Class ID
+	icon					= int: Icon ID
+	info1					= string: 1. palette column
+	info2					= string: 2. palette column
+	forceDelete				= int: >0 = show object only if used in document. 0 = show object as normal. <0 = Object is displayed but not placeable
+	panelstatement			= int: 0 = no subitems. >=10000 = ID of panelstatement for subitems
+	docID					= int: Document ID (unused)
+	masterpage				= string: Master page name (with prefix. e.g. C-aMasterPage)
+	gridname				= string: Grid name
+	gridElementName			= string: Grid element name
+	gridID					= int: Grid ID
+	gridElementID			= int: Grid element IP
+	pageItemID				= int: Name of the template that shall be used while placing
+
+	RESULT (document search):
+	id1						= int: ID1
+	id2						= int: ID2
+	id3						= int: ID3
+	name					= 
+	info					= 
+	info1					= 
+	info2					= 
+	info3					= 
+	domainname				= 
+	title					= 
+	path					= 
+	url						= 
+	canoverrideurl			= 
+	canoverridelocal		= 
+	subStatementID			= int: ID of panelstatement for subitems (optional)
+	icon					= int: Icon ID
+-->
+<panelstatements>
+
+	<panelstatement>
+		<id>11</id>
+		<usage>Platzhalterfarben laden</usage>
+		<domain></domain>
+		<statement>
+			"colors.xml" xmlget name, id, red, green, blue node
+			colors.color where id &amp;gt; ? orderby id
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Platzhalterfarben laden</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>22</id>
+		<usage>Lade die Liste der PageItems</usage>
+		<domain></domain>
+		<statement>
+			"pageitems.xml" xmlget id, name, description, type.name,
+			state.value, domain.name, preview.src, leftpos, toppos,
+			rightpos, bottompos, type.id, domain.id, state.id,
+			placeholder.id, placeholder.name, spread.position,
+			spread.leftitem, spread.middleitem, spread.rightitem node
+			pageitems.pageitem where id > ? and upper (name) like ? and
+			(? = "" or upper (domain.name) = ?) orderby id
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Lade die IDs und Daten der Liste der PageItems gemaess den
+			Sucheingaben in der Palette
+		</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>23</id>
+		<usage>
+			Lade einen PageItem zur Anzeige in der Palette PageItems
+			(Vorlagen)
+		</usage>
+		<domain></domain>
+		<statement>
+			"pageitems.xml" xmlget name, description, type.name,
+			state.value, domain.name, preview.src, leftpos, toppos,
+			rightpos, bottompos, type.id, domain.id, state.id,
+			placeholder.id, placeholder.name, spread.position,
+			spread.leftitem, spread.middleitem, spread.rightitem node
+			pageitems.pageitem where id = ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Lade einen PageItem zur Anzeige in der Palette PageItems
+			(Vorlagen)
+		</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>24</id>
+		<usage>
+			Lade die Mandanten in das Suchpopup (Palette und Dialog)
+		</usage>
+		<domain></domain>
+		<statement>
+			"domain.xml" xmlget id, name node domains.domain where id
+			&gt; 0 and upper (name) like ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Lade die Mandanten in das Suchpopup (Palette und Dialog)
+		</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>25</id>
+		<usage>Lade alle Vorlagentypen</usage>
+		<domain></domain>
+		<statement>
+			"pageitemtypes.xml" xmlget id, name node
+			pageitemtypes.pageitemtype where id &gt; 0 orderby name
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Lade alle Vorlagentypen zur Darstellung im Vorlage-Dialog
+			fuer die Metadaten der Vorlagen
+		</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>26</id>
+		<usage>Lade alle Vorlagenstati</usage>
+		<domain></domain>
+		<statement>
+			"relatedto.xml" xmlget id, value node relatedtos.relatedto
+			where id > 0 orderby value
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Lade alle Vorlagenstati zur Darstellung im Vorlage-Dialog
+			fuer die Metadaten der Vorlagen
+		</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>27</id>
+		<usage>Hole die ID-Werte eines PageItems</usage>
+		<domain></domain>
+		<statement></statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Hole die ID-Werte eines PageItems : TypeID, DomainID,
+			StateID. UNBENUTZT IN COMET LITE. Hier werden die ID-Werte
+			in den Statementsn 22 (Liste laden) und 23 (eine Vorlage
+			laden) mit geladen.
+		</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>28</id>
+		<usage>Aendere die Metadaten einer Vorlage</usage>
+		<domain></domain>
+		<statement>
+			"pageitems.xml" update name = ?, description = ?, type.name
+			= ?, type.id = ?, domain.name = ?, domain.id = ?,
+			state.value = ?, state.id = ?, placeholder.id = ?,
+			placeholder.name= ?, spread.position = ?, spread.leftitem =
+			?, spread.middleitem = ?, spread.rightitem = ? node
+			pageitems.pageitem where id = ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Aendere die Metadaten einer Vorlage</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>29</id>
+		<usage>Aendere die Daten einer Vorlage</usage>
+		<domain></domain>
+		<statement>
+			"pageitems.xml" update preview.src = ?, data.src = ?,
+			leftpos = ?, toppos = ?, rightpos = ?, bottompos = ? node
+			pageitems.pageitem where id = ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Aendere die Daten einer Vorlage</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>30</id>
+		<usage>Loesche eine Vorlage</usage>
+		<domain></domain>
+		<statement>
+			"pageitems.xml" delete node pageitems.pageitem where id = ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Loesche eine Vorlage</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>31</id>
+		<usage>
+			Lade die Daten einer Vorlage zum Einfuegen ins Dokument
+		</usage>
+		<domain></domain>
+		<statement>select data from pageitems where id = ?</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Lade die Daten einer Vorlage zum Einfuegen ins Dokument
+		</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>32</id>
+		<usage></usage>
+		<domain></domain>
+		<statement>
+			"domain.xml" xmlget id, name node domains.domain where id
+			&gt; 0 orderby name
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Lade die Mandantentypen in den Metadaten-Dialog
+		</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>33</id>
+		<usage></usage>
+		<domain></domain>
+		<statement>
+			"domain.xml" xmlget id, name node domains.domain where id =
+			?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Lade den Mandanten in das Suchpopup (Palette und Dialog)
+		</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>34</id>
+		<usage></usage>
+		<domain></domain>
+		<statement>
+			"actions.xml" xmlget id, name node actions.action where type
+			= "multi frames"
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Alle Actions fuer Platzhalter mit PageItems. Ich setze
+			dafuer mal die TypeID = 6 (multi frame)
+		</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>35</id>
+		<usage></usage>
+		<domain></domain>
+		<statement>
+			"domain.xml" xmlget id, name node domains.domain where id
+			&gt; 0
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Alle Domains in den Metadatendialog fuer Vorlagen laden
+		</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>36</id>
+		<usage>PublicationPanel Load Script</usage>
+		<domain>hybris</domain>
+		<statement>getList=PublicationPanelHandler&#xA;param1=? /* immer 0 */&#xA;AND param2=? /* domainID */&#xA;AND param3=? /* domainID */&#xA;$1 $2 $3 </statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>PublicationPanel Load Script</description>
+		<hasstringids>1</hasstringids>
+		<timestamp>1208194548580</timestamp>
+	</panelstatement>
+	
+	<panelstatement>
+		<id>37</id>
+		<usage></usage>
+		<domain>Lade ein Dokument in die Liste</domain>
+		<statement>
+			select d.name, &apos;Marktname&apos;, &apos;Status&apos;,
+			&apos;Auftragsinfo 1&apos;, &apos;Auftragsinfo 2&apos;,
+			p.name, &apos;Dokumentinfo&apos;, d.path, d.url,
+			d.canOverrideURL, d.canOverrideLocal from documents d,
+			domain p where d.id = ? and p.id = d.domainid
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Lade ein Dokument in die Liste</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>38</id>
+		<usage></usage>
+		<domain>Alle Domains laden</domain>
+		<statement>
+			select distinct (d.id), d.name from domain d, userxdomain x
+			where d.ID &amp;gt; 0 and (x.userid = ? or 0 = ?) and d.id =
+			x.domainid
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Alle Domains laden</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>41</id>
+		<usage>Before new</usage>
+		<domain></domain>
+		<statement>
+			int main () { return 0; }
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Vor dem Anlegen eines neuen Dokumentes</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>42</id>
+		<usage>After new</usage>
+		<domain></domain>
+		<statement>
+			int main () { return 0; }
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Nach dem Anlegen eines neuen Dokumentes</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>43</id>
+		<usage>Before open</usage>
+		<domain></domain>
+		<statement>
+			int main () { return 0; }
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Vor dem &#214;ffnen eines Dokumentes</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>44</id>
+		<usage>After open</usage>
+		<domain></domain>
+		<statement>
+		#include "internal/types.h"
+		#include "internal/text.h"
+		#include "[soap]/actions/20034.crpt"
+
+		int main ()
+		{
+			importComments();
+			return 0;
+		}
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Nach dem &#214;ffnen eines Dokumentes</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>45</id>
+		<usage>Before save</usage>
+		<domain></domain>
+		<statement>
+		#include "[soap]/actions/20034.crpt"
+
+		int main () { 
+			//put comments to hybris
+			exportComments();
+			
+			//hide comments in preview JPG
+			document::hide_notes(0);
+			return 0;
+		 }
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Vor dem Sichern eines Dokumentes</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>46</id>
+		<usage>After save</usage>
+		<domain></domain>
+		<statement>#include &quot;[soap]/actions/601.crpt&quot;&#xA;int main () &#xA;{ &#xA;char * filename = alloc(4096);&#xA;document::name(filename);&#xA;if( strstrpos(filename, &quot;AutoComet&quot;) == -1 &amp;&amp; documentKnownInPIM(filename) == 1 )&#xA;{ &#xA;wlog(&quot;&quot;, &quot;After save: creating page preview for [%s]&quot;, filename);&#xA;createPreviews(filename,1,document::pages(gDocument),-1);&#xA;}&#xA;else&#xA;{&#xA;wlog(&quot;&quot;, &quot;After save: skipping page preview for [%s] &quot;, filename);&#xA;}&#xA;return 0; &#xA;}</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Nach dem Sichern eines Dokumentes</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>47</id>
+		<usage>Before save as</usage>
+		<domain></domain>
+		<statement>
+			int main () { return 0; }
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Vor dem 'Sichern als' eines Dokumentes</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>48</id>
+		<usage>After save as</usage>
+		<domain></domain>
+		<statement>
+			int main () { return 0; }
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Nach dem 'Sichern als' eines Dokumentes</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>49</id>
+		<usage>Before save a copy</usage>
+		<domain></domain>
+		<statement>
+			int main () { return 0; }
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Vor dem 'Sichern einer Kopie' eines Dokumentes</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>50</id>
+		<usage>After save a copy</usage>
+		<domain></domain>
+		<statement>
+			int main () { return 0; }
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Nach dem 'Sichern einer Kopie' eines Dokumentes</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>51</id>
+		<usage>Before revert</usage>
+		<domain></domain>
+		<statement>
+			int main () { return 0; }
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Vor 'Zur&#252;ck zur letzten Version' eines Dokumentes</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>52</id>
+		<usage>After revert</usage>
+		<domain></domain>
+		<statement>
+			int main () { return 0; }
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Nach 'Zur&#252;ck zur letzten Version' eines Dokumentes</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>53</id>
+		<usage>Before close</usage>
+		<domain></domain>
+		<statement>
+			int main () { return 0; }
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Vor dem Schliessen eines Dokumentes</description>
+	</panelstatement>
+
+	<panelstatement>
+		<id>54</id>
+		<usage>After close</usage>
+		<domain></domain>
+		<statement>
+			int main () { return 0; }
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Nach dem Schliessen eines Dokumentes</description>
+	</panelstatement>
+	
+	<panelstatement>
+		<id>55</id>
+		<usage>Producttree - Root-Level</usage>
+		<domain></domain>
+		<statement>
+			getProductList1 
+			param1=? /* immer 0 */ 
+			AND param2=? /* Inhalt des oberen Suchfelds */ 
+			AND param3=? /* Inhalt des unteren Suchfelds */ 
+			AND type = "DefaultProductList"
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Lade die IDs und Werte fuer die Produktrecherche
+		</description>
+		<hasstringids>1</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>61</id>
+		<usage>Lade ein Raster zur Anzeige in der Palette Raster</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot;&#xA;xmlget name, description,
+			type.name, domain.name, preview.src,&#xA;0.0, 0.0, xsize,
+			ysize,&#xA;type.id, domain.id, spread.position,
+			spread.leftitem, spread.middleitem,
+			spread.rightitem&#xA;node grids.grid where id = ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster-Anzeige</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>60</id>
+		<usage>
+			Lade die IDs und Daten der Liste der Raster gem&#228;ss den
+			Sucheingaben in der Palette
+		</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot;&#xA;xmlget &#xA;id, name, description,
+			type.name, domain.name, preview.src,&#xA;0.0, 0.0, xsize,
+			ysize,&#xA;type.id, domain.id, &#xA;spread.position,
+			spread.leftitem, spread.middleitem,
+			spread.rightitem&#xA;node grids.grid &#xA;where id &gt; ?
+			and upper (name) like ? and (? = &quot;&quot; or upper
+			(domain.name) = ?) &#xA;orderby name
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster-Liste</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>62</id>
+		<usage>
+			Hole die ID-Werte eines Rasters : TypeID, DomainID.
+			UNBENUTZT IN COMET LITE. Hier werden die ID-Werte in den
+			Statementnt 60 (Liste laden) und 61 (ein Raster laden) mit
+			geladen.
+		</usage>
+		<domain></domain>
+		<statement></statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Raster-Metadaten (unbenutzt in XML basiert)
+		</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>63</id>
+		<usage>&#228;ndere die Metadaten eines Rasters</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot;&#xA;update &#9;name &#9;&#9;&#9;=
+			?,&#xA;description &#9;&#9;= ?,&#xA;type.name&#9;&#9;&#9;=
+			?,&#xA;type.id&#9;&#9;&#9;= ?,&#xA;domain.name&#9;&#9;=
+			?,&#xA;domain.id&#9;&#9;&#9;=
+			?,&#xA;spread.position&#9;&#9;=
+			?,&#xA;spread.leftitem&#9;&#9;=
+			?,&#xA;spread.middleitem&#9;=
+			?,&#xA;spread.rightitem&#9;&#9;= ?,&#xA;node
+			&#9;&#9;grids.grid where id =&#9; ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster-Metadaten &#228;ndern</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>64</id>
+		<usage>
+			&#228;ndere die Daten eines Rasters. Die eigentlichen
+			Rastereintraege werden im Befehl 76 (Loeschen) und 77 (neu
+			schreiben) angelegt.
+		</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot;&#xA;update&#9;preview.src &#9;=
+			?,&#xA;xsize &#9;&#9;= ?,&#xA;ysize &#9;&#9;= ?&#xA;node
+			&#9;&#9;grids.grid where id = ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>65</id>
+		<usage>L?sche ein Raster</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot;&#xA;delete node &#9;grids.grid where
+			id = ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>66</id>
+		<usage></usage>
+		<domain></domain>
+		<statement></statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>UNBENUTZT</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>67</id>
+		<usage>
+			Lade die Mandanten in das Suchpopup (Palette und Dialog),
+			wie Statement 24
+		</usage>
+		<domain></domain>
+		<statement>
+			&quot;domain.xml&quot; xmlget id, name node domains.domain
+			where id &gt; 0 and upper (name) like ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>68</id>
+		<usage>
+			Lade den Previewpfad eines Rasters zur Darstellung im Dialog
+		</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot;&#xA;select preview.src&#xA;node
+			grids.grid&#xA;where &#9;id = ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>69</id>
+		<usage>
+			Lade ID und Name der Raster eines bestimmten Seitetypes zur
+			Verwendung in den Seitentyp-Popupmenues
+		</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot;&#xA;select id, name&#xA;node
+			grids.grid&#xA;where &#9;id &gt; 0 and (domain.id = ? or
+			domain.id = 0 or id = ?) and (spread.position = ? or
+			spread.position = &apos;&apos; or id = ?)&#xA;orderby name
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>70</id>
+		<usage>
+			Lade alle Rastertypen zur Darstellung im Raster-Dialog
+			f&#252;;r die Metadaten der Raster
+		</usage>
+		<domain></domain>
+		<statement>
+			&quot;gridtypes.xml&quot; xmlget id, name node
+			gridtypes.gridtype where id &gt; 0 orderby name
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>71</id>
+		<usage>
+			Raster haben keinen RelatedTo-Eintrag (State) (text,
+			imageframe, ...). Die Anweisung ist leer.
+		</usage>
+		<domain></domain>
+		<statement></statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>UNBENUTZT</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>72</id>
+		<usage>
+			Lade die Mandantentypen in den Metadaten-Dialog der Raster
+		</usage>
+		<domain></domain>
+		<statement>
+			&quot;domain.xml&quot; xmlget id, name node domains.domain
+			where id &gt; 0 orderby name
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>73</id>
+		<usage>
+			Lade den Mandanten in das Suchpopup (Palette und Dialog) des
+			Metadatendialoges der Raster
+		</usage>
+		<domain></domain>
+		<statement>
+			&quot;domain.xml&quot; xmlget id, name node domains.domain
+			where id = ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>74</id>
+		<usage></usage>
+		<domain></domain>
+		<statement></statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>UNBENUTZT</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>75</id>
+		<usage>
+			Alle Domains in den Metadatendialog f&#252;;r Raster leden
+		</usage>
+		<domain></domain>
+		<statement>
+			&quot;domain.xml&quot; xmlget id, name node domains.domain
+			where id &gt; 0
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>76</id>
+		<usage>Loesche alle Platzhalter eines Rasters</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot; &#xA;delete&#xA;node grids.grid where
+			id = ?&#xA;node placeholders.placeholder where id &gt; 0
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>77</id>
+		<usage>Fuege einen Platzhalter in ein Raster ein</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot; &#xA;insert&#xA;id &#9;&#9;= ?,
+			&#xA;name &#9;= ?,&#xA;xpos &#9;&#9;= ?,&#xA;ypos &#9;&#9;=
+			?,&#xA;xsize &#9;= ?,&#xA;ysize &#9;= ?&#xA;node grids.grid
+			where id = ?&#xA;node placeholders.placeholder where id = 0
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>78</id>
+		<usage>Lade die Platzhalter eines Rasters</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot; &#xA;select
+			id,&#xA;name,&#xA;xpos,&#xA;ypos,&#xA;xsize,&#xA;ysize&#xA;node
+			grids.grid where id = ?&#xA;node placeholders.placeholder
+			where id &gt; 0 orderby id
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>79</id>
+		<usage>
+			Hole die sortierte Liste alle verwendeten Raster. Der Aufruf
+			wird benoetigt, um die ID fuer ein neues Raster zu
+			ermitteln.
+		</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot; &#xA;select id node grids.grid where
+			id &gt; 0 orderby id
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>80</id>
+		<usage>Anlegen eines neues Rasters</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot; &#xA;insert &#xA;id &#9;&#9;&#9;&#9;=
+			?,&#xA;name&#9;&#9;&#9;&#9;= ?,&#xA;description&#9;&#9;&#9;=
+			?,&#xA;xsize&#9;&#9;&#9;&#9;= ?,&#xA;ysize&#9;&#9;&#9;&#9;=
+			?,&#xA;preview.src&#9;&#9;= ?,&#xA;type.id&#9;&#9;&#9;=
+			?,&#xA;type.name&#9;&#9;&#9;= ?,&#xA;domain.id&#9;&#9;&#9;=
+			?,&#xA;domain.name&#9;&#9;= ?,&#xA;spread.position &#9;&#9;=
+			?,&#xA;spread.leftitem&#9;&#9;= ?,&#xA;spread.middleitem
+			&#9;= ?,&#xA;spread.rightitem&#9; &#9;= ?&#xA;node
+			grids.grid where id = 0
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>81</id>
+		<usage>
+			Lade die Werte eines Raster-Platzhalters (verwendet im
+			Scriptsprachen-Modul grid).
+		</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot; &#xA;select
+			xpos,&#xA;ypos,&#xA;xsize,&#xA;ysize,&#xA;...spread.position,&#xA;...spread.leftitem,&#xA;...spread.middleitem,&#xA;...spread.rightitem&#xA;node
+			grids.grid where id = ?&#xA;node placeholders.placeholder
+			where id = ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>82</id>
+		<usage>
+			Ermittle die id eines Rasterplatzhalters ueber dessen Namen
+			(verwendet im Scriptsprachen-Modul grid).
+		</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot; &#xA;select id node grids.grid where
+			upper (name) = ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>83</id>
+		<usage>
+			Lade die Werte eines Raster-Platzhalters. (grid by name,
+			placeholder by id)
+		</usage>
+		<domain></domain>
+		<statement>
+			&quot;grids.xml&quot; &#xA;select id node grids.grid where
+			id = ? node placeholders.placeholder where upper (name) = ?
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>84</id>
+		<usage>Lade die Groesse und Seitentyp aller Rasterplaetze eines &#9;&#9;&#9;Rasters, verwendet im Seitenaufbau (falsch!) &#9;&#9;</usage>
+		<domain></domain>
+		<statement>&quot;grids.xml&quot; &#xA;select&#9;id,name,xpos,ypos,xsize,ysize,...spread.position,...spread.leftitem,...spread.middleitem,...spread.rightitem node grids.grid where id = ? node placeholders.placeholder where id &gt; 0 orderby id</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Raster</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	<panelstatement>
+		<id>92</id>
+		<usage>AfterLogin Script</usage>
+		<domain>AfterLogin Script</domain>
+		<statement>#include &quot;[soap]/actions/600.crpt&quot;&#xA;int main () &#xA;{ &#xA;int publication;&#9;&#xA;Query qu = sql::query( soap::connection() );&#xA;setClientLanguage();&#xA;setOperatingSystem();&#xA;if( qu )&#xA;{&#xA;// build query&#xA;query::send( qu, &quot;method=GET_publication\n&quot; );&#9;&#9;// must have at least one constraint or else we get an error in the print extension&#xA;query::send( qu, &quot;param1=test&quot; );&#xA;query::output( qu, kInt, &amp;publication );&#xA;if( query::exec (qu) )&#xA;{&#xA;while (query::fetch (qu))&#xA;{&#xA;if( publication == 0 )&#xA;{&#xA;showPublicationSelector();&#xA;}&#xA;}&#xA;}&#xA;}&#xA;// Cleanup&#xA;release( publication );&#xA;query::close( qu );&#xA; system::set_docwatch (1); &#xA;return 0; &#xA;} </statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>After Login</description>
+		<hasstringids>0</hasstringids>
+	</panelstatement>
+	
+	<panelstatement>
+		<id>95</id>
+		<usage>DoubleClick in product recherche</usage>
+		<domain></domain>
+		<statement>"actions.xml" &#xA;select 700</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Doppelklick in der Produktrecherche</description>
+		<hasstringids>0</hasstringids>
+		<timestamp>1232384620640</timestamp>
+	</panelstatement>
+	<panelstatement>
+		<id>96</id>
+		<usage>DoubleClick in document palette</usage>
+		<domain></domain>
+		<statement>"actions.xml" &#xA;select 701</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Doppelklick in der Dokumentpalette</description>
+		<hasstringids>0</hasstringids>
+		<timestamp>1232384527265</timestamp>
+	</panelstatement>
+	<panelstatement>
+		<id>97</id>
+		<usage>DoubleClick in preview palette</usage>
+		<domain></domain>
+		<statement>"actions.xml" &#xA;select 702</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>Doppelklick in der Previewpalette</description>
+		<hasstringids>0</hasstringids>
+		<timestamp>1232384527265</timestamp>
+	</panelstatement>
+	
+	
+	
+	<panelstatement>
+		<id>3000</id>
+		<usage></usage>
+		<domain></domain>
+		<statement>getList=PublicationPanelHandler&#xA;param1=? /* immer 0 */&#xA;param2=? /* domainID */&#xA;param3=? /* domainID */&#xA;parentid=&lt;parent.STRINGID&gt;&#xA;$1 $2 $3 </statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>PublicationPanel Subelements</description>
+		<hasstringids>1</hasstringids>
+		<timestamp>1208196032296</timestamp>
+	</panelstatement>
+	<panelstatement>
+		<id>20000</id>
+		<usage>Producttree - SubLevels</usage>
+		<domain></domain>
+		<statement>
+			getSubProductList1 
+			parent.ID = &lt;parent.ID&gt; 
+			AND parent.ID2 = &lt;parent.ID2&gt; 
+			AND parent.ID3 = &lt;parent.ID3&gt; 
+			AND parent.StringID = &lt;parent.StringID&gt; 
+			AND search.value1 = &lt;searchvalue1&gt; 
+			AND search.value2 = &lt;searchvalue2&gt; 
+			AND search.value3 = &lt;searchvalue3&gt; 
+			AND search.value4 = &lt;searchvalue4&gt;
+			AND type = "DefaultProductList"
+		</statement>
+		<in_parameters></in_parameters>
+		<out_parameters></out_parameters>
+		<description>
+			Lade die IDs und Werte fuer die Produktrecherche
+		</description>
+		<hasstringids>1</hasstringids>
+	</panelstatement>
+</panelstatements>

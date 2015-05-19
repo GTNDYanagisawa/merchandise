@@ -1,0 +1,59 @@
+$catalog-id=testCatalog
+$catalog-version=Online
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;
+;de;true;;;;;;
+;en;true;;;;;;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;E
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=de];name[lang=en];active;
+;DE;Deutschland;Germany;true;
+;US;Vereinigte Staaten von Amerika;United States of America;true;
+
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid);
+;otherUG;;
+;customergroup;cockpitgroup;
+;cockpitgroup;supercockpitgroup;
+;supercockpitgroup;;
+
+
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password
+;ahertz;K2006-C0005;Anja Hertz;;en;USD;customergroup;1234
+;abrode;K2006-C0006;Arin Brode;;en;USD;supercockpitgroup;1234
+;dejol;CIA-88721;Max de Jol;;en;USD;supercockpitgroup;1234
+;other;;;;en;USD;otherUG;1234
+
+INSERT_UPDATE Address;owner(Customer.uid)[unique=true];streetname[unique=true];streetnumber[unique=true];postalcode[unique=true];duplicate[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;gender(code);middlename;phone1;title(code);url;company;fax;department
+;ahertz;Zennerstrasse;45;28277;false;Bremen;DE;false;false;false;true;Anja;Hertz;ahertz@na-du.de;FEMALE;;;;;hybris GmbH
+;ahertz;Schiller Allee;8;28277;false;Bremen;DE;true;true;true;false;Anja;Hertz;ahertz@na-du.de;FEMALE;;;;;hybris GmbH
+;ahertz;Stietzbaumplatz;2;81371;false;München;DE;false;false;false;false;Anja;Hertz;;FEMALE;;;;;hybris GmbH
+;abrode;Feldweg;7;18551;false;Sagard;DE;true;false;true;true;Arin;Brode;arin@wow-europe.com;MALE;;;;;hybris GmbH
+
+INSERT_UPDATE Customer;uid[unique=true];defaultPaymentaddress(owner(Customer.uid), streetname, streetnumber, postalcode,duplicate);defaultShipmentAddress(owner(Customer.uid), streetname, streetnumber, postalcode, duplicate)
+;ahertz;ahertz:Schiller Allee:8:28277:false;ahertz:Stietzbaumplatz:2:81371:false
+;abrode;abrode:Feldweg:7:18551:false;abrode:Feldweg:7:18551:false
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog
+;$catalog-id;$catalog-id;$catalog-id;true
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode)
+;$catalog-id;$catalog-version;true;EUR;de,en
+
+INSERT_UPDATE CockpitUIConfigurationMedia;code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];
+;advanced_search_ahertz_ui_config;text/xml;TestBaseProductManager.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBaseProductManager.xml;
+;advanced_search_abrode_ui_config;text/xml;TestBaseProductManager.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBaseProductManager.xml;
+;editor_area_ahertz_ui_config;text/xml;TestBaseProductManager.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBaseProductManager.xml;
+;list_view_ahertz_ui_config;text/xml;TestBaseProductManager.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBaseProductManager.xml;
+;list_view_cockpitgroup_ui_config;text/xml;TestBaseProductManager.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBaseProductManager.xml;
+;list_view_supercockpitgroup_ui_config;text/xml;TestBaseProductManager.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBaseProductManager.xml;
+
+INSERT_UPDATE CockpitUIComponentConfiguration;code[unique=true];objectTemplateCode[unique=true];principal(uid)[unique=true];media(code);factoryBean;
+;advancedSearch;TestProduct;ahertz;advanced_search_ahertz_ui_config;advancedSearchConfigurationFactory;
+;advancedSearch;TestProduct;abrode;advanced_search_abrode_ui_config;advancedSearchConfigurationFactory;
+;editorArea;TestProduct;ahertz;editor_area_ahertz_ui_config;editorAreaConfigurationFactory;
+;listView;TestProduct;ahertz;list_view_ahertz_ui_config;listViewConfigurationFactory;
+;listView;TestCategory;cockpitgroup;list_view_cockpitgroup_ui_config;listViewConfigurationFactory;
+;listView;TestCatalog;supercockpitgroup;list_view_supercockpitgroup_ui_config;listViewConfigurationFactory;

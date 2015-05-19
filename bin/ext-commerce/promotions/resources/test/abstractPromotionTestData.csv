@@ -1,0 +1,33 @@
+$catalogVersion=catalogVersion(catalog(id[default='hwcatalog']),version[default='Online'])[unique=true,default='hwcatalog:Online'];
+
+INSERT_UPDATE PromotionGroup;Identifier[unique=true];
+;prGroup1;
+;prGroup2;
+;prGroup3;
+;prGroup4;
+;prGroup5;
+;prGroup6;
+
+INSERT PromotionPriceRow;&id;Currency(isocode);price;
+;1001;EUR;700;
+;1002;EUR;200;
+;1003;EUR;900;
+;1004;EUR;400;
+
+INSERT_UPDATE ProductBOGOFPromotion;code[unique=true];title;description;enabled;qualifyingCount;products(code,$catalogVersion);PromotionGroup(Identifier);priority;
+;Buy 3 get 1 free;Buy 3 get 1 free;Buy 3 get 4;true;4;HW1210-3411,HW1100-0023,HW2310-1001,HW2320-1009;prGroup1;1000;
+
+INSERT_UPDATE ProductBundlePromotion;code[unique=true];title;enabled;products(code,$catalogVersion);bundlePrices(&id);PromotionGroup(Identifier);priority;
+;Bundle Promotion;Bundle Promotion;true;HW1210-3411,HW1100-0023,HW2310-1001;1001;prGroup2;1000;
+
+INSERT_UPDATE ProductFixedPricePromotion;code[unique=true];enabled;products(code,$catalogVersion);productFixedUnitPrice(&id);PromotionGroup(Identifier);priority;
+;FixedPrice;true;HW1210-3411;1002;prGroup3;1000;
+
+INSERT_UPDATE ProductMultiBuyPromotion;code[unique=true];enabled;products(code,$catalogVersion);qualifyingCount;bundlePrices(&id);PromotionGroup(Identifier);priority;
+;MultiBuy;true;HW1100-0023,HW1210-3411;3;1003;prGroup4;1000;
+
+INSERT_UPDATE ProductOneToOnePerfectPartnerPromotion;code[unique=true];enabled;baseProduct(code,$catalogVersion);partnerProduct(code,$catalogVersion);bundlePrices(&id);PromotionGroup(Identifier);priority;
+;One to One Perfect Partner Promotion;true;HW2110-0019;HW2200-0561;1004;prGroup5;1000;
+
+INSERT_UPDATE ProductPercentageDiscountPromotion;code[unique=true];enabled;products(code,$catalogVersion);percentageDiscount;PromotionGroup(Identifier);priority;
+;Percentage discount;true;HW2110-0019;19;prGroup6;1000;

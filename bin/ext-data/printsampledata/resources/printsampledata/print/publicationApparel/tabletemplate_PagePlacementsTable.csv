@@ -1,0 +1,63 @@
+﻿###############################################################;
+### Specify the table template objects;
+INSERT_UPDATE TableBlock;code[unique=true];$categories;widthType(code)[default='FIT_TO_FRAME'];width;tableStyle(id);isTemplate[default=false];tableTemplate(code);$catalogversion[unique=true];
+;PagePlacementsTable;tableblocks;
+
+
+
+###############################################################;
+### Specify the column and row type;
+INSERT_UPDATE ColumnEntry;$table[unique=true];tablePOS[unique=true];widthType(code)[default='FIXED_WIDTH'];width;widthExpression;locked[default=true];$catalogversion[unique=true];
+;PagePlacementsTable;0;;50;
+;PagePlacementsTable;1;;30;
+
+INSERT_UPDATE RowEntry;$table[unique=true];tablePOS[unique=true];height;maxHeight;locked[default=true];$catalogversion[unique=true];
+;PagePlacementsTable;0;
+;PagePlacementsTable;1;
+
+
+
+###############################################################;
+### Specify cell styles;
+INSERT_UPDATE CellEntry;$table[unique=true];$row[unique=true];$column[unique=true];cellText[lang=en];cellText[lang=de];postProcessingExpression;convert[default=false];colSpan[default='1'];rowSpan[default='1'];mergeHorizontal[default='false'];mergeVertical[default='false'];cellStyle(id);cellStyleExpression;$catalogversion[unique=true];
+;PagePlacementsTable;PagePlacementsTable:::0;PagePlacementsTable:::0;;;"columnData.name";;;;;;Apparel Table Header;
+;PagePlacementsTable;PagePlacementsTable:::0;PagePlacementsTable:::1;"Price";"Preis";;;;;;;Apparel Table Header;
+;PagePlacementsTable;PagePlacementsTable:::1;PagePlacementsTable:::0;;;;;;;;;Apparel Table Body left;
+;PagePlacementsTable;PagePlacementsTable:::1;PagePlacementsTable:::1;;;"PriceUtils.getPriceContainer( rowData ).getPrimaryPriceValue()";;;;;;Apparel Table Body left;
+
+
+
+###############################################################;
+### Specify parameters for columns/rows/table
+INSERT SingleParameterValue;&paramID;hasItem[default='true'];$pageAsItem;
+# ;pageReference;;shirts;
+
+INSERT SingleParameterValue;&paramID;hasItem[default='false'];data;
+# ;productsOnly;;"Boolean.TRUE";
+
+INSERT SingleParameterValue;&paramID;hasItem[default='true'];$attributeDescriptorAsItem;
+;pagePlacementsTable_attr_code;;Product:code;
+
+
+###############################################################;
+### Assigning parameters to table
+INSERT_UPDATE TableDataHolder;$table[unique=true];parameters(key,value(&paramID));
+# ;PagePlacementsTable;page->pageReference;
+
+
+###############################################################;
+### Assigning parameters to column or row entries
+INSERT_UPDATE AxisDataHolder;$table[unique=true];$rowAxis[unique=true];dataProviderClass;parameters(key,value(&paramID));
+# ;PagePlacementsTable;PagePlacementsTable:::0;de.hybris.platform.print.util.table.PagePlacementsProvider;productsOnly->productsOnly;
+
+INSERT_UPDATE AxisDataHolder;$table[unique=true];$columnAxis[unique=true];dataProviderClass;parameters(key,value(&paramID));
+;PagePlacementsTable;PagePlacementsTable:::0;de.hybris.platform.print.util.table.SingleItemDataProvider;item->pagePlacementsTable_attr_code;
+
+
+
+###############################################################;
+### Specify data resolvers for cells
+INSERT_UPDATE CellDataHolder;$table[unique=true];$cell[unique=true];dataResolverClass[default='de.hybris.platform.print.util.table.DefaultDataResolver'];
+;PagePlacementsTable;PagePlacementsTable:::1:PagePlacementsTable:::0;
+
+

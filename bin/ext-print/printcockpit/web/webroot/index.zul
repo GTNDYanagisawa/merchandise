@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?taglib 			uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+
+<?page title="[y] hybris Print Cockpit [y]" ?>
+
+<div width="100%" height="100%" style="overflow: hidden;">
+	
+	<!--  custom styles in here -->
+	<style src="/cockpit/css/cockpit.css" /> 
+	<style src="/printcockpit/css/printcockpit.css" />
+	<style src="/printcockpit/css/defaultstyles.css"/>
+	<style src="/printcockpit/css/tableeditor.css" />
+
+
+	<script type="text/javascript">
+
+				function scrollToSlot(cont, tgt)
+				{
+					var xPos = tgt.offsetLeft + tgt.parentNode.offsetLeft + tgt.parentNode.parentNode.offsetLeft;
+					var yPos = tgt.offsetTop + tgt.parentNode.offsetTop + tgt.parentNode.parentNode.offsetTop;
+					var yScroll = cont.scrollTop;
+					var xScroll = cont.scrollLeft;
+					var width = cont.offsetWidth;
+					var height = cont.offsetHeight;
+							
+					if( xPos &lt; xScroll || yPos &lt; yScroll || ( xPos + 50 ) &gt; (xScroll + width) || ( yPos + 50 ) &gt; ( yScroll + height ) )
+					{
+						cont.scrollTop = yPos;
+						cont.scrollLeft = xPos;
+					}
+				}
+				
+				function scrollToFlowBox(cont, tgt)
+				{
+					scrollToBox(cont, tgt, 'normal');
+				}
+				
+				function scrollToBox(cont, tgt, mode)
+				{		
+					if (mode == 'list')
+					{
+						var containerWidth = cont.parentNode.offsetWidth;
+						var containerHeight = cont.parentNode.offsetHeight;
+						var yScroll = cont.parentNode.scrollTop;
+						var xScroll = cont.parentNode.scrollLeft;
+					}
+					else if (mode == 'normal')
+					{
+						var containerWidth = cont.offsetWidth;
+						var containerHeight = cont.offsetHeight;
+						var yScroll = cont.scrollTop;
+						var xScroll = cont.scrollLeft;
+					}
+		
+					var xPos = tgt.offsetLeft;
+					var yPos = tgt.offsetTop;
+					var componentWidth = tgt.offsetWidth;
+					var componentHeight = tgt.offsetHeight;
+												
+					if( xPos &lt; xScroll || yPos &lt; yScroll || ( xPos + componentWidth) &gt; (xScroll + containerWidth) || ( yPos + componentHeight ) &gt; (yScroll + containerHeight) )
+					{
+						if (xPos > 30)
+						{
+							xPos = xPos - 30;
+						}		
+						if (yPos > 30)
+						{
+							yPos = yPos - 30;
+						}		
+						
+						if (mode == 'list')
+						{
+							cont.parentNode.scrollTop = yPos;
+							cont.parentNode.scrollLeft = xPos;
+						}
+						if (mode == 'normal')
+						{				
+							cont.scrollTop = yPos;
+							cont.scrollLeft = xPos;
+						}
+					}
+				}
+					
+		</script>	
+
+
+	<include src="/cockpit/commonCSA.zul" visible="false"/>
+	
+	<window xmlns="http://www.zkoss.org/2005/zul" 
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xmlns:h="http://www.w3.org/1999/xhtml" 
+			xmlns:zk="http://www.zkoss.org/2005/zk"
+			xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd "
+			id="mainWin" mode="embedded" height="100%" sclass="hywin" use="de.hybris.platform.cockpit.components.impl.MainWindow"
+			shadow="false">
+	
+	</window>
+</div>

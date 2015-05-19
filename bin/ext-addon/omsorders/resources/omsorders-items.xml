@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- ~ [y] hybris Platform ~ ~ Copyright (c) 2000-2013 hybris AG ~ All rights reserved. ~ ~ This software is the confidential and proprietary 
+	information of hybris ~ ("Confidential Information"). You shall not disclose such Confidential ~ Information and shall use it only 
+	in accordance with the terms of the ~ license agreement you entered into with hybris. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<itemtypes>
+
+		<typegroup name="oms cronjobs">
+
+			<itemtype code="Order" autocreate="false" generate="false">
+				<description>Extending Order type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="exportedToOmsRetryCount" type="java.lang.Integer">
+						<description>Hold a counter of how many times the order was attempted to be sent to oms.
+						</description>
+						<defaultvalue>Integer.valueOf(0)</defaultvalue>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="orderExportTime" type="java.util.Date">
+						<description>The time of order export.</description>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="orderUpdateRemoteTime" type="java.util.Date">
+						<description>The time of the last sync to the Order in this system from the remote system.
+						</description>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="Consignment" autocreate="false" generate="false">
+				<description>Extending Consignment type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="trackingURL" type="java.lang.String">
+						<modifiers read="true" write="true" optional="true"/>
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="OmsOrderSyncCronJob"
+					  jaloclass="de.hybris.platform.integration.oms.order.cronjob.jalo.OmsOrderSyncCronJob"
+					  extends="CronJob" autocreate="true" generate="true">
+				<attributes>
+					<attribute qualifier="lastRemoteUpdateTime" type="java.util.Date">
+						<description>The time of the last sync with the remote system (remote system time).
+						</description>
+						<modifiers read="true" write="true" initial="false" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="zoneDeliveryMode">
+
+			<itemtype code="ZoneDeliveryModeValue"
+					  extends="GenericItem"
+					  jaloclass="de.hybris.platform.deliveryzone.jalo.ZoneDeliveryModeValue"
+					  autocreate="false"
+					  generate="false">
+				<indexes>
+					<index name="IdentityIDX" unique="false" replace="true">
+						<key attribute="deliveryMode"/>
+						<key attribute="zone"/>
+						<key attribute="currency"/>
+						<key attribute="minimum"/>
+					</index>
+				</indexes>
+			</itemtype>
+
+			<itemtype code="OmsZoneDeliveryModeValue" extends="ZoneDeliveryModeValue" autocreate="true" generate="true"
+					  jaloclass="de.hybris.platform.integration.oms.order.jalo.OmsZoneDeliveryModeValue">
+				<attributes>
+					<attribute qualifier="fromZone" type="Zone">
+						<description>From zone attribute to determine international shipping.</description>
+						<persistence type="property"/>
+						<modifiers read="true" write="true" search="true" optional="false" initial="true"
+								   unique="true"/>
+					</attribute>
+					<attribute qualifier="specificCarrierShippingMethod"
+							   type="java.lang.String">
+						<description>Shipping method code for specific carrier</description>
+						<persistence type="property"/>
+						<modifiers read="true" write="true" search="true" optional="true" initial="true" unique="false"/>
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="OmsIdentityIDX" unique="true">
+						<key attribute="deliveryMode"/>
+						<key attribute="zone"/>
+						<key attribute="fromZone"/>
+						<key attribute="currency"/>
+						<key attribute="minimum"/>
+					</index>
+				</indexes>
+			</itemtype>
+		</typegroup>
+
+
+		<typegroup name="Ondemand BaseStore Preference Types">
+
+			<itemtype code="OndemandBaseStorePreference" autocreate="false" generate="false">
+				<description>Extending AbstractOrder type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="omsProductAttributes" type="StringCollection">
+						<persistence type="property"/>
+						<modifiers unique="false" optional="true"/>
+					</attribute>
+				</attributes>
+
+			</itemtype>
+		</typegroup>
+
+	</itemtypes>
+
+</items>

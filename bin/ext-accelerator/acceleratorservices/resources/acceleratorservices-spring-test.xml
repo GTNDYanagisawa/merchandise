@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias alias="cockpitTypeService" name="extensibleCockpitTypeService"/>
+	
+	<bean id="extensibleCockpitTypeService" class="de.hybris.platform.cockpit.services.meta.impl.ExtensibleTypeService"  init-method="init" destroy-method="clear">
+		<property name="typeService" ref="typeService" />
+		<property name="modelService" ref="modelService" />
+		<property name="baseTypeCache" ref="baseTypeCache" />
+		<property name="objectTemplateCache" ref="objectTemplateCache" />
+		
+		<property name="extendedTypeChain" ref="cockpitTypeLoaderChain"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="propertyService" ref="cockpitPropertyService"/>
+		
+	</bean>
+	
+	<bean id="baseTypeCache" class="de.hybris.platform.cockpit.services.meta.impl.TypeCache"  destroy-method="clear">
+		<constructor-arg value="2000" />
+	</bean>
+	
+	<alias alias="cockpitTypeLoaderChain" name="defaultCockpitTypeLoaderChain"/>
+	<bean id="defaultCockpitTypeLoaderChain" class="de.hybris.platform.cockpit.services.meta.impl.DefaultExtendedTypeChain" >
+		<property name="extendedTypeLoaders">
+			<list>
+				<bean class="de.hybris.platform.cockpit.services.meta.impl.ClassificationTypeLoader">
+					<property name="extendedTypeCache" ref="extendedTypeCache" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="cockpitPropertyService" name="defaultCockpitPropertyService" />
+	<bean id="defaultCockpitPropertyService" class="de.hybris.platform.cockpit.services.meta.impl.DefaultPropertyService" />
+	
+		
+	<bean id="objectTemplateCache" class="de.hybris.platform.cockpit.services.meta.impl.TypeCache" scope="session" destroy-method="clear">
+		<constructor-arg value="100" />
+		<aop:scoped-proxy/>
+	</bean>
+	
+	<bean id="synchronizationServiceDao" class="de.hybris.platform.cockpit.daos.impl.DefaultSynchronizationServiceDao" >
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<bean id="synchronizationService" class="de.hybris.platform.cockpit.services.sync.impl.SynchronizationServiceImpl" >
+		<property name="synchronizationServiceDao" ref="synchronizationServiceDao" />
+		<property name="modelService" ref="modelService" />
+		<property name="cockpitTypeService" ref="cockpitTypeService" />
+	</bean>
+
+</beans>

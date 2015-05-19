@@ -1,0 +1,336 @@
+/*
+	Script           :  600
+	Author           :
+	Description      :  Helper methods for Login dialogs (show language-, publication-, MediaContext- or operating system-selector etc.)
+*/
+
+#include "internal/types.h"
+#include "internal/text.h"
+#include "internal/products.h"
+
+int showElementStatusSelector()
+{
+	int kBufferSize = 16000;
+	int err = 0;
+	DBC con = soap::connection();
+	char * statement = "getlist=GET_statuses";
+	char * tmp = alloc(kBufferSize);
+	char * elements = alloc(kBufferSize);
+	int id = 0;
+	int ok = false;
+	Query qu = soap::call(con, "SET_status");
+	Product pr;
+	ProductList prList;
+
+	if (qu)
+	{
+		ok = askstring2(tmp, "", 0, tmp, "", 0, con, statement, "", &id, "Select status", 1, "Element status", "Select", "Cancel");
+
+		if (ok)
+		{
+			// get list of selected items
+			prList = productlist::get("selected"); // list = all products, watched = only products with an eye symbol, selected = all selected products
+			wlog("", "Found %d watched products.\n", productlist::length(prList));
+
+			for (pr = productlist::first(prList); pr; pr = productlist::next(prList))
+			{
+				strcat(elements, product::gets(pr, kStringID));
+				strcat(elements, ",");
+			}
+
+			query::send(qu, "status=?\n");
+			query::input(qu, kInt, id);
+			query::send(qu, "elements=?\n");
+			query::input(qu, kString, elements);
+			if (query::exec(qu) != 1)
+			{
+				wlog("", "There was a query:exec error in 600.crpt, method showElementStatusSelector(). \n");
+				err = 1;
+			}
+		}
+		else
+		{
+			// User canceled
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful in script 600.crpt, method showElementStatusSelector(). \n");
+		err = 3;
+	}
+
+	if( query::close(qu) != 0)
+	{
+		// TODO - is it good reason to return fail?
+		wlog("", "There was an error during SOAP connection close in script 600.crpt, method showLanguageSelector(). \n");
+	}	
+
+	// Cleanup
+	productlist::release( prList, DONT_DELETE_PRODUCTLIST_ELEMENTS );
+	// product::release( pr );		// There is no alloc() for this product, so dont call a release() here!
+	release(elements);
+	release(statement);
+	release(tmp);
+
+	return err;
+}
+
+
+int showLanguageSelector()
+{
+	int kBufferSize = 8000;
+	int err = 0;
+	DBC con = soap::connection ();
+	char * statement = "getlist=GET_languages\nparam1=test1";
+	char * tmp = alloc (kBufferSize);
+	int id = 0;
+	int ok = false;
+	Query qu = soap::call (con, "SET_language");
+	
+
+	if(qu)
+	{
+		ok = askstring2 (tmp, "", 0, tmp, "", 0, con, statement, "", &id, "Select language", 1, "Session language", "Select", "Cancel");	
+
+		if (ok)
+		{
+			if(query::send (qu, "index=?") && query::input (qu, kInt, id))
+			{
+				if(query::exec (qu) != 1)
+				{
+					wlog("", "There was a query:exec error in 600.crpt, method showLanguageSelector(). \n");
+					err = 1;
+				}
+			}
+			else
+			{
+				wlog("", "There was query send/input errors in 600.crpt, method showLanguageSelector(). \n");	
+				err = 2;
+			}
+		}
+		else
+		{
+			// User canceled
+		};
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful in script 600.crpt, method showLanguageSelector(). \n");
+		err = 3;
+	}
+
+	if( query::close(qu) != 0)
+	{
+		// TODO - is it good reason to return fail?
+		wlog("", "There was an error during SOAP connection close in script 600.crpt, method showLanguageSelector(). \n");
+	}	
+
+	release( statement );
+	release( tmp );
+	
+	return 0;	
+}
+
+
+int showPublicationSelector()
+{
+	int kBufferSize = 8000;
+	DBC con = soap::connection ();
+	char * statement = "getlist=GET_publications\nparam1=test1\nparam2=test2\n";
+	char * tmp = alloc (kBufferSize);
+	int id = 0;
+	int ok = false;
+	int err = 0;
+	Query qu = soap::call (con, "SET_publication");
+
+	if(qu)
+	{
+		ok = askstring2 (tmp, "", 0, tmp, "", 0, con, statement, "", &id, "Select active publication", 1, "Active Publication", "Select", "Cancel");	
+
+		if (ok)
+		{
+			if(query::send (qu, "index=?") && query::input (qu, kInt, id))
+			{
+				if(query::exec (qu))
+				{
+					list::reload( 3, 1 ); //classid product, reload all
+				}
+				else
+				{
+					wlog("", "There were a query:exec error in 600.crpt, method showPublicationSelector(). \n");
+					err = 1;
+				}
+			}
+			else
+			{
+				wlog("", "There were query send/input errors in 600.crpt, method showPublicationSelector(). \n");	
+				err = 2;
+			}
+		}
+		else
+		{
+			// User canceled
+		};
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful in script 600.crpt, method showPublicationSelector(). \n");
+		err = 3;
+	}
+			
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in script 600.crpt, method showPublicationSelector(). \n");
+	}	
+
+	release( statement );
+	release( tmp );
+	
+	return 0;	
+}
+
+
+int showMediaContextSelector()
+{
+	int kBufferSize = 8000;
+	DBC con = soap::connection ();
+	char * statement = "getlist=GET_mediacontexts\nparam1=test1\nparam2=test2\n";
+	char * tmp = alloc (kBufferSize);
+	int id = 0;
+	int ok = false;
+	int err = 0;
+	Query qu = soap::call (con, "SET_mediacontext");
+
+	if(qu)
+	{
+		ok = askstring2 (tmp, "", 0, tmp, "", 0, con, statement, "", &id, "Select active image format", 1, "Image Format", "Select", "Cancel");	
+
+		if (ok)
+		{
+			if(query::send (qu, "index=?") && query::input (qu, kInt, id))
+			{
+				if(query::exec (qu) != 1)
+				{
+					wlog("", "There were a query:exec error in 600.crpt, method showMediaContextSelector(). \n");
+					err = 1;
+				}
+			}
+			else
+			{
+				wlog("", "There were query send/input errors in 600.crpt, method showMediaContextSelector(). \n");	
+				err = 2;
+			}
+		}
+		else
+		{
+			// User canceled
+		};
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful in script 600.crpt, method showMediaContextSelector(). \n");
+		err = 3;
+	}
+
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in script 600.crpt, method showMediaContextSelector(). \n");
+	}	
+
+	release( statement );
+	release( tmp );
+	
+	return 0;	
+}
+
+
+int setOperatingSystem()
+{
+	int kBufferSize = 8000;
+	DBC con = soap::connection ();
+	char * tmp = alloc (kBufferSize);
+	int id = 0;
+	int ok = false;
+	int err = 0;
+	
+	Query qu = soap::call (con, "SET_os");
+
+	if(qu)
+	{
+		id = system::os();
+
+		if(query::send (qu, "os=?") && query::input (qu, kInt, id))
+		{
+			if(query::exec (qu) != 1)
+			{
+				wlog("", "There were a query:exec error in 600.crpt, method setOperatingSystem(). \n");
+				err = 1;
+			}
+		}
+		else
+		{
+			wlog("", "There were query send/input errors in 600.crpt, method setOperatingSystem(). \n");	
+			err = 2;
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful in script 600.crpt, method setOperatingSystem(). \n");
+		err = 3;
+	}
+	
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in script 600.crpt, method setOperatingSystem(). \n");
+	}	
+	
+	release( tmp );
+	
+	return 0;	
+}
+
+
+int setClientLanguage()
+{
+	int kBufferSize = 8000;
+	DBC con = soap::connection ();
+	char * tmp = alloc (kBufferSize);
+	int id = 0;
+	int ok = false;
+	int err = 0;
+	
+	Query qu = soap::call (con, "SET_clientLanguage");
+
+	if(qu)
+	{
+		id = system::language();
+
+		if(query::send (qu, "lang=?") && query::input (qu, kInt, id))
+		{
+			if(query::exec (qu) != 1)
+			{
+				wlog("", "There were a query:exec error in 600.crpt, method setClientLanguage(). \n");
+				err = 1;
+			}
+		}
+		else
+		{
+			wlog("", "There were query send/input errors in 600.crpt, method setClientLanguage(). \n");	
+			err = 2;
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful in script 600.crpt, method setClientLanguage(). \n");
+		err = 3;
+	}
+	
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in script 600.crpt, method setClientLanguage(). \n");
+	}	
+	
+	release( tmp );
+	
+	return 0;	
+}

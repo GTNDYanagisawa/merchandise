@@ -1,0 +1,33 @@
+/*
+	Script           :  352
+	Author           :
+	Description      :  Product oriented Flowlayout buildup
+*/
+
+#include "internal/types.h"
+#include "internal/products.h"
+#include "[soap]/actions/601.crpt"
+
+/*********************************************************************
+ MAIN script
+ Starts the processig of selected products
+*********************************************************************/
+int main ()
+{
+	int err = 0;
+
+	ProductList prList; //contain all the selected items
+
+	// get list of selected items
+	prList = productlist::get( "selected" );  // list = all products, watched = only products with an eye symbol, selected = all selected products
+
+	err = processFlowlayoutBuild(prList);
+	if( err != 0 )
+	{
+		wlog( "", "Error while build in flow layout [%d] \n", err );
+	}
+
+	productlist::release( prList, DONT_DELETE_PRODUCTLIST_ELEMENTS );
+	
+	return 0;
+} 

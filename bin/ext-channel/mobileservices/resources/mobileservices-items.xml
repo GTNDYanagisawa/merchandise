@@ -1,0 +1,918 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+	<!--
+		ATTENTION: This is just an example file. You have to edit it according
+		to your needs.
+	-->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+
+		<enumtype code="EnginesType" autocreate="true" generate="true" dynamic="true">
+			<value code="smppEngine" />
+			<value code="mBloxSmppEngine" />
+			<value code="bulkSMSEngine" />
+			<value code="httpEngine"/>
+			<!-- todo: move test engines to different extension-->
+			<value code="testSendSMSEngine" />
+			<value code="brokenTestSendSMSEngine" />
+			<value code="unavailableTestSendSMSEngine"/>
+		</enumtype>
+		
+		
+		<enumtype code="NetworkType" autocreate="true" generate="true"
+			dynamic="true">
+			<value code="GSM" />
+			<value code="CDMA" />
+		</enumtype>
+		
+		<enumtype code="PhoneNumberFormat" autocreate="true"
+			generate="true" dynamic="true">
+			<value code="LOCAL" />
+			<value code="INTERNATIONAL" />
+		</enumtype>
+		
+		<enumtype code="MobileKeywordType" autocreate="true"
+			generate="true" dynamic="true">
+			<value code="IGNORECASE" />
+			<value code="REGEX" />
+		</enumtype>
+
+		<enumtype code="MobileActionAssignmentStateType" autocreate="true"
+			generate="true">
+			<value code="ACTIVE" />
+			<value code="TESTMODE" />
+			<value code="OFF" />
+		</enumtype>
+		
+		<enumtype code="MobileActiveStateType" autocreate="true"
+			generate="true">
+			<value code="ACTIVE" />
+			<value code="OFF" />
+		</enumtype>
+		
+		<enumtype code="PhoneType" autocreate="true"
+			generate="true" dynamic="true">
+			<value code="MOBILE" />
+			<value code="OFFICE" />
+			<value code="HOME" />
+		</enumtype>
+
+		<enumtype code="MobileMessageStatus" autocreate="true"
+			generate="true" dynamic="true">
+			<value code="RECEIVED" />
+			<value code="PROCESSING" />
+			
+			<value code="PROCCESED" />
+			<value code="VERIFYING" /> <!-- A message sent but that we are awaiting for a confirmation. If the confirmation does not reach the system, the message will be resend up to max number of failures -->
+			
+			<value code="SENT" />
+			<value code="DONE" />
+			<value code="DISCARDED" />
+			<value code="SCHEDULED" />
+			<value code="ERROR" />
+		</enumtype>
+		
+		<enumtype code="MobileMessageError" autocreate="true"
+			generate="true" dynamic="true">
+			<value code="INVALID_PHONE_NUMBER" />
+			<value code="MAX_SIZE_EXCEEDED" />
+			<value code="UNSUBSCRIBED" />
+			<value code="NOROUTE" />
+			<value code="ACTIONMISSING" />
+			<value code="LINKNOTSUPPORTED" />
+			<value code="FILTERED" />
+			<value code="WRONGCONFIG" />
+			<value code="UNKNOWN" />
+		</enumtype>
+
+		<enumtype code="MobileAggregatorError" autocreate="true"
+			generate="true" dynamic="true">
+			<value code="IO_ERROR" />
+			<value code="REJECTED" />
+			<value code="NO_CREDIT" />
+			<value code="LIMIT_EXCEEDED" />
+			<value code="UNAVAILABLE" />
+			<value code="UNKNOWN" />
+		</enumtype>
+
+		<enumtype code="MessageType" autocreate="true" generate="true"
+			dynamic="true">
+			<value code="OUTGOING" />
+			<value code="INCOMING" />
+			<value code="TWO_WAY" />
+		</enumtype>
+	</enumtypes>
+
+	<maptypes>
+		<maptype code="StringMap" argumenttype="java.lang.String"
+			returntype="java.lang.String" generate="true" autocreate="true" />
+	</maptypes>
+
+	<relations>
+
+		<relation code="AggregatorParameterRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement type="MobileAggregator" qualifier="aggregator" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+			</sourceElement>
+			<targetElement type="MobileAggregatorParameter" qualifier="parameters" cardinality="many">
+				<modifiers read="true" write="true" search="true" partof="true" optional="true" />
+			</targetElement>
+		</relation>
+
+
+		<relation code="AggregatorShortCodeRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement type="MobileAggregator" qualifier="aggregator" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement type="MobileShortcode" qualifier="shortcodes" cardinality="many">
+				<modifiers read="true" write="true" search="true" partof="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="ShortcodesActionAssignmentsRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement type="MobileShortcode" qualifier="shortcode" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement type="MobileActionAssignment" qualifier="assignments" cardinality="many">
+				<modifiers read="true" write="true" search="true" partof="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="ShortcodeAlternativeRouteRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement type="MobileShortcode" qualifier="connectedShortcodes" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="MobileShortcode" qualifier="alternativeReplyRoute" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="UserPhoneNumberRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement type="User" qualifier="user" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="UserPhoneNumber" qualifier="phoneNumbers" cardinality="many">
+				<modifiers read="true" write="true" search="true" partof="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="ShortcodeRevenueRelation" localized="false"
+			generate="true" autocreate="true">
+			<sourceElement type="MobileShortcode" qualifier="receivingShortcode" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="MobileCostPlan" qualifier="revenuePlans" cardinality="many">
+				<modifiers read="true" write="true" search="true" partof="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="ShortcodeCostRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement type="MobileShortcode" qualifier="sendingShortcode" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement type="MobileCostPlan" qualifier="costPlans" cardinality="many">
+				<modifiers read="true" write="true" search="true" partof="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="ListNumberRelation" generate="true" localized="false" autocreate="true">
+			<deployment table="Lists2PhoneNumbers" typecode="2620" />
+			<sourceElement qualifier="lists" type="PhoneNumberList" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="numbers" type="PhoneNumber" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="CronjobPhoneListRelation" generate="true" localized="false" autocreate="true">
+			<deployment table="SendJob2PListRel" typecode="2615" />
+			<sourceElement type="MobileSendMessageCronJob" cardinality="many" navigable="false">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</sourceElement>
+			<targetElement type="PhoneNumberList" qualifier="recipientPhoneNumberLists" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="CronjobUserRelations" generate="true" localized="false" autocreate="true">
+			<deployment table="SendJob2UserRel" typecode="2616" />
+			<sourceElement type="MobileSendMessageCronJob" cardinality="many" navigable="false">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</sourceElement>
+			<targetElement type="User" qualifier="recipients" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="CronjobPhoneNumberRelations" generate="true" localized="false" autocreate="true">
+			<deployment table="SendJob2PhoneNrRel" typecode="2618" />
+			<sourceElement type="MobileSendMessageCronJob" cardinality="many" navigable="false">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</sourceElement>
+			<targetElement type="PhoneNumber" qualifier="phoneNumbers" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</targetElement>
+		</relation>
+
+
+		<!-- assigning phone number lists as block lists to a shortcode -->
+		<relation code="ShortcodeListRelation" generate="true" localized="false" autocreate="true">
+			<deployment table="Shortcode2Lists" typecode="2617" />
+			<sourceElement type="MobileShortcode"  qualifier="blockedShortcodes" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="phoneNumberFilters" type="PhoneNumberList" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</targetElement>
+		</relation>
+
+		<!-- assigning phone number lists as testing white-lists to a shortcode -->
+		<relation code="ShortcodeTestListRelation" generate="true" localized="false" autocreate="true">
+			<deployment table="Shortcode2TestLists" typecode="2613" />
+			<sourceElement type="MobileShortcode"  qualifier="testingShortcodes" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="testingPhoneNumbers" type="PhoneNumberList" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AssignmentListRelation" generate="true" localized="false" autocreate="true">
+			<deployment table="Asgnmt2Lists" typecode="2622" />
+			<sourceElement type="MobileActionAssignment" qualifier="blockedAssignments"  cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="phoneNumberFilters" type="PhoneNumberList" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AssignmentTestListRelation" generate="true" localized="false" autocreate="true">
+			<deployment table="Asgnmt2TestLists" typecode="2614" />
+			<sourceElement type="MobileActionAssignment" qualifier="testingAssignments"  cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="testingPhoneNumbers" type="PhoneNumberList" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="SendActionsPhoneListRelation" generate="true" localized="false" autocreate="true">
+			<deployment table="SendAction2Phones" typecode="2619" />
+			<sourceElement qualifier="sendingActions" type="AbstractMobileSendAction" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="filterLists" type="PhoneNumberList" cardinality="many">
+				<modifiers read="true" write="true" search="false" optional="true" />
+			</targetElement>
+		</relation>
+
+	</relations>
+
+	<itemtypes>
+
+		<itemtype code="PhoneNumber"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.PhoneNumber"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="PhoneNumbers" typecode="2605" />
+			<attributes>
+				<attribute qualifier="format" type="PhoneNumberFormat">
+					<persistence type="property" />
+					<modifiers optional="false" search="false" />
+					<defaultvalue>em().getEnumerationValue("PhoneNumberFormat", "LOCAL")</defaultvalue>
+				</attribute>
+				<attribute qualifier="number" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="country" type="Country">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="normalizedNumber" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" write="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="PhoneNumberList"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.PhoneNumberList"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="PhoneNumberLists" typecode="2621" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" search="true" />
+				</attribute>
+				<attribute qualifier="memberSize" type="java.lang.Integer">
+					<persistence type="jalo" />
+					<modifiers write="false" initial="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="UserPhoneNumber"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.UserPhoneNumber"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="UserPhoneNumbers" typecode="2606" />
+			<attributes>
+				<attribute qualifier="type" type="PhoneType">
+					<persistence type="property" />
+					<modifiers optional="false" search="true" />
+					<defaultvalue>em().getEnumerationValue("PhoneType", "MOBILE")</defaultvalue>
+				</attribute>
+				<attribute qualifier="phoneNumber" type="PhoneNumber">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="default" type="java.lang.Boolean">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileActionKeyword"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileActionKeyword"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="MobileActionKeywords" typecode="2607" />
+			<attributes>
+				<attribute qualifier="type" type="MobileKeywordType">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>em().getEnumerationValue("MobileKeywordType", "IGNORECASE")</defaultvalue>
+				</attribute>
+				<attribute qualifier="keyword" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="keywordLowerCase" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" private="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileMessageContext"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileMessageContext"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="MobileMessages" typecode="2608" />
+			<attributes>
+				<attribute qualifier="incomingMessageId" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="incomingText" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="outgoingMessageId" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="outgoingText" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="outgoingSubject" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="phoneNumber" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="normalizedPhoneNumber" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="countryIsoCode" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="phoneCountryIsoCode" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="type" type="MessageType">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="user" type="User">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="status" type="MobileMessageStatus">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="usingDefaultAction" type="java.lang.Boolean">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="messageError" type="MobileMessageError">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="messageErrorDescription" type="java.lang.String">
+					<persistence type="property" />
+					<!--  keep in props table to allow unlimited error text -->
+					<modifiers optional="true" dontOptimize="true"/>
+				</attribute>
+				<attribute qualifier="aggregatorError" type="MobileAggregatorError">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="aggregatorErrorDescription" type="java.lang.String">
+					<persistence type="property" />
+					<!--  keep in props table to allow unlimited error text -->
+					<modifiers optional="true" dontOptimize="true"/>
+				</attribute>
+				<attribute qualifier="isLink" type="java.lang.Boolean">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="shortcode" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="normalizedShortcode" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="matchedActionAssignment" type="MobileActionAssignment">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="matchedAction" type="AbstractAction">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="matchedShortcode" type="MobileShortcode">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="outgoingShortcode" type="MobileShortcode">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="failures" type="java.lang.Integer">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>java.lang.Integer.valueOf(0)</defaultvalue>
+				</attribute>
+				<attribute qualifier="price" type="java.math.BigDecimal">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="priceCurrency" type="Currency">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="revenue" type="java.math.BigDecimal">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="revenueCurrency" type="Currency">
+					<persistence type="property" />
+				</attribute>
+				<!-- AG ???? -->
+				<attribute qualifier="optOperator" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<!-- AG ???? -->
+				<attribute qualifier="optTariff" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<!-- AG ???? -->
+				<attribute qualifier="optSessionId" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="rawMessageDetails" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" initial="true" write="false" dontOptimize="true"/>
+				</attribute>
+				<attribute qualifier="incomingEngineId" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" initial="true" write="false" dontOptimize="true"/>
+				</attribute>
+				<attribute qualifier="outgoingEngineId" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileActionAssignment"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileActionAssignment"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="MobileActionAssignments" typecode="2623" />
+			<attributes>
+				<attribute qualifier="action" type="MobileReceiveGenericAction">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="keyword" type="MobileActionKeyword">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="state" type="MobileActionAssignmentStateType">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>em().getEnumerationValue("MobileActionAssignmentStateType", "OFF")</defaultvalue>
+				</attribute>
+				<attribute qualifier="language" type="Language">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="startDate" type="java.util.Date">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="endDate" type="java.util.Date">
+					<persistence type="property" />
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileAggregator"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileAggregator"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="MobileAggregators" typecode="2610" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String" autocreate="true" generate="true">
+					<modifiers read="true" write="true" optional="false" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="engine" type="EnginesType" autocreate="true" generate="true">
+					<modifiers read="true" write="false" optional="false" initial="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="maxSendingRetries" type="java.lang.Integer" autocreate="true" generate="true">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property" />
+					<defaultvalue>java.lang.Integer.valueOf(10)</defaultvalue>
+				</attribute>
+				<attribute qualifier="sendingRetryInterval" type="java.lang.Integer" autocreate="true" generate="true">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property" />
+					<defaultvalue>java.lang.Integer.valueOf(60)</defaultvalue>
+				</attribute>
+				<attribute qualifier="available" type="java.lang.Boolean">
+					<persistence type="jalo" />
+					<modifiers write="false" initial="false"/>
+				</attribute>
+				<attribute qualifier="state" type="MobileActiveStateType">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>em().getEnumerationValue("MobileActiveStateType", "ACTIVE")</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileAggregatorParameter"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileAggregatorParameter"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="MobileAggregatorParams" typecode="2611" />
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String" autocreate="true" generate="true">
+					<modifiers read="true" write="true" optional="false" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="value" type="java.lang.String" autocreate="true" generate="true">
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileShortcode"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileShortcode"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="MobileShortcodes" typecode="2624" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="keywordPrefix" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="supportedMessageType" type="MessageType">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>em().getEnumerationValue("MessageType", "TWO_WAY")</defaultvalue>
+				</attribute>
+				<attribute qualifier="country" type="Country">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="defaultAction" type="MobileReceiveGenericAction">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="networkType" type="NetworkType">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>em().getEnumerationValue("NetworkType", "GSM")</defaultvalue>
+				</attribute>
+				<attribute qualifier="messageMaxSize" type="java.lang.Integer">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>java.lang.Integer.valueOf(140)</defaultvalue>
+				</attribute>
+				<attribute qualifier="state" type="MobileActiveStateType">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>em().getEnumerationValue("MobileActiveStateType", "ACTIVE")</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileCostPlan"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileCostPlan"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="MobileCostPlans" typecode="2612" />
+			<attributes>
+				<attribute qualifier="price" type="java.math.BigDecimal">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>new java.math.BigDecimal("0.0")</defaultvalue>
+				</attribute>
+				<attribute qualifier="priceCurrency" type="Currency">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="startDate" type="java.util.Date">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="endDate" type="java.util.Date">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileReceiveGenericAction"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileReceiveGenericAction"
+			extends="AbstractAction" autocreate="true" generate="true" abstract="true">
+			<attributes>
+				<!-- This does not mean that all receive action are necessarily PLAIN type actions.
+				 	Having the default value just makes life easier for testing. -->
+				<attribute qualifier="type" type="ActionType" redeclare="true">
+					<modifiers read="true" write="false" optional="false" initial="true" private="true"/>
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("ActionType", "PLAIN")</defaultvalue>
+				</attribute>
+				<attribute qualifier="code" type="java.lang.String" autocreate="true" generate="true" redeclare="true">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.string" qualifier="target" redeclare="true">
+					<persistence type="property" />
+					<modifiers optional="false" private="true"/>
+				
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileReceiveAndSendTextAction"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileReceiveAndSendTextAction"
+			extends="MobileReceiveGenericAction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="isLink" type="java.lang.Boolean">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="content" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="subject" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute type="java.lang.string" qualifier="target" redeclare="true">
+					<persistence type="property" />
+					<modifiers optional="false" private="true"/>
+					<defaultvalue>"mobileReceiveAndSendTextAction"</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileReceiveAndSendItemAction"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileReceiveAndSendItemAction"
+			extends="MobileReceiveGenericAction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="content" type="Item">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="deeplinkUrl" type="DeeplinkUrl">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="subject" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="isLink" type="java.lang.Boolean">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute type="java.lang.string" qualifier="target"
+					redeclare="true">
+					<persistence type="property" />
+					<modifiers optional="false" private="true" />
+					<defaultvalue>"mobileReceiveAndSendItemAction"</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileReceiveAndSendProductAction"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileReceiveAndSendProductAction"
+			extends="MobileReceiveAndSendItemAction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="content" type="Product" redeclare="true">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="MobileReceiveAndSendCategoryAction"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileReceiveAndSendCategoryAction"
+			extends="MobileReceiveAndSendItemAction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="content" type="Category" redeclare="true">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="MobileReceiveAndSendCatalogAction"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileReceiveAndSendCatalogAction"
+			extends="MobileReceiveAndSendItemAction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="content" type="Catalog" redeclare="true">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="MobileReceiveAndSubscribeAction"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileReceiveAndSubscribeAction"
+			extends="MobileReceiveGenericAction" autocreate="true" generate="true">
+			<attributes>
+				<attribute type="java.lang.string" qualifier="target"
+					redeclare="true">
+					<persistence type="property" />
+					<modifiers optional="false"  private="true"/>
+					<defaultvalue>"mobileReceiveAndSubscribeAction"</defaultvalue>
+				</attribute>
+				<attribute qualifier="remove" type="java.lang.Boolean">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>false</defaultvalue>
+				</attribute>
+				<attribute qualifier="list" type="PhoneNumberList">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="successMessage" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="defaultErrorMessage" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AbstractMobileSendAction"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.AbstractMobileSendAction"
+			extends="AbstractAction" autocreate="true" generate="true" abstract="true">
+			<attributes>
+				<attribute qualifier="defaultLanguage" type="Language">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="type" type="ActionType" autocreate="true" generate="true" redeclare="true">
+					<modifiers read="true" write="false" optional="false" initial="true" private="true"/>
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("ActionType", "PLAIN")</defaultvalue>
+				</attribute>
+				<attribute qualifier="code" type="java.lang.String" autocreate="true" generate="true" redeclare="true">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.string" qualifier="target" redeclare="true">
+					<persistence type="property" />
+					<modifiers optional="false" private="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileSendTextAction"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileSendTextAction"
+			extends="AbstractMobileSendAction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="template" type="localized:java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.string" qualifier="target" redeclare="true">
+					<persistence type="property" />
+					<modifiers optional="false" private="true" />
+					<defaultvalue>"mobileSendTextAction"</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileSendLinkAction"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileSendLinkAction"
+			extends="AbstractMobileSendAction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="link" type="localized:java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="subject" type="localized:java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.string" qualifier="target"
+					redeclare="true">
+					<persistence type="property" />
+					<modifiers optional="false" private="true" />
+					<defaultvalue>"mobileSendLinkAction"</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileSendItemLinkAction"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.MobileSendItemLinkAction"
+			extends="AbstractMobileSendAction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="subject" type="localized:java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="defaultItem" type="Item">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="deeplinkUrl" type="DeeplinkUrl">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute type="java.lang.string" qualifier="target"
+					redeclare="true">
+					<persistence type="property" />
+					<modifiers optional="false" private="true" />
+					<defaultvalue>"mobileSendItemLinkAction"</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MobileSendMessageCronJob"
+			jaloclass="de.hybris.platform.mobileservices.jalo.text.job.MobileSendMessageCronJob"
+			extends="CronJob" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="link" type="java.lang.Boolean">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="subject" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="template" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="deeplinkUrl" type="DeeplinkUrl">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="variables" type="StringMap">
+					<persistence type="property"/>
+					<modifiers optional="true" search="false" dontOptimize="true" />
+				</attribute>
+				<attribute qualifier="item" type="Item">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="language" type="Language">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- TODO: BLOB / CLOB !!! -->
+
+	</itemtypes>
+</items>

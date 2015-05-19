@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+
+<project name="backoffice_buildcallbacks" >
+
+	 <macrodef name="backoffice_after_clean">
+		<sequential>
+			<sequential>
+				<echo level="info" message="Deleting backoffice jars"/>
+				<delete quiet="true">
+					<fileset dir="${ext.backoffice.path}/web/webroot/WEB-INF/lib">
+						<include name="*_bof.jar" />
+					</fileset>
+				</delete>
+			</sequential>
+		</sequential>
+	</macrodef>
+
+	<target name="widgetsxsddoc">
+       <callback extname="backoffice" target="widgetsxsddoc"/>
+       </target>
+       
+       <macrodef name="backoffice_widgetsxsddoc">
+                     <sequential>
+                           <mkdir dir="${ext.backoffice.path}/resources/doc" />
+                           <tempfile property="temp.dir" destDir="${java.io.tmpdir}" prefix="xslt"/>
+                           <mkdir dir="${temp.dir}"/>
+                           <echo message="Generating widgets.xsd documentation..." />
+                           <get src="http://www.hybris.com/schema/cockpitng/widgets.xsd"  dest="${temp.dir}/widgets.xsd" verbose="false" usetimestamp="false"/>
+                           <xslt in="${temp.dir}/widgets.xsd" out="${ext.backoffice.path}/resources/doc/widgets-xsd.html" style="${platformhome}/resources/xsl/xsd-doc.xsl" force="true"/>
+                           <delete dir="${temp.dir}"/>
+                     </sequential>
+       </macrodef>
+
+</project>
+
+

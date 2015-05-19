@@ -1,0 +1,23 @@
+#**************************************************************
+# This impex file fixes some HTML2TaggedTextTranslation issues caused by <br> tags which are impolerted as <br/> here
+
+"#% import de.hybris.platform.printsampledata.jalo.PrintsampledataManager";
+"#% impex.enableExternalImpExSyntaxParsing( true )";
+"#% impex.enableExternalDataCodeExecution( true )";
+"#% impex.setDumpingAllowed( false )";
+
+
+
+$catalogID=apparelProductCatalog;
+$catalogVersionID=Staged;
+$catalogVersion=catalogVersion(catalog(id[default='$catalogID']),version[default='$catalogVersionID']);
+
+"#% impex.info(""Print sampledata: Fix apparel product data <br> issues...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/_FIXES/apparel_products_de.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/_FIXES/apparel_products_en.csv""), ""utf-8"", 0, 0 );";
+
+$catalogVersionID=Online;
+$catalogVersion=catalogVersion(catalog(id[default='$catalogID']),version[default='$catalogVersionID']);
+
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/_FIXES/apparel_products_de.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/_FIXES/apparel_products_en.csv""), ""utf-8"", 0, 0 );";

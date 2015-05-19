@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype code="ItemInItemType" autocreate="true" generate="true" dynamic="true">
+			<description>
+				
+			</description>
+			<value code="COMPOSITE" />
+			<value code="ITEM" />
+		</enumtype>
+
+		<enumtype code="PunchOutOrderOperationAllowed" autocreate="true" generate="true" dynamic="true">
+			<description>
+				The operationAllowed attribute controls whether the user can initiate later PunchOut
+				sessions containing data from this PunchOutOrderMessage
+			</description>
+			<value code="create" />
+			<value code="inspect" />
+			<value code="edit" />
+		</enumtype>
+		<enumtype code="PunchOutClassificationDomain" autocreate="true" generate="true" dynamic="true">
+			<value code="UNSPSC" />
+		</enumtype>
+	</enumtypes>
+	
+	<relations>
+		<relation code="PunchOutCredential2B2BCustomerPunchOutCredentialMapping" localized="false">
+			<sourceElement type="PunchOutCredential" qualifier="credentials"
+				cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement type="B2BCustomerPunchOutCredentialMapping" qualifier="B2BCustomerPunchOutCredentialMapping"
+				cardinality="one" />
+		</relation>
+	</relations>
+
+	<itemtypes>
+		<itemtype code="AbstractOrder" autocreate="false" generate="false">
+			<description>Extending AbstractOrder type with additional attributes.</description>
+			<attributes>
+				<attribute qualifier="punchOutOrder" type="java.lang.Boolean">
+					<description>Signifies whether the order originates from a punch out process.</description>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Product" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="unspcs" type="java.lang.String">
+					<description>
+						Classification specifies the commodity grouping of the line item to the buyer. All the
+						supplier's products and services must be mapped and standardized to the UNSPSC
+						schema. For PunchOut index catalogs, the Classification determines the location of
+						the PunchOut item within catalogs displayed to users. For a list of UNSPSC codes,
+						see www.unspsc.org.	
+					</description>
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="unitOfMeasure" type="java.lang.String">
+					<description>
+						UnitOfMeasure describes how the product is packaged or shipped. It must conform to
+						UN/CEFACT Unit of Measure Common Codes. For a list of UN/CEFACT codes, see
+						www.unetrades.net.
+					</description>
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="B2BCustomerPunchOutCredentialMapping" >
+            <deployment table="b2bcustomercredential" typecode="10038" />
+			<attributes>
+				<attribute qualifier="b2bCustomer" type="B2BCustomer">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="PunchOutCredential" >
+            <deployment table="punchoutcredential" typecode="10039" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers optional="false" unique="true" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="identity" type="java.lang.String">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="domain" type="java.lang.String">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="sharedsecret" type="java.lang.String">
+					<modifiers optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

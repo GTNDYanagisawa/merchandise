@@ -1,0 +1,30 @@
+# Comments
+$owner=admin
+$assignee=layoutergroup
+
+# create workflow basic settings:
+INSERT_UPDATE WorkflowTemplate;&Item;code[unique=true];name[lang=en];name[lang=de];description[lang=en];description[lang=de];owner(User.uid[default=$owner])
+;Item1;PrintJob.Workflow;Correctionworkflow;Korrekturworkflow;Default print workflow;Standard print workflow;
+
+INSERT_UPDATE WorkflowActionTemplate;&Item;code[unique=true];name[lang=en];name[lang=de];principalAssigned(Principal.uid[default=$owner]);owner(User.uid[default=$owner]);workflow(&Item);actionType(code)
+;Item2;ToDo;To Do;Zu erledigen;$assignee;;Item1;start
+;Item3;Request;Request;Frage;;;Item1;normal
+;Item4;Okay;Okay;Okay;;;Item1;normal
+;Item5;Approved;Approved;Genehmigt;;;Item1;end
+;Item6;Terminated;Terminated;Abgebrochen;;;Item1;end
+
+INSERT_UPDATE WorkflowDecisionTemplate;&Item;code[unique=true];name[lang=en];name[lang=de];actionTemplate(&Item)
+;Item7;Request2ToDo;To Do;Zu erledigen;Item3
+;Item8;ToDo2Request;Request;Frage;Item2
+;Item9;ToDo2Okay;Okay;Okay;Item2
+;Item10;Okay2ToDo;To Do;Zu erledigen;Item4
+;Item11;Okay2Approve;Approve;Genehmigen;Item4
+;Item12;Request2Terminate;Terminate;Abbrechen;Item3
+
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation;source(&Item)[unique=true];target(&Item)
+;Item7;Item2
+;Item8;Item3
+;Item9;Item4
+;Item10;Item2
+;Item11;Item5
+;Item12;Item6

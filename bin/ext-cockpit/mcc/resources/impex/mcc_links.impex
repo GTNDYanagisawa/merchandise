@@ -1,0 +1,59 @@
+$catalogVersion=catalogVersion(catalog(id[default='Default']),version[default='Online'])[unique=true,default='Default:Online'];;;;;;;;;;
+$descriptionIcon=descriptionIcon(code, catalogVersion(catalog(id[default='Default']),version[default='Online']));;;;;;;;;;
+
+INSERT_UPDATE Catalog;id[unique=true];supplier(uid);defaultCatalog;previewURLTemplate;;;;;;
+;Default;;FALSE;/storefoundation/index.jsf;;;;;;
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];languages(isocode);inclAssurance;inclDuty;inclFreight;inclPacking;readPrincipals(uid);active;
+;Default;Online;de,en; true;TRUE;TRUE;FALSE;employeegroup;TRUE;
+;Default;Staged;de,en; true;TRUE;TRUE;FALSE;employeegroup;FALSE;
+
+INSERT_UPDATE Media;code[unique=true];$catalogVersion; mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];;;;;
+;mcc-icon-b2b.png;;image/png;mcc-icon-b2b.png; jar:de.hybris.platform.cockpit.jalo.CockpitManager&/mcc/import/media/mcc-icon-b2b.png;;;;;
+;mcc-icon-b2c.png;;image/png;mcc-icon-b2c.png; jar:de.hybris.platform.cockpit.jalo.CockpitManager&/mcc/import/media/mcc-icon-b2c.png;;;;;
+;mcc-icon-customerservice.png;;image/png;mcc-icon-customerservice.png; jar:de.hybris.platform.cockpit.jalo.CockpitManager&/mcc/import/media/mcc-icon-customerservice.png;;;;;
+;mcc-icon-import.png;;image/png;mcc-icon-import.png; jar:de.hybris.platform.cockpit.jalo.CockpitManager&/mcc/import/media/mcc-icon-import.png;;;;;
+;mcc-icon-mobile.png;;image/png;mcc-icon-mobile.png; jar:de.hybris.platform.cockpit.jalo.CockpitManager&/mcc/import/media/mcc-icon-mobile.png;;;;;
+;mcc-icon-multichannel.png;;image/png;mcc-icon-multichannel.png; jar:de.hybris.platform.cockpit.jalo.CockpitManager&/mcc/import/media/mcc-icon-multichannel.png;;;;;
+;mcc-icon-pcm.png;;image/png;mcc-icon-pcm.png; jar:de.hybris.platform.cockpit.jalo.CockpitManager&/mcc/import/media/mcc-icon-pcm.png;;;;;
+;mcc-icon-platform.png;;image/png;mcc-icon-platform.png; jar:de.hybris.platform.cockpit.jalo.CockpitManager&/mcc/import/media/mcc-icon-platform.png;;;;;
+;mcc-icon-print.png;;image/png;mcc-icon-print.png; jar:de.hybris.platform.cockpit.jalo.CockpitManager&/mcc/import/media/mcc-icon-print.png;;;;;
+;mcc-icon-report.png;;image/png;mcc-icon-report.png; jar:de.hybris.platform.cockpit.jalo.CockpitManager&/mcc/import/media/mcc-icon-report.png;;;;;
+;mcc-icon-wcms.png;;image/png;mcc-icon-wcms.png; jar:de.hybris.platform.cockpit.jalo.CockpitManager&/mcc/import/media/mcc-icon-wcms.png;;;;;
+;mcc-icon-instore.png;;image/png;mcc-icon-instore.png; jar:de.hybris.platform.cockpit.jalo.CockpitManager&/mcc/import/media/mcc-icon-instore.png;;;;;
+;mcc-icon-oms.png;;image/png;mcc-icon-oms.png; jar:de.hybris.platform.cockpit.jalo.CockpitManager&/mcc/import/media/mcc-icon-oms.png;;;;;
+
+
+INSERT_UPDATE StaticLink;code[unique=true];area(code);sortorder;readPrincipals(uid);$descriptionIcon;url;extensionName;parentLink(code);;
+;reportCockpit;platform;0;;mcc-icon-report.png;{reportcockpit};reportcockpit;;;
+;admincockpit;platform;1;admingroup;mcc-icon-platform.png;{admincockpit};admincockpit;;;
+;hmc2;platform;2;employeegroup;mcc-icon-platform.png;{hmc}/hybris?select=user;hmc;;;
+;hmc;platform;3;employeegroup;mcc-icon-platform.png;{hmc}/hybris;hmc;;;
+;hac;platform;4;admingroup;mcc-icon-platform.png;{hac};;;;
+;productcockpit;content;0;;mcc-icon-pcm.png;{productcockpit};productcockpit;;;
+;importcockit;content;1;;mcc-icon-import.png;{importcockpit};importcockpit;;;
+#;mam;content;3;employeegroup;;celum;mam;;;
+;hmc3;commerce;2;employeegroup;mcc-icon-b2c.png;{hmc}/hybris?select=marketing;hmc;;;
+;hmc4;commerce;3;employeegroup;;mcc-icon-b2c.png;{hmc}/hybris?select=order;hmc;;;
+
+"#% if: !de.hybris.platform.jalo.extension.ExtensionManager.getInstance().isExtensionInstalled(""btgcockpit"")";;;;;;;;;;
+;cmscockpit;channel;0;;mcc-icon-wcms.png;{cmscockpit};cmscockpit;;;
+#% endif:;;;;;;;;;;
+
+"#% if: de.hybris.platform.jalo.extension.ExtensionManager.getInstance().isExtensionInstalled(""btgcockpit"")";;;;;;;;;;
+;cmscockpit;channel;0;;mcc-icon-wcms.png;{btgcockpit};cmscockpit;;;
+#% endif:;;;;;;;;;;
+
+;cscockpit;channel;1;;mcc-icon-customerservice.png;{cscockpit};cscockpit;;;
+;printcockpit;channel;2;;mcc-icon-print.png;{printcockpit};printcockpit;;;
+;instore;channel;3;;mcc-icon-instore.png;{instore};instore;;;
+;omscockpit;channel;4;;mcc-icon-oms.png;http://cp.od-partner-na.hybris.com/oms-web/login.zul;omsorders;;;
+;webfrontends;channel;6;;;;;;;
+;storetemplate;channel;7;;;{storetemplate};storetemplate;webfrontends;;
+;mobiletemplate;channel;8;;mcc-icon-mobile.png;{mobiletemplate};mobiletemplate;webfrontends;;
+
+
+INSERT_UPDATE Divider;code[unique=true];area(code);sortorder;readPrincipals(uid);height;spacer;;;;
+;contentDivider1;content;2;cockpitgroup;10;FALSE;;;;
+;commerceDivider1;commerce;1;cockpitgroup;10;FALSE;;;;
+;channelDivider1;channel;5;cockpitgroup;10;FALSE;;;;

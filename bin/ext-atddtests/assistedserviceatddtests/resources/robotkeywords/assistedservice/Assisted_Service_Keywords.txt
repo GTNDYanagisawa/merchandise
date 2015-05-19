@@ -1,0 +1,71 @@
+**** Settings ***
+Library    de.hybris.platform.assistedserviceatddtests.keywords.AssistedServiceKeywordLibrary
+Library    de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+
+
+
+*** Keywords ***
+import asm sample data
+    [Documentation]    Imports the ASM test data
+    import impex from resource    /impex/asm-sampledata.csv
+
+login AS agent with credentials "${username:[^"]+}" "${password:[^"]+}"
+    [Documentation]    Login AS agent with provided credentials
+    login agent    ${username}    ${password}
+    [Return]
+    
+logout AS agent     
+    [Documentation]    Logout AS agent
+    logout agent
+
+verify session customer has id "${customerId:[^"]+}"
+    [Documentation]    verifies that the expected customer is set to the session
+    verify session customer    ${customerId}
+    
+verify session cart user has id "${customerId:[^"]+}"
+	[Documentation]    verifies that the expected customer is assigned to the session cart
+    verify session cart user    ${customerId}
+
+emulate customer with customer id "${customerId:[^"]+}" and cart id "${cartId:[^"]+}"
+    [Documentation]    sets the customer with the given id and cart id to the session
+    emulate customer    ${customerId}    ${cartId}
+  
+emulate customer with customer id "${customerId:[^"]+}" only
+    [Documentation]    sets the customer with the given id to the session
+    emulate customer    ${customerId}    ${EMPTY}
+    
+emulate customer with cart id "${cartId:[^"]+}" only
+    [Documentation]    sets the anonymous customer with the given cart id to the session
+    emulate customer    ${EMPTY}    ${cartId}
+    
+bind customer with customer id "${customerId:[^"]+}" to emulated cart
+	[Documentation]    binds the customer with the given id to the currently emulated cart
+	bind customer to cart    ${customerId}
+	
+stop emulate customer
+	[Documentation]    Stops customer emulation
+	stop emulation
+	
+verify session cart contains product with code "${productCode:[^"]+}"
+	[Documentation]    verifies that the current session cart contains at least one entry of the product with the given code
+	verify session cart contains product    ${productCode}
+
+get current session cart
+	[Documentation]     Returns current session cart as CartModel class
+	${customerCart}=    get cart
+	[Return]    ${customerCart}
+	
+get cart by code "${customerCartCode:[^"]+}"
+	[Documentation]     Returns cart by code
+	${customerCart}=    get cart    ${customerCartCode}
+	[Return]    ${customerCart}
+
+get carts for customer with id "${customerId:[^"]+}"
+    [Documentation]    returns all the customer's carts
+    ${customerCarts}=    get customer carts   ${customerId}
+    [Return]    ${customerCarts}
+    
+get first cart for customer with id "${customerId:[^"]+}"
+    [Documentation]    returns the 1st cart of the customer
+    ${customerCart}=    get first customer cart   ${customerId}
+    [Return]    ${customerCart}

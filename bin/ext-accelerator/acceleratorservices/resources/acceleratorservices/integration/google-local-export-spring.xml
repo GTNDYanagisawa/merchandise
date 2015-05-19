@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:file="http://www.springframework.org/schema/integration/file"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/file
+		http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<!--
+		Google Local Shopping Export Pipeline
+
+		Overview of steps in the export pipeline:
+
+			1) Listen for events of type ExportDataEvent and inject them into the exportDataQueryConverterChainInputChannel channel
+			2) Run through the exportDataQueryConverterChain
+				- Lookup the pipelineConfig bean
+				- Create export start history item
+				- Execute the pipeline Query
+				- Lookup the item by PK
+				- Convert the item into data
+				- Combine the data objects
+			3) Run through the exportDataOutputChannel
+			4) Write the export data to file
+			5) Write export complete history item
+	-->
+
+	<!-- Generic pipeline service -->
+	<alias name="defaultExportDataProcessorService" alias="exportDataProcessorService"/>
+	<bean id="defaultExportDataProcessorService" class="de.hybris.platform.acceleratorservices.dataexport.generic.impl.DefaultExportDataProcessorService" >
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias name="defaultExportDataHistoryService" alias="exportDataHistoryService"/>
+	<bean id="defaultExportDataHistoryService" class="de.hybris.platform.acceleratorservices.dataexport.generic.impl.DefaultExportDataHistoryService" >
+		<property name="modelService" ref="modelService"/>
+		<property name="cronJobDao" ref="cronJobDao"/>
+		<aop:scoped-proxy />
+	</bean>
+
+	<!-- generic pipeline services -->
+	<alias name="defaultExportConvertObjectsToCSV" alias="exportConvertObjectsToCSV"/>
+	<bean id="defaultExportConvertObjectsToCSV" class="de.hybris.platform.acceleratorservices.dataexport.generic.output.csv.ConvertObjectsToCSV" />
+
+	<!-- generic data pipeline start -->
+
+	<int:channel id="exportDataEventChannel"/>
+
+	<!-- Listen for ExportDataEvent and inject it into channel queryDataChannel -->
+	<bean id="exportDataEventListener" class="de.hybris.platform.acceleratorservices.dataexport.generic.event.ExportMessageSendingEventListener" parent="abstractEventListener">
+		<property name="eventClass" value="de.hybris.platform.acceleratorservices.dataexport.generic.event.ExportDataEvent"/>
+		<property name="channel" ref="exportDataEventChannel" />
+		<property name="errorHandler">
+			<bean class="org.springframework.integration.channel.MessagePublishingErrorHandler"/>
+		</property>
+	</bean>
+
+	<!-- define custom error channel for messages from this chain -->
+	<int:channel id="exportDataErrorChannel"/>
+	<int:header-enricher input-channel="exportDataEventChannel" output-channel="exportPreChainChannel">
+		<int:error-channel ref="exportDataErrorChannel"/>
+	</int:header-enricher>
+
+	<int:channel id="exportPreChainChannel"/>
+
+	<int:publish-subscribe-channel id="exportDataCompleteChannel"/>
+
+	<int:chain id="exportDataQueryConverterChain" input-channel="exportPreChainChannel" output-channel="exportDataCompleteChannel">
+		<int:service-activator ref="exportDataHistoryService" method="recordExportStart"/>
+		<int:header-enricher>
+			<int:header name="event" expression="payload"/>
+			<int:header name="pipelineConfig" expression="@exportDataProcessorService.lookupBean(payload.dataGenerationPipeline)"/>
+		</int:header-enricher>
+		<int:header-enricher>
+			<int:header name="targetFilename" ref="exportDataProcessorService" method="computeFilename"/>
+		</int:header-enricher>
+		<int:service-activator ref="exportDataProcessorService" method="search"/>
+		<int:splitter/>
+		<int:transformer ref="exportDataProcessorService" method="lookupItemForPk"/>
+		<int:transformer ref="exportDataProcessorService" method="convertItem"/>
+		<int:aggregator/>
+		<int:header-enricher>
+			<int:header name="processedCount" expression="payload.size()"/>
+		</int:header-enricher>
+		<int:transformer ref="exportDataProcessorService" method="convertOutput"/>
+	</int:chain>
+
+	<!-- write the output from the chain to file -->
+	<file:outbound-channel-adapter
+			id="exportDataOutputFileAdapter"
+			directory="#{exportDataBaseDirectory}"
+			auto-create-directory="true"
+			temporary-file-suffix="_temp"
+			filename-generator-expression="headers.targetFilename"
+			channel="exportDataCompleteChannel"
+			order="1"/>
+
+	<int:service-activator ref="exportDataHistoryService" method="recordExportEnd" input-channel="exportDataCompleteChannel" output-channel="nullChannel" order="2"/>
+
+	<int:service-activator ref="exportDataHistoryService" method="handleError" input-channel="exportDataErrorChannel" output-channel="nullChannel"/>
+
+	<!-- generic data pipeline end -->
+
+	<!-- Google POS Pipeline -->
+
+	<alias name="defaultExportGooglePOSConverter" alias="exportGooglePOSConverter"/>
+	<bean id="defaultExportGooglePOSConverter" class="de.hybris.platform.acceleratorservices.dataexport.googlelocal.converter.PosConverter">
+	<!-- 230 = Retail Store for a full list go to http://www.google.com/support/places/bin/answer.py?answer=178024#3-->
+		<property name="businessCategories" value="230"/>
+		<property name="internationalToInitialDigitCode">
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<description>An international number to number that is removed from the local number</description>
+				<entry key="+44" value="0"/>
+			</map>
+		</property>
+	</bean>
+
+	<alias name="defaultExportGooglePOSQuery" alias="exportGooglePOSQuery"/>
+	<bean id="defaultExportGooglePOSQuery" class="de.hybris.platform.acceleratorservices.dataexport.generic.query.impl.FlexibleSearchExportQuery" >
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="query" value="SELECT {PK} FROM {PointOfService} WHERE {BaseStore}=?baseStore"/>
+		<property name="parameters">
+			<map>
+				<entry key="baseStore" value="payload.baseStore"/>
+			</map>
+		</property>
+		<property name="impersonationService" ref="impersonationService"/>
+	</bean>
+
+	<bean id="exportGooglePosPipeline" class="de.hybris.platform.acceleratorservices.dataexport.generic.config.PipelineConfig" >
+		<property name="query" ref="exportGooglePOSQuery"/>
+		<property name="itemConverter" ref="exportGooglePOSConverter"/>
+		<property name="outputConverter" ref="exportConvertObjectsToCSV"/>
+		<!-- Example file name: code-timestamp.tsv -->
+		<property name="filename" value="headers.event.code + '-' + headers.timestamp + '.tsv'"/>
+	</bean>
+
+
+	<!-- Google Product Pipeline -->
+
+	<alias name="defaultExportGoogleProductConverter" alias="exportGoogleProductConverter"/>
+	<bean id="defaultExportGoogleProductConverter" class="de.hybris.platform.acceleratorservices.dataexport.googlelocal.converter.ProductConverter" >
+		<property name="productModelUrlResolver" ref="productModelUrlResolver"/>
+		<property name="commercePriceService" ref="commercePriceService" />
+		<property name="categoryService" ref="categoryService"/>
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService"/>
+	</bean>
+
+	<alias name="defaultExportGoogleProductQuery" alias="exportGoogleProductQuery"/>
+	<bean id="defaultExportGoogleProductQuery" class="de.hybris.platform.acceleratorservices.dataexport.generic.query.impl.FlexibleSearchExportQuery" >
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="query" value="SELECT {p.pk} FROM {Product AS p
+			JOIN CatalogVersion AS cv ON {p.catalogVersion}={cv.pk}
+			JOIN Catalog AS cat ON {cv.pk}={cat.activeCatalogVersion}
+			JOIN CMSSite AS site ON {cat.pk}={site.defaultCatalog}}
+			WHERE {site.pk} = ?cmsSite"/>
+		<property name="parameters">
+			<map>
+				<entry key="cmsSite" value="payload.site"/>
+			</map>
+		</property>
+		<property name="impersonationService" ref="impersonationService"/>
+	</bean>
+
+	<bean id="exportGoogleProductPipeline" class="de.hybris.platform.acceleratorservices.dataexport.generic.config.PipelineConfig" >
+		<property name="query" ref="exportGoogleProductQuery"/>
+		<property name="itemConverter" ref="exportGoogleProductConverter"/>
+		<property name="outputConverter" ref="exportConvertObjectsToCSV"/>
+		<!-- Example file name: code-timestamp.tsv -->
+		<property name="filename" value="headers.event.code + '-' + headers.timestamp + '.tsv'"/>
+	</bean>
+
+</beans>

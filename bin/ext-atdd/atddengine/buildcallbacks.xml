@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<project name="atddengine_buildcallbacks">
+	<macrodef name="atdd_clean">
+		<attribute name="ext"/>
+		<sequential>
+			<delete includeemptydirs="true" verbose="true" failonerror="false">
+				<fileset dir="${ext.@{ext}.path}/${atddengine.proxies.target-path}/${atddengine.proxies.root-package-path}">
+					<include name="**/*"/>
+				</fileset>
+			</delete>
+		</sequential>
+	</macrodef>
+		
+	<macrodef name="atddengine_before_build">
+		<sequential>
+			<copy file="${ant.core.lib}" todir="${ext.atddengine.path}/lib" overwrite="true" verbose="true"/>
+			
+			<mkdir dir="${ext.atddengine.path}/classes"/>
+			<javacompile destdir="${ext.atddengine.path}/classes">
+				<source>
+					<dirset dir="${ext.atddengine.path}/src">
+						<include name="de/hybris/platform/atddengine/ant"/>
+						<include name="de/hybris/platform/atddengine/framework"/>
+						<include name="de/hybris/platform/atddengine/templates"/>
+					</dirset>
+				</source>
+				<additionalclasspath>
+					<fileset dir="${ext.atddengine.path}/lib">
+						<include name="**.jar"/>
+					</fileset>
+				</additionalclasspath>
+			</javacompile>
+			
+			<if>
+				<available file="${platformhome}/ext/core/bin"/>
+				<then>
+					<path id="atddengine.classpath">
+						<dirset dir="${ext.atddengine.path}/resources" />
+						<dirset dir="${ext.atddengine.path}/classes" />
+						<fileset dir="${ext.atddengine.path}/lib">
+							<include name="*.jar" />
+						</fileset>
+						<fileset dir="${platformhome}/ext/core/bin">
+							<include name="coreserver.jar"/>
+						</fileset>
+						<fileset dir="${platformhome}/ext/core/lib">
+							<include name="log4j-*.jar"/>
+							<include name="velocity-*.jar"/>
+							<include name="commons*.jar"/>
+						</fileset>
+					</path>
+		        </then>
+		        <else>
+					<path id="atddengine.classpath">
+						<dirset dir="${ext.atddengine.path}/resources" />
+						<dirset dir="${ext.atddengine.path}/classes" />
+						<fileset dir="${ext.atddengine.path}/lib">
+							<include name="*.jar" />
+						</fileset>
+						<dirset dir="${platformhome}/ext/core/classes" />
+						<fileset dir="${platformhome}/ext/core/lib">
+							<include name="log4j-*.jar"/>
+							<include name="velocity-*.jar"/>
+							<include name="commons*.jar"/>
+						</fileset>
+					</path>
+		        </else>
+			</if>
+			
+			<echoproperties prefix="log4j." destfile="${ext.atddengine.path}/log4j-config.properties"/>
+			<property name="log4j.configuration" value="${ext.atddengine.path}/log4j-config.properties"/>
+			
+		</sequential>
+	</macrodef>
+	
+	<!-- definition of the generateproxies task which can be used by atdd extensions -->
+	<macrodef name="atddengine_after_build">
+		<sequential>
+			<taskdef name="atdd_generate_proxies" classname="de.hybris.platform.atddengine.ant.tasks.GenerateProxies" classpathref="atddengine.classpath"/>
+		</sequential>
+	</macrodef>
+	
+</project>

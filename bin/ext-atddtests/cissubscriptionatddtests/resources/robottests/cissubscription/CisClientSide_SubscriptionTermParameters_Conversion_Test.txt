@@ -1,0 +1,612 @@
+*** Settings ***
+Resource          subscriptionservices/SubscriptionTerm_Keywords.txt
+Resource          subscriptionservices/SubscriptionBillingPlan_Keywords.txt
+Resource          subscriptionservices/SubscriptionProduct_Keywords.txt
+Resource          subscriptionservices/SubscriptionPricePlan_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+Resource          commerce/SubscriptionCommerce_Keywords.txt
+Resource          cissubscription/CisSubscription_Keywords.txt
+Test Setup        import commercecart sampledata
+
+
+*** Test Cases ***
+
+Test_CisClientSide_SubscriptionTermParameters_Conversion_Cancellable_True_NoBillingPlan
+	create subscription term "T1" with renewal type "auto_renewing" and term frequency "monthly" and term number "10" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"      
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2" and cycle end "3"
+    add product "P1" to cart
+    
+# Subscription term - cancellable
+
+Test_CisClientSide_SubscriptionTermParameters_Conversion_Cancellable_True
+	create billing plan "BP1" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "1"
+	create subscription term "T1" with billing plan "BP1" and renewal type "auto_renewing" and term frequency "monthly" and term number "12" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>12</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>true</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+															
+Test_CisClientSide_SubscriptionTermParameters_Conversion_Cancellable_False
+	create billing plan "BP1" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "1"
+	create subscription term "T1" with billing plan "BP1" and renewal type "auto_renewing" and term frequency "monthly" and term number "12" and cancellable "false"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>12</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"	
+															
+# Subscription term - autoRenewal
+
+Test_CisClientSide_SubscriptionTermParameters_Conversion_AutoRenewal_True
+	create billing plan "BP1" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "1"
+	create subscription term "T1" with billing plan "BP1" and renewal type "auto_renewing" and term frequency "monthly" and term number "12" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>12</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>true</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+															
+Test_CisClientSide_SubscriptionTermParameters_Conversion_AutoRenewal_False
+	create billing plan "BP1" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "1"
+	create subscription term "T1" with billing plan "BP1" and renewal type "non_renewing" and term frequency "monthly" and term number "12" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>12</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>false</autoRenewal>
+																			<cancellable>true</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+					
+# Subscription term - frequency
+															
+Test_CisClientSide_SubscriptionTermParameters_Conversion_Frequency_Monthly
+	create billing plan "BP1" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "1"
+	create subscription term "T1" with billing plan "BP1" and renewal type "auto_renewing" and term frequency "monthly" and term number "12" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>12</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>true</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+															
+Test_CisClientSide_SubscriptionTermParameters_Conversion_Frequency_Quarterly
+	create billing plan "BP1" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "1"
+	create subscription term "T1" with billing plan "BP1" and renewal type "auto_renewing" and term frequency "quarterly" and term number "12" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>12</number>
+																			<frequency>quarterly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>true</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+															
+Test_CisClientSide_SubscriptionTermParameters_Conversion_Frequency_Annually
+	create billing plan "BP1" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "1"
+	create subscription term "T1" with billing plan "BP1" and renewal type "auto_renewing" and term frequency "annually" and term number "12" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>12</number>
+																			<frequency>annually</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>true</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+	
+# Subscription term - number
+															
+Test_CisClientSide_SubscriptionTermParameters_Conversion_Number_1
+	create billing plan "BP1" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "1"
+	create subscription term "T1" with billing plan "BP1" and renewal type "auto_renewing" and term frequency "monthly" and term number "1" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>1</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>true</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+																													
+Test_CisClientSide_SubscriptionTermParameters_Conversion_Number_100
+	create billing plan "BP1" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "1"
+	create subscription term "T1" with billing plan "BP1" and renewal type "auto_renewing" and term frequency "monthly" and term number "100" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>100</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>true</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+
+# Billing plan - frequency
+															
+Test_CisClientSide_SubscriptionTermParameters_Conversion_BillingPlan_Frequency_Monthly
+	create billing plan "BP1" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "1"
+	create subscription term "T1" with billing plan "BP1" and renewal type "auto_renewing" and term frequency "monthly" and term number "12" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>12</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>true</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+															
+Test_CisClientSide_SubscriptionTermParameters_Conversion_BillingPlan_Frequency_Quarterly
+	create billing plan "BP1" with billing frequency "quarterly" and billing cycle type "day_of_month" and billing cycle day "1"
+	create subscription term "T1" with billing plan "BP1" and renewal type "auto_renewing" and term frequency "monthly" and term number "12" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>12</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>true</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Quarter</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+															
+Test_CisClientSide_SubscriptionTermParameters_Conversion_BillingPlan_Frequency_Yearly
+	create billing plan "BP1" with billing frequency "yearly" and billing cycle type "day_of_month" and billing cycle day "1"
+	create subscription term "T1" with billing plan "BP1" and renewal type "auto_renewing" and term frequency "monthly" and term number "12" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>12</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>true</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Year</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+												
+# Billing plan - billingCycleDay
+															
+Test_CisClientSide_SubscriptionTermParameters_Conversion_BillingPlan_BillingCycleDay_1
+	create billing plan "BP1" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "1"
+	create subscription term "T1" with billing plan "BP1" and renewal type "auto_renewing" and term frequency "monthly" and term number "12" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>12</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>true</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>1</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+															
+Test_CisClientSide_SubscriptionTermParameters_Conversion_BillingPlan_BillingCycleDay_28
+	create billing plan "BP1" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "28"
+	create subscription term "T1" with billing plan "BP1" and renewal type "auto_renewing" and term frequency "monthly" and term number "12" and cancellable "true"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>12</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>true</autoRenewal>
+																			<cancellable>true</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>28</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges/>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"
+																																																							
+Test_CisClientSide_SubscriptionTermParameters_Conversion_BillingPlan_Onfirstbill_Paynow_CycleFrom1To3_From4To4_From5To_Complex
+	create billing plan "BP1" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "20"
+	create subscription term "T1" with billing plan "BP1" and renewal type "non_renewing" and term frequency "monthly" and term number "9" and cancellable "false"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10.00"
+    for subscription priceplan "PP1" add "paynow" one time price of "7.00"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "5"
+    ${customerId}=    register and login customer "John" "Doe" with login "john.doe@test.com"
+    add product "P1" to cart
+	${convertedXml}=    convert to cis subscription order
+	Log    ${convertedXml}
+	verify that conversion result "${convertedXml}" equals "<subscriptionorder id="WILL_NOT_BE_VALIDATED">
+																<date>WILL_NOT_BE_VALIDATED</date>
+																<currency>USD</currency>
+																<addresses/>
+																<merchantAccountId>${customerId}</merchantAccountId>
+																<items>
+																	<item id="0">
+																		<code>P1</code>
+																		<name>P1</name>
+																		<subscriptionTerm>
+																			<name>T1</name>
+																			<number>9</number>
+																			<frequency>monthly</frequency>
+																			<autoRenewal>false</autoRenewal>
+																			<cancellable>false</cancellable>
+																			<billingPlanName>BP1</billingPlanName>
+																			<billingCycleDay>20</billingCycleDay>
+																			<billingFrequency>Month</billingFrequency>
+																		</subscriptionTerm>
+																		<subscriptionPlan id="WILL_NOT_BE_VALIDATED">
+																			<name>PP1</name>
+																			<charges>
+																				<charge>
+																					<chargePrice>10.0</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																					<oneTimeChargeTime>onFirstBill</oneTimeChargeTime>
+																				</charge>
+																				<charge>
+																					<chargePrice>20.99</chargePrice>
+																					<numberOfCycles>3</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>40.99</chargePrice>
+																					<numberOfCycles>1</numberOfCycles>
+																				</charge>
+																				<charge>
+																					<chargePrice>50.99</chargePrice>
+																					<numberOfCycles>0</numberOfCycles>
+																				</charge>
+																			</charges>
+																			<usageCharges/>
+																		</subscriptionPlan>
+																	</item>
+																</items>
+															</subscriptionorder>"																																																																																																																																																																																																																																																																																																																																									
+
+       

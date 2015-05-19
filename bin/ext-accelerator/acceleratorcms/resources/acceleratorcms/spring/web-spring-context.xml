@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<!-- Spring bean definitions that should be loaded in the application context 
+	of the web application. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/util
+		   http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+	<!-- cmsPageContextService Tenant scoped bean to support CMS component rendering. -->
+	<alias alias="cmsPageContextService" name="defaultCMSPageContextService" />
+	<bean id="defaultCMSPageContextService"
+		class="de.hybris.platform.acceleratorcms.services.impl.DefaultCMSPageContextService">
+		<property name="cmsPreviewService" ref="cmsPreviewService" />
+		<property name="cmsPageService" ref="cmsPageService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="userService" ref="userService" />
+	</bean>
+
+
+	<!-- cmsPageRequestContextData Request scoped spring bean that holds contextual 
+		information about the CMS for the current request. -->
+	<alias alias="cmsPageRequestContextData" name="defaultCmsPageRequestContextData" />
+	<bean id="defaultCmsPageRequestContextData"
+		class="de.hybris.platform.acceleratorcms.data.CmsPageRequestContextData"
+		scope="request" />
+
+
+	<!-- cmsPageContextService Tenant scoped bean to support CMS component rendering. -->
+	<alias alias="cmsPageSlotComponentService" name="defaultCMSPageSlotComponentService" />
+	<bean id="defaultCMSPageSlotComponentService"
+		class="de.hybris.platform.acceleratorcms.component.slot.impl.DefaultCMSPageSlotComponentService">
+		<property name="cmsRestrictionService" ref="cmsRestrictionService" />
+		<property name="cmsContentSlotService" ref="cmsContentSlotService" />
+		<property name="cmsComponentService" ref="cmsComponentService" />
+		<property name="cmsComponentRenderer" ref="cmsComponentRendererRegistry" />
+		<property name="cmsComponentContainerStrategy" ref="cmsComponentContainerStrategyRegistry" />
+	</bean>
+
+
+	<!-- componentContainerStrategyRegistry Registry of CMSComponentContainerStrategy 
+		for specific component types. -->
+	<alias alias="cmsComponentContainerStrategyRegistry" name="defaultCMSComponentContainerStrategyRegistry" />
+	<bean id="defaultCMSComponentContainerStrategyRegistry"
+		class="de.hybris.platform.acceleratorcms.component.container.impl.DefaultCMSComponentContainerStrategyRegistry">
+		<property name="strategies">
+			<map>
+				<!--<entry key="" value=""/> -->
+			</map>
+		</property>
+		<property name="defaultCMSComponentContainerStrategy" ref="legacyCMSComponentContainerStrategy" />
+		<property name="typeService" ref="typeService" />
+	</bean>
+
+	<!-- legacyCMSComponentContainerStrategy Strategy that calls the deprecated 
+		AbstractCMSComponentContainer.currentCMSComponents -->
+	<alias alias="legacyCMSComponentContainerStrategy" name="defaultLegacyCMSComponentContainerStrategy" />
+	<bean id="defaultLegacyCMSComponentContainerStrategy"
+		class="de.hybris.platform.acceleratorcms.component.container.impl.LegacyCMSComponentContainerStrategy" />
+
+	<!-- identityCMSComponentContainerStrategy Strategy that returns the container 
+		itself. -->
+	<alias alias="identityCMSComponentContainerStrategy" name="defaultIdentityCMSComponentContainerStrategy" />
+	<bean id="defaultIdentityCMSComponentContainerStrategy"
+		class="de.hybris.platform.acceleratorcms.component.container.impl.IdentityCMSComponentContainerStrategy" />
+
+
+	<!-- cmsComponentRendererRegistry Registry of CmsComponentRenderers for 
+		specific component types. -->
+	<alias alias="cmsComponentRendererRegistry" name="defaultCMSComponentRendererRegistry" />
+	<bean id="defaultCMSComponentRendererRegistry"
+		class="de.hybris.platform.acceleratorcms.component.renderer.impl.DefaultCMSComponentRendererRegistry">
+		<property name="typeService" ref="typeService" />
+		<property name="defaultCmsComponentRenderer" ref="genericViewCMSComponentRenderer" />
+		<property name="renderers">
+			<map>
+				<entry key="CMSParagraphComponent" value-ref="cmsParagraphComponentRenderer" />
+			</map>
+		</property>
+	</bean>
+
+
+	<!-- cmsComponentRendererRegistry Registry of CmsComponentRenderers for 
+		specific component types. -->
+	<alias alias="genericViewCMSComponentRenderer" name="defaultGenericViewCMSComponentRenderer" />
+	<bean id="defaultGenericViewCMSComponentRenderer"
+		class="de.hybris.platform.acceleratorcms.component.renderer.impl.GenericViewCMSComponentRenderer" />
+
+
+	<!-- Custom CMS Component Renderers -->
+
+	<alias alias="cmsParagraphComponentRenderer" name="defaultCMSParagraphComponentRenderer" />
+	<bean id="defaultCMSParagraphComponentRenderer"
+		class="de.hybris.platform.acceleratorcms.component.renderer.impl.CMSParagraphComponentRenderer" />
+
+	<!-- Context information loader - bean that load context information -->
+	<alias name="defaultContextInformationLoader" alias="contextInformationLoader" />
+	<bean id="defaultContextInformationLoader"
+		class="de.hybris.platform.acceleratorcms.context.impl.DefaultContextInformationLoader">
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="cmsSiteService" ref="cmsSiteService" />
+		<property name="i18NService" ref="i18NService" />
+		<property name="modelService" ref="modelService" />
+		<property name="timeService" ref="timeService" />
+		<property name="userService" ref="userService" />
+		<property name="strategies" ref="contextLoadStrategiesList" />
+		<property name="previewRequestStrategies" ref="previewRequestStrategiesList" />
+	</bean>
+
+	<alias name="defaultContextLoadStrategiesList" alias="contextLoadStrategiesList" />
+	<util:list id="defaultContextLoadStrategiesList">
+		<bean id="loadUserStrategy" parent="defaultContextInformationLoader"
+			class="de.hybris.platform.acceleratorcms.context.impl.DefaultContextInformationLoader$LoadUserStrategy" />
+		<bean id="loadUserGroupStrategy" parent="defaultContextInformationLoader"
+			class="de.hybris.platform.acceleratorcms.context.impl.DefaultContextInformationLoader$LoadUserGroupStrategy" />
+		<bean id="loadLanguageStrategy" parent="defaultContextInformationLoader"
+			class="de.hybris.platform.acceleratorcms.context.impl.DefaultContextInformationLoader$LoadLanguageStrategy" />
+		<bean id="loadDateStrategy" parent="defaultContextInformationLoader"
+			class="de.hybris.platform.acceleratorcms.context.impl.DefaultContextInformationLoader$LoadDateStrategy" />
+	</util:list>
+
+	<alias name="defaultPreviewRequestStrategiesList" alias="previewRequestStrategiesList" />
+	<util:list id="defaultPreviewRequestStrategiesList">
+		<ref bean="activeBaseSitePreviewStrategy" />
+		<ref bean="catalogVersionsPreviewStrategy" />
+		<ref bean="uiExperienceLevelPreviewStrategy" />
+	</util:list>
+
+	<bean id="activeBaseSitePreviewStrategy"
+		class="de.hybris.platform.acceleratorcms.preview.strategies.impl.ActiveBaseSitePreviewStrategy">
+		<property name="baseSiteService" ref="baseSiteService" />
+	</bean>
+
+	<bean id="catalogVersionsPreviewStrategy"
+		class="de.hybris.platform.acceleratorcms.preview.strategies.impl.CatalogVersionsPreviewStrategy">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+	</bean>
+
+	<bean id="uiExperienceLevelPreviewStrategy"
+		class="de.hybris.platform.acceleratorcms.preview.strategies.impl.UiExperienceLevelPreviewStrategy">
+		<property name="uiExperienceService" ref="uiExperienceService" />
+	</bean>
+
+
+</beans>

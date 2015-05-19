@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only
+		in accordance with the terms of the license agreement you entered into with hybris.
+	-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+              http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd 
+              http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd"
+    default-autowire="byName">
+
+	<!--  								-->
+	<!-- REMEMBERME SERVICE			-->
+	<!--  								-->
+	<!-- 
+	<bean id="rememberMeServices" class="de.hybris.platform.spring.security.CoreRememberMeService">
+		<property name="userDetailsService" ref="cockpitUserDetailsService"/>
+		<property name="key" value="cockpit"/>
+		<property name="cookieName" value="LoginToken"/>	
+	</bean>
+	 -->
+	
+	<alias alias="coreUserDetailsService" name="defaultCoreUserDetailsService" />
+	<bean id="defaultCoreUserDetailsService" class="de.hybris.platform.cockpit.security.DefaultCockpitUserDetailsService" scope="tenant">
+		<property name="activateCatalogVersions" value="true" />
+		<property name="userService" ref="userService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+	</bean>
+	
+	<!--  						-->
+	<!-- PROCESSING FILTER 	-->
+	<!--  						-->
+	<!-- 
+	<bean id="authenticationProcessingFilter" class="org.springframework.security.ui.webapp.AuthenticationProcessingFilter">
+		<security:custom-filter position="AUTHENTICATION_PROCESSING_FILTER" />
+		<property name="authenticationManager" ref="authenticationManager" />
+		<property name="authenticationFailureUrl" value="/login.zul?login_error=1" />
+		<property name="defaultTargetUrl" value="/index.zul" />
+		<property name="rememberMeServices" ref="rememberMeServices" />
+		<property name="alwaysUseDefaultTargetUrl" value="false" />
+	</bean>
+	-->
+	<!--  				-->
+	<!-- ENTRY POINT	-->
+	<!--  				-->
+	<!--  
+	<bean id="authenticationEntryPoint" class="org.springframework.security.ui.webapp.AuthenticationProcessingFilterEntryPoint">
+		<property name="loginFormUrl" value="/login.zul" />
+		<property name="forceHttps" value="false" />
+	</bean>
+	-->
+	<!--  								-->
+	<!-- AUTHENTICATION PROVIDER	-->
+	<!--  								-->
+	<!-- 
+	<bean id="coreAuthenticationProvider" class="de.hybris.platform.spring.security.CoreAuthenticationProvider">
+		<property name="userDetailsService" ref="cockpitUserDetailsService" />
+		<security:custom-authentication-provider />
+	</bean>
+ 	-->
+</beans>

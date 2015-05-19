@@ -1,0 +1,194 @@
+/*
+	Script           :	200
+	Description      :	Example Build script
+*/
+
+#include "internal/types.h"
+#include "internal/products.h"
+#include "internal/text.h"
+
+int	gSpecialLinkID		= 1;
+int	gMaxNumPages		= 50;
+char * gMasterPage		= "A-Master";
+int	gBufferSize 		= 10000000;
+char * gImagePageItem	= "1"; // char* for strcat
+char * gTextStyle		= "NormalText";
+char * gTableStyle		= "NormalTable";
+char * gImageStyle		= "inline";
+
+#include "[soap]/actions/1013.crpt"
+#include "[soap]/actions/601.crpt"
+
+int main ()
+{
+	int result = 0;
+	int	err = 0;
+	int	len = 0;
+	int	i = 0;
+	int	plid = 0;
+	int id1 = 0;
+	int id2 = 0;
+	int id3 = 0;
+	int	first = 1;
+	char *stringid = alloc(256);
+	char *exportpath = alloc(1024);
+	char *profile = alloc(256);
+	char *systime = alloc(20);
+	char *timestamp = alloc(20);
+	char *fileid = alloc(100);
+	char *filename = alloc(100);
+
+	ItemRef	 frame = item::alloc();
+	ItemRef	 newFrame = 0;
+	ItemList frames	= itemlist::alloc();
+
+	SOAP	sh	= soap::connection();
+	Query 	qu 	= sql::query(sh);
+
+	int dummy = 0, dummy1 = 0, dummy4 = 0, dummy5 = 0, dummy6 = 0, dummy10 = 0, dummy11 = 0, dummy12 = 0;
+	char *dummy2 = alloc(3), *dummy3 = alloc(3), *dummy7 = alloc(3), *dummy8 = alloc(3), *dummy9 = alloc(3); 
+
+	wlog("", "----------------------------------------\nstart autocomet with jobid %d\n----------------------------------------\n", gJobID);
+
+	if( frame )
+	{
+		if (document::current() == 0) // no doc open
+		{
+			showmessage("Please open the document!");
+		}
+		else
+		{
+			// find special placeholder
+			frames=itemlist::allframes();
+			len = itemlist::length(frames);
+			if (len < 1)
+			{
+				showmessage("There must be a frame with the Build-Placeholder in the current document.");
+			}
+			else
+			{
+				while (i < len && plid != gSpecialLinkID)
+				{
+					itemlist::get(frames,frame,i++);
+					plid = placeholder::get_value(frame,"Placeholder");
+				}
+				if (plid != gSpecialLinkID) // special placeholder not found
+				{
+					showmessage("There must be a frame with the Build-Placeholder in the current document.");
+				}
+				else
+				{
+					query::send(qu, "getSubProductList1 ");
+					query::send(qu, "jobid = ?");
+				
+					query::input(qu, kInt, gJobID);
+				
+					query::output(qu, kInt, &id1);
+					query::output(qu, kInt, &id2);
+					query::output(qu, kInt, &id3);
+					query::output(qu, kInt, &dummy);
+					query::output(qu, kInt, &dummy1);
+					query::output(qu, kString, dummy2, 2);
+					query::output(qu, kString, dummy3, 2);
+					query::output(qu, kInt, &dummy4);
+					query::output(qu, kInt, &dummy5);
+					query::output(qu, kInt, &dummy6);
+					query::output(qu, kString, dummy7, 2);
+					query::output(qu, kString, dummy8, 2);
+					query::output(qu, kString, dummy9, 2);
+					query::output(qu, kInt, &dummy10);
+					query::output(qu, kInt, &dummy11);
+					query::output(qu, kInt, &dummy12);
+				
+					query::output(qu, kString, stringid, gBufferSize);
+				
+					query::exec (qu);
+				
+					while (query::fetch(qu))
+					{
+						wlog("","fetch got %d %d %d %s\n", id1, id2, id3, stringid);
+				
+						// baue knoten (aid,aid2,aid3,astringid) auf
+						if (id1 == 5) // change of chapter
+						{
+							if (!first) {
+								// create more pages and frames if frame is overset
+								wlog("", "id1 == 5 found, call make pages\n");
+								wlog("", "frame on page %d\n", page::get(frame));
+								newFrame = item::alloc();
+								frame = makePages(frame, newFrame); // new pages with frames were created
+								item::release(newFrame);
+				
+								wlog("", "alloc new frame\n");
+								newFrame = item::alloc();
+								wlog("", "start new chain with %d cols\n", id2);
+								startNewChain(frame, newFrame, id2); // id2 of chapter change gives the style of the new chapter
+								wlog("", "no release this time\n");
+								item::release(frame); // we dont need infos about frame anymore
+								frame = newFrame; // we need the new frame later on.
+							} else {
+								if (id2 == 1)
+									frame::create_columns(gFrame, 1);
+							}
+							first = 0;
+						}
+						else if (id1 == 4) // title object
+						{
+							// take care for placeholder on page one
+							linkFirstPageFrames(id1, id2, id3, stringid);
+						}
+						else  // id1 = 1 or 2 or 3
+						{
+							buildContents(frame, -1, id1, id2, id3, stringid);
+						}
+					}
+				
+					// create more pages and frames if frame is overset
+					newFrame = item::alloc();
+					makePages(frame, newFrame);
+				
+					query::close(qu);
+				
+					// pdf export
+					system::now(systime, 97);
+					strcpy(timestamp, strsubstring(systime, 6, 4));
+					strcat(timestamp, strsubstring(systime, 3, 2));
+					strcat(timestamp, strsubstring(systime, 0, 2));
+					strcat(timestamp, strsubstring(systime, 11, 2));
+					strcat(timestamp, strsubstring(systime, 14, 2));	
+					sprintf(fileid, "AutoCometJob_%d_%s", gJobID, timestamp);
+					wlog("", "fileid for export: \"%s\"\n", fileid);
+					sprintf(exportpath, "C:/printcontent/%s.pdf", fileid);
+					getPDFpreset(profile, gJobID);
+					sprintf(filename, "%s.pdf", fileid);
+					err = document::export_(0, exportpath, "pdf", profile, 0, 1);
+					wlog("", "PDF saved to \"%s\" with result: %d - %s.\n", exportpath, err, serror(err) );
+					err = soap::upload(sh, exportpath, -1, filename);
+					wlog("", "upload PDF to server ... result: %d - %s\n", err, serror(err));
+            }
+         }
+	   }
+   }
+   else
+   {
+		result = 1;
+   }
+
+	// Cleanup
+	release(dummy2);
+	release(dummy3);
+	release(dummy7);
+	release(dummy8);
+	release(dummy9);
+		
+	release(stringid);
+	release(exportpath);
+	release(profile);
+	release(systime);
+	release(timestamp);
+	release(fileid);
+
+	wlog("", "----------------------------------------\njobid %d done\n----------------------------------------\n", gJobID);
+
+	return 0;
+} 

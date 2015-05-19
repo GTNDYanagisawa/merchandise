@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype elementtype="AbstractSolrFacetVisibilityRule" code="SolrFacetVisibilityRuleList" type="list"/>
+		<collectiontype elementtype="FacetSelectedState" code="FacetSelectedStateSet" type="set" />
+		<collectiontype elementtype="AbstractSolrSortCondition" code="SolrSortConditionList" type="list" />
+		
+	</collectiontypes>
+
+	<enumtypes>
+		<enumtype code="FacetValueCountOperator">
+			<value code="GREATER_THAN"/>
+			<value code="LESS_THAN" />
+		</enumtype>
+		<enumtype code="FacetVisibilityRuleCondition">
+			<value code="OR" />
+			<value code="AND" />
+			<value code="NOT" />
+		</enumtype>
+		<enumtype code="FacetSelectedState">
+			<value code="SELECTED" />
+			<value code="UNSELECTED" />
+		</enumtype>
+		<enumtype code="SolrBoostConditionOperator">
+			<value code="GREATER_THAN"/>
+			<value code="GREATER_THAN_OR_EQUAL_TO"/>
+			<value code="LESS_THAN"/>
+			<value code="LESS_THAN_OR_EQUAL_TO"/>
+			<value code="EQUAL_TO"/>
+			<value code="CONTAINS"/>
+		</enumtype>
+	</enumtypes>
+	
+	<relations>
+		<relation localized="false" code="SolrIndexedProperty2FacetVisibilityRules">
+			<sourceElement type="SolrIndexedProperty" cardinality="one" qualifier="facet">
+				<modifiers optional="false" initial="true" />
+			</sourceElement>
+			<targetElement type="AbstractSolrFacetVisibilityRule" cardinality="many" qualifier="facetVisibilityRules" ordered="true">
+				<modifiers optional="true" partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="SolrHeroProductDef2ProductRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="solrHeroProdDef2ProdRel" typecode="9253"/>
+    		<sourceElement qualifier="solrHeroProductDefinitions" type="SolrHeroProductDefinition" cardinality="many" collectiontype="list">
+    		   <description>SolrHeroProductDefinition</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</sourceElement>
+    		<targetElement qualifier="products" type="Product" cardinality="many" collectiontype="list" ordered="true">
+    		   <description>Products</description>
+    			<modifiers read="true" write="true" search="true" optional="true"/>
+    		</targetElement>
+    	</relation>
+
+		<relation localized="false" code="SolrIndexedProperty2SolrFacetReconfiguration">
+			<sourceElement type="SolrIndexedProperty" cardinality="one" qualifier="facet">
+				<modifiers optional="false" initial="true" />
+			</sourceElement>
+			<targetElement type="SolrFacetReconfiguration" cardinality="many" qualifier="solrFacetReconfigurations" ordered="true">
+				<modifiers optional="true" partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation localized="false" code="SolrFacetReconfiguration2SolrSearchProfile">
+			<deployment table="solrfacetreconf2srchprof" typecode="9254"/>
+			<sourceElement type="SolrFacetReconfiguration" cardinality="many" qualifier="solrFacetReconfigurations">
+				<modifiers optional="true" initial="true" />
+			</sourceElement>
+			<targetElement type="AbstractSolrSearchProfile" cardinality="many" qualifier="solrSearchProfiles" ordered="true">
+				<modifiers optional="false" initial="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="SolrIndexedProperty2SolrBoostRuleRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="solrIndexedProperty" type="SolrIndexedProperty" cardinality="one">
+					<modifiers optional="false" read="true" write="true" search="true" />
+			</sourceElement>
+			<targetElement qualifier="boostRules" type="SolrBoostRule" cardinality="many" collectiontype="list" ordered="true" >
+				<modifiers optional="true" read="true" write="true" search="true" partof="true"/>
+			</targetElement>
+		</relation>	
+
+		<relation localized="false" code="SolrBoostRule2SolrSearchProfile">
+			<deployment table="solrboostrule2srchprof" typecode="9258"/>
+			<sourceElement type="SolrBoostRule" cardinality="many" qualifier="boostRules">
+				<modifiers optional="true" initial="true" />
+			</sourceElement>
+			<targetElement type="AbstractSolrSearchProfile" cardinality="many" qualifier="solrSearchProfiles" ordered="true">
+				<modifiers optional="false" initial="true" />
+			</targetElement>
+		</relation>
+		
+	</relations>
+
+	<itemtypes>
+		<typegroup name="solr">
+			<itemtype code="AbstractSolrFacetVisibilityRule" abstract="true" autocreate="true" generate="true" extends="GenericItem" jaloclass="de.hybris.platform.commercesearch.jalo.AbstractSolrFacetVisibilityRule">
+				<deployment table="solrfacetvisiblerule" typecode="9251"/>
+				<attributes>
+					<attribute type="java.lang.String" qualifier="code">
+						<persistence type="property"/>
+						<modifiers initial="true" optional="false"/>
+					</attribute>
+					<attribute type="java.lang.String" qualifier="name">
+						<persistence type="property"/>
+					</attribute>
+					<attribute type="FacetVisibilityRuleCondition" qualifier="condition">
+						<persistence type="property"/>
+						<modifiers initial="true" optional="false"/>
+						<defaultvalue>em().getEnumerationValue("FacetVisibilityRuleCondition","OR")</defaultvalue>
+					</attribute>
+				</attributes>
+			</itemtype>
+			
+			<itemtype code="FacetValueCountSolrFacetVisibilityRule"  autocreate="true" generate="true" extends="AbstractSolrFacetVisibilityRule" jaloclass="de.hybris.platform.commercesearch.jalo.FacetValueCountSolrFacetVisibilityRule">
+				<attributes>
+					<attribute qualifier="operator" type="FacetValueCountOperator">
+						<modifiers initial="true" optional="false"/>
+						<persistence type="property"/>
+						<defaultvalue>em().getEnumerationValue("FacetValueCountOperator","LESS_THAN")</defaultvalue>
+					</attribute> 
+					<attribute qualifier="count" type="java.lang.Integer">
+						<modifiers initial="true" optional="false"/>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="selectedStates" type="FacetSelectedStateSet">
+						<modifiers initial="false" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+			
+			<itemtype code="OtherFacetValueCountSolrFacetVisibilityRule"  autocreate="true" generate="true" extends="FacetValueCountSolrFacetVisibilityRule" jaloclass="de.hybris.platform.commercesearch.jalo.OtherFacetValueCountSolrFacetVisibilityRule">
+				<attributes>
+					<attribute qualifier="otherFacet" type="SolrIndexedProperty">
+						<modifiers initial="true" optional="false"/>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+			
+			<itemtype code="CategorySelectedSolrFacetVisibilityRule"  autocreate="true" generate="true" extends="AbstractSolrFacetVisibilityRule" jaloclass="de.hybris.platform.commercesearch.jalo.CategorySelectedSolrFacetVisibilityRule">
+				<attributes>
+					<attribute qualifier="categories" type="CategoryCollection">
+						<modifiers initial="true" optional="false"/>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+			
+			<itemtype code="ValueCoverageSolrFacetVisibilityRule"  autocreate="true" generate="true" extends="AbstractSolrFacetVisibilityRule" jaloclass="de.hybris.platform.commercesearch.jalo.ValueCoverageSolrFacetVisibilityRule">
+				<attributes>
+					<attribute qualifier="coveragePercentage" type="java.lang.Integer">
+						<modifiers initial="true" optional="false"/>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+			
+			<itemtype code="SolrSort" autocreate="false" generate="false">
+				<attributes>
+					<attribute qualifier="visible" type="java.lang.Boolean">
+						<description>The property is used to check whether a sort should be visible for front users or not.</description>
+						<modifiers unique="false" optional="false" />
+						<defaultvalue>Boolean.TRUE</defaultvalue>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+			
+			<itemtype code="ConditionalSolrSort" extends="SolrSort" autocreate="true" generate="true" abstract="false" jaloclass="de.hybris.platform.commercesearch.jalo.ConditionalSolrSort">
+				<attributes>
+					<attribute qualifier="conditions" type="SolrSortConditionList">
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+	
+			<itemtype code="AbstractSolrSortCondition" extends="GenericItem" autocreate="true" generate="true" abstract="true" jaloclass="de.hybris.platform.commercesearch.jalo.AbstractSolrSortCondition">
+				<deployment table="solrsortcondition" typecode="9250"/>
+				<attributes>
+					<attribute qualifier="inverse" type="java.lang.Boolean">
+						<modifiers optional="false" initial="true"/>
+						<persistence type="property" />
+						<defaultvalue>Boolean.FALSE</defaultvalue>
+					</attribute>
+					<attribute qualifier="description" generate="true" autocreate="true" type="java.lang.String">
+						<persistence type="dynamic" />
+						<modifiers write="false" />
+					</attribute>
+				</attributes>
+			</itemtype>
+			
+			<itemtype code="SelectedCategoryHierarchySolrSortCondition" extends="AbstractSolrSortCondition" autocreate="true" generate="true" abstract="false" jaloclass="de.hybris.platform.commercesearch.jalo.SelectedCategoryHierarchySolrSortCondition">
+				<attributes>
+					<attribute qualifier="rootCategory" type="Category">
+						<persistence type="property"/>
+						<modifiers optional="false" />
+					</attribute>
+					<attribute qualifier="description" type="java.lang.String" redeclare="true">
+						<persistence type="dynamic" attributeHandler="selectedCategoryHierarchySolrSortConditionDynamicDescription" />
+						<modifiers write="false" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="SolrHeroProductDefinition" extends="GenericItem" autocreate="true" generate="true" jaloclass="de.hybris.platform.commercesearch.jalo.SolrHeroProductDefinition">
+				<deployment table="solrHeroProductDef" typecode="9252"/>
+					<custom-properties>
+						<property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+						<property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+						<property name="uniqueKeyAttributeQualifier"><value>"code"</value></property>
+						<property name="catalog.sync.default.root.type"><value>Boolean.TRUE</value></property>		
+						<property name="catalog.sync.default.root.type.order"><value>Integer.valueOf(2)</value></property>
+					</custom-properties>
+					<attributes>
+						<attribute qualifier="category" type="Category">
+							<persistence type="property"/>
+							<modifiers optional="false" />
+						</attribute>
+						<attribute qualifier="indexedType" type="SolrIndexedType">
+							<persistence type="property"/>
+							<modifiers optional="false" />
+						</attribute>
+						<attribute qualifier="code" type="java.lang.String">
+							<persistence type="property"/>
+							<modifiers optional="false" />
+						</attribute>
+						<attribute qualifier="catalogVersion" type="CatalogVersion">
+							<persistence type="property"/>
+							<modifiers optional="false" />
+						</attribute>
+					</attributes>
+					<indexes>
+						<index name="versionIDX" unique="false">
+							<key attribute="catalogVersion"/>
+						</index>
+						<index name="codeVersionIDX" unique="false">
+							<key attribute="code"/>
+							<key attribute="catalogVersion"/>
+						</index>
+					</indexes>
+			</itemtype>
+
+			<itemtype code="AbstractSolrSearchProfile" extends="GenericItem" autocreate="true" generate="true" abstract="true" jaloclass="de.hybris.platform.commercesearch.jalo.AbstractSolrSearchProfile">
+				<deployment table="solrsearchprofile" typecode="9255"/>
+				<attributes>
+					<attribute qualifier="code" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers optional="false" />
+					</attribute>
+					<attribute qualifier="indexedType" type="SolrIndexedType">
+						<persistence type="property" />
+						<modifiers optional="false" />
+					</attribute>
+					<attribute qualifier="description" generate="true" autocreate="true" type="java.lang.String">
+						<persistence type="dynamic" />
+						<modifiers write="false" />
+					</attribute>
+				</attributes>
+			</itemtype>
+			
+			<itemtype code="GlobalSolrSearchProfile" extends="AbstractSolrSearchProfile" autocreate="true" generate="true" jaloclass="de.hybris.platform.commercesearch.jalo.GlobalSolrSearchProfile">
+				<attributes>
+					<attribute qualifier="description" type="java.lang.String" redeclare="true">
+						<persistence type="dynamic" attributeHandler="globalSolrSearchProfileDynamicDescription" />
+						<modifiers write="false" />
+					</attribute>
+				</attributes>
+			</itemtype>		
+			
+			<itemtype code="CategorySolrSearchProfile" extends="AbstractSolrSearchProfile" autocreate="true" generate="true" jaloclass="de.hybris.platform.commercesearch.jalo.CategorySolrSearchProfile">
+				<attributes>
+					<attribute qualifier="categoryCode" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers optional="false" />
+					</attribute>
+					<attribute qualifier="description" type="java.lang.String" redeclare="true">
+						<persistence type="dynamic" attributeHandler="categorySolrSearchProfileDynamicDescription" />
+						<modifiers write="false" />
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="categoryIndexTypeIdx" unique="true">
+						<key attribute="categoryCode"/>
+						<key attribute="indexedType" />
+					</index>
+				</indexes>
+			</itemtype>
+
+			<itemtype code="SolrFacetReconfiguration" extends="GenericItem" autocreate="true" generate="true" jaloclass="de.hybris.platform.commercesearch.jalo.SolrFacetReconfiguration">
+				<deployment table="solrfacetreconfig" typecode="9256"/>
+				<attributes>
+					<attribute qualifier="customFacetSortProvider" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers optional="true" />
+						<description>Facet sort values are facet being dependent</description>
+					</attribute>
+					<attribute qualifier="facetType" type="SolrIndexedPropertyFacetType">
+						<persistence type="property" />
+						<modifiers optional="true" />
+					</attribute>
+					<attribute qualifier="priority" type="java.lang.Integer">
+						<persistence type="property" />
+						<modifiers optional="true" />
+					</attribute>
+					<attribute qualifier="visible" type="boolean">
+						<description>This property is used to define whether a facet should be visible for frontend users or not.</description>
+						<modifiers unique="false" optional="false" />
+						<defaultvalue>Boolean.TRUE</defaultvalue>
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="description" generate="true" autocreate="true" type="java.lang.String">
+						<persistence type="dynamic"  attributeHandler="solrFacetReconfigurationDynamicDescription" />
+						<modifiers write="false" />
+					</attribute>
+				</attributes>
+			</itemtype>
+			
+			<itemtype code="SolrBoostRule" jaloclass="de.hybris.platform.commercesearch.jalo.SolrBoostRule"
+					extends="GenericItem" autocreate="true" generate="true">
+				<deployment table="SolrBoostRule" typecode="9257" />
+				<attributes>
+					<attribute qualifier="operator" type="SolrBoostConditionOperator">
+						<modifiers initial="true" optional="false"/>
+						<persistence type="property"/>
+						<defaultvalue>em().getEnumerationValue("SolrBoostConditionOperator","EQUAL_TO")</defaultvalue>
+					</attribute>									
+					<attribute type="java.lang.String" qualifier="propertyValue">
+						<persistence type="property"/>
+						<modifiers optional="false"/>	
+					</attribute>
+					<attribute type="int" qualifier="boostFactor">
+						<persistence type="property"/>
+						<modifiers optional="false"/>					
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>	
+
+	</itemtypes>
+
+</items>

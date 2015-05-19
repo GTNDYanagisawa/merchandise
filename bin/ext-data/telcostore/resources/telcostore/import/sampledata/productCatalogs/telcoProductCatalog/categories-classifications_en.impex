@@ -1,0 +1,65 @@
+# ImpEx for Importing Category Classifications into telco Store
+
+# Macros / Replacement Parameter definitions
+$productCatalog=telcoProductCatalog
+$productCatalogName=Telco Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$classCatalogVersion=catalogversion(catalog(id[default='TelcoClassification']),version[default='1.0'])[unique=true,default='TelcoClassification:1.0']
+$classSystemVersion=systemVersion(catalog(id[default='TelcoClassification']),version[default='1.0'])[unique=true]
+
+$lang=en
+
+
+# Insert Classifications
+UPDATE ClassificationClass;$classCatalogVersion;code[unique=true];name[lang=$lang]
+;;mobilephoneclassification;Telco Products
+;;accessoryclassification;Telco Accessories
+;;serviceplanclassification;Service Plans
+
+
+# Insert Classification Attributes
+UPDATE ClassificationAttribute;code[unique=true];name[lang=$lang];$classSystemVersion
+;featurecompatibility;Feature Compatibility
+;mobileplatform; Operating System
+;storage; Storage
+;camera; Has Camera
+;gps; Has GPS
+;keyboard; Has Keyboard
+;formfactor; Form Factor
+;displayresolution; Display Resolution
+;displaysize; Display size
+;touchscreen; Has touchScreen
+;color; Color
+;colorcompatibility;Other Available Colors
+;height; Height
+;weight; Weight
+;width; Width
+;depth; Depth
+;bands; Bands
+;vendorcompatibility; Vendor Compatibility
+
+INSERT_UPDATE ClassificationAttributeValue;code[unique=true]; name[lang=$lang];$classSystemVersion
+;feature_bt10;Bluetooth Version 1.0
+;feature_bt20;Bluetooth Version 2.0
+;feature_bt21;Bluetooth Version 2.1
+;feature_usb1;USB 1.1
+;feature_usb2;USB 2.0
+;feature_microsd;MicroSD
+;feature_sdhc;Secure Digital High-Capacity
+;feature_memorystickmicro;Memory Stick Micro (M2)
+;feature_multimediacard;MultiMediaCard (MMC)
+;feature_microsdhc;Micro Secure Digital High-Capacity
+;feature_8pinmicrosd;8-pin microSD
+;platform_ios;IOS
+;platform_android;Android
+;platform_rim;Blackbery
+;platform_symbian;Symbian OS
+;platform_ms;Windows Mobile
+;band_dualband;Dual-Band
+;band_triband;Tri-Band
+;band_quadband;Quad-Band
+;band_umts;UMTS
+;band_lte;LTE
+;formfactor_slider;Slider
+;formfactor_bar;Bar
+;formfactor_clamshell;Clamshell

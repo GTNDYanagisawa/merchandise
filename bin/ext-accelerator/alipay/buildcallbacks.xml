@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+-->
+
+<project name="alipay_buildcallbacks">
+	<macrodef name="alipay_before_compile_core">
+		<sequential>
+
+			<!-- you can do anything before the EAR file is being packed -->
+			<echo>generating JAXB classes for Alipay Integration</echo>
+
+			<mkdir dir="${ext.alipay.path}/gensrc" />
+			<mkdir dir="${ext.alipay.path}/classes" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="alipay_after_build">
+		<sequential>
+			<impexGenerate extname="alipay" />
+			<containsExact separator=";" string="${extension.names}" substring="addonsupport">
+				<do>
+					<foreachext>
+						<do>
+							<for delimiter=";" list="${addon.folder}" param="addOnFile">
+								<sequential>
+									<if>
+										<available file="${ext.@{extname}.path}/acceleratoraddon/@{addOnFile}" />
+										<then>
+											<echo message="Extname test:  @{extname}" />
+											<echo message="addOnFile test:  @{addOnFile}" />
+											<copyAddOnToExtension addonextension="@{extname}" addonresource="@{addOnFile}" target="alipay" />
+										</then>
+									</if>
+								</sequential>
+							</for>
+						</do>
+					</foreachext>
+				</do>
+			</containsExact>
+		</sequential>
+	</macrodef>
+
+	<!-- 
+		Called whenever 'ant ear' is used. this callback can be used to modify the content of the ear file
+
+		${ear.path}: 			path to ear
+	 -->
+	<macrodef name="alipay_after_clean">
+		<sequential>
+			<!-- Addon folders in storefronts are always cleaned (even if there is no addonsupport on localextension list) -->
+			<addonclean />
+		</sequential>
+	</macrodef>
+
+</project>

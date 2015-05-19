@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+
+<project name="ldap_buildcallbacks">
+
+	<target name="test">
+		<move file="C:\ws\ebusiness_trunk\temp\hybris\dists/.classpath" tofile="C:\ws\ebusiness_trunk\temp\hybris\dists/new.classpath" overwrite="true" failonerror="true">
+			<filterchain>
+				<linecontainsregexp negate="true">
+					<regexp pattern="path=&quot;lib" />
+				</linecontainsregexp>
+			</filterchain>
+		</move>
+
+	</target>
+
+	<macrodef name="ldap_after_dist">
+		<sequential>
+			<!-- delete library entries from classpath file -->
+			<move file="${destdir}/.classpath" tofile="${destdir}/tmp.classpath" overwrite="true">
+				<filterchain>
+					<linecontainsregexp negate="true">
+						<regexp pattern="path=&quot;lib" />
+					</linecontainsregexp>
+				</filterchain>
+			</move>
+			<move file="${destdir}/tmp.classpath" tofile="${destdir}/.classpath" overwrite="true" />
+		</sequential>
+	</macrodef>
+
+
+	<patternset id="extension.ldap.notests.filter">
+		<!-- don't copy embedded LDAP libraries in distribution either src/binary -->
+		<exclude name="lib/**/*" />
+		<exclude name="doc" />
+		<exclude name="resources/test/embedded/**/*" />
+
+		<!-- don't copy  test classes and custom log for embedded LDAP in distribution either src/binary -->
+		<exclude name="classes/de/hybris/platform/ldap/jalo/**/*Test.class" />
+		<exclude name="classes/de/hybris/platform/ldap/jalo/**/*Test$*.class" />
+		<exclude name="classes/de/hybris/platform/ldap/jalo/**/HybrisLDAPConfAnnotation.class" />
+
+		<!-- don't copy log classes -->
+		<exclude name="classes/de/hybris/platform/ldap/log/**/*" />
+
+		<!-- don't copy testsrc -->
+		<exclude name="testsrc/**/*" />
+	</patternset>
+
+
+	<patternset id="extension.ldap.binary.filter">
+		<patternset refid="extension.binary.filter" />
+		<patternset refid="extension.ldap.notests.filter" />
+	</patternset>
+
+	<patternset id="extension.ldap.source.filter">
+		<patternset refid="extension.source.filter" />
+		<patternset refid="extension.ldap.notests.filter" />
+	</patternset>
+
+</project>

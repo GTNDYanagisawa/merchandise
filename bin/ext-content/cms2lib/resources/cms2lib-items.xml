@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only
+		in accordance with the terms of the license agreement you entered into with hybris.
+	-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype generate="true" code="ProductListLayouts" autocreate="true" jaloclass="de.hybris.platform.jalo.enumeration.EnumerationValue">
+			<value code="listViewLayout" />
+			<value code="thumbViewLayout" />
+		</enumtype>
+		<enumtype generate="true" code="RotatingImagesComponentEffect" autocreate="true">
+			<value code="zoom" />
+			<value code="fade" />
+			<value code="turnDown" />
+			<value code="curtainX" />
+		</enumtype>
+		<enumtype generate="true" code="FlashQuality" autocreate="true">
+			<value code="low" />
+			<value code="autolow" />
+			<value code="autohigh" />
+			<value code="medium" />
+			<value code="high" />
+			<value code="best" />
+		</enumtype>
+		<enumtype generate="true" code="FlashScale" autocreate="true">
+			<value code="default" />
+			<value code="noorder" />
+			<value code="exactfit" />
+		</enumtype>
+		<enumtype generate="true" code="FlashSalign" autocreate="true">
+			<value code="l" />
+			<value code="r" />
+			<value code="t" />
+			<value code="tl" />
+			<value code="tr" />
+		</enumtype>
+		<enumtype generate="true" code="FlashWmode" autocreate="true">
+			<value code="window" />
+			<value code="opaque" />
+			<value code="transparent" />
+		</enumtype>
+		<enumtype generate="true" code="CarouselScroll" autocreate="true">
+			<value code="one" />
+			<value code="allVisible" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		<relation code="BannersForRotatingComponent" generate="true" localized="false" autocreate="true">
+			<deployment table="BannForRotCompRels" typecode="3000"/>
+			<sourceElement qualifier="rotatingComponent" type="RotatingImagesComponent" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="banners" type="BannerComponent" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		<relation code="BannersForContentPage" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="bannerComponets" type="BannerComponent" cardinality="many" collectiontype="list">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="page" type="ContentPage" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		<relation code="FlashComponentsForContentPage" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="flashComponents" type="FlashComponent" cardinality="many" collectiontype="list">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="page" type="ContentPage" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		<relation code="ProductsForProductListComponent" generate="true" localized="false" autocreate="true">
+			<deployment table="ProdsForProdListCompRels" typecode="3001"/>
+			<sourceElement qualifier="productListComponents" type="ProductListComponent" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="products" type="Product" cardinality="many" collectiontype="list">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		<relation code="ProductListComponentsForCategory" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="productListComponents" type="ProductListComponent" cardinality="many" collectiontype="list">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="category" type="Category" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		<relation code="ProductDetailComponentsForProduct" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="productDetailComponents" type="ProductDetailComponent" cardinality="many"
+				collectiontype="list">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="product" type="Product" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		<relation code="ProductsForProductCarouselComponent" generate="true" localized="false" autocreate="true">
+			<deployment table="ProdsForProdCarCompRels" typecode="3002"/>
+			<sourceElement qualifier="productCarouselComponents" type="ProductCarouselComponent" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="products" type="Product" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		<relation code="CategoriesForProductCarouselComponent" generate="true" localized="false" autocreate="true">
+			<deployment table="CatsForProdCarCompRels" typecode="3003"/>
+			<sourceElement qualifier="productCarouselComponents" type="ProductCarouselComponent" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="categories" type="Category" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+
+		<itemtype code="AbstractBannerComponent" autocreate="true" generate="true" abstract="true" extends="SimpleCMSComponent"
+			jaloclass="de.hybris.platform.cms2lib.components.AbstractBannerComponent">
+			<attributes>
+				<attribute type="localized:Media" qualifier="media">
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="urlLink">
+					<persistence type="property" />
+				</attribute>
+				<attribute type="boolean" qualifier="external">
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="BannerComponent" autocreate="true" generate="true" extends="AbstractBannerComponent"
+			jaloclass="de.hybris.platform.cms2lib.components.BannerComponent">
+			<attributes>
+				<attribute type="localized:java.lang.String" qualifier="headline">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="localized:java.lang.String" qualifier="content">
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>varchar2(4000)</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>text</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>nvarchar(max)</value>
+						</columntype>
+						<columntype database="hsqldb">
+							<value>LONGVARCHAR</value>
+						</columntype>
+					</persistence>
+					<modifiers search="false" />
+				</attribute>	
+				<attribute type="java.lang.String" qualifier="pageLabelOrId">
+					<persistence type="jalo" />
+					<modifiers write="false" search="false" />
+				</attribute>											
+			</attributes>
+		</itemtype>
+
+		<itemtype code="FlashComponent" autocreate="true" generate="true" extends="AbstractBannerComponent"
+			jaloclass="de.hybris.platform.cms2lib.components.FlashComponent">
+			<attributes>
+				<attribute type="java.lang.Boolean" qualifier="play">
+					<modifiers read="true" write="true" initial="false" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.Boolean" qualifier="loop">
+					<modifiers read="true" write="true" initial="false" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.Boolean" qualifier="menu">
+					<modifiers read="true" write="true" initial="false" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="FlashQuality" qualifier="quality">
+					<persistence type="property" />
+					<defaultvalue>
+						em().getEnumerationValue("FlashQuality","best")
+					</defaultvalue>
+				</attribute>
+				<attribute type="FlashScale" qualifier="scale">
+					<persistence type="property" />
+					<defaultvalue>
+						em().getEnumerationValue("FlashScale","default")
+					</defaultvalue>
+				</attribute>
+				<attribute type="FlashWmode" qualifier="wmode">
+					<persistence type="property" />
+					<defaultvalue>
+						em().getEnumerationValue("FlashWmode","transparent")
+					</defaultvalue>
+				</attribute>
+				<attribute type="FlashSalign" qualifier="sAlign">
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="bgcolor">
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.Integer" qualifier="width">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute type="java.lang.Integer" qualifier="height">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="pageLabelOrId">
+					<persistence type="jalo" />
+					<modifiers write="false" search="false" />
+				</attribute>					
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ProductCarouselComponent" autocreate="true" generate="true" extends="SimpleCMSComponent"
+			jaloclass="de.hybris.platform.cms2lib.components.ProductCarouselComponent">
+			<attributes>
+				<attribute type="CarouselScroll" qualifier="scroll">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>
+						em().getEnumerationValue("CarouselScroll","one")
+					</defaultvalue>					
+				</attribute>
+				<attribute type="CMSStringList" qualifier="productCodes">
+					<!-- since this is Collection(String) we MUST disable pre-fetching explicitly! -->
+					<custom-properties>
+ 						<property name="modelPrefetchMode"> <value>java.lang.Boolean.FALSE</value> </property>
+ 					</custom-properties>
+					<persistence type="jalo" />
+					<modifiers write="false" search="false" />
+				</attribute>
+				<attribute type="CMSStringList" qualifier="categoryCodes">
+					<!-- since this is Collection(String) we MUST disable pre-fetching explicitly! -->
+					<custom-properties>
+ 						<property name="modelPrefetchMode"> <value>java.lang.Boolean.FALSE</value> </property>
+ 					</custom-properties>
+					<persistence type="jalo" />
+					<modifiers write="false" search="false" />
+				</attribute>		
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="RotatingImagesComponent" generate="true" extends="SimpleCMSComponent" autocreate="true"
+			jaloclass="de.hybris.platform.cms2lib.components.RotatingImagesComponent">
+			<attributes>
+				<attribute type="java.lang.Integer" qualifier="timeout">
+					<persistence type="property" />
+				</attribute>
+				<attribute type="RotatingImagesComponentEffect" qualifier="effect">
+					<persistence type="property" />
+					<defaultvalue>
+						em().getEnumerationValue("RotatingImagesComponentEffect","fade")
+					</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ProductListComponent" generate="true" extends="SimpleCMSComponent" autocreate="true"
+			jaloclass="de.hybris.platform.cms2lib.components.ProductListComponent">
+			<attributes>
+				<attribute type="localized:java.lang.String" qualifier="headline">
+					<modifiers read="true" write="true" search="false" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="categoryCode" type="java.lang.String">
+					<persistence type="jalo" />
+					<modifiers write="false" search="false" />
+				</attribute>
+				<attribute type="boolean" qualifier="productsFromContext">
+					<modifiers read="true" write="true" search="false" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="localized:java.lang.String" qualifier="searchQuery">
+					<modifiers read="true" write="true" search="false" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="boolean" qualifier="pagination">
+					<modifiers read="true" write="true" search="false" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="layout" generate="true" autocreate="true" type="ProductListLayouts">
+					<defaultvalue>
+						em().getEnumerationValue("ProductListLayouts","listViewLayout")
+					</defaultvalue>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" optional="false" initial="false" unique="false" />
+				</attribute>
+				<attribute type="CMSStringList" qualifier="productCodes">
+					<!-- since this is Collection(String) we MUST disable pre-fetching explicitly! -->
+					<custom-properties>
+ 						<property name="modelPrefetchMode"> <value>java.lang.Boolean.FALSE</value> </property>
+ 					</custom-properties>
+					<persistence type="jalo" />
+					<modifiers write="false" search="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ProductDetailComponent" generate="true" extends="SimpleCMSComponent" autocreate="true"
+			jaloclass="de.hybris.platform.cms2lib.components.ProductDetailComponent">
+			<attributes>
+				<attribute qualifier="productCode" type="java.lang.String">
+					<persistence type="jalo" />
+					<modifiers write="false" search="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

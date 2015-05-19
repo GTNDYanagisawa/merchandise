@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<?init 				class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" arg0="./tableEditorID"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+<?taglib 			uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<?taglib 			uri="/printcockpit/tld/hybris.tld" prefix="hy"?>
+
+<window xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd"
+		border="none" mode="embedded" width="99%" height="99%" 
+		closable="true"
+		position="center"
+		sizable="true"
+		onCreate="printTableController.viewCreated(event);"
+		id="tableEditorID">
+
+
+	<style src="/printcockpit/css/printcockpit.css" />
+	<style src="/printcockpit/css/tableeditor.css" />
+
+		<borderlayout sclass="tableEditor">
+			
+			<center>
+				<borderlayout id="tableEditor" >
+					<center>
+						<borderlayout>
+<!--							<north>-->
+<!--								<div sclass="area_header" style="height: 35px;">-->
+<!--									<toolbar>-->
+<!--										<space bar="false" spacing="3px" />-->
+<!--										<toolbarbutton onClick="printTableController.saveTable()" label="${hy:l('table_save')}" image="/printcockpit/images/header_save.gif"/>-->
+<!--										<toolbarbutton onClick="printTableController.saveTableAs()" label="${hy:l('table_saveas')}" image="/printcockpit/images/header_save_as.gif"/>-->
+<!--										<toolbarbutton onClick="printTableController.reloadTable()" label="${hy:l('table_reload')}" image="/printcockpit/images/toolbar_refresh.gif"/>-->
+<!--									</toolbar>-->
+<!--								</div>	-->
+<!--							</north>-->
+							<center autoscroll="true">
+								<box style="padding: 5px;">
+									<grid id="tableGrid" use="de.hybris.platform.printcockpit.view.table.TableGridZKComponent" onCreate="printTableController.setTableGridComponent(self)" fixedLayout="false" sclass="table_grid"/>
+								</box>
+							</center>
+						</borderlayout>
+					</center>
+				
+					<south size="66%" splittable="true" collapsible="true" flex="true" border="none">
+						<borderlayout>
+							<center>
+								<borderlayout>
+									<north>
+										<div sclass="area_header" style="height: 35px;">
+											<toolbar>
+<!--												<space bar="false" spacing="3px" />-->
+<!--												<toolbarbutton onClick="printTableController.saveEditor(true)" label="${hy:l('table_editor_save')}" image="/printcockpit/images/header_save.gif"/>-->
+<!--												<toolbarbutton onClick="printTableController.loadEditor(true)" label="${hy:l('table_editor_reload')}" image="/printcockpit/images/toolbar_refresh.gif"/>-->
+<!--												<space bar="false"  spacing="3px" />-->
+												<toolbarbutton id="elementEditorToolbar" style="float: right; margin-top: -19px; margin-right: 13px;" label="${hy:l('table_section_element_editor')}" />
+											</toolbar>
+										</div>
+									</north>
+									<center autoscroll="true">
+										<div id="propEditorContainer" style="padding:5px;"/>
+									</center>
+								</borderlayout>
+							</center>
+							<east size="50%" splittable="true" collapsible="true" flex="true" border="none">
+								<borderlayout>
+									<north>
+										<div sclass="area_header" style="height: 35px;">
+											<toolbar>
+												<space bar="false" spacing="3px" />
+												<toolbarbutton label="${hy:l('table_section_preview')}"/>
+											</toolbar>
+										</div>
+									</north>
+									<center>
+										<iframe id="tablepreview" width="100%" height="100%" scrolling="auto" />
+									</center>
+								</borderlayout>
+							</east>
+						</borderlayout>
+					</south>
+				</borderlayout>
+				
+			</center>
+
+			<east size="25%" splittable="true" collapsible="true" flex="true" border="none">
+				<borderlayout onCreate="tableSourceBrowseController.viewCreated(self); tableAttributeBrowseController.viewCreated(self)" id="tableSourceBorderLayout" />
+			</east>
+ 			 			
+		</borderlayout>
+</window>

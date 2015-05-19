@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop-3.1.xsd"
+	default-autowire="byName">
+
+	<alias alias="UICockpitSession" name="B2BAdminCockpitSession" />
+	<bean id="B2BAdminCockpitSession" parent="AdminCockpitSession">
+		<property name="availablePerspectives">
+			<list merge="true">
+				<ref bean="B2BAdminPerspective" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="B2BAdminPerspective" parent="AdminPerspective">
+		<property name="uid" value="cockpit.perspective.b2badmin" />
+		<property name="label" value="cockpit.perspective.b2badmin" />
+		<property name="navigationArea">
+			<bean parent="BaseNavigationArea">
+				<property name="sections">
+					<list>
+						<ref bean="B2BAdminTypeSelectorSection" />
+						<!-- UNDO section -->
+						<bean
+							class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection">
+							<property name="localizedLabel" value="navigationarea.history" />
+							<property name="visible" value="true" />
+							<property name="renderer">
+								<bean
+									class="de.hybris.platform.cockpit.components.navigationarea.renderer.UndoSectionRenderer" />
+							</property>
+						</bean>
+					</list>
+				</property>
+				<property name="infoSlotAttachmentTypes">
+					<ref bean="WorkflowAttachmentData" />
+				</property>
+			</bean>
+		</property>
+		<property name="editorArea">
+			<bean id="B2BAdminEditorAreaModel" parent="BaseEditorAreaModel">
+				<property name="editorAreaController">
+					<ref bean="B2BAdminEditorAreaController" />
+				</property>
+			</bean>
+		</property>
+		<property name="browserArea">
+			<bean
+				class="de.hybris.platform.admincockpit.session.impl.AdmincockpitBrowserArea">
+				<property name="rootSearchTypeCode" value="AbstractConstraint" />
+				<property name="viewURI" value="/cockpit/baseSearchBrowserArea.zul" />
+				<property name="multiSelectActions">
+					<ref bean="B2BContentBrowserActionColumn" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="B2BContentBrowserActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="B2BOrganizationButtonAction" />
+				<ref bean="SplitterDummyAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="DefaultActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="B2BOrganizationButtonAction"
+		class="de.hybris.platform.b2badmincockpit.components.browserarea.impl.B2BOrganizationButtonAction" />
+
+	<bean id="B2BAdminEditorAreaController"
+		class="de.hybris.platform.b2badmincockpit.session.impl.B2BDefaultEditorAreaController"
+		scope="session">
+		<property name="sectionRowRenderer">
+			<bean id="B2BEditorSectionRowRenderer" parent="EditorSectionRowRenderer" />
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory" />
+		</property>
+		<property name="sectionPanelRenderer" ref="B2BAdminSectionPanelRenderer"/>
+	</bean>
+
+	<bean id="B2BAdminSectionPanelRenderer"
+		class="de.hybris.platform.b2badmincockpit.components.sectionpanel.B2BAdminSectionPanelRenderer"
+		scope="session">
+		<property name="catalogTypeService" ref="catalogTypeService"/>
+	</bean>
+
+
+	<bean id="CustomerContentBrowserActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="DeleteCustomerAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="DeleteCustomerAction"
+		class="de.hybris.platform.b2badmincockpit.components.listview.impl.DeleteCustomerAction"
+		scope="prototype">
+		<property name="modelService" ref="modelService" />
+		<property name="b2bOrderService" ref="b2bOrderService" />
+		<property name="modelHelper" ref="cockpitModelHelper" />
+	</bean>
+
+
+	<bean id="AbstractEnableDisableAction"
+		class="de.hybris.platform.b2badmincockpit.components.listview.impl.AbstractEnableDisableAction" abstract="true"
+		scope="prototype">
+		<property name="typeService" ref="cockpitTypeService"/>
+	</bean>
+	
+	<bean id="EnableOrDisableStatus"
+		class="de.hybris.platform.b2badmincockpit.components.listview.impl.B2BItemEnableOrDisableStatus"
+		scope="prototype"
+		parent="AbstractEnableDisableAction">
+	</bean>
+
+	<bean id="B2BUnitEnableOrDisableAction"
+		class="de.hybris.platform.b2badmincockpit.components.listview.impl.B2BUnitEnableOrDisableAction"
+		scope="prototype"
+		parent="AbstractEnableDisableAction">
+		<property name="b2bUnitService" ref="b2bUnitService" />
+	</bean>
+
+	<bean id="B2BCostCenterEnableOrDisableAction"
+		class="de.hybris.platform.b2badmincockpit.components.listview.impl.B2BCostCenterEnableOrDisableAction"
+		scope="prototype"
+		parent="AbstractEnableDisableAction">
+		<property name="modelHelper" ref="cockpitModelHelper" />
+		<property name="valueService" ref="valueService" />
+	</bean>
+
+	<bean id="recalculateOrderAction"
+		class="de.hybris.platform.admincockpit.components.listview.impl.RecalculateOrderAction"
+		scope="prototype">
+		<property name="calculationService" ref="calculationService" />
+	</bean>
+
+	<bean id="B2BBudgetEnableOrDisableAction"
+		class="de.hybris.platform.b2badmincockpit.components.listview.impl.B2BBudgetEnableOrDisableAction"
+		scope="prototype"
+		parent="AbstractEnableDisableAction">
+		<property name="modelHelper" ref="cockpitModelHelper" />
+		<property name="valueService" ref="valueService" />
+	</bean>
+
+	<bean id="B2BMerchantCheckEnableOrDisableAction"
+		class="de.hybris.platform.b2badmincockpit.components.listview.impl.B2BMerchantCheckEnableOrDisableAction"
+		scope="prototype"
+		parent="AbstractEnableDisableAction">
+		<property name="modelHelper" ref="cockpitModelHelper" />
+		<property name="valueService" ref="valueService" />
+	</bean>
+
+	<bean id="B2BPermissionEnableOrDisableAction"
+		class="de.hybris.platform.b2badmincockpit.components.listview.impl.B2BPermissionEnableOrDisableAction"
+		scope="prototype"
+		parent="AbstractEnableDisableAction">
+		<property name="modelHelper" ref="cockpitModelHelper" />
+		<property name="valueService" ref="valueService" />
+	</bean>
+
+	<bean id="B2BItemBrowserStatusColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Status" />
+		<property name="actions">
+			<list>
+				<ref bean="EnableOrDisableStatus" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="B2BUnitBrowserActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="B2BUnitEnableOrDisableAction" />
+			</list>
+		</property>
+	</bean>
+
+
+	<bean id="B2BCostCenterBrowserActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="B2BCostCenterEnableOrDisableAction" />
+			</list>
+		</property>
+	</bean>
+
+
+	<bean id="B2BBudgetBrowserActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="B2BBudgetEnableOrDisableAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="OrderContentBrowserActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="recalculateOrderAction" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="OrderContentBrowserQuoteActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="recalculateOrderAction" />
+				<ref bean="b2bQuoteWizardButtonAction" /> 
+			</list>
+		</property>
+	</bean>
+
+	<bean id="B2BMerchantCheckBrowserActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="B2BMerchantCheckEnableOrDisableAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="B2BPermissionBrowserActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="B2BPermissionEnableOrDisableAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="WorkflowAttachmentData" class="java.util.LinkedList">
+		<constructor-arg>
+			<list value-type="java.lang.String">
+				<value>de.hybris.platform.core.model.product.ProductModel</value>
+				<value>de.hybris.platform.category.model.CategoryModel</value>
+				<value>de.hybris.platform.core.model.order.OrderModel</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="B2BAdminTypeSelectorSection" parent="AdminTypeSelectorSection">
+		<property name="localizedLabel" value="navigationarea.types" />
+		<property name="visible" value="true" />
+		<property name="renderer" ref="B2BAdminTypeSelectorSectionRenderer" />
+	</bean>
+
+	<bean id="B2BAdminTypeSelectorSectionRenderer" parent="AdminTypeSelectorSectionRenderer">
+		<property name="typeCodes"
+			value="Order,B2BUnit,B2BCustomer,B2BCostCenter,B2BBudget,B2BUserGroup,B2BReportingSet,B2BMerchantCheck,B2BPermission" />
+		<property name="includeSubtypes" value="true" />
+		<property name="displayType" value="TREE" />
+	</bean>
+	
+	<bean id="b2bQuoteWizardButtonAction"
+		class="de.hybris.platform.b2badmincockpit.components.listview.impl.B2BQuoteWizardButtonAction" scope="prototype" />
+
+	<bean id="quoteWizard" class="de.hybris.platform.cockpit.wizards.Wizard"
+		scope="prototype">
+		<property name="title" value="cockpit.wizard.quoteWizard.page.title" />
+		<property name="pageRoot" value="classpath:cockpit/wizards" />
+		<property name="pages">
+			<list>
+				<ref bean="quoteDiscountWizardPage" />
+				<ref bean="quoteSummaryWizardPage" />
+			</list>
+		</property>	
+		<property name="defaultController" ref="quoteDiscountWizardPageController" />
+	</bean>
+
+	<bean id="quoteDiscountWizardPage"
+		class="de.hybris.platform.b2badmincockpit.wizards.impl.B2BQuoteDiscountWizardPage" 
+		scope="prototype">
+		<property name="id" value="quoteDiscount" />
+		<property name="componentURI" value="quoteDiscount.zul" />
+		<property name="attributesToValidate">
+			<list>
+				<value>code</value>
+				<value>typeOfDiscount</value>
+				<value>amount</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="quoteSummaryWizardPage"
+		class="de.hybris.platform.b2badmincockpit.wizards.impl.B2BQuoteDiscountSummaryPage"
+		scope="prototype">
+		<property name="id" value="quoteSummary" />
+		<property name="componentURI" value="quoteSummary.zul" />
+	</bean>
+
+	<bean id="quoteWizardConfig"
+		class="de.hybris.platform.cockpit.wizards.generic.CreateWizardConfiguration"
+		scope="tenant">
+		<property name="templateCode" value="Quote" /> 
+		<property name="wizardBeanId" value="quoteWizard" />
+		<property name="restrictToPerspectives">
+			<set>
+				<value>b2badmincockpit.perspective.b2badmincockpit</value>
+			</set>
+		</property>
+	</bean>
+	
+	<bean id="quoteDiscountWizardPageController" class="de.hybris.platform.b2badmincockpit.wizards.impl.B2BQuoteDiscountWizardPageController" scope="prototype">
+		<property name="attributeSets">
+			<set>
+				<value>quoteDiscount</value>
+			</set>
+		</property>
+		<property name="b2bOrderService" ref="b2bOrderService" />
+		<property name="calculationService" ref="calculationService" />
+	</bean>
+
+	<bean id="createOrganizationWizard" class="de.hybris.platform.cockpit.wizards.Wizard"
+		scope="prototype">
+		<property name="title" value="cockpit.wizard.createorganization.page.title" />
+		<property name="pageRoot" value="classpath:cockpit/wizards" />
+		<property name="pages">
+			<list>
+				<ref bean="commonWizardPage" />
+				<ref bean="addressWizardPage" />
+				<ref bean="b2bAdminWizardPage" />
+				<ref bean="accountManagerWizardPage" />
+				<ref bean="costCenterWizardPage" />
+				<ref bean="budgetWizardPage" />
+				<ref bean="creditLimitWizardPage" />
+				<ref bean="approvalWizardPage" />
+				<ref bean="summaryWizardPage" />
+			</list>
+		</property>
+		<property name="defaultController" ref="organizationWizardPageController" />
+	</bean>
+
+	<bean id="organizationWizardPageController" class="de.hybris.platform.b2badmincockpit.wizards.impl.B2BOrganizationWizardPageController" scope="prototype">
+		<property name="modelHelper" ref="cockpitModelHelper"/>
+		<property name="attributeSets">
+			<set>
+				<value>common</value>
+				<value>address</value>
+				<value>b2bAdmin</value>
+				<value>accountManager</value>
+				<value>costCenter</value>
+				<value>budget</value>
+				<value>creditLimit</value>
+				<value>approval</value>
+			</set>
+		</property>
+	</bean>
+	
+	<bean id="createOrganizationWizardConfig"
+		class="de.hybris.platform.cockpit.wizards.generic.CreateWizardConfiguration"
+		scope="tenant">
+		<property name="templateCode" value="Organization" />
+		<property name="wizardBeanId" value="createOrganizationWizard" />
+		<property name="restrictToPerspectives">
+			<set>
+				<value>b2badmincockpit.perspective.b2badmincockpit</value>
+			</set>
+		</property>
+	</bean>
+
+	<bean id="commonWizardPage"
+		class="de.hybris.platform.b2badmincockpit.wizards.impl.B2BCommonOrganizationWizardPage" 
+		scope="prototype">
+		<property name="id" value="common" />
+		<property name="componentURI" value="common.zul" />
+		<property name="attributesToValidate">
+			<list>
+				<value>uid</value>
+				<value>name</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="addressWizardPage"
+		class="de.hybris.platform.b2badmincockpit.wizards.impl.B2BAddressOrganizationWizardPage" 
+		scope="prototype">
+		<property name="id" value="address" />
+		<property name="componentURI" value="address.zul" />
+		<property name="attributesToValidate">
+			<list>
+				<value>title</value>
+				<value>firstName</value>
+				<value>lastName</value>
+				<value>line1</value>
+				<value>town</value>
+				<value>postalCode</value>
+				<value>phone1</value>
+				<value>country</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="b2bAdminWizardPage"
+		class="de.hybris.platform.b2badmincockpit.wizards.impl.B2BAdminOrganizationWizardPage" 
+		scope="prototype">
+		<property name="id" value="b2bAdmin" />
+		<property name="componentURI" value="b2bAdmin.zul" />
+		<property name="attributesToValidate">
+			<list>
+				<value>uid</value>
+				<value>name</value>
+				<value>email</value>
+				<value>password</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="accountManagerWizardPage"
+		class="de.hybris.platform.b2badmincockpit.wizards.impl.B2BAccountManagersOrganizationWizardPage" 
+		scope="prototype">
+		<property name="id" value="accountManager" />
+		<property name="componentURI" value="accountManager.zul" />
+		<property name="attributesToValidate">
+			<list>
+				<value>uid</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="costCenterWizardPage"
+		class="de.hybris.platform.b2badmincockpit.wizards.impl.B2BCostCenterOrganizationWizardPage" 
+		scope="prototype">
+		<property name="id" value="costCenter" />
+		<property name="componentURI" value="costCenter.zul" />
+		<property name="attributesToValidate">
+			<list>
+				<value>uid</value>
+				<value>name</value>
+				<value>currency</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="budgetWizardPage"
+		class="de.hybris.platform.b2badmincockpit.wizards.impl.B2BBudgetOrganizationWizardPage" 
+		scope="prototype">
+		<property name="id" value="budget" />
+		<property name="componentURI" value="budget.zul" />
+		<property name="attributesToValidate">
+			<list>
+				<value>uid</value>
+				<value>name</value>
+				<value>budget</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="creditLimitWizardPage"
+		class="de.hybris.platform.b2badmincockpit.wizards.impl.B2BCreditLimitWizardPage" 
+		scope="prototype">
+		<property name="id" value="creditLimit" />
+		<property name="componentURI" value="creditLimit.zul" />
+		<property name="attributesToValidate">
+			<list>
+				<value>uid</value>
+				<value>creditLimit</value>
+				<value>period</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="approvalWizardPage"
+		class="de.hybris.platform.b2badmincockpit.wizards.impl.B2BApprovalOrganizationWizardPage" 
+		scope="prototype">
+		<property name="id" value="approval" />
+		<property name="componentURI" value="approval.zul" />
+		<property name="attributesToValidate">
+			<list>
+				<value>approval</value>
+			</list>
+		</property>
+	</bean>
+	<bean id="summaryWizardPage"
+		class="de.hybris.platform.b2badmincockpit.wizards.impl.B2BSummaryOrganizationWizardPage" 
+		scope="prototype">
+		<property name="id" value="summary" />
+		<property name="componentURI" value="summary.zul" />
+	</bean>
+	
+</beans>

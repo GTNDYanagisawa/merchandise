@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+	<!--
+	The hybris platform provides one single Spring application context for beans located at the jalo layer.
+	Each extension can add beans to this context by specifying them at this configuration file.
+	 
+	You can use and/or redefine beans defined at configuration files of other extensions as well as
+	adding new one.
+		
+	If you want to locate this file at a different location or want to use several files for better,
+	structuring, please use the '<yourextension>.application-context' property at your project.properties file.
+	There you can specify a comma separated list of files where first is tried to find a file per classpath and
+	then per file system.
+	
+	Please be aware of the special 'tenant' scope. If you have a multi tenant system you mostly have to use this
+	scope instead of the default Spring 'singleton' scope.
+	
+	If you want to configure beans for your web module please have a look at
+	your web/webroot/WEB-INF/<extname>-web-spring.xml.
+	-->
+	
+	<!--  Example how to override a manager -->
+	<!--
+	<bean id="core.productManager"   class="com.configurablebundleservices.jalo.ConfigurablebundleservicesProductManager" 	init-method="init"	destroy-method="destroy"  />
+	-->
+	
+	
+ 	<!--  Example how to configure the class to use for jalo session creation -->
+	<!--
+	<bean id="jalosession"   class="de.hybris.platform.jalo.JaloSessionFactory">
+		<property name="targetClassName" value="com.configurablebundleservices.jalo.ConfigurablebundleservicesJaloSession"/>
+	</bean>
+	-->
+
+	
+	<!--  Example how to override an item  -->
+	<!-- 
+	<bean id="de.hybris.platform.jalo.product.Product" class="com.configurablebundleservices.jalo.ConfigurablebundleservicesProduct" scope="prototype" />		
+ 	-->
+
+	<!--  
+	 Example how to register and use an AOP aspect 
+     Also see http://static.springframework.org/spring/docs/2.5.x/reference/aop.html	
+     -->
+	
+	<!-- 
+	<bean id="configurablebundleservicesProfBean" class="com.configurablebundleservices.aop.ConfigurablebundleservicesProfilingAspect"/>
+	<aop:config proxy-target-class="true">
+  		<aop:aspect id="configurablebundleservicesProfAspect" ref="configurablebundleservicesProfBean" >
+    	  <aop:pointcut id="profiledMethods" 
+	      	expression="execution(* getModificationTime(..))" />  	            
+	   		<aop:around pointcut-ref="profiledMethods" method="profile" />
+  		</aop:aspect>
+	</aop:config>
+	 -->
+
+	
+	<!-- some other examples of a pointcut that matches everything:
+
+    	  <aop:pointcut id="profiledMethods" 
+	      	expression="bean(de.hybris.platform.jalo.user.Customer) &amp;&amp; 
+	      	            !execution(* getPK(..))" />  	            
+	       <aop:pointcut id="profiledMethods" expression="execution(* *(..))" />	
+	  -->
+
+	<bean id="configurableBundleServicesSystemSetup" class="de.hybris.platform.configurablebundleservices.setup.ConfigurableBundleServicesSystemSetup" parent="subscriptionServicesSystemSetup" />
+
+	<alias alias="commerceCartService" name="bundleCommerceCartService" />
+	<alias alias="bundleCommerceCartService" name="defaultBundleCommerceCartService"/>
+	<bean id="defaultBundleCommerceCartService" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultBundleCommerceCartService"
+	    	 parent="defaultSubscriptionCommerceCartService">
+	    <property name="bundleTemplateService" ref="bundleTemplateService" />
+	    <property name="sessionService" ref="sessionService" />
+	    <property name="bundleCartEntryDao" ref="bundleCartEntryDao" />
+	    <property name="orderEntryModifiableChecker" ref="bundleOrderEntryModifiableChecker"/>
+	    <property name="removableChecker" ref="orderEntryRemoveableChecker" />
+	    <property name="bundleComponentEditableChecker" ref="cartBundleComponentEditableChecker" />
+	    <property name="bundleRuleService" ref="bundleRuleService" />
+	    <property name="l10NService" ref="l10nService" />
+	</bean>
+
+    <alias alias="bundleRuleDao" name="abstractBundleRuleDao"/>
+	<bean id="abstractBundleRuleDao" abstract="true" class="de.hybris.platform.configurablebundleservices.daos.impl.AbstractBundleRuleDao" parent="abstractItemDao" >
+	</bean> 
+
+	<alias alias="disableProductBundleRuleDao" name="defaultDisableProductBundleRuleDao"/>
+	<bean id="defaultDisableProductBundleRuleDao" class="de.hybris.platform.configurablebundleservices.daos.impl.DefaultDisableProductBundleRuleDao" parent="bundleRuleDao" >
+	</bean> 	
+
+	<alias alias="changeProductPriceBundleRuleDao" name="defaultChangeProductPriceBundleRuleDao"/>
+	<bean id="defaultChangeProductPriceBundleRuleDao" class="de.hybris.platform.configurablebundleservices.daos.impl.DefaultChangeProductPriceBundleRuleDao" parent="bundleRuleDao" />	
+	
+	<alias alias="bundleTemplateDao" name="defaultBundleTemplateDao"/>
+	<bean id="defaultBundleTemplateDao" class="de.hybris.platform.configurablebundleservices.daos.impl.DefaultBundleTemplateDao" parent="abstractItemDao" >
+	</bean> 
+
+    <alias alias="orderEntryDao" name="abstractOrderEntryDao"/>
+	<bean id="abstractOrderEntryDao" abstract="true" class="de.hybris.platform.configurablebundleservices.daos.impl.AbstractOrderEntryDao" parent="abstractItemDao" >
+		<property name="typeService" ref="typeService" />
+	</bean> 
+
+	<alias alias="bundleCartEntryDao" name="defaultBundleCartEntryDao"/>
+	<bean id="defaultBundleCartEntryDao" class="de.hybris.platform.configurablebundleservices.daos.impl.DefaultCartEntryDao" parent="orderEntryDao" >
+	</bean> 
+
+	<alias alias="bundleTemplateService" name="defaultBundleTemplateService"/>
+	<bean id="defaultBundleTemplateService" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultBundleTemplateService" >
+	     <property name="bundleTemplateDao" ref="bundleTemplateDao" />
+	     <property name="bundleComponentEditableChecker" ref="cartBundleComponentEditableChecker" />
+		 <property name="modelService" ref="modelService" />
+	</bean>
+	
+	<alias alias="currentFactoryFindPricingStrategy" name="currentFactoryFindBundlePricingStrategy"/>
+	<bean id="currentFactoryFindBundlePricingStrategy" class="de.hybris.platform.configurablebundleservices.bundle.impl.FindBundlePricingWithCurrentPriceFactoryStrategy"  parent="currentFactoryFindSubscriptionPricingStrategy">
+		<property name="bundleRuleService" ref="bundleRuleService" />
+        <property name="subscriptionCommercePriceService" ref="subscriptionCommercePriceService"/>
+	</bean>
+
+	<bean id="defaultBundleRuleService" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultBundleRuleService" >
+		<property name="changeProductPriceBundleRuleDao" ref="changeProductPriceBundleRuleDao" />
+		<property name="disableProductBundleRuleDao" ref="disableProductBundleRuleDao" />
+		<property name="bundleTemplateService" ref="bundleTemplateService" />
+		<property name="cartEntryDao" ref="bundleCartEntryDao" />
+	</bean>
+
+    <alias alias="bundleRuleService" name="defaultBundleRuleService"/>
+	
+	<bean id="bundleTemplateValidator" class="de.hybris.platform.configurablebundleservices.interceptor.impl.BundleTemplateValidator" />
+	
+	<bean id="bundleTemplateValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="bundleTemplateValidator"/>
+		<property name="typeCode" value="BundleTemplate"/>
+	</bean>
+
+	<bean id="productBundleValidator" class="de.hybris.platform.configurablebundleservices.interceptor.impl.ProductBundleValidator" />
+	<bean id="productBundleValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="productBundleValidator"/>
+		<property name="typeCode" value="Product"/>
+	</bean>
+	
+	<bean id="pickExactlyNSelectionValidator" class="de.hybris.platform.configurablebundleservices.interceptor.impl.PickExactlyNBundleSelectionCriteriaValidateInterceptor" />
+	<bean id="pickExactlyNSelectionValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="pickExactlyNSelectionValidator"/>
+		<property name="typeCode" value="PickExactlyNBundleSelectionCriteria"/>
+	</bean>
+	
+	<bean id="pickNToMSelectionValidator" class="de.hybris.platform.configurablebundleservices.interceptor.impl.PickNToMBundleSelectionCriteriaValidateInterceptor" />
+	
+	<bean id="pickNToMSelectionValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="pickNToMSelectionValidator"/>
+		<property name="typeCode" value="PickNToMBundleSelectionCriteria"/>
+	</bean>
+	<bean id="bundleTemplatePrepareInterceptor" class="de.hybris.platform.configurablebundleservices.interceptor.impl.BundleTemplatePrepareInterceptor" />
+	
+	<bean id="bundleTemplatePrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="bundleTemplatePrepareInterceptor"/>
+		<property name="typeCode" value="BundleTemplate"/>
+	</bean>
+
+	<bean id="bundleTemplateRemoveInterceptor" class="de.hybris.platform.configurablebundleservices.interceptor.impl.BundleTemplateRemoveInterceptor" />
+	<bean id="bundleTemplateRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="bundleTemplateRemoveInterceptor"/>
+		<property name="typeCode" value="BundleTemplate"/>
+	</bean>
+
+    <bean id="bundleSelectionCriteriaIDGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" >
+        <property name="key" value="BundleSelectionCriteriaId"/>
+        <property name="digits" value="8"/>
+        <property name="start" value="00000000"/>
+        <property name="numeric" value="false"/>
+    </bean>
+    
+    <bean id="bundleSelectionCriteriaIDPrepareInterceptor" class="de.hybris.platform.configurablebundleservices.interceptor.impl.BundleSelectionCriteriaIDPrepareInterceptor" >
+        <property name="bundleSelectionCriteriaIDGenerator" ref="bundleSelectionCriteriaIDGenerator"/>
+    </bean>     
+    
+    <bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+        <property name="interceptor" ref="bundleSelectionCriteriaIDPrepareInterceptor"/>
+        <property name="typeCode" value="BundleSelectionCriteria"/>
+    </bean>
+
+    <bean id="abstractBundleRuleIDGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" >
+        <property name="key" value="AbstractBundleRuleId"/>
+        <property name="digits" value="8"/>
+        <property name="start" value="00000000"/>
+        <property name="numeric" value="false"/>
+    </bean>
+    
+    <bean id="abstractBundleRuleIDPrepareInterceptor" class="de.hybris.platform.configurablebundleservices.interceptor.impl.AbstractBundleRuleIDPrepareInterceptor" >
+        <property name="abstractBundleRuleIDGenerator" ref="abstractBundleRuleIDGenerator"/>
+    </bean>     
+    
+    <bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+        <property name="interceptor" ref="abstractBundleRuleIDPrepareInterceptor"/>
+        <property name="typeCode" value="AbstractBundleRule"/>
+    </bean>
+
+    <bean id="bundleTemplateStatusIDGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" >
+        <property name="key" value="BundleTemplateStatusId"/>
+        <property name="digits" value="8"/>
+        <property name="start" value="00000000"/>
+        <property name="numeric" value="false"/>
+    </bean>
+    
+    <bean id="bundleTemplateStatusIDPrepareInterceptor" class="de.hybris.platform.configurablebundleservices.interceptor.impl.BundleTemplateStatusIDPrepareInterceptor" >
+        <property name="bundleTemplateStatusIDGenerator" ref="bundleTemplateStatusIDGenerator"/>
+    </bean>  
+
+    <bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+        <property name="interceptor" ref="bundleTemplateStatusIDPrepareInterceptor"/>
+        <property name="typeCode" value="BundleTemplateStatus"/>
+    </bean>
+   
+    <alias alias="orderEntryRemoveableChecker" name="bundleOrderEntryRemoveableChecker"/>
+    <bean id="bundleOrderEntryRemoveableChecker" class="de.hybris.platform.configurablebundleservices.bundle.impl.BundleOrderEntryRemoveableChecker" >
+         <property name="cartEntryDao" ref="bundleCartEntryDao" />
+         <property name="subscriptionCommerceCartService" ref="subscriptionCommerceCartService" />
+    </bean>
+    
+    <alias alias="bundleOrderEntryModifiableChecker" name="defaultBundleOrderEntryModifiableChecker"/>
+    <bean id="defaultBundleOrderEntryModifiableChecker" class="de.hybris.platform.configurablebundleservices.bundle.impl.BundleOrderEntryModifiableChecker" >
+    </bean>
+
+    <alias alias="abstractBundleComponentEditableChecker" name="defaultAbstractBundleComponentEditableChecker"/>
+	<bean id="defaultAbstractBundleComponentEditableChecker" abstract="true" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultAbstractBundleComponentEditableChecker" >
+        <property name="orderEntryDao" ref="orderEntryDao"/>
+	</bean> 
+
+	<alias alias="cartBundleComponentEditableChecker" name="defaultCartBundleComponentEditableChecker"/>
+	<bean id="defaultCartBundleComponentEditableChecker" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultCartBundleComponentEditableChecker" parent="abstractBundleComponentEditableChecker" >
+	    <property name="orderEntryDao" ref="bundleCartEntryDao"/>
+	</bean> 
+	
+	<alias alias="commerceCheckoutService" name="bundleCommerceCheckoutService"/>
+	<alias alias="bundleCommerceCheckoutService" name="defaultBundleCommerceCheckoutService"/>
+	<bean id="defaultBundleCommerceCheckoutService" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultBundleCommerceCheckoutService" parent="defaultSubscriptionCommerceCheckoutService" >
+	    <property name="bundleCommerceCartService" ref="bundleCommerceCartService" />
+	</bean>
+
+	<bean id="productBundleTemplatesValueProvider" class="de.hybris.platform.configurablebundleservices.search.solrfacetsearch.provider.impl.ProductBundleTemplatesValueProvider" parent="abstractPropertyFieldValueProvider" >
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+	</bean>
+	
+	<bean id="lowestBundlePriceValueProvider" class="de.hybris.platform.configurablebundleservices.search.solrfacetsearch.provider.impl.LowestBundlePriceValueProvider" parent="abstractPropertyFieldValueProvider" >
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="bundleRuleService" ref="bundleRuleService"/>
+		<property name="priceService" ref="priceService" />
+		<property name="sessionService" ref="sessionService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="commercePriceService" ref="subscriptionCommercePriceService" />
+	</bean>
+
+	<bean id="abstractBundleRuleValidator" class="de.hybris.platform.configurablebundleservices.interceptor.impl.AbstractBundleRuleValidator" />
+	<bean id="abstractBundleRuleValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="abstractBundleRuleValidator"/>
+		<property name="typeCode" value="AbstractBundleRule"/>
+	</bean>
+	
+</beans>

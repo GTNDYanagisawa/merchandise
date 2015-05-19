@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2013 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+	<type name="ZoneDeliveryMode" icon="images/icons/e_deliverymode.gif" mode="replace">
+		<organizer>
+			<search autoperform="true">
+				<condition attribute="code" operator="contains"/>
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code" width="100"/>
+						<attribute name="name" width="150"/>
+						<attribute name="active"/>
+					</itemlayout>
+				</listview>
+				<editview mode="replace">
+					<itemlayout>
+						<attribute name="code" width="100"/>
+						<attribute name="name" width="150"/>
+						<attribute name="active" width="50"/>
+					</itemlayout>
+				</editview>
+				<treeview mode="replace">
+					<itemlayout>
+						<attribute name="code"/>
+					</itemlayout>
+					<explorable>
+						<attribute name="supportedpaymentmodes" suppressroot="true"/>
+					</explorable>
+				</treeview>
+			</result>
+			<editor mode="replace">
+				<essentials>
+					<listlayout>
+						<attribute name="code"/>
+					</listlayout>
+				</essentials>
+				<tabref idref="tab_deliverymodes"/>
+				<tab name="zonedeliverymodeprices">
+					<section name="zonedeliveryproperties">
+						<listlayout>
+							<attribute name="propertyname"/>
+							<attribute name="net">
+								<advancedbooleaneditor truename="order.net.true" falsename="order.net.false"/>
+							</attribute>
+						</listlayout>
+					</section>
+					<section name="zonedeliverymodeprices" mode="replace">
+						<table>
+							<tr>
+								<td width="146px"/>
+								<td>
+									<shortcut name="create" type="OmsZoneDeliveryModeValue" usage="creator" autoperform="true">
+										<preset targetattribute="deliverymode"/>
+									</shortcut>
+								</td>
+								<td>
+									<shortcut name="finddeliverymodevalues" type="OmsZoneDeliveryModeValue" usage="finder" autoperform="true">
+										<preset targetattribute="deliverymode"/>
+									</shortcut>
+								</td>
+							</tr>
+						</table>
+					</section>
+				</tab>
+				<tabref idref="tab_administration"/>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="OmsZoneDeliveryModeValue" icon="images/icons/e_deliverymodevalue.gif" mode="replace">
+		<organizer>
+			<search>
+				<condition attribute="zone"/>
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="fromZone" width="136"/>
+						<attribute name="deliverymode" width="100"/>
+						<attribute name="zone" width="100"/>
+						<attribute name="minimum" width="140"/>
+						<attribute name="value" width="100"/>
+						<attribute name="currency" width="100"/>
+						<attribute name="specificCarrierShippingMethod" width="136"/>
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="fromZone" width="136"/>
+						<attribute name="deliverymode" width="100"/>
+						<attribute name="zone" width="100"/>
+						<attribute name="minimum" width="140"/>
+						<attribute name="value" width="100"/>
+						<attribute name="currency" width="100"/>
+						<attribute name="specificCarrierShippingMethod" width="136"/>
+					</itemlayout>
+				</editview>
+				<treeview mode="append">
+					<itemlayout>
+						<attribute name="zone"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor mode="append">
+				<essentials>
+					<listlayout>
+						<attribute name="deliverymode"/>
+					</listlayout>
+				</essentials>
+				<tab name="properties">
+					<section name="properties">
+						<listlayout>
+							<attribute name="fromZone"/>
+							<attribute name="zone"/>
+							<attribute name="minimum"/>
+							<attribute name="value"/>
+							<attribute name="currency"/>
+							<attribute name="specificCarrierShippingMethod"/>
+						</listlayout>
+					</section>
+				</tab>
+				<tabref idref="tab_administration"/>
+			</editor>
+		</organizer>
+		<defaultreference mode="append">
+			<itemlayout>
+				<attribute name="zone"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="ZoneDeliveryModeValue" icon="images/icons/e_deliverymodevalue.gif" mode="delete" useselector="false"/>
+
+</configuration>

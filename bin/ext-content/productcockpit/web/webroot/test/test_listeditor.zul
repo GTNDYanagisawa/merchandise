@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?init 				class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+<?taglib 			uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+
+<?page title="[y] hybris Product Cockpit : Test page for List Editor component [y]"?>
+
+<window xmlns="http://www.zkoss.org/2005/zul"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:zk="http://www.zkoss.org/2005/zk"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd "
+	width="100%" height="100%" style="background-color: white" shadow="false">
+	
+	<zscript>
+		import de.hybris.platform.productcockpit.components.listeditor.*;
+		
+		DefaultListEditorModel listEditorModel = new DefaultListEditorModel();
+		int itemNr = 1;
+		boolean controllerActive = true;	
+		
+		DefaultListEditorItemRenderer testListEditorItemRenderer = new DefaultListEditorItemRenderer();	
+		class FancyListEditorItemRenderer extends DefaultListEditorItemRenderer
+		{
+			public void render(AbstractComponent parent, Object item)
+			{
+				Hbox hbox = new Hbox();
+				hbox.setAlign("center");
+				hbox.setSclass("listEditorItem");
+				hbox.appendChild(new Image("/images/tetris.gif"));
+				hbox.appendChild(new Label(item.toString()));
+				
+				parent.appendChild(hbox);				
+			}
+		}		
+		
+		FancyListEditorItemRenderer fancyRenderer = new FancyListEditorItemRenderer();
+	</zscript>
+	
+	<!--  custom styles in here -->
+	<style src="/css/productcockpit.css" />
+	<style src="/css/defaultstyles.css" />
+	<borderlayout sclass="plainBorderlayout" style="background-color: #D0D7DF">
+		<north collapsible="true" splittable="true" title="Component Information" id="componentInfo" >		
+			<vbox>
+				<separator height="12px"/>
+				<label value="Properties" style="font-size: large; font-weight: bold"/>
+				<label value="* = In package 'de.hybris.platform.productcockpit.components.listeditor'" style="font-size: xx-small"/>
+				<separator height="12px"/>
+				<listbox width="980px">
+					<listhead>
+						<listheader label="Property"/>
+						<listheader label="Description"/>
+						<listheader label="Data type"/>
+						<listheader label="Default value"/>				
+					</listhead>
+					<listitem>
+						<listcell label="listEditorItemRenderer" style="font-family: monospace"/>
+						<listcell label="The list editor item renderer to be used for rendering items"/>
+						<listcell label="ListEditorItemRenderer *" style="font-family: monospace"/>
+						<listcell label="DefaultListEditorItemRenderer *" style="font-family: monospace"/>				
+					</listitem>
+					<listitem>
+						<listcell label="model" style="font-family: monospace"/>
+						<listcell label="The list editor model."/>
+						<listcell label="ListEditorModel *" style="font-family: monospace"/>
+						<listcell label="DefaultListEditorModel&lt;Object&gt; *" style="font-family: monospace"/>				
+					</listitem>
+					<listitem>
+						<listcell label="selectable" style="font-family: monospace"/>
+						<listcell label="Can elements be selected"/>
+						<listcell label="boolean" style="font-family: monospace"/>
+						<listcell label="true" style="font-family: monospace"/>				
+					</listitem>
+					<listitem>
+						<listcell label="multiple" style="font-family: monospace"/>
+						<listcell label="Is multi selection enabled (using CTRL or SHIFT)"/>
+						<listcell label="boolean" style="font-family: monospace"/>
+						<listcell label="true" style="font-family: monospace"/>				
+					</listitem>			
+				</listbox>
+				<separator height="24px"/>
+				<label value="Events" style="font-size: large; font-weight: bold"/>
+				<separator height="12px"/>
+				<listbox width="650px">
+					<listhead>
+						<listheader label="Name"/>
+						<listheader label="Description"/>
+						<listheader label="Data type"/>				
+					</listhead>
+					<listitem>
+						<listcell label="onSelect" style="font-family: monospace"/>
+						<listcell label="Fired when the list editor's selection has been changed"/>
+						<listcell label="ListEditorSelectEvent *" style="font-family: monospace"/>				
+					</listitem>
+					<listitem>
+						<listcell label="onMoveElement" style="font-family: monospace"/>
+						<listcell label="Fired when a user wants to move an element"/>
+						<listcell label="ListEditorMoveEvent *" style="font-family: monospace"/>				
+					</listitem>
+					<listitem>
+						<listcell label="onRemoveElement" style="font-family: monospace"/>
+						<listcell label="Fired when a user wants to remove an element"/>
+						<listcell label="ListEditorRemoveEvent *" style="font-family: monospace"/>				
+					</listitem>
+					<listitem>
+						<listcell label="onChanged" style="font-family: monospace"/>
+						<listcell label="Fired when the list model has been changed"/>
+						<listcell label="ListEditorChangeEvent *" style="font-family: monospace"/>				
+					</listitem>		
+				</listbox>
+				<separator height="12px"/>					
+			</vbox>		
+		</north>
+		<center>
+			<borderlayout sclass="plainBorderlayout" style="background-color: white">
+				<north>
+					<vbox>
+						<separator height="12px"/>
+						<label value="Demo area" style="font-size: large; font-weight: bold"/>
+						<separator height="12px"/>
+					</vbox>
+				</north>
+				<center autoscroll="true" style="border: 1px solid black;">
+					<vbox>	
+						<button label="Add sample items to list editor model">
+						<attribute name="onClick">
+								listEditorModel.add("Unremovable/-movable item " + (itemNr++), false, false);
+								listEditorModel.add("Unremovable/-movable item " + (itemNr++), false, false);
+								listEditorModel.add("Unmovable item " + (itemNr++), true, false);
+								listEditorModel.add("Normal item " + (itemNr++), true, true);
+								listEditorModel.add("Normal item " + (itemNr++), true, true);				
+								listEditorModel.add("Normal item " + (itemNr++), true, true);
+								listEditorModel.add("Normal item " + (itemNr++), true, true);
+								listEditorModel.add("Normal item " + (itemNr++), true, true);
+								
+								componentInfo.setOpen(false);	
+								logInfo.setOpen(true);
+							</attribute>
+						</button>
+						<button label="Clear sample list editor model">			
+							<attribute name="onClick">
+								listEditorModel.clear();								
+							</attribute>
+						</button>
+						<checkbox label="Controller active" checked="true" >
+							<attribute name="onCheck">
+								CheckEvent ce = (CheckEvent)event;
+								controllerActive = ce.isChecked();				
+							</attribute>
+						</checkbox>
+						<separator height="24px"/>
+						<label value="Remove (press the remove button next to an element to remove it or press 'delete' in order to remove the selected items), move (drag &amp; drop) and select items (multi select using SHIFT and CTRL works)."/>
+						<separator height="24px"/>			
+						<listeditor id="listEditor1" width="450px" model="@{listEditorModel}" listEditorItemRenderer="${testListEditorItemRenderer}">		
+							<attribute name="onSelect">
+								<![CDATA[
+									import de.hybris.platform.productcockpit.components.listeditor.*;
+									import java.text.DateFormat;
+														
+									ListEditorSelectEvent lese = (ListEditorSelectEvent)event;
+									java.util.Set selItems = lese.getSelectedItems();
+									Iterator it = selItems.iterator();
+							
+									if(it.hasNext())
+									{
+										String s = "";
+										while(it.hasNext())
+										{
+											s += it.next().toString() + "\n";
+										}
+										selectedItemLabel.setValue(s);
+									}
+									else
+									{
+										selectedItemLabel.setValue("");
+									}
+							
+									System.out.println("List editor test listener > Item selected.");
+									msg.setValue(msg.getValue() + " " + DateFormat.getTimeInstance().format(new Date()) + " Selection changed: event: '" + event + "'\n");
+														
+								]]>
+							</attribute>	
+							<attribute name="onChanged">
+								<![CDATA[
+									import de.hybris.platform.productcockpit.components.listeditor.*;
+									import java.text.DateFormat;
+									System.out.println("List editor test listener > Content changed.");
+									msg.setValue(msg.getValue() + " " + DateFormat.getTimeInstance().format(new Date()) + " Content changed\n");
+								]]>
+							</attribute>
+							<attribute name="onMoveElement">
+								<![CDATA[
+									import de.hybris.platform.productcockpit.components.listeditor.*;
+									import java.text.DateFormat;
+									
+									if(controllerActive)
+									{
+										ListEditorMoveEvent leme = (ListEditorMoveEvent)event;
+										listEditorModel.moveElement(leme.getFromIndex(), leme.getToIndex());
+									}
+									
+									System.out.println("List editor test listener > Move element.");
+									msg.setValue(msg.getValue() + " " + DateFormat.getTimeInstance().format(new Date()) + " Move element: event: '" + event + "'\n");										
+								]]>
+							</attribute>
+							<attribute name="onRemoveElement">
+								<![CDATA[
+									import de.hybris.platform.productcockpit.components.listeditor.*;
+									import java.text.DateFormat;
+									
+									if(controllerActive)
+									{
+										ListEditorRemoveEvent lere = (ListEditorRemoveEvent)event;
+										listEditorModel.removeAll(lere.getElements());
+									}					
+									msg.setValue(msg.getValue() + " " + DateFormat.getTimeInstance().format(new Date()) + " Remove element(s): event: '" + event + "'\n");
+								]]>
+							</attribute>
+						</listeditor>
+						<checkbox label="Selectable" checked="true">
+							<attribute name="onCheck">
+								CheckEvent ce = (CheckEvent)event;
+								listEditor1.setSelectable(ce.isChecked());				
+							</attribute>
+						</checkbox>
+						<separator height="24px"/>	
+						<label value="Selected items:"/>
+						<textbox multiline="true" readonly="true" value="" id="selectedItemLabel" cols="40" rows="3"/>					
+						<separator height="24px"/>
+						<label value="List editor with custom renderer"/>
+						<label value="Note: This list editor has no controller of its own, but is connected to the same model as the list editor above. This means that changes made to the list above will affect this one as well." style="font-size:xx-small"/>
+						
+						<listeditor id="listEditor2" model="@{listEditorModel}" 
+									listEditorItemRenderer="${fancyRenderer}"
+									width="350px" height="250px" selectable="true"/>
+						<checkbox label="Selectable" checked="true">
+							<attribute name="onCheck">
+								<![CDATA[  
+									CheckEvent ce = (CheckEvent)event;
+									listEditor2.setSelectable(ce.isChecked());
+								]]>
+							</attribute>
+						</checkbox>		
+					</vbox>	
+				</center>
+			</borderlayout>
+		</center>
+		<south title="Log" splittable="true" collapsible="true" id="logInfo" open="false">
+			<vbox>
+				<separator height="24px"/>
+				<label value="Event listener output"/>
+				<textbox id="msg" multiline="true" readonly="true" value="" rows="10" width="980px"/>
+				<button label="Clear log" onClick='msg.setValue("")'/>
+			</vbox>
+		</south>
+	</borderlayout>
+</window>

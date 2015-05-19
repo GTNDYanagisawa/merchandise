@@ -1,0 +1,185 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-3.1.xsd" default-autowire="byName">
+	
+	<bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
+		
+	<!-- services -->
+
+	<alias alias="loginService" name="defaultLoginService" />
+	<bean id="defaultLoginService" class="de.hybris.platform.printcockpit.services.login.impl.LoginServiceImpl" scope="tenant"/>
+
+	<alias alias="tableService" name="defaultTableService" />
+	<bean id="defaultTableService" class="de.hybris.platform.printcockpit.model.table.impl.TableServiceImpl" scope="tenant">
+		<property name="typeService" ref="cockpitTypeService"/>
+		<property name="uiAccessRightService" ref="uiAccessRightService"/>
+		<property name="modelHelper" ref="cockpitModelHelper"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	
+	<alias alias="uiAccessRightService" name="PrintcockpitUIAccessRightService"/>
+	<bean id="PrintcockpitUIAccessRightService" class="de.hybris.platform.printcockpit.services.impl.DefaultPrintcockpitUIAccessRightService" scope="tenant"/>
+	
+	<alias alias="printcockpitService" name="defaultPrintcockpitService"/>
+	<bean id="defaultPrintcockpitService" class="de.hybris.platform.printcockpitnew.services.impl.DefaultPrintcockpitService" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="typeService" ref="cockpitTypeService"/>
+		<property name="objectCollectionService" ref="objectCollectionService"/>
+		<property name="modelHelper" ref="cockpitModelHelper"/>
+	</bean>
+	
+	<alias alias="publicationService" name="defaultPublicationService" />
+	<bean id="defaultPublicationService" class="de.hybris.platform.printcockpit.model.publication.impl.PublicationServiceImpl" scope="tenant">
+		<property name="printcockpitService" ref="printcockpitService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="typeService" ref="cockpitTypeService"/>
+		<property name="layoutService" ref="layoutService"/>
+		<property name="uiAccessRightService" ref="uiAccessRightService"/>
+		<property name="modelHelper" ref="cockpitModelHelper"/>
+	</bean>	
+	
+	<alias alias="sourcePublicationService" name="defaultSourcePublicationService" />
+	<bean id="defaultSourcePublicationService" class="de.hybris.platform.printcockpit.model.publication.impl.SourcePublicationServiceImpl" scope="tenant">
+	</bean>
+
+	
+	<bean id="abstractPrintSearchProvider" class="de.hybris.platform.printcockpit.services.search.impl.AbstractPrintPerspectiveQueryProvider" abstract="true">
+		<property name="publicationService" ref="publicationService" />
+	</bean>
+
+	<alias alias="printSearchProvider" name="defaultPrintSearchProvider" />
+	<bean id="defaultPrintSearchProvider" class="de.hybris.platform.printcockpit.services.search.impl.PrintPerspectiveQueryProvider" scope="tenant" parent="abstractPrintSearchProvider">
+		<property name="maxChapterCount" value="900"/>
+	</bean>
+	
+	<alias alias="placementSearchProvider" name="defaultPlacementSearchProvider" />
+	<bean id="defaultPlacementSearchProvider" class="de.hybris.platform.printcockpit.services.search.impl.PlacementsQueryProvider" scope="tenant"  parent="abstractPrintSearchProvider" />
+
+	<alias alias="pageSearchProvider" name="defaultPageSearchProvider" />
+	<bean id="defaultPageSearchProvider" class="de.hybris.platform.printcockpit.services.search.impl.PagesQueryProvider" scope="tenant" parent="abstractPrintSearchProvider" />
+
+	<alias alias="chapterSearchProvider" name="defaultChapterSearchProvider" />
+	<bean id="defaultChapterSearchProvider" class="de.hybris.platform.printcockpit.services.search.impl.ChaptersQueryProvider" scope="tenant" parent="abstractPrintSearchProvider"/>
+
+	<alias alias="cellEntryService" name="defaultCellEntryService" />
+	<bean id="defaultCellEntryService" class="de.hybris.platform.printcockpit.model.table.impl.DefaultCellEntryService" scope="tenant">
+		<property name="modelHelper" ref="cockpitModelHelper"/>
+	</bean>
+
+	<alias alias="axisEntryService" name="defaultAxisEntryService" />
+	<bean id="defaultAxisEntryService" class="de.hybris.platform.printcockpit.model.table.impl.DefaultAxisEntryService" scope="tenant">
+	</bean>
+
+	<!--  Overridden from cockpit-spring-services.xml -->
+	<alias alias="objectCollectionService" name="defaultObjectCollectionService" />
+	<bean id="defaultObjectCollectionService" class="de.hybris.platform.cockpit.services.impl.ObjectCollectionServiceImpl" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="objectTypeFilterList">
+			<list>
+				<value>Publication:s</value>
+				<value>Chapter:s</value>
+				<value>Page:s</value>
+				<value>Placement:s</value>
+				<value>ContentBlock:s</value>
+				<value>Product:s</value>
+				<value>Category:s</value>
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="printPublicationLabelProvider" name="defaultPrintPublicationLabelProvider" />
+	<bean id="defaultPrintPublicationLabelProvider" class="de.hybris.platform.printcockpit.services.label.impl.PublicationLabelProvider" scope="tenant"/>
+	<alias alias="printChapterLabelProvider" name="defaultPrintChapterLabelProvider" />
+	<bean id="defaultPrintChapterLabelProvider" class="de.hybris.platform.printcockpit.services.label.impl.ChapterLabelProvider" scope="tenant"/>
+	<alias alias="printLayoutTemplateLabelProvider" name="defaultPrintLayoutTemplateLabelProvider" />
+	<bean id="defaultPrintLayoutTemplateLabelProvider" class="de.hybris.platform.printcockpit.services.label.impl.LayoutTemplateLabelProvider" scope="tenant"/>
+	<alias alias="printPlaceholderTemplateLabelProvider" name="defaultPrintPlaceholderTemplateLabelProvider" />
+	<bean id="defaultPrintPlaceholderTemplateLabelProvider" class="de.hybris.platform.printcockpit.services.label.impl.PlaceholderTemplateLabelProvider" scope="tenant"/>
+	<alias alias="printGridLabelProvider" name="defaultPrintGridLabelProvider" />
+	<bean id="defaultPrintGridLabelProvider" class="de.hybris.platform.printcockpit.services.label.impl.GridLabelProvider" scope="tenant"/>
+	<alias alias="printMasterPageLabelProvider" name="defaultPrintMasterPageLabelProvider" />
+	<bean id="defaultPrintMasterPageLabelProvider" class="de.hybris.platform.printcockpit.services.label.impl.MasterPageLabelProvider" scope="tenant"/>
+	<alias alias="printPageFormatLabelProvider" name="defaultPrintPageFormatLabelProvider" />
+	<bean id="defaultPrintPageFormatLabelProvider" class="de.hybris.platform.printcockpit.services.label.impl.PageFormatLabelProvider" scope="tenant"/>
+	
+	<alias alias="PrintOverallBrowserModel" name="defaultPrintOverallBrowserModel" />
+	<bean id="defaultPrintOverallBrowserModel" class="de.hybris.platform.printcockpit.session.impl.PrintOverallBrowserModel"
+			scope="prototype" parent="AbstractPageableBrowserModel">
+		<property name="scalingValues">
+			<set>
+				<value>5</value>
+				<value>10</value>
+				<value>25</value>
+				<value>50</value>
+				<value>100</value>
+			</set>
+		</property>
+		<property name="publicationService" ref="publicationService"/>
+		<property name="typeService" ref="cockpitTypeService"/>
+	</bean>
+	
+	<alias alias="PrintPageBrowserModel" name="defaultPrintPageBrowserModel" />
+	<bean id="defaultPrintPageBrowserModel" class="de.hybris.platform.printcockpit.session.impl.PrintPageBrowserModel"
+			scope="prototype" parent="AbstractPageableBrowserModel">
+		<property name="scalingValues">
+			<set>
+				<value>10</value>
+				<value>25</value>
+				<value>50</value>
+				<value>100</value>
+				<value>200</value>
+			</set>
+		</property>
+		<property name="publicationService" ref="publicationService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="modelHelper" ref="cockpitModelHelper"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="commentLayerComponentController" ref="printCockpitCommentLayerComponentController"/>
+		<property name="pagePlannerRegistry" ref="pagePlannerRegistry"/>
+	</bean>
+	
+	<alias alias="PrintPublicationElementSearchBrowserModel" name="defaultPrintPublicationElementSearchBrowserModel" />
+	<bean id="defaultPrintPublicationElementSearchBrowserModel" class="de.hybris.platform.printcockpit.session.impl.PrintPublicationElementSearchBrowserModel"
+			scope="prototype" parent="AbstractPageableBrowserModel"/>
+	<alias alias="publicationCloningService" name="DefaultPublicationCloningService"/>
+	<bean id="DefaultPublicationCloningService" class="de.hybris.platform.printcockpit.services.impl.DefaultPublicationCloningService"
+			scope="session">
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="modelCloningContext" ref="printModelCloningContext"/>
+		<property name="modelHelper" ref="cockpitModelHelper"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<alias alias="printModelCloningContext" name="defaultPrintModelCloningContext" />
+	<bean id="defaultPrintModelCloningContext" class="de.hybris.platform.printcockpit.services.impl.PrintModelCloningContext" scope="tenant"/>
+
+	<!--  Overridden from cockpit-spring-services.xml -->
+	<alias alias="savedQueryService" name="defaultSavedQueryService" />
+	<bean id="defaultSavedQueryService" class="de.hybris.platform.printcockpit.services.query.impl.SavedQueryUserRightsServiceImpl" scope="tenant">		
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="searchService" ref="searchService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="savedQueryDao" ref="savedQueryDao"/>
+		<property name="enumerationService" ref="enumerationService" />
+	</bean>
+
+	<alias alias="cockpitCommentUtils" name="defaultCockpitCommentUtils" />
+	<bean id="defaultCockpitCommentUtils" class="de.hybris.platform.printcockpit.util.CockpitCommentUtils" />
+
+	<!-- Comment layer -->
+	<alias  alias="commentLayerService" name="printCommentLayerService"/>	
+	<bean id="printCommentLayerService" scope="tenant" parent="defaultCommentLayerService">
+		<property name="userCanMoveCommentStrategy" ref="printUserCanMoveCommentStrategy"/>
+	</bean>
+
+	<alias alias="userCanMoveCommentStrategy" name="printUserCanMoveCommentStrategy"/>
+	<bean id="printUserCanMoveCommentStrategy" class="de.hybris.platform.printcockpit.components.mvc.commentlayer.impl.PrintUserCanMoveCommentStrategy" scope="tenant" parent="abstractUserCommentsPermissionsCheckStrategy">
+		<property name="printCollaborationFacade" ref="printCollaborationFacade"/>
+	</bean>
+
+</beans>

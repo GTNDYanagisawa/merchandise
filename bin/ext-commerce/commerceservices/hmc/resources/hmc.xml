@@ -1,0 +1,690 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+
+	<!-- Configuration for extension commerceservices -->
+	
+	<explorertree>
+		<group name="group.basecommerce" description="group.basecommerce.description" mode="append">
+			<typeref type="PointOfService" description="typeref.pointofservice.description" />
+			<typeref type="Warehouse" description="typeref.warehouse.description" />
+			<typeref type="StockLevel" description="typeref.stocklevel.description" />
+		</group>
+	</explorertree>
+	
+	<type name="BaseStore" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<essentials mode="append">
+					<columnlayout>
+						<row>
+							<attribute name="net"/>
+						</row>
+						<row>
+							<attribute name="defaultCurrency"/>
+							<attribute name="defaultLanguage"/>
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="locations" mode="append">
+					<section name="section.basecommerce.locations">
+						<listlayout mode="append">
+							<attribute name="defaultDeliveryOrigin"/>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="properties" position="1" mode="append">
+					<section name="section.basecommerce.catalogs" mode="append">
+						<listlayout>
+							<attribute name="currencies" width="300"/>
+						</listlayout>
+					</section>
+					<section name="section.basecommerce.solr.config" mode="append">
+						<listlayout>
+							<attribute name="solrFacetSearchConfiguration" width="300"/>
+						</listlayout>
+					</section>
+					<section name="section.basestore.warehouses" mode="append">
+						<listlayout>
+							<attribute name="warehouses" width="500"/>
+						</listlayout>
+					</section>
+					<section name="section.baseStore.customerallowedtoignoresuggestions" mode="append">
+						<listlayout>
+							<attribute name="customerAllowedToIgnoreSuggestions" width="300"/>
+						</listlayout>
+					</section>
+					<section name="section.baseStore.deliverycountries" mode="append">
+						<listlayout>
+							<attribute name="deliveryCountries" width="300"/>
+						</listlayout>
+					</section>
+					<section name="section.baseStore.externaltaxenabled" mode="append">
+						<listlayout>
+							<attribute name="externalTaxEnabled" width="300"/>
+						</listlayout>
+					</section>
+					<section name="section.baseStore.paymentprovider" mode="append">
+						<listlayout>
+							<attribute name="paymentProvider" width="300"/>
+						</listlayout>
+					</section>
+					<section name="section.baseStore.pickupinstoremode" mode="append">
+						<listlayout>
+							<attribute name="pickupInStoreMode" width="300"/>
+						</listlayout>
+					</section>
+					<section name="section.baseStore.submitorderprocesscode" mode="append">
+						<listlayout>
+							<attribute name="submitOrderProcessCode" width="300"/>
+						</listlayout>
+					</section>
+					<section name="section.baseStore.taxgroup" mode="append">
+						<listlayout>
+							<attribute name="taxGroup" width="300"/>
+						</listlayout>
+					</section>
+					<section name="section.basestore.storelocatordistanceunit" mode="append">
+						<listlayout>
+							<attribute name="storelocatorDistanceUnit" width="300"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="name">
+			<itemlayout>
+				<attribute name="name"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="Warehouse" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code"/>
+				<condition attribute="name"/>
+				<condition attribute="default"/>
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="code" width="100"/>
+						<attribute name="name" width="250"/>
+						<attribute name="default" width="100"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="code"/>
+						<attribute name="name"/>
+						<attribute name="default"/>
+					</listlayout>
+				</essentials>
+				<tab name="properties" position="0" mode="append">
+					<section name="section.warehouse.basestores" mode="append">
+						<listlayout>
+							<attribute name="baseStores"/>
+						</listlayout>
+					</section>
+					<section name="section.warehouse.stocklevels" mode="append">
+						<listlayout>
+							<table>
+		                        <tr>
+		                           <td width="141px">
+		                           	<text name="type.Warehouse.stocklevels.name" />
+		                           </td>
+		                           <td>
+		                           	  <text name="text.warehouse.usesearchtogetstocklevels" />
+		                              <shortcut name="findstocklevelsforwarehouse" type="StockLevel" usage="finder" autoperform="true">
+		                                 <preset targetattribute="warehouse"/>
+		                              </shortcut>
+		                           </td>
+		                        </tr>
+	                     	</table>
+                  		</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.warehouse.consignments" position="1" mode="append">
+					<section name="section.warehouse.consignments" mode="append">
+						<listlayout>
+	                     	<attribute name="consignments">
+								<referencecollectioneditor editable="true" add="true" remove="true" maxcount="10" showsearcheditor="true"/>
+							</attribute>
+							<table>
+		                        <tr>
+		                           <td width="141px">
+		                           </td>
+		                           <td>
+		                              <shortcut name="findconsignmentsforwarehouse" type="Consignment" usage="finder" autoperform="true">
+		                                 <preset targetattribute="warehouse"/>
+		                              </shortcut>
+		                           </td>
+		                        </tr>
+	                     	</table>
+                  		</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="code">
+			<itemlayout>
+				<attribute name="code"/>
+				<attribute name="name"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="Consignment" mode="replace">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="order" />
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout mode="replace">
+						<attribute name="order" width="100"></attribute>
+						<attribute name="trackingID" width="100"></attribute>
+						<attribute name="deliveryMode" width="100"></attribute>
+						<attribute name="status" width="100"></attribute>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="code" />
+							<attribute name="order" />
+						</row>
+						<row>
+							<attribute name="status" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties" position="0">
+					<section name="consignment.details">
+						<listlayout>
+							<attribute name="warehouse" width="250"/>
+							<attribute name="deliveryMode" />
+							<attribute name="shippingDate" />
+							<attribute name="namedDeliveryDate" />
+							<attribute name="deliveryPointOfService" width="250"/>
+							<attribute name="shippingAddress" />
+							<attribute name="carrier" />
+							<attribute name="trackingID" />
+						</listlayout>
+					</section>
+					<section name="consignment.entries">
+						<listlayout>
+							<attribute name="consignmentEntries" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.process" position="1">
+					<section name="consignment.processes">
+						<listlayout>
+							<attribute name="consignmentProcesses" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="code"/>
+				<attribute name="status"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="StockLevel" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="productCode"/>
+				<condition attribute="warehouse"/>
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="productCode" width="200"/>
+						<attribute name="warehouse" width="400"/>
+						<attribute name="available" width="100"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="productCode"/>
+						<attribute name="warehouse"/>
+						<attribute name="inStockStatus"/>
+					</listlayout>
+				</essentials>
+				<tab name="properties" position="0" mode="append">
+					<section name="section.stocklevel.stock" mode="append">
+						<columnlayout>
+							<row>
+								<attribute name="available"/>
+								<attribute name="reserved"/>		
+							</row>
+							<row>
+								<attribute name="overSelling"/>
+								<attribute name="preOrder"/>
+							</row>
+							<row>
+								<attribute name="maxPreOrder"/>
+								<attribute name="treatNegativeAsZero"/>
+							</row>
+							<row>
+								<attribute name="releaseDate"/>
+								<attribute name="nextDeliveryTime"/>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="productCode">
+			<itemlayout>
+				<attribute name="productCode"/>
+				<attribute name="warehouse"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="BaseSite" mode="append">
+		<organizer>
+			<editor>
+				<tab name="properties" position="0" mode="append">
+					<section name="section.basesite.config" mode="append">
+						<listlayout>
+							<attribute name="theme"/>
+							<attribute name="channel"/>
+							<attribute name="defaultLanguage"/>
+							<attribute name="locale"/>
+							<attribute name="solrFacetSearchConfiguration"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="SolrIndexedType" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.configuration.solrsorts">
+					<section name="sec.configuration.solrsorts">
+						<listlayout>
+							<attribute name="sorts">
+								<referencecollectioneditor editable="false" resortable="true" externalcreate="true" create="true" add="false" remove="true">
+									<itemlayout>
+										<attribute name="code"/>
+										<attribute name="name"/>
+									</itemlayout>
+									<preset targetattribute="indexedType"/>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="identifier"/>
+				<attribute name="type"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="SolrIndexedProperty" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.configuration.indexedproperty" mode="append">
+					<section name="sec.configuration.indexedproperty" mode="append">
+						<listlayout mode="append">
+							<attribute name="categoryField"/>
+							<attribute name="classAttributeAssignment"/>
+							<attribute name="rangeSets"/>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.configuration.indexedproperty.facet" mode="append">
+					<section name="sec.configuration.indexedproperty.facet" mode="append">
+						<listlayout mode="append">
+							<attribute name="topValuesProvider">
+								<customeditor classname="de.hybris.platform.commerceservices.hmc.TopValuesProviderSelectEditorChip"/>
+							</attribute>
+							<attribute name="displayName"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="SolrSort" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="indexedType"/>
+				<condition attribute="code"/>
+				<condition attribute="name"/>
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="indexedType"/>
+						<attribute name="code"/>
+						<attribute name="name"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="indexedType"/>
+						<attribute name="code"/>
+					</listlayout>
+				</essentials>
+				<tab name="tab.configuration.solrsort">
+					<section name="sec.configuration.solrsort">
+						<listlayout>
+							<attribute name="name"/>
+							<attribute name="fields">
+								<referencecollectioneditor editable="true" externalcreate="false" create="true" add="false" remove="true" resortable="true">
+									<itemlayout>
+										<attribute name="fieldName"/>
+										<attribute name="ascending"/>
+									</itemlayout>
+									<preset targetattribute="sort"/>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="Product" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.product.properties" position="1">
+					<section name="product.descriptions">
+						<listlayout>
+							<attribute name="summary">
+								<textareaeditor/>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.product.multimedia" mode="append">
+					<section name="section.product.additionalmedias" mode="append">
+						<listlayout>
+							<attribute name="galleryImages" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.product.stock" mode="append" position="10">
+					<section name="tab.product.stockfinder" mode="append">
+						<listlayout>
+							<table>
+		                        <tr>
+		                           <td width="141px">
+		                           	<text name="text.product.stocklevels.name" />
+		                           </td>
+		                           <td>
+		                           	  <text name="text.product.usesearchtogetstocklevels" />
+		                              <shortcut name="findstocklevelsforproduct" type="StockLevel" usage="finder" autoperform="true">
+		                                 <preset targetattribute="productCode" sourceattribute="code"/>
+		                              </shortcut>
+		                           </td>
+		                        </tr>
+	                     	</table>
+                  		</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="AbstractOrder" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="site" />
+				<condition attribute="store" />
+			</search>
+			<editor mode="append">
+				<tab name="positions_and_prices" id="tab_order_positions_and_prices" position="0" mode="append">
+					<section name="common" mode="append">
+						<columnlayout>
+							<row>
+								<attribute name="site" />
+								<attribute name="store" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="positions" mode="append">
+                  		<listlayout mode="append">
+                  			<attribute name="entries" mode="replace" position="0">
+	                           <referencecollectioneditor editable="true" externalcreate="false" presetattribute="order" remove="true" create="true" autosave="true" >
+	                              <itemeditorlayout>
+	                                 <attribute name="product" width="250"/>
+	                                 <attribute name="quantity" width="50"/>
+	                                 <attribute name="unit" width="90"/>
+	                                 <attribute name="basePrice" width="77">
+										<editor classname="de.hybris.platform.hmc.attribute.DoubleEditorChip">
+											<parameter key="align" value="right"/>
+										</editor>
+									</attribute>
+			                  		<attribute name="totalPrice" width="80">
+										<editor classname="de.hybris.platform.hmc.attribute.DoubleEditorChip">
+											<parameter key="align" value="right"/>
+										</editor>
+									</attribute>
+									<attribute name="deliveryPointOfService" width="250"/>
+	                              </itemeditorlayout>
+	                           </referencecollectioneditor>
+	                        </attribute>
+                  		</listlayout>
+                  	</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="Order" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="salesApplication" />
+			</search>
+			<editor mode="append">
+				<tab name="positions_and_prices" id="tab_order_positions_and_prices" position="0" mode="append">
+					<section name="common" mode="append">
+						<columnlayout>
+							<row>
+								<attribute name="salesApplication" />
+								<attribute name="language" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	
+	<type name="PointOfService" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="name" />
+				<condition attribute="type" />
+				<condition attribute="basestore" />
+			</search>
+			<result defaultview="list">
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="name" width="200" />
+						<attribute name="type" width="100" />
+						<attribute name="basestore" width="100" />
+						<attribute name="description" width="200" />
+						<attribute name="address" width="200" />
+						<attribute name="geocodeTimestamp" width="100" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="append">
+					<listlayout>
+						<attribute name="name" />
+						<attribute name="displayName" />
+						<attribute name="basestore" />
+					</listlayout>
+				</essentials>
+				<tab name="tab.address">
+					<section name="sec.type" position="0">
+						<columnlayout>
+							<row>
+								<attribute name="type" />
+								<attribute name="mapIcon" />
+							</row>
+						</columnlayout>
+						<listlayout>
+							<attribute name="description" />
+							<attribute name="warehouse" />
+						</listlayout>
+					</section>
+					<section name="sec.geodata">
+						<columnlayout>
+							<row>
+								<attribute name="geocodeTimestamp" editable="false" />
+								<action classname="de.hybris.platform.basecommerce.hmc.GeoCodePOSAction"
+									type="item" name="geocode" />
+							</row>
+							<row>
+								<attribute name="latitude" editable="false" />
+								<attribute name="longitude" editable="false" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="sec.address">
+						<listlayout>
+							<attribute name="address" editable="true" >
+								<referenceeditor>
+									<preset targetattribute="owner"/>
+								</referenceeditor>
+							</attribute>
+						</listlayout>
+					</section>
+					<section name="sec.availability">
+						<listlayout>
+							<attribute name="openingSchedule" editable="true"   />	
+							<attribute name="features" editable="true" />	
+						</listlayout>									
+					</section>
+					<section name="sec.content">
+						<listlayout>
+							<attribute name="storeImage" editable="true" />
+							<attribute name="storeContent" editable="true" />											
+						</listlayout>
+					</section>
+					<section name="sec.warehouses">
+						<listlayout>
+							<attribute name="warehouses" editable="true" />
+						</listlayout>
+					</section>
+					<section name="sec.employees">
+						<listlayout>
+							<attribute name="storeEmployeeGroups" editable="true"/>														
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="StoreEmployeeGroup" mode="append">
+      <organizer mode="append">
+      	<search mode="append">
+      		<condition attribute="store"/>
+      	</search>
+         <editor mode="append">
+            <tab name="instore" id="tab_employee_instore" position="2" >
+               <section name="instore">
+                  <listlayout>
+                     <attribute name="store"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+	</type>
+	
+	<type name="StoreLocatorFeature" mode="append">
+		<organizer>
+			<editor>
+				<essentials mode="append">
+					<listlayout>
+						<attribute name="code" />
+						<attribute name="name" />
+					</listlayout>
+				</essentials>
+				<tab name="sec.config" mode="append">
+					<section name="sec.icon">
+						<listlayout>
+							<attribute name="icon" />										
+						</listlayout>
+					</section>
+					<section name="sec.pointsofservice">
+						<listlayout>
+							<attribute name="pointOfServices"  />											
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+				<attribute name="name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="PromotionOrderRestriction" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.restriction.properties" mode="append">
+					<section name="section.restriction.orders" mode="append" position="2">
+						<listlayout>
+							<attribute name="orders" labelwidth="100"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+</configuration>

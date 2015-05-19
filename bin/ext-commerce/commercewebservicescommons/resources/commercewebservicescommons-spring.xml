@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="commerceCacheKeyGenerator" class="de.hybris.platform.commercewebservicescommons.cache.CommerceCacheKeyGenerator">
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<!-- DTO mapping mechanism -->
+
+	<bean id="abstractCustomMapper"
+	      class="de.hybris.platform.commercewebservicescommons.mapping.mappers.AbstractCustomMapper"
+	      abstract="true">
+		<property name="fieldSelectionStrategy" ref="fieldSelectionStrategy"/>
+	</bean>
+
+	<alias alias="fieldSelectionStrategy" name="defaultFieldSelectionStrategy"/>
+	<bean id="defaultFieldSelectionStrategy"
+	      class="de.hybris.platform.commercewebservicescommons.mapping.impl.DefaultFieldSelectionStrategy"/>
+
+	<alias alias="oauthTokenDao" name="defaultOAuthTokenDao"/>
+	<bean id="defaultOAuthTokenDao" class="de.hybris.platform.commercewebservicescommons.oauth2.token.dao.impl.DefaultOAuthTokenDao"
+	      parent="abstractItemDao"/>
+
+	<alias alias="oauthTokenService" name="defaultOAuthTokenService" />
+	<bean id="defaultOAuthTokenService"
+		class="de.hybris.platform.commercewebservicescommons.oauth2.token.impl.DefaultOAuthTokenService"
+		parent="abstractBusinessService">
+		<property name="oauthTokenDao" ref="oauthTokenDao" />
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+	</bean>
+</beans>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?init 				class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+<?taglib 			uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+
+<?page title="[y] hybris Product Cockpit : Test page for Text Editor component [y]"?>
+
+<window xmlns="http://www.zkoss.org/2005/zul"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:zk="http://www.zkoss.org/2005/zk"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd "
+	width="100%" height="100%" style="background-color: white" shadow="false">
+
+	<!--  custom styles in here -->
+	<style src="/css/productcockpit.css" />
+	<style src="/css/defaultstyles.css" />
+
+	<vbox align="left">
+		<label value="Single line editor"/>
+		<texteditor>
+			<attribute name="onChange">
+			{
+				import de.hybris.platform.productcockpit.components.texteditor.TextEditorChangeEvent;
+				System.out.println("Text editor test listener > Content changed\n\tContent: " + ((TextEditorChangeEvent)event).getContent() );
+			}
+			</attribute>
+		</texteditor>
+		
+		<separator height="24px"/>
+		
+		<label value="Multi line editor with initial value"/>
+		<texteditor value="This is an initial value" multiline="true">
+			<attribute name="onChange">
+			{
+				import de.hybris.platform.productcockpit.components.texteditor.TextEditorChangeEvent;
+				System.out.println("Text editor test listener > Content changed\n\tContent: " + ((TextEditorChangeEvent)event).getContent() );
+			}
+			</attribute>
+		</texteditor>
+		
+		<separator height="24px"/>
+
+		<label value="Multi line editor with initial value, custom width and automatic line count adjustment"/>
+
+		<texteditor value="This is an initial value" multiline="true" cols="30" onChange="self.doFitSize()"/>
+
+		<separator height="24px"/>
+
+		<label value="Multi line editor with initial value, custom width and automatic line count adjustment using data binding"/>
+		<zscript>
+			class TextHolder
+			{
+			   String s = "Foo";
+			   
+			   public String getText()
+			   {
+			      System.out.println("get");
+			   	  return this.s;
+			   }
+			   public void setText( String s)
+			   {
+			      System.out.println("set");
+			   	  this.s = s;
+			   }
+			}
+			TextHolder th = new TextHolder();
+		</zscript>
+		<texteditor value="@{th.text}" multiline="true" cols="30" onChange='System.out.println("changed");self.doFitSize()'/>
+		<div>
+			<label value="Current value: "/><label value="@{th.text}"/>
+		</div>
+	</vbox>
+</window>

@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- System setup -->
+	<bean id="cms2SystemSetup" class="de.hybris.platform.cms2.systemsetup.CMS2SystemSetup" scope="tenant" autowire="byName">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<!-- Services -->
+	
+	<bean id="abstractCMSAdminService" class="de.hybris.platform.cms2.servicelayer.services.admin.impl.AbstractCMSAdminService"
+		abstract="true" parent="abstractBusinessService" autowire="byName"/>
+
+	<bean id="abstractCMSService" class="de.hybris.platform.cms2.servicelayer.services.impl.AbstractCMSService" abstract="true"
+		parent="abstractBusinessService">
+		<property name="searchRestrictionService" ref="searchRestrictionService" />
+		<property name="userService" ref="userService" />
+		<property name="baseSiteService" ref="baseSiteService" />
+	</bean>
+
+	<alias alias="cmsSiteService" name="defaultCMSSiteService" />
+	<bean id="defaultCMSSiteService" class="de.hybris.platform.cms2.servicelayer.services.impl.DefaultCMSSiteService" parent="abstractCMSService"
+		scope="tenant">
+		<property name="catalogService" ref="catalogService" />
+		<property name="cmsSiteDao" ref="cmsSiteDao" />
+		<lookup-method name="lookupCmsPageService" bean="cmsPageService" />
+	</bean>
+
+	<alias alias="cmsPageService" name="defaultCMSPageService" />
+	<bean id="defaultCMSPageService" class="de.hybris.platform.cms2.servicelayer.services.impl.DefaultCMSPageService" parent="abstractCMSService"
+		scope="tenant">
+		<property name="cmsRestrictionService" ref="cmsRestrictionService" />
+		<property name="catalogService" ref="catalogService" />
+		<property name="categoryService" ref="categoryService" />
+		<property name="productService" ref="productService" />
+		<property name="typeService" ref="typeService" />
+		<property name="cmsPageDao" ref="cmsPageDao" />
+		<property name="cmsPageTemplateDao" ref="cmsPageTemplateDao" />
+		<property name="cmsContentSlotDao" ref="cmsContentSlotDao" />
+		<property name="cmsDataFactory" ref="cmsDataFactory" />
+	</bean>
+
+	<alias alias="cmsComponentService" name="defaultCMSComponentService" />
+	<bean id="defaultCMSComponentService" class="de.hybris.platform.cms2.servicelayer.services.impl.DefaultCMSComponentService"
+		parent="abstractCMSService" scope="tenant">
+		<property name="typeService" ref="typeService" />
+		<property name="cmsComponentDao" ref="cmsComponentDao" />
+		<property name="systemProperties" ref="cockpitRestrictedSystemProperties" />
+		<property name="catalogService" ref="catalogService" />
+	</bean>
+
+	<alias alias="cmsContentSlotService" name="defaultCMSContentSlotService" />
+	<bean id="defaultCMSContentSlotService" class="de.hybris.platform.cms2.servicelayer.services.impl.DefaultCMSContentSlotService"
+		parent="abstractCMSService" scope="tenant">
+		<property name="cmsContentSlotDao" ref="cmsContentSlotDao" />
+		<property name="cmsDataFactory" ref="cmsDataFactory" />
+		<property name="catalogService" ref="catalogService" />
+		<property name="cmsRestrictionService" ref="cmsRestrictionService" />
+		<property name="cmsPageService" ref="cmsPageService" />
+	</bean>
+
+	<alias alias="cmsRestrictionService" name="defaultCMSRestrictionService" />
+	<bean id="defaultCMSRestrictionService" class="de.hybris.platform.cms2.servicelayer.services.impl.DefaultCMSRestrictionService"
+		parent="abstractCMSService" scope="tenant">
+		<property name="cmsRestrictionDao" ref="cmsRestrictionDao" />
+		<property name="evaluatorRegistry" ref="cmsRestrictionEvaluatorRegistry" />
+	</bean>
+
+	<alias alias="cmsNavigationService" name="defaultCMSNavigationService" />
+	<bean id="defaultCMSNavigationService" class="de.hybris.platform.cms2.servicelayer.services.impl.DefaultCMSNavigationService"
+		parent="abstractCMSService" scope="tenant">
+		<property name="cmsNavigationDao" ref="cmsNavigationDao" />
+		<property name="catalogService" ref="catalogService" />
+		<property name="cmsPageService" ref="cmsPageService" />
+		<property name="processCodeGenerator" ref="processCodeGenerator" />
+	</bean>
+
+	<alias alias="cmsAdminSiteService" name="defaultCMSAdminSiteService" />
+	<bean id="defaultCMSAdminSiteService" class="de.hybris.platform.cms2.servicelayer.services.admin.impl.DefaultCMSAdminSiteService"
+		parent="abstractCMSAdminService" scope="tenant">
+		<property name="typeService" ref="typeService" />
+		<property name="catalogService" ref="catalogService" />
+		<property name="cmsSiteDao" ref="cmsSiteDao" />
+	</bean>
+
+	<alias alias="cmsAdminPageService" name="defaultCMSAdminPageService" />
+	<bean id="defaultCMSAdminPageService" class="de.hybris.platform.cms2.servicelayer.services.admin.impl.DefaultCMSAdminPageService"
+		parent="abstractCMSAdminService" scope="tenant">
+		<property name="typeService" ref="typeService" />
+		<property name="cmsPageDao" ref="cmsPageDao" />
+		<property name="cmsPageTemplateDao" ref="cmsPageTemplateDao" />
+	</bean>
+
+	<alias alias="cmsAdminRestrictionService" name="defaultCMSAdminRestrictionService" />
+	<bean id="defaultCMSAdminRestrictionService" class="de.hybris.platform.cms2.servicelayer.services.admin.impl.DefaultCMSAdminRestrictionService"
+		parent="abstractCMSAdminService" scope="tenant">
+		<property name="typeService" ref="typeService" />
+		<property name="cmsAdminPageService" ref="cmsAdminPageService" />
+		<property name="cmsRestrictionDao" ref="cmsRestrictionDao" />
+		<property name="categoryService" ref="categoryService" />
+		<property name="productService" ref="productService" />
+		<property name="cmsRestrictionService" ref="cmsRestrictionService" />
+		<property name="userService" ref="userService" />
+		<property name="i18nService" ref="i18nService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+
+	<alias alias="cmsAdminContentSlotService" name="defaultCMSAdminContentSlotService" />
+	<bean id="defaultCMSAdminContentSlotService" class="de.hybris.platform.cms2.servicelayer.services.admin.impl.DefaultCMSAdminContentSlotService"
+		parent="abstractCMSAdminService" scope="tenant">
+		<property name="cmsAdminComponentService" ref="cmsAdminComponentService" />
+		<property name="cmsContentSlotDao" ref="cmsContentSlotDao" />
+		<property name="cmsDataFactory" ref="cmsDataFactory" />
+	</bean>
+
+	<alias alias="cmsAdminComponentService" name="defaultCMSAdminComponentService" />
+	<bean id="defaultCMSAdminComponentService" class="de.hybris.platform.cms2.servicelayer.services.admin.impl.DefaultCMSAdminComponentService"
+		parent="abstractCMSAdminService" scope="tenant">
+		<property name="typeService" ref="typeService" />
+		<property name="cmsComponentDao" ref="cmsComponentDao" />
+		<property name="systemProperties" ref="cockpitRestrictedSystemProperties" />
+	</bean>
+
+	<alias alias="cmsAdminNavigationService" name="defaultCMSAdminNavigationService" />
+	<bean id="defaultCMSAdminNavigationService" class="de.hybris.platform.cms2.servicelayer.services.admin.impl.DefaultCMSAdminNavigationService"
+		parent="abstractCMSAdminService" scope="tenant" />
+
+	<alias alias="cmsPreviewService" name="defaultCMSPreviewService" />
+	<bean id="defaultCMSPreviewService" class="de.hybris.platform.cms2.servicelayer.services.impl.DefaultCMSPreviewService"
+		parent="abstractCMSAdminService" scope="tenant">
+		<property name="taskService" ref="taskService" />
+		<property name="cmsPreviewTicketDao" ref="cmsPreviewTicketDao" />
+		<property name="cmsSiteService" ref="cmsSiteService" />
+	</bean>
+
+	<alias alias="cmsUtilService" name="defaultCMSUtilService" />
+	<bean id="defaultCMSUtilService" class="de.hybris.platform.cms2.servicelayer.services.impl.DefaultCMSUtilService" parent="abstractCMSAdminService"
+		scope="tenant">
+		<property name="catalogService" ref="catalogService" />
+		<property name="cmsPageDao" ref="cmsPageDao" />
+		<property name="cmsContentCatalogDao" ref="cmsContentCatalogDao" />
+		<property name="typeService" ref="typeService" />
+		<property name="contentCatalogService" ref="contentCatalogService" />
+	</bean>
+	
+	<alias alias="contentCatalogService" name="defaultContentCatalogService" />
+	<bean id="defaultContentCatalogService" class="de.hybris.platform.cms2.services.impl.DefaultContentCatalogService" parent="abstractCMSAdminService"
+		scope="tenant">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="cmsPageDao" ref="cmsPageDao" />
+		<property name="cmsContentCatalogDao" ref="cmsContentCatalogDao" />
+		<property name="typeService" ref="typeService" />
+	</bean>
+
+	<alias alias="cmsPageLockingService" name="defaultCMSPageLockingService" />
+	<bean id="defaultCMSPageLockingService" class="de.hybris.platform.cms2.servicelayer.services.impl.DefaultCMSPageLockingService"
+		parent="abstractCMSService" scope="tenant">
+		<property name="cmsPageService" ref="cmsPageService" />
+	</bean>
+
+	<alias alias="abTestService" name="defaultABTestService" />
+	<bean id="defaultABTestService" class="de.hybris.platform.cms2.servicelayer.services.impl.DefaultABTestService" parent="abstractCMSService"
+		scope="tenant" />
+
+	<!-- DAOS -->
+	<alias alias="cmsSiteDao" name="defaultCMSSiteDao" />
+	<bean id="defaultCMSSiteDao" class="de.hybris.platform.cms2.servicelayer.daos.impl.DefaultCMSSiteDao" parent="abstractItemDao"
+		scope="tenant" />
+
+	<alias alias="cmsPageDao" name="defaultCMSPageDao" />
+	<bean id="defaultCMSPageDao" class="de.hybris.platform.cms2.servicelayer.daos.impl.DefaultCMSPageDao" parent="abstractItemDao"
+		scope="tenant" />
+
+	<alias alias="cmsPageTemplateDao" name="defaultCMSPageTemplateDao" />
+	<bean id="defaultCMSPageTemplateDao" class="de.hybris.platform.cms2.servicelayer.daos.impl.DefaultCMSPageTemplateDao"
+		parent="abstractItemDao" scope="tenant" />
+
+	<alias alias="cmsRestrictionDao" name="defaultCMSRestrictionDao" />
+	<bean id="defaultCMSRestrictionDao" class="de.hybris.platform.cms2.servicelayer.daos.impl.DefaultCMSRestrictionDao" parent="abstractItemDao"
+		scope="tenant" />
+
+	<alias alias="cmsNavigationDao" name="defaultCMSNavigationDao" />
+	<bean id="defaultCMSNavigationDao" class="de.hybris.platform.cms2.servicelayer.daos.impl.DefaultCMSNavigationDao" parent="abstractItemDao"
+		scope="tenant" />
+
+	<alias alias="cmsContentSlotDao" name="defaultCMSContentSlotDao" />
+	<bean id="defaultCMSContentSlotDao" class="de.hybris.platform.cms2.servicelayer.daos.impl.DefaultCMSContenSlotDao" parent="abstractItemDao"
+		scope="tenant" />
+
+	<alias alias="cmsComponentDao" name="defaultCMSComponentDao" />
+	<bean id="defaultCMSComponentDao" class="de.hybris.platform.cms2.servicelayer.daos.impl.DefaultCMSComponentDao" parent="abstractItemDao"
+		scope="tenant" />
+
+	<alias alias="cmsContentCatalogDao" name="defaultCMSContentCatalogDao" />
+	<bean id="defaultCMSContentCatalogDao" class="de.hybris.platform.cms2.servicelayer.daos.impl.DefaultCMSContentCatalogDao"
+		parent="abstractItemDao" scope="tenant" />
+
+	<alias alias="cmsPreviewTicketDao" name="defaultCMSPreviewTicketDao" />
+	<bean id="defaultCMSPreviewTicketDao" class="de.hybris.platform.cms2.servicelayer.daos.impl.DefaultCMSPreviewTicketDao"
+		parent="abstractItemDao" scope="tenant" />
+
+	<alias alias="cmsDataFactory" name="defaultCMSDataFactory" />
+	<bean id="defaultCMSDataFactory" class="de.hybris.platform.cms2.servicelayer.data.impl.DefaultCMSDataFactory" scope="tenant">
+		<property name="cmsSiteService" ref="cmsSiteService" />
+		<property name="productService" ref="productService" />
+		<property name="categoryService" ref="categoryService" />
+		<property name="catalogService" ref="catalogService" />
+	</bean>
+
+	<bean id="cockpitRestrictedSystemProperties" scope="tenant" class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="sourceList">
+			<list>
+				<value>allDocuments</value>
+				<value>assignedCockpitItemTemplates</value>
+				<value>catalogVersion</value>
+				<value>container</value>
+				<value>containers</value>
+				<value>creationtime</value>
+				<value>itemtype</value>
+				<value>modifiedtime</value>
+				<value>name</value>
+				<value>owner</value>
+				<value>pk</value>
+				<value>savedValues</value>
+				<value>slots</value>
+				<value>synchronizationSources</value>
+				<value>synchronizedCopies</value>
+				<value>type</value>
+				<value>typeCode</value>
+				<value>uid</value>
+				<value>visible</value>
+				<value>dimVals</value>
+				<value>onlyOneRestrictionMustApply</value>
+				<value>comments</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="previewTicketRemoveTaskRunner" class="de.hybris.platform.cms2.servicelayer.services.impl.PreviewTicketRemoveTaskRunner"
+		scope="tenant">
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<!-- Interceptors -->
+
+	<bean id="cmsAbstractPageRemoveInterceptor" class="de.hybris.platform.cms2.servicelayer.interceptor.impl.CMSAbstractPageRemoveInterceptor"
+		scope="tenant" autowire="byName" />
+	<bean id="catalogVersionRemoveInterceptor" class="de.hybris.platform.cms2.servicelayer.interceptor.impl.CatalogVersionRemoveInterceptor"
+		scope="tenant" autowire="byName" />
+	<bean id="cmsContentSlotRemoveInterceptor" class="de.hybris.platform.cms2.servicelayer.interceptor.impl.CMSContentSlotRemoveInterceptor"
+		scope="tenant" autowire="byName" />
+	<bean id="cmsPageTemplateRemoveInterceptor" class="de.hybris.platform.cms2.servicelayer.interceptor.impl.CMSPageTemplateRemoveInterceptor"
+		scope="tenant" autowire="byName" />
+
+	<bean id="cmsAbstractPageRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+		scope="tenant">
+		<property name="interceptor" ref="cmsAbstractPageRemoveInterceptor" />
+		<property name="typeCode" value="AbstractPage" />
+	</bean>
+	<bean id="catalogVersionRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+		scope="tenant">
+		<property name="interceptor" ref="catalogVersionRemoveInterceptor" />
+		<property name="typeCode" value="CatalogVersion" />
+	</bean>
+	<bean id="cmsContentSlotRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+		scope="tenant">
+		<property name="interceptor" ref="cmsContentSlotRemoveInterceptor" />
+		<property name="typeCode" value="ContentSlot" />
+	</bean>
+	<bean id="cmsPageTemplateRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+		scope="tenant">
+		<property name="interceptor" ref="cmsPageTemplateRemoveInterceptor" />
+		<property name="typeCode" value="PageTemplate" />
+	</bean>
+
+	<bean id="contentPagePrepareInterceptor" class="de.hybris.platform.cms2.servicelayer.interceptor.impl.CmsContentPagePrepareInterceptor"
+		scope="tenant" autowire="byName">
+		<property name="cmsAdminPageService" ref="cmsAdminPageService"></property>
+	</bean>
+
+	<bean id="contentPagePrepareInterceptorMapping" scope="tenant" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="contentPagePrepareInterceptor" />
+		<property name="typeCode" value="ContentPage" />
+	</bean>
+
+	<bean id="cmsRelationInitDefaultsInterceptor" class="de.hybris.platform.cms2.servicelayer.interceptor.impl.CMSRelationInitDefaultsInterceptor"
+		scope="tenant">
+		<property name="processCodeGenerator" ref="processCodeGenerator" />
+	</bean>
+
+	<bean id="cmsRelationInitDefaultsInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+		scope="tenant">
+		<property name="interceptor" ref="cmsRelationInitDefaultsInterceptor" />
+		<property name="typeCode" value="CMSRelation" />
+	</bean>
+
+	<bean id="contentSlotForPageInitDefaultsInterceptor" class="de.hybris.platform.cms2.servicelayer.interceptor.impl.ContentSlotForPageInitDefaultsInterceptor"
+		scope="tenant" />
+
+	<bean id="contentSlotForPageInitDefaultsInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+		scope="tenant">
+		<property name="interceptor" ref="contentSlotForPageInitDefaultsInterceptor" />
+		<property name="typeCode" value="ContentSlotForPage" />
+	</bean>
+
+	<bean id="contentSlotForTemplateInitDefaultsInterceptor" class="de.hybris.platform.cms2.servicelayer.interceptor.impl.ContentSlotForTemplateInitDefaultsInterceptor"
+		scope="tenant" />
+
+	<bean id="contentSlotForTemplateInitDefaultsInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+		scope="tenant">
+		<property name="interceptor" ref="contentSlotForTemplateInitDefaultsInterceptor" />
+		<property name="typeCode" value="ContentSlotForTemplate" />
+	</bean>
+	
+	<bean id="navigationNodePrepareInterceptor" class="de.hybris.platform.cms2.servicelayer.interceptor.impl.NavigationNodePrepareInterceptor" scope="tenant">
+		<property name="cmsNavigationService" ref="cmsNavigationService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	<bean id="navigationNodePrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+		scope="tenant">
+		<property name="interceptor" ref="navigationNodePrepareInterceptor" />
+		<property name="typeCode" value="CMSNavigationNode" />
+	</bean>
+	
+	<bean id="ContentSlotForPageInterceptor" class="de.hybris.platform.cms2.servicelayer.interceptor.impl.ContentSlotForPageValidateInterceptor" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+    
+    <bean id="ContentSlotForPageInterceptorMapping" scope="tenant" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+    	<property name="interceptor" ref="ContentSlotForPageInterceptor"/>
+    	<property name="typeCode" value="ContentSlotForPage"/>
+	</bean>
+	
+	<bean id="ContentSlotForTemplateInterceptor" class="de.hybris.platform.cms2.servicelayer.interceptor.impl.ContentSlotForTemplateValidateInterceptor" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+    
+    <bean id="ContentSlotForTemplateInterceptorMapping" scope="tenant" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+    	<property name="interceptor" ref="ContentSlotForTemplateInterceptor"/>
+    	<property name="typeCode" value="ContentSlotForTemplate"/>
+	</bean>
+
+	<!-- *** Restriction Evaluator Registry *** -->
+
+	<bean id="cmsRestrictionEvaluatorRegistry" class="de.hybris.platform.cms2.servicelayer.services.evaluator.impl.DefaultCMSRestrictionEvaluatorRegistry"
+		scope="tenant" init-method="init" />
+
+	<!-- *** Restriction Evaluators *** -->
+	<bean id="cmsCatalogRestrictionEvaluator" class="de.hybris.platform.cms2.servicelayer.services.evaluator.impl.CMSCatalogRestrictionEvaluator"
+		scope="tenant" />
+	<bean id="cmsCategoryRestrictionEvaluator" class="de.hybris.platform.cms2.servicelayer.services.evaluator.impl.CMSCategoryRestrictionEvaluator"
+		scope="tenant" />
+	<bean id="cmsProductRestrictionEvaluator" class="de.hybris.platform.cms2.servicelayer.services.evaluator.impl.CMSProductRestrictionEvaluator"
+		scope="tenant" />
+	<bean id="cmsTimeRestrictionEvaluator" class="de.hybris.platform.cms2.servicelayer.services.evaluator.impl.CMSTimeRestrictionEvaluator"
+		scope="tenant" autowire="byName" />
+	<bean id="cmsUserRestrictionEvaluator" class="de.hybris.platform.cms2.servicelayer.services.evaluator.impl.CMSUserRestrictionEvaluator"
+		scope="tenant">
+		<property name="modelService" ref="modelService" />
+		<property name="userService" ref="userService" />
+	</bean>
+	<bean id="cmsUserGroupRestrictionEvaluator" class="de.hybris.platform.cms2.servicelayer.services.evaluator.impl.CMSUserGroupRestrictionEvaluator"
+		scope="tenant">
+		<property name="modelService" ref="modelService" />
+		<property name="userService" ref="userService" />		
+	</bean>
+
+	<!-- *** Restriction Evaluator Mappings *** -->
+
+	<bean id="cmsCatalogRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping"
+		scope="tenant">
+		<property name="restrictionTypeCode" value="CMSCatalogRestriction" />
+		<property name="restrictionEvaluator" ref="cmsCatalogRestrictionEvaluator" />
+	</bean>
+
+	<bean id="cmsCategoryRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping"
+		scope="tenant">
+		<property name="restrictionTypeCode" value="CMSCategoryRestriction" />
+		<property name="restrictionEvaluator" ref="cmsCategoryRestrictionEvaluator" />
+	</bean>
+
+	<bean id="cmsProductRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping"
+		scope="tenant">
+		<property name="restrictionTypeCode" value="CMSProductRestriction" />
+		<property name="restrictionEvaluator" ref="cmsProductRestrictionEvaluator" />
+	</bean>
+
+	<bean id="cmsTimeRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping"
+		scope="tenant">
+		<property name="restrictionTypeCode" value="CMSTimeRestriction" />
+		<property name="restrictionEvaluator" ref="cmsTimeRestrictionEvaluator" />
+	</bean>
+
+	<bean id="cmsUserRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping"
+		scope="tenant">
+		<property name="restrictionTypeCode" value="CMSUserRestriction" />
+		<property name="restrictionEvaluator" ref="cmsUserRestrictionEvaluator" />
+	</bean>
+
+	<bean id="cmsUserGroupRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping"
+		scope="tenant">
+		<property name="restrictionTypeCode" value="CMSUserGroupRestriction" />
+		<property name="restrictionEvaluator" ref="cmsUserGroupRestrictionEvaluator" />
+	</bean>
+	
+	<!-- dynamic attributes -->
+	<bean id="AbstractRestriction_descriptionAttributeHandler" class="de.hybris.platform.cms2.model.AbstractRestrictionDescriptionAttributeHandler" scope="tenant" />
+	<bean id="catalogRestrictionDynamicDescription" class="de.hybris.platform.cms2.model.CatalogRestrictionDescription" scope="tenant" />
+	<bean id="categoryRestrictionDynamicDescription" class="de.hybris.platform.cms2.model.CategoryRestrictionDescription" scope="tenant" />
+	<bean id="inverseRestrictionDynamicDescription" class="de.hybris.platform.cms2.model.InverseRestrictionDescription" scope="tenant" />
+	<bean id="productRestrictionDynamicDescription" class="de.hybris.platform.cms2.model.ProductRestrictionDescription" scope="tenant" />
+	<bean id="timeRestrictionDynamicDescription" class="de.hybris.platform.cms2.model.TimeRestrictionDescription" scope="tenant" />
+	<bean id="userRestrictionDynamicDescription" class="de.hybris.platform.cms2.model.UserRestrictionDescription" scope="tenant" />
+	<bean id="userGroupRestrictionDynamicDescription" class="de.hybris.platform.cms2.model.UserGroupRestrictionDescription" scope="tenant" />
+	
+	<alias name="abstractPageDynamicNavigationNodeList" alias="abstractPagenaDynamicNavigationNodeList"/>
+	<bean id="abstractPageDynamicNavigationNodeList" class="de.hybris.platform.cms2.model.AbstractPageDynamicNavigationNodeList" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="cmsNavigationEntryCodeGenerator">
+			<bean class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+				<property name="key" value="CMSNavigationEntry"/>
+				<property name="digits" value="8"/>
+				<property name="start" value="00000000"/>
+				<property name="numeric" value="false"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<alias alias="activateBaseSiteInSessionStrategy" name="cms2ActivateBaseSiteInSessionStrategy"/>
+	<bean id="cms2ActivateBaseSiteInSessionStrategy"
+			class="de.hybris.platform.cms2.strategies.impl.DefaultCMSActivateBaseSiteInSessionStrategy" scope="tenant">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<lookup-method name="lookupCmsSiteService" bean="cmsSiteService"/>
+	</bean>
+</beans>

@@ -1,0 +1,32 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                    http://www.springframework.org/schema/beans/spring-beans.xsd
+                    http://www.springframework.org/schema/security 
+                    http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<beans:import resource="classpath:/META-INF/backoffice-core-spring-security.xml" />
+
+	<http use-expressions="true" security="none" pattern="/zkau/**" />
+	<http use-expressions="true" security="none" pattern="/cng/**" />
+	<http use-expressions="true" security="none" pattern="/css/**" />
+	<http use-expressions="true" security="none" pattern="/login.zul" />
+	<http use-expressions="true" auto-config="true" access-denied-page="/login.zul">
+		<intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMINGROUP')" />
+		<intercept-url pattern="/j_spring_security_check" access="permitAll" />
+		<intercept-url pattern="/**" access="isAuthenticated()" />
+		<form-login authentication-details-source-ref="backofficeAuthenticationDetailsSource"
+			always-use-default-target="false" 
+			login-page="/login.zul"
+			authentication-success-handler-ref="backofficeAuthenticationSuccessHandler"
+			authentication-failure-url="/login.zul?login_error=1" />	
+	</http>
+	
+	<authentication-manager>
+		<authentication-provider ref="backofficeAuthenticationProvider" />
+	</authentication-manager>
+
+	<beans:bean id="fixation" class="de.hybris.platform.servicelayer.security.spring.HybrisSessionFixationProtectionStrategy" />
+
+	<beans:bean id="loginFormModel" class="java.util.concurrent.ConcurrentHashMap" scope="session" />
+</beans:beans>  

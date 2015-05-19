@@ -1,0 +1,26 @@
+$classSystemVersion=systemVersion(catalog(id[default='PowertoolsClassification']),version[default='1.0'])
+$classCatalogVersion=catalogVersion(catalog(id[default='PowertoolsClassification']),version[default='1.0'])
+$classAttribute=classificationAttribute(code,$classSystemVersion)
+$classClass=classificationClass(code,$classCatalogVersion)
+$classAttributeAssignment=classAttributeAssignment($classClass,$classAttribute,$classSystemVersion)
+$productCatalog=powertoolsProductCatalog
+$productCatalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+
+#
+# Add additional indexed properties for the classification features that we want to index
+#
+
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);sortableType(code);currency[default=false];localized[default=false];multiValue[default=false];facet[default=false];facetType(code);facetSort(code);priority;visible;fieldValueProvider;customFacetSortProvider;rangeSets(name)
+;powertoolsProductType;Colour of product, 1766;string;; ;true; ;true;MultiSelectOr;Alpha;1000;true;classificationPropertyValueProvider;
+
+# Import classification features
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);localized[default=false];multiValue[default=false];fieldValueProvider;$classAttributeAssignment
+;powertoolsProductType;feature-powersupply   ;text;true;false;commerceClassificationPropertyValueProvider;4671:::Power supply type, 514::::
+
+# Show the classification features in the product lister
+INSERT_UPDATE ClassAttributeAssignment;$classClass[unique=true];$classAttribute[unique=true];$classSystemVersion[unique=true];listable
+;4671;Power supply type, 514;;true
+
+INSERT_UPDATE SolrCategoryRedirect;redirectItem(code,$productCatalogVersion)[unique=true]
+;1360
+;1595

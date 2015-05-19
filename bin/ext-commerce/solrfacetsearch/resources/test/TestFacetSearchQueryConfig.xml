@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../config/SolrFacetConfig.xsd">
+  <solrconfig>
+    <mode>embedded</mode>
+    <clusterconfig embeddedMaster="true">
+    	<aliveCheckInterval>5000</aliveCheckInterval>
+    	<connectionTimeout>5000</connectionTimeout>
+    	<readTimeout>5000</readTimeout>
+    	<endpointURLs>
+      		<endpointURL master="true">http://localhost/test</endpointURL>
+    	</endpointURLs>
+    </clusterconfig>
+  </solrconfig>
+  <indexconfig>
+    <exportpath>testexportpath</exportpath>
+    <batchSize>100</batchSize>
+  </indexconfig>
+  <itemTypes>
+    <itemType code="Product" variant="false" identityProvider="itemIdentityProvider">
+      <properties>
+        <property facet="false" name="id" type="string"/>
+        <property facet="true" name="description" type="text" localized="true" />
+        <property facet="true" name="manufacturer" type="string" />
+        <property facet="true" name="name" type="text" localized="true"/>
+        <property facet="false" name="catalog" type="string"/>
+        <property facet="false" name="catalogversion" type="string"/>
+        <property facet="true" name="category" type="string"/>
+        <property facet="true" name="price" type="double" currency="true" valueProvider="productPriceValueProvider"/>
+      </properties>
+      <flexibleSearchUpdateQueries>
+        <fullIndexQuery injectCurrentDate="false" injectCurrentTime="false" injectLastIndexTime="false" parameterProvider="simpleParameterProvider" user="anonymous">fullIndexQuery</fullIndexQuery>
+        <updateIndexQuery injectCurrentDate="false" injectCurrentTime="false" injectLastIndexTime="true" user="anonymous">updateIndexQuery</updateIndexQuery>
+        <deleteFromIndexQuery injectCurrentDate="true" injectCurrentTime="true" injectLastIndexTime="true" user="anonymous">deleteFromIndexQuery</deleteFromIndexQuery>
+      </flexibleSearchUpdateQueries>
+    </itemType>
+  </itemTypes>
+</config>

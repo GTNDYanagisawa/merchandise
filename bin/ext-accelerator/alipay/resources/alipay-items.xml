@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2012 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+	<enumtypes>
+	    <enumtype code="ServiceType" autocreate="true" generate="true">
+	         <value code="DirectPay"/>
+	         <!-- TODO: CHECK IF OK <value code="BankPay"/>  -->
+	         <value code="ExpressPay"/>
+	    </enumtype>
+	    <enumtype code="PaymentTransactionType" autocreate="false" generate="false"
+			dynamic="false">
+	         <value code="REQUEST"/>
+	         <value code="NOTIFY"/>
+	         <value code="CHECK_TRADE"/>
+	         <value code="PREPARE_REFUND"/>
+		</enumtype>
+	    <enumtype code="AlipayTransactionStatus" autocreate="true" generate="true">
+	         <value code="PAYMENT_REQUEST"/>
+	         <value code="CHECK_TRADE"/>
+	         <value code="CLOSE_TRADE_SUCCESS"/>
+	         <value code="CLOSE_TRADE_FAILED"/>
+	         <value code="REFUND_REQUEST_FAILED"/>
+	         <value code="REFUND_REQUEST_SUCCESS"/>
+	         <value code="NOTIFY_AFTER_PAYMENT"/>
+	         <value code="NOTIFY_AFTER_REFUND"/>
+	    </enumtype>
+<!-- TODO: CHECK IF OK		<enumtype code="BankType" autocreate="true" generate="true">
+	         <value code="ICBCBTB"/>
+	         <value code="ABCBTB"/>
+	         <value code="CCBBTB"/>
+	         <value code="SPDBB2B"/>
+	         <value code="BOCB2C"/>
+	         <value code="ICBCB2C"/>
+	         <value code="CMB"/>
+	         <value code="CCB"/>
+	         <value code="ABC"/>
+	         <value code="SPDB"/>
+	         <value code="CIB"/>
+	         <value code="GDB"/>
+	         <value code="SDB"/>
+	         <value code="CMBC"/>
+	         <value code="COMM"/>
+	         <value code="CITIC"/>
+	         <value code="HZCBB2C"/>
+	         <value code="CEBBANK"/>
+	         <value code="SHBANK"/>
+	         <value code="NBBANK"/>
+	         <value code="SPABANK"/>
+	         <value code="BJBANK"/>
+	         <value code="BJRCB"/>
+	         <value code="FDB"/>
+	         <value code="POSTGC"/> 
+	    </enumtype> -->
+		<enumtype code="OrderStatus" autocreate="false" generate="true"
+			dynamic="true">
+<!-- TODO: CHECK IF OK commented things can be removed? -->			<!--  <value code="CHECKED_VALID" />
+			<value code="CHECKED_INVALID" />
+			<value code="PAYMENT_AUTHORIZED" />
+			<value code="PAYMENT_NOT_AUTHORIZED" />
+			<value code="PAYMENT_AMOUNT_RESERVED" />
+			<value code="PAYMENT_AMOUNT_NOT_RESERVED" />
+			<value code="PAYMENT_CAPTURED" />
+			<value code="PAYMENT_NOT_CAPTURED" />
+			<value code="FRAUD_CHECKED" />
+			<value code="ORDER_SPLIT" />
+			<value code="PROCESSING_ERROR" />
+			<value code="WAIT_FRAUD_MANUAL_CHECK"/>-->
+			<value code="ORDER_PLACED_NOTIFICATION_SENT" />
+			<value code="AWAITING_PAYMENT" />
+			<value code="FRAUD" />
+			<value code="IN_DELIVERY" />
+<!-- TODO: CHECK IF OK commented things can be removed? -->			<!-- 
+			<value code="FRAUD" />
+			<value code="CONFIRMED" />
+			<value code="MISPICK" /> -->
+		</enumtype>
+		
+	</enumtypes>
+	<itemtypes>
+		<itemtype code="AlipayPaymentTransactionEntry" extends="PaymentTransactionEntry" generate="false" singleton="false" jaloonly="false" autocreate="true">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="paymentType" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="tradeAlipayNo" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="tradeStatus" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="notifyType" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="notifyId" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="buyerEmail" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="buyerId" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="body" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.util.Date" qualifier="gmtCreate" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.util.Date" qualifier="gmtPayment" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.util.Date" qualifier="gmtClose" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.util.Date" qualifier="gmtRefund" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="refundStatus" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="isTotalFeeAdjust" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="useCoupon" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="outChannelType" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="outChannelAmount" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="flag_trade_locked" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+	               <description>Check trade attribute</description>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="gmt_last_modified_time" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+	               <description>Check trade attribute</description>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="operator_role" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+	               <description>Check trade attribute</description>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="time_out" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+	               <description>Check trade attribute</description>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="time_out_type" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+	               <description>Check trade attribute</description>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="to_buyer_fee" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+	               <description>Check trade attribute</description>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="to_seller_fee" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+	               <description>Check trade attribute</description>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="additional_trade_status" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+	               <description>Check trade attribute</description>
+				</attribute>
+<!-- TODO: CHECK IF OK				<attribute type="java.lang.String" qualifier="service" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+	               <description>WAP attributes for service.</description>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="version" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+	               <description>WAP attribute v for version.</description>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="sign_type" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+	               <description>WAP attribute sec_id for sign type.</description>
+				</attribute> -->
+				<attribute type="java.lang.String" qualifier="refund_agent_pay_fee" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="refund_cash_fee" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="refund_coupon_fee" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="refund_fee" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="refund_flow_type" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="refund_id" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="batch_no" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="refund_reason" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="AlipayPaymentTransaction" extends="PaymentTransaction" generate="false" singleton="false" jaloonly="false" autocreate="true">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="url" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />	               
+					<persistence type="property" >
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="latestTransactionType" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+	            </attribute>
+				<attribute type="java.lang.String" qualifier="latestTradeStatus" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="latestRefundStatus" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="errorStatus" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="errorStatusTimestamp" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="refundErrorStatus" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="refundErrorTimestamp" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="tradeAlipayNo" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="AlipayPaymentInfo" extends="PaymentInfo" generate="false" singleton="false" jaloonly="false" autocreate="true">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="outTradeNo" autocreate="true">
+	               <modifiers read="true" write="true" search="true" optional="true" />
+	               <persistence type="property" />
+				</attribute>
+				<attribute generate="true" autocreate="true" qualifier="serviceType" type="ServiceType">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+				</attribute>
+				<attribute generate="true" autocreate="true" type="java.lang.Boolean" qualifier="isToSupplyReturnUrl">
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" optional="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+<!-- TODO: CHECK IF OK		<itemtype code="BankTransferPaymentInfo" extends="AlipayPaymentInfo" generate="false" singleton="false" jaloonly="false" autocreate="true">
+			<attributes>
+				<attribute generate="true" autocreate="true" qualifier="bankType" type="BankType">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" encrypted="false" optional="false" removable="true" initial="false" unique="false" private="false" partof="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+-->
+
+		<itemtype code="AbstractOrder" autocreate="false" generate="false">
+			<description>additional attributes.</description>
+			<attributes>
+				<attribute qualifier="transactionInitiateDate" type="java.util.Date" generate="true" autocreate="true">
+					<persistence type="property" />
+					<modifiers partof="true" optional="true" />
+					<description>Attribute to store the date for initiating the call to the Alipay transaction.</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="OrderStatusUpdateRecord" autocreate="true"
+			generate="true" extends="OrderModificationRecord"
+			jaloclass="de.hybris.platform.ordercancel.jalo.OrderStatusUpdateRecord">
+			<description>to store the timing of status change </description>
+			<attributes>
+				<attribute qualifier="status" type="OrderStatus">
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

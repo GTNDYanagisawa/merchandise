@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<itemtypes>
+
+        <itemtype code="CMSSecurePortalRestriction" jaloclass="de.hybris.platform.secureportaladdon.jalo.restrictions.CMSSecurePortalRestriction" extends="AbstractRestriction" autocreate="true" generate="true">
+            <attributes>
+                <attribute qualifier="description" redeclare="true" type="java.lang.String">
+                    <persistence type="dynamic" attributeHandler="cmsSecurePortalRestrictionDynamicDescription"/>
+                    <modifiers write="false"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+		<itemtype code="CMSSite" autocreate="false" generate="false">
+			<attributes>
+				<attribute type="boolean" qualifier="requiresAuthentication">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>true</defaultvalue>
+					<description>Indicates if the website requires authentication or not.</description>
+				</attribute>
+				<attribute type="boolean" qualifier="enableRegistration">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>true</defaultvalue>
+					<description>Indicates if the website supports registration request.</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="B2BRegistration">
+            <deployment table="b2bregistration" typecode="10040" />
+			<attributes>
+				<attribute type="CMSSite" qualifier="cmsSite">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute type="Language" qualifier="language">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute type="Currency" qualifier="currency">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute type="BaseStore" qualifier="baseStore">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute type="Title" qualifier="title">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="name">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="email">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<!-- attribute type="java.lang.String" qualifier="accountNumber"> <persistence
+					type="property" /> <modifiers optional="true" /> </attribute> -->
+				<attribute type="java.lang.String" qualifier="position">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="telephone">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="telephoneExtension">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="companyName">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="companyAddressStreet">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="companyAddressStreetLine2">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="companyAddressCity">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="companyAddressPostalCode">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute type="Region" qualifier="companyAddressRegion">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute type="Country" qualifier="companyAddressCountry">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="message">
+					<modifiers optional="true" />
+					<persistence type="property">
+						<columntype>
+                            <value>HYBRIS.LONG_STRING</value>
+                        </columntype>
+					</persistence>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="rejectReason">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute type="B2BUnit" qualifier="defaultB2BUnit">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="B2BRegistrationProcess" extends="StoreFrontCustomerProcess"
+			autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="registration" type="B2BRegistration">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="B2BRegistrationApprovedProcess" extends="B2BRegistrationProcess"
+			autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="passwordResetToken" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="B2BRegistrationRejectedProcess" extends="B2BRegistrationProcess"
+			autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="rejectReason" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<project name="cms2lib_buildcallbacks">
+
+	<property name="cms2lib.base.extension.name" value="cms2lib" />
+	<property name="cms2lib.tagsrc.dir" value="${ext.cms2lib.path}/classes/de/hybris/platform/cms2lib/cmstags" />
+	<property name="cms2lib.taglib.dir" value="${ext.cms2lib.path}/resources/cms2lib/cmstags/jar" />
+	<property name="cms2lib.taglib.jar" value="cmstags.jar" />
+	<property name="cms2lib.tagsrc.zip" value="${ext.cms2lib.path}/src/de/hybris/platform/cms2lib/cmstags" />
+
+	<macrodef name="cms2lib_after_build">
+		<sequential>
+			<if>
+				<available file="${ext.cms2lib.path}/classes" type="dir" />
+				<then>
+					<outofdate>
+						<sourcefiles>
+							<fileset dir="${cms2lib.tagsrc.dir}" includes="**" />
+						</sourcefiles>
+						<targetfiles path="${cms2lib.taglib.dir}/${cms2lib.taglib.jar}" />
+						<sequential>
+							<!-- create cmstags.jar -->
+							<mkdir dir="tmp" />
+
+							<echo>Copying tag library classes</echo>
+							<!-- copy class files -->
+							<copy todir="tmp/de/hybris/platform/cms2lib/cmstags">
+								<fileset file="${cms2lib.tagsrc.dir}/CMSBodyTag.class" />
+								<fileset file="${cms2lib.tagsrc.dir}/CMSComponentTag.class" />
+								<fileset file="${cms2lib.tagsrc.dir}/CMSContentSlotTag.class" />
+							</copy>
+
+							<!-- copy tld to META-INF -->
+							<mkdir dir="tmp/META-INF" />
+							<echo>Copying tag library descriptors</echo>
+							<copy todir="tmp/META-INF">
+								<fileset file="${ext.cms2lib.path}/resources/cms2lib/cmstags/cmstags.tld" />
+							</copy>
+
+							<echo>Creating JAR</echo>
+							<!-- create jar -->
+							<jar destfile="${cms2lib.taglib.dir}/${cms2lib.taglib.jar}">
+								<fileset dir="tmp" />
+							</jar>
+							<delete dir="tmp" />
+							
+							<mkdir dir="tmp" />
+							<echo>Copying tag library sources</echo>
+							<!-- copy class files -->
+							<copy todir="tmp/de/hybris/platform/cms2lib/cmstags">
+								<fileset file="${cms2lib.tagsrc.zip}/CMSBodyTag.java" />
+								<fileset file="${cms2lib.tagsrc.zip}/CMSComponentTag.java" />
+								<fileset file="${cms2lib.tagsrc.zip}/CMSContentSlotTag.java" />
+							</copy>
+							
+							<echo>Creating ZIP</echo>
+							<zip destfile="${ext.cms2lib.path}/resources/cms2lib/cmstags/src/cmstags-src.zip">
+								<fileset dir="tmp" />
+							</zip>
+							
+							<!-- delete tmp directory -->
+							<delete dir="tmp" />
+					</sequential>
+					</outofdate>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="cms2lib_after_clean">
+		<sequential>
+			<if>
+				<available file="${ext.cms2lib.path}/resources/cms2lib/cmstags/jar/cmstags.jar" />
+				<then>
+					<echo level="info" message="Removing old tag library JAR" />
+					<delete failonerror="false" file="${ext.cms2lib.path}/resources/cms2lib/cmstags/jar/cmstags.jar" />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+</project>

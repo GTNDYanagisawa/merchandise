@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+
+<!-- 
+  WARNING: This is the Spring WEB configuration file. If you want to replace
+  items or managers you have to do this from the extensions core configuration 
+  file (hmc/resources/hmc-spring.xml) 
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<!-- 
+	 Registering the hybris "tenant" scope 
+	 This is the custom hybris scope that manages the lifetime of a "tenant". 
+	 If you do not deal with tenants ("multimandantenfähigkeit"), then there 
+	 is no need to understand what this is for.  
+	 -->
+	 <!-- 
+	<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+        <property name="scopes">
+            <map>
+                <entry key="tenant" value="de.hybris.platform.spring.TenantScope"/>
+            </map>
+        </property>
+    </bean>
+     -->
+
+     <!-- filter -->  
+     <bean id="hmcFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+      <constructor-arg>
+       <list>
+        <ref bean="log4jFilter"/>
+        <ref bean="dynamicTenantActivationFilter"/>    
+        <ref bean="hmcRedirectFilter"/>
+        <ref bean="sessionFilter"/>
+        <ref bean="hmcDataSourceSwitchingFilter"/>    
+        <ref bean="hmcCatalogVersionActivationFilter"/>
+        <ref bean="hmcSecureMediaFilter"/>
+       </list>
+      </constructor-arg>
+     </bean>
+
+     <bean id="hmcRedirectFilter" class="de.hybris.platform.servicelayer.web.RedirectWhenSystemIsNotInitializedFilter">
+      <constructor-arg>
+         <value><!-- nothing - redirect to default maintenance page --></value>
+        </constructor-arg>
+        <property name="urlPaths">
+       <list>
+        <value>login</value>    
+       </list>
+      </property>
+     </bean>
+     
+     <bean id="hmcDataSourceSwitchingFilter" class="de.hybris.platform.servicelayer.web.DataSourceSwitchingFilter">
+     </bean>
+     
+      <bean id="hmcCatalogVersionActivationFilter" class="de.hybris.platform.servicelayer.web.DynamicCatalogVersionActivationFilter">
+       <property name="catalogVersionService" ref="catalogVersionService"/>
+       <property name="catalogService" ref="catalogService"/>
+     </bean>
+
+     <bean id="hmcSecureMediaFilter" class="de.hybris.platform.servicelayer.web.SecureMediaFilter">
+       <property name="mediaPermissionService" ref="mediaPermissionService"/>
+       <property name="modelService" ref="modelService"/>
+       <property name="userService" ref="userService"/>
+       <property name="mediaService" ref="mediaService"/>
+      <!-- <property name="secureMediaToken" value="securemedias"/>  securemedias is default but you may overwrite it -->
+     </bean>
+
+</beans>

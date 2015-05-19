@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+
+-->
+<project name="virtualjdbc_buildcallbacks">
+
+    <property name="hybris.client.jar" value="hybris-virtualjdbc.jar" />
+    <property name="simplicit.client.jar" value="vjdbc.jar" />
+    <property name="commons.logging.jar" value="commons-logging-1.1.1.jar" />
+
+	<macrodef name="virtualjdbc_before_dist">
+		<sequential>
+			<echo>Deleting vjdbc client jar</echo>
+			<delete file="${HYBRIS_TEMP_DIR}/virtualjdbc/${hybris.client.jar}" failonerror="false" />
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="virtualjdbc_after_dist">
+		<sequential>
+
+			<!-- make sure that a classes folder exists, extract bin/virtualjdbcserver.jar if it doesn't -->
+			<if>
+				<and>
+					<not>
+						<available file="${ext.virtualjdbc.path}/classes" type="dir" />
+					</not>
+					<available file="${ext.virtualjdbc.path}/bin/virtualjdbcserver.jar" type="file" />
+				</and>
+				<then>
+					<echo>Extracting virtualjdbcserver.jar into temporary 'classes' folder...</echo>
+					<unzip src="${ext.virtualjdbc.path}/bin/virtualjdbcserver.jar" dest="${ext.virtualjdbc.path}/classes"/>
+					<property name="cleanup-vjdbc-classes" value="true"/>
+				</then>
+			</if>
+	
+			<if>
+				<available file="${ext.virtualjdbc.path}/classes" type="dir" />
+				<then>
+
+					<echo>Creating vjdbc client jar</echo>
+					<property name="ext.virtualjdbc.tmp" value="${HYBRIS_TEMP_DIR}/_vjdbc_client_temp" />
+					<mkdir dir="${ext.virtualjdbc.tmp}" />
+
+					<unzip src="${ext.core.path}/lib/${commons.logging.jar}" overwrite="true" dest="${ext.virtualjdbc.tmp}" />
+					<copy todir="${ext.virtualjdbc.tmp}">
+						<fileset dir="${ext.virtualjdbc.path}/classes">
+							<include name="de/hybris/vjdbc/**/*.class" />
+						</fileset>
+					</copy>
+
+                    <copy file="${ext.virtualjdbc.path}/lib/${simplicit.client.jar}"  todir="${HYBRIS_TEMP_DIR}/virtualjdbc" />
+
+					<jar destfile="${HYBRIS_TEMP_DIR}/virtualjdbc/${hybris.client.jar}">
+						<fileset dir="${ext.virtualjdbc.tmp}" />
+						<manifest>
+							<attribute name="Built-By" value="hybris" />
+							<attribute name="Implementation-Vendor" value="hybris" />
+							<attribute name="Implementation-Title" value="hybris virtual jdbc" />
+							<attribute name="Implementation-Version" value="1.0" />
+						</manifest>
+					</jar>
+
+					<delete includeemptydirs="true" dir="${ext.virtualjdbc.tmp}" failonerror="false">
+						<fileset dir="${ext.virtualjdbc.tmp}" includes="**/*" />
+					</delete>
+
+				</then>
+				<else>
+					<echo level="warning" message="Can't create ${hybris.client.jar} since virtualjdbc extension is not available as source. If needed, please download the jar from https://download.hybris.com!" />
+				</else>
+			</if>
+
+			<!-- remove classes folder if necessary (see above) -->
+			<if>
+				<istrue value="${cleanup-vjdbc-classes}" />
+				<then>
+					<echo>Removing temporary 'classes' folder...</echo>
+					<delete dir="${ext.virtualjdbc.path}/classes" />
+					<var name="cleanup-vjdbc-classes" unset="true" />
+				</then>
+			</if>
+	
+		</sequential>
+	</macrodef>
+
+</project>
+

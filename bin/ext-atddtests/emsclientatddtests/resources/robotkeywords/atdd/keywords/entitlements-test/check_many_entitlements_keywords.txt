@@ -1,0 +1,35 @@
+*** Settings ***
+Library         com.hybris.services.entitlements.atdd.keywords.EntitlementsExecuteManyKeywordLibrary
+Library         com.hybris.services.entitlements.atdd.keywords.EntitlementsDetailsKeywordLibrary
+
+
+*** Keywords ***
+create simple execute many
+    [Documentation]    Create simple execute many
+    ${result}=    create simple execute many data
+    [Return]    ${result}
+
+create timeframe execute many
+    [Documentation]    Create timeframe execute many
+    ${result}=    create timeframe execute many data
+    [Return]    ${result}
+
+create execute many from condition ${condition:[^"]+}
+    [Documentation]    Create execute many data from given condition
+    ${result}=    create execute many data    ${condition}
+    [Return]    ${result}
+
+${action:[^"]+} many with "${executeManyDataCollection:[^"]+}" for user "${user:[^"]+}" and expect exception "${exceptionType:[^"]+}" with message "${exceptionMessage:[^"]+}"
+    [Documentation]    Execute many.
+    ${result}=    execute many entitlement    ${action}    ${executeManyDataCollection}    ${user}    ${exceptionType}    ${exceptionMessage}
+    [Return]    ${result}
+
+${action:[^"]+} many with "${executeManyDataCollection:[^"]+}" for user "${user:[^"]+}"
+    [Documentation]    Execute many.
+    ${result}=    execute many entitlement    ${action}    ${executeManyDataCollection}    ${user}
+    [Return]    ${result}
+
+assert in ${executeManyResult:[^"]+} result with offset ${offset:[^"]+} is ${resultFlag:[^"]+}
+    [Documentation]    Checks ManyResult
+    ${result}=    assert execute many result    ${executeManyResult}    ${offset}    ${resultFlag}
+    [Return]    ${result}

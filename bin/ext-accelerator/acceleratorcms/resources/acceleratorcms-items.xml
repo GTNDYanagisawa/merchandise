@@ -1,0 +1,818 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype code="productReferenceTypeList"
+			elementtype="ProductReferenceTypeEnum" autocreate="true" generate="true"
+			type="list" />
+		<collectiontype code="accountNavigationComponentList"
+			elementtype="AccountNavigationComponent" autocreate="true" generate="true"
+			type="list" />
+		<collectiontype code="navigationBarComponentList"
+			elementtype="NavigationBarComponent" autocreate="true" generate="true"
+			type="list" />
+		<collectiontype code="CMSComponentTypes" elementtype="CMSComponentType"
+			autocreate="true" generate="true" type="list" />
+	</collectiontypes>
+
+	<enumtypes>
+		<enumtype generate="true" code="NavigationBarMenuLayout"
+			autocreate="true" dynamic="true">
+			<description>This type determines the position of navigation bar.</description>
+			<value code="AUTO" />
+			<value code="RIGHT_EDGE" />
+			<value code="LEFT_EDGE" />
+		</enumtype>
+
+		<enumtype generate="true" code="CartTotalDisplayType"
+			autocreate="true">
+			<description>This type is intended to allow configuration of the Total displayed on the MiniCart.</description>
+			<value code="SUBTOTAL" />
+			<value code="TOTAL_WITHOUT_DELIVERY" />
+			<value code="TOTAL" />
+		</enumtype>
+
+	</enumtypes>
+
+	<maptypes>
+		<maptype code="localized:MediaContainer" argumenttype="Language"
+			returntype="MediaContainer" autocreate="true" generate="false" />
+	</maptypes>
+
+	<relations>
+		<relation code="ProductFeatureComponents2ProductRel"
+			generate="true" localized="false" autocreate="true">
+			<description>This relation links product with one or more feature components that contain this product.</description>
+			<sourceElement qualifier="productFeatureComponents"
+				type="ProductFeatureComponent" cardinality="many" collectiontype="list">
+				<modifiers read="true" write="true" search="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement qualifier="product" type="Product"
+				cardinality="one">
+				<modifiers read="true" write="true" search="true"
+					optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="CategoryFeatureComponents2CategoryRel"
+			generate="true" localized="false" autocreate="true">
+			<description>This relation links category with one or more feature components that contain this product.</description>
+			<sourceElement qualifier="categoryFeatureComponents"
+				type="CategoryFeatureComponent" cardinality="many" collectiontype="list">
+				<modifiers read="true" write="true" search="true"
+					optional="true" />
+			</sourceElement>
+			<targetElement qualifier="category" type="Category"
+				cardinality="one">
+				<modifiers read="true" write="true" search="true"
+					optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="CmsActionsForCmsComponents" generate="true"
+			localized="false" autocreate="true">
+			<deployment table="Actions4Comps" typecode="6226" />
+			<sourceElement qualifier="components" type="AbstractCMSComponent"
+				cardinality="many" />
+			<targetElement qualifier="actions" type="AbstractCMSAction"
+				cardinality="many" collectiontype="list" ordered="true" />
+		</relation>
+
+		<relation code="ApplicableCmsActionsTypeForCmsComponent"
+			generate="true" localized="false" autocreate="true">
+			<deployment table="ApplActnTyp4CompTyp" typecode="6227" />
+			<sourceElement qualifier="actionTypes" type="CMSActionType"
+				cardinality="many" />
+			<targetElement qualifier="componentTypes" type="CMSComponentType"
+				cardinality="many" />
+		</relation>
+
+	</relations>
+
+
+	<itemtypes>
+		<typegroup name="CmsPages">
+
+			<itemtype code="ContentPage" autocreate="false" generate="false">
+				<description>Extends existing type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="keywords" type="localized:java.lang.String">
+						<persistence type="property" />
+						<modifiers />
+						<description>Localized content page keywords.</description>
+					</attribute>
+					<attribute qualifier="description" type="localized:java.lang.String">
+						<persistence type="property" />
+						<modifiers />
+						<description>Localized content page description.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+
+		<typegroup name="Components">
+
+			<itemtype code="CMSTabParagraphContainer" generate="true"
+				extends="AbstractCMSComponentContainer" autocreate="true"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.CMSTabParagraphContainer">
+				<description>This is container used to group tab paragraph components.</description>
+			</itemtype>
+
+			<itemtype code="CMSTabParagraphComponent" generate="true"
+				extends="CMSParagraphComponent" autocreate="true"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.CMSTabParagraphComponent">
+				<description>It represents tap paragraph component. Contains some additional attributes that are required to display paragraph as a tab.</description>
+				<attributes>
+					<attribute qualifier="title" generate="true" autocreate="true"
+						type="localized:java.lang.String">
+						<persistence type="property" />
+						<description>Attribute that represents title of the tab.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="ProductReferencesComponent" extends="SimpleCMSComponent"
+				autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.ProductReferencesComponent">
+				<description>It represents product references component, that is the component that displays configured references to the specified product.</description>
+				<attributes>
+					<attribute qualifier="title" type="localized:java.lang.String">
+						<persistence type="property" />
+						<description>Title of the component.</description>
+					</attribute>
+					<attribute qualifier="productReferenceTypes" type="productReferenceTypeList">
+						<persistence type="property" />
+						<description>Product reference type that is displayed in this component.</description>
+					</attribute>
+					<attribute qualifier="maximumNumberProducts" type="java.lang.Integer">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>Integer.valueOf(5)</defaultvalue>
+						<description>Maximum number of the product references that are displayed in the component.</description>
+					</attribute>
+					<attribute qualifier="displayProductTitles" type="boolean">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>Boolean.TRUE</defaultvalue>
+						<description>Determines if product titles are shown.</description>
+					</attribute>
+					<attribute qualifier="displayProductPrices" type="boolean">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>Boolean.TRUE</defaultvalue>
+						<description>Determines if product prices are shown.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="SimpleSuggestionComponent" extends="ProductReferencesComponent"
+				autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.SimpleSuggestionComponent">
+				<description>Represents the suggestion component that displays suggestions to the user.</description>
+				<attributes>
+					<attribute qualifier="filterPurchased" type="boolean">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>Boolean.TRUE</defaultvalue>
+						<description>Determines if only purchased products are displayed in the component.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="PurchasedCategorySuggestionComponent"
+				extends="SimpleSuggestionComponent" autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.PurchasedCategorySuggestionComponent">
+				<description>Represents the suggestion component that displays product references that can be filtered by purchased or from specified category.</description>
+				<attributes>
+					<attribute qualifier="category" type="Category">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<description>Category to filter displayed references with.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="CartSuggestionComponent" extends="SimpleSuggestionComponent"
+				autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.CartSuggestionComponent">
+				<description>Represents the suggestion component that displays product references for each item in the cart.</description>
+			</itemtype>
+
+			<itemtype code="MiniCartComponent" generate="true"
+				extends="SimpleCMSComponent" autocreate="true"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.MiniCartComponent">
+				<description>It represents mini cart component that can be configured to show some information about cart content.</description>
+				<attributes>
+					<attribute qualifier="title" type="localized:java.lang.String"
+						generate="true" autocreate="true">
+						<persistence type="property" />
+						<description>It is localized title of the component.</description>
+					</attribute>
+					<attribute qualifier="totalDisplay" type="CartTotalDisplayType"
+						generate="true" autocreate="true">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>em().getEnumerationValue("CartTotalDisplayType", "TOTAL")</defaultvalue>
+						<description>This attribute determines the type of displayed total cart value.</description>
+					</attribute>
+					<attribute qualifier="shownProductCount" type="int"
+						generate="true" autocreate="true">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>Integer.valueOf(3)</defaultvalue>
+						<description>It controls the maximum number of products to display in the component.</description>
+					</attribute>
+					<attribute qualifier="lightboxBannerComponent" type="SimpleBannerComponent"
+						generate="true" autocreate="true">
+						<persistence type="property" />
+						<modifiers />
+						<description>It is a banner component that can be displayed in the mini cart.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="ImageMapComponent" autocreate="true"
+				generate="true" extends="AbstractBannerComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.ImageMapComponent">
+				<description>It represents image map component that extends AbstractBannerComponent and contains one more attribute.</description>
+				<attributes>
+					<attribute qualifier="imageMapHTML" type="localized:java.lang.String">
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+						<modifiers />
+						<description>It is localized HTML string that is displayed under the banner.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="DynamicBannerComponent" autocreate="true"
+				generate="true" extends="AbstractBannerComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.DynamicBannerComponent">
+				<description>Banner component implementation that displays media that code is dynamically evaluated basing on given parameters.</description>
+				<attributes>
+					<attribute type="java.lang.String" qualifier="mediaCodePattern">
+						<persistence type="property" />
+						<modifiers />
+						<description>Media code pattern that will be used for evaluation.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="SimpleBannerComponent" autocreate="true"
+				generate="true" extends="AbstractBannerComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.SimpleBannerComponent">
+				<description>It is just a simple concrete implementation of the AbstractBannerComponent.</description>
+			</itemtype>
+
+			<itemtype code="NavigationBarComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.NavigationBarComponent">
+				<description>It represents navigation bar component that contains cms navigation node. Nodes structure can be built in a hierarchical way.</description>
+				<attributes>
+					<attribute type="NavigationBarMenuLayout" qualifier="dropDownLayout">
+						<persistence type="property" />
+						<defaultvalue>em().getEnumerationValue("NavigationBarMenuLayout", "AUTO")</defaultvalue>
+						<modifiers />
+						<description>Determines the way navigation drop down is positioned.</description>
+					</attribute>
+
+					<attribute type="CMSNavigationNode" qualifier="navigationNode">
+						<persistence type="property" />
+						<modifiers />
+						<description>The cms navigation node of this navigation bar component.</description>
+					</attribute>
+
+					<attribute type="java.lang.Integer" qualifier="wrapAfter">
+						<persistence type="property" />
+						<defaultvalue>java.lang.Integer.valueOf(10)</defaultvalue>
+						<modifiers />
+						<description>Determines the number of navigation nodes when the following elements will be wrapped.</description>
+					</attribute>
+
+					<attribute type="CMSLinkComponent" qualifier="link">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<description>The cms link component that is attached to this bar component.</description>
+					</attribute>
+
+					<attribute type="java.lang.String" qualifier="styleClass">
+						<persistence type="property" />
+						<modifiers />
+						<description>CSS style class of this bar component.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="NavigationBarCollectionComponent"
+				autocreate="true" generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.NavigationBarCollectionComponent">
+				<description>It represents account navigation bar component that contains cms navigation node.</description>
+				<attributes>
+					<attribute qualifier="components" type="navigationBarComponentList">
+						<persistence type="property" />
+						<modifiers />
+						<description>A collection of navigation bar components</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+
+			<itemtype code="FooterComponent" autocreate="true" generate="true"
+				extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.FooterComponent">
+				<description>Represents footer component that contains configurable list of navigation nodes.</description>
+				<attributes>
+					<attribute type="CMSNavigationNodeList" qualifier="navigationNodes">
+						<persistence type="property" />
+						<modifiers />
+						<description>List of navigation nodes that are rendered in this footer component.</description>
+					</attribute>
+
+					<attribute type="java.lang.Integer" qualifier="wrapAfter">
+						<persistence type="property" />
+						<modifiers />
+						<description>Determines the number of navigation nodes when the following elements will be wrapped.</description>
+					</attribute>
+
+					<attribute type="boolean" qualifier="showLanguageCurrency">
+						<persistence type="property" />
+						<defaultvalue>Boolean.FALSE</defaultvalue>
+						<modifiers />
+						<description>Determines whether or not to show the language currency selection.</description>
+					</attribute>
+
+					<attribute qualifier="notice" type="localized:java.lang.String">
+						<description>Intended to store a copyright notice or other text to be displayed in the footer</description>
+						<persistence type="property" />
+						<modifiers />
+					</attribute>
+
+				</attributes>
+			</itemtype>
+
+			<itemtype code="ProductFeatureComponent" generate="true"
+				extends="SimpleCMSComponent" autocreate="true"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.ProductFeatureComponent">
+				<description>Represents product feature component that displays some commercial information about the product.</description>
+				<attributes>
+					<attribute qualifier="title" type="localized:java.lang.String">
+						<persistence type="property" />
+						<modifiers />
+						<description>Localized title of the component.</description>
+					</attribute>
+					<attribute qualifier="description" type="localized:java.lang.String">
+						<persistence type="property" />
+						<modifiers />
+						<description>Localized description of the component.</description>
+					</attribute>
+					<attribute type="localized:Media" qualifier="media">
+						<persistence type="property" />
+						<modifiers />
+						<description>Localized media that is displayed in the component.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="CategoryFeatureComponent" generate="true"
+				extends="SimpleCMSComponent" autocreate="true"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.CategoryFeatureComponent">
+				<description>Represents category feature component that displays some commercial information about the category.</description>
+				<attributes>
+					<attribute qualifier="title" type="localized:java.lang.String">
+						<persistence type="property" />
+						<modifiers />
+						<description>Localized title of the component.</description>
+					</attribute>
+					<attribute qualifier="description" type="localized:java.lang.String">
+						<persistence type="property" />
+						<modifiers />
+						<description>Localized description of the component.</description>
+					</attribute>
+					<attribute type="localized:Media" qualifier="media">
+						<persistence type="property" />
+						<modifiers />
+						<description>Localized media that is displayed in the component.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="ProductCarouselComponent" autocreate="false"
+				generate="false">
+				<description>Extends existing type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="title" type="localized:java.lang.String">
+						<persistence type="property" />
+						<modifiers />
+						<description>Localized title of the component.</description>
+					</attribute>
+					<attribute qualifier="searchQuery" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers />
+						<description>A solr query string</description>
+					</attribute>
+					<attribute qualifier="categoryCode" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers />
+						<description>A code for a category for a solr search</description>
+					</attribute>
+					<attribute qualifier="popup" type="boolean">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>Boolean.TRUE</defaultvalue>
+						<description>If true shows a popup else redirects to products page</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="CMSLinkComponent" autocreate="false"
+				generate="false">
+				<attributes>
+					<attribute qualifier="styleAttributes" type="java.lang.String">
+						<description>Can store custom styling attributes for additional styling</description>
+						<persistence type="property" />
+						<modifiers optional="true" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="SubCategoryListComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.SubCategoryListComponent">
+				<description>Represents subcategory component that displays a list of subcategories for the current category.</description>
+			</itemtype>
+
+			<itemtype code="ProductVariantSelectorComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.ProductVariantSelectorComponent">
+				<description>Represents product variant selector component that gives the ability to select different types of the product.</description>
+			</itemtype>
+
+			<itemtype code="ProductAddToCartComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.ProductAddToCartComponent">
+				<description>Represents product add to cart component that displays available stock quantity and addToCart button.</description>
+			</itemtype>
+
+			<itemtype code="SearchBoxComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.SearchBoxComponent">
+				<description>Represents the search box component.</description>
+				<attributes>
+					<attribute qualifier="displaySuggestions" type="boolean">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>Boolean.TRUE</defaultvalue>
+						<description>Determines if suggested terms are displayed in the component.</description>
+					</attribute>
+					<attribute qualifier="displayProducts" type="boolean">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>Boolean.TRUE</defaultvalue>
+						<description>Determines if product results are displayed in the component.</description>
+					</attribute>
+					<attribute qualifier="displayProductImages" type="boolean">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>Boolean.TRUE</defaultvalue>
+						<description>Determines if product images are shown.</description>
+					</attribute>
+					<attribute qualifier="maxSuggestions" type="java.lang.Integer">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>java.lang.Integer.valueOf(6)</defaultvalue>
+						<description>Determines the max number of suggestions to display in the component.</description>
+					</attribute>
+					<attribute qualifier="maxProducts" type="java.lang.Integer">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>java.lang.Integer.valueOf(4)</defaultvalue>
+						<description>Determines the max number of products to display in the component.</description>
+					</attribute>
+					<attribute qualifier="minCharactersBeforeRequest" type="java.lang.Integer">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>java.lang.Integer.valueOf(3)</defaultvalue>
+						<description>Determines the min number of characters to enter before submitting a search request.</description>
+					</attribute>
+					<attribute qualifier="waitTimeBeforeRequest" type="java.lang.Integer">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>java.lang.Integer.valueOf(500)</defaultvalue>
+						<description>Determines the wait time after the search term has been altered before resubmitting the search request.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="AccountNavigationComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.AccountNavigationComponent">
+				<description>It represents account navigation bar component that contains cms navigation node.</description>
+				<attributes>
+
+					<attribute qualifier="title" type="localized:java.lang.String">
+						<persistence type="property" />
+						<modifiers />
+						<description>Localized title of the component.</description>
+					</attribute>
+					<attribute type="java.lang.String" qualifier="styleClass">
+						<persistence type="property" />
+						<modifiers />
+						<description>CSS style class of this bar component.</description>
+					</attribute>
+
+					<attribute type="CMSNavigationNode" qualifier="navigationNode">
+						<persistence type="property" />
+						<modifiers />
+						<description>The cms navigation node of this navigation component.</description>
+					</attribute>
+
+				</attributes>
+			</itemtype>
+
+			<itemtype code="AccountNavigationCollectionComponent"
+				autocreate="true" generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.AccountNavigationCollectionComponent">
+				<description>It represents account navigation bar component that contains cms navigation node.</description>
+				<attributes>
+					<attribute qualifier="components" type="accountNavigationComponentList">
+						<persistence type="property" />
+						<modifiers />
+						<description>A collection of Account navigation components</description>
+					</attribute>
+
+				</attributes>
+			</itemtype>
+
+			<itemtype code="JspIncludeComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.JspIncludeComponent">
+				<description>A component for including other views</description>
+				<attributes>
+
+					<attribute qualifier="page" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers />
+						<description>A jsp view</description>
+					</attribute>
+
+				</attributes>
+			</itemtype>
+
+			<itemtype code="BreadcrumbComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.BreadcrumbComponent">
+				<description>A component wrapping the breadcrumb tag</description>
+			</itemtype>
+
+			<itemtype code="LanguageCurrencyComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.LanguageCurrencyComponent">
+				<description>A component wrapping the language and currency tags</description>
+			</itemtype>
+
+			<itemtype code="LogoComponent" autocreate="true" generate="true"
+				extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.LogoComponent">
+				<description>It represents header logo.</description>
+				<attributes>
+					<attribute qualifier="logo" type="SimpleBannerComponent"
+						generate="true" autocreate="true">
+						<persistence type="property" />
+						<modifiers />
+						<description>It is a banner component to be displayed.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="StoreFinderComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.StoreFinderComponent">
+				<description>A component wrapping the store finder.</description>
+			</itemtype>
+
+			<itemtype code="AccountControlComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.AccountControlComponent">
+				<description>Represents Profile Links</description>
+			</itemtype>
+
+			<itemtype code="ProductRefinementComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.ProductRefinementComponent">
+				<description>Wraps facet nav refinement</description>
+			</itemtype>
+
+			<itemtype code="CMSProductListComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.CMSProductListComponent">
+				<description>Product list component</description>
+			</itemtype>
+
+			<itemtype code="ProductGridComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.ProductGridComponent">
+				<description>Product grid component</description>
+			</itemtype>
+
+			<itemtype code="SearchResultsListComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.SearchResultsListComponent">
+				<description>Search result list component</description>
+			</itemtype>
+
+			<itemtype code="SearchResultsGridComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.SearchResultsGridComponent">
+				<description>Search result grid component</description>
+			</itemtype>
+
+			<itemtype code="AccountBookmarkComponent" autocreate="true"
+				generate="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.AccountBookmarkComponent">
+				<description>It represents account bookmark component containing one link to the previous page usually</description>
+				<attributes>
+					<attribute type="java.lang.String" qualifier="styleClass">
+						<persistence type="property" />
+						<modifiers />
+						<description>CSS style class of this bar component.</description>
+					</attribute>
+					<attribute type="CMSLinkComponent" qualifier="link">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<description>The cms navigation node of this navigation component.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+
+			<itemtype code="AbstractMediaContainerComponent" autocreate="true"
+				generate="true" abstract="true" extends="SimpleCMSComponent"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.AbstractMediaContainerComponent">
+				<attributes>
+					<attribute qualifier="media" type="localized:MediaContainer">
+						<persistence type="property" />
+						<description>It is a media container containing images for specific resolutions</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="AbstractResponsiveBannerComponent" generate="true"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.AbstractResponsiveBannerComponent"
+				extends="AbstractMediaContainerComponent" autocreate="true">
+				<description>Responsive image component</description>
+				<attributes>
+					<attribute type="java.lang.String" qualifier="urlLink">
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+			
+			<itemtype code="SimpleResponsiveBannerComponent" generate="true"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.components.SimpleResponsiveBannerComponent"
+				extends="AbstractResponsiveBannerComponent" autocreate="true">
+				<description>Concrete implementation of abstract responsive banner component</description>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="Restrictions">
+
+			<itemtype code="CMSUiExperienceRestriction"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.restrictions.CMSUiExperienceRestriction"
+				extends="AbstractRestriction" autocreate="true" generate="true">
+				<attributes>
+					<attribute qualifier="description" redeclare="true"
+						type="java.lang.String">
+						<persistence type="dynamic"
+							attributeHandler="uiExperienceRestrictionDynamicDescription" />
+						<modifiers write="false" />
+					</attribute>
+					<attribute qualifier="uiExperience" type="UiExperienceLevel">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>em().getEnumerationValue("UiExperienceLevel", "DESKTOP")</defaultvalue>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="Preview">
+
+			<itemtype code="PreviewData" autocreate="false" generate="false">
+				<attributes>
+					<attribute qualifier="uiExperience" type="UiExperienceLevel">
+						<persistence type="property" />
+						<modifiers optional="false" />
+						<defaultvalue>em().getEnumerationValue("UiExperienceLevel", "DESKTOP")</defaultvalue>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>
+
+
+		<typegroup name="CMS Actions">
+
+			<!-- maybe should just extend CMSItem -->
+			<itemtype code="AbstractCMSAction"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.actions.AbstractCMSAction"
+				extends="SimpleCMSComponent" autocreate="true" generate="true"
+				abstract="true" metatype="CMSActionType">
+				<attributes>
+					<attribute qualifier="url" type="java.lang.String">
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="actions"
+						type="CmsActionsForCmsComponentsactionsColl" redeclare="true">
+						<modifiers write="false" read="false" />
+					</attribute>
+					<attribute qualifier="slots" type="ElementsForSlotslotsColl"
+						redeclare="true">
+						<modifiers write="false" read="false" />
+					</attribute>
+					<attribute qualifier="container" type="java.lang.Boolean"
+						redeclare="true">
+						<modifiers write="false" read="false" />
+					</attribute>
+					<attribute qualifier="containers" type="ElementsForContainercontainersColl"
+						redeclare="true">
+						<modifiers write="false" read="false" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="SimpleCMSAction"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.actions.SimpleCMSAction"
+				extends="AbstractCMSAction" autocreate="true" generate="true"
+				abstract="true">
+			</itemtype>
+
+			<itemtype code="AddToCartAction"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.actions.AddToCartAction"
+				extends="SimpleCMSAction" autocreate="true" generate="true">
+			</itemtype>
+
+			<itemtype code="ListAddToCartAction"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.actions.ListAddToCartAction"
+				extends="SimpleCMSAction" autocreate="true" generate="true">
+			</itemtype>
+
+			<itemtype code="ListPickUpInStoreAction"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.actions.ListPickUpInStoreAction"
+				extends="SimpleCMSAction" autocreate="true" generate="true">
+			</itemtype>
+
+			<itemtype code="PickUpInStoreAction"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.actions.PickUpInStoreAction"
+				extends="SimpleCMSAction" autocreate="true" generate="true">
+			</itemtype>
+
+			<itemtype code="ShareOnSocialNetworkAction"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.actions.ShareOnSocialNetworkAction"
+				extends="SimpleCMSAction" autocreate="true" generate="true">
+			</itemtype>
+
+			<itemtype code="ViewOrderAction"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.actions.ViewOrderAction"
+				extends="SimpleCMSAction" autocreate="true" generate="true">
+			</itemtype>
+
+			<itemtype code="ViewStoreAction"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.actions.ViewStoreAction"
+				extends="SimpleCMSAction" autocreate="true" generate="true">
+			</itemtype>
+
+			<itemtype code="CMSActionRestriction"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.restrictions.CMSActionRestriction"
+				extends="AbstractRestriction" autocreate="true" generate="true">
+				<attributes>
+					<attribute qualifier="description" type="java.lang.String"
+						redeclare="true">
+						<persistence type="dynamic"
+							attributeHandler="cmsActionRestrictionDynamicDescription" />
+						<modifiers write="false" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="CMSActionType"
+				jaloclass="de.hybris.platform.acceleratorcms.jalo.CMSActionType"
+				autocreate="true" generate="true" extends="CMSComponentType">
+			</itemtype>
+
+		</typegroup>
+
+	</itemtypes>
+</items>

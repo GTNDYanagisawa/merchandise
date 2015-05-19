@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<project name="printcockpit_buildcallbacks" >
+	
+	<property name="printcockpit.base.extension.name" value="printcockpit"/>
+	
+	<macrodef name="printcockpit_before_build">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<and>
+							<equals arg1="${ext.@{extname}.webmodule.available}" arg2="available" />
+							<contains string="${required.extensions.for.@{extname}}" substring="${printcockpit.base.extension.name}"/>
+						</and>
+						<then>
+							<echo level="info" message="Start copying print cockpit files for extension @{extname}..."/>
+							<copy todir="${ext.@{extname}.path}/web/webroot">
+								<fileset dir="${ext.printcockpit.path}/web/webroot">
+									<include name="printcockpit/**/**.*" />
+								</fileset>
+							</copy>
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="printcockpit_after_clean">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<and>
+							<equals arg1="${ext.@{extname}.webmodule.available}" arg2="available" />
+							<contains string="${required.extensions.for.@{extname}}" substring="${printcockpit.base.extension.name}"/>
+						</and>
+						<then>
+							<echo level="info" message="Start cleaning up print cockpit files for extension @{extname}"/>
+							<delete quiet="true" dir="${ext.@{extname}.path}/web/webroot/printcockpit"/>
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+		
+</project>

@@ -1,0 +1,97 @@
+#######################
+# REGISTRATION EMAILS #
+#######################
+
+# TODO: Create template for RegistrationApprovedEmailTemplate 
+# TODO: Create template for RegistrationRejectedEmailTemplate
+# TODO: Create template for RegistrationReceivedEmailTemplate
+
+# Variables
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$allowedContent=CMSImageComponent,BannerComponent
+$emailFromEmail=customerservices@hybris.com
+$emailFromName=Customer Services Team
+$jarResource=jar:de.hybris.platform.secureportaladdon.constants.SecureportaladdonConstants&/secureportaladdon/import/contentCatalogs/powertoolsContentCatalog/emails
+
+# The name of the content slots
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='RegistrationPendingApprovalEmailTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$allowedContent;
+;BottomContent;;$allowedContent;
+
+# Create content slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;EmailTopSlot;Default Email Top Slot;true
+;;EmailBottomSlot;Default Email Bottom Slot;true
+
+# Preview image displayed in the CMS Cockpit
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true]
+;;EmailPageModel_preview;text/gif;EmailPageModel_preview.gif;$jarResource/EmailPageModel_preview.gif
+
+# Email page template definition
+INSERT_UPDATE EmailPageTemplate;$contentCV[unique=true];uid[unique=true];name;active;subject(code);htmlTemplate(code);restrictedPageTypes(code);frontendTemplateName
+;;RegistrationPendingApprovalEmailTemplate;Registration Pending Approval Email Template;true;RegistrationPendingApprovalEmailTemplateSubject;RegistrationPendingApprovalEmailTemplateBody;EmailPage;RegistrationPendingApprovalEmailTemplate
+;;RegistrationApprovedEmailTemplate;Registration Approved Email Template;true;RegistrationApprovedEmailTemplateSubject;RegistrationApprovedEmailTemplateBody;EmailPage;RegistrationApprovedEmailTemplate
+;;RegistrationReceivedEmailTemplate;Registration Received Email Template;true;RegistrationReceivedEmailTemplateSubject;RegistrationReceivedEmailTemplateBody;EmailPage;RegistrationReceivedEmailTemplate
+;;RegistrationRejectedEmailTemplate;Registration Rejected Email Template;true;RegistrationRejectedEmailTemplateSubject;RegistrationRejectedEmailTemplateBody;EmailPage;RegistrationRejectedEmailTemplate
+
+# Templates for cms cockpit page edition
+UPDATE EmailPageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;RegistrationPendingApprovalEmailTemplate;$jarResource/email-registrationPendingApprovalTemplate.vm
+;;RegistrationApprovedEmailTemplate;$jarResource/email-registrationApprovedTemplate.vm
+;;RegistrationReceivedEmailTemplate;$jarResource/email-registrationReceivedTemplate.vm
+;;RegistrationRejectedEmailTemplate;$jarResource/email-registrationRejectedTemplate.vm
+
+# Bind content slots to email page template
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='RegistrationPendingApprovalEmailTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-RegistrationPendingApprovalEmailTemplate;SiteLogo;;SiteLogoSlot;true
+;;TopContent-RegistrationPendingApprovalEmailTemplate;TopContent;;EmailTopSlot;true
+;;BottomContent-RegistrationPendingApprovalEmailTemplate;BottomContent;;EmailBottomSlot;true
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='RegistrationApprovedEmailTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-RegistrationApprovedEmailTemplate;SiteLogo;;SiteLogoSlot;true
+;;TopContent-RegistrationApprovedEmailTemplate;TopContent;;EmailTopSlot;true
+;;BottomContent-RegistrationApprovedEmailTemplate;BottomContent;;EmailBottomSlot;true
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='RegistrationReceivedEmailTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-RegistrationReceivedEmailTemplate;SiteLogo;;SiteLogoSlot;true
+;;TopContent-RegistrationReceivedEmailTemplate;TopContent;;EmailTopSlot;true
+;;BottomContent-RegistrationReceivedEmailTemplate;BottomContent;;EmailBottomSlot;true
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='RegistrationRejectedEmailTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-RegistrationRejectedEmailTemplate;SiteLogo;;SiteLogoSlot;true
+;;TopContent-RegistrationRejectedEmailTemplate;TopContent;;EmailTopSlot;true
+;;BottomContent-RegistrationRejectedEmailTemplate;BottomContent;;EmailBottomSlot;true
+
+# Email page
+INSERT_UPDATE EmailPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved'];fromEmail[lang=en];fromName[lang=en]
+;;RegistrationPendingApprovalEmail;Registration Pending Approval Email;RegistrationPendingApprovalEmailTemplate;true;;$emailFromEmail;$emailFromName
+;;RegistrationApprovedEmail;Registration Approved Email;RegistrationApprovedEmailTemplate;true;;$emailFromEmail;$emailFromName
+;;RegistrationReceivedEmail;Registration Received Email;RegistrationReceivedEmailTemplate;true;;$emailFromEmail;$emailFromName
+;;RegistrationRejectedEmail;Registration Rejected Email;RegistrationRejectedEmailTemplate;true;;$emailFromEmail;$emailFromName
+
+# Email velocity templates
+INSERT_UPDATE RendererTemplate;code[unique=true];description[lang=en];contextClass;rendererType(code)[default='velocity']
+;RegistrationPendingApprovalEmailTemplateSubject;Registration Pending Approval Email - Subject;de.hybris.platform.secureportaladdon.email.context.B2BRegistrationEmailContext
+;RegistrationPendingApprovalEmailTemplateBody;Registration Pending Approval Email - Body;de.hybris.platform.secureportaladdon.email.context.B2BRegistrationEmailContext
+;RegistrationApprovedEmailTemplateSubject;Registration Approved Email - Subject;de.hybris.platform.secureportaladdon.email.context.B2BRegistrationApprovedEmailContext
+;RegistrationApprovedEmailTemplateBody;Registration Approved Email - Body;de.hybris.platform.secureportaladdon.email.context.B2BRegistrationApprovedEmailContext
+;RegistrationReceivedEmailTemplateSubject;Registration Received Email - Subject;de.hybris.platform.secureportaladdon.email.context.B2BRegistrationEmailContext
+;RegistrationReceivedEmailTemplateBody;Registration Received Email - Body;de.hybris.platform.secureportaladdon.email.context.B2BRegistrationEmailContext
+;RegistrationRejectedEmailTemplateSubject;Registration Rejected Email - Subject;de.hybris.platform.secureportaladdon.email.context.B2BRegistrationRejectedEmailContext
+;RegistrationRejectedEmailTemplateBody;Registration Rejected Email - Body;de.hybris.platform.secureportaladdon.email.context.B2BRegistrationRejectedEmailContext
+
+# Renderer templates to be used
+UPDATE RendererTemplate;code[unique=true];templateScript[lang=en,translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;RegistrationPendingApprovalEmailTemplateSubject;$jarResource/email-registrationPendingApprovalSubject.vm
+;RegistrationPendingApprovalEmailTemplateBody;$jarResource/email-registrationPendingApprovalBody.vm
+;RegistrationApprovedEmailTemplateSubject;$jarResource/email-registrationApprovedSubject.vm
+;RegistrationApprovedEmailTemplateBody;$jarResource/email-registrationApprovedBody.vm
+;RegistrationReceivedEmailTemplateSubject;$jarResource/email-registrationReceivedSubject.vm
+;RegistrationReceivedEmailTemplateBody;$jarResource/email-registrationReceivedBody.vm
+;RegistrationRejectedEmailTemplateSubject;$jarResource/email-registrationRejectedSubject.vm
+;RegistrationRejectedEmailTemplateBody;$jarResource/email-registrationRejectedBody.vm
+
+UPDATE EmailPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;RegistrationPendingApprovalEmail;EmailPageModel_preview
+;;RegistrationApprovedEmail;EmailPageModel_preview
+;;RegistrationReceivedEmail;EmailPageModel_preview
+;;RegistrationRejectedEmail;EmailPageModel_preview

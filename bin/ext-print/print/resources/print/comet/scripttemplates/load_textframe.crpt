@@ -1,0 +1,89 @@
+/*
+ * [y] hybris Platform
+ * Script: %SCRIPT_ID%
+ * LOAD script to read the attribute value of a hybris item
+ */
+
+#include "internal/types.h"
+
+int kBufferSize = 50000;
+
+int main ()
+{
+	int err = 0;
+	int errorcode = 0;
+	char * result = alloc( kBufferSize );
+	Query qu = sql::query( soap::connection() );
+	char * layer = alloc( 8000 );
+
+	// Getting parameter values
+	frame::get_layer( gItem, layer );
+
+	if(qu)
+	{
+		// Creating query
+		if(query::set_method( qu, "GET_attribute" ) == 0)
+		{
+			if(	query::send( qu, "qualifier = %QUALIFIER%\n" ) &&
+				query::send( qu, "id = ?\n" ) &&
+				query::send( qu, "language = ?\n" ) &&
+				query::input( qu, kString, gRecordStringID ) &&
+				query::input( qu, kString, layer ) &&
+				query::output( qu, kString, result, kBufferSize ))
+			{
+				// Executing query
+				if(query::exec( qu ))
+				{
+					query::fetch( qu );
+					if( gNewValue != 0 )
+					{
+						// the script is called via todo list panel
+						// dont change the document, but write the database value to the variable gNewValue which is displayed in the todo list panel as comparison value
+						strcpy( gNewValue, result );
+					}
+					else
+					{
+						err = frame::replace( gFrame, result );
+
+						if( err != 0 )
+						{
+						  wlog( "", "Error [%d], message: [%s] in frame::replace, template loadtextframe.crpt. \n", err, serror(err) );
+						  errorcode = 5;
+						}
+					}
+				}
+				else
+				{
+					wlog("", "There was a query::exec error in template loadtextframe.crpt, method main(). \n");
+					errorcode = 1;
+				}
+			}
+			else
+			{
+				wlog("", "There was a query send/input/output error in template loadtextframe.crpt, method main(). \n");
+				errorcode = 2;
+			}
+		}
+		else
+		{
+			wlog("", "There was a query::set_method error in template loadtextframe.crpt, method main(). \n");
+			errorcode = 3;
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful! error in method main() in template loadtextframe.crpt. \n");
+		errorcode = 4;
+	}	
+
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in template loadtextframe.crpt, method main(). \n");
+	}
+
+	// Cleanup
+	release( result );
+	release( layer );
+
+	return 0;
+}

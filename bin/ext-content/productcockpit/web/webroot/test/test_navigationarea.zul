@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?init 				class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+<?taglib 			uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+
+<?page title="[y] hybris Product Cockpit [y]"?>
+
+<window xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:h="http://www.w3.org/1999/xhtml" 
+		xmlns:zk="http://www.zkoss.org/2005/zk"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd "
+		id="mainWin" mode="embedded" height="100%" sclass="hywin" shadow="false">
+	
+	<!--  custom styles in here -->
+	<style src="/css/productcockpit.css" /> 
+	<style src="/css/defaultstyles.css"/>	
+	
+	
+	<div align="center" width="100%" height="100%" style="background:none">
+		<borderlayout width="99%" height="100%" style="background:none">
+			<north height="5px" border="none" sclass="main_header"/>
+			<west width="270px" border="none" style="background-color:transparent; border-right: 1px solid #6e7780;" splittable="true">
+				<vbox width="100%" height="100%" align="start" heights="none,none,none,none,100%,none" sclass="fixed_vbox">
+					<div sclass="section_header" height="67px" width="100%" />
+					<space orient="vertical" height="4px" />	
+					<div use="de.hybris.platform.cockpit.components.StyledDiv" align="left" width="99%">
+						<hbox align="start">
+							<button label="Product" sclass="plainBtn"/>
+							<space orient="vertical" bar="true" width="1px"/>
+							<button label="Catalog" sclass="plainBtn"/>
+							<space orient="vertical" bar="true" width="1px"/>
+							<button label="Classes" sclass="plainBtn"/>
+						</hbox> 
+					</div>	
+					<space orient="vertical" height="4px" />
+					<borderlayout style="background:none" width="99%">
+						<center autoscroll="true">
+							<zscript>
+								<![CDATA[
+								    import de.hybris.platform.productcockpit.components.navigationarea.*;
+									NavigationSectionRenderer renderer = new NavigationSectionRenderer();
+								]]>
+							</zscript>
+							<sectionpanel model="${ProductPerspective.navigationArea.sectionModel}" 
+										  sectionRenderer="${renderer}"
+										  height="inherit" width="100%" sclass="navigation_area"/>
+						</center>
+					</borderlayout>
+					<groupbox label="Inbox / Infobox"
+							use="de.hybris.platform.cockpit.components.AdvancedGroupbox" 
+							width="99%"
+							onOpen="self.parent.invalidate()">
+						<div style="background:white;padding:7px">
+							<label value="@{navigationAreaController.userDisplayName}" />
+							<div style="margin-top:4px">
+								<image src="/images/message.gif" />
+								<label value="0 Tasks"/>
+							</div>
+						</div>
+					</groupbox>
+				</vbox>
+			</west>
+			<center border="none" margins="6, 6, 6, 6" autoscroll="true">
+				<panel id="centerPanel" height="100%">
+					<panelchildren style="background:white" >
+						<vbox width="100%" align="center" >
+							<button label="Create Sample Section Panel Model" onClick="editorAreaTestController.createSampleModel()"/> 
+							<button label="Add Sample Section To Model" onClick="editorAreaTestController.addDefaultSection()"/>
+							<button label="Clear Section Panel Model" onClick="editorAreaTestController.clearModel()"/>
+							<button label="Create Sample Messages" onClick="editorAreaTestController.createSampleMessages()"/>
+						</vbox>
+						<!-- Search component 
+						<searchpanel/>
+						<toolbar>
+							<toolbarbutton image="/css/images/duplicate_btn.gif">
+								<attribute name="onClick">
+									mainController.onDuplicateBox(null);
+								</attribute>
+							</toolbarbutton>	
+						</toolbar>-->
+					</panelchildren>					
+				</panel>				
+			</center>
+			<east width="27%" border="none" splittable="true" style="border-left: 1px solid #6e7780;">
+				<vbox width="100%" height="inherit" heights="67px,100%" align="end" sclass="fixed_vbox">
+					<div sclass="section_header" height="inherit" width="100%">
+						<image src="images/hy_product_control_logo.gif" align="right"></image>
+					</div>
+					<div width="99%" align="right" height="inherit">
+						<sectionpanel height="inherit" width="100%" align="left" flatSectionLayout="true"
+									  model="@{editorAreaTestController.sectionPanelModel}"
+									  sectionRowRenderer="${editorAreaTestController.sectionRowRenderer}"
+									  onRowHide="self.model.hideRow(event.data)"
+		     						  onRowShow="self.model.showRow(event.data)"	
+		     						  onRowMove='System.out.println("Row moved")'
+								   	  onSectionHide="self.model.hideSection(event.data)"
+								  	  onSectionShow="self.model.showSection(event.data)" />
+					</div>
+				</vbox>
+			</east>
+		</borderlayout>
+	</div>
+</window>

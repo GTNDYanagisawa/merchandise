@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<div visible="false">
+	<html>
+		<![CDATA[ 
+			<script type="text/javascript">
+
+				function scrollToSlot(cont, tgt)
+				{
+					var xPos = tgt.offsetLeft + tgt.parentNode.offsetLeft + tgt.parentNode.parentNode.offsetLeft;
+					var yPos = tgt.offsetTop + tgt.parentNode.offsetTop + tgt.parentNode.parentNode.offsetTop;
+					var yScroll = cont.scrollTop;
+					var xScroll = cont.scrollLeft;
+					var width = cont.offsetWidth;
+					var height = cont.offsetHeight;
+							
+					if( xPos &lt; xScroll || yPos &lt; yScroll || ( xPos + 50 ) &gt; (xScroll + width) || ( yPos + 50 ) &gt; ( yScroll + height ) )
+					{
+						cont.scrollTop = yPos;
+						cont.scrollLeft = xPos;
+					}
+				}
+				
+				function scrollToFlowBox(cont, tgt)
+				{
+					scrollToBox(cont, tgt, 'normal');
+				}
+				
+				function scrollToBox(cont, tgt, mode)
+				{		
+					if (mode == 'list')
+					{
+						var containerWidth = cont.parentNode.offsetWidth;
+						var containerHeight = cont.parentNode.offsetHeight;
+						var yScroll = cont.parentNode.scrollTop;
+						var xScroll = cont.parentNode.scrollLeft;
+					}
+					else if (mode == 'normal')
+					{
+						var containerWidth = cont.offsetWidth;
+						var containerHeight = cont.offsetHeight;
+						var yScroll = cont.scrollTop;
+						var xScroll = cont.scrollLeft;
+					}
+		
+					var xPos = tgt.offsetLeft;
+					var yPos = tgt.offsetTop;
+					var componentWidth = tgt.offsetWidth;
+					var componentHeight = tgt.offsetHeight;
+												
+					if( xPos &lt; xScroll || yPos &lt; yScroll || ( xPos + componentWidth) &gt; (xScroll + containerWidth) || ( yPos + componentHeight ) &gt; (yScroll + containerHeight) )
+					{
+						if (xPos > 30)
+						{
+							xPos = xPos - 30;
+						}		
+						if (yPos > 30)
+						{
+							yPos = yPos - 30;
+						}		
+						
+						if (mode == 'list')
+						{
+							cont.parentNode.scrollTop = yPos;
+							cont.parentNode.scrollLeft = xPos;
+						}
+						if (mode == 'normal')
+						{				
+							cont.scrollTop = yPos;
+							cont.scrollLeft = xPos;
+						}
+					}
+				}
+					
+			</script>
+			]]>
+	</html>
+</div>

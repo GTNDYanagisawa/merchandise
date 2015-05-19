@@ -1,0 +1,16 @@
+$siteUid=apparel-de
+$currency=EUR
+#% impex.setLocale(Locale.GERMAN)               ;
+
+INSERT_UPDATE OndemandBaseStorePreference ; baseStore(uid)[unique=true] ; externalCallsEnabled
+                                                ; $siteUid                    ; true
+
+#
+# Modify the base stores delivery countries.
+#
+$supportedAddressVerificationCountries=CA,CN,DE,GB,JP,US
+$deliveryCountries=$supportedAddressVerificationCountries
+
+# Base Store
+INSERT_UPDATE BaseStore                         ; uid[unique=true]            ; deliveryCountries(isocode)[mode=replace]        ;
+                                                ; $siteUid                    ; $deliveryCountries                              ;

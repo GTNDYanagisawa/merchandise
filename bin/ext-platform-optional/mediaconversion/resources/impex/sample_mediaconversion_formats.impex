@@ -1,0 +1,27 @@
+#
+# Watermark and other needed media
+#
+INSERT_UPDATE Media;code[unique=true];catalogVersion(catalog(id),version)[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator] ;mediaFormat(qualifier);
+;watermark;Default:Online;jar:/impex/mediaconversion/hybris_watermark.png;;
+;crazybg;Default:Online;jar:/impex/mediaconversion/scroll.gif;;
+
+#
+# Some Default ConversionMediaFormats
+#
+INSERT_UPDATE ConversionMediaFormat;qualifier[unique=true];name[lang=en];name[lang=de];conversionStrategy;conversion;inputFormat(qualifier);mediaAddOns(code,catalogVersion(catalog(id),version));mimeType;
+;Default-WorkingFormat;Working Format as base for other Conversion Media Formats.;Arbeitsformat als Basis für andere Medienkonvertierungsformate;imageMagickMediaConversionStrategy;-resize 1000x> -colorspace RGB;;;image/jpeg;
+;Default-BMECat;Format for BMECat;BMECat Format;imageMagickMediaConversionStrategy;-resize 300x300;Default-WorkingFormat;
+;Default-Hitlist;Hitlist;Hitlist;imageMagickMediaConversionStrategy;-resize 40x40;Default-WorkingFormat;
+;Default-Thumbnail;Thumbnail;Thumbnail;imageMagickMediaConversionStrategy;-resize 80x80;Default-WorkingFormat;
+;Default-Detail;Detail;Detail;imageMagickMediaConversionStrategy;-resize 800x>;Default-WorkingFormat;
+;Default-Preview;Preview;Preview;imageMagickMediaConversionStrategy;-resize 160x160;Default-WorkingFormat;
+;Default-Print;Print;Print;imageMagickMediaConversionStrategy;-colorspace CMYK;;;image/tiff;
+;Default-Watermark;Watermark;Wasserzeichen;imageMagickMediaConversionStrategy;{addOn#1} -compose bumpmap -gravity center -composite;Default-WorkingFormat;watermark:Default:Online;
+;Default-Crazy;Crazy;Verrückt;imageMagickMediaConversionStrategy;{addOn#1} {input}[150x150]  -compose bumpmap -gravity center -composite;Default-WorkingFormat;crazybg:Default:Online;image/gif;
+;Default-TextOverlay;Text;Text;imageMagickMediaConversionStrategy;-font Arial -pointsize 25 -draw "gravity south fill black text 0,12 'Copyright by hybris' fill white  text 1,11 'Copyright by hybris'";Default-WorkingFormat;
+
+#
+# Default ConversionGroup
+#
+INSERT_UPDATE ConversionGroup;code[unique=true];name[lang=en];name[lang=de];supportedFormats(qualifier);
+;DefaultConversionGroup;Default conversion with working File;Standardkonvertierung mit Arbeitsdatei;Default-WorkingFormat,Default-BMECat,Default-Hitlist,Default-Thumbnail,Default-Detail,Default-Preview,Default-Print,Default-Watermark,Default-Crazy,Default-TextOverlay;

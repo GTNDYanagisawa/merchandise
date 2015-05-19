@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../config/SolrFacetConfig.xsd">
+  <solrconfig>
+    <mode>standalone</mode>
+    <clusterconfig>
+    	<endpointURLs>
+		    <endpointURL master="true">http://localhost:8983/solr</endpointURL>
+        </endpointURLs>
+    </clusterconfig>
+  </solrconfig>
+  <indexconfig>
+    <exportpath>testexportpath</exportpath>
+    <batchSize>100</batchSize>
+  </indexconfig>
+  <itemTypes>
+    <itemType code="Product" variant="false" identityProvider="itemIdentityProvider">
+      <properties>
+        <property facet="true" name="name" type="text" rangeSet="stringRange" localized="true" facetType="MultiSelectOr"/>
+        <property facet="false" name="code" type="text" rangeSet="stringRange" />
+        <property facet="false" name="description" type="text" localized="true"/>
+        <property facet="false" name="onlineDate" type="date" rangeSet="dateRange"/>
+      </properties>
+      <flexibleSearchUpdateQueries>
+        <fullIndexQuery injectCurrentDate="false" injectCurrentTime="false" injectLastIndexTime="false" user="anonymous">fullIndexQuery</fullIndexQuery>
+        <updateIndexQuery injectCurrentDate="false" injectCurrentTime="false" injectLastIndexTime="false" user="anonymous">updateIndexQuery</updateIndexQuery>
+        <deleteFromIndexQuery injectCurrentDate="false" injectCurrentTime="true" injectLastIndexTime="false" user="anonymous">deleteFromIndexQuery</deleteFromIndexQuery>
+      </flexibleSearchUpdateQueries>
+    </itemType>
+  </itemTypes>
+</config>

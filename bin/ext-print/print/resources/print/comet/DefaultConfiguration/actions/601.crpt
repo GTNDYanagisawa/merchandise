@@ -1,0 +1,1272 @@
+/*
+	Script           :  601
+	Author           :  RR
+	Description      :  Helper methods for processing publication items
+*/
+
+#include "internal/types.h"
+#include "internal/text.h"
+#include "internal/products.h"
+
+// ##  Enable Debug mode  ######################
+int DEBUG_ENABLED = 1;
+
+// ##  Constants  ##############################
+int DELETE_PRODUCTLIST_ELEMENTS = 1;
+int DONT_DELETE_PRODUCTLIST_ELEMENTS = 0;
+int ALLOW_DOUBLES = 1;
+int DONT_ALLOW_DOUBLES = 0;
+int COPY_MASTERPAGE_PLACEHOLDERS = 1;
+int DONT_COPY_MASTERPAGE_PLACEHOLDERS = 0;
+int OVERWRITE_EXISTING_FILES = 1;
+int DONT_OVERWRITE_EXISTING_FILES = 0;
+int SUPPRESS_UI_DIALOGS = 0;
+int SHOW_IMPORTANT_UI_DIALOGS = 1;
+int SHOW_ALL_UI_DIALOGS = 2;
+
+int PAGEINFO_MASTERPAGE = 0;
+int PAGEINFO_ALIGNMENT = 1;
+int PAGEINFO_TYPE = 2;
+
+int CREATE_FILL_PAGES = 1;		// create empty fill pages. This is not necessary e.g. when creating previews
+
+int REMOVE_TEMPORARY_FILES_AFTER_UPLOAD = 1; //removing temp. files, aka the pdf and the preview jpfs which are uploaded to the PIM
+
+int FLOWLAYOUT_LINK_ID = 1;	// Placeholder ID of the Placeholder that marks a frame where all content is inserted in
+
+
+// ##  Node types  ############################
+int NODETYPE_PUBLICATION = 9;
+int NODETYPE_CHAPTER = 10;
+int NODETYPE_PAGE = 11;
+int NODETYPE_PLACEMENT = 12; 
+
+// ##  Preview mode constants  ############################
+int PREVIEW_MODE_ALL	= 1; // Create preview images and PDF
+int PREVIEW_MODE_IMAGES = 2; // Only create preview images
+int PREVIEW_MODE_PDF	= 3; // Only create a (preview) PDF
+
+
+
+
+/*********************************************************************
+ Calls the respective process method depending of the given item's type
+ pr		- A ProductList entry (Product)
+*********************************************************************/
+int processItem( Product pr )
+{
+	int nodetype = 0;
+	nodetype = product::get( pr, kID );
+
+	if( nodetype == NODETYPE_PUBLICATION )
+		return processPublication( pr );
+	else if( nodetype == NODETYPE_CHAPTER )
+		return processChapter( pr );
+	else if( nodetype == NODETYPE_PAGE )
+		return processPage( pr );
+	else if( nodetype == NODETYPE_PLACEMENT )
+		return processPlacement( pr );
+	else
+		if(DEBUG_ENABLED)  wlog( "", "Unknown nodetype: %d\n", nodetype );
+
+	return 0;
+}
+
+
+/*********************************************************************
+ Processes a Publication and iterates over its Chapters
+ publication	- A ProductList entry (Product)
+*********************************************************************/
+int processPublication( Product publication )
+{
+	char *publicationStringID = alloc(256);
+
+	int chapterID1 = 0, chapterID2 = 0, chapterID3 = 0;
+	char *chapterStringID = alloc(256);
+
+	int imageID = 0, classID = 0, forceDelete = 0, panelStatementID = 0, docID = 0, gridID = 0, gridElementID = 0, pageItemID = 0;
+	char *productNumber = alloc(256), *productName = alloc(256), *masterpage = alloc(256), *gridName = alloc(256), *gridElementName = alloc(256);
+
+	Query qu;
+
+	// Do a getSubProductList query
+	strcpy( publicationStringID, product::gets( publication, kStringID ) );
+	qu = sql::query( soap::connection() );
+	if( qu )
+	{
+		// build query
+		query::send( qu, "getSubProductList \n" );		// must have at least one constraint or else we get an error in the print extension
+		query::send( qu, "parent.StringID = \"" );
+		query::send( qu, publicationStringID );
+		query::send( qu, "\" \n" );
+		query::send( qu, "AND type = \"DefaultProductList\"" );
+
+		// define output variables
+		// define variables for the x-th column of the resultset (in order they are used in the code)
+		// ATTENTION: string variables contain x-1 characters, where x is the specified max_length
+		query::output( qu, kInt, &chapterID1 );					// ID1
+		query::output( qu, kInt, &chapterID2 );					// ID2
+		query::output( qu, kInt, &chapterID3 );					// ID3
+		query::output( qu, kInt, &imageID );						// image ID
+		query::output( qu, kInt, &classID );        				// class ID
+		query::output( qu, kString, productNumber, 256 );		// Product number
+		query::output( qu, kString, productName, 256 );			// Product name
+		query::output( qu, kInt, &forceDelete );					// force delete
+		query::output( qu, kInt, &panelStatementID );			// panel statement ID der untergeordneten Baumabfrage
+		query::output( qu, kInt, &docID );							// doc ID
+		query::output( qu, kString, masterpage, 256 );			// masterpage
+		query::output( qu, kString, gridName, 256 );				// grid
+		query::output( qu, kString, gridElementName, 256 );	// grid element
+		query::output( qu, kInt, &gridID );							// grid ID
+		query::output( qu, kInt, &gridElementID );				// grid element ID
+		query::output( qu, kInt, &pageItemID );					// layoutTemplateID
+		query::output( qu, kString, chapterStringID, 256 );	// String ID
+
+		// Execute SOAP query
+		if( query::exec (qu) )
+		{
+			// get result and iterate over them
+			while (query::fetch (qu))
+			{
+				processItem( createProduct( chapterID1, chapterID2, chapterID3, chapterStringID, productNumber, productName, masterpage, pageItemID, gridID, gridName, gridElementID, gridElementName, 0 ) );
+			}
+		}
+	}
+
+	// Cleanup
+	release( publicationStringID );
+	release( chapterStringID );
+	release( productNumber );
+	release( productName );
+	release( masterpage );
+	release( gridName);
+	release( gridElementName );
+	query::close( qu );
+
+    return 0;
+}
+
+/*********************************************************************
+ Processes a Chapter and iterates over its SubChapters/Pages
+ chapter	- A ProductList entry (Product)
+*********************************************************************/
+int processChapter( Product chapter )
+{
+	char * chapterStringID = alloc(256);
+
+	int pageID1 = 0, pageID2 = 0, pageID3 = 0;
+	char *pageStringID = alloc(256);
+
+	int imageID = 0, classID = 0, forceDelete = 0, panelStatementID = 0, docID = 0, gridID = 0, gridElementID = 0, pageItemID = 0;
+	char *productNumber = alloc(256), *productName = alloc(256), *masterpage = alloc(256), *gridName = alloc(256), *gridElementName = alloc(256);
+
+	Query qu;
+
+	// Do a getSubProductList query
+	strcpy( chapterStringID, product::gets( chapter, kStringID ) );
+	qu = sql::query( soap::connection() );
+	if( qu )
+	{
+		// build query
+		query::send( qu, "getSubProductList \n" );		// must have at least one constraint or else we get an error in the print extension
+		query::send( qu, "parent.StringID = \"" );
+		query::send( qu, chapterStringID );
+		query::send( qu, "\" \n" );
+		query::send( qu, "AND type = \"DefaultProductList\"" );
+
+		// define output variables
+		// define variables for the x-th column of the resultset (in order they are used in the code)
+		// ATTENTION: string variables contain x-1 characters, where x is the specified max_length
+		query::output( qu, kInt, &pageID1 );						// ID1
+		query::output( qu, kInt, &pageID2 );						// ID2
+		query::output( qu, kInt, &pageID3 );						// ID3
+		query::output( qu, kInt, &imageID );						// image ID
+		query::output( qu, kInt, &classID );        				// class ID
+		query::output( qu, kString, productNumber, 256 );		// Product number
+		query::output( qu, kString, productName, 256 );			// Product name
+		query::output( qu, kInt, &forceDelete );					// force delete
+		query::output( qu, kInt, &panelStatementID );			// panel statement ID der untergeordneten Baumabfrage
+		query::output( qu, kInt, &docID );							// doc ID
+		query::output( qu, kString, masterpage, 256 );			// masterpage
+		query::output( qu, kString, gridName, 256 );				// grid
+		query::output( qu, kString, gridElementName, 256 );	// grid element
+		query::output( qu, kInt, &gridID );							// grid ID
+		query::output( qu, kInt, &gridElementID );				// grid element ID
+		query::output( qu, kInt, &pageItemID );					// layoutTemplateID
+		query::output( qu, kString, pageStringID, 256 );		// String ID
+
+		// Execute SOAP query
+		if( query::exec (qu) )
+		{
+			// get result and iterate over them
+			while (query::fetch (qu))
+			{
+				processItem( createProduct( pageID1, pageID2, pageID3, pageStringID, productNumber, productName, masterpage, pageItemID, gridID, gridName, gridElementID, gridElementName, 0 ) );
+				document::repaint();
+			}
+		}
+	}
+
+	// Cleanup
+	release( chapterStringID );
+	release( pageStringID );
+	release( productNumber );
+	release( productName );
+	release( masterpage );
+	release( gridName);
+	release( gridElementName );
+	query::close( qu );
+
+    return 0;
+}
+
+/*********************************************************************
+ Processes a Page and iterates over its Placements
+ page		- A ProductList entry (Product)
+*********************************************************************/
+int processPage( Product page )
+{
+	int pageID1 = 0;						// The page's ID 1
+	int pageID2 = 0;						// The page's ID 2
+	int pageID3 = 0;						// The page's ID 3
+	int pageGridID = 0;						// The page's grid ID
+	char *pageStringID = alloc(256);		// The page's StringID
+	char *pageInfo = alloc(256);			// The page's concatenated info string
+	char *masterpage = alloc(256);			// The page's masterpage
+	char *pageAlignment = alloc(10);		// The page's alignment
+	char *pageType = alloc(10);				// The page's page type (single/double)
+	int pageNr = document::page();
+	int pageCount = document::pages();
+	int fillPagesCount = 0;					// The number of pages that have been created as fill pages
+	int pageRangeStart = 0;					// The page number of the first page of a created page (range)
+	int doublePageStart = 0;				// The page number of the first page of a doublepage. If the build_list() command creates a second page automatically, dont create the second page of a doublepage manually
+	int pageCountBeforeBuildlist = 0;		// The number of pages before a build_list() command was executed
+	int buildlistPageCountDiff = 0;			// The number of pages a build_list() command created
+	int flags = 0;							// flags for the build_list command
+	char *gridMode = alloc(256);			// The page's grid mode
+	int errorValue = 0;
+	char *errorMessage = alloc(256);
+	int currentVirtualPage = -1;
+	int previousVirtualPage = -1;
+
+	int placementID1 = 0, placementID2 = 0, placementID3 = 0;
+	char *placementStringID = alloc(256);
+	int placementImageID = 0, placementClassID = 0, placementForceDelete = 0, placementPanelStatementID = 0, placementDocID = 0, placementGridID = 0, placementGridElementID = 0, placementPageItemID = 0;
+	char *placementNumber = alloc(256), *placementName = alloc(256), *placementMasterpage = alloc(256), *placementGridName = alloc(256), *placementGridElementName = alloc(256);
+
+	Product pr;
+	ProductList prList = productlist::alloc();
+	ProductList virtualPrList = productlist::alloc();
+	LinkList lli = linklist::alloc( 1 );	// list of type 1 (= placeholder IDs. Only one ID per entry) (2=object IDs. Four IDs per entry)
+	char * buffer = alloc( 100000 );
+	Query qu;
+	
+    int grid, elem, pid;
+    Product p;
+    float left, top;
+    char *pname = alloc(1024);
+    int cc = 0;
+    float ml = 0.0, mt = 0.0;        // Margins
+	
+
+	// [CS]
+	int startPageNr = pageNr;
+	wlog ("", "Start build at page #%d\n", startPageNr);
+
+	strcpy( pageStringID, product::gets( page, kStringID ) );
+	pageID1 = product::get( page, kID );
+	pageID2 = product::get( page, kID2 );
+	pageID3 = product::get( page, kID3 );
+	strcpy( pageInfo, product::gets( page, kMasterpage ) );
+	extractPageInfo( masterpage, pageInfo, PAGEINFO_MASTERPAGE );
+	extractPageInfo( pageAlignment, pageInfo, PAGEINFO_ALIGNMENT );
+	extractPageInfo( pageType, pageInfo, PAGEINFO_TYPE );
+
+	pageGridID = product::get( page, kGridid );
+
+	// Prepare a getSubProductList query
+	qu = sql::query( soap::connection() );
+	if(qu)
+	{
+		// build query
+		query::send( qu, "getSubProductList \n" );		// must have at least one constraint or else we get an error in the print extension
+		query::send( qu, "parent.StringID = \"" );
+		query::send( qu, pageStringID );
+		query::send( qu, "\" \n" );
+		query::send( qu, "AND type = \"DefaultProductList\"" );
+
+		// define output variables
+		// define variables for the x-th column of the resultset (in order they are used in the code)
+		// ATTENTION: string variables contain x-1 characters, where x is the specified max_length
+		query::output( qu, kInt, &placementID1 );					// ID1
+		query::output( qu, kInt, &placementID2 );					// ID2
+		query::output( qu, kInt, &placementID3 );					// ID3
+		query::output( qu, kInt, &placementImageID );				// image ID
+		query::output( qu, kInt, &placementClassID );        		// class ID
+		query::output( qu, kString, placementNumber, 256 );			// Product number
+		query::output( qu, kString, placementName, 256 );			// Product name
+		query::output( qu, kInt, &placementForceDelete );			// force delete
+		query::output( qu, kInt, &placementPanelStatementID );		// panel statement ID der untergeordneten Baumabfrage
+		query::output( qu, kInt, &placementDocID );					// doc ID
+		query::output( qu, kString, placementMasterpage, 256 );		// masterpage
+		query::output( qu, kString, placementGridName, 256 );		// grid
+		query::output( qu, kString, placementGridElementName, 256 );		// grid element
+		query::output( qu, kInt, &placementGridID );				// grid ID
+		query::output( qu, kInt, &placementGridElementID );			// grid element ID
+		query::output( qu, kInt, &placementPageItemID );			// layoutTemplateID
+		query::output( qu, kString, placementStringID, 256 );		// String ID
+	}
+
+
+	if(pageGridID > 0)
+	{
+		//if page grid is specified build page in grid mode
+	
+		strcpy( gridMode, product::gets( page, kGrid ) );
+	
+		if( pageCount == 1 )
+		{
+			// There is only one page in the document, reuse this page
+			// check explicit left/right page
+			if( CREATE_FILL_PAGES == 1
+				 && ( ((strcmp(pageAlignment, "LEFT") == 0)  &&  (page::get_type(pageNr) == kRightPage))
+						||  ((strcmp(pageAlignment, "RIGHT") == 0)  &&  (page::get_type(pageNr) == kLeftPage)) ) )
+			{
+				// Create a new page and start processing on her
+				page::create( 1, -1, masterpage, 0., 0., 0., 0., COPY_MASTERPAGE_PLACEHOLDERS );
+				page::masteritems_load( pageCount+1 );		// TODO: Workaround: page::create() does not copy the masterpage placeholders, so copy them separately
+				page::select( pageCount+1 );
+				pageNr = document::page();
+				linklist::collect_any( lli, pageNr, "", kFirstIgnore, kSortNo );
+				if(DEBUG_ENABLED)  wlog( "", "Created new page. Found [%d] linked frames on masterpage\n", linklist::length(lli) );
+				linklist::load( lli, kDesignateDocument );
+			}
+			else
+			{
+				// Check if page is not empty
+				linklist::collect_any( lli, pageNr, "", kFirstIgnore, kSortNo );
+				if(linklist::length( lli ) > 0)
+				{
+					// is not empty, so create new page
+					page::create( 1, -1, masterpage, 0., 0., 0., 0., COPY_MASTERPAGE_PLACEHOLDERS );		
+					pageCount = pageCount + 1;
+					page::select( pageCount );
+					pageNr = document::page();
+				}		
+				
+				// set the masterpage to the current page of the document
+				page::set_masterpage( pageNr, masterpage, "", "" );
+				// TODO: if we assign another masterpage, how could we copy and afterwards get all placeholders on the page and execute them?
+	
+				// (re)load the placeholders of the masterpage
+				page::masteritems_load( pageCount );
+	
+				page::select( pageCount );
+				pageNr = pageCount;
+			}
+		}
+		else
+		{
+			// There are already existing pages in this document
+			// Create a new page and start processing on her
+	
+			// check explicit left/right page
+			if( CREATE_FILL_PAGES == 1
+				 && ( ((strcmp(pageAlignment, "LEFT") == 0)  &&  (page::get_type(pageNr) == kLeftPage))
+						||  ((strcmp(pageAlignment, "RIGHT") == 0)  &&  (page::get_type(pageNr) == kRightPage)) ) )
+			{
+				// create empty dummy page
+				page::create( 1, pageNr+1, "", 0., 0., 0., 0., DONT_COPY_MASTERPAGE_PLACEHOLDERS );
+				fillPagesCount = fillPagesCount + 1;
+				page::masteritems_load( pageCount+1 );		// TODO: Workaround: page::create() does not copy the masterpage placeholders, so copy them separately
+				page::select( pageNr+1 );
+				pageNr = document::page();
+			}
+	
+			page::create( 1, pageNr+1, masterpage, 0., 0., 0., 0., COPY_MASTERPAGE_PLACEHOLDERS );
+			page::masteritems_load( pageCount+1 );		// TODO: Workaround: page::create() does not copy the masterpage placeholders, so copy them separately
+			page::select( pageNr+1 );
+			pageNr = document::page();
+			linklist::collect_any( lli, pageNr, "", kFirstIgnore, kSortNo );
+			if(DEBUG_ENABLED)  wlog( "", "Created new page. Found [%d] linked frames on masterpage\n", linklist::length(lli) );
+			linklist::load( lli, kDesignateDocument );
+		}
+		pageRangeStart = pageNr;
+	
+		if( qu )
+		{
+			// Execute prepared getSubProductList query
+			if( query::exec (qu) )
+			{
+				// get result and iterate over them
+				while (query::fetch (qu))
+				{
+					productlist::append( prList, createProduct( placementID1, placementID2, placementID3, placementStringID, placementNumber, placementName, placementMasterpage, placementPageItemID, placementGridID, placementGridName, placementGridElementID, placementGridElementName, placementDocID ), ALLOW_DOUBLES );
+				}
+	
+				// kShowErrors = 32
+				// kIntersectionsAllowed = 64
+				// kUseDefaultGrid = 2
+				// kDisableOptimizing = 512
+				// kCheckGridElementSize = 128
+				flags += kShowErrors;
+				flags += kDisableOptimizing;				// No optimization of subsequent pages after buildup. The Optimization searches any item on subsequent pages and tries to rearrange them (using their grid placing information); pages with no content become deleted.
+				flags += kUseBleed;
+				
+				if( strcmp(gridMode,"FIXED") == 0 )
+				{
+	    			// Flags for mode FIXED
+					flags += kIntersectionsAllowed;
+				}
+				else
+				{
+	    			// Flags for mode DYNAMIC
+					flags += kUseDefaultGrid;
+					flags += kIntersectionsAllowed;
+				}
+	
+				// set the first page of a doublepage to the current page number
+				doublePageStart = document::page();
+				pageCountBeforeBuildlist = document::pages();
+	
+				if( productlist::length(prList) > 0 )
+				{
+					if(DEBUG_ENABLED)  wlog( "", "BuildList: masterpage [%s], gridID [%d], gridMode [%s], flags [%d]\n", masterpage, pageGridID, gridMode, flags );
+					// See: file:///C:/hybris/Werk2/.Originale/Comet/Doku_deDE/cscript/document.html#PreScript
+					// productlist::build_list( prList, kUseDefaultGrid + kAllowIncompletePlacements + kShowErrors, errmsg, baseFrame=0, baseFrame=0, pageNum=-1, layerName="", defaultMasterpage="'A-name1','A-name2'", pageGridID, pageitemID(template), anchor(???) );
+					if( strcmp(gridMode,"FIXED") == 0 )
+					{	// if mode is FIXED create each virtual page separately
+						for ( pr = productlist::first( prList ); pr; pr = productlist::next( prList ) )
+						{
+							currentVirtualPage = product::get( pr, kDocid );	// here pageitemid means page number for placement
+							if( previousVirtualPage == -1 )
+							{	// first iteration - fill values
+								previousVirtualPage = currentVirtualPage;
+							}
+							
+							if( currentVirtualPage != previousVirtualPage )
+							{	// virtual page has changed - create new page and build it up, or reuse
+								// productlist::build_list( virtualPrList, flags, 0, 0, 0, pageNr, layer::get_name(gFrame), masterpage, pageGridID );
+
+								for (p = productlist::first(virtualPrList); p; p = productlist::next(virtualPrList))
+								{
+									pid = product::get(p, kPageitemid);
+									grid = product::get(p, kGridid);
+									elem = product::get(p, kElementid);
+									left = grid::left(grid, elem);
+									top = grid::top(grid, elem);
+									document::place_items (
+										0, "", "", 
+										product::get (p,kPageitemid),
+										left + ml,
+										top + mt,
+										pageNr, "",
+										product::get(p, kID),
+										product::get(p, kID2),
+										product::get(p, kID3),
+										product::gets(p, kStringID),
+										1);                            // Autoload on!
+								}
+	
+								page::create( 1, pageNr+1, masterpage, 0., 0., 0., 0., COPY_MASTERPAGE_PLACEHOLDERS );
+								page::masteritems_load( pageNr+1 );		// TODO: Workaround: page::create() does not copy the masterpage placeholders, so copy them separately
+								page::select( pageNr+1 );
+								pageNr = pageNr+1;
+								linklist::collect_any( lli, pageNr, "", kFirstIgnore, kSortNo );
+								if(DEBUG_ENABLED)  wlog( "", "Created new page. Found [%d] linked frames on masterpage\n", linklist::length(lli) );
+								linklist::load( lli, kDesignateDocument );
+								
+								// recreate virtual placements list								
+								productlist::release( virtualPrList, DONT_DELETE_PRODUCTLIST_ELEMENTS );
+								virtualPrList = productlist::alloc();
+								previousVirtualPage = currentVirtualPage;
+							}
+							productlist::append( virtualPrList, pr );
+						}
+						// if virtual placements list not empty - build up the last page
+						if( productlist::length( virtualPrList ) > 0 )
+						{
+							// productlist::build_list( virtualPrList, flags, 0, 0, 0, pageNr, layer::get_name(gFrame), masterpage, pageGridID );
+							for (p = productlist::first(virtualPrList); p; p = productlist::next(virtualPrList))
+							{
+								pid = product::get(p, kPageitemid);
+								grid = product::get(p, kGridid);
+								elem = product::get(p, kElementid);
+								left = grid::left(grid, elem);
+								top = grid::top(grid, elem);
+								document::place_items (
+									0, "", "", 
+									product::get (p,kPageitemid),
+									left + ml,
+									top + mt,
+									pageNr, "",
+									product::get(p, kID),
+									product::get(p, kID2),
+									product::get(p, kID3),
+									product::gets(p, kStringID),
+									1);                            // Autoload on!
+							}
+						}
+					}
+					else
+					{	// if mode is other than FIXED - build the page up
+						productlist::build_list( prList, flags, errorMessage, 0, 0, pageNr, "", masterpage, pageGridID );
+					}
+				}
+	
+				buildlistPageCountDiff = document::pages() - pageCountBeforeBuildlist -1;	// -1 because the first page is also used to build the content on
+				pageNr = document::page();
+	
+				if( strcmp(pageType,"DOUBLE") == 0 )
+				{
+					if(DEBUG_ENABLED)  wlog( "", "We may need to create a second page for the doublepage. doublePageStart[%d], buildlistPageCountDiff[%d], current pageNr[%d], pageCountBeforeBuildlist[%d], current pagecount[%d]\n", doublePageStart, buildlistPageCountDiff, pageNr, pageCountBeforeBuildlist, document::pages() );
+					if( buildlistPageCountDiff % 2 == 1 )
+					{
+		    			// create a second page for the doublepage
+						page::create( 1, doublePageStart+buildlistPageCountDiff, masterpage, 0., 0., 0., 0., COPY_MASTERPAGE_PLACEHOLDERS );
+						fillPagesCount = fillPagesCount + 1;
+						errorValue = page::select( doublePageStart+buildlistPageCountDiff+1 );
+						pageNr = document::page();
+						linklist::collect_any( lli, pageNr, "", kFirstIgnore, kSortNo );
+						if(DEBUG_ENABLED)  wlog( "", "Created second page for doublepage. Found [%d] linked frames on masterpage\n", linklist::length(lli) );
+						linklist::load( lli, kDesignateDocument );
+					}
+				}
+				else
+				{
+					wlog ("", "Generated %d pages, select page #%d\n", buildlistPageCountDiff, (startPageNr + buildlistPageCountDiff));
+					page::select(document::pages());
+					pageNr = document::page();
+				}
+	
+				linkMasterpageFrames( pageRangeStart, pageRangeStart+buildlistPageCountDiff-1, pageID1, pageID2, pageID3, pageStringID );
+			}
+		}
+
+	}
+	else
+	{
+		//if page grid is not specified perform flow based page build up
+
+		if( qu )
+		{
+			// Execute prepared getSubProductList query
+			if( query::exec (qu) )
+			{
+				// get result and iterate over them
+				while (query::fetch (qu))
+				{
+					productlist::append( prList, createProduct( placementID1, placementID2, placementID3, placementStringID, placementNumber, placementName, placementMasterpage, placementPageItemID, placementGridID, placementGridName, placementGridElementID, placementGridElementName, 0 ), ALLOW_DOUBLES );
+				}
+			}
+		}
+		
+		if(productlist::length( prList ) == 0)
+		{
+			// if no product found, check if any product is selected
+			prList = productlist::get( "selected" );
+		}
+		page::create( 1, -1, masterpage, 0., 0., 0., 0., 1 );
+		page::masteritems_load( pageCount+1 );		
+		page::select( pageCount+1 );
+
+		processFlowlayoutBuild(prList);
+	}	
+
+	// Cleanup
+	release( pageStringID );
+	release( pageInfo );
+	release( masterpage );
+	release( pageAlignment );
+	release( pageType );
+	release( gridMode );
+
+	release( placementStringID );
+	release( placementNumber );
+	release( placementName );
+	release( placementMasterpage );
+	release( placementGridName);
+	release( placementGridElementName );
+	release ( pname );
+
+	productlist::release( prList, DONT_DELETE_PRODUCTLIST_ELEMENTS );
+	productlist::release( virtualPrList, DONT_DELETE_PRODUCTLIST_ELEMENTS );
+	linklist::release( lli );
+	release( buffer );
+	query::close( qu );
+
+    return 0;
+}
+
+/*********************************************************************
+ Processes a Placement
+ placement		- A ProductList entry (Product)
+*********************************************************************/
+int processPlacement( Product placement )
+{
+	if(DEBUG_ENABLED)  wlog( "", "Could not process Placements\n" );
+	return 0;
+}
+
+
+
+/*********************************************************************
+ Creates a new product and fills it with the given information
+ id1			- Product's ID1
+ id2			- Product's ID2
+ id3			- Product's ID3
+ stringid		- Product's String-ID
+ productNumber  - Product nr
+ productName    - Product name
+ masterpage     - Masterpage name
+ pageItemID     - LayoutTemplate ID
+ gridID         - Grid ID
+ gridName       - Grid name
+ gridElementID  - Grid element ID
+ gridElementName - Grid element mame
+*********************************************************************/
+Product createProduct( int id1, int id2, int id3, char * stringID, char * productNumber, char * productName, char * masterpage, int pageItemID, int gridID, char * gridName, int gridElementID, char * gridElementName, int placementDocID )
+{
+	Product pr;
+	pr = product::alloc( kGlobalStack );		// create a new product in the global stack
+
+	if(DEBUG_ENABLED)  wlog( "", "Create Product: ID1 [%d], ID2 [%d], ID3 [%d], stringID [%s], productNr [%s], productName [%s], masterpage [%s], pageItemID[%d], gridID [%d], gridName [%s], gridElement [%d], gridElementName [%s]\n", id1, id2, id3, stringID, productNumber, productName, masterpage, pageItemID, gridID, gridName, gridElementID, gridElementName );
+
+	product::set( pr, kID, id1 );				// and fill it with the given data
+	product::set( pr, kID2, id2 );
+	product::set( pr, kID3, id3 );
+	product::set( pr, kStringID, stringID );
+	product::set( pr, kRow1, productNumber );
+	product::set( pr, kRow2, productName );
+	product::set( pr, kMasterpage, masterpage );
+	product::set( pr, kPageitemid, pageItemID );
+	product::set( pr, kGridid, gridID );
+	product::set( pr, kGrid, gridName );
+	product::set( pr, kElementid, gridElementID );
+	product::set( pr, kElement, gridElementName );
+	product::set( pr, kDocid, placementDocID );
+
+	return pr;
+}
+
+
+/*********************************************************************
+ Extracts a certain info from the page info string
+ output			- The string where the result is written into
+ input			- The page info string
+ pageInfoField	- The field spezifier (see PAGEINFO_* variables at the beginning of this file)
+*********************************************************************/
+int extractPageInfo( char * output, char * input, int pageInfoField )
+{
+	// char PAGEINFO_DIVIDER = ':';
+	strcpy( output, strtoken(input, '|', pageInfoField) );
+	return 0;
+}
+
+
+
+/*********************************************************************
+ Creates previews of the given page (preview images and PDF)
+ stringID		- The string ID of the page for which to create the previews
+ pagenumStart	- The number of the page where the previews should start
+ pagenumEnd		- The number of the page where the previews should end
+ useAutoCometJob	- indicades whenever script is being run in autoCometjob environment, ussed for determination of preview size
+*********************************************************************/
+int createPreviews( char * stringID, int pagenumStart, int pagenumEnd, int useAutoCometJob)
+{
+	return createPreviewsByMode( stringID, pagenumStart, pagenumEnd, useAutoCometJob, PREVIEW_MODE_ALL );
+}
+
+/*********************************************************************
+ Creates previews images of the given page
+ stringID		- The string ID of the page for which to create the previews
+ pagenumStart	- The number of the page where the previews should start
+ pagenumEnd		- The number of the page where the previews should end
+ useAutoCometJob	- indicades whenever script is being run in autoCometjob environment, ussed for determination of preview size
+*********************************************************************/
+int createPreviewImages( char * stringID, int pagenumStart, int pagenumEnd, int useAutoCometJob )
+{
+	return createPreviewsByMode( stringID, pagenumStart, pagenumEnd, useAutoCometJob, PREVIEW_MODE_IMAGES );
+}
+
+/*********************************************************************
+ Creates a (preview) PDF of the given page
+ stringID		- The string ID of the page for which to create the previews
+ pagenumStart	- The number of the page where the previews should start
+ pagenumEnd		- The number of the page where the previews should end
+*********************************************************************/
+int createPreviewPDF( char * stringID, int pagenumStart, int pagenumEnd )
+{
+	return createPreviewsByMode( stringID, pagenumStart, pagenumEnd, -1, PREVIEW_MODE_PDF );
+}
+
+
+/*********************************************************************
+ Creates previews of the given page (preview images or PDF or both)
+ stringID		- The string ID of the page for which to create the previews
+ pagenumStart	- The number of the page where the previews should start
+ pagenumEnd		- The number of the page where the previews should end
+ useAutoCometJob	- indicades whenever script is being run in autoCometjob environment, 
+						used for determination of preview size, -1 = no, any positive value = yes
+ mode			- Create preview images or PDF only or both
+*********************************************************************/
+int createPreviewsByMode( char * stringID, int pagenumStart, int pagenumEnd, int useAutoCometJob, int mode )
+{
+	char *exportpath = alloc(1024);
+	char *profile = alloc(256);
+	char *systime = alloc(20);
+	char *timestamp = alloc(20);
+	char *fileid = alloc(100);
+	char *preview_large = alloc(100);
+	char *preview_middle = alloc(100);
+	char *preview_small = alloc(100);
+	char *preview_pdf = alloc(100);
+	char *preview_large_abs = alloc(100);
+	char *preview_middle_abs = alloc(100);
+	char *preview_small_abs = alloc(100);
+	char *preview_pdf_abs = alloc(100);
+	char *workDir = alloc(100);
+	Image img = 0;
+	int filelength = 0;
+	int previewSize = 0;
+	int err = 0;
+	int jobID = 0;
+	SOAP sh = soap::connection();
+	Query qu;
+
+	if(DEBUG_ENABLED)  wlog( "", "Creating previews for page %s mode: %d\n", stringID, mode );
+
+	if( mode == PREVIEW_MODE_ALL  ||  mode == PREVIEW_MODE_IMAGES  ||  mode == PREVIEW_MODE_PDF )
+	{
+		system::now(systime, 98);
+		strcpy( timestamp, strsubstring(systime, 6, 4) ); //year
+		strcat( timestamp, strsubstring(systime, 3, 2) ); //month
+		strcat( timestamp, strsubstring(systime, 0, 2) ); //day
+		strcat( timestamp, strsubstring(systime, 11, 2) );//hour
+		strcat( timestamp, strsubstring(systime, 14, 2) );//minute
+		strcat( timestamp, strsubstring(systime, 17, 2) );//secound
+		
+		workDir = "$HOME/werk2_print/previews";
+	
+		//create preview images
+		if( mode == PREVIEW_MODE_ALL  ||  mode == PREVIEW_MODE_IMAGES )
+		{
+			qu = sql::query( soap::connection() );
+			if( qu ) //estabishing connection was successful
+			{
+				if(useAutoCometJob != -1)
+				{
+					jobID = gJobID;
+				}else{
+					//no auto commet job context (runned from inDesign for example) -> use defult value saved in cometConfiguration
+					jobID = -1;//anything less than 0 means: use default value for preview size.
+				}
+				if(DEBUG_ENABLED) wlog("","\njobID: %i\n",jobID);
+				//ask for page preview size
+				err = query::set_method(qu, "GET_pagePreviewSize");
+				err = err + query::send(qu, "jobID = ?\n");
+				err = err + query::input(qu, kInt, jobID);
+				query::output( qu, kInt, &previewSize );	
+				if( err != 2 )
+				{
+					wlog("", "There were %i query send/input errors in 601.crpt! \n", (4-err));
+					return (2-err);
+				}
+				err = query::exec (qu);
+				if( err != 1 )
+				{
+					wlog("", "Error [%i], message: [%s], in query:exec in 601.crpt! . \n", err, serror(err));
+					return (1); //err is here 0, so we have to return 1 bacause return(0) means all is ok
+				}
+		
+				while (query::fetch(qu)) //returns 1 (true) if a line was fetched, 0 means no more lines and the while aborts
+				{
+					wlog("","\nPage preview size fetched: %i\n",previewSize);
+					break;//there is only one value expected
+				}
+			}
+			if( previewSize <= 0 )
+			{
+				previewSize = kOriginalSize;
+			}
+			//create full size image
+			err = createPreviewImage( stringID, pagenumStart, pagenumEnd, workDir, timestamp, previewSize);
+			if( err != 0)
+			{
+				if(DEBUG_ENABLED)  wlog("", "Got error code '%i' from method createPreviewImage() in 601.crpt! \n", err);
+			}
+		}
+
+		//create pdf
+		if( mode == PREVIEW_MODE_ALL  ||  mode == PREVIEW_MODE_PDF )
+		{
+			if(useAutoCometJob > 0)
+			{
+				getPDFpreset( profile, gJobID );
+			}	
+			sprintf( preview_pdf, "pagepreview_pdf_%s_%s.pdf", timestamp, stringID );
+			sprintf( preview_pdf_abs, "%s/%s", workDir, preview_pdf );
+		
+			err = document::export_( gDocument, preview_pdf_abs, "pdf", profile, SUPPRESS_UI_DIALOGS, OVERWRITE_EXISTING_FILES );
+			if( err != 0 )
+			{
+				if(DEBUG_ENABLED)  wlog( "", "Error while creating PDF file for job [%d]. Errorcode [%d], message [%s], path [%s], profile [%s] \n", 0, err, serror(err), preview_pdf_abs, profile );
+			}
+
+			err = soap::upload( sh, preview_pdf_abs, -1, preview_pdf );
+			if( err != 0 )
+			{
+				if(DEBUG_ENABLED)  wlog( "", "Error while uploading PDF file for job [%d]. Errorcode [%d], message [%s] \n", 0, err, serror(err) );
+			}
+		
+			//removing file after upload
+			if(REMOVE_TEMPORARY_FILES_AFTER_UPLOAD)
+			{
+				err = file::remove(preview_pdf_abs);
+				if(err != 0)
+				{
+					if(DEBUG_ENABLED)  wlog("", "Tried to delete file '%s' after upload to PIM. The error code is: %i. Aborting! \n", preview_pdf_abs, err);
+				}
+			}
+      		}
+	}
+	else
+	{
+		if(DEBUG_ENABLED)  wlog( "", "Unknown preview creation mode: %d\n", mode );
+	}
+
+	// Cleanup
+	release( exportpath );
+	release( profile );
+	release( systime );
+	release( timestamp );
+	release( fileid );
+	release( preview_large );
+	release( preview_middle );
+	release( preview_small );
+	release( preview_pdf );
+	release( preview_large_abs );
+	release( preview_middle_abs );
+	release( preview_small_abs );
+	release( preview_pdf_abs );
+	release( workDir );
+	image::release (img);
+
+	return 0;
+}
+
+
+/*********************************************************************
+ Creates a preview image of the given page
+ stringID		- The string ID of the page for which to create the preview (used for file naming)
+ pagenumStart	- The number of the page where the previews should start
+ pagenumEnd		- The number of the page where the previews should end
+ workDir		- The work directory (where the preview image is stored temporarily)
+ code			- A code for this image (may be an empty string)
+ imageSize		- The image's height
+*********************************************************************/
+int createPreviewImage( char * pageStringID, int pagenumStart, int pagenumEnd, char * workDir, char * code, int imageSize )
+{
+	char *filename = alloc(100);
+	char *filepath_absolute = alloc(100);
+	int currentPagenum = pagenumStart;
+	int pageCounter = 0;
+	int err = 0;
+	Image img = 0;
+	SOAP sh = soap::connection();
+
+	for( currentPagenum = pagenumStart; currentPagenum <= pagenumEnd; currentPagenum++ )
+	{
+		pageCounter = 1 + currentPagenum - pagenumStart;
+		if(DEBUG_ENABLED)  wlog( "", "Pagepreview page numbers: pageCounter[%d], pagenumStart[%d], currentPagenum[%d], pagenumEnd[%d] \n", pageCounter, pagenumStart, currentPagenum, pagenumEnd );
+		
+		//pageStringID will be soon a (unique) number, not the (currently) filename
+		if( imageSize == kOriginalSize )
+		{
+			sprintf( filename, "pagepreview_img_%s_full_(%d)_%s.jpg", code, pageCounter, pageStringID );
+		}
+		else
+		{
+			sprintf( filename, "pagepreview_img_%s_%d_(%d)_%s.jpg", code, imageSize, pageCounter, pageStringID );
+		}
+		sprintf( filepath_absolute, "%s/%s", workDir, filename );
+		if(DEBUG_ENABLED)  wlog( "", "Creating preview image for page [%s], pageNr [%d], size [%d], path [%s]\n", pageStringID, currentPagenum, imageSize, filepath_absolute );
+		img = image::snapshot_page( 0, currentPagenum, imageSize, "JPEG" );
+		if( img )
+		{
+			if(DEBUG_ENABLED)  wlog( "", "... preview image file size [%d] \n", image::bytes(img) );
+			err = image::save( img, filepath_absolute, OVERWRITE_EXISTING_FILES );
+			if(err != 0)
+			{
+				wlog("", "Could not save image '%s'! The error code is: %i. Aborting! \n", filepath_absolute, err);
+				return err;
+			}
+
+			wlog("", "Bildpath: %s", filepath_absolute );
+			err = soap::upload( sh, filepath_absolute, -1, filename );
+			if( err != 0)
+			{
+				wlog("", "The upload of the image '%s' to the PIM was not successfull. The error code is: %i \n", filepath_absolute, err );
+				return err;
+			}
+
+			if(REMOVE_TEMPORARY_FILES_AFTER_UPLOAD)
+			{
+				err = file::remove(filepath_absolute);
+				if(err != 0)
+				{
+					wlog("", "tried to delete file '%s' after upload to PIM. The error code is: %i. Aborting! \n", filepath_absolute, err);
+					return err;
+				}
+			}
+
+		}
+		else
+		{
+			if(DEBUG_ENABLED)  wlog( "", "... preview image could not be created \n" );
+			return 1;
+		}
+	}
+
+	release( filename );
+	release( filepath_absolute );
+	image::release (img);
+	return 0;
+}
+
+
+/*********************************************************************
+ Links any masterpage frames with the given page
+ and executes their placeholders
+ pageNrStart		- The page number of the page where to start the process
+ pageNrEnd			- The page number of the page where to end the process
+ ID1				- The ID1 to which to link the masterpage frames
+ ID2				- The ID2 to which to link the masterpage frames
+ ID3				- The ID3 to which to link the masterpage frames
+ stringID			- The stringID to which to link the masterpage frames
+*********************************************************************/
+int linkMasterpageFrames( int pageNrStart, int pageNrEnd, int ID1, int ID2, int ID3, char * stringID )
+{
+ 	int i = 0;
+ 	int pageCounter = 0;
+
+	LinkList lli = linklist::alloc( 1 );
+	Link link;
+	int placeholderID = 0;
+
+	ItemList masterpageFrames = itemlist::alloc();
+	ItemRef frameInternal = item::alloc();
+	ItemRef frame = item::alloc();
+
+	if(DEBUG_ENABLED)  wlog( "", "Start linking masterpage frames from page [%d] to page [%d] with ID1 [%d], ID2 [%d], ID3 [%d], StringID [%s].\n", pageNrStart, pageNrEnd, ID1, ID2, ID3, stringID );
+
+	if( pageNrStart < 0
+		|| pageNrEnd < 0
+		|| pageNrEnd < pageNrStart )
+	{
+		if(DEBUG_ENABLED)  wlog( "", "Could not link masterpage frames, page range [%d]-[%d] is not or incorrect specified\n", pageNrStart, pageNrEnd );
+		linklist::release( lli );
+		return -1;
+	}
+
+	for( pageCounter = pageNrStart; pageCounter <= pageNrEnd; pageCounter++ )
+	{
+		page::masteritems_load( pageCounter );		// TODO: Workaround: page::create() does not copy the masterpage placeholders, so copy them separately
+
+		linklist::collect_any( lli, pageCounter, "", kFirstIgnore, kSortNo );
+
+		for( link = linklist::first(lli); link != 0; link = linklist::next(lli) )
+		{
+			frameInternal = link::frame( link );
+			placeholderID = link::placeholderid( link );
+
+			// relink only placeholders/frames whose ID is in a specific range
+			if( placeholderID >= 900  &&  placeholderID < 990 )
+			{
+				if(DEBUG_ENABLED)  wlog( "", "Found masterpage frame placeholder with ID [%d] \n", placeholderID );
+// TODO: could we use the frameInternal directly without copying it to the separate frame?!
+// Consider the availability scope of the frameInternal objects
+				if(frame) item::release(frame);	// clear frame for reuse
+				frame = item::alloc( frameInternal );		// Copy-Constructor
+				itemlist::append( masterpageFrames, frame );
+			}
+		}
+
+		if(DEBUG_ENABLED)  wlog( "", "Found %d masterpage frames on page [%d]\n", itemlist::length(masterpageFrames), pageCounter );
+
+		if( masterpageFrames )
+		{
+			if(frame) item::release(frame);	// clear frame for reuse
+			frame = item::alloc();
+			for( i = 0; i < itemlist::length(masterpageFrames); i++ )
+			{
+				itemlist::get( masterpageFrames, frame, i );
+				if(DEBUG_ENABLED)  wlog( "", "Link masterpage frame [%d] with ID1 [%d], ID2 [%d], ID3 [%d], stringID [%s]\n", item::getint(frame), ID1, ID2, ID3, stringID );
+				// placeholder::link2( ItemRef placedItem, int classid, int id, int id2, int id3, char* StringID, int textStart, int textLen )
+				placeholder::link2( frame, 0, ID1, ID2, ID3, stringID, -1, -1 );
+				placeholder::load( frame, 0 );
+			}
+		}
+
+		linklist::clear( lli );	// clear linklist for reuse with next page
+		itemlist::clear( masterpageFrames ); // clear itemlist for reuse with next page
+	}
+
+	// Cleanup
+	itemlist::release( masterpageFrames );
+	item::release( frame );
+	item::release( frameInternal );
+	linklist::release( lli );
+
+	if(DEBUG_ENABLED)  wlog( "", "Finished linking masterpage frames\n" );
+	return 0;
+}
+
+
+
+/*********************************************************************
+ Debugs information about a given product
+ pr				- The product to debug information about
+*********************************************************************/
+int debugProduct( Product pr )
+{
+	if( DEBUG_ENABLED )
+	{
+		if( pr )
+		{
+			wlog( "", "Debug Product: ID1 [%d]", product::get(pr, kID) );
+			wlog( "", ", ID2 [%d]", product::get(pr, kID2) );
+			wlog( "", ", ID3 [%d]", product::get(pr, kID3) );
+			wlog( "", ", stringID [%s]", product::gets(pr, kStringID) );
+			wlog( "", ", productNr [%s]", product::gets(pr, kRow1) );
+			wlog( "", ", productName [%s]", product::gets(pr, kRow2) );
+			wlog( "", ", masterpage [%s]", product::gets(pr, kMasterpage) );
+			wlog( "", ", pageItemID[%d]", product::get(pr, kPageitemid) );
+			wlog( "", ", gridID [%d]", product::get(pr, kGridid) );
+			wlog( "", ", gridName [%s]", product::gets(pr, kGrid) );
+			wlog( "", ", gridElement [%d]", product::get(pr, kElementid) );
+			wlog( "", ", gridElementName [%s]", product::gets(pr, kElement) );
+			wlog( "", "\n" );
+		}
+		else
+		{
+			wlog( "", "No Product specified to debug\n" );
+		}
+	}
+
+	return 0;
+}
+
+
+int debugProductList( ProductList prList )
+{
+	Product pr;
+	if( DEBUG_ENABLED )
+	{
+		for ( pr = productlist::first( prList ); pr; pr = productlist::next( prList ) )
+		{
+			debugProduct( pr );
+		}
+	}
+
+	return 0;
+}
+
+
+/*********************************************************************
+ All selected items will be inserted into a frame. The procedure is simple: search for the frame with
+ the ID=1, create a CometProductList from the selected products only (meaning: filter the non-products out)
+ and call the textmodel::insert_list method
+ prList			- List of products that shall be build up
+*********************************************************************/
+int processFlowlayoutBuild( ProductList prList )
+{
+	int result = 0;
+	int flags = 0;		// flags that control the flowlayout buildup
+
+	int i = 0;
+	int len = 0;
+	int plid = 0;
+
+	ItemRef currentframe = item::alloc();
+	ItemList frames = itemlist::alloc();
+
+	Product pr;
+	ProductList newlist = productlist::alloc (); //contains only the products items (placable items) from the selected list
+
+	if(DEBUG_ENABLED)  wlog( "", "Start flowlayout Processing...\n" );
+
+	//first: search for the correct frame
+	frames=itemlist::allframes();
+	len = itemlist::length(frames);
+	if (len < 1)
+	{
+		showmessage("There must be a frame with the Build-Placeholder in the current document.");
+		result = 1;
+	}
+	else
+	{
+		while (i < len && plid != FLOWLAYOUT_LINK_ID)
+		{
+			itemlist::get(frames,currentframe,i++);
+			plid = placeholder::get_value(currentframe,"Placeholder"); //get the id from the frame
+		}
+
+		if (plid != FLOWLAYOUT_LINK_ID) // special placeholder not found
+		{
+			showmessage("There must be a frame with the Build-Placeholder in the current document.");
+			result = 2;
+		}
+		else
+		{
+			if(DEBUG_ENABLED)  wlog( "", "Found %d selected products.\n", productlist::length( prList ) );
+
+			//filter the products
+			for( pr=productlist::first(prList); pr; pr=productlist::next(prList) )
+			{
+				if( product::get(pr, kID) == NODETYPE_PLACEMENT ) //products have the id 12
+				{
+					productlist::append( newlist, pr, 1 );
+				}
+			}
+
+			//finally: insert list into frame
+			// flags += kSuppressAutoExtent;		// dont create new pages if text is too long for current page
+			flags += kExpandGroups;		// if the pageitem is grouped, the grouped frames are used for buildup and not the surrounding group frame
+			flags += kAutoDetectType;	// auto detect the type of a frame to insert. Text frames are inserted as content, other frames are inserted as inline frames
+			result = textmodel::insert_list( currentframe, kEnd, 0, newlist, kNoRule, flags, 0, 0, "", "", "" );
+			if( result != 0 )
+			{
+				if(DEBUG_ENABLED)  wlog( "", "Error while inserting products into flowlayout text frame: %d, %s \n", result, serror(result) );
+			}
+		}
+	}
+
+	// Cleanup
+	release( currentframe );
+	release( pr );
+	itemlist::release (frames);
+	productlist::release( newlist, DONT_DELETE_PRODUCTLIST_ELEMENTS );
+
+	showmessage( "Finished flow based Buildup" );
+   return result;
+}
+
+
+
+/*********************************************************************
+Gets the PDF preset for the given AutoCometJob
+presetName = The string where the name of the PDF preset will be written in
+jobID = The ID of the AutoCometJob for which to get the PDF preset
+*********************************************************************/
+int getPDFpreset (char * presetName, int jobID)
+{
+	char * buffer = alloc (500);
+	int err = 0;
+	int result = 0;
+	Query qu = sql::query (soap::connection());
+
+	if(qu)
+	{
+		err = query::set_method (qu, "GET_pdfPreset");//0
+		err = err + query::send (qu, "jobID = ?\n");//1
+		err = err + query::input(qu, kInt, jobID);//1
+		err = err + query::output (qu, kString, buffer, 500);//1
+		if(err == 3){
+			if(query::exec (qu))
+			{
+				query::fetch (qu);
+				strcpy (presetName, buffer);
+				wlog ("", "got PDF preset name [%s] for jobID [%d]\n", presetName, jobID);
+			}
+			else
+			{
+				wlog("", "There was a query::exec error in 601.crpt, method getPDFpreset(). \n");
+				result = 1;
+			}
+		}
+		else
+		{
+			wlog("", "There was a query::set_method error in 601.crpt, method getPDFpreset(). \n");
+			result = 2;
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful! error in method getPDFpreset() in 601.crpt. \n");
+		result = 3;
+	}
+
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in script 601.crpt, method getPDFpreset(). \n");
+		result = 4;
+	}
+
+	// Cleanup
+	release( buffer );
+
+	return result;
+}
+
+/*********************************************************************
+Gets the information if page for such indd file exists in PIM
+docName = indd doc to check
+Returns 1 if exists
+*********************************************************************/
+int documentKnownInPIM (char * docName)
+{
+	char * buffer = alloc (500);
+	int err = 0;
+	Query qu = sql::query (soap::connection());
+
+	if(qu)
+	{
+		wlog ("", " ----- docName result :  [%s] \n", docName);
+		err = query::set_method (qu, "GET_hasPage");//0
+		err = err + query::send (qu, "documentIdentifier = ?");//1
+		err = err + query::input(qu, kString, docName);//1
+		err = err + query::output (qu, kString, buffer, 500);//1
+		if(err == 3){
+			if(query::exec (qu))
+			{
+				query::fetch (qu);
+				if(strcmp(buffer, "1")==0)
+				{
+					release( buffer );
+					return 1;
+				}
+				else
+				{
+					release( buffer );
+					return 0;
+				}
+
+			}
+			else
+			{
+				wlog("", "There was a query::exec error in 601.crpt, method hasSuchPageInPIMpreset(). \n");
+				return 0;
+			}
+		}
+		else
+		{
+			wlog("", "There was a query::set_method error in 601.crpt, method hasSuchPageInPIMpreset(). \n");
+			return 0;
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful! error in method hasSuchPageInPIMpreset() in 601.crpt. \n");
+		return 0;
+	}
+
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in script 601.crpt, method hasSuchPageInPIMpreset(). \n");
+		return 0;
+	}
+	// Cleanup
+	release( buffer );
+	return 0;
+}

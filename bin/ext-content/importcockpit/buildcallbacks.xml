@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+
+-->
+<project name="importcockpit_buildcallbacks" >
+
+	<target name="generate-importcockpit-jaxb-files">
+		<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+			<classpath>
+				<fileset dir="${ext.core.path}/lib" includes="*.jar" />
+				<fileset dir="${ext.cockpit.path}/antlib" includes="*.jar" />
+			</classpath>
+		</taskdef>
+		<echo>Generating JAXB files for mapping line configuration</echo>
+		<xjc
+			destdir="${ext.importcockpit.path}/src"
+			schema="${ext.importcockpit.path}/resources/importcockpit/impex/config/mapping-line.xsd"
+			package="de.hybris.platform.importcockpit.services.config.mapping.jaxb.mappingline">
+			<produces dir="${ext.importcockpit.path}/src/de/hybris/platform/importcockpit/services/config/mapping/jaxb/mappingline">
+				<include name="*.java"/>
+			</produces>
+			<depends file="${ext.importcockpit.path}/resources/importcockpit/impex/config/mapping-line.xsd"/>
+		</xjc>
+		<echo>Generating JAXB files for targets configuration</echo>
+		<xjc
+			destdir="${ext.importcockpit.path}/src"
+			schema="${ext.importcockpit.path}/resources/importcockpit/impex/config/targets.xsd"
+			package="de.hybris.platform.importcockpit.services.config.mapping.jaxb.targets">
+			<produces dir="${ext.importcockpit.path}/src/de/hybris/platform/importcockpit/services/config/mapping/jaxb/targets">
+				<include name="*.java"/>
+			</produces>
+			<depends file="${ext.importcockpit.path}/resources/importcockpit/impex/config/targets.xsd"/>
+		</xjc>
+	</target>
+
+</project>

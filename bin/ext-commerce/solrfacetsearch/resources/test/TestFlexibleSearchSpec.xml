@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../config/SolrFacetConfig.xsd">
+  <solrconfig>
+    <mode>standalone</mode>
+  </solrconfig>
+  <indexconfig>
+    <exportpath>testexportpath</exportpath>
+    <batchSize>100</batchSize>
+  </indexconfig>
+  <itemTypes>
+    <itemType code="Product" variant="false">
+      <properties>
+        <property facet="true" name="prop1" type="boolean" />
+        <property facet="true" name="prop2" type="string" />
+        <property facet="false" name="prop3" type="double" />
+      </properties>
+      <flexibleSearchUpdateQueries>
+        <fullIndexQuery  parameterProvider="simpleParameterProvider" user="admin">
+				SELECT {PK} FROM {Product} WHERE {price} &lt; ?price
+			</fullIndexQuery>
+        <updateIndexQuery injectLastIndexTime="true" >
+        		SELECT {PK} FROM {Product} WHERE {modifiedtime} &gt;
+					?lastIndexTime
+        </updateIndexQuery>
+        <deleteFromIndexQuery injectCurrentDate="true" injectCurrentTime="true" user="anonymous">
+        		SELECT {PK} FROM {Product} WHERE {modifiedtime} &gt;
+					?lastIndexTime AND {somethingelse} &lt; ?currentDate AND {somethingelse} &gt; ?currentTime
+        </deleteFromIndexQuery>
+      </flexibleSearchUpdateQueries>
+    </itemType>
+  </itemTypes>
+</config>

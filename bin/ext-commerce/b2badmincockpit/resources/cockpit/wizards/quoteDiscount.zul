@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+ 
+<zk xmlns="http://www.zkoss.org/2005/zul"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:h="http://www.w3.org/1999/xhtml"
+        xmlns:zk="http://www.zkoss.org/2005/zk"
+        xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd ">
+    <div> 
+    <div style="text-align: left;" onCreate="wizardBean.setShowNext(true);
+		wizardBean.refreshButtons();">
+    	<div style="padding: 20px; border-bottom: 1px solid #ccc;">
+			<label value="${c:l('cockpit.wizard.quoteWizard.discount.page.prompt')}" />
+		</div>
+		
+		<div style="margin: 30px; margin-top: 20px; font-size: 10px;">
+		<hbox widths="80px,none">
+			<label value="${c:l('cockpit.wizard.quoteWizard.discount.code')}" />
+			<textbox onCreate='self.setValue(pageBean.getAttribute("code"));' onChange='pageBean.setAttribute("code", event.value)' />
+		</hbox>
+		</div>
+		
+   		<div style="margin: 30px; margin-top: 20px; font-size: 10px;">
+		<hbox widths="80px,none">
+		<label value="${c:l('cockpit.wizard.quoteWizard.discount.selectType')}" />
+			<combobox onCreate='self.setValue(pageBean.getAttribute("typeOfDiscount"));' onChange='pageBean.setAttribute("typeOfDiscount", event.value)' readonly="true">
+				<comboitem label="Percentage" value="percentage"/>
+				<comboitem label="Absolute" value="absolute" />
+			</combobox>
+		</hbox>
+		</div>
+		
+		<div style="margin: 30px; margin-top: 20px; font-size: 10px;">
+		<hbox widths="80px,none">
+			<label value="${c:l('cockpit.wizard.quoteWizard.discount.amount')}" />
+			<textbox onCreate='self.setValue(pageBean.getAttribute("amount"));' onChange='pageBean.setAttribute("amount", event.value)' />
+		</hbox>
+		</div>
+		
+		<div style="margin: 30px; margin-top: 20px; font-size: 10px;">
+			<hbox widths="80px,none">
+				<label value="${c:l('cockpit.wizard.quoteWizard.discount.expiration')}" />
+				<datebox format="MM/dd/yyyy" onCreate='self.setValue(pageBean.getExpirationInfo());' onChange='pageBean.setAttribute("expiration", event.value)' />
+			</hbox>
+		</div>
+		
+		<div style="margin: 30px; margin-top: 20px; font-size: 10px;">
+		<hbox widths="80px,none">
+			<label value="${c:l('cockpit.wizard.quoteWizard.discount.comment')}" />
+			<textbox onCreate='self.setValue(pageBean.getAttribute("comment"));' onChange='pageBean.setAttribute("comment", event.value)' />
+		</hbox>
+		</div>
+		
+	</div>
+     
+    </div>   
+</zk>

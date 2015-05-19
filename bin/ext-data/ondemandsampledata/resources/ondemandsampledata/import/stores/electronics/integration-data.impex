@@ -1,0 +1,203 @@
+#% impex.setLocale( Locale.GERMAN )             ;
+$siteUid=electronics
+
+$productCatalog=electronicsProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default='$productCatalog:Staged']
+$prices=Europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+
+INSERT_UPDATE OndemandBaseStorePreference ; baseStore(uid)[unique=true] ; externalCallsEnabled
+                                                ; $siteUid                    ; true
+
+#
+# Modify the base stores delivery countries.
+#
+$supportedAddressVerificationCountries=CA,CN,DE,GB,JP,US
+$deliveryCountries=$supportedAddressVerificationCountries
+
+# Base Store
+INSERT_UPDATE BaseStore                         ; uid[unique=true]            ; deliveryCountries(isocode)[mode=replace]        ; net                  ;
+                                                ; $siteUid                    ; $deliveryCountries                              ; true                 ;
+
+
+# set all prices to net
+UPDATE Product                                  ; code[unique=true]           ; $prices                                         ; $catalogVersion      ;
+                                                ; 107701                      ; 179,93 USD N , 15330 JPY N
+                                                ; 266899                      ; 86,86 USD N , 7400 JPY N
+                                                ; 325234                      ; 134,95 USD N , 11490 JPY N
+                                                ; 479956                      ; 102,37 USD N , 8720 JPY N
+                                                ; 592506                      ; 35,68 USD N , 3030 JPY N
+                                                ; 805693                      ; 136,5 USD N , 11620 JPY N
+                                                ; 816379                      ; 1695,36 USD N , 144440 JPY N
+                                                ; 824259                      ; 184,58 USD N , 15720 JPY N
+                                                ; 861175                      ; 184,58 USD N , 15720 JPY N
+                                                ; 824267                      ; 283,85 USD N , 24180 JPY N
+                                                ; 847942                      ; 240,42 USD N , 20480 JPY N
+                                                ; 848855                      ; 369,16 USD N , 31450 JPY N
+                                                ; 917699                      ; 145,8 USD N , 12420 JPY N
+                                                ; 1232590                     ; 156,66 USD N , 13340 JPY N
+                                                ; 1377492                     ; 79,11 USD N , 6740 JPY N
+                                                ; 1422218                     ; 89,96 USD N , 7660 JPY N
+                                                ; 1422222                     ; 152,01 USD N , 12950 JPY N
+                                                ; 1422224                     ; 293,16 USD N , 24970 JPY N
+                                                ; 1438466                     ; 1865,98 USD N , 158980 JPY N
+                                                ; 1446509                     ; 1321,54 USD N , 112590 JPY N
+                                                ; 1451546                     ; 89,96 USD N , 7660 JPY N
+                                                ; 1715477                     ; 6030,71 USD N , 513810 JPY N
+                                                ; 1978440                     ; 558,4 USD N , 47570 JPY N
+                                                ; 1978440_red                 ; 558,4 USD N , 47570 JPY N
+                                                ; 1978440_green               ; 558,4 USD N , 47570 JPY N
+                                                ; 1978440_blue                ; 558,4 USD N , 47570 JPY N
+                                                ; 1986316                     ; 1934,23 USD N , 164790 JPY N
+                                                ; 1990255                     ; 924,46 USD N , 78760 JPY N
+                                                ; 1992693                     ; 541,34 USD N , 46120 JPY N
+                                                ; 1992696                     ; 223,36 USD N , 19030 JPY N
+                                                ; 1993748                     ; 406,39 USD N , 34620 JPY N
+                                                ; 2006139                     ; 231,12 USD N , 19690 JPY N
+                                                ; 2053226                     ; 1538,7 USD N , 131090 JPY N
+                                                ; 2053266                     ; 1391,34 USD N , 118540 JPY N
+                                                ; 2053367                     ; 2410,42 USD N , 205360 JPY N
+                                                ; 3470545                     ; 370,72 USD N , 31580 JPY N
+                                                ; 3505505                     ; 426,55 USD N , 36340 JPY N
+                                                ; 3514521                     ; 626,65 USD N , 53390 JPY N
+                                                ; 3595723                     ; 2002,48 USD N , 170610 JPY N
+                                                ; 346944                      ; 105,48 USD N , 8980 JPY N
+                                                ; 1451563                     ; 120,99 USD N , 10300 JPY N
+                                                ; 1641905                     ; 142,7 USD N , 12150 JPY N
+                                                ; 2938457                     ; 31,02 USD N , 2640 JPY N
+                                                ; 3965240                     ; 204,75 USD N , 17440 JPY N
+                                                ; 4135570                     ; 165,97 USD N , 14140 JPY N
+                                                ; 4205431                     ; 134,95 USD N , 11490 JPY N
+                                                ; 4205436                     ; 333,49 USD N , 28410 JPY N
+                                                ; 4769104                     ; 165,97 USD N , 14140 JPY N
+                                                ; 4769626                     ; 148,91 USD N , 12680 JPY N
+                                                ; 65652                       ; 358,88 USD N , 30570 JPY N
+                                                ; 503392                      ; 1696,88 USD N , 144570 JPY N
+                                                ; 791635                      ; 569,88 USD N , 48550 JPY N
+                                                ; 832382                      ; 466,88 USD N , 39770 JPY N
+                                                ; 1382080                     ; 574,88 USD N , 48970 JPY N
+                                                ; 1432722                     ; 396,88 USD N , 33810 JPY N
+                                                ; 1438465                     ; 645,88 USD N , 55020 JPY N
+                                                ; 1776947                     ; 243,88 USD N , 20770 JPY N
+                                                ; 1776948                     ; 146,88 USD N , 12510 JPY N
+                                                ; 1934398                     ; 610,88 USD N , 52040 JPY N
+                                                ; 1934406                     ; 452,88 USD N , 38580 JPY N
+                                                ; 1993747                     ; 206,88 USD N , 17620 JPY N
+                                                ; 2934297                     ; 589,88 USD N , 50250 JPY N
+                                                ; 2934302                     ; 508,88 USD N , 43350 JPY N
+                                                ; 2934303                     ; 429,88 USD N , 36620 JPY N
+                                                ; 3325048                     ; 121,88 USD N , 10380 JPY N
+                                                ; 3357724                     ; 121,88 USD N , 10380 JPY N
+                                                ; 3557133                     ; 929,88 USD N , 79220 JPY N
+                                                ; 1934796                     ; 110,88 USD N , 9440 JPY N
+                                                ; 1997551                     ; 177,88 USD N , 15150 JPY N
+                                                ; 1934793                     ; 99,85 USD N , 8500 JPY N
+                                                ; 1934794                     ; 99,85 USD N , 8500 JPY N
+                                                ; 443175                      ; 6,04 USD N , 510 JPY N
+                                                ; 2938458                     ; 14,5 USD N , 1230 JPY N
+                                                ; 3514519                     ; 159,34 USD N , 13570 JPY N
+                                                ; 4786113                     ; 55,56 USD N , 4730 JPY N
+                                                ; 4852405                     ; 37,11 USD N , 3160 JPY N
+                                                ; 23355                       ; 580,38 USD N , 49440 JPY N
+                                                ; 266685                      ; 154,5 USD N , 13160 JPY N
+                                                ; 284533                      ; 419,43 USD N , 35730 JPY N
+                                                ; 289540                      ; 154,65 USD N , 13170 JPY N
+                                                ; 301233                      ; 21,56 USD N , 1830 JPY N
+                                                ; 572461                      ; 48,65 USD N , 4140 JPY N
+                                                ; 918735                      ; 69,05 USD N , 5880 JPY N
+                                                ; 1312640                     ; 13,88 USD N , 1180 JPY N
+                                                ; 1422706                     ; 15,1 USD N , 1280 JPY N
+                                                ; 2063624                     ; 26,21 USD N , 2230 JPY N
+                                                ; 2140197                     ; 102,63 USD N , 8740 JPY N
+                                                ; 1934795                     ; 111,84 USD N , 9520 JPY N
+                                                ; 3514520                     ; 309,17 USD N , 26340 JPY N
+                                                ; 137220                      ; 8,0 USD N , 680 JPY N
+                                                ; 816780                      ; 1086,0 USD N , 92520 JPY N
+                                                ; 872912                      ; 10,0 USD N , 850 JPY N
+                                                ; 898503                      ; 2117,0 USD N , 180360 JPY N
+                                                ; 1366001                     ; 12,0 USD N , 1020 JPY N
+                                                ; 1366053                     ; 20,0 USD N , 1700 JPY N
+                                                ; 1312564                     ; 7,61 USD N , 640 JPY N
+                                                ; 1325806                     ; 136,0 USD N , 11580 JPY N
+                                                ; 1209761                     ; 347,46 USD N , 29600 JPY N
+                                                ; 149243                      ; 19,69 USD N , 1670 JPY N
+                                                ; 479742                      ; 86,37 USD N , 7350 JPY N
+                                                ; 493683                      ; 118,45 USD N , 10090 JPY N
+                                                ; 594471                      ; 64,92 USD N , 5530 JPY N
+                                                ; 1322031                     ; 9,99 USD N , 90 JPY N
+                                                ; 1322041                     ; 9,99 USD N , 90 JPY N
+                                                ; 768108                      ; 53,22 USD N , 4530 JPY N
+                                                ; 779841                      ; 3,45 USD N , 290 JPY N
+                                                ; 784343                      ; 818,33 USD N , 69720 JPY N
+                                                ; 832386                      ; 4836,85 USD N , 412090 JPY N
+                                                ; 932577                      ; 24,47 USD N , 2080 JPY N
+                                                ; 1391319                     ; 394,5 USD N , 33610 JPY N
+                                                ; 1687508                     ; 149,71 USD N , 12750 JPY N
+                                                ; 2140285                     ; 9,05 USD N , 770 JPY N
+                                                ; 3555166                     ; 934,41 USD N , 79610 JPY N
+                                                ; 4787985                     ; 29,25 USD N , 2490 JPY N
+                                                ; 4787986                     ; 122,46 USD N , 10430 JPY N
+                                                ; 779864                      ; 7,95 USD N , 670 JPY N
+                                                ; 1992695                     ; 91,51 USD N , 7790 JPY N
+                                                ; 1992697                     ; 91,51 USD N , 7790 JPY N
+                                                ; 4812254                     ; 927,89 USD N , 79050 JPY N
+                                                ; 898520                      ; 1650,0 USD N , 140580 JPY N
+                                                ; 2278102                     ; 11,0 USD N , 930 JPY N
+                                                ; 278688                      ; 137,96 USD N , 11750 JPY N
+                                                ; 358639                      ; 485,57 USD N , 41370 JPY N
+                                                ; 726510                      ; 1035,25 USD N , 88200 JPY N
+                                                ; 726511                      ; 1088,28 USD N , 92720 JPY N
+                                                ; 325414                      ; 147,04 USD N , 12520 JPY N
+                                                ; 492274                      ; 249,99 USD N , 21290 JPY N
+                                                ; 553637                      ; 264,69 USD N , 22550 JPY N
+                                                ; 280916                      ; 8,2 USD N , 690 JPY N
+                                                ; 1298094                     ; 168,52 USD N , 14350 JPY N
+                                                ; 2006365                     ; 48,02 USD N , 4090 JPY N
+                                                ; 429430                      ; 65,51 USD N , 5580 JPY N
+                                                ; 450848                      ; 65,51 USD N , 5580 JPY N
+                                                ; 1981415                     ; 212,26 USD N , 18080 JPY N
+                                                ; 3429337                     ; 11,12 USD N , 940 JPY N
+                                                ; 454831                      ; 925,82 USD N , 78870 JPY N
+                                                ; 1981412                     ; 164,53 USD N , 14010 JPY N
+                                                ; 1981413                     ; 184,69 USD N , 15730 JPY N
+                                                ; 1981414                     ; 193,03 USD N , 16440 JPY N
+                                                ; 1320808                     ; 171,36 USD N , 14590 JPY N
+                                                ; 2231913                     ; 1,58 USD N , 130 JPY N
+                                                ; 572473                      ; 146,6 USD N , 12490 JPY N
+                                                ; 779842                      ; 7,5 USD N , 630 JPY N
+                                                ; 779848                      ; 8,5 USD N , 720 JPY N
+                                                ; 779866                      ; 7,5 USD N , 630 JPY N
+                                                ; 779868                      ; 7,5 USD N , 630 JPY N
+                                                ; 834954                      ; 4,5 USD N , 380 JPY N
+                                                ; 834955                      ; 7,5 USD N , 630 JPY N
+                                                ; 1291399                     ; 12,5 USD N , 1060 JPY N
+                                                ; 489702                      ; 227,24 USD N , 19360 JPY N
+                                                ; 669789                      ; 94,69 USD N , 8060 JPY N
+                                                ; 686951                      ; 260,87 USD N , 22220 JPY N
+                                                ; 812888                      ; 322,94 USD N , 27510 JPY N
+                                                ; 816262                      ; 322,94 USD N , 27510 JPY N
+                                                ; 816323                      ; 322,94 USD N , 27510 JPY N
+                                                ; 816802                      ; 260,87 USD N , 22220 JPY N
+                                                ; 855246                      ; 1022,51 USD N , 87110 JPY N
+                                                ; 478828                      ; 498,75 USD N , 42490 JPY N
+                                                ; 1225694                     ; 847,74 USD N , 72220 JPY N
+                                                ; 5103712                     ; 131,54 USD N , 11200 JPY N
+                                                ; 514518                      ; 315,52 USD N , 26880 JPY N
+                                                ; 2054947                     ; 1066,18 USD N , 90830 JPY N
+                                                ; 3708646                     ; 968,89 USD N , 82540 JPY N
+                                                ; 1494590                     ; 146,0 USD N , 12430 JPY N
+                                                ; 29925                       ; 115,0 USD N , 9790 JPY N
+                                                ; 676442                      ; 202,0 USD N , 17210 JPY N
+                                                ; 816261                      ; 216,0 USD N , 18400 JPY N
+                                                ; 2292454                     ; 49,0 USD N , 4170 JPY N
+                                                ; 3357888                     ; 130,65 USD N , 11130 JPY N
+                                                ; 899387                      ; 94,71 USD N , 8060 JPY N
+                                                ; 4608858                     ; 505,66 USD N , 43080 JPY N
+                                                ; 5103775                     ; 169,07 USD N , 14400 JPY N
+                                                ; 482105                      ; 149,69 USD N , 12750 JPY N
+                                                ; 816324                      ; 347,55 USD N , 29610 JPY N
+                                                ; 784173                      ; 90,0 USD N , 7660 JPY N
+                                                ; 300938                      ; 114,12 USD N , 9720 JPY N
+                                                ; 458542                      ; 34,53 USD N , 2940 JPY N
+                                                ; 1099285                     ; 23,91 USD N , 2030 JPY N
+                                                ; 1099413                     ; 360,86 USD N , 30740 JPY N
+

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+
+	<!-- Configuration for extension importcockpit -->
+
+	<explorertree>
+		<group name="group.importcockpit" description="group.importcockpit.description">
+			<typeref type="ImportCockpitCronJob" description="typeref.ImportCockpitCronJob.description" />
+			<typeref type="ImportCockpitInputMedia" description="typeref.ImportCockpitInputMedia.description" />
+			<typeref type="ImportCockpitMapping" description="typeref.ImportCockpitMapping.description" />
+			<typeref type="ImpExImportCockpitMedia" description="typeref.ImpExImportCockpitMedia.description"  />
+		</group>
+	</explorertree>
+
+	<type name="ImportCockpitCronJob" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="job" mode="delete" />
+				<condition attribute="mapping" />
+				<condition attribute="mappingValid" />
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout mode="append">
+						<attribute name="job" mode="delete" />
+						<attribute name="mapping" width="250" />
+						<attribute name="mappingValid" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<exclude>
+					<exclusion attribute="job"></exclusion>
+				</exclude>
+				<essentials>
+					<columnlayout>
+						<row position="1">
+							<attribute name="mapping"/>
+							<attribute name="mappingValid" />
+						</row>
+						<row>
+							<attribute name="startTime" />
+							<attribute name="endTime" />
+						</row>
+						<row>
+							<attribute name="status" />
+							<attribute name="result" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="tab.inputmedia" position="0">
+					<section name="properties">
+						<listlayout>
+							<attribute name="inputMedia" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ImportCockpitInputMedia" mode="append">
+		<organizer>
+			<editor>
+				<tab name="tab.common">
+					<section name="section.impexmedia.properties">
+						<columnlayout>
+							<row>
+								<attribute name="hasHeaderLine" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+</configuration>

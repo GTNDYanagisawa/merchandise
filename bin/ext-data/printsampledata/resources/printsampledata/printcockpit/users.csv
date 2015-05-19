@@ -1,0 +1,20 @@
+# Set catalog read / write access for users and describe the users;
+$writableCatalogVersions=writableCatalogVersions(catalog(id),version);
+$readableCatalogVersions=readableCatalogVersions(catalog(id),version);
+
+INSERT_UPDATE Employee;UID[unique=true];$writableCatalogVersions;$readableCatalogVersions;description;name;groups(uid);sessionLanguage(isocode);sessionCurrency(isocode)
+;printmanager;;electronicsProductCatalog:Staged,apparelProductCatalog:Staged,electronicsProductCatalog:Online,apparelProductCatalog:Online;;;printadmingroup;en;USD
+;publicationmanager;;electronicsProductCatalog:Staged,apparelProductCatalog:Staged,electronicsProductCatalog:Online,apparelProductCatalog:Online;;;publicationmanagergroup;en;USD
+;pageplaner;;electronicsProductCatalog:Staged,apparelProductCatalog:Staged,electronicsProductCatalog:Online,apparelProductCatalog:Online;;;pageplanergroup;en;USD
+;layouter;;electronicsProductCatalog:Staged,apparelProductCatalog:Staged,electronicsProductCatalog:Online,apparelProductCatalog:Online;;;layoutergroup;en;USD
+
+;print_editor;;electronicsProductCatalog:Staged,apparelProductCatalog:Staged,electronicsProductCatalog:Online,apparelProductCatalog:Online;;;publicationmanagergroup;en;USD
+;print_publisher;;electronicsProductCatalog:Staged,apparelProductCatalog:Staged,electronicsProductCatalog:Online,apparelProductCatalog:Online;;;pageplanergroup;en;USD
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];readPrincipals(uid)[mode=append];writePrincipals(uid)[mode=append]
+;electronicsProductCatalog;Online;printadmingroup;printadmingroup;
+;electronicsProductCatalog;Staged;printadmingroup;printadmingroup;
+;apparelProductCatalog;Online;printadmingroup;printadmingroup;
+;apparelProductCatalog;Staged;printadmingroup;printadmingroup;
+;Default;Online;printadmingroup;printadmingroup;
+;Default;Staged;printadmingroup;printadmingroup;

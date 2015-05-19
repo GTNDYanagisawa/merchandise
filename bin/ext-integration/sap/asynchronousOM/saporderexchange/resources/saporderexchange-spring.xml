@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<!-- ********* Outbound processing -->
+	
+	<alias name="defaultSapAbstractRawItemBuilder" alias="sapAbstractRawItemBuilder" />
+	<bean abstract="true" id="defaultSapAbstractRawItemBuilder" class="de.hybris.platform.sap.orderexchange.outbound.impl.AbstractRawItemBuilder"/>
+
+	<alias name="defaultSapRawHybrisOrderBuilder" alias="sapRawHybrisOrderBuilder" />
+	<bean id="defaultSapRawHybrisOrderBuilder" class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultRawHybrisOrderBuilder"
+		parent="sapAbstractRawItemBuilder">
+		<property name="contributors">
+			<list>
+				<ref bean="sapSalesConditionsContributor"></ref>
+				<ref bean="sapPaymentContributor"></ref>
+				<ref bean="sapOrderContributor"></ref>
+				<ref bean="sapOrderEntryContributor"></ref>
+				<ref bean="sapPartnerContributor"></ref>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultSapOrderContributor" alias="sapOrderContributor" />
+	<bean id="defaultSapOrderContributor" class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultOrderContributor"/>
+
+	<alias name="defaultSapOrderEntryContributor" alias="sapOrderEntryContributor" />
+	<bean id="defaultSapOrderEntryContributor" class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultOrderEntryContributor"/>
+
+	<alias name="defaultSapSalesConditionsContributor" alias="sapSalesConditionsContributor" />
+	<bean id="defaultSapSalesConditionsContributor" class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultSalesConditionsContributor">
+		<property name="tax1" value="${saporderexchange.itemtax.code1}" />
+	</bean>
+
+	<alias name="defaultSapPartnerContributor" alias="sapPartnerContributor" />
+	<bean id="defaultSapPartnerContributor" class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultPartnerContributor">
+		<property name="b2CCustomerHelper" ref="sapOrderexchangeB2CCustomerHelper" />
+	</bean>
+
+	<alias name="defaultSapPaymentContributor" alias="sapPaymentContributor" />
+	<bean id="defaultSapPaymentContributor" class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultPaymentContributor"/>
+
+	<alias name="defaultSapOrderCancelRequestBuilder" alias="sapOrderCancelRequestBuilder" />
+	<bean id="defaultSapOrderCancelRequestBuilder" class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultOrderCancelRequestBuilder"
+		parent="sapAbstractRawItemBuilder">
+		<property name="contributors">
+			<list>
+				<ref bean="sapOrderCancelRequestContributor"></ref>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultSapOrderCancelRequestContributor" alias="sapOrderCancelRequestContributor" />
+	<bean id="defaultSapOrderCancelRequestContributor" class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultOrderCancelRequestContributor"/>
+
+	<alias name="sapDefaultAbstractSendToDataHubHelper" alias="sapAbstractSendToDataHubHelper" />
+	<bean id="sapDefaultAbstractSendToDataHubHelper" class="de.hybris.platform.sap.orderexchange.outbound.impl.AbstractSendToDataHubHelper"
+		abstract="true">
+		<property name="feed" value="${saporderexchange.orderoutbound.datahub.feed}"></property>
+		<property name="dataHubOutboundService" ref="dataHubOutboundService"></property>
+	</bean>
+	
+	<alias name="sapOrderexchangeDefaultSendOrderToDataHubHelper" alias="sapOrderexchangeSendOrderToDataHubHelper" />
+	<bean id="sapOrderexchangeDefaultSendOrderToDataHubHelper" class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultSendOrderToDataHubHelper"
+		parent="sapAbstractSendToDataHubHelper">
+		<property name="rawItemBuilder" ref="sapRawHybrisOrderBuilder"></property>
+		<property name="rawItemType" value="${saporderexchange.orderoutbound.datahub.rawOrderItemType}"></property>
+	</bean>
+		
+	<alias name="sapOrderexchangeDefaultSendOrderCancelRequestToDataHubHelper" alias="sapOrderexchangeSendOrderCancelRequestToDataHubHelper" />
+	<bean id="sapOrderexchangeDefaultSendOrderCancelRequestToDataHubHelper" class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultSendOrderCancelRequestToDataHubHelper"
+		parent="sapAbstractSendToDataHubHelper">
+		<property name="rawItemType" value="${saporderexchange.orderoutbound.datahub.rawCancelRequestItemType}"></property>
+		<property name="rawItemBuilder" ref="sapOrderCancelRequestBuilder"></property>
+	</bean>
+
+	<bean id="customerReplicationEventListener" class="de.hybris.platform.sap.orderexchange.inbound.events.CustomerReplicationEventListener">
+		<property name="b2CCustomerHelper" ref="sapOrderexchangeB2CCustomerHelper" />
+	</bean>
+
+	<!-- ********* Inbound processing -->
+	
+	<alias name="defaultSapAbstractDataHubOrderInboundHelper" alias="sapAbstractDataHubOrderInboundHelper" />
+	<bean id="defaultSapAbstractDataHubOrderInboundHelper" class="de.hybris.platform.sap.orderexchange.datahub.inbound.impl.AbstractDataHubInboundHelper"
+		abstract="true">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="businessProcessService" ref="businessProcessService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias name="defaultSapDataHubInboundOrderHelper" alias="sapDataHubInboundOrderHelper" />
+	<bean id="defaultSapDataHubInboundOrderHelper" class="de.hybris.platform.sap.orderexchange.datahub.inbound.impl.DefaultDataHubInboundOrderHelper"
+		parent="sapAbstractDataHubOrderInboundHelper">
+		<property name="sapOrderCancelService" ref="sapOrderexchangeOrderCancelService" />
+	</bean>
+
+	<alias name="defaultSapDataHubInboundDeliveryHelper" alias="sapDataHubInboundDeliveryHelper" />
+	<bean id="defaultSapDataHubInboundDeliveryHelper" class="de.hybris.platform.sap.orderexchange.datahub.inbound.impl.DefaultDataHubInboundDeliveryHelper"
+		parent="sapAbstractDataHubOrderInboundHelper">
+		<property name="consignmentService" ref="consignmentService" />
+	</bean>
+	
+	<alias name="sapOrderexchangeDefaultB2CCustomerHelper" alias="sapOrderexchangeB2CCustomerHelper" />
+	<bean id="sapOrderexchangeDefaultB2CCustomerHelper" class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultB2CCustomerHelper">
+		<property name="flexibleSearchService" ref="flexibleSearchService"></property>
+		<property name="sAPGlobalConfigurationService" ref="sapCoreDefaultSAPGlobalConfigurationService"></property>
+		<property name="businessProcessService" ref="businessProcessService"></property>
+	</bean>	
+	
+	<!-- ********* Order cancellation -->
+	
+	<bean id="defaultOrderCancelStateMappingStrategy" class="de.hybris.platform.sap.orderexchange.cancellation.DefaultSAPOrderCancelStateMappingStrategy"
+		scope="prototype" />
+
+	<alias name="sapOrderexchangeDefaultOrderCancelService" alias="sapOrderexchangeOrderCancelService" />
+	<bean id="sapOrderexchangeDefaultOrderCancelService" class="de.hybris.platform.sap.orderexchange.cancellation.DefaultSapOrderCancelService">
+		<property name="orderCancelService" ref="orderCancelService" />
+		<property name="orderCancelRecordsHandler" ref="orderCancelRecordsHandler" />
+		<property name="orderCancelCallbackService" ref="orderCancelCallbackService" />
+		<property name="userService" ref="userService" />
+	</bean>
+	
+	<alias name="defaultSapSendOrderCancelRequestAsCSVTaskRunner" alias="sapSendOrderCancelRequestAsCSVTaskRunner" />
+	<bean id="defaultSapSendOrderCancelRequestAsCSVTaskRunner" class="de.hybris.platform.sap.orderexchange.taskrunners.SendOrderCancelRequestAsCSVTaskRunner">
+		<property name="orderCancelRequestCSVHelper" ref="sapOrderexchangeSendOrderCancelRequestToDataHubHelper" />
+		<property name="retryDelay" value="${saporderexchange.orderoutbound.retryDelay}"></property>
+		<property name="maxRetries" value="${saporderexchange.orderoutbound.maxRetries}"></property>
+		<property name="modelService" ref="modelService"></property>
+	</bean>
+
+	<alias name="sapOrderexchangeDefaultOrderExchangeRepair" alias="sapOrderexchangeOrderExchangeRepair" />
+	<bean id="sapOrderexchangeDefaultOrderExchangeRepair" class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultOrderExchangeRepair">
+		<property name="modelService" ref="modelService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<!-- override basecommerce beans -->
+	<bean id="enterCancellingStrategy" class="de.hybris.platform.sap.orderexchange.cancellation.DefaultSapEnterCancellingStrategy"
+		scope="tenant">
+		<property name="modelService" ref="modelService" />
+		<property name="taskService" ref="taskService" />
+	</bean>
+
+	<bean id="orderCancelPaymentServiceAdapter" class="de.hybris.platform.sap.orderexchange.cancellation.OrderCancelPaymentServiceAdapterMock" />
+
+	<bean id="warehouseResponseExecutor" class="de.hybris.platform.ordercancel.impl.executors.WarehouseResponseExecutor" scope="prototype">
+		<property name="modelService" ref="modelService" />
+		<property name="orderCancelRecordsHandler" ref="orderCancelRecordsHandler" />
+		<property name="completeCancelStatusChangeStrategy" ref="setCancellledStrategy" />
+		<property name="partialCancelStatusChangeStrategy" ref="restorePreviousOrderStatusStrategy" />
+		<property name="warehouseDenialStatusChangeStrategy" ref="restorePreviousOrderStatusStrategy" />
+		<property name="warehouseErrorStatusChangeStrategy" ref="restorePreviousOrderStatusStrategy" />
+		<property name="paymentServiceAdapter" ref="orderCancelPaymentServiceAdapter" />
+	</bean>
+
+	<bean id="partialCancelRulesViolationStrategy" class="de.hybris.platform.ordercancel.impl.denialstrategies.PartialCancelRulesViolationStrategy"
+		scope="prototype">
+		<property name="reason">
+			<bean class="de.hybris.platform.ordercancel.DefaultOrderCancelDenialReason">
+				<property name="code" value="3" />
+				<property name="description" value="Partial cancelling not supported" />
+			</bean>
+		</property>
+	</bean>
+
+</beans>

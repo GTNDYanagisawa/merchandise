@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+	
+
+
+	<bean id="createCommentWizard" class="de.hybris.platform.cockpit.wizards.Wizard" scope="prototype">
+		<property name="title" value="cockpit.wizard.createcomment"/>
+		<property name="pages">
+			<list>
+				<bean class="de.hybris.platform.cockpit.wizards.impl.DefaultPage">
+					<property name="id" value="contentPage"/>
+					<property name="title" value="cockpit.wizard.createcomment.page.content"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.wizards.impl.DefaultPage">
+					<property name="id" value="attachmentPage"/>
+					<property name="title" value="cockpit.wizard.createcomment.page.attachment"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- Add Attachment Wizard -->
+	<bean id="AddAttachmentWizard" parent="genericWizard" scope="prototype" class="de.hybris.platform.cockpit.wizards.comments.CommentAttachmentWizard">
+		<property name="currentStringType" value="CommentAttachment"/>
+		<property name="pages">
+			<list>
+				<ref bean="attachmentPage"/> 
+			</list>
+		</property>
+	</bean>
+	<bean id="attachmentPage" class="de.hybris.platform.cockpit.wizards.generic.GenericItemMandatoryPage" scope="prototype">
+		<property name="title" value="tbt: attachmentPage"/>
+		<property name="id" value="attachmentPage"/>
+	</bean>
+	
+	<!-- Generic Wizard -->
+	<bean id="genericWizard" class="de.hybris.platform.cockpit.wizards.generic.GenericItemWizard" scope="prototype">
+		<property name="componentURI" value="/cockpit/wizards/defaultWizardFrame.zul"></property>
+		<property name="defaultController">
+			<bean id="defaultController" class="de.hybris.platform.cockpit.wizards.impl.DefaultPageController" />
+		</property>
+		<property name="pages">
+			<list></list>
+		</property>
+	</bean> 
+	
+	<bean id="genericCreateWizardPageMapping" scope="prototype" parent="defaultGenericCreateWizardPageMapping"/>
+	
+	<bean id="defaultGenericCreateWizardPageMapping" class="de.hybris.platform.cockpit.wizards.generic.AdditionalPageMapping" 
+				scope="prototype">
+		<property name="pageMap">
+			<map>
+				<entry key="Media">
+					<list>
+						<bean class="de.hybris.platform.cockpit.wizards.generic.UploadMediaPage">
+							<property name="title" value="cockpit.wizard.createwidget.uploadpage.title"/>
+							<property name="id" value="uploadPage"/>
+							<property name="mediaService" ref="mediaService"/>
+						</bean>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	
+	<bean id="createItemWizardRegistry" class="de.hybris.platform.cockpit.wizards.generic.CreateItemWizardRegistry" scope="tenant" init-method="init"/>
+	
+	
+	<!-- Wizard responsible for resetting personalized ui configs to group defaults -->
+	<bean id="resetPersonalUIConfigWizard" class="de.hybris.platform.cockpit.wizards.Wizard" scope="prototype">
+		<property name="title" value="menu.usersettings.resetuiconfig"/>
+		<property name="pageRoot" value="/cockpit/wizards/resetconfig"/>
+		<property name="pages">
+			<list>
+				<ref bean="resetPersonalUIConfigWizard_chooseConfigPage"/>
+			</list>
+		</property>
+		<property name="defaultController">
+			<bean class="de.hybris.platform.cockpit.wizards.resetconfigs.ResetConfigWizardController"/>
+		</property>
+	</bean>
+	
+	<bean id="resetPersonalUIConfigWizard_chooseConfigPage" class="de.hybris.platform.cockpit.wizards.impl.DefaultPage" scope="prototype">
+		<property name="id" value="chooseConfigPage"/>
+		<property name="title" value="cockpit.wizard.resetconfig.chooseconfig"/>
+		<property name="componentURI" value="chooseConfig.zul"/>
+	</bean>
+	
+	
+	<bean id="uploadMediaWizard" scope="prototype" class="de.hybris.platform.cockpit.wizards.media.UploadMediaWizard" >
+		<property name="title" value="uploadmediawizard.title"/>
+ 		<property name="defaultController" ref="uploadMediaDefaultPageController"/>
+		<property name="pages">
+			<list>
+				<ref bean="uploadMediaFirstPage"/>
+				<ref bean="uploadMediaSecondPage"/>
+			</list>
+		</property>
+	</bean>
+ 
+ 	<bean id="uploadMediaFirstPage" class="de.hybris.platform.cockpit.wizards.media.UploadMediaFirstPage"  scope="prototype">
+ 		<property name="id" value="uploadMediaFirstPage"></property>
+ 		<property name="parameters">
+			<map></map>
+		</property>
+		<property name="controller" ref="uploadMediaDefaultPageController"></property>	
+ 		<property name="rootSearchStringType" value="Media"></property>
+ 		<property name="width" value="600px"/>
+		<property name="height" value="490px"/>
+		<property name="title" value="uploadmediafirstpage.title"></property>
+ 	</bean>
+ 	
+ 	<bean id="uploadMediaSecondPage" class="de.hybris.platform.cockpit.wizards.generic.GenericItemMandatoryPage"  scope="prototype">
+ 		<property name="id" value="uploadMediaSecondPage"></property>
+  		<property name="controller" ref="uploadMediaSecondPageController"></property>
+	</bean>
+ 	
+ 	<bean id="uploadMediaSecondPageController" class="de.hybris.platform.cockpit.wizards.media.UploadMediaSecondPageController" scope="prototype">
+		<property name="mediaService" ref="mediaService"></property>
+	</bean>
+	
+	<bean id="uploadMediaDefaultPageController" class="de.hybris.platform.cockpit.wizards.media.UploadMediaFirstPageController" scope="prototype">
+	</bean>
+	
+	<alias alias="assignWorkflowWizard" name="defaultAssignWorkflowWizard" />
+	<bean id="defaultAssignWorkflowWizard" parent="genericWizard" scope="prototype" class="de.hybris.platform.cockpit.wizards.workflow.AssignWorkflowWizard">
+		<property name="defaultController">
+			<bean id="defaultController" class="de.hybris.platform.cockpit.wizards.workflow.AssignWorkflowWizardController" />
+		</property>
+		<property name="title" value="workflow.users.manage"/>
+		<property name="pages">
+				<list>
+					<ref bean="assignWorkflowPage"/>
+				</list>
+		</property>
+	</bean>
+	
+	<alias alias="assignWorkflowPage" name="defaultAssignWorkflowPage" />
+	<bean id="defaultAssignWorkflowPage" class="de.hybris.platform.cockpit.wizards.workflow.AssignWorkflowPage" scope="prototype">
+		<property name="id" value="assignWorkflowPage"/>
+	</bean>
+	
+	<alias alias="assignQueryPermissionsWizard" name="defaultAssignQueryPermissionsWizard" />
+	<bean id="defaultAssignQueryPermissionsWizard" parent="genericWizard" scope="prototype" class="de.hybris.platform.cockpit.wizards.queries.AssignQueryPermissionsWizard">
+		<property name="defaultController">
+			<bean id="defaultController" class="de.hybris.platform.cockpit.wizards.queries.AssignQueryPermissionsWizardController" />
+		</property>
+		<property name="title" value="query.manageUser"/>
+		<property name="pages">
+				<list>
+				<ref bean="assignQueryPermissionsPage"/>
+				</list>
+		</property>
+	</bean>
+		
+	<alias alias="assignQueryPermissionsPage" name="defaultAssignQueryPermissionsPage" />
+	<bean id="defaultAssignQueryPermissionsPage" class="de.hybris.platform.cockpit.wizards.queries.AssignQueryPermissionsPage" scope="prototype">
+		<property name="id" value="assignQueryPermissionsPage"/>
+	</bean>
+	
+	<alias alias="assignColumnWizard" name="defaultAssignColumnWizard" />
+	<bean id="defaultAssignColumnWizard" parent="genericWizard" scope="prototype">
+		<property name="defaultController">
+			<bean id="defaultController" class="de.hybris.platform.cockpit.wizards.listview.AssignColumnWizardController" />
+		</property>
+		<property name="title" value="listview.column.manage"/>
+		<property name="pages">
+				<list>
+				<ref bean="assignColumnPage"/>
+				</list>
+		</property>
+	</bean>
+		
+	<alias alias="assignColumnPage" name="defaultAssignColumnPage" />
+	<bean id="defaultAssignColumnPage" class="de.hybris.platform.cockpit.wizards.listview.AssignColumnPage" scope="prototype">
+		<property name="id" value="assignColumnPage"/>
+	</bean>
+	
+	<!-- SavedQueryPermissionsWizard  -->
+	<alias name="defaultAssignSavedQueryPermissionsWizard" alias="assignSavedQueryPermissionsWizard"/>
+	<bean id="defaultAssignSavedQueryPermissionsWizard" parent="genericWizard" scope="prototype" class="de.hybris.platform.cockpit.wizards.queries.AssignQueryPermissionsWizard">
+		<property name="defaultController">
+			<bean id="defaultAssignSavedQueryPermissionsWizardController" class="de.hybris.platform.cockpit.wizards.queries.AssignSavedQueryPermissionsWizardController" />
+		</property>
+		<property name="title" value="query.manageUser"/>
+		<property name="pages">
+				<list>
+				<ref bean="assignSavedQueryPermissionsPage"/>
+				</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultAssignSavedQueryPermissionsPage" alias="assignSavedQueryPermissionsPage"/>	
+	<bean id="defaultAssignSavedQueryPermissionsPage" class="de.hybris.platform.cockpit.wizards.queries.AssignQueryPermissionsPage" scope="prototype">
+		<property name="id" value="assignSavedQueryPermissionsPage"/>
+	</bean>
+	<!-- END SavedQueryPermissionsWizard  -->
+	
+</beans>
+	
+	

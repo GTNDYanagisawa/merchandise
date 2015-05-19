@@ -1,0 +1,12 @@
+#
+# Import the Content Catalog
+#
+$contentCatalog=hybrisContentCatalog
+$languages=ja,en,de,zh
+# Content catalog for CMS contents
+INSERT_UPDATE ContentCatalog;id[unique=true]
+;$contentCatalog
+# Catalog versions for content catalogs
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;languages(isoCode);writePrincipals(uid)[mode=append];readPrincipals(uid)[mode=append]
+;$contentCatalog;Staged;false;$languages;cmsmanagergroup;cmsmanagergroup;
+;$contentCatalog;Online;true;$languages;cmsmanagergroup;cmsmanagergroup;

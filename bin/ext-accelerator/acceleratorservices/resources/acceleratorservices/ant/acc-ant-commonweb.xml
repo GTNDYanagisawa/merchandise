@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<project name="acc.ant.commonweb">
+
+	<!--
+	Copies a given resource to any extension inheriting from commonweb extion.
+	-->
+	<macrodef name="copyCommonWebToExtension">
+		<attribute name="CommonWebExtension"/>
+		<attribute name="CommonWebResource"/>
+		<attribute name="target"/>
+		<sequential>
+			<echo message="copyCommonWebToExtension CommonWebExtension=@{CommonWebExtension} CommonWebResource=@{CommonWebResource} target=@{target}"/>
+			<foreachext>
+				<do>
+					<containsExact string="${required.extensions.for.@{extname}}" substring="@{CommonWebExtension}">
+						<do>
+							<if>
+								<not>
+									<available file="${ext.@{extname}.path}/acceleratoraddon"/>
+								</not>
+								<then>
+									<if>
+										<available file="${ext.@{extname}.path}/web/webroot"/>
+										<then>
+											<processCommonWeb commonwebextension="@{CommonWebExtension}" commonwebresource="@{CommonWebResource}">
+												<doSrc>
+													<sequential>
+
+														<echo message="Synchronizing &lt;@{CommonWebExtension}&gt;/commonweb with &lt;@{extname}&gt;/web/commonwebsrc/"/>
+														<sync todir="${ext.@{extname}.path}/web/commonwebsrc/@{CommonWebExtension}/" overwrite="true">
+															<fileset dir="${ext.@{CommonWebExtension}.path}/commonweb/src" includes="**/*.java"/>
+														</sync>
+
+														<sequential>
+															<compileCommonWeb extname="@{target}" commonwebextension="@{CommonWebExtension}"/>
+															<mkdir dir="${HYBRIS_TEMP_DIR}/touch"/>
+															<touch file="${HYBRIS_TEMP_DIR}/touch/@{target}_CommonWeb_@{CommonWebExtension}srctouch"/>
+														</sequential>
+													</sequential>
+												</doSrc>
+											</processCommonWeb>
+										</then>
+									</if>
+								</then>
+							</if>
+
+
+						</do>
+					</containsExact>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+
+	<!--
+	Compiles CommonWeb src from predefined source to /WEB-INF/classes
+	-->
+	<macrodef name="compileCommonWeb">
+		<attribute name="extname"/>
+		<attribute name="CommonWebExtension"/>
+		<sequential>
+			<echo message="KOMP @{extname} - @{CommonWebExtension}"/>
+			<if>
+				<and>
+					<available file="${ext.@{CommonWebExtension}.path}/commonweb"/>
+					<available file="${ext.@{extname}.path}/web/commonwebsrc/@{CommonWebExtension}"/>
+				</and>
+				<then>
+					<mkdir dir="${ext.@{extname}.path}/web/webroot/WEB-INF/classes"/>
+					<javacompile destdir="${ext.@{extname}.path}/web/webroot/WEB-INF/classes">
+						<source>
+							<pathelement path="${ext.@{extname}.path}/web/commonwebsrc/@{CommonWebExtension}"/>
+						</source>
+						<additionalclasspath>
+							<fileset dir="${ext.@{extname}.path}/web/webroot">
+								<include name="WEB-INF/lib/**.jar"/>
+							</fileset>
+							<fileset dir="${ext.@{extname}.path}">
+								<include name="bin/*.jar"/>
+							</fileset>
+							<pathelement path="${ext.@{extname}.classpath}"/>
+						</additionalclasspath>
+					</javacompile>
+
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<!--
+	Deleting the given resource to any extension not inheriting from CommonWebExtension, but having its CommonWebs copied.
+	The example CommonWeb resource might be :
+		CommonWeb.folder=/webroot/_ui;/webroot/WEB-INF
+	There is separate rule for _ui subfolders and for WEB-INF subfolders
+	-->
+	<macrodef name="deleteCommonWebFromExtension">
+		<attribute name="CommonWebExtension"/>
+		<attribute name="CommonWebResource"/>
+		<sequential>
+			<foreachext>
+				<do>
+					<containsExact string="${required.extensions.for.@{extname}}" substring="@{CommonWebExtension}">
+						<do>
+							<if>
+								<available file="${ext.@{extname}.path}/web/webroot"/>
+								<then>
+									<echo message="Clearing add-on resource(@{CommonWebResource}) for the extension &lt;@{extname}&gt;"/>
+
+									<processCommonWeb commonwebextension="@{CommonWebExtension}" commonwebresource="@{CommonWebResource}">
+										<doSrc>
+											<delete dir="${ext.@{extname}.path}/web/commonwebsrc/@{CommonWebExtension}" verbose="true" failonerror="false"/>
+										</doSrc>
+									</processCommonWeb>
+								</then>
+							</if>
+						</do>
+					</containsExact>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<!--
+	Process CommonWeb extension dir as tags folder or static resource folder basing on the CommonWebResource path
+	-->
+	<macrodef name="processCommonWeb">
+		<element name="doSrc" optional="false"/>
+		<attribute name="CommonWebExtension"/>
+		<attribute name="CommonWebResource"/>
+		<sequential>
+			<if>
+				<contains string="@{CommonWebResource}" substring="/src"/>
+				<then>
+					<doSrc/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+
+</project>

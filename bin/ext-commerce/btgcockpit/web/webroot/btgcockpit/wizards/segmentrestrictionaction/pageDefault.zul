@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:h="http://www.w3.org/1999/xhtml" 
+		xmlns:zk="http://www.zkoss.org/2005/zk"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd ">
+		
+		<style src="${wizardBean.pageRoot}/styles.css"/>
+		
+		<zscript>
+			de.hybris.platform.cockpit.model.meta.TypedObject defaultPage = cmsCockpitService.getDefaultPage(wizardBean.getRestrictedPage());
+			List persPages = cmsCockpitService.getPersonalizedPages(wizardBean.getRestrictedPage(), defaultPage);
+			boolean hasPersonalizedPages = persPages!=null &amp;&amp; !persPages.isEmpty();
+		</zscript>
+				
+		<div style="text-align: left;">
+			<div sclass="wizardPageDescription">
+				<label if="${wizardBean.defaultPageSelected}" 
+					value="${c:l('btgcockpit.wizard.segmentRestrictionAction.pageDefault.selectedPageDefault')}"/>
+				<label if="${!wizardBean.defaultPageSelected}"
+					value="${c:l('btgcockpit.wizard.segmentRestrictionAction.pageDefault.selectedPageRestricted')}"/>
+				<label if="${hasPersonalizedPages}"
+					value="${c:l('btgcockpit.wizard.segmentRestrictionAction.pageDefault.selectedPageHasPersonalized')}"/>
+			</div>
+			<div style="margin: 30px; margin-top: 10px; margin-bottom: 0; font-size: 10px;" >
+				<div if="${hasPersonalizedPages}">
+					<listbox checkmark="true" oddRowSclass="none" multiple="true" sclass="pageListBox" height="100px" 
+								onSelect='self.setSelectedItem(event.getReference()); wizardBean.setRestrictedPage(self.getSelectedItem().getValue()); 
+												Events.echoEvent("onUpdate",optionGroup,null);'>
+						<listitem if="${defaultPage!=null}" label="${c:label(defaultPage)} [default]" checkable="true" sclass="defaultPage" value="${defaultPage}"
+								selected="${wizardBean.restrictedCmsItem==defaultPage}"/>
+						<listitem value="${each}" forEach="${persPages}" selected="${wizardBean.restrictedCmsItem==each}" checkable="true" >
+							<listcell>
+								<div style="position: relative; height: 20px;">
+								<div style="position: absolute; top: 0; left: 40px; ">
+									<hbox>
+										<label value="${c:label(each)}" style="margin-right: 5px;"/>
+										<div use="de.hybris.platform.btgcockpit.wizard.BTGSegmentRestrictionActionWizard$RestrictionIndicator" 
+											pageItem="${each}" onCreate="self.init()"/>
+									</hbox>
+								</div>
+								</div>
+							</listcell>
+						</listitem>
+					</listbox>			
+				</div>
+				<div height="15px"/>
+				<div id="optionGroup"
+								onCreate='self.setVisible(wizardBean.isDefaultPageSelected() || wizardBean.isSelectedPageRestricted());
+											setAttr("addRestriction",!self.isVisible());' 
+								onUpdate='addToRestrictionsOption.setDisabled(wizardBean.isDefaultPageSelected());
+											self.setVisible(wizardBean.isDefaultPageSelected() || wizardBean.isSelectedPageRestricted());
+											setAttr("addRestriction",!self.isVisible());
+											addToRestrictionsOptionBox.setSclass("dis_"+wizardBean.isDefaultPageSelected());
+											if(wizardBean.isDefaultPageSelected()) createPersonalizedOption.setChecked(true);'>
+					<radiogroup>
+						<hbox>
+							<radio id="createPersonalizedOption" checked='true' 
+										onCheck='setAttr("addToExistingPage",false);setAttr("addRestriction",false);setAttr("keepExistingRestrictions",false);' 
+										onCreate='setAttr("addToExistingPage",false);'/>
+							<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.pageDefault.restrictions.personalizedPage')}" />
+						</hbox>
+						<div height="8px"/>
+						<hbox id="addToRestrictionsOptionBox" sclass="dis_${wizardBean.defaultPageSelected}">
+							<radio id="addToRestrictionsOption" onCheck='setAttr("addToExistingPage",true);setAttr("addRestriction",true);' disabled="${wizardBean.defaultPageSelected}"/>
+							<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.pageDefault.restrictions.addRestriction')}" />
+						</hbox>
+					</radiogroup>
+				</div>
+			</div>
+			
+		</div>
+</zk>

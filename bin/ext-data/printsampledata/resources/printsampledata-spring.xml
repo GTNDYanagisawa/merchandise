@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns:aop="http://www.springframework.org/schema/aop"
+		 xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+
+	<!--  SystemSetup  -->
+	<bean id="printsampledataSystemSetup" class="de.hybris.platform.printsampledata.setup.PrintsampledataSystemSetup" parent="abstractCoreSystemSetup"/>
+
+
+	<!--  Overriding ValueUtils  -->
+	<bean id="ValueUtils" class="de.hybris.platform.print.util.AdditionalValueUtils" scope="tenant" lazy-init="true"/>
+
+
+	<!--  Adding DataProviders  -->
+	<bean id="print.manager" class="de.hybris.platform.print.jalo.PrintManager" init-method="init" scope="tenant">
+		<!--
+			List of all available axis data providers for the table editor.
+		-->
+		<property name="tableAxisDataProviders">
+			<list value-type="java.lang.Class">
+				<value>de.hybris.platform.print.util.table.SingleItemDataProvider</value>
+				<value>de.hybris.platform.print.util.table.ItemListDataProvider</value>
+				<value>de.hybris.platform.print.util.table.ClassAttrDataProvider</value>
+				<value>de.hybris.platform.print.util.table.VariantProductsDataProvider</value>
+				<value>de.hybris.platform.print.util.table.VariantAttributesDataProvider</value>
+				<value>de.hybris.platform.print.util.table.CategoryProductDataProvider</value>
+				<value>de.hybris.platform.print.util.table.PagePlacementsProvider</value>
+				<value>de.hybris.platform.print.util.table.PageProductsProvider</value>
+			</list>
+		</property>
+
+		<!--
+			List of all available cell data resolvers for the table editor.
+		-->
+		<property name="tableCellDataResolvers">
+			<list value-type="java.lang.Class">
+				<value>de.hybris.platform.print.util.table.DefaultDataResolver</value>
+			</list>
+		</property>
+
+		<!--
+			List of all available sorting comparators for the table editor.
+		-->
+		<property name="tableSortComparators">
+			<list value-type="java.lang.Class">
+				<value>de.hybris.platform.print.util.table.DefaultCellValueComparator</value>
+			</list>
+		</property>
+	</bean>
+
+
+
+</beans>

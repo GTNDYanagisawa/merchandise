@@ -1,0 +1,108 @@
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2013 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="defaultOndemandHystrixCommandFactory" alias="ondemandHystrixCommandFactory" />
+	<bean id="defaultOndemandHystrixCommandFactory" class="de.hybris.platform.integration.commons.hystrix.OndemandHystrixCommandFactory">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="ondemandPreferenceSelectorService" ref="ondemandPreferenceSelectorService"/>
+	</bean>
+
+	<alias name="defaultOndemandDeliveryAddressStrategy" alias="ondemandDeliveryAddressStrategy" />
+	<bean id="defaultOndemandDeliveryAddressStrategy"
+		class="de.hybris.platform.integration.commons.strategies.impl.DefaultOndemandDeliveryAddressStrategy" />
+
+	<alias name="defaultOndemandTaxAreaLookupStrategy" alias="taxAreaLookupStrategy" />
+	<bean id="defaultOndemandTaxAreaLookupStrategy"
+		class="de.hybris.platform.integration.commons.strategies.impl.DefaultOndemandTaxAreaLookupStrategy">
+		<property name="ondemandDeliveryAddressStrategy" ref="ondemandDeliveryAddressStrategy" />
+	</bean>
+
+	<alias name="defaultOndemandTaxCalculationService" alias="ondemandTaxCalculationService" />
+	<bean id="defaultOndemandTaxCalculationService"
+		class="de.hybris.platform.integration.commons.services.impl.DefaultOndemandTaxCalculationService" />
+
+	<alias name="defaultOndemandPreferenceSelectorService"
+		alias="ondemandPreferenceSelectorService" />
+	<bean id="defaultOndemandPreferenceSelectorService"
+		class="de.hybris.platform.integration.commons.services.impl.DefaultOndemandPreferenceSelectorService">
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="tenantContextService" ref="tenantContextService" />
+	</bean>
+
+	<alias name="defaultOndemandSourceDeliveryFromStrategy" alias="ondemandSourceDeliveryFromStrategy" />
+	<bean id="defaultOndemandSourceDeliveryFromStrategy"
+		class="de.hybris.platform.integration.commons.strategies.impl.DefaultOndemandSourceDeliveryFromStrategy">
+		<property name="modelService" ref="modelService" />
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+	<alias name="defaultOndemandCheckoutCartCalculationStrategy"
+		alias="checkoutCartCalculationStrategy" />
+	<bean id="defaultOndemandCheckoutCartCalculationStrategy"
+		class="de.hybris.platform.integration.commons.strategies.impl.OndemandCheckoutCartCalculationStrategy"
+		parent="defaultCheckoutCartCalculationStrategy">
+		<property name="modelService" ref="modelService" />
+		<property name="externalTaxesService" ref="externalTaxesService" />
+		<property name="ondemandSourceDeliveryFromStrategy" ref="ondemandSourceDeliveryFromStrategy" />
+		<lookup-method name="getDeliveryFromAddressStrategyViaLookup"
+			bean="deliveryFromAddressStrategy" />
+	</bean>
+
+	<alias alias="onDemandDiscountableEntryStrategy" name="defaultOnDemandDiscountableEntryStrategy" />
+	<bean id="defaultOnDemandDiscountableEntryStrategy"
+		class="de.hybris.platform.integration.commons.strategies.impl.DefaultOndemandDiscountableEntryStrategy" />
+
+	<alias name="defaultOnDemandPromotionService" alias="onDemandPromotionService" />
+	<bean id="defaultOnDemandPromotionService"
+		class="de.hybris.platform.integration.commons.services.impl.DefaultOndemandPromotionService">
+		<property name="discountableEntryStrategy" ref="onDemandDiscountableEntryStrategy" />
+		<property name="taxCalculationService" ref="ondemandTaxCalculationService" />
+	</bean>
+
+	<bean id="ondemandHystrixThreadPoolTenantListener" 
+		class="de.hybris.platform.integration.commons.hystrix.OndemandHystrixThreadPoolTenantListener"
+		 init-method="init" />
+
+	<bean id="ondemandAfterInitializationStartEventListener"
+		class="de.hybris.platform.integration.commons.event.AfterInitializationStartEventListener"
+		parent="abstractEventListener">
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+	<bean id="ondemandAfterInitializationEndEventListener"
+		class="de.hybris.platform.integration.commons.event.AfterInitializationEndEventListener"
+		parent="abstractEventListener">
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+
+	<!-- endpointProvider for subscription as long as CIS is not on premise -->
+	<bean id="endpointProvider"
+		class="com.hybris.commons.client.external.ExternalEndpointProvider">
+		<property name="gatewayUri" value="${hybris.gateway.uri}" />
+	</bean>
+
+
+	<!-- re-using the hybris platform property configurer for onPremise accounts -->
+	<!-- rma this breaks properties required for coreplus extensions e.g. omsextension -->
+	<!--alias name="hybrisProperties" alias="applicationProperties"/-->
+</beans>

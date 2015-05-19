@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  /*
+   * [y] hybris Platform
+   *
+   * Copyright (c) 2000-2013 hybris AG
+   * All rights reserved.
+   *
+   * This software is the confidential and proprietary information of hybris
+   * ("Confidential Information"). You shall not disclose such Confidential
+   * Information and shall use it only in accordance with the terms of the
+   * license agreement you entered into with hybris.
+   *
+   *
+   */
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+	   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+	<import resource="classpath:/META-INF/propertyregistry-rest-client-spring.xml" />
+
+	<bean id="propertyregistryGenericRestClient" parent="abstractPropertyregistryGenericRestClient" lazy-init="true">
+		<property name="endpointProvider" ref="propertyregistryEndpointProvider"/>
+	</bean>
+
+	<bean id="propertyregistryEndpointProvider" class="com.hybris.commons.client.StaticEndpointProvider">
+		<!-- Important: we're using 'hybrisProperties' to be able to configure properties in local.properties -->
+		<property name="properties" ref="hybrisProperties"/>
+	</bean>
+	
+	<bean id="propertyregistryEndpointProviderStaticTenantDecorator" class="com.hybris.commons.client.StaticHeaderValueRestCallDecorator">
+		<property name="headerName" value="X-tenantId"/>
+		<property name="staticValue" value="${propertyregistry.defaultTenant}"/>
+	</bean>
+
+	<!-- Define roleDecorator using the static 'accelerator' role -->
+ 	<bean id="propertyregistryStaticRoleDecorator" class="com.hybris.commons.client.StaticHeaderValueRestCallDecorator">
+		<property name="headerName" value="X-role"/>
+		<property name="staticValue" value="accelerator"/>
+	</bean>
+
+    <!-- Provides a platform aware current locale information -->
+	<bean id="propertyregistryLocaleDecorator" class="com.hybris.platform.coreplus.commons.decorators.LocaleDecorator"/>
+
+    <!--
+     fixed list of decorators since e.g. the archetype hickers-ext-archetype we are expecting to overwrite the hickers project configuration
+     -->
+	<util:list id="propertyregistryRestCallDecorators">
+		<ref bean="propertyregistryStaticTenantDecorator"/>
+		<ref bean="propertyregistryStaticRoleDecorator"/>
+		<ref bean="propertyregistryLocaleDecorator"/>
+	</util:list>
+</beans>

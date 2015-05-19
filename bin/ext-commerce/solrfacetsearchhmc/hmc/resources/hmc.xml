@@ -1,0 +1,1349 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+
+	<!-- Configuration for extension solrfacetsearch -->
+
+	<explorertree>
+		<group name="system" mode="append">
+			<group name="solrfacetsearch" description="group.solrfacetsearch.description">
+				<typeref type="SolrFacetSearchConfig" description="typeref.solrfacetsearch.description" />
+				<typeref type="SolrIndexerOperationWizard" description="typeref.solrindexeroperationwizard.description" />
+				<typeref type="SolrIndexerHotUpdateWizard" description="typeref.solrindexerhotupdatewizard.description" />
+				<typeref type="SolrIndexedType" description="typeref.solrindexedtype.description" />
+				<typeref type="SolrValueRangeSet" description="typeref.solrvaluerangeset.description" />
+				<typeref type="SolrIndexedCoresRecord"  description="typeref.solrindexedcoresrecord.description" />
+			</group>
+		</group>
+	</explorertree>
+	
+	<type name="SolrFacetSearchConfig" useselector="true" mode="append" icon="ext/solrfacetsearch/images/facetsearch.gif">
+		<organizer>
+			<search mode="replace" autoperform="true">
+				<condition attribute="name" />
+				<condition attribute="description" />
+				<condition attribute="catalogVersions" />
+				<condition attribute="currencies" />
+				<condition attribute="languages" />
+			</search>
+			<result defaultview="list">
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="name" width="100" />
+						<attribute name="description" width="300" />
+					</itemlayout>
+				</listview>
+				<editview mode="replace">
+					<itemlayout>
+						<attribute name="name" width="150" />
+						<attribute name="description" width="300" />
+					</itemlayout>
+				</editview>
+				<treeview mode="replace">
+					<itemlayout>
+						<attribute name="name" />
+						<attribute name="description"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<essentials mode="replace">
+					<listlayout>
+						<attribute name="name" />
+					</listlayout>
+				</essentials>
+				<tab name="tab.configuration.properties">
+					<section name="sec.configuration.cronjobs">
+						<listlayout>
+							<attribute name="solrIndexerCronJob"/>
+						</listlayout>
+					</section>
+					<section name="sec.configuration.properties">
+						<listlayout>
+							<attribute name="description" editable="true"/>
+							<attribute name="catalogVersions" editable="true">
+								<referencecollectioneditor resortable="false" create="true" remove="true" autosave="false">
+									<itemlayout>
+										<attribute name="catalog"/>
+										<attribute name="version"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="currencies" editable="true">
+								<referencecollectioneditor resortable="false" create="true" remove="true" autosave="false">
+									<itemlayout>
+										<attribute name="name"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>	
+							<attribute name="languages" editable="true">
+								<referencecollectioneditor resortable="false" create="true" remove="true" autosave="false">
+									<itemlayout>
+										<attribute name="isoCode"/>
+										<attribute name="name"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="enabledLanguageFallbackMechanism" editable="true"/>
+							<attribute name="solrValueRangeSets"/>
+							<attribute name="indexNamePrefix"/>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.configuration.indexedtype">
+					<section name="sec.configuration.indexedtype">
+						<listlayout>
+							<attribute name="solrIndexedTypes" editable="true">
+								<referencecollectioneditor resortable="false" create="true" remove="true" autosave="false">
+									<itemlayout>
+										<attribute name="identifier"/>
+										<attribute name="type"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.configuration.searchconfig">
+					<section name="sec.configuration.searchconfig">
+						<listlayout>
+							<attribute name="solrSearchConfig"/>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.configuration.solrconfig.redirects">
+					<section name="tab.configuration.solrconfig.redirects.general">
+						<listlayout>
+							<attribute name="languageKeywordRedirectMapping" editable="true">
+								<referencecollectioneditor presetattribute="facetSearchConfig" add="false" create="true" editable="true" >
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.configuration.solrconfig">
+					<section name="sec.configuration.solrconfig">
+						<listlayout>
+							<attribute name="solrServerConfig"/>
+						</listlayout>
+					</section>
+					<section name="sec.configuration.indexerconfig">
+						<listlayout>
+							<attribute name="solrIndexConfig" editable="true" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.configuration.solrconfig.synonym">
+					<section name="sec.configuration.solrconfig.synonym">
+						<listlayout>
+							<action classname="de.hybris.platform.solrfacetsearch.hmc.ExportSynonymsAction" type="item" name="act.configuration.solrconfig.synonym" hidebutton="false"/>
+							<attribute name="languageSynonymMapping" editable="true">
+								<referencecollectioneditor add="false" create="true" editable="true" />
+							</attribute>
+							<attribute name="solrUpdateSynonymsCronJobs">
+								<referencecollectioneditor add="false" create="true" editable="false" />
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.configuration.solrconfig.stopword">
+					<section name="sec.configuration.solrconfig.stopword">
+						<columnlayout>
+							<row>
+								<action classname="de.hybris.platform.solrfacetsearch.hmc.ExportStopWordsAction" type="item" name="act.configuration.solrconfig.stopword" hidebutton="false"/>
+							</row>
+						</columnlayout>
+						<listlayout>
+							<attribute name="languageStopWordMapping" editable="true">
+								<referencecollectioneditor add="false" create="true" editable="true" />
+							</attribute>
+							<attribute name="solrUpdateStopWordsCronJobs">
+								<referencecollectioneditor add="false" create="true" editable="false" />
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="name" >
+			<itemlayout>
+				<attribute name="name"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrFacetSearchKeywordRedirect" useselector="true" mode="append">
+		<organizer mode="append">
+			<search>
+				<condition attribute="keyword"/>
+				<condition attribute="matchType"/>
+				<condition attribute="redirect"/>
+				<condition attribute="language"/>
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="keyword" width="200"/>
+						<attribute name="matchType" width="100"/>
+						<attribute name="ignoreCase" width="100"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.configuration.solrconfig.keywordredirects">
+					<section name="sec.configuration.solrconfig.keywordredirects">
+						<listlayout mode="append">
+							<attribute name="keyword" editable="true" />
+							<attribute name="matchType" editable="true">
+								<enumerationvalueselecteditor />
+							</attribute>
+							<attribute name="ignoreCase" editable="true" />
+							<attribute name="redirect" editable="true" />
+							<attribute name="facetSearchConfig" editable="false" />
+							<attribute name="language" editable="true" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="keyword"/>
+				<attribute name="matchType"/>
+				<attribute name="language"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrAbstractKeywordRedirect" mode="append">
+		<organizer mode="append" />
+		<defaultreference>
+			<itemlayout>
+				<attribute name="hmcLabel" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrSynonymConfig" mode="append" useselector="true">
+		<organizer mode="append">
+			<search mode="replace">
+				<condition attribute="synonymFrom"/>
+				<condition attribute="synonymTo"/>
+				<condition attribute="language"/>
+			</search>
+			<result defaultview="list" mode="replace">
+					<listview mode="replace">
+						<itemlayout>
+							<attribute name="synonymFrom" width="150"/>
+							<attribute name="synonymTo" width="150"/>
+							<attribute name="language" width="150"/>
+						</itemlayout>
+					</listview>
+					<editview mode="replace">
+						<itemlayout>
+							<attribute name="synonymFrom"/>
+							<attribute name="synonymTo"/>
+						</itemlayout>
+					</editview>
+					<treeview mode="replace">
+						<itemlayout>
+							<attribute name="synonymFrom"/>
+							<attribute name="synonymTo"/>
+							<attribute name="language"/>
+						</itemlayout>
+					</treeview>
+			</result>
+			<editor>
+				<tab name="tab.configuration.synonym" position="0">
+					<section name="sec.configuration.synonym">
+						<listlayout mode="append">
+							<attribute name="synonymFrom" editable="true"/>
+							<attribute name="synonymTo" editable="true" />
+							<attribute name="language" editable="true" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="synonymFrom"/>
+				<attribute name="synonymTo"/>
+				<attribute name="language"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrStopWord" mode="append" useselector="true">
+		<organizer mode="append">
+			<search mode="replace">
+				<condition attribute="stopword"/>
+				<condition attribute="language"/>
+			</search>
+			<result defaultview="list" mode="replace">
+					<listview mode="replace">
+						<itemlayout>
+							<attribute name="stopword" width="150"/>
+							<attribute name="language" width="150"/>
+						</itemlayout>
+					</listview>
+					<editview mode="replace">
+						<itemlayout>
+							<attribute name="stopword"/>
+						</itemlayout>
+					</editview>
+					<treeview mode="replace">
+						<itemlayout>
+							<attribute name="stopword"/>
+							<attribute name="language"/>
+						</itemlayout>
+					</treeview>
+			</result>
+			<editor>
+				<tab name="tab.configuration.stopword" position="0">
+					<section name="sec.configuration.stopword">
+						<listlayout mode="append">
+							<attribute name="stopword" editable="true"/>
+							<attribute name="language" editable="true" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="stopword"/>
+				<attribute name="language"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrValueRangeSet" useselector="true" mode="append" icon="ext/solrfacetsearch/images/facetsearch.gif">
+		<organizer mode="append">
+			<search mode="replace">
+				<condition attribute="name"/>
+				<condition attribute="type"/>
+				<condition attribute="facetSearchConfigs" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="name" width="150"/>
+						<attribute name="type" width="150"/>
+					</itemlayout>
+				</listview>
+				<editview mode="replace">
+					<itemlayout>
+						<attribute name="name"/>
+						<attribute name="type"/>
+					</itemlayout>
+				</editview>
+				<treeview mode="replace">
+					<itemlayout>
+						<attribute name="name"/>
+						<attribute name="type"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<essentials mode="append">
+					<listlayout mode="append">
+						<attribute name="name" editable="true"/>
+						<attribute name="facetSearchConfigs" />
+					</listlayout>
+				</essentials>
+				<tab name="tab.configuration.ranges">
+					<section name="sec.configuration.ranges">
+						<listlayout>
+							<attribute name="type" editable="true"/>
+							<attribute name="solrValueRanges" editable="true">
+								<referencecollectioneditor resortable="false" create="true" remove="true" autosave="true">
+									<itemlayout>
+										<attribute name="name"/>
+										<attribute name="from"/>
+										<attribute name="to"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" >
+			<itemlayout>
+				<attribute name="name"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrValueRange" useselector="true" mode="append">
+		<organizer>
+			<search autoperform="true" mode="replace">
+				<condition attribute="solrValueRangeSet"/>
+				<condition attribute="name"/>
+				<condition attribute="from"/>
+				<condition attribute="to"/>
+			</search>
+			<result defaultview="list">
+					<listview>
+						<itemlayout>
+							<attribute name="solrValueRangeSet"/>
+							<attribute name="name"/>
+							<attribute name="from"/>
+							<attribute name="to"/>
+						</itemlayout>
+					</listview>
+					<editview>
+						<itemlayout>
+							<attribute name="solrValueRangeSet"/>
+							<attribute name="name"/>
+							<attribute name="from"/>
+							<attribute name="to"/>
+						</itemlayout>
+					</editview>
+					<treeview>
+						<itemlayout>
+							<attribute name="solrValueRangeSet"/>
+							<attribute name="name"/>
+							<attribute name="from" />
+							<attribute name="to"/>
+						</itemlayout>
+					</treeview>
+			</result>
+			<editor>
+				<tab name="tab.configuration.ranges">
+				<section name="sec.configuration.ranges">
+					<listlayout mode="replace">
+						<attribute name="solrValueRangeSet"/>
+						<attribute name="name" editable="true"/>
+						<attribute name="from" editable="true"/>
+						<attribute name="to" editable="true"/>
+					</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	
+	<type name="SolrSearchConfig" mode="append">
+		<organizer mode="append">
+			<search mode="replace">
+				<condition attribute="description"/>
+				<condition attribute="pageSize"/>
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="pageSize"/>
+						<attribute name="defaultSortOrder"/>
+						<attribute name="description"/>
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="pageSize"/>
+						<attribute name="defaultSortOrder"/>
+						<attribute name="description"/>
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="pageSize"/>
+						<attribute name="defaultSortOrder"/>
+						<attribute name="description"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="tab.configuration.searchconfig">
+					<section name="sec.configuration.searchconfig">
+						<listlayout mode="replace">
+							<attribute name="pageSize" editable="true"/>
+							<attribute name="defaultSortOrder">
+								<collectioneditor resortable="false" addremove="true" title="sortorder.title"/>
+							</attribute>
+							<attribute name="description"/>
+							<attribute name="groupingProperty">
+								<defaulteditor>
+									<parameter key="creatable" value="false"/>
+								</defaulteditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" >
+			<itemlayout>
+				<attribute name="description"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+<!-- 	<type name="SolrSynonymLangMapping" mode="append">
+		
+	</type> -->
+
+	<type name="SolrIndexerCronJob" mode="append">
+		<organizer>
+			<editor>
+				<tab name="tab.cronjob.common" mode="append">
+					<section name="section.cronjob.indexer" mode="append">
+						<listlayout mode="append">
+							<attribute name="facetSearchConfig" />
+							<attribute name="indexerOperation" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="SolrIndexerOperationWizard" mode="append" icon="ext/solrfacetsearch/images/facetsearch.gif">
+		<organizer>
+			<editor>
+				<exclude>
+					<exclusion attribute="owner" />
+				</exclude>
+				<tab name="tab.solrindexeroperationwizard.tab1" position="0">
+					<section name="section.facetservciceupdateindexwizard.one">
+						<listlayout>
+							<attribute name="indexerOperation" />
+							<attribute name="facetSearchConfig" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	
+	<type name="SolrIndexerHotUpdateWizard" mode="append" icon="ext/solrfacetsearch/images/facetsearch.gif">
+		<organizer>
+			<editor>
+				<exclude>
+					<exclusion attribute="owner" />
+				</exclude>
+				<tab name="tab.indexerhotupdate.one" position="0">
+					<section name="tab.indexerhotupdate.one">
+						<listlayout>
+							<attribute name="solrFacetSearchConfig"  />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.indexerhotupdate.two" position="1">
+					<section name="tab.indexerhotupdate.two">
+						<listlayout>
+							<attribute name="indexType" width="300"/>
+							<attribute name="updateOperation" width="300">
+								<advancedbooleaneditor truename="update_operation" falsename="delete_operation"/>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.indexerhotupdate.three" position="2">
+					<section name="tab.indexerhotupdate.three">
+						<listlayout>
+							<attribute name="itemsToIndex">
+								<referencecollectioneditor typeattribute="composedTypeAttribute"/>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	
+	<type name="ComposedIndexedType" mode="append">
+		<organizer>
+			<editor>
+				<tab name="composedIndexedType.tab">
+					<section name="composedIndexedType.sec">
+						<listlayout>
+							<attribute name="indexedType"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="indexedType"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrIndexedType" mode="append" icon="ext/solrfacetsearch/images/facetsearch.gif">
+		<organizer>
+			<search mode="replace" autoperform="true">
+				<condition attribute="identifier" />
+				<condition attribute="type" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="identifier"/>
+						<attribute name="type"/>
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="identifier"/>
+						<attribute name="type"/>
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="identifier"/>
+						<attribute name="type"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="tab.configuration.indexedtype">
+					<section name="sec.configuration.indexedtype">
+						<listlayout mode="replace">
+							<attribute name="identifier"/>
+							<attribute name="type"/>
+							<attribute name="indexName"/>
+							<attribute name="solrIndexedProperties" editable="true">
+								<referencecollectioneditor resortable="false" create="true" remove="true" autosave="false" editable="true">
+									<itemlayout>
+										<attribute name="name"/>
+										<attribute name="type"/>
+										<attribute name="facet"/>
+										<attribute name="multiValue"/>
+										<attribute name="useForSpellchecking"/>
+										<attribute name="useForAutocomplete"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="solrIndexerQueries">
+								<referencecollectioneditor resortable="false" create="true" remove="true" autosave="false" editable="true">
+									<itemlayout>
+										<attribute name="type"/>
+										<attribute name="query" width="300"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="identityProvider"/>
+							<attribute name="modelLoader"/>
+							<attribute name="valuesProvider"/>
+							<attribute name="solrResultConverter"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="identifier"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="SolrIndexerQuery" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="identifier"/>
+				<condition attribute="type"/>
+				<condition attribute="solrIndexedType"/>
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="identifier"/>
+						<attribute name="type"/>
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="identifier"/>
+						<attribute name="type"/>
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="identifier"/>
+						<attribute name="type"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="identifier"/>
+					</listlayout>
+				</essentials>
+				<tab name="tab.configuration.indexqueries">
+					<section name="sec.configuration.indexqueries">
+						<columnlayout>
+							<row>
+								<attribute name="query">
+									<textareaeditor expanded="true"/>
+								</attribute>
+								<attribute name="solrIndexerQueryParameters">
+									<referencecollectioneditor resortable="false" create="true" remove="true" autosave="false" externalcreate="false" editable="true">
+										<itemlayout>
+											<attribute name="name"/>
+											<attribute name="value"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+							</row>
+							<row>
+								<void/>
+								<attribute name="parameterProvider"/>
+							</row>
+							<row>
+								<attribute name="type"/>
+								<attribute name="user"/>
+							</row>
+							<row>
+								<attribute name="injectLastIndexTime"/>
+							</row>
+							<row>
+								<attribute name="injectCurrentTime"/>
+							</row>
+							<row>
+								<attribute name="injectCurrentDate"/>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="SolrIndexedProperty" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="name"/>
+				<condition attribute="type"/>
+				<condition attribute="facet"/>
+				<condition attribute="solrIndexedType"/>
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="name"/>
+						<attribute name="type"/>
+						<attribute name="facet"/>
+						<attribute name="exportId"/>
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="name"/>
+						<attribute name="type"/>
+						<attribute name="facet"/>
+						<attribute name="exportId"/>
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="name"/>
+						<attribute name="type"/>
+						<attribute name="facet"/>
+						<attribute name="exportId"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="tab.configuration.indexedproperty">
+					<section name="sec.configuration.indexedproperty">
+						<listlayout mode="replace">
+							<table>
+								<tr>
+									<td>
+										<attribute name="name"/>
+									</td>
+									<td/>
+								</tr>
+								<tr>
+									<td>
+										<attribute name="exportId"/>
+									</td>
+									<td/>
+								</tr>
+								<tr>
+									<td width="146px">
+										<attribute name="type"/>
+									</td>
+									<td>
+										<shortcut name="createsolrtype" usage="creator" type="SolrPropertiesTypes">
+										</shortcut>
+									</td>
+								</tr>
+								<tr>
+									<td width="146px">
+										<attribute name="sortableType"/>
+									</td>
+									<td>
+										<shortcut name="createsolrtype" usage="creator" type="SolrPropertiesTypes">
+										</shortcut>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<attribute name="localized"/>
+										<attribute name="currency"/>
+										<attribute name="multiValue"/>
+										<attribute name="useForSpellchecking"/>
+										<attribute name="useForAutocomplete"/>
+										<attribute name="rangeSet"/>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<attribute name="fieldValueProvider">
+											<customeditor classname="de.hybris.platform.solrfacetsearch.hmc.FieldValueProviderSelectEditorChip"/>
+										</attribute>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<attribute name="valueProviderParameter"/>
+									</td>
+								</tr>
+							</table>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.configuration.indexedproperty.facet">
+					<section name="sec.configuration.indexedproperty.facet">
+						<listlayout mode="replace">
+							<table>
+								<tr>
+									<td>
+										<attribute name="facet"/>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<attribute name="facetDisplayNameProvider"/>
+										<attribute name="facetType"/>
+										<!-- added for GEN-1029 -->
+										<attribute name="priority"/>
+										<attribute name="customFacetSortProvider">
+											<customeditor classname="de.hybris.platform.solrfacetsearch.hmc.FacetSortProviderEditorChip"/>
+										</attribute>
+									</td>
+								</tr>
+							</table>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="name"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrServerConfig" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="name" />
+				<condition attribute="mode" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="name" />
+						<attribute name="mode" />
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="name" />
+						<attribute name="mode" />
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="name" />
+						<attribute name="mode" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="tab.configuration.serverconfig">
+				<section name="sec.configuration.serverconfig">
+					<listlayout mode="replace">
+						<attribute name="name" />
+						<attribute name="mode" />
+						<attribute name="embeddedMaster" />
+						<attribute name="aliveCheckInterval" />
+						<attribute name="connectionTimeout" />
+						<attribute name="socketTimeout" />
+						<attribute name="maxTotalConnections"/>
+						<attribute name="maxTotalConnectionsPerHostConfig"/>
+						<attribute name="tcpNoDelay"/>
+						
+						<attribute name="solrEndpointUrls">
+							<referencecollectioneditor resortable="false" create="true" remove="true" autosave="false" externalcreate="false" editable="true">
+								<itemlayout>
+									<attribute name="url" width="200"/>
+									<attribute name="master"/>
+								</itemlayout>
+							</referencecollectioneditor>
+						</attribute>
+						<attribute name="useMasterNodeExclusivelyForIndexing"/>
+						<text name="text.usemasternodeexclusivelyforindexing.warning"/>
+					</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" >
+			<itemlayout>
+				<attribute name="name"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrIndexConfig" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="name" />
+				<condition attribute="batchSize" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="name" />
+						<attribute name="batchSize" />
+						<attribute name="exportPath" />
+						<attribute name="numberOfThreads" />
+						<attribute name="indexMode"/>
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="name" />
+						<attribute name="batchSize" />
+						<attribute name="exportPath" />
+						<attribute name="numberOfThreads" />
+						<attribute name="indexMode"/>
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="name" />
+						<attribute name="batchSize" />
+						<attribute name="exportPath" />
+						<attribute name="numberOfThreads" />
+						<attribute name="indexMode"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="tab.configuration.indexconfig">
+					<section name="sec.configuration.indexconfig">
+						<listlayout mode="replace">
+							<attribute name="name" />
+							<attribute name="batchSize" />
+							<attribute name="exportPath" />
+							<attribute name="numberOfThreads" />
+							<attribute name="indexMode"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" >
+			<itemlayout>
+				<attribute name="name"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrEndpointUrl" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="url" />
+				<condition attribute="master" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="url" />
+						<attribute name="master" />
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="url" />
+						<attribute name="master" />
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="url" />
+						<attribute name="master" />
+						</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="tab.configuration.indexconfig">
+					<section name="sec.configuration.indexconfig">
+						<listlayout mode="replace">
+							<attribute name="url" />
+							<attribute name="master" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" >
+			<itemlayout>
+				<attribute name="url"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrIndexOptimizationCronJob" mode="append">
+		<organizer>
+			<editor>
+			<essentials>
+				<listlayout>
+					<attribute name="facetSearchConfig" />
+				</listlayout>
+			</essentials>
+			</editor>
+		</organizer>
+	</type>
+	
+	<type name="SolrUpdateSynonymsCronJob" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" />
+				<condition attribute="solrFacetSearchConfig" />
+				<condition attribute="language" />
+			</search>
+			<editor>
+				<essentials>
+					<listlayout >
+						<attribute name="solrFacetSearchConfig" />
+						<attribute name="language"  />
+					</listlayout>
+				</essentials>
+<!-- 			<tab name="tab.syncronjob.settings" position="2" mode="append">
+				<section name="sec.syncronjob.sec1">
+					<listlayout mode="replace">
+							<attribute name="solrFacetSearchConfig" />
+							<attribute name="language" />
+					</listlayout>
+					</section>
+				</tab> -->
+			</editor>
+		</organizer>
+		<defaultreference mode="append">
+			<itemlayout>
+				<attribute name="solrFacetSearchConfig" position="0"/>
+				<attribute name="language" position="1"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrUpdateStopWordsCronJob" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" />
+				<condition attribute="solrFacetSearchConfig" />
+				<condition attribute="language" />
+			</search>
+			<editor>
+			<essentials>
+				<listlayout >
+					<attribute name="solrFacetSearchConfig"  />
+					<attribute name="language"  />
+				</listlayout>
+			</essentials>
+			</editor>
+		</organizer>
+		<defaultreference mode="append">
+			<itemlayout>
+				<attribute name="solrFacetSearchConfig" position="0"/>
+				<attribute name="language" position="1"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrAbstractKeywordRedirect" mode="append">
+		<organizer>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="hmcLabel" />
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="hmcLabel" />
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="hmcLabel" />
+					</itemlayout>
+				</treeview>
+			</result>
+		</organizer>
+		<defaultreference mode="replace" >
+			<itemlayout>
+				<attribute name="hmcLabel"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrURIRedirect" mode="append">
+		<organizer>
+			<search>
+				<condition attribute="url" />
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout>
+						<attribute name="url" />
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="url" />
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="url" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="SolrURIRedirect.tab">
+					<section name="SolrURIRedirect.sec">
+						<listlayout>
+							<attribute name="url"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference>
+			<itemlayout>
+				<attribute name="url"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrProductRedirect" mode="append">
+		<organizer>
+			<search>
+				<condition attribute="redirectItem" />
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout>
+						<attribute name="redirectItem" />
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="redirectItem" />
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="redirectItem" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="SolrItemRedirect.tab">
+					<section name="SolrItemRedirect.sec">
+						<listlayout>
+							<attribute name="redirectItem"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference>
+			<itemlayout>
+				<attribute name="redirectItem"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="SolrCategoryRedirect" mode="append">
+		<organizer>
+			<search>
+				<condition attribute="redirectItem" />
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout>
+						<attribute name="redirectItem" />
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="redirectItem" />
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="redirectItem" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="SolrItemRedirect.tab">
+					<section name="SolrItemRedirect.sec">
+						<listlayout>
+							<attribute name="redirectItem"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference>
+			<itemlayout>
+				<attribute name="redirectItem"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrIndexedCoresRecord" mode="append" icon="ext/solrfacetsearch/images/facetsearch.gif">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="coreName"/>
+				<condition attribute="indexName"/>
+				<condition attribute="serverMode"/>
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="coreName"/>
+						<attribute name="indexName"/>
+						<attribute name="serverMode"/>
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="coreName"/>
+						<attribute name="indexName"/>
+						<attribute name="serverMode"/>
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="coreName"/>
+						<attribute name="indexName"/>
+						<attribute name="serverMode"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="SolrIndexedCoresRecord.tab">
+					<section name="SolrIndexedCoresRecord.sec1">
+						<listlayout>
+						<attribute name="coreName"/>
+						<attribute name="indexName"/>
+						<attribute name="serverMode" editable="false"/>
+						</listlayout>
+					</section>
+					<section name="SolrIndexedCoresRecord.sec2">
+						<listlayout>
+							<attribute name="indexOperations"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="coreName"/>
+				<attribute name="indexName"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="SolrIndexOperationRecord" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="solrIndexCoreRecord"/>
+				<condition attribute="mode"/>
+				<condition attribute="status"/>
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="mode"/>
+						<attribute name="status"/>
+						<attribute name="startTime"/>
+						<attribute name="finishTime"/>
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="mode"/>
+						<attribute name="status"/>
+						<attribute name="startTime"/>
+						<attribute name="finishTime"/>
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="mode"/>
+						<attribute name="status"/>
+						<attribute name="startTime"/>
+						<attribute name="finishTime"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="SolrIndexOperationRecord.tab">
+					<section name="SolrIndexOperationRecord.sec1">
+						<listlayout>
+							<attribute name="solrIndexCoreRecord"/>
+							<attribute name="startTime" editable="false"/>
+							<attribute name="finishTime" editable="false"/>
+							<attribute name="threadId" editable="false"/>
+							<attribute name="clusterId" editable="false"/>
+							<attribute name="mode" editable="false"/>	
+							<attribute name="status" editable="false"/>
+							<attribute name="failedReason" editable="false"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="solrIndexCoreRecord"/>
+				<attribute name="mode"/>
+				<attribute name="status"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+</configuration>

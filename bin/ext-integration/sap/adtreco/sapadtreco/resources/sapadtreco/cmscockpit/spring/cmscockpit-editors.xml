@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+	default-autowire="byName">
+
+
+
+	<alias alias="LookupEditorFactory" name="sapADTRecoLookupEditorFactory" />
+    <bean id="sapADTRecoLookupEditorFactory" class="de.hybris.platform.cockpit.model.meta.LookupEditorFactory"  init-method="init" lazy-init="false">
+   		<property name="editorFactory" ref="EditorFactory"></property>
+	</bean>
+    
+    <bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+     <property name="editorType" value="TEXT"/>
+     <property name="defaultMode" value="single"/>
+     <property name="defaultEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultTextUIEditor"/>
+     <property name="defaultSearchMode" value="search"/>
+     <property name="editors">
+      <map>
+       <entry key="multi" value="de.hybris.platform.cockpit.model.editor.impl.GenericCollectionUIEditor"/>
+       <entry key="initiativeCollection" value="de.hybris.platform.cockpit.model.editor.impl.InitiativeCollectionUIEditorFixed"/>
+       <entry key="initiative" value="de.hybris.platform.cockpit.model.editor.impl.DefaultSAPInitiativeUIEditor"/>
+       <entry key="range" value="de.hybris.platform.cockpit.model.editor.impl.GenericRangeUIEditor"/>
+       <entry key="imageEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultImageUIEditor"/>
+       <entry key="wysiwyg" value="de.hybris.platform.cockpit.model.editor.WysiwygUIEditor"/>
+       <entry key="wysiwyg2" value="de.hybris.platform.cockpit.model.editor.WysiwygUIEditor"/>
+       <entry key="search" value="de.hybris.platform.cockpit.model.editor.search.impl.DefaultTextConditionUIEditor"/>
+      </map>
+     </property>
+     <property name="label" value="textEditor"/>
+    </bean>
+
+</beans>

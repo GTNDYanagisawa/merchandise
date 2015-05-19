@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:security="http://www.springframework.org/schema/security"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop 
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/security 
+           http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<security:http pattern="/login.jsp*" security="none" />
+	<security:http pattern="/images/**" security="none" />
+	<security:http pattern="/styles/**" security="none" />
+
+	<security:http access-decision-manager-ref="accessDecisionManager">
+	  	<security:anonymous username="anonymous" granted-authority="ROLE_ADMINWEBGROUP"/>
+		<security:session-management session-authentication-strategy-ref="fixation"/>
+    	<security:intercept-url pattern="/**" access="ROLE_ADMINGROUP"/>
+		<security:http-basic />
+		<security:form-login always-use-default-target="false" login-page="/login.jsp" authentication-failure-url="/login.jsp?login_error=1"/>
+		<security:remember-me services-ref="rememberMeServices" key="mobiletestweb"/>
+		<security:logout logout-url="/j_spring_security_logout"  logout-success-url="/login.jsp"/>
+	</security:http>
+
+	<bean id="fixation" class="de.hybris.platform.servicelayer.security.spring.HybrisSessionFixationProtectionStrategy"/>
+	
+	<bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+		<property name="decisionVoters">
+			<list>
+				<bean id="notInitializedVoter" class="de.hybris.platform.spring.security.voter.HybrisNotInitializedVoter" />
+				<bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter" />
+				<bean id="authenticatedVoter" class="org.springframework.security.access.vote.AuthenticatedVoter" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="rememberMeServices" class="de.hybris.platform.spring.security.CoreRememberMeService">
+		<!-- avoiding hard reference to tenant-scoped 'coreUserDetailsService' -->
+		<lookup-method name="lookupUserDetailsService" bean="coreUserDetailsService" />
+		<property name="key" value="mobiletestweb" />
+		<property name="cookieName" value="LoginToken" />
+	</bean>
+
+	<security:authentication-manager>
+		<security:authentication-provider ref="coreAuthenticationProvider"/>
+	</security:authentication-manager>
+	
+	<bean id="coreAuthenticationProvider" class="de.hybris.platform.spring.security.CoreAuthenticationProvider">
+		<property name="userDetailsService" ref="coreUserDetailsService" />
+	</bean>
+	
+	<bean id="coreUserDetailsService" class="de.hybris.platform.spring.security.CoreUserDetailsService" />
+ 
+ <!-- filter --> 
+ <bean id="mobileservicesFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+  <constructor-arg>
+   <list>
+    <ref bean="log4jFilter"/>
+    <ref bean="mobileservicesRedirectFilter"/>
+    <ref bean="sessionFilter"/>
+    <ref bean="mobileservicesDataSourceSwitchingFilter"/>    
+    <ref bean="mobileservicesCatalogVersionActivationFilter"/>
+    <ref bean="mobileServicesSecureMediaFilter"/> 
+   </list>
+  </constructor-arg>
+ </bean>
+ 
+ <bean id="mobileservicesRedirectFilter" class="de.hybris.platform.servicelayer.web.RedirectWhenSystemIsNotInitializedFilter">
+  <constructor-arg>
+     <value><!-- nothing - redirect to default maintenance page --></value>
+    </constructor-arg>
+    <property name="urlPaths">
+   <list>
+    <value>login</value>    
+   </list>
+  </property>
+ </bean>
+ 
+ <bean id="mobileservicesDataSourceSwitchingFilter" class="de.hybris.platform.servicelayer.web.DataSourceSwitchingFilter">
+ </bean>
+ 
+  <bean id="mobileservicesCatalogVersionActivationFilter" class="de.hybris.platform.servicelayer.web.DynamicCatalogVersionActivationFilter">
+   <property name="catalogVersionService" ref="catalogVersionService"/>
+   <property name="catalogService" ref="catalogService"/>
+   <aop:scoped-proxy/>
+ </bean>
+ 
+  <bean id="mobileServicesSecureMediaFilter" class="de.hybris.platform.servicelayer.web.SecureMediaFilter">
+       <property name="mediaPermissionService" ref="mediaPermissionService"/>
+       <property name="modelService" ref="modelService"/>
+       <property name="userService" ref="userService"/>
+       <property name="mediaService" ref="mediaService"/>
+      <!-- <property name="secureMediaToken" value="securemedias"/>  securemedias is default but you may overwrite it -->
+       <aop:scoped-proxy/>
+     </bean>
+ 
+
+
+</beans>

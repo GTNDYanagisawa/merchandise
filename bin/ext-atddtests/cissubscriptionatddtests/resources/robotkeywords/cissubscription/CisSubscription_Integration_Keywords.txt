@@ -1,0 +1,22 @@
+*** Settings ***
+Library    		de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Library			de.hybris.platform.cissubscriptionatddtests.keywords.CisSubscriptionKeywordLibrary
+Resource		impex/Impex_Keywords.txt
+Resource		commerce/SubscriptionCommerce_Keywords.txt
+
+*** Keywords ***
+create subscription for order "${orderId}"
+	[Documentation]    creates a new subscription for an order using the subcriptionFacade layer
+	create subscription for order    ${orderId}
+	
+cancel subscription "${subscriptionId}"
+    [Documentation]    cancels a subscription
+    cancel subscription    ${subscriptionId}
+    
+cancel subscription "${subscriptionId}" expect exception "${exception}"
+    [Documentation]    cancels a subscription but fails with an exception
+    cancel subscription expect exception    ${subscriptionId}    ${exception}
+
+verify that subscription "${subscriptionId}" is cancelled
+	[Documentation]    checks that the subscription status is set to value 'cancelled' and that the cancelledDate is set
+	verify cancel subscription    ${subscriptionId}

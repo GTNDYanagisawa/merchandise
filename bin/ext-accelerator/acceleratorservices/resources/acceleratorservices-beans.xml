@@ -1,0 +1,734 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<enum
+		class="de.hybris.platform.acceleratorservices.controllers.page.PageType">
+		<value>ProductSearch</value>
+		<value>Category</value>
+		<value>Product</value>
+		<value>Cart</value>
+		<value>OrderConfirmation</value>
+	</enum>
+
+	<bean class="de.hybris.platform.acceleratorservices.payment.data.PaymentData">
+		<property name="parameters" type="java.util.Map&lt;String, String>" />
+		<property name="postUrl" type="String" />
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.sitemap.data.SiteMapUrlData">
+		<property name="loc" type="String" />
+		<property name="images" type="java.util.List&lt;String>" />
+
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.PaymentSubscriptionResult">
+		<property name="success" type="boolean" />
+		<property name="decision" type="String" />
+		<property name="resultCode" type="String" />
+		<property name="errors"
+			type="java.util.Map&lt;String, de.hybris.platform.acceleratorservices.payment.data.PaymentErrorField>" />
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.PaymentSubscriptionResultItem"
+		extends="de.hybris.platform.acceleratorservices.payment.data.PaymentSubscriptionResult">
+		<property name="storedCard"
+			type="de.hybris.platform.core.model.order.payment.CreditCardPaymentInfoModel" />
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.PaymentErrorField">
+		<property name="name" type="String" />
+		<property name="missing" type="boolean" />
+		<property name="invalid" type="boolean" />
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.HostedOrderPageRequest">
+		<property name="requestId" type="String" />
+		<property name="requestUrl" type="String" />
+		<property name="responseUrl" type="String" />
+		<property name="siteName" type="String" />
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.HostedOrderPageResult">
+		<property name="requestId" type="String" />
+		<property name="reasonCode" type="Integer" />
+		<property name="errors" type="java.util.Map&lt;Integer, String>" />
+	</bean>
+
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.AbstractPaymentResult"
+		extends="de.hybris.platform.acceleratorservices.payment.data.HostedOrderPageResult">
+		<property name="decision" type="String" />
+		<!--<description> &lt;code&gt;String&lt;/code&gt;(6) value that summarizes 
+			the result of the overall request. This field can contain one of these values:&lt;br/&gt;- 
+			ACCEPT: The request succeeded.&lt;br/&gt;- REVIEW: You should review this 
+			order.&lt;br/&gt;- ERROR: A system error occurred.&lt;br/&gt;- REJECT: One 
+			or more of the services in the request was declined.&lt;br/&gt;- CANCEL: 
+			Customer cancelled the order.&lt;br/&gt;- PARTIAL: The authorization was 
+			partially approved. </description> -->
+		<!--</property> -->
+		<property name="decisionPublicSignature" type="String" />
+		<!--<description> A validation result that uses decision to verify that 
+			the order data is not fraudulent. This field can contain a string that has 
+			to be decrypted. </description> -->
+		<!--</property> -->
+		<property name="transactionSignatureVerified" type="Boolean" />
+		<!--<description> A &lt;code&gt;Boolean&lt;/code&gt; value which determines 
+			if the transaction signature sent by the CyberSource Hosted Order Page server 
+			is valid. </description> -->
+		<!--</property> -->
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.AuthReplyData">
+		<property name="ccAuthReplyReasonCode" type="Integer" />
+		<!--<description>A Numeric value corresponding to the result of the overall 
+			request.</description> -->
+		<!--</property> -->
+		<property name="ccAuthReplyAuthorizationCode" type="String" />
+		<!--<description>Authorization code. Returned only if a value is returned 
+			by the processor (provider who does the card authorization).</description> -->
+		<!--</property> -->
+		<property name="ccAuthReplyCvCode" type="String" />
+		<!--<description>The result of processing the card verification number.</description> -->
+		<!--</property> -->
+		<property name="cvnDecision" type="Boolean" />
+		<!--<description>Is card verification number valid?</description> -->
+		<!--</property> -->
+		<property name="ccAuthReplyAvsCodeRaw" type="String" />
+		<!--<description>A card verification result code sent directly from the 
+			processor. Returned only if a value is returned by the processor. Usually 
+			used for debugging.</description> -->
+		<!--</property> -->
+		<property name="ccAuthReplyAvsCode" type="String" />
+		<!--<description>The results of address verification.</description> -->
+		<!--</property> -->
+		<property name="ccAuthReplyAmount" type="java.math.BigDecimal" />
+		<!--<description>Amount of the order</description> -->
+		<!--</property> -->
+		<property name="ccAuthReplyProcessorResponse" type="String" />
+		<!--<description>Processor's response code that you can use to debug your 
+			application.</description> -->
+		<!--</property> -->
+		<property name="ccAuthReplyAuthorizedDateTime" type="String" />
+		<!--<description> Time of authorization in the format YYYY-MMDDThhmmssZ 
+			where T separates the date and the time, and the Z indicates GMT. For example, 
+			2003-08-11T224757Z equals August 11, 2003, at 10:47:57 P.M. </description> -->
+		<!--</property> -->
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.CreateSubscriptionRequest"
+		extends="de.hybris.platform.acceleratorservices.payment.data.HostedOrderPageRequest">
+		<property name="customerBillToData" type="CustomerBillToData" />
+		<property name="customerShipToData" type="CustomerShipToData" />
+		<property name="paymentInfoData" type="PaymentInfoData" />
+		<!--<description>The customer's payment data.</description> -->
+		<!--</property> -->
+		<property name="orderInfoData" type="OrderInfoData" />
+		<!--<description>The customer's order data.</description> -->
+		<!--</property> -->
+		<property name="orderPageAppearanceData" type="OrderPageAppearanceData" />
+		<!--<description> The Hosted Order Page Appearance configuration data. 
+			This is optional since the configuration can be done via the CyberSource 
+			Business Center. </description> -->
+		<!--</property> -->
+		<property name="orderPageConfirmationData" type="OrderPageConfirmationData" />
+		<!--<description> After customers complete their order, they receive a 
+			confirmation message indicating whether the order was successful or declined. 
+			This page includes a link back to your Web site. This method gets the configuration 
+			field data that will be sent to the Hosted Order Page to configure it. </description> -->
+		<!--</property> -->
+		<property name="signatureData" type="SignatureData" />
+		<!--<description>The transaction's encrypted data.</description> -->
+		<!--</property> -->
+		<property name="subscriptionSignatureData" type="SubscriptionSignatureData" />
+		<!--<description>The transaction's encrypted subscription data.</description> -->
+		<!--</property> -->
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.CreateSubscriptionResult"
+		extends="de.hybris.platform.acceleratorservices.payment.data.AbstractPaymentResult">
+		<property name="authReplyData" type="AuthReplyData" />
+		<property name="customerInfoData" type="CustomerInfoData" />
+		<property name="paymentInfoData" type="PaymentInfoData" />
+		<property name="orderInfoData" type="OrderInfoData" />
+		<property name="signatureData" type="SignatureData" />
+		<property name="subscriptionInfoData" type="SubscriptionInfoData" />
+		<property name="subscriptionSignatureData" type="SubscriptionSignatureData" />
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.CustomerBillToData">
+		<property name="billToCity" type="String" />
+		<property name="billToCompany" type="String" />
+		<property name="billToCompanyTaxId" type="String" />
+		<property name="billToCountry" type="String" />
+		<!--<description> Billing country for the account. Use the two-character 
+			country codes located in the Support Center. @see "http://apps.cybersource.com/library/documentation/sbc/quickref/countries_alpha_list.pdf" 
+			</description> -->
+		<!--</property> -->
+		<property name="billToCustomerIdRef" type="String" />
+		<!--<description> Optional customer's account ID, tracking number, reward 
+			number or other unique number that you assign to the customer for the purpose 
+			that you choose. </description> -->
+		<!--</property> -->
+		<property name="billToDateOfBirth" type="String" />
+		<!--<description>Date of birth of the customer. Uses format YYYY-MM-DD 
+			or YYYYMMDD.</description> -->
+		<!--</property> -->
+		<property name="billToEmail" type="String" />
+		<!--<description> Customer's email address, including the domain name, 
+			for example: jdoe@example.com. Make sure to send only valid and well-formed 
+			data in this field. </description> -->
+		<!--</property> -->
+		<property name="billToFirstName" type="String" />
+		<property name="billToLastName" type="String" />
+		<property name="billToPhoneNumber" type="String" />
+		<property name="billToPostalCode" type="String" />
+		<!--<description>Billing postal code for the billing address. The postal 
+			code must consist of 5 to 9 digits.</description> -->
+		<!--</property> -->
+		<property name="billToState" type="String" />
+		<!--<description> State or province of the customer. Make sure to send 
+			only valid and well-formed data in this field. Uses the two-character codes 
+			located in the Support Center. @see "http://apps.cybersource.com/library/documentation/sbc/quickref/countries_alpha_list.pdf" 
+			</description> -->
+		<!--</property> -->
+		<property name="billToStreet1" type="String" />
+		<property name="billToStreet2" type="String" />
+		<!--<description>Used for additional address information, for example: 
+			Attention: Accounts Payable.</description> -->
+		<!--</property> -->
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.CustomerInfoData">
+		<property name="billToCity" type="String" />
+		<property name="billToCompany" type="String" />
+		<property name="billToCompanyTaxId" type="String" />
+		<property name="billToCountry" type="String" />
+		<!--<description> Billing country for the account. Use the two-character 
+			country codes located in the Support Center. @see "http://apps.cybersource.com/library/documentation/sbc/quickref/countries_alpha_list.pdf" 
+			</description> -->
+		<!--</property> -->
+		<property name="billToCustomerIdRef" type="String" />
+		<!--<description> Optional customer's account ID, tracking number, reward 
+			number or other unique number that you assign to the customer for the purpose 
+			that you choose. </description> -->
+		<!--</property> -->
+		<property name="billToDateOfBirth" type="String" />
+		<!--<description>Date of birth of the customer. Uses format YYYY-MM-DD 
+			or YYYYMMDD.</description> -->
+		<!--</property> -->
+		<property name="billToEmail" type="String" />
+		<!--<description> Customer's email address, including the domain name, 
+			for example: jdoe@example.com. Make sure to send only valid and well-formed 
+			data in this field. </description> -->
+		<!--</property> -->
+		<property name="billToFirstName" type="String" />
+		<property name="billToLastName" type="String" />
+		<property name="billToPhoneNumber" type="String" />
+		<property name="billToPostalCode" type="String" />
+		<property name="billToState" type="String" />
+		<property name="billToStreet1" type="String" />
+		<property name="billToStreet2" type="String" />
+		<property name="shipToCity" type="String" />
+		<property name="shipToCompany" type="String" />
+		<property name="shipToCountry" type="String" />
+		<property name="shipToFirstName" type="String" />
+		<property name="shipToLastName" type="String" />
+		<property name="shipToPhoneNumber" type="String" />
+		<property name="shipToPostalCode" type="String" />
+		<!--<description>Billing postal code for the billing address. The postal 
+			code must consist of 5 to 9 digits.</description> -->
+		<!--</property> -->
+		<property name="shipToShippingMethod" type="String" />
+		<property name="shipToState" type="String" />
+		<!--<description> State or province of the customer. Make sure to send 
+			only valid and well-formed data in this field. Uses the two-character codes 
+			located in the Support Center. @see "http://apps.cybersource.com/library/documentation/sbc/quickref/countries_alpha_list.pdf" 
+			</description> -->
+		<!--</property> -->
+		<property name="shipToStreet1" type="String" />
+		<property name="shipToStreet2" type="String" />
+		<!--<description>Used for additional address information, for example: 
+			Attention: Accounts Payable.</description> -->
+		<!--</property> -->
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.CustomerShipToData">
+		<property name="shipToCity" type="String" />
+		<property name="shipToCompany" type="String" />
+		<property name="shipToCountry" type="String" />
+		<!--<description> Country where to ship the product. Uses the two-character 
+			country codes located in the Support Center. @see "http://apps.cybersource.com/library/documentation/sbc/quickref/countries_alpha_list.pdf" 
+			</description> -->
+		<!--</property> -->
+		<property name="shipToFirstName" type="String" />
+		<property name="shipToLastName" type="String" />
+		<property name="shipToPhoneNumber" type="String" />
+		<property name="shipToPostalCode" type="String" />
+		<property name="shipToShippingMethod" type="String" />
+		<!--<description> Shipping method for the product. It can contain one of 
+			these values: - sameday: Courier or same -day service - oneday: Next day 
+			or overnight service - twoday: Two-day service - threeday: Three-day service 
+			- lowcost: Lowest-cost service - pickup: Store pick-up - other: Other shipping 
+			method - none: No shipping method because product is a service or subscription 
+			</description> -->
+		<!--</property> -->
+		<property name="shipToState" type="String" />
+		<!--<description> State, province, or territory of the shipping address. 
+			See the Support Center for a list of codes. @see "http://apps.cybersource.com/library/documentation/sbc/quickref/countries_alpha_list.pdf" 
+			</description> -->
+		<!--</property> -->
+		<property name="shipToStreet1" type="String" />
+		<property name="shipToStreet2" type="String" />
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.OrderInfoData">
+		<property name="comments" type="String" />
+		<!--<description> Additional general information about the order. Do not 
+			insert sensitive information in this field. This information can appear in 
+			the order confirmation e-mail that you send to your customers. </description> -->
+		<!--</property> -->
+		<property name="orderNumber" type="String" />
+		<!--<description> Reference number unique to each order; equivalent to 
+			the merchant reference number. If you do not send an order number, the Hosted 
+			Order Page creates one for you. Use this number to keep track of the orders 
+			in your system and in the Business Center. </description> -->
+		<!--</property> -->
+		<property name="orderPageIgnoreAVS" type="Boolean" />
+		<!--<description> Flag that indicates how to use the result of the address 
+			verification test. - true: Ignore the result of the test: no transaction 
+			will be declined if the test fails. - false: Do not ignore the result of 
+			the test. In this case, the authorization is declined if the test fails, 
+			and the order is not processed. </description> -->
+		<!--</property> -->
+		<property name="orderPageIgnoreCVN" type="Boolean" />
+		<!--<description> Flag that indicates how to use the result of the card 
+			verification test. - true: Ignore the result of the test: no transaction 
+			will be declined if the test fails. - false: Do not ignore the result of 
+			the test. In this case, the authorization is declined if the test fails (D 
+			or N codes), and the order is not processed. </description> -->
+		<!--</property> -->
+		<property name="orderPageRequestToken" type="String" />
+		<!--<description>Request token data that you received for the order.</description> -->
+		<!--</property> -->
+		<property name="orderPageTransactionType" type="String" />
+		<property name="recurringSubscriptionInfoPublicSignature"
+			type="String" />
+		<!--<description> Subscription or customer profile data that is used to 
+			determine the authenticity of the subscription or customer profile. </description> -->
+		<!--</property> -->
+		<property name="subscriptionTitle" type="String" />
+		<!--<description> Name of the subscription or customer profile if it exists. 
+			If present, the title is displayed on the order form, the receipt page, and 
+			in the Business Center. </description> -->
+		<!--</property> -->
+		<property name="taxAmount" type="String" />
+		<!--<description> Tax amount that is displayed only for the customer's 
+			reference. This amount is not added to the cost of the order. This field 
+			is required if you check the Display Tax Amount box in the Hosted Order Page 
+			settings. </description> -->
+		<!--</property> -->
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.OrderPageAppearanceData">
+		<property name="orderPageBackgroundImageURL" type="String" />
+		<!--<description> URL for an image to display in the background of the 
+			order page, such as https://www.example.com/images/background.gif. Note Make 
+			sure to use a secure (HTTPS) URL so that your customer's Web browser does 
+			not display a security warning. </description> -->
+		<!--</property> -->
+		<property name="orderPageBarColor" type="String" />
+		<!--<description> Color of the bars that separate the sections of the order 
+			form. Must be in 6-character HTML code or name of color. CyberSource recommends 
+			that you use the HTML code to ensure that the correct color and all elements 
+			of the order form appear normally. </description> -->
+		<!--</property> -->
+		<property name="orderPageBarTextColor" type="String" />
+		<!--<description> Color of the text in the bars that separate the sections 
+			of the order form. Must be in 6-character HTML code or name of color. CyberSource 
+			recommends that you use the HTML code to ensure that the correct color and 
+			all elements of the order form appear normally. </description> -->
+		<!--</property> -->
+		<property name="orderPageBuyButtonText" type="String" />
+		<!--<description>If provided, the content of this field will replace the 
+			default button text.</description> -->
+		<!--</property> -->
+		<property name="orderPageColorScheme" type="String" />
+		<!--<description> Color scheme to use on the order page. Use one of these 
+			values: -blue -standard (Gray) -gray -green -orange -red -custom If you choose 
+			custom, these four fields become required: -orderPageBarColor -orderPageBarTextColor 
+			-orderPageRequiredFieldColor -orderPageMessageBoxBackgroundColor </description> -->
+		<!--</property> -->
+		<property name="orderPageMerchantDisplayName" type="String" />
+		<!--<description>Business name displayed on the order page. This field 
+			is available only with Payer Authentication.</description> -->
+		<!--</property> -->
+		<property name="orderPageMessageBoxBackgroundColor" type="String" />
+		<!--<description> Background color of the messages box that can appear 
+			at the top of the order form to display success and error messages to the 
+			customer. Can be in 6-character HTML code or name of color. CyberSource recommends 
+			that you use the HTML code to ensure that the correct color and all elements 
+			of the order form appear normally. </description> -->
+		<!--</property> -->
+		<property name="orderPageRequiredFieldColor" type="String" />
+		<!--<description> Color of the fields that you set as required on the order 
+			form. Can be in 6-character HTML code or name of color. CyberSource recommends 
+			that you use the HTML code to ensure that the correct color and all elements 
+			of the order form appear normally. </description> -->
+		<!--</property> -->
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.OrderPageConfirmationData">
+		<property name="cancelLinkText" type="String" />
+		<!--<description>The text for the link at the bottom of the cancel page, 
+			such as "Your order has been cancelled."</description> -->
+		<!--</property> -->
+		<property name="cancelResponseUrl" type="String" />
+		<!--<description> The URL your customer is returned to if they choose to 
+			cancel midway through a partial auth / split tender payment process. </description> -->
+		<!--</property> -->
+		<property name="declineLinkText" type="String" />
+		<!--<description>The text for the link at the bottom of the decline page, 
+			such as "Return to Example.com".</description> -->
+		<!--</property> -->
+		<property name="declineResponseUrl" type="String" />
+		<!--<description> The URL that will appear at the bottom of the page for 
+			example, "https://my-domain.com/return-reject.html". (When using the default 
+			CyberSource decline page </description> -->
+		<!--</property> -->
+		<property name="emailFromAddress" type="String" />
+		<!--<description> The sender's email address to use on the customers email 
+			receipt, such as "service@example.com". </description> -->
+		<!--</property> -->
+		<property name="emailFromName" type="String" />
+		<!--<description>The sender's name to use on the customers email receipt, 
+			such as "Customer Service".</description> -->
+		<!--</property> -->
+		<property name="merchantEmailAddress" type="String" />
+		<!--<description>The email address for sending an order receipt to your 
+			business, such as "orders@example.com".</description> -->
+		<!--</property> -->
+		<property name="receiptLinkText" type="String" />
+		<!--<description>The text for the link at the bottom of the receipt page, 
+			such as Return to "Example.com".</description> -->
+		<!--</property> -->
+		<property name="receiptResponseUrl" type="String" />
+		<!--<description> The URL that will appear at the bottom of the page for 
+			example, "https://my-domain.com/return-receipt.html". (When using the default 
+			CyberSource receipt page) </description> -->
+		<!--</property> -->
+		<property name="returnCardNumber" type="Boolean" />
+		<!--<description> The indicator that determines is the customers credit 
+			card number is returned masked or not. Only the last four digits will be 
+			displayed. Use one of these values:&lt;br/&gt;&lt;code&gt;true&lt;/code&gt;: 
+			Display the masked credit card number.&lt;br/&gt; &lt;code&gt;false&lt;/code&gt;: 
+			Do not display the masked credit card number.&lt;br/&gt; </description> -->
+		<!--</property> -->
+		<property name="returnBinInCardNumber" type="Boolean" />
+		<!--<description> The indicator that determines is the customers BIN and 
+			credit card number is returned masked or not. Only the first six digits and 
+			the last four digits will be displayed. Use one of these values:&lt;br/&gt;&lt;code&gt;true&lt;/code&gt;: 
+			Display the masked BIN and credit card number.&lt;br/&gt; &lt;code&gt;false&lt;/code&gt;: 
+			Do not display the masked BIN and credit card number.&lt;br/&gt; </description> -->
+		<!--</property> -->
+		<property name="returnCardBin" type="Boolean" />
+		<!--<description> Is the customers BIN is returned masked or not. Only 
+			the first six digits will be displayed. Use one of these values:&lt;br/&gt;&lt;code&gt;true&lt;/code&gt;: 
+			Display the masked BIN.&lt;br/&gt; &lt;code&gt;false&lt;/code&gt;: Do not 
+			display the masked BIN.&lt;br/&gt; </description> -->
+		<!--</property> -->
+		<property name="sendCustomerReceiptEmail" type="Boolean" />
+		<!--<description> The indicator that determines whether to send an email 
+			receipt to the customer. Use one of these values:&lt;br/&gt; &lt;code&gt;true&lt;/code&gt;: 
+			Send an email receipt to the customer.&lt;br/&gt; &lt;code&gt;false&lt;/code&gt;: 
+			Do not send an email receipt to the customer.&lt;br/&gt; </description> -->
+		<!--</property> -->
+		<property name="sendMerchantEmailPost" type="Boolean" />
+		<!--<description> The indicator that determines whether to send the transaction 
+			results to the address specified in the field &lt;code&gt;orderPage_merchantEmailPostAddress&lt;/code&gt;. 
+			Use one of these values:&lt;br/&gt; &lt;code&gt;true&lt;/code&gt;: Send the 
+			transaction results to your business.&lt;br/&gt; &lt;code&gt;false&lt;/code&gt;: 
+			Do not send the transaction results to your business.&lt;br/&gt; </description> -->
+		<!--</property> -->
+		<property name="merchantEmailPostAddress" type="String" />
+		<!--<description> The address for sending the transaction results to your 
+			business, such as "orders@example.com". </description> -->
+		<!--</property> -->
+		<property name="sendMerchantReceiptEmail" type="Boolean" />
+		<!--<description> The indicator that determines whether to send the transaction 
+			results to the address specified in the field &lt;code&gt;orderPage_merchantEmailAddress&lt;/code&gt;. 
+			Use one of these values:&lt;br/&gt; &lt;code&gt;true&lt;/code&gt;: Send an 
+			email receipt to your business.&lt;br/&gt; &lt;code&gt;false&lt;/code&gt;: 
+			Do not send an email receipt to your business.&lt;br/&gt; </description> -->
+		<!--</property> -->
+		<property name="sendMerchantUrlPost" type="Boolean" />
+		<!--<description> The indicator that determines whether to send the transaction 
+			results to the URL specified in the field &lt;code&gt;orderPage_merchantURLPostAddress&lt;/code&gt;. 
+			Use one of these values:&lt;br/&gt; &lt;code&gt;true&lt;/code&gt;: Send the 
+			transaction results to your business.&lt;br/&gt; &lt;code&gt;false&lt;/code&gt;: 
+			Do not send the transaction results to your business.&lt;br/&gt; </description> -->
+		<!--</property> -->
+		<property name="merchantUrlPostAddress" type="String" />
+		<!--<description>The URL for sending the transaction results to your business, 
+			such as "www.example.com".</description> -->
+		<!--</property> -->
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.PaymentInfoData">
+		<property name="cardAccountNumber" type="String" />
+		<!--<description>Card account number. Non-numeric values are ignored.</description> -->
+		<!--</property> -->
+		<property name="cardCardType" type="String" />
+		<!--<description> Type of card. CyberSource strongly recommends that you 
+			send the card type even if it is optional for your processor. Omitting the 
+			card type can cause the transaction to be processed with the wrong card type. 
+			&lt;br/&gt;- 001: Visa&lt;br/&gt;- 002: MasterCard and EuroCard's European 
+			regional brand of MasterCard&lt;br/&gt;- 003: American Express&lt;br/&gt;- 
+			004: Discover&lt;br/&gt;- 005: Diners Club&lt;br/&gt;- 006: Carte Blanche&lt;br/&gt;- 
+			007: JCB&lt;br/&gt;- 014: Enroute&lt;br/&gt;- 021: JAL&lt;br/&gt;- 024: Maestro 
+			(UK Domestic)&lt;br/&gt;- 031: Delta(Global Collect only otherwise use 001 
+			for other processors)&lt;br/&gt;- 033: Visa Electron&lt;br/&gt;- 034: Dankort&lt;br/&gt;- 
+			035: Laser&lt;br/&gt;- 036: Carte Bleue&lt;br/&gt;- 037: Carta Si&lt;br/&gt;- 
+			042: Maestro (International)&lt;br/&gt;- 043: GE Money UK Card </description> -->
+		<!--</property> -->
+		<property name="cardCvNumber" type="String" />
+		<!--<description> A three- or four-digit number printed on the back or 
+			front of credit cards that ensures that your customer has physical possession 
+			of the card. </description> -->
+		<!--</property> -->
+		<property name="cardExpirationMonth" type="Integer" />
+		<!--<description>Expiration month (MM) of the credit card.</description> -->
+		<!--</property> -->
+		<property name="cardExpirationYear" type="Integer" />
+		<!--<description>Expiration year (YYYY) of the credit card.</description> -->
+		<!--</property> -->
+		<property name="cardIssueNumber" type="String" />
+		<!--<description> Indicates how many times a Maestro (UK Domestic) card 
+			has been issued to the account holder. The card may or may not have an issue 
+			number. The field is required if the card has an issue number. The number 
+			can consist of one or two digits, and the first digit may be a zero. Include 
+			exactly what is printed on the card (a value of 2 is different from a value 
+			of 02). Do not include the field (even with a blank value) if the card is 
+			not a Maestro (UK Domestic) card. </description> -->
+		<!--</property> -->
+		<property name="cardStartMonth" type="String" />
+		<!--<description> Starting month (MM) of the validity period for the Maestro 
+			(UK Domestic) card. The card may or may not have a start date. The field 
+			is required if the card has a start date. Do not include the field (even 
+			with a blank value) if the card is not a Maestro (UK Domestic) card. The 
+			valid values are 01 to 12, inclusive. </description> -->
+		<!--</property> -->
+		<property name="cardStartYear" type="String" />
+		<!--<description> Year (YYYY) of the start of the Maestro (UK Domestic) 
+			card validity period. The card may or may not have a start date printed on 
+			it; the field is required if the card has a start date. Do not include the 
+			field (even with a blank value) if the card is not a Maestro (UK Domestic) 
+			card. </description> -->
+		<!--</property> -->
+		<property name="paymentOption" type="String" />
+		<!--<description> Method of payment. If you do not include this field, 
+			the Hosted Order Page assumes that the payment method is credit card. When 
+			the value is check, the Hosted Order Page ignores the contents of the credit 
+			card fields (if any), and the fields appropriate for your check processor 
+			become required. Use one of these values: - card (default) - check </description> -->
+		<!--</property> -->
+
+		<property name="cardAccountHolderName" type="String" />
+		<!--<description> Addition field which is not used by cybersource but somebody 
+			wanted it in accelerator payment </description> -->
+		<!--</property> -->
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.SignatureData">
+		<property name="amount" type="java.math.BigDecimal" />
+		<!--<description>Amount of the order that is passed in the signature.</description> -->
+		<!--</property> -->
+		<property name="currency" type="String" />
+		<!--<description>Currency for the order. If this field is absent, the default 
+			currency is U.S. dollars. Use the ISO currency codes.</description> -->
+		<!--</property> -->
+		<property name="merchantID" type="String" />
+		<!--<description>The CyberSource merchant ID.</description> -->
+		<!--</property> -->
+		<property name="orderPageSerialNumber" type="String" />
+		<!--<description> A unique serial number that is transmitted for each transaction 
+			requests to CyberSource. This is generated in the Business Center as part 
+			of a security key and downloaded in a security script provided by CyberSource. 
+			</description> -->
+		<!--</property> -->
+		<property name="sharedSecret" type="String" />
+		<!--<description>A public key used to encrypt data being transmitted to 
+			CyberSource.</description> -->
+		<!--</property> -->
+		<property name="orderPageVersion" type="String" />
+		<!--<description>The current CyberSource Hosted Order Page version.</description> -->
+		<!--</property> -->
+		<property name="amountPublicSignature" type="String" />
+		<!--<description> Validation result that uses orderAmount to verify that 
+			the order data is not fraudulent. This field can contain a string that you 
+			need to decrypt. </description> -->
+		<!--</property> -->
+		<property name="currencyPublicSignature" type="String" />
+		<!--<description> Validation result that uses orderCurrency to verify that 
+			the order data is not fraudulent. This field can contain a string that you 
+			need to decrypt. </description> -->
+		<!--</property> -->
+		<property name="transactionSignature" type="String" />
+		<!--<description> Validation result that uses all fields to verify that 
+			the order data is not fraudulent. This field is returned in the POST data 
+			(URL and email). </description> -->
+		<!--</property> -->
+		<property name="signedFields" type="String" />
+		<!--<description> Comma-delimited list of the field names whose values 
+			are included in the encoded transaction signature. This field is returned 
+			in the POST data (URL and email). </description> -->
+		<!--</property> -->
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.SubscriptionInfoData">
+		<property name="subscriptionID" type="String" />
+		<!--<description> Identifier that is returned to you when a subscription 
+			or customer profile is created. Include this field in your request when you 
+			modify a subscription or customer profile or request a credit. </description> -->
+		<!--</property> -->
+		<property name="subscriptionIDPublicSignature" type="String" />
+		<!--<description> Validation result that uses paySubscriptionCreateReply_subscriptionID 
+			to verify that the order data is not fraudulent. This field can contain a 
+			string that you need to decrypt. </description> -->
+		<!--</property> -->
+		<property name="subscriptionSignedValue" type="String" />
+		<!--<description> The encrypted value used to verify that the values during 
+			form submissions (SOP, HOP...) were not altered. </description> -->
+		<!--</property> -->
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.payment.data.SubscriptionSignatureData">
+		<property name="recurringSubscriptionInfoAmount" type="java.math.BigDecimal" />
+		<!--<description> Amount of the subscription or customer profile payments, 
+			such as 20.00. For on-demand profiles, this value can be 0. This field is 
+			required for installment and recurring subscriptions and is optional for 
+			on-demand profiles. </description> -->
+		<!--</property> -->
+		<property name="recurringSubscriptionInfoStartDate" type="String" />
+		<!--<description>Subscription start date in UTC (YYYYMMDD).</description> -->
+		<!--</property> -->
+		<property name="recurringSubscriptionInfoFrequency" type="String" />
+		<!--<description> Interval between payments. Possible values: - weekly: 
+			7 days - bi-weekly: 14 days - semi-monthly: 15 days - monthly: 1 month - 
+			quad-weekly: 4 weeks - quarterly: 3 months - semi-annually: 26 weeks - annually: 
+			1 year - on-demand </description> -->
+		<!--</property> -->
+		<property name="recurringSubscriptionInfoNumberOfPayments"
+			type="Integer" />
+		<!--<description> Number of payments for the duration of the installment 
+			subscription. For example, an annual subscription paid on a monthly basis 
+			has 12 payments. The maximum allowed value is 3 years of weekly payments 
+			(156 payments).&lt;br/&gt;- weekly: 52&lt;br/&gt;- bi-weekly: 26&lt;br/&gt;- 
+			semi-monthly: 24&lt;br/&gt;- quad-weekly: 13&lt;br/&gt;- monthly: 12&lt;br/&gt;- 
+			quarterly: 4&lt;br/&gt;- semi-annually: 2&lt;br/&gt;- annually: 1&lt;br/&gt;- 
+			on demand: either omit this field or set it to 0. </description> -->
+		<!--</property> -->
+		<property name="recurringSubscriptionInfoAutomaticRenew"
+			type="Boolean" />
+		<!--<description> Flag which indicates whether a subscription is to automatically 
+			renew the subscription schedule after the specified number of payments is 
+			processed (&lt;code&gt;recurringSubscriptionInfo_automaticRenew&lt;/code&gt;). 
+			When creating an installment subscription, set this field to false. Otherwise, 
+			the service will continue to bill the customer after the last payment. Possible 
+			values: - true (default): The subscription will be renewed automatically. 
+			- false: The subscription will not be renewed automatically. </description> -->
+		<!--</property> -->
+		<property name="sharedSecret" type="String" />
+		<!--<description>A public key used to encrypt data being transmitted to 
+			CyberSource.</description> -->
+		<!--</property> -->
+		<property name="recurringSubscriptionInfoNumberOfPaymentsPublicSignature"
+			type="String" />
+		<!--<description> Validation result Page that uses recurringSubscriptionInfo_numberOfPayments 
+			to verify that the order data is not fraudulent. This field may contain a 
+			string that you need to decrypt. </description> -->
+		<!--</property> -->
+		<property name="recurringSubscriptionInfoAmountPublicSignature"
+			type="String" />
+		<!--<description> Validation result that uses recurringSubscriptionInfo_amount 
+			to verify that the order data is not fraudulent. This field can contain a 
+			string that you need to decrypt </description> -->
+		<!--</property> -->
+		<property name="recurringSubscriptionInfoStartDatePublicSignature"
+			type="String" />
+		<!--<description> Validation result that uses recurringSubscriptionInfo_startDate 
+			to verify that the order data is not fraudulent. This field can contain a 
+			string that you need to decrypt </description> -->
+		<!--</property> -->
+		<property name="recurringSubscriptionInfoAutomaticRenewPublicSignature"
+			type="String" />
+		<!--<description> Validation result that uses recurringSubscriptionInfo_automaticRenew 
+			to verify that the order data is not fraudulent. This field can contain a 
+			string that you need to decrypt. </description> -->
+		<!--</property> -->
+		<property name="recurringSubscriptionInfoFrequencyPublicSignature"
+			type="String" />
+		<!--<description> Validation result that uses recurringSubscriptionInfo_frequency 
+			to verify that the order data is not fraudulent. This field can contain a 
+			string that you need to decrypt. </description> -->
+		<!--</property> -->
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.store.data.UserLocationData">
+		<property name="searchTerm" type="String" />
+		<property name="point"
+			type="de.hybris.platform.commerceservices.store.data.GeoPoint" />
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.storefront.data.MetaElementData">
+		<property name="name" type="String" />
+		<property name="content" type="String" />
+		<property name="property" type="String" />
+	</bean>
+
+	<bean
+		class="de.hybris.platform.acceleratorservices.storefront.data.JavaScriptVariableData">
+		<property name="qualifier" type="String" />
+		<property name="value" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.acceleratorservices.data.RequestContextData">
+		<description>Holds context data for rendering the current request</description>
+
+		<!-- Contextual data -->
+		<property name="product"
+			type="de.hybris.platform.core.model.product.ProductModel" />
+		<property name="category"
+			type="de.hybris.platform.category.model.CategoryModel" />
+		<property name="search"
+			type="de.hybris.platform.commerceservices.search.pagedata.SearchPageData" />
+	</bean>
+
+</beans>

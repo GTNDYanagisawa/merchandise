@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+
+<project name="hmc_buildcallbacks">
+
+	<macrodef name="hmc_after_build">
+		<sequential>
+			<hmc_special_handling />
+			<if>
+				<equals arg1="${ant.project.name}" arg2="hmc" />
+				<then>
+					<foreachext>
+						<do>
+							<extension_compile_hmc extname="@{extname}" />
+						</do>
+					</foreachext>
+					<if>
+						<and>
+							<istrue value="${ext.hmc.extension.webmodule.jspcompile}" />
+							<istrue value="${build.jspcompile}" />
+						</and>
+						<then>
+							<appserver_jspcompile extname="hmc" />
+						</then>
+					</if>
+
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="hmc_before_clean">
+		<sequential>
+			<!--<if>
+				<isset property="env.SYSINTERNALS_HOME" />
+				<then>
+					<echo message="============================================================" />
+					<exec executable="cmd.exe" dir="${env.SYSINTERNALS_HOME}">
+						<arg line="/c" />
+						<arg line="handle.exe jar" />
+					</exec>
+					<exec executable="cmd.exe" dir="${env.SYSINTERNALS_HOME}">
+						<arg line="/c" />
+						<arg line="pslist.exe" />
+					</exec>
+
+					<echo message="============================================================" />
+				</then>
+			</if>-->
+
+			<delete dir="${ext.hmc.path}/web/webroot/ext" failonerror="false" />
+			<delete verbose="true" failonerror="false">
+				<fileset dir="${ext.hmc.path}/web/webroot/WEB-INF/lib">
+					<include name="*hmc.jar" />
+				</fileset>
+			</delete>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="hmc_before_doc">
+		<sequential>
+			<callback extname="hmc" target="create_xsddoc" />
+		</sequential>
+	</macrodef>
+
+	<!-- create documentation of hmc.xsd -->
+	<target name="xsddoc">
+		<callback extname="hmc" target="xsddoc" />
+	</target>
+
+	<macrodef name="hmc_xsddoc">
+		<sequential>
+			<echo message="Generating hmc.xsd documentation..." />
+			<mkdir dir="${ext.hmc.path}/doc" />
+			<xslt in="${ext.hmc.path}/resources/hmc.xsd" out="${ext.hmc.path}/doc/hmc-xsd.html" style="${platformhome}/resources/xsl/xsd-doc.xsl" force="true" />
+		</sequential>
+	</macrodef>
+
+
+	<target name="hmc-selenium">
+		<taskdef resource="selenium-ant.properties">
+			<classpath>
+				<pathelement location="${ext.hmc.path}/selenium/server/selenium-server.jar" />
+			</classpath>
+		</taskdef>
+		<selenese suite="${ext.hmc.path}\web\webroot\selenium\tests\hmc_TestSuite.html" browser="*iexplore" results="${ext.hmc.path}\selenium\results\results.html" multiWindow="false" timeoutInSeconds="900" startURL="http://localhost:9001" />
+	</target>
+
+	<macrodef name="hmc_before_ear">
+		<sequential>
+			<if>
+				<equals arg1="${ear.target.appserver}" arg2="jboss" />
+				<then>
+					<echo message="*** special jboss handling: removing xalan*.jar from ext/core (otherwise this will clash with jboss/lib/endorsed/xalan.jar)" />
+					<delete>
+						<fileset dir="${ear.libs.path}">
+							<include name="xalan-*.jar" />
+						</fileset>
+					</delete>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<!-- moving the webroot/ext folder and all *hmc.jars to a temporary location (moving it back after the dist copy) -->
+	<macrodef name="hmc_before_dist_copy">
+		<sequential>
+
+			<!-- moved as exclude to platform/resources/ant/dist.xml -> macrodef copy_extension_for_binary_dist -->
+
+		</sequential>
+	</macrodef>
+
+	<!-- moving the webroot/ext folder and *hmc.jars back from the temporary location -->
+	<macrodef name="hmc_after_dist_copy">
+		<sequential>
+
+			<!-- moved as exclude to platform/resources/ant/dist.xml -> macrodef copy_extension_for_binary_dist -->
+
+		</sequential>
+	</macrodef>
+
+
+	<!--
+	<patternset id="extension.hmc.source.filter">
+		<patternset refid="extension.source.filter" />
+		<exclude name="web/webroot/WEB-INF/lib/*hmc.jar" />
+	</patternset>
+
+	<patternset id="extension.hmc.binary.filter">
+		<patternset refid="extension.binary.filter" />
+		<exclude name="web/webroot/WEB-INF/lib/*hmc.jar" />
+	</patternset>
+	-->
+
+
+</project>

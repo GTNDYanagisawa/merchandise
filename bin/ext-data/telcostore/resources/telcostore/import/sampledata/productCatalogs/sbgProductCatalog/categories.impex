@@ -1,0 +1,17 @@
+# ImpEx for Importing Categories into Telco Store
+
+# Macros / Replacement Parameter definitions
+$productCatalog=sbgProductCatalog
+
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default=Staged])[unique=true,default=$productCatalog:Staged]
+$supercategories=source(code, $catalogVersion)[unique=true]
+$categories=target(code, $catalogVersion)[unique=true]
+
+# Insert Categories
+INSERT_UPDATE Category;code[unique=true];allowedPrincipals(uid)[default='customergroup'];$catalogVersion
+;1
+;sbgproducts
+
+# Insert Category Structure
+INSERT_UPDATE CategoryCategoryRelation;$categories;$supercategories
+;sbgproducts;1

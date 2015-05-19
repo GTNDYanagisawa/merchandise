@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+
+	<!-- Configuration for extension ticketsystem -->
+
+	<explorertree>
+		<group name="ticketsystemgroup">
+			<typeref type="CsTicket"  description="typeref.csticket.description"/>	
+			<typeref type="CsTicketEventEmailConfiguration" description="typeref.csticketeventemailconfiguration.description"/>	
+		</group>
+	</explorertree>
+	
+	<type name="CsTicket" mode="append" icon="ext/ticketsystem/images/e_ticket.gif">
+		<organizer mode="append">
+			<search mode="replace" autoperform="true">
+				<condition attribute="ticketID" operator="contains"/>
+			</search>
+			<result>
+				<listview>
+					<itemlayout mode="replace">
+						<attribute name="ticketID" width="80"/>
+						<attribute name="headline" width="250"/>
+						<attribute name="customer" width="100"/>
+						<attribute name="order" width="150"/>
+						<attribute name="state" width="80"/>
+						<attribute name="priority" width="80"/>
+						<attribute name="category" width="80"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<exclude>
+					<exclusion attribute="comments"/>
+				</exclude>
+				<tab name="tab.ticket.details">
+					<section name="tab.section.ticket.details">
+						<listlayout mode="append">
+							<attribute name="ticketID"/>
+							<attribute name="headline" width="500"/>
+							<attribute name="category" width="100"/>
+							<attribute name="state" width="100"/>
+							<attribute name="priority" width="100"/>
+						</listlayout>
+					</section>
+					<section name="tab.section.ticket.associated">
+						<listlayout mode="append">
+							<attribute name="order" width="200"/>
+							<attribute name="customer" width="200"/>
+						</listlayout>
+					</section>
+					<section name="tab.section.ticket.assigned">
+						<listlayout mode="append">
+							<attribute name="assignedAgent" width="300"/>
+							<attribute name="assignedGroup" width="300"/>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.ticket.history">
+					<section name="tab.section.ticket.history">
+						<listlayout mode="append">
+							<attribute name="resolution" editable="false" width="400"/>
+							<attribute name="events" editable="false" width="400"/>
+						</listlayout>
+					</section>
+				</tab>
+				
+			</editor>
+		</organizer>
+	</type>
+	
+	<type name="CsTicketEvent" mode="append" icon="ext/ticketsystem/images/events/ticketicon-list-update-black.png">
+		<organizer mode="append">
+			<result>
+				<listview>
+					<itemlayout mode="replace">
+						<attribute name="text"/>
+					</itemlayout>
+				</listview>
+			</result>
+		</organizer>
+		<defaultreference>
+			<itemlayout mode="replace">
+				<attribute name="text"/>
+				<attribute name="author"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="CsCustomerEvent" mode="append" icon="ext/ticketsystem/images/events/ticketicon-list-note.png">
+		<organizer mode="append"></organizer>
+		<defaultreference mode="replace">					
+			<itemlayout mode="replace">
+				<attribute name="interventionType"/>
+				<attribute name="reason"/>
+				<attribute name="author"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="CsTicketResolutionEvent" mode="append" icon="ext/ticketsystem/images/events/ticketicon-list-resolve.png">
+		<organizer mode="append"></organizer>
+		<defaultreference mode="replace">					
+			<itemlayout mode="replace">
+				<attribute name="resolutionType"/>
+				<attribute name="reason"/>
+				<attribute name="author"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+		
+	<type name="Order" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.order.tickets">
+					<section name="section.order.tickets"  mode="append">
+						<listlayout>
+							<inlineshortcut type="CsTicket">
+							<preset sourceattribute="pk" targetattribute="order"/>
+								<itemlayout mode="append">
+									<attribute name="ticketID" width="200"/>
+									<attribute name="headline" width="200"/>
+									<attribute name="assignedAgent" width="200"/>
+									<attribute name="state" width="100"/>
+									<attribute name="priority" width="100"/>
+								</itemlayout>
+							</inlineshortcut>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	
+	<type name="Customer" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.customer.tickets">
+					<section name="section.customer.tickets"  mode="append">
+						<listlayout>
+							<inlineshortcut type="CsTicket">
+								<preset sourceattribute="pk" targetattribute="customer"/>
+								<itemlayout mode="append">
+									<attribute name="ticketID" width="200"/>
+									<attribute name="headline" width="200"/>
+									<attribute name="order" width="200"/>
+									<attribute name="assignedAgent" width="200"/>
+									<attribute name="state" width="100"/>
+									<attribute name="priority" width="100"/>
+								</itemlayout>
+							</inlineshortcut>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CsAgentGroup" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.csagentgroup.tickets">
+					<section name="section.csagentgroup.tickets"  mode="append">
+						<listlayout>
+							<attribute name="name"/>
+							<attribute name="emailDistributionList"/>
+							<attribute name="ticketstores"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	
+	<type name="CsTicketEventEmailConfiguration" mode="append" icon="ext/ticketsystem/images/events/ticketicon-list-customermail.png">
+		<organizer mode="append">
+			<search mode="replace" autoperform="true">
+				<condition attribute="code" operator="contains"/>
+				<condition attribute="recipientType" operator="equal"/>
+				<condition attribute="subject" operator="contains"/>
+			</search>
+			<result>
+				<listview>
+					<itemlayout mode="replace">
+						<attribute name="code"/>
+						<attribute name="recipientType"/>
+						<attribute name="subject"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<tab name="tab.ticketeventemail.config">
+					<section name="tab.section.ticketeventemail.properties">
+						<listlayout mode="append">
+							<attribute name="code"/>
+							<attribute name="subject" width="500"/>
+							<attribute name="eventType"/>
+							<attribute name="alteredAttributes"/>
+							<attribute name="recipientType"/>
+						</listlayout>
+					</section>
+					<section name="tab.section.ticketeventemail.layout">
+						<listlayout mode="append">
+							<attribute name="plainTextTemplate"/>
+							<attribute name="htmlTemplate"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference>
+			<itemlayout mode="replace">
+				<attribute name="code"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="CommentType" mode="append">
+		<organizer mode="append">
+			<search mode="replace" autoperform="true">
+				<condition attribute="code" operator="contains"/>
+				<condition attribute="domain" operator="equal"/>
+				<condition attribute="name" operator="contains"/>
+				<condition attribute="metaType" operator="contains"/>
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout mode="replace">
+						<attribute name="code" width="150"/>
+						<attribute name="domain" width="200"/>
+						<attribute name="name" width="200"/>
+						<attribute name="metaType" width="200"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<tab name="tab.common" position="0" mode="append">
+					<section name="section.common" mode="append">
+						<listlayout>
+							<attribute name="code"/>
+							<attribute name="domain"/>
+							<attribute name="name"/>
+							<attribute name="metaType"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference>
+			<itemlayout mode="replace">
+				<attribute name="code"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+</configuration>

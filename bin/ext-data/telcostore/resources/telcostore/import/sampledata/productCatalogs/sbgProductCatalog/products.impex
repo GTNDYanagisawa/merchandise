@@ -1,0 +1,23 @@
+# ImpEx for Importing Products
+
+# Macros / Replacement Parameter definitions
+$productCatalog=sbgProductCatalog
+
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default=Staged])[unique=true,default=$productCatalog:Staged]
+$supercategories=supercategories(code, $catalogVersion)
+
+$storeUid=telco
+$solrIndexedTypeIdentifier=telcoProductType
+$solrIndexedType=indexedType(identifier[default=$solrIndexedTypeIdentifier])
+
+# Insert Subscription Products
+INSERT_UPDATE SubscriptionProduct;code[unique=true];$supercategories;manufacturerAID;subscriptionTerm(id);unit(code)[default=pieces];soldIndividually[default=true];approvalstatus(code)[default='approved'];$catalogVersion;europe1pricefactory_ptg(code)[default='us-sales-tax-full']
+;BASIC_TV;sbgproducts;BASIC_TV;6_months_non_renewing_cancel
+;BIG_TV;sbgproducts;BIG_TV;6_months_auto_renewing_cancel
+;PREMIUM_TV;sbgproducts;PREMIUM_TV;1_year_auto_renewing_cancel
+;DELUXE_TV;sbgproducts;DELUXE_TV;1_year_auto_renewing_cancel
+
+
+# create a solr hero product definition for the sbg products to make sure that they are always sorted in a certain order
+INSERT_UPDATE SolrHeroProductDefinition;code[unique=true];category(code, $catalogVersion)[unique=true];products(code, $catalogVersion);$solrIndexedType[unique=true];$catalogVersion
+;sbgproducts_telcoProductType;sbgproducts;BASIC_TV,BIG_TV,PREMIUM_TV,DELUXE_TV

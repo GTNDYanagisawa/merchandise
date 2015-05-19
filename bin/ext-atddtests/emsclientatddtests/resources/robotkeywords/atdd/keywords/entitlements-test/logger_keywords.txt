@@ -1,0 +1,15 @@
+*** Settings ***
+Library         com.hybris.services.entitlements.atdd.keywords.LoggingKeywordLibrary
+
+*** Keywords ***
+start recording logger "${loggerName}"
+    [Documentation]    Starts to recording of given logger. A previously running recording will be stopped
+    register new appender    ${loggerName}
+
+check message ${index} in logger "${loggerName}" matches pattern "${pattern}"
+    [Documentation]    Verifies if the n-th message recorded matches the given pattern
+    assert message matches    ${loggerName}    ${index}    ${pattern}
+
+check message count in logger "${loggerName}" is ${count}
+    [Documentation]    Checks the amount of messages in logger agains the given count
+    assert has messages    ${loggerName}    ${count}

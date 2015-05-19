@@ -1,0 +1,24 @@
+# ImpEx for Related Products
+
+# Macros / Replacement Parameter definitions
+$productCatalog=sbgProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$supercategories=supercategories(code, $catalogVersion)
+$baseProduct=baseProduct(code,$catalogVersion)
+$approved=approvalstatus(code)[default='check']
+
+
+INSERT_UPDATE ProductReference;source(code,$catalogVersion)[unique=true];target(code,$catalogVersion)[unique=true];referenceType(code)[unique=true];active[default=true];preselected[default=false]
+;BASIC_TV;BIG_TV;UPSELLING
+;BASIC_TV;PREMIUM_TV;UPSELLING
+;BASIC_TV;DELUXE_TV;UPSELLING
+;BIG_TV;BASIC_TV;UPSELLING
+;BIG_TV;PREMIUM_TV;UPSELLING
+;BIG_TV;DELUXE_TV;UPSELLING
+;PREMIUM_TV;BASIC_TV;UPSELLING
+;PREMIUM_TV;BIG_TV;UPSELLING
+;PREMIUM_TV;DELUXE_TV;UPSELLING
+;DELUXE_TV;BASIC_TV;UPSELLING
+;DELUXE_TV;BIG_TV;UPSELLING
+;DELUXE_TV;PREMIUM_TV;UPSELLING
+ 

@@ -1,0 +1,179 @@
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$picture=media(code, $contentCV);
+$siteResource=jar:de.hybris.platform.b2bacceleratorsampledata.constants.B2BAcceleratorSampleDataConstants&/b2bacceleratorsampledata/import/contentCatalogs/$contentCatalog
+
+# Language
+$lang=ja
+
+# Site Logo Component
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+;;SiteLogoComponent;/images/theme/logo-hybris.png
+
+# CMS Image Components
+UPDATE CMSImageComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+
+# CMS Link Components
+UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];linkName[lang=ja]
+ ;;AboutAcceleratorLink;"マルチチャネル・アクセラレータについて"
+ ;;AboutHybrisLink;"Hybris について"
+ ;;AgileCommerceBlogLink;"Agile Commerce Blog"
+ ;;AngleGrindersCategoryLink;"アングルグラインダ"
+ ;;CircularSawsCategoryLink;"丸鋸"
+ ;;ContactUsLink;"お問い合わせ"
+ ;;DocumentationLink;"ドキュメント"
+ ;;FacebookLink;"Facebook"
+ ;;HammersCategoryLink;"ハンマー"
+ ;;HandSawsCategoryLink;"のこぎり"
+ ;;HandToolsCategoryLink;"作業用工具"
+ ;;HomepageNavLink;"Home"
+ ;;JigsawsCategoryLink;"ジグソー"
+ ;;LinkedInLink;"Linked In"
+ ;;LogoutLink;"ログアウト"
+ ;;ManageBudgetsLink;"予算管理"
+ ;;ManageBusinessUnitsLink;"事業ユニット管理"
+ ;;ManageCostCentersLink;"コストセンター管理"
+ ;;ManagePermissionsLink;"権限管理"
+ ;;ManageUsergroupsLink;"ユーザーグループ管理"
+ ;;ManageUsersLink;"ユーザー管理"
+ ;;MeasuringLayoutToolsCategoryLink;"レイアウト＆測定器"
+ ;;MyAccountLink;"マイ アカウント"
+ ;;MyCompanyLink;"マイ会社"
+ ;;NutDriversCategoryLink;"ナット ドライバ"
+ ;;PowerDrillsCategoryLink;"電動ドリル"
+ ;;PunchesCategoryLink;"パンチ"
+ ;;RotaryHammersCategoryLink;"ロータリー ハンマー"
+ ;;SandersCategoryLink;"サンダー"
+ ;;ScrewdriversCategoryLink;"ドライバー"
+ ;;StoreFinderLink;"店舗検索"
+ ;;StrippingToolsCategoryLink;"剥ぎ取り工具"
+ ;;TwitterLink;"Twitter"
+ ;;UserLoginLink;"ログイン"
+
+# Lightbox Banner for Mini Cart (banner is not localizable so we must create a separate banner per language)
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];&imageRef;altText
+ ;;Powertools_358x45_HomeDeliveryBanner_JA_01.gif;$siteResource/images/banners/site/Powertools_358x45_HomeDeliveryBanner_JA_01.gif;image/gif;Powertools_358x45_HomeDeliveryBanner_JA_01.gif;"6pm までに注文すれば、翌日に配達できます"
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+ ;;LightboxHomeDeliveryBannerComponent;Powertools_358x45_HomeDeliveryBanner_JA_01.gif;
+
+# CMS Mini Cart Component
+UPDATE MiniCartComponent;$contentCV[unique=true];uid[unique=true];title[lang=ja]
+ ;;MiniCart;"買物カゴ"
+
+# CMS tabs components
+UPDATE CMSTabParagraphComponent;$contentCV[unique=true];uid[unique=true];title[lang=ja];content[lang=ja]
+ ;;deliveryTab;配送;"<table border=""0"" cellspacing=""0"" cellpadding=""10"" style=""border-collapse: collapse empty-cells: show font-size: 12px padding: 0px margin: 0px border: 0px initial initial""><tbody><tr style=""padding: 0px margin: 0px""><td colspan=""4"" style=""vertical-align: top text-align: left font-weight: normal padding: 0px margin: 0px""><div style=""padding-top: 10px padding-right: 0px padding-bottom: 0px padding-left: 0px border-bottom-width: 1px border-bottom-style: solid border-bottom-color: #8edf75 height: 30px border-top-width: 1px border-top-style: solid border-top-color: #8edf75 margin: 0px""><strong style=""font-weight: bold padding: 0px margin: 0px""><span style=""color: #285190 font-size: 14px padding: 0px margin: 0px"">出荷と配送</span></strong></div></td></tr><tr style=""padding: 0px margin: 0px""><td colspan=""4"" style=""vertical-align: top text-align: left font-weight: normal padding: 0px margin: 0px""><strong style=""font-weight: bold padding: 0px margin: 0px""><br />2.1 郵送料はいくらかかりますか？<br /></strong>すべての商品の米国本土内の郵送は無料です。 望遠鏡と双眼鏡を除くすべての商品のアラスカ、ハワイ、プエルトリコ、グァム、および在外米軍基地住所への郵送は無料です。 詳細については、ここをクリックしてください。<br /><br /><strong style=""font-weight: bold padding: 0px margin: 0px"">2.2 郵送方法は？<br /></strong>望遠鏡と双眼鏡の米国本土内への郵送は、UPS または Fedex を使用します（追跡機能と全額保険付き）。<br /><br />その他すべての商品は USPS（米国郵便公社）を使用します。 ご注文の内容により、米国内の注文はファースト クラス郵便（13 オンス以下の梱包重量）、プライオリティ郵便（13 オンスを超える梱包重量）、メディア郵便（チャート、ソフトウェア、または書籍）、またはこれらの組み合わせで出荷されます。 配送証明はほとんどの注文に含まれ、特別料金はかかりません。 ただし、保険はオプションです。<br /><br /><strong style=""font-weight: bold padding: 0px margin: 0px"">2.3 注文商品の出荷日は？</strong><br />通常、注文商品は月曜日から金曜日の毎日出荷されます。 太平洋標準時 9pm（東部標準時 12pm）までに受け取った注文は、通常、同日に出荷されます。<br /><br /><strong style=""font-weight: bold padding: 0px margin: 0px"">2.4 注文商品はすでに出荷されましたか？</strong><br />注文商品が出荷されたときに、その通知が電子メールで自動的に送信されます。 弊社のオンライン アカウントを作成した場合は、いつでもアカウントにログインして出荷状況を確認できます。 注文商品に問題または遅延がある場合は、ただちにお客様にご連絡いたします。<br /><br /></td></tr></tbody></table>";
+
+# CMS Footer Component
+UPDATE FooterComponent;$contentCV[unique=true];uid[unique=true];notice[lang=ja]
+ ;;FooterComponent;"© 2014 hybris software"
+
+# CMS Paragraph Component (Contact information)
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=ja]
+ ;;ContactInfo;"電話連絡先： +1 302 295 5067"
+ ;;NewCustomerContactCenterParagraphComponent;"新規登録をご希望のお客様は、カスタマーサービスセンター 888-888-8888 にご連絡ください。"
+
+# CMS ProductReferences Components
+UPDATE ProductReferencesComponent;$contentCV[unique=true];uid[unique=true];title[lang=ja]
+ ;;AccessoriesProductReferencesComponent;"ベストセラー商品"
+ ;;CrossSellingProductReferencesComponent;"アクセサリ"
+
+# Category Pages
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];title[lang=ja]
+
+# CMS Navigation Nodes
+UPDATE CMSNavigationNode;$contentCV[unique=true];uid[unique=true];title[lang=ja]
+ ;;AcceleratorNavNode;"Accelerator"
+ ;;AngleGrindersNavNode;"アングルグラインダ"
+ ;;FollowUsNavNode;"フォロー"
+ ;;HammersNavNode;"ハンマー"
+ ;;HandToolsLinksNavNode;"作業用工具"
+ ;;HandToolsNavNode;"作業用工具"
+ ;;HybrisNavNode;"Hybris"
+ ;;MeasuringLayoutToolsNavNode;"レイアウト＆測定器"
+ ;;MyCompanyLinksNavNode;"企業管理"
+ ;;PowerDrillsNavNode;"電動ドリル"
+ ;;PowertoolsNavNode;"Powertools Site"
+ ;;SandersNavNode;"サンダー"
+ ;;ScrewdriversNavNode;"ドライバー"
+ ;;SiteRootNode;"SiteRoot"
+
+# Powertools Terms and Conditions Page
+
+# CMS Paragraph Component
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=ja];
+
+#  Powertools Homepage
+
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];&imageRef;altText
+ ;;Powertools_228x228_Home_Banner_JA_01.jpg;$siteResource/images/banners/homepage/Powertools_228x228_Home_Banner_JA_01.jpg;;Powertools_228x228_Home_Banner_JA_01.jpg;"すべてのねじ回し作業に適した軽量かつ強力な"
+ ;;Powertools_228x228_Home_Banner_JA_02.jpg;$siteResource/images/banners/homepage/Powertools_228x228_Home_Banner_JA_02.jpg;;Powertools_228x228_Home_Banner_JA_02.jpg;"スクリュードライバとビットのセットの検索"
+ ;;Powertools_228x228_Home_Banner_JA_03.jpg;$siteResource/images/banners/homepage/Powertools_228x228_Home_Banner_JA_03.jpg;;Powertools_228x228_Home_Banner_JA_03.jpg;"その価格範囲で最も強力なツール"
+ ;;Powertools_228x228_Home_Banner_JA_04.jpg;$siteResource/images/banners/homepage/Powertools_228x228_Home_Banner_JA_04.jpg;;Powertools_228x228_Home_Banner_JA_04.jpg;"過酷な環境での仕事用電源装置"
+ ;;Powertools_468x418_Rotating_Image_JA_01.jpg;$siteResource/images/banners/homepage/Powertools_468x418_Rotating_Image_JA_01.jpg;;Powertools_468x418_Rotating_Image_JA_01.jpg;"マルチ サンダー - 現在新シリーズの在庫あり"
+ ;;Powertools_468x418_Rotating_Image_JA_02.jpg;$siteResource/images/banners/homepage/Powertools_468x418_Rotating_Image_JA_02.jpg;;Powertools_468x418_Rotating_Image_JA_02.jpg;"取引および産業用 Bosch"
+ ;;Powertools_468x418_Rotating_Image_JA_03.jpg;$siteResource/images/banners/homepage/Powertools_468x418_Rotating_Image_JA_03.jpg;;Powertools_468x418_Rotating_Image_JA_03.jpg;"現代技術と高性能 - 今すぐチェックアウト"
+ ;;Powertools_948x60_Home_Top_Banner_JA_01.jpg;$siteResource/images/banners/homepage/Powertools_948x60_Home_Top_Banner_JA_01.jpg;;Powertools_948x60_Home_Top_Banner_JA_01.jpg;"Bosch | Black & Decker | Einhall | Skil | Hitachi"
+ ;;Powertools_96x96_CatScrewdrivers_JA_01.jpg;$siteResource/images/banners/homepage/Powertools_96x96_CatScrewdrivers_JA_01.jpg;;Powertools_96x96_CatScrewdrivers_JA_01.jpg;"ドライバー"
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+ ;;BTGBannerProductDetail;;
+ ;;HomepageBanner1;Powertools_228x228_Home_Banner_JA_01.jpg;
+ ;;HomepageBanner2;Powertools_228x228_Home_Banner_JA_02.jpg;
+ ;;HomepageBanner3;Powertools_228x228_Home_Banner_JA_03.jpg;
+ ;;HomepageBanner4;Powertools_228x228_Home_Banner_JA_04.jpg;
+ ;;HomepageTopBanner;Powertools_948x60_Home_Top_Banner_JA_01.jpg;
+
+UPDATE BannerComponent;$contentCV[unique=true];uid[unique=true];headline[lang=ja];$picture[lang=$lang];content[lang=ja]
+ ;;RotatingImageBanner1;マルチ サンダー - 現在新シリーズの在庫あり;Powertools_468x418_Rotating_Image_JA_01.jpg;;
+ ;;RotatingImageBanner2;取引および産業用 Bosch;Powertools_468x418_Rotating_Image_JA_02.jpg;;
+ ;;RotatingImageBanner3;現代技術と高性能 - 今すぐチェックアウト;Powertools_468x418_Rotating_Image_JA_03.jpg;;
+
+UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];title[lang=ja]
+ ;;PowertoolsHomepageProductCarouselComponent;"買物カゴ"
+ ;;PremiumbuyersgroupHomepageProductCarouselComponent;"ベストセラー商品"
+
+UPDATE CategoryFeatureComponent;$contentCV[unique=true];uid[unique=true];title[lang=ja];description[lang=ja];$picture[lang=$lang]
+ ;;ScrewdriversFeatureComponent;ドライバー;;Powertools_96x96_CatScrewdrivers_JA_01.jpg;
+
+
+#  Powertools Search Results Page
+
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText
+ ;;Powertools_148x318_SearchResultsSideBanner_JA_01.jpg;$siteResource/images/banners/site/Powertools_148x318_SearchResultsSideBanner_JA_01.jpg;;
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+ ;;SearchResultsSideBanner;Powertools_148x318_SearchResultsSideBanner_JA_01.jpg;
+
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=ja]
+ ;;NoSearchResultsParagraphComponent;<h2>検索条件に一致する結果は見つかりませんでした</h2><p>ご提案</p><ul><li>入力した語句が間違っているかもしれません。入力ミスがないかご確認ください</li><li>指定した検索条件が細かすぎる場合があります。キーワードを減らして検索し直してみてください</li><li>上記のカテゴリを選択して商品をお探しください</li></ul>;
+
+
+#  Powertools Cart Page
+
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText
+ ;;Powertools_148x300_HelpBanner_JA_01.jpg;$siteResource/images/banners/site/Powertools_148x300_HelpBanner_JA_01.jpg;;"お手伝いが必要ですか?チェックアウトのお手伝いには、ここをクリックしてください"
+ ;;Powertools_788x120_HomeDeliveryBanner_JA_01.jpg;$siteResource/images/banners/site/Powertools_788x120_HomeDeliveryBanner_JA_01.jpg;;"午後 6 時までにご注文いただくと、翌日に納入いたします"
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+ ;;HelpBanner;Powertools_148x300_HelpBanner_JA_01.jpg;
+ ;;NextDayDeliveryBanner120;Powertools_788x120_HomeDeliveryBanner_JA_01.jpg;
+
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=ja]
+ ;;EmptyCartParagraphComponent;"<h2>買物カゴは空です</h2><p>ご提案</p><ul><li>上記のカテゴリを選択して商品をお探しください</li></ul>";
+
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=ja]
+ ;;HelpParagraphComponent;"<div class=""helpBanner""><span class=""bannerHeadline"" >必要性の助けか。</span><span class=""bannerText"">チェックアウトのヘルプについては、ここをクリックしてください<a href=""#"" >GO > ></a></span></div>";
+
+# Powertools Store Finder Page
+
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText
+ ;;Powertools_148x318_StoreFinderSideBanner_JA_01.jpg;$siteResource/images/banners/site/Powertools_148x318_StoreFinderSideBanner_JA_01.jpg;;""
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+ ;;StoreFinderSideBanner;Powertools_148x318_StoreFinderSideBanner_JA_01.jpg;

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:h="http://www.w3.org/1999/xhtml" 
+		xmlns:zk="http://www.zkoss.org/2005/zk"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd ">
+				
+		<div style="text-align: left;">
+			<div style="margin: 30px; margin-top: 10px; margin-bottom: 0; font-size: 10px;" >
+				<div>
+					<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.pageNotDefault.restrictions.title')}"/>
+				</div>
+				<div style="margin-top: 5px; overflow: auto; height: 70px; width; 300px; border: 1px solid #ccc;">
+					<div style="float: left; min-width: 300px;">
+						<div use="de.hybris.platform.cockpit.components.editor.CockpitEditorContainer" 
+								propertyQualifier="AbstractPage.restrictions" editorCode="listViewReferenceEditor"
+								valueContainer="${wizardBean.pageValueContainer}">
+						</div>
+					</div>
+				</div>
+				<div style="margin-top: 10px;">
+					<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.pageNotDefault.restrictions.question')}"></label>
+					<div style="margin-top:8px; margin-left: 10px;">
+						<radiogroup onCreate='setAttr("addRestriction",true);'>
+							<hbox>
+								<radio checked='true' onCheck='setAttr("addToExistingPage",true);'/>
+								<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.pageNotDefault.restrictions.addRestriction')}" />
+							</hbox>
+							<div height="8px"/>
+							<hbox>
+								<radio onCheck='setAttr("addToExistingPage",false);setAttr("keepExistingRestrictions",false);'/>
+								<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.pageNotDefault.restrictions.personalizedPage')}" />
+							</hbox>
+							<div height="8px"/>
+							<hbox>
+								<radio onCheck='setAttr("addToExistingPage",false);setAttr("keepExistingRestrictions",true);'/>
+								<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.pageNotDefault.restrictions.personalizedPageWithRestrictions')}" />
+							</hbox>
+						</radiogroup>
+					</div>
+				</div>	
+				
+			</div>
+			
+		</div>
+</zk>

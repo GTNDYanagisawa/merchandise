@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<project name="acc.ant.sonar" xmlns:jacoco="antlib:org.jacoco.ant">
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
+		<classpath path="${ext.acceleratorservices.path}/lib/jacocoant.jar"/>
+	</taskdef>
+
+
+	<target name="jacocoalltests" description="runs allstests with jacoco attached">
+
+		<jacoco:agent property="agentvmparam"
+		              append="true"
+		              output="file"
+		              destfile="${HYBRIS_LOG_DIR}/junit/jacoco.exec"
+				/>
+
+		<property name="testclasses.extensions" value="${extname}"/>
+		<ant dir="${platformhome}" target="alltests" inheritrefs="false">
+			<property name="standalone.javaoptions" value="${agentvmparam} ${standalone.javaoptions}"/>
+		</ant>
+	</target>
+</project>

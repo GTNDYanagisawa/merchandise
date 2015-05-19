@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<!-- 
+  WARNING: This is the Spring WEB configuration file. If you want to replace
+  items or managers you have to do this from the extensions core configuration 
+  file (btgcockpit/resources/btgcockpit-spring.xml) 
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+	
+	<!-- 
+		UICockpitSession represents session in an cockpit application. It manages e.g. the available cockpit perspectives.
+	 -->
+	<alias alias="UICockpitSession" name="defaultUICockpitSession" />
+	<bean id="defaultUICockpitSession" class="de.hybris.platform.cockpit.session.impl.UISessionImpl" scope="session">
+		<property name="initialSessionListeners">
+			<list></list>
+		</property>
+		<property name="availablePerspectives">
+			<list>
+				<ref bean="CatalogPerspective"/>
+				<ref bean="LiveEditPerspective"/>
+				<ref bean="NavigationNodePerspective"/>
+				<ref bean="BtgcockpitPerspective"/>
+				
+				<!-- uncomment the following line if you want an administration perspective -->
+<!--				<ref bean="AdminPerspective" />-->
+				
+			</list>
+		</property>
+		<property name="usingTestIDs" value="false" />
+		<property name="dragOverPerspectivesEnabled" value="true" />
+		<property name="cachePerspectivesEnabled" value="true" />
+		<property name="sendEventsImmediately" value="false" />
+		<property name="requestHandler" ref="CMSRequestHandler" />
+		<property name="pushContainers">
+			<list value-type="de.hybris.platform.cockpit.session.impl.PushCreationContainer">
+				<ref bean="WorkflowPushContainer" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 
+		Btgcockpit perspective.
+	 -->
+	<alias alias="BtgcockpitPerspective" name="defaultBtgcockpitPerspective" />
+	<bean id="defaultBtgcockpitPerspective" scope="session" parent="BasePerspective" class="de.hybris.platform.btgcockpit.session.impl.BtgCockpitPerspective">
+		<property name="uid" value="btgcockpit.perspective.btgcockpit" />  <!-- unique ID of the perspective -->
+		<property name="label" value="perspective.btgcockpit" />  <!-- localization key for the label of the perspective -->
+		<property name="customCsaURI" value="/btgcockpit/btgcockpitCSA.zul" />  <!-- file with optional custom client side actions -->
+
+		<property name="navigationArea">
+			<ref bean="BtgcockpitNavigationArea" />
+		</property>
+		<property name="browserArea">
+			<bean class="de.hybris.platform.btgcockpit.session.impl.BtgcockpitBrowserArea">
+				<property name="rootSearchTypeCode" value="BTGSegment"/>
+				<property name="viewURI" value="/cockpit/baseSearchBrowserArea.zul"/>
+				<property name="defaultBrowserViewMapping">
+					<map>
+						<entry key="cockpitgroup" value="GRID" />
+						<entry key="cmsmanagergroup" value="GRID" />
+					</map>
+				</property>
+				<property name="multiSelectActions">
+					<ref bean="BtgcockpitBrowserMultiSelectActionColumn" />
+				</property>
+				<property name="additionalToolbarActions">
+					<ref bean="BtgcockpitBrowserAdditionalToolbarActionColumn" />
+				</property>
+			</bean>
+		</property>
+		
+		<property name="editorArea">
+			<bean id="BtgcockpitEditorAreaModel" parent="BaseEditorAreaModel">
+			<property name="editorAreaController">
+					<ref bean="BtgcockpitEditorAreaController"/>
+				</property>
+			</bean>	
+		</property>
+		<property name="popupEditorArea">		
+			<bean id="BtgcockpitPopupEditor" parent="BasePopupEditor">
+				<property name="editorAreaController">
+					<ref bean="BtgcockpitPopupEditorAreaController"/>
+				</property>
+			</bean>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>		
+	</bean>
+	
+	<!-- Used for action buttons that act on current selection -->
+	<bean id="BtgcockpitBrowserMultiSelectActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="BTGSegmentEditAction" />
+				<ref bean="BTGSegmentRemovalAction" />
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Used for action buttons independent of what is selected -->
+	<bean id="BtgcockpitBrowserAdditionalToolbarActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="BTGSegmentNewSegmentAction" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="BtgcockpitNavigationArea" name="defaultBtgcockpitNavigationArea" />
+	<bean id="defaultBtgcockpitNavigationArea" class="de.hybris.platform.btgcockpit.session.impl.BtgcockpitNavigationArea" scope="session" parent="BaseNavigationArea">
+		<property name="sectionModel">
+			<ref bean="BtgcockpitNavigationAreaModel"/>	
+		</property>		
+		<property name="infoSlotRenderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.InfoBoxRenderer"/>
+		</property>
+		<property name="sections">
+			<list>
+				<ref bean="BtgSpecialCollectionsSection" />
+				<ref bean="BTGSiteSelectorSection" />
+				<ref bean="BtgcockpitUndoSection" />
+			</list>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+	</bean>
+	
+	<alias alias="BtgSpecialCollectionsSection" name="defaultBtgSpecialCollectionsSection" />
+	<bean id="defaultBtgSpecialCollectionsSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection" scope="session">
+		<property name="localizedLabel" value="navigationarea.shortcuts"/>
+		<property name="visible" value="true"/>
+		<property name="renderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.SpecialCollectionSectionRenderer">
+				<property name="allItemsLabel" value="btg_general.all_segments" />
+				<property name="allowedTypes">
+					<list value-type="java.lang.String">
+						<value>BTGSegment</value>
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<alias alias="BTGSiteSelectorSection" name="defaultBTGSiteSelectorSection" />
+	<bean id="defaultBTGSiteSelectorSection" class="de.hybris.platform.btgcockpit.components.sectionpanel.BTGSiteSelectorSection" scope="session" autowire="byName">
+	<property name="localizedLabel" value="navigationarea.websites"/>
+		<property name="initiallySelected" value="false"/>
+		<property name="visible" value="true"/>
+		<property name="subSections">
+			<list>
+			</list>
+		</property>				
+		<!-- comment out the next lines in order to use the default cockpit selector renderer -->
+		<property name="renderer">
+			<bean class="de.hybris.platform.btgcockpit.components.sectionpanel.renderer.BTGSiteSectionSelectorSectionRenderer" autowire="byName"/>
+		</property>		 
+		<property name="navigationAreaModel" ref="BtgcockpitNavigationAreaModel"/>
+	</bean>
+	
+	<!--#### content catalog version selector section ####-->
+	<!-- 	
+	<bean id="BTGCatalogVersionSelectorSection" class="de.hybris.platform.btgcockpit.components.sectionpanel.BTGCatalogVersionSectionSelectorSection" scope="prototype" autowire="byName">
+		<property name="localizedLabel" value="navigationarea.catalogs"/>
+		<property name="initiallySelected" value="false"/>
+		<property name="visible" value="true"/>
+		<property name="subSections">
+			<list>
+			</list>
+		</property>		
+		<property name="renderer">
+			<bean class="de.hybris.platform.btgcockpit.components.sectionpanel.renderer.BTGCatalogVersionSectionSelectorSectionRenderer" autowire="byName"/>
+		</property>		 
+		<property name="navigationAreaModel" ref="BtgcockpitNavigationAreaModel"/>
+	</bean>
+	 -->
+	<alias alias="BtgcockpitNavigationAreaModel" name="defaultBtgcockpitNavigationAreaModel" /> 
+	<bean id="defaultBtgcockpitNavigationAreaModel" class="de.hybris.platform.btgcockpit.components.navigationarea.BtgcockpitNavigationAreaModel" scope="session">
+		<property name="specialCollectionTypes">
+			<list>
+				<value>blacklist</value>
+				<value>quickcollection</value>
+			</list>
+		</property>						
+	</bean>
+	
+	<alias alias="BtgcockpitUndoSection" name="defaultBtgcockpitUndoSection" /> 
+	<bean id="defaultBtgcockpitUndoSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection" scope="prototype">
+		<property name="localizedLabel" value="navigationarea.history" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.UndoSectionRenderer" />
+		</property>
+	</bean>
+	
+	<alias alias="BtgcockpitEditorAreaController" name="defaultBtgcockpitEditorAreaController" />
+	<bean id="defaultBtgcockpitEditorAreaController" class="de.hybris.platform.cockpit.session.impl.DefaultEditorAreaController" scope="session">
+		<property name="sectionRowRenderer">
+			<bean id="BtgcockpitEditorSectionRowRenderer" parent="EditorSectionRowRenderer"/>
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory"/>
+		</property>
+	</bean>
+	
+	<alias alias="BtgcockpitPopupEditorAreaController" name="defaultBtgcockpitPopupEditorAreaController" />
+	<bean id="defaultBtgcockpitPopupEditorAreaController" class="de.hybris.platform.btgcockpit.session.impl.BtgcockpitPopupEditorAreaControllerImpl" scope="prototype">
+		<property name="sectionRowRenderer">
+			<bean id="BtgcockpitPopupEditorSectionRowRenderer" parent="EditorSectionRowRenderer"/>
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory"/>
+		</property>
+	</bean>
+	
+	<alias alias="BTGSegmentActionColumn" name="defaultBTGSegmentActionColumn" />
+	<bean id="defaultBTGSegmentActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="BTGSegmentSynchronizationAction" />
+				<ref bean="BTGSegmentEditAction" />
+				<ref bean="BTGSegmentRemovalAction" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="BTGSegmentActionColumnGrid" name="defaultBTGSegmentActionColumnGrid" />
+	<bean id="defaultBTGSegmentActionColumnGrid" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="BTGSegmentSynchronizationAction" />
+				<ref bean="BTGSegmentEditAction" />
+				<ref bean="BTGSegmentRemovalAction" />
+				<ref bean="BTGSegmentTimePeriodStatus" />
+				<ref bean="BTGSegmentActiveStatus" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="SegmentHeaderListActionColumn" name="defaultSegmentHeaderListActionColumn" />
+	<bean id="defaultSegmentHeaderListActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="BTGSegmentEditAction" />
+				<ref bean="BTGSegmentSynchronizationAction" />
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="BTGRuleIconColumn" name="defaultBTGRuleIconColumn" />
+	<bean id="defaultBTGRuleIconColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="BTGRuleIconAction" />
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="BTGRuleActionColumn" name="defaultBTGRuleActionColumn" />
+	<bean id="defaultBTGRuleActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="BTGRuleRemovalAction" />
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="BTGOutputActionIconColumn" name="defaultBTGOutputActionIconColumn" />
+	<bean id="defaultBTGOutputActionIconColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="BTGOutputActionIconAction" />
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="BTGOutputActionActionColumn" name="defaultBTGOutputActionActionColumn" />
+	<bean id="defaultBTGOutputActionActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="BTGOutputActionRemovalAction" />
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="BTGRuleItemColumn" name="defaultBTGRuleItemColumn" />
+	<bean id="defaultBTGRuleItemColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultSingleColumnConfiguration"
+		scope="prototype">
+		<property name="name" value="rule" />
+		<property name="iconAction">
+			<ref bean="BTGRuleIconAction" />
+		</property>
+		<property name="actions">
+			<list>
+				<ref bean="BTGRuleRemovalAction" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="BTGOutputActionItemColumn" name="defaultBTGOutputActionItemColumn" />
+	<bean id="defaultBTGOutputActionItemColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultSingleColumnConfiguration"
+		scope="prototype">
+		<property name="name" value="outputAction" />
+		<property name="actions">
+			<list>
+				<ref bean="BTGOutputActionRemovalAction" />
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="BTGSegmentRemovalAction" name="defaultBTGSegmentRemovalAction" />
+	<bean id="defaultBTGSegmentRemovalAction" class="de.hybris.platform.btgcockpit.components.listview.impl.BTGSegmentRemovalAction"
+		scope="prototype" />
+	<alias alias="BTGSegmentSynchronizationAction" name="defaultBTGSegmentSynchronizationAction" />
+	<bean id="defaultBTGSegmentSynchronizationAction" class="de.hybris.platform.btgcockpit.components.listview.impl.BTGSegmentSynchronizationAction"
+		scope="prototype" />
+	<alias alias="BTGSegmentEditAction" name="defaultBTGSegmentEditAction" />
+	<bean id="defaultBTGSegmentEditAction" class="de.hybris.platform.cockpit.components.listview.impl.ActivateItemAction"
+		scope="prototype" />
+	<alias alias="BTGRuleRemovalAction" name="defaultBTGRuleRemovalAction" />
+	<bean id="defaultBTGRuleRemovalAction" class="de.hybris.platform.btgcockpit.components.listview.impl.BTGRuleRemovalAction"
+		scope="prototype" />
+	<alias alias="BTGOutputActionRemovalAction" name="defaultBTGOutputActionRemovalAction" />
+	<bean id="defaultBTGOutputActionRemovalAction" class="de.hybris.platform.btgcockpit.components.listview.impl.BTGOutputActionRemovalAction"
+		scope="prototype" />
+	<alias alias="BTGSegmentActiveStatus" name="defaultBTGSegmentActiveStatus" />
+	<bean id="defaultBTGSegmentActiveStatus" class="de.hybris.platform.btgcockpit.components.gridview.impl.BTGSegmentActiveStatus"
+		scope="prototype" />
+	<alias alias="BTGSegmentTimePeriodStatus" name="defaultBTGSegmentTimePeriodStatus" />
+	<bean id="defaultBTGSegmentTimePeriodStatus" class="de.hybris.platform.btgcockpit.components.gridview.impl.BTGSegmentTimePeriodStatus"
+		scope="prototype" />
+	<alias alias="BTGRuleIconAction" name="defaultBTGRuleIconAction" />
+	<bean id="defaultBTGRuleIconAction" class="de.hybris.platform.btgcockpit.components.listview.impl.BtgRuleIconAction"
+		scope="prototype" />
+	<alias alias="cmsContentEditorInjector" name="defaultCmsContentEditorInjector" />
+	<bean id="defaultCmsContentEditorInjector" class="de.hybris.platform.btgcockpit.session.impl.BtgContentEditorInjector" scope="prototype" />
+	<alias alias="BTGSegmentNewSegmentAction" name="defaultBTGSegmentNewSegmentAction" />
+	<bean id="defaultBTGSegmentNewSegmentAction" class="de.hybris.platform.btgcockpit.components.listview.impl.BTGSegmentNewSegmentAction"
+		scope="prototype" />
+	
+	
+	<!--###  BTG Segment selector section ###-->
+	
+	<!--#### CS selector section ####-->		
+	<alias alias="LiveSegmentSelectorSection" name="defaultLiveSegmentSelectorSection" />
+	<bean id="defaultLiveSegmentSelectorSection" class="de.hybris.platform.btgcockpit.components.sectionpanel.LiveSegmentSelectorSection" scope="session" autowire="byName">
+		<property name="localizedLabel" value="navigationarea.segments"/>
+		<property name="initiallySelected" value="false"/>
+		<property name="visible" value="false"/>
+		<property name="multiselect" value="true"/>
+		<property name="subSections">
+			<list>
+				<ref bean="LiveRuleSelectorSection"/>
+			</list>
+		</property>				
+		<!-- comment out the next lines in order to use the default cockpit selector renderer -->
+		<property name="renderer">
+			<bean class="de.hybris.platform.btgcockpit.components.sectionpanel.renderer.SegmentSelectorSectionRenderer" autowire="byName"/>
+		</property>		 
+		<property name="navigationAreaModel" ref="LiveEditNavigationAreaModel"/>
+	</bean>
+	
+	<alias alias="LiveRuleSelectorSection" name="defaultLiveRuleSelectorSection" />
+	<bean id="defaultLiveRuleSelectorSection" class="de.hybris.platform.btgcockpit.components.sectionpanel.LiveRuleSectionSelectorSection" scope="prototype" autowire="byName">
+		<property name="localizedLabel" value="navigationarea.rules"/>
+		<property name="initiallySelected" value="false"/>
+		<property name="visible" value="true"/>
+		<!-- comment out the next lines in order to use the default cockpit selector renderer -->
+		<property name="renderer">
+			<bean class="de.hybris.platform.btgcockpit.components.sectionpanel.RuleSelectorSectionRenderer" autowire="byName"/>
+		</property>		 
+		<property name="navigationAreaModel" ref="LiveEditNavigationAreaModel"/>
+	</bean>
+
+	<alias alias="BTGLiveSiteSelectorSection" name="defaultBTGLiveSiteSelectorSection" />
+	<bean id="defaultBTGLiveSiteSelectorSection" class="de.hybris.platform.btgcockpit.components.sectionpanel.BTGLiveSiteSelectorSection" parent="LiveSiteSelectorSection">
+		<property name="subSections">
+			<list>
+			<ref bean="BTGLiveCatalogVersionSelectorSection"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="BTGLiveCatalogVersionSelectorSection" name="defaultBTGLiveCatalogVersionSelectorSection" />
+	<bean id="defaultBTGLiveCatalogVersionSelectorSection" class="de.hybris.platform.btgcockpit.components.sectionpanel.BTGLiveCatalogVersionSelectorSection" parent="LiveCatalogVersionSelectorSection"/>
+	
+	<alias alias="LiveEditNavigationArea" name="defaultLiveEditNavigationArea" />
+	<bean id="defaultLiveEditNavigationArea" class="de.hybris.platform.cmscockpit.session.impl.LiveEditNavigationArea" scope="session" parent="BaseNavigationArea">	
+		<property name="sectionModel">
+			<ref bean="LiveEditNavigationAreaModel"/>	
+		</property>
+		<property name="infoSlotRenderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.InfoBoxRenderer"/>
+		</property>
+		<property name="infoSlotAttachmentTypes">
+			<ref bean="WorkflowAttachmentData"/>
+		</property>
+		<property name="sections">
+			<list>
+				<ref bean="BTGLiveSiteSelectorSection"/>
+				<ref bean="CmsUndoSection"/>
+			</list>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+	</bean>
+	
+	<alias alias="btgReportWidgetFactory" name="defaultBtgReportWidgetFactory" />
+	<bean id="defaultBtgReportWidgetFactory" class="de.hybris.platform.btgcockpit.reports.BtgReportWidgetFactoryImpl" scope="prototype" parent="reportWidgetFactory">
+		<property name="modelService" ref="modelService"></property>
+	</bean>
+	
+	<alias alias="BtgReportBrowserModel" name="defaultBtgReportBrowserModel" />
+	<bean id="defaultBtgReportBrowserModel" class="de.hybris.platform.btgcockpit.reports.BtgWidgetDashboardBrowserModel" scope="prototype">
+		<property name="browserCode" value="btgcockpit.browser.report"/>
+		<property name="initiallyOpen" value="true"/>
+		<property name="viewClass"  value="de.hybris.platform.cockpit.reports.components.contentbrowser.ReportDashboardContentBrowser"/>	
+		<property name="containerLayoutConfiguration" ref="widgetDashboardConfig"/>	
+		<property name="widgetMapProvider">
+			<bean class="de.hybris.platform.cockpit.reports.widgets.util.ReportWidgetMapProvider">
+				<property name="reportWidgetFactory" ref="btgReportWidgetFactory"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<alias alias="MembershipTableActionColumn" name="defaultMembershipTableActionColumn" />
+	<bean id="defaultMembershipTableActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Remove" />
+		<property name="actions">
+			<list>
+				<ref bean="RemoveUserResults" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="RemoveUserResults" name="defaultRemoveUserResults" />
+	<bean id="defaultRemoveUserResults" class="de.hybris.platform.btgcockpit.session.impl.RemoveUserResults" scope="prototype" >
+		<property name="flexibleSearchService" ref="flexibleSearchService"></property>
+		<property name="modelService" ref="modelService"></property>
+		<property name="jasperReportCache" ref="jasperReportCache"></property>
+	</bean>
+	
+	<!-- filter -->
+	<alias alias="btgCockpitFilterChain" name="defaultBtgCockpitFilterChain" />
+	<bean id="defaultBtgCockpitFilterChain" class="de.hybris.platform.servicelayer.web.BackOfficeFilterChain">
+		<constructor-arg>
+			<list>
+				<ref bean="log4jFilter"/>
+				<ref bean="dynamicTenantActivationFilter"/>				
+				<ref bean="sessionFilter"/>
+				<ref bean="btgCockpitDataSourceSwitchingFilter"/>
+				<ref bean="btgCockpitCatalogVersionActivationFilter"/>
+            <ref bean="btgCockpitSecureMediaFilter"/>
+			</list>
+		</constructor-arg>
+	</bean>
+
+ 
+   <bean id="btgCockpitSecureMediaFilter" class="de.hybris.platform.servicelayer.web.SecureMediaFilter">
+       <property name="mediaPermissionService" ref="mediaPermissionService"/>
+       <property name="modelService" ref="modelService"/>
+       <property name="userService" ref="userService"/>
+       <property name="mediaService" ref="mediaService"/>
+      <!-- <property name="secureMediaToken" value="securemedias"/>  securemedias is default but you may overwrite it -->
+       <aop:scoped-proxy/>
+     </bean>
+	
+	<alias alias="btgCockpitDataSourceSwitchingFilter" name="defaultBtgCockpitDataSourceSwitchingFilter" />
+	<bean id="defaultBtgCockpitDataSourceSwitchingFilter" class="de.hybris.platform.servicelayer.web.DataSourceSwitchingFilter">
+	</bean>
+	 <alias alias="btgCockpitCatalogVersionActivationFilter" name="defaultBtgCockpitCatalogVersionActivationFilter" />
+	 <bean id="defaultBtgCockpitCatalogVersionActivationFilter" class="de.hybris.platform.servicelayer.web.DynamicCatalogVersionActivationFilter" scope="tenant">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="catalogService" ref="catalogService"/>
+		<aop:scoped-proxy/>
+	</bean>
+	
+	<bean id="themeConfig" class="de.hybris.platform.cockpit.util.CockpitThemeConfig" scope="singleton">
+		<property name="keepZKCss" value="false"/>
+		<property name="uris">
+			<list>
+				<value>/cockpit/css/zk_essential.css</value>
+				<value>/cockpit/css/zk_recommended.css</value>
+				 <value>/cockpit/css/zk_additional.css</value>
+
+				<value>/cockpit/css/cockpit_essential.css</value>
+				<value>/cockpit/css/cockpit_comments.css</value>
+				<value>/cockpit/css/cockpit_compare.css</value>
+				<value>/cockpit/css/cockpit_login.css</value>
+				<value>/cockpit/css/cockpit_navsections.css</value>
+				<value>/cockpit/css/cockpit_refeditor.css</value>
+				<value>/cockpit/css/cockpit_sectionbrowser.css</value>
+				<value>/cockpit/css/cockpit_widgets.css</value>
+				<value>/cockpit/css/cockpit_wizard.css</value>
+				<value>/cockpit/css/cockpit_workflow.css</value>
+				<value>/cockpit/css/cockpit_fileupload.css</value>
+				
+				<value>/btgcockpit/css/btgcockpit.css</value>
+			</list>
+		</property>
+		<property name="ieCssUris">
+			<list>
+				<value>/cockpit/css/cockpit_essential_ie.css</value>
+			</list>
+		</property>
+	</bean>
+	
+</beans>

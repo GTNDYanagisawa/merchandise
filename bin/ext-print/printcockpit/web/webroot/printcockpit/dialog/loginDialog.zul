@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<?taglib 			uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+
+<window xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:h="http://www.w3.org/1999/xhtml" 
+		xmlns:zk="http://www.zkoss.org/2005/zk"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd "
+		id="win" 
+		border="none" 
+		width="310px" 
+		height="450px"
+		position="center" 
+		mode="overlapped" 
+		closable="false" 
+		sizable="false"
+		onCreate="printLoginForm.init(self);showTimeoutNotice()"
+		onOK="printLoginForm.doOK(); doOK(spaceOwner);"
+		sclass="loginContainerWindow">
+
+	<zscript>
+ 		import org.zkoss.util.resource.Labels;
+		
+		void showTimeoutNotice()
+		{ 		
+			if( "true".equalsIgnoreCase( Executions.getCurrent().getParameter("timeout") ) )
+			{
+				Messagebox.show(Labels.getLabel("timeout_notice"));
+			}
+		}
+	</zscript>
+
+	<zscript>
+		void doOK(Window win)
+		{
+			Clients.submitForm(loginForm);
+		}
+	</zscript>
+	<h:form id="loginForm" action="j_acegi_security_check" method="POST">
+	
+	
+	<vbox sclass="login_grid z-grid" spacing="2px">
+		<hbox widths="90px">
+			<label value="${c:l('printcockpit.login')}:"/>
+		  	<textbox 	id="login"  name="j_username" value="${LoginForm.login}"/>
+		</hbox>
+		<hbox widths="90px">
+		  	<label value="${c:l('printcockpit.password')}:"/> 
+		  	<textbox  type="password"	id="pw" name="j_password" value="${printLoginForm.password}"/>
+		  </hbox>
+		   <hbox widths="90px">
+		  	<label 		value="${c:l('printcockpit.language')}:"/>
+		  	<combobox id="box" width="110px"/>
+		  </hbox>
+		  <hbox width="100%">
+		  	<label id="status" visible="false" style="color:red" value="${c:l('printcockpit.wrong_credentials')}"/>
+		  </hbox>
+		  <hbox width="100%">
+		  	<div style="position:relative">
+			  	<button id="lgBtn" label="${c:l('printcockpit.dologin')}" onClick="printLoginForm.doOK(); doOK(spaceOwner);" onCreate="self.focus()"/>
+				<checkbox sclass="login-checkbox"
+		  				name="_acegi_security_remember_me"
+		  				label="${c:l('printcockpit.rememberme')}" />
+		  	</div>
+		  </hbox>
+	</vbox>
+	
+	
+	</h:form>
+</window>

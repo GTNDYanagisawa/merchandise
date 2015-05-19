@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+	<!--
+		SystemSetup
+	 -->
+
+	<bean name="cockpitImportConfig" class="de.hybris.platform.cockpit.systemsetup.CockpitImportConfig" scope="tenant">
+			<property name="typeService" ref="typeService" />
+			<property name="modelService" ref="modelService" />
+			<property name="flexibleSearchService" ref="flexibleSearchService" />
+			<property name="ctxID2FactoryMappings" ref="ctxID2FactoryMappings" />
+	</bean>
+
+	<bean id="cockpitSystemSetup" class="de.hybris.platform.cockpit.systemsetup.CockpitSystemSetup" scope="tenant">
+		<property name="modelService" ref="modelService" />
+		<property name="mediaService" ref="mediaService" />
+		<property name="i18nService" ref="i18nService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="reportsConfig">
+			<bean class="de.hybris.platform.cockpit.components.editorarea.export.ReportsConfiguration"/>
+		</property>
+	</bean>
+	
+	<bean id="cockpitConfigurationMediaSystemSetup" class="de.hybris.platform.cockpit.systemsetup.CockpitConfigurationMediaSystemSetup" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="catalogService" ref="catalogService"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="itemModelCloneCreator" ref="itemModelCloneCreator"/>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+<!--*************************************************************
+	 *** Object collection service			                    ***
+	 ************************************************************* -->
+
+	<alias name="defaultObjectCollectionDao" alias="objectCollectionDao"/>
+	<bean id="defaultObjectCollectionDao" class="de.hybris.platform.cockpit.daos.impl.DefaultCockpitObjectAbstractCollectionDao" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultCockpitCollectionService" alias="cockpitCollectionService"/>
+	<bean id="defaultCockpitCollectionService" class="de.hybris.platform.cockpit.impl.DefaultCockpitCollectionService" scope="tenant">
+		<property name="objectCollectionDao" ref="objectCollectionDao"/>
+		<property name="enumerationService" ref="enumerationService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+<!--*************************************************************
+	 *** Cockpit configuration service 		                    ***
+	 ************************************************************* -->
+
+	<alias name="defaultCockpitConfigurationDao" alias="cockpitConfigurationDao"/>
+	<bean id="defaultCockpitConfigurationDao" class="de.hybris.platform.cockpit.daos.impl.DefaultCockpitConfigurationDao" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultCockpitConfigurationService" alias="cockpitConfigurationService"/>
+	<bean id="defaultCockpitConfigurationService" class="de.hybris.platform.cockpit.impl.DefaultCockpitConfigurationService" scope="tenant">
+		<property name="cockpitConfigurationDao" ref="cockpitConfigurationDao"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+
+	<!-- Interceptors -->
+
+	<bean id="cockpitObjectCollectionModelPrepareInterceptor" class="de.hybris.platform.cockpit.interceptor.CockpitObjectCollectionModelPrepareInterceptor"
+		scope="tenant" />
+
+	<bean id="cockpitObjectCollectionModelPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+		scope="tenant">
+		<property name="interceptor" ref="cockpitObjectCollectionModelPrepareInterceptor" />
+		<property name="typeCode" value="CockpitObjectCollection" />
+	</bean>
+
+	<!-- Report services -->
+	<alias name="defaultJasperReportCompileService" alias="jasperReportCompileService"/>
+	<bean id="defaultJasperReportCompileService" class="de.hybris.platform.cockpit.reports.impl.DefaultJasperReportCompileService" scope="tenant">
+		<property name="mediaService" ref="mediaService"></property>
+	</bean>
+
+	<alias name="defaultJasperReportFillService" alias="jasperReportFillService"/>
+	<bean id="defaultJasperReportFillService" class="de.hybris.platform.cockpit.reports.impl.DefaultJasperReportFillService" scope="tenant">
+		<property name="i18NService" ref="i18nService"></property>
+		<property name="jasperReportConnectionFactory" ref="jasperReportConnectionFactory"></property>
+	</bean>
+
+	<alias name="defaultJasperReportExportService" alias="jasperReportExportService"/>
+	<bean id="defaultJasperReportExportService" class="de.hybris.platform.cockpit.reports.impl.DefaultJasperReportExportService" scope="tenant">
+		<property name="exporterFactory" ref="exporterFactory"></property>
+	</bean>
+
+	<alias name="defaultJasperMediaService" alias="jasperMediaService"/>
+	<bean id="defaultJasperMediaService" class="de.hybris.platform.cockpit.reports.impl.DefaultJasperMediaService" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="commonI18nService" ref="commonI18NService"></property>
+		<property name="jasperReportParameterFactory" ref="jasperReportParameterFactory"></property>
+		<property name="typeService" ref="typeService"></property>
+	</bean>
+
+	<alias name="defaultJasperReportsRefreshService" alias="jasperReportsRefreshService"/>
+	<bean id="defaultJasperReportsRefreshService" class="de.hybris.platform.cockpit.reports.impl.DefaultJasperReportsRefreshService" scope="tenant">
+		<property name="jasperReportsCacheService" ref="jasperReportCacheService"></property>
+	</bean>
+
+	<alias name="defaultJasperReportCacheService" alias="jasperReportCacheService"/>
+	<bean id="defaultJasperReportCacheService" class="de.hybris.platform.cockpit.reports.impl.DefaultJasperReportCacheService" scope="tenant">
+		<property name="jasperReportCompileService" ref="jasperReportCompileService"></property>
+		<property name="jasperMediaService" ref="jasperMediaService"></property>
+		<property name="jasperReportExportService" ref="jasperReportExportService"></property>
+		<property name="jasperReportFillService" ref="jasperReportFillService"></property>
+	</bean>
+
+	<!-- Factories -->
+
+	<bean id="jasperReportConnectionFactory" class="de.hybris.platform.cockpit.reports.factories.impl.DefaultJasperReportConnectionFactory"  scope="tenant">
+		<property name="userService" ref="userService"></property>
+		<property name="tenantService" ref="tenantService"></property>
+	</bean>
+
+	<bean id="exporterFactory" class="de.hybris.platform.cockpit.reports.factories.impl.DefaultExporterFactory"  scope="tenant">
+	</bean>
+
+	<bean id="jasperReportParameterFactory" class="de.hybris.platform.cockpit.reports.widgets.factory.impl.JasperReportParameterFactoryImpl" scope="tenant">
+		<property name="typeService" ref="typeService"/>
+		<property name="commonI18NService" ref="commonI18NService"></property>
+	</bean>
+
+		<!-- Interceptors -->
+
+	<bean id="jasperMediaPrepareInterceptor"
+		class="de.hybris.platform.cockpit.reports.interceptor.JasperMediaPrepareInterceptor"
+		scope="tenant">
+		<property name="jasperMediaService" ref="jasperMediaService" />
+	</bean>
+
+	<bean
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping"
+		scope="tenant">
+		<property name="interceptor" ref="jasperMediaPrepareInterceptor" />
+		<property name="typeCode" value="JasperMedia" />
+	</bean>
+
+	<bean id="jasperWidgetPreferencesPreparer" class="de.hybris.platform.cockpit.reports.interceptor.JasperWidgetPreferencesPreparer"
+		scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="jasperReportParameterFactory" ref="jasperReportParameterFactory"/>
+	</bean>
+
+	<bean id="jasperWidgetPreferencesPreparerMapping" scope="tenant"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="jasperWidgetPreferencesPreparer"/>
+		<property name="typeCode" value="JasperWidgetPreferences"/>
+	</bean>
+
+
+	<bean id="cockpitSavedQueryCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" init-method="init" scope="tenant">
+		<property name="key" value="cockpitSavedQuery"/>
+		<property name="digits" value="8"/>
+		<property name="start" value="00000000"/>
+		<property name="numeric" value="false"/>
+	</bean>
+	
+	
+	<bean id="CockpitSavedQueryPrepareInterceptor" class="de.hybris.platform.cockpit.interceptor.CockpitSavedQueryPrepareInterceptor" scope="tenant">
+		<property name="keyGenerator" ref="cockpitSavedQueryCodeGenerator"/>
+	</bean>	
+	
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" scope="tenant">
+		<property name="interceptor" ref="CockpitSavedQueryPrepareInterceptor"/>
+		<property name="typeCode" value="CockpitSavedQuery"/>
+	</bean>	
+	
+	<bean id="CockpitSavedQueryRemoveInterceptor" class="de.hybris.platform.cockpit.interceptor.CockpitSavedQueryRemoveInterceptor" scope="tenant">
+			<property name="modelService" ref="modelService"/>
+			<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" scope="tenant">
+		<property name="interceptor" ref="CockpitSavedQueryRemoveInterceptor"/>
+		<property name="typeCode" value="CockpitSavedQuery"/>
+	</bean>
+	
+	<!--  Daos  -->
+	
+	<bean id="typeDefinitionDao" class="de.hybris.platform.cockpit.daos.impl.DefaultTypeDefinitionDao" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<!-- Coverage -->
+	
+	<bean id="simpleCockpitCoverageCalculationStrategy" class="de.hybris.platform.cockpit.coverage.strategies.impl.SimpleCockpitCoverageCalculationStrategy" scope="prototype">
+		<property name="delegationStrategy">
+			<bean class="de.hybris.platform.cockpit.coverage.strategies.impl.SimpleCoverageCalculationStrategy">
+				<property name="typeService" ref="typeService"></property>
+				<property name="commonI18nService" ref="commonI18NService"></property>
+				<property name="modelService" ref="modelService"></property>
+				<property name="sessionService" ref="sessionService"></property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="PrepareCommentInterceptor" class="de.hybris.platform.comments.interceptors.CommentPreparer" scope="tenant">
+		<property name="keyGenerator" ref="commentsCodeGenerator"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>		
+	
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" scope="tenant">
+		<property name="interceptor" ref="PrepareCommentInterceptor"/>
+		<property name="typeCode" value="Comment"/>
+	</bean>
+	
+	<bean id="coverageCalculationCockpitDomainMapping" class="de.hybris.platform.validation.coverage.strategies.impl.CoverageCalculationStrategyMapping" 
+	 			scope="tenant">
+	 	<property name="domainID" value="cockpit"/>
+		<property name="strategyMap">
+			<map merge="true">
+				<entry key="Item" value-ref="validationCoverageCalculationStrategy"/>
+				<entry key="Category" value-ref="simpleCockpitCoverageCalculationStrategy"></entry>
+				<entry key="ClassAttributeAssignment" value-ref="simpleCockpitCoverageCalculationStrategy"></entry>	
+				<entry key="ProductPage" value-ref="simpleCockpitCoverageCalculationStrategy"></entry>	
+				<entry key="ContentPage" value-ref="simpleCockpitCoverageCalculationStrategy"></entry>	
+				<entry key="CategoryPage" value-ref="simpleCockpitCoverageCalculationStrategy"></entry>
+				<entry key="EmailPage" value-ref="simpleCockpitCoverageCalculationStrategy"></entry>
+			</map>
+		</property> 		
+	</bean>
+	
+	<alias name="cockpitDomainStrategiesList" alias="domainStrategiesList"/> 
+	<util:list id="cockpitDomainStrategiesList" value-type="de.hybris.platform.validation.coverage.strategies.impl.CoverageCalculationStrategyMapping">
+		<ref bean="coverageCalculationDefaultDomainMapping" />
+		<ref bean="coverageCalculationCockpitDomainMapping" />
+	</util:list>	
+
+	 
+</beans>

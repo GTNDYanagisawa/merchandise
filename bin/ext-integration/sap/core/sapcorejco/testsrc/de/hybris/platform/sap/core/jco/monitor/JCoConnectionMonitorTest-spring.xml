@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<bean id="sapCoreAbstractJCoConnectionMonitorProvider" scope="singleton" abstract="true">
+		<property name="rfcDestinationService" ref="sapCoreRFCDestinationService" />
+		<property name="jaxbHandler" ref="sapCoreJCoMonitorJAXBHandler" />
+		<property name="clusterService" ref="clusterService" />
+		<property name="longLifetimeThresholdInSeconds" value="3600" />
+	</bean>
+	
+	<alias alias="sapCoreJCoConnectionMonitorLocalContext" name="testJCoConnectionMonitorTestContext" />
+	<bean id="testJCoConnectionMonitorTestContext" class="de.hybris.platform.sap.core.jco.monitor.provider.JCoConnectionMonitorTestContext" init-method="init"
+		scope="singleton">
+		<property name="jaxbHandler"			ref="sapCoreJCoMonitorJAXBHandler" />
+		<property name="snapshotTimestamp" 	value="1412176327000" />
+		<property name="filename"				value="resources/test/jcoConnectionsClusterSnapshot.xml" />
+	</bean>
+
+	<!-- Test RFC Destination 1 -->
+	<bean id="testRFCDestination1" parent="sapCoreRFCDestination">
+		<property name="rfcDestinationName" value="SAP_ERP1"/>
+		<property name="poolSize" 				value="4"/>
+	</bean>
+
+	<!-- Test RFC Destination 1 -->
+	<bean id="testRFCDestination2" parent="sapCoreRFCDestination">
+		<property name="rfcDestinationName" value="SAP_ERP2"/>
+		<property name="poolSize" 				value="4"/>
+	</bean>
+
+	<!-- Test RFC Destination Service -->
+	<alias alias="sapCoreRFCDestinationService" name="testRFCDestinationService" />
+	<bean id="testRFCDestinationService" parent="sapCoreDefaultRFCDestinationService">
+		<property name="RFCDestinations">
+			<map>
+				<entry key="SAP_ERP1" value-ref="testRFCDestination1"/>
+				<entry key="SAP_ERP2" value-ref="testRFCDestination1"/>
+			</map>
+		</property>
+	</bean>
+
+</beans>

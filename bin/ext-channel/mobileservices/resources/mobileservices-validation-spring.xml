@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+		   http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- General -->
+
+	<bean id="mobileValidationService"
+		class="de.hybris.platform.mobileservices.text.validation.impl.DefaultValidationService"
+		scope="tenant">
+		<property name="searchService" ref="flexibleSearchService" />
+	</bean>
+
+	<bean id="mobileActionAssignmentRemoveInterceptor"
+		class="de.hybris.platform.mobileservices.text.validation.impl.MobileActionAssignmentRemoveInterceptor"
+		scope="tenant">
+		<property name="validationService" ref="mobileValidationService" />
+	</bean>
+	
+	<bean id="mobileReceivingActionRemoveInterceptor"
+		class="de.hybris.platform.mobileservices.text.validation.impl.MobileReceivingActionRemoveInterceptor"
+		scope="tenant">
+		<property name="validationService" ref="mobileValidationService" />
+	</bean>
+	
+	<bean id="mobileActionKeywordRemoveInterceptor"
+		class="de.hybris.platform.mobileservices.text.validation.impl.MobileActionKeywordRemoveInterceptor"
+		scope="tenant">
+		<property name="validationService" ref="mobileValidationService" />
+	</bean>
+	
+	<bean id="phoneNumberListRemoveInterceptor"
+		class="de.hybris.platform.mobileservices.text.validation.impl.PhoneNumberListRemoveInterceptor"
+		scope="tenant">
+		<property name="validationService" ref="mobileValidationService" />
+	</bean>
+	
+	<bean id="mobileShortcodeRemoveInterceptor"
+		class="de.hybris.platform.mobileservices.text.validation.impl.MobileShortcodeRemoveInterceptor"
+		scope="tenant">
+		<property name="validationService" ref="mobileValidationService" />
+	</bean>
+	
+	<bean id="mobileAggregatorRemoveInterceptor"
+		class="de.hybris.platform.mobileservices.text.validation.impl.MobileAggregatorRemoveInterceptor"
+		scope="tenant">
+		<property name="validationService" ref="mobileValidationService" />
+	</bean>
+	
+	<bean id="phoneNumberRemoveInterceptor"
+		class="de.hybris.platform.mobileservices.text.validation.impl.PhoneNumberRemoveInterceptor"
+		scope="tenant">
+		<property name="validationService" ref="mobileValidationService" />
+	</bean>
+	
+	<bean id="mobileSendMessageCronJobValidator"
+		class="de.hybris.platform.mobileservices.text.validation.impl.MobileSendMessageCronJobValidator"
+		scope="tenant">
+	</bean>
+	
+	<bean id="mobileSendMessageCronJobInterceptorMapping" scope="tenant"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="mobileSendMessageCronJobValidator" />
+		<property name="typeCode" value="MobileSendMessageCronJob" />
+	</bean>
+	
+	
+
+	<bean id="assignmentRemoveInterceptorMapping" scope="tenant"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="mobileActionAssignmentRemoveInterceptor" />
+		<property name="typeCode" value="MobileActionAssignment" />
+	</bean>
+	
+	<bean id="receivingActionRemoveInterceptorMapping" scope="tenant"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="mobileReceivingActionRemoveInterceptor" />
+		<property name="typeCode" value="MobileReceiveGenericAction" />
+	</bean>
+	
+	<bean id="actionKeywordRemoveInterceptorMapping" scope="tenant"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="mobileActionKeywordRemoveInterceptor" />
+		<property name="typeCode" value="MobileActionKeyword" />
+	</bean>
+	
+	<bean id="phoneNumberListRemoveInterceptorMapping" scope="tenant"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="phoneNumberListRemoveInterceptor" />
+		<property name="typeCode" value="PhoneNumberList" />
+	</bean>
+	
+	<bean id="mobileShortcodeRemoveInterceptorMapping" scope="tenant"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="mobileShortcodeRemoveInterceptor" />
+		<property name="typeCode" value="MobileShortcode" />
+	</bean>
+	
+	<bean id="mobileAggregatorRemoveInterceptorMapping" scope="tenant"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="mobileAggregatorRemoveInterceptor" />
+		<property name="typeCode" value="MobileAggregator" />
+	</bean>
+	
+	
+	<bean id="phoneNumberRemoveInterceptorMapping" scope="tenant"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="phoneNumberRemoveInterceptor" />
+		<property name="typeCode" value="PhoneNumber" />
+	</bean>
+	
+
+</beans>

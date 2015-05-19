@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report2_subreport1_subreport1_attributes" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="19"/>
+	<property name="ireport.y" value="0"/>
+	<style name="label" hAlign="Left" vAlign="Middle" fontName="Arial Black" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold">
+		<box topPadding="1" leftPadding="1"/>
+	</style>
+	<style name="text" hAlign="Left" vAlign="Middle" fontName="Arial" fontSize="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false">
+		<box topPadding="2" leftPadding="2" bottomPadding="1"/>
+	</style>
+	<subDataset name="attributesDataset">
+		<queryString language="xPath">
+			<![CDATA[/root/section/row/attributes]]>
+		</queryString>
+		<field name="name" class="java.lang.String">
+			<fieldDescription><![CDATA[name]]></fieldDescription>
+		</field>
+		<field name="value" class="java.lang.String">
+			<fieldDescription><![CDATA[value]]></fieldDescription>
+		</field>
+		<field name="imgUrl" class="java.lang.String">
+			<fieldDescription><![CDATA[imgUrl]]></fieldDescription>
+		</field>
+	</subDataset>
+	<queryString language="xPath">
+		<![CDATA[/root/section/row/attributes]]>
+	</queryString>
+	<field name="name" class="java.lang.String">
+		<fieldDescription><![CDATA[@name]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="10" splitType="Stretch">
+			<frame>
+				<reportElement stretchType="RelativeToTallestObject" x="200" y="0" width="280" height="10" isPrintWhenDetailOverflows="true"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="1">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<componentElement>
+					<reportElement stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="278" height="7" isPrintWhenDetailOverflows="true"/>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Horizontal" ignoreWidth="false">
+						<datasetRun subDataset="attributesDataset">
+							<dataSourceExpression><![CDATA[$P{REPORT_DATA_SOURCE}.subDataSource("/attributes/attribute")]]></dataSourceExpression>
+						</datasetRun>
+						<jr:listContents height="10" width="10">
+							<image scaleImage="RetainShape" vAlign="Middle" onErrorType="Icon">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="10" height="7" isPrintWhenDetailOverflows="true"/>
+								<imageExpression class="java.lang.String"><![CDATA[$F{imgUrl}]]></imageExpression>
+							</image>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+			</frame>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="label" stretchType="RelativeToTallestObject" mode="Transparent" x="0" y="0" width="200" height="10" isPrintWhenDetailOverflows="true" backcolor="#FFFFFF"/>
+				<box topPadding="2" leftPadding="2" bottomPadding="1">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement>
+					<font fontName="Arial Black" size="9" isBold="false" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

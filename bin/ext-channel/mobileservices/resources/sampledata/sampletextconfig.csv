@@ -1,0 +1,78 @@
+### Two Way
+
+
+"INSERT_UPDATE Country";"name[lang=en]";"isocode[unique=true]";
+;Spain;ES;
+;United States;US;
+;United Kingdom;GB;
+;Germany;DE;
+;Switzerland;CH;
+
+"INSERT_UPDATE MobileActionKeyword";"&keyword";"keyword[unique=true,ignore=true]";
+;start;start;
+;stop;stop;
+;KEYWORD;KEYWORD;
+;order;order;
+;monitor;monitor;
+;equipment;equipment;
+;promotion;promotion;
+;page;page;
+;hardware;hardware;
+
+
+"INSERT_UPDATE MobileAggregator";"engine(code)";code[unique=true];
+;"testSendSMSEngine";testOutgoingAggregator;
+
+"INSERT_UPDATE MobileShortcode";"aggregator(code)";supportedMessageType(code);country(isocode);code[unique=true];&shortcode;"networkType(code)";
+;testOutgoingAggregator;OUTGOING;"ES";"demoES";demoES;GSM;
+;testOutgoingAggregator;OUTGOING;"US";"demoUS";demoUS;GSM;
+;testOutgoingAggregator;OUTGOING;"GB";"demoGB";demoGB;GSM;
+;testOutgoingAggregator;OUTGOING;"DE";"demoDE";demoDE;GSM;
+;testOutgoingAggregator;OUTGOING;"CH";"demoCH";demoCH;GSM;
+
+"INSERT_UPDATE PhoneNumberList";code[unique=true];name[lang=en];
+;newsSubscribers;"News and info";
+
+"INSERT_UPDATE MobileSendTextAction";code[unique=true];defaultLanguage(isocode);filterLists(code);template[lang=en];
+;sendWelcomeAction;en;newsSubscribers;"Welcome to the hybris mobile suite";
+
+"INSERT_UPDATE MobileSendItemLinkAction";code[unique=true];defaultLanguage(isocode);filterLists(code);subject[lang=en];defaultItem(Product.code,Product.catalogVersion(catalog(id),version));
+;sendItemAction;en;newsSubscribers;"Item of the day";"HW1100-0023:hwcatalog:Online";
+
+"INSERT_UPDATE MobileReceiveAndSendTextAction";content;isLink;code[unique=true];
+;"Sorry, the requested resource is not available";FALSE;defaultErrorMessage;
+
+"INSERT_UPDATE MobileAggregator";"engine(code)";code[unique=true];
+;"testSendSMSEngine";testTwoWayAggregator;
+
+"INSERT_UPDATE MobileShortcode";"aggregator(code)";country(isocode);code[unique=true];defaultAction(code);&shortcode;keywordPrefix;
+;testTwoWayAggregator;GB;000101;defaultErrorMessage;gb000101;;
+;testTwoWayAggregator;GB;000102;defaultErrorMessage;gb000102;KEYWORD;
+
+
+"INSERT_UPDATE MobileReceiveAndSubscribeAction";code[unique=true];remove;list(code);successMessage;defaultErrorMessage;
+;optinAction;false;newsSubscribers;"Optin to news content";"Already subscribed";
+;optoutAction;true;newsSubscribers;"Optout of news content";"Already unsubscribed";
+
+"INSERT_UPDATE MobileReceiveAndSendProductAction";"content(Product.code,Product.catalogVersion(catalog(id),version))";subject;isLink;code[unique=true];deeplinkUrl(code);
+;"HW1100-0023:hwcatalog:Online";"Product link";"TRUE";monitorSilverProductAction;mobile;
+
+"INSERT_UPDATE MobileReceiveAndSendCategoryAction";"content(Category.code, Category.catalogVersion(catalog(id),version))";subject;isLink;code[unique=true];deeplinkUrl(code);
+;"HW1000:hwcatalog:Online";"Category link";"TRUE";peripheralEquipmentCategoryAction;mobile;
+
+"INSERT_UPDATE MobileReceiveAndSendCatalogAction";"content(Catalog.id)";subject;isLink;code[unique=true];deeplinkUrl(code);
+;"hwcatalog";"hello $ctx.configuration.content.name";"TRUE";hardwareCatalogAction;mobile;
+
+
+"INSERT_UPDATE MobileActionAssignment";"state(code)";"keyword(&keyword)[unique=true]";shortcode(&shortcode)[unique=true];action(code);
+;"ACTIVE";"start";gb000101;optinAction;
+;"ACTIVE";"stop";gb000101;optoutAction;
+;"ACTIVE";"monitor";gb000101;monitorSilverProductAction;
+;"ACTIVE";"equipment";gb000101;peripheralEquipmentCategoryAction;
+;"ACTIVE";"hardware";gb000101;hardwareCatalogAction;
+;"ACTIVE";"start";gb000102;optinAction;
+;"ACTIVE";"stop";gb000102;optoutAction;
+;"ACTIVE";"monitor";gb000102;monitorSilverProductAction;
+;"ACTIVE";"equipment";gb000102;peripheralEquipmentCategoryAction;
+;"ACTIVE";"hardware";gb000102;hardwareCatalogAction;
+

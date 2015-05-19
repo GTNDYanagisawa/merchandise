@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+	<explorertree>
+		<group name="system">
+         <typeref type="LuceneIndex" description="typeref.luceneindex.description"/>
+      </group>
+	</explorertree>
+
+	<type name="LuceneIndex" useselector="true" icon="images/ext/lucenesearch/lucenesearchicon.gif" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="code"/>
+         </search>
+         <result mode="append">
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="130"/>
+               </itemlayout>
+            </listview>
+         </result>
+         <editor>            
+            <essentials>
+               <listlayout>
+                  <attribute name="code"/>
+               </listlayout>
+            </essentials>
+            <tab name="tab.common">
+               <section name="section.update">
+						<columnlayout>
+							<row>
+								<attribute name="rebuildStartTimestamp"/>
+								<attribute name="rebuildEndTimestamp"/>
+							</row>
+							<row>
+								<attribute name="upToDate"/>
+								<attribute name="pendingUpdatesCount"/>
+							</row>
+                  </columnlayout>
+               </section>
+               <section name="section.indexconfiguration">
+                  <listlayout>
+                     <!--
+                     <shortcut name="indexConfigurationsShortcut" type="IndexConfiguration" usage="finder" autoperform="true">
+                        <preset targetattribute="luceneIndex"/>
+                     </shortcut>
+                     -->
+                     <text name="text.luceneindex.indexconfigurations" width="595"/>
+                     <attribute name="indexConfigurations" width="595">
+                        <referencecollectioneditor presetattribute="luceneIndex"
+                        									remove="true"
+                        									create="true"
+                        									autosave="true">
+                           <itemlayout>
+                              <attribute name="indexedType" width="120"/>
+                              <attribute name="attributeConfigurations"/>
+                           </itemlayout>
+                        </referencecollectioneditor>                             
+                     </attribute>
+                     <text name="text.luceneindex.postqueryfilterclassname" width="595"/>
+                     <attribute name="postQueryFilterClassName" width="595"/>
+                  </listlayout>
+                  <table>
+                     <tr>
+                        <td>
+                           <action type="item"
+                                   classname="de.hybris.platform.lucenesearch.hmc.RebuildIndexAction"
+                                   name="rebuildindex"
+                                   toolbaricon="images/ext/lucenesearch/luceneindex_update_toolbar" 
+                                   icon="images/ext/lucenesearch/refreshindex.gif"
+                                   disabledicon="images/ext/lucenesearch/refreshindex_inactive.gif"
+                                   showtoolbarlabel="true"
+                                   hidebutton="true"/>
+                        </td>
+                     </tr>
+                  </table>      
+               </section>
+					<section name="section.languageconfigurations">
+						<listlayout>
+                     <attribute name="languageConfigurations" width="595">
+                        <referencecollectioneditor presetattribute="luceneIndex" remove="true" create="true" autosave="true">
+                           <itemlayout>
+                              <attribute name="indexedLanguage" width="123"/>
+                              <attribute name="analyzerDefinition" width="440"/>
+                           </itemlayout>
+                        </referencecollectioneditor>                             
+                     </attribute>
+						</listlayout>
+					</section>
+            </tab>
+            <!--<tabref idref="tab_administration"/>-->
+             <customtab name="lucenesearch.tab.search" classname="de.hybris.platform.lucenesearch.hmc.SearchTab"/>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="IndexConfiguration" useselector="true" mode="append">
+      <organizer>    
+         <search mode="replace">
+            <condition attribute="luceneIndex"/>
+            <condition attribute="indexedType"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="luceneIndex" width="200"/>
+                  <attribute name="indexedType" width="200"/>
+               </itemlayout>
+            </listview>
+         </result>
+         <editor mode="replace">
+            <exclude>
+               <exclusion attribute="allAvailableAttributes"/>
+               <exclusion attribute="availableActivationAttributes"/>
+               <exclusion attribute="availableIndexableAttributes"/>
+               <exclusion attribute="availableGroupingAttributes"/>
+               <exclusion attribute="groupingAttribute"/> 
+            </exclude>
+            <essentials>
+               <columnlayout>
+						<row>
+							<attribute name="luceneIndex"/>  
+							<attribute name="indexedType"/>  
+						</row>
+					</columnlayout>
+            </essentials>
+            <tab name="tab.attribute">
+               <section name="section.configurationofindex">
+                  <listlayout>
+                     <attribute name="attributeConfigurations">
+                        <referencecollectioneditor presetattribute="indexConfiguration" editable="true" externalcreate="false" remove="true" create="true">
+                           <itemlayout>
+                              <attribute name="indexedAttribute" width="120"/>
+                              <attribute name="fieldName" width="120"/>
+                              <attribute name="weight" width="80"/>
+                              <attribute name="exact" width="80"/>
+                              <attribute name="storeData" width="80"/>
+                           </itemlayout>
+                        </referencecollectioneditor>                             
+                     </attribute>
+                     <customchip classname="de.hybris.platform.lucenesearch.hmc.AttributeConfigurationCreatorChip"/>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="tab.advancedsettings">
+               <section name="section.extendedattributeconfiguration">
+                  <listlayout>                     
+                     <text name="text.indexconfiguration.activationAttribute" width="480"/>
+                     <attribute name="activationAttribute"/>
+							<attribute name="indexedDataParams" width="595">
+								<textareaeditor expanded="true" wrap="false" cols="80" rows="10"/>
+							</attribute>
+                  </listlayout>
+               </section>
+               <section name="section.projectspecificindexes">
+                  <listlayout>
+                     <text name="text.indexconfiguration.indexeddatafactoryclassname" width="480"/>
+                     <attribute name="indexedDataFactoryClassName" width="595"/>
+                  </listlayout>
+               </section>
+               <section name="section.includedtypes">
+                  <listlayout>
+                     <attribute name="includedTypes">
+								<referencecollectioneditor add="true" remove="true" create="false" editable="false">
+                           <itemlayout>
+                              <attribute name="code"/>
+                           </itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+                  </listlayout>
+               </section>
+				</tab>
+            <tab name="tab.pendingupdates">
+               <section name="section.pendingupdates">
+                  <listlayout>
+                     <attribute name="pendingUpdates">
+								<referencecollectioneditor add="false" remove="true" create="true" editable="false" attribute="indexConfiguration">
+                           <itemlayout>
+                              <attribute name="creationTime" width="120"/>
+                              <attribute name="item" width="140"/>
+                              <attribute name="itemPK" width="110"/>
+                              <attribute name="remove" width="60"/>
+                           </itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+                  </listlayout>
+               </section>
+				</tab>
+            <tabref idref="tab_administration"/>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="luceneIndex"/>
+            <attribute name="indexedType"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+	<type name="IndexUpdate" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="indexConfiguration"/>
+            <condition attribute="itemPK"/>
+         </search>
+         <result defaultview="list">
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="indexConfiguration" width="150"/>
+                  <attribute name="item" width="140"/>
+                  <attribute name="itemPK" width="100"/>
+               </itemlayout>
+            </listview>
+         </result>
+         <editor mode="replace">
+            <essentials>
+               <columnlayout>
+						<row>
+							<attribute name="indexConfiguration"/>  
+							<attribute name="item"/>  
+						</row>
+						<row>
+							<attribute name="itemPK"/>  
+							<attribute name="remove"/>  
+						</row>
+						<row>
+							<attribute name="inProgress"/>
+							<void/>
+						</row>
+					</columnlayout>
+            </essentials>
+            <tabref idref="tab_administration"/>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="indexConfiguration"/>
+            <attribute name="item"/>
+            <attribute name="itemPK"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+	<type name="UpdateIndexJob" mode="append">
+      <organizer>
+         <editor>
+            <essentials mode="append">
+				<listlayout>
+					<attribute name="maxUpdatesPerRun" labelwidth="100"/>
+				</listlayout>
+            </essentials>
+         </editor>
+      </organizer>
+   </type>
+
+	<type name="LanguageConfiguration" useselector="true" mode="append">
+      <organizer>    
+         <search mode="replace">
+            <condition attribute="luceneIndex"/>
+            <condition attribute="indexedLanguage"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="luceneIndex" width="200"/>
+                  <attribute name="indexedLanguage" width="200"/>
+               </itemlayout>
+            </listview>
+         </result>
+         <editor mode="replace">
+            <essentials>
+               <columnlayout>
+						<row>
+							<attribute name="luceneIndex"/>  
+							<attribute name="indexedLanguage"/>  
+						</row>
+					</columnlayout>
+            </essentials>
+            <tab name="properties">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="analyzerDefinition">
+								<textareaeditor cols="80" rows="10" expanded="true" wrap="false"/>
+							</attribute>
+                  </listlayout>
+               </section>
+            </tab>
+            <tabref idref="tab_administration"/>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="luceneIndex"/>
+            <attribute name="indexedLanguage"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="AttributeConfiguration" useselector="true" mode="append">
+      <organizer>    
+         <search mode="replace">
+            <condition attribute="indexConfiguration"/>
+            <condition attribute="indexedAttribute"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="indexConfiguration" width="200"/>
+                  <attribute name="indexedAttribute" width="200"/>
+                  <attribute name="fieldName" width="100"/>
+                  <attribute name="weight" width="100"/>
+                  <attribute name="exact" width="80"/>
+                  <attribute name="storeData"/>
+               </itemlayout>
+            </listview>
+         </result>
+         <editor mode="replace">
+            <exclude>
+               <exclusion attribute="availableIndexableAttributes"/>
+            </exclude>
+            <essentials>
+               <columnlayout>	
+               	<row>
+                  <attribute name="indexConfiguration"/>
+                  <attribute name="indexedAttribute"/>
+               	</row>
+               	<row>
+                  <attribute name="weight"/>
+                  <attribute name="fieldName"/>
+               	</row>
+               </columnlayout>
+            </essentials>
+            <tab name="tab.attribute">
+               <section name="section.indexedattribute">
+                  <columnlayout>
+                  	<row>
+                     <attribute name="exact"/>
+                     <attribute name="storeData"/>
+                  	</row>
+                  </columnlayout>
+               </section>
+            </tab>
+            <tabref idref="tab_administration"/>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="indexConfiguration"/>
+            <attribute name="indexedAttribute"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="AttributeDescriptor" mode="append">
+      <organizer>
+      	<editor>
+      		<tab name="tab.common" position="0">
+      			<section name="properties.advanced">
+                	<listlayout>
+                		<attribute name="forceluceneindexable"/>
+                     	<attribute name="hmcindexfield"/>
+                     </listlayout>
+                </section>
+            </tab>
+      	</editor>
+      </organizer>
+     </type>
+   
+</configuration>

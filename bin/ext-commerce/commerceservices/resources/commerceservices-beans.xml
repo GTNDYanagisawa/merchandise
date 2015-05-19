@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<!-- Address Verification -->
+	<bean class="de.hybris.platform.commerceservices.address.data.AddressVerificationResultData&lt;DECISION, FIELD_ERROR>">
+		<description>POJO representation of an address verification result.</description>
+		<property name="decision" type="DECISION"/>
+		<property name="fieldErrors" type="java.util.List&lt;FIELD_ERROR>"/>
+		<property name="suggestedAddresses" type="java.util.List&lt;de.hybris.platform.core.model.user.AddressModel>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.address.data.AddressFieldErrorData&lt;FIELD_TYPE, ERROR_CODE>">
+		<description>POJO representation of an address field error.</description>
+		<property name="fieldType" type="FIELD_TYPE"/>
+		<property name="errorCode" type="ERROR_CODE"/>
+	</bean>
+
+	<!-- Product -->
+
+	<bean class="de.hybris.platform.commerceservices.product.data.ReferenceData&lt;TYPE, TARGET>">
+		<property name="referenceType" type="TYPE"/>
+		<property name="description" type="String"/>
+		<property name="quantity" type="Integer"/>
+		<property name="target" type="TARGET"/>
+	</bean>
+
+
+	<!-- Page Search Data -->
+
+	<bean class="de.hybris.platform.commerceservices.search.pagedata.PageableData">
+		<description>POJO representation of search query pagination.</description>
+		<property name="pageSize" type="int">
+			<description>The number of results per page. A page may have less results if there are less than a full page of results, only on the last page in the results.</description>
+		</property>
+		<property name="currentPage" type="int">
+			<description>The current page number. The first page is number zero (0), the second page is number one (1), and so on.</description>
+		</property>
+		<property name="sort" type="String">
+			<description>The selected sort code.</description>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.pagedata.PaginationData" extends="de.hybris.platform.commerceservices.search.pagedata.PageableData">
+		<description>POJO representation of search results pagination.</description>
+		<property name="numberOfPages" type="int">
+			<description>The total number of pages. This is the number of pages, each of pageSize, required to display the totalNumberOfResults.</description>
+		</property>
+		<property name="totalNumberOfResults" type="long">
+			<description>The total number of matched results across all pages.</description>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.pagedata.SearchPageData&lt;RESULT>">
+		<description>POJO that includes all necessary data for creating proper result in refine search.</description>
+		<property name="results" type="java.util.List&lt;RESULT>"/>
+		<property name="sorts" type="java.util.List&lt;de.hybris.platform.commerceservices.search.pagedata.SortData>"/>
+		<property name="pagination" type="de.hybris.platform.commerceservices.search.pagedata.PaginationData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.pagedata.SortData">
+		<description>POJO representing a sort option.</description>
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="selected" type="boolean"/>
+	</bean>
+
+
+	<!-- Search Facet Data -->
+
+	<bean class="de.hybris.platform.commerceservices.search.facetdata.BreadcrumbData&lt;STATE>">
+		<description>POJO representing a section of the Breadcrumb.</description>
+		<property name="facetCode" type="String"/>
+		<property name="facetName" type="String"/>
+		<property name="facetValueCode" type="String"/>
+		<property name="facetValueName" type="String"/>
+		<property name="removeQuery" type="STATE"/>
+		<property name="truncateQuery" type="STATE"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.facetdata.FacetData&lt;STATE>">
+		<description>POJO representing a facet.</description>
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="priority" type="int"/>
+		<property name="category" type="boolean"/>
+		<property name="multiSelect" type="boolean"/>
+		<property name="visible" type="boolean"/>
+		<property name="topValues" type="java.util.List&lt;de.hybris.platform.commerceservices.search.facetdata.FacetValueData&lt;STATE>>"/>
+		<property name="values" type="java.util.List&lt;de.hybris.platform.commerceservices.search.facetdata.FacetValueData&lt;STATE>>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.facetdata.FacetRefinement&lt;STATE>">
+		<description>POJO representing a facet refinement.</description>
+		<property name="facets" type="java.util.List&lt;de.hybris.platform.commerceservices.search.facetdata.FacetData&lt;STATE>>"/>
+		<property name="breadcrumbs" type="java.util.List&lt;de.hybris.platform.commerceservices.search.facetdata.BreadcrumbData&lt;STATE>>"/>
+		<property name="count" type="long"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.facetdata.FacetSearchPageData&lt;STATE, RESULT>" extends="de.hybris.platform.commerceservices.search.pagedata.SearchPageData&lt;RESULT>">
+		<description>POJO that includes all necessary data for creating proper result in facet search.</description>
+		<property name="currentQuery" type="STATE"/>
+		<property name="breadcrumbs" type="java.util.List&lt;de.hybris.platform.commerceservices.search.facetdata.BreadcrumbData&lt;STATE>>"/>
+		<property name="facets" type="java.util.List&lt;de.hybris.platform.commerceservices.search.facetdata.FacetData&lt;STATE>>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.facetdata.FacetValueData&lt;STATE>">
+		<description>POJO representing a facet value.</description>
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="count" type="long"/>
+		<property name="query" type="STATE"/>
+		<property name="selected" type="boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.facetdata.ProductCategorySearchPageData&lt;STATE, RESULT, CATEGORY>" extends="de.hybris.platform.commerceservices.search.facetdata.ProductSearchPageData&lt;STATE, RESULT>">
+		<description>POJO containing the result page for product or category search.</description>
+		<property name="subCategories" type="java.util.List&lt;CATEGORY>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.facetdata.ProductSearchPageData&lt;STATE, RESULT>" extends="de.hybris.platform.commerceservices.search.facetdata.FacetSearchPageData&lt;STATE, RESULT>">
+		<description>POJO containing the result page for product search.</description>
+		<property name="freeTextSearch" type="String"/>
+		<property name="categoryCode" type="String"/>
+		<property name="keywordRedirectUrl" type="String"/>
+		<property name="spellingSuggestion" type="de.hybris.platform.commerceservices.search.facetdata.SpellingSuggestionData&lt;STATE>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.facetdata.SpellingSuggestionData&lt;STATE>">
+		<description>POJO representing a spell checker suggestion.</description>
+		<property name="suggestion" type="String"/>
+		<property name="query" type="STATE"/>
+	</bean>
+
+
+	<!-- Flexible Search Data -->
+
+	<bean class="de.hybris.platform.commerceservices.search.flexiblesearch.data.SortQueryData">
+		<property name="sortCode" type="String"/>
+		<property name="sortName" type="String"/>
+		<property name="query" type="String"/>
+	</bean>
+
+
+	<!-- Search Result Data -->
+
+	<bean class="de.hybris.platform.commerceservices.search.resultdata.SearchResultValueData">
+		<property name="values" type="java.util.Map&lt;String, Object>"/>
+		<property name="featureValues" type="java.util.Map&lt;de.hybris.platform.catalog.model.classification.ClassAttributeAssignmentModel, Object>"/>
+	</bean>
+
+
+	<!-- Solr Facet Search Data -->
+
+	<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.AutocompleteSuggestion">
+		<description>Represents a single keyword suggestion.</description>
+		<property name="term" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.IndexedPropertyValueData&lt;INDEXED_PROPERTY_TYPE>">
+		<property name="indexedProperty" type="INDEXED_PROPERTY_TYPE"/>
+		<property name="value" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SearchQueryPageableData&lt;STATE>">
+		<property name="searchQueryData" type="STATE"/>
+		<property name="pageableData" type="de.hybris.platform.commerceservices.search.pagedata.PageableData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrDocumentData&lt;SEARCH_QUERY_TYPE, SOLR_DOCUMENT_TYPE>">
+		<property name="searchQuery" type="SEARCH_QUERY_TYPE"/>
+		<property name="solrDocument" type="SOLR_DOCUMENT_TYPE"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchQueryData">
+		<description>POJO representing a Search query.</description>
+		<property name="freeTextSearch" type="String"/>
+		<property name="categoryCode" type="String"/>
+		<property name="filterTerms" type="java.util.List&lt;de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchQueryTermData>"/>
+		<property name="sort" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchQueryTermData">
+		<property name="key" type="String"/>
+		<property name="value" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchRequest&lt;FACET_SEARCH_CONFIG_TYPE, INDEXED_TYPE_TYPE, INDEXED_PROPERTY_TYPE, SEARCH_QUERY_TYPE, INDEXED_TYPE_SORT_TYPE>">
+		<property name="searchQueryData" type="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchQueryData"/>
+		<property name="pageableData" type="de.hybris.platform.commerceservices.search.pagedata.PageableData"/>
+		<property name="catalogVersions" type="java.util.List&lt;de.hybris.platform.catalog.model.CatalogVersionModel>"/>
+		<property name="facetSearchConfig" type="FACET_SEARCH_CONFIG_TYPE"/>
+		<property name="indexedType" type="INDEXED_TYPE_TYPE"/>
+		<property name="indexedPropertyValues" type="java.util.List&lt;de.hybris.platform.commerceservices.search.solrfacetsearch.data.IndexedPropertyValueData&lt;INDEXED_PROPERTY_TYPE>>"/>
+		<property name="currentSort" type="INDEXED_TYPE_SORT_TYPE"/>
+		<property name="searchText" type="String"/>
+		<property name="searchQuery" type="SEARCH_QUERY_TYPE"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchResponse&lt;FACET_SEARCH_CONFIG_TYPE, INDEXED_TYPE_TYPE, INDEXED_PROPERTY_TYPE, SEARCH_QUERY_TYPE, INDEXED_TYPE_SORT_TYPE, SEARCH_RESULT_TYPE>">
+		<property name="request" type="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchRequest&lt;FACET_SEARCH_CONFIG_TYPE, INDEXED_TYPE_TYPE, INDEXED_PROPERTY_TYPE, SEARCH_QUERY_TYPE, INDEXED_TYPE_SORT_TYPE>"/>
+		<property name="searchResult" type="SEARCH_RESULT_TYPE"/>
+	</bean>
+
+	<bean class="de.hybris.platform.solrfacetsearch.config.IndexedProperty">
+		<property name="classAttributeAssignment" type="de.hybris.platform.catalog.model.classification.ClassAttributeAssignmentModel"/>
+		<property name="categoryField" type="boolean"/>
+		<property name="displayName" type="String"/>
+		<property name="multiSelect" type="boolean"/>
+		<property name="topValuesProvider" type="String"/>
+		<property name="visible" type="boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.solrfacetsearch.config.IndexConfig">
+		<property name="baseSite" type="de.hybris.platform.basecommerce.model.site.BaseSiteModel"/>
+	</bean>
+
+	<bean class="de.hybris.platform.solrfacetsearch.config.IndexedType">
+		<property name="sorts" type="java.util.List&lt;de.hybris.platform.commerceservices.search.solrfacetsearch.config.IndexedTypeSort>"/>
+		<property name="sortsByCode" type="java.util.Map&lt;String, de.hybris.platform.commerceservices.search.solrfacetsearch.config.IndexedTypeSort>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.config.IndexedTypeSort">
+		<property name="sort" type="de.hybris.platform.commerceservices.model.solrsearch.config.SolrSortModel"/>
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.order.CommerceCartModification">
+		<description>Represents the result of a modification to a cart entry.</description>
+		<property name="statusCode" type="String"/>
+		<property name="quantity" type="long"/>
+		<property name="quantityAdded" type="long"/>
+		<property name="entry" type="de.hybris.platform.core.model.order.AbstractOrderEntryModel"/>
+		<property name="product" type="de.hybris.platform.core.model.product.ProductModel"/>
+		<property name="deliveryModeChanged" type="java.lang.Boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.order.CommerceCartRestoration">
+		<description>Represents the result of the restoration of a cart to a customer's session.</description>
+		<property name="modifications" type="java.util.List&lt;de.hybris.platform.commerceservices.order.CommerceCartModification&gt;"/>
+	</bean>
+
+	<!-- Store finder -->
+
+	<bean class="de.hybris.platform.commerceservices.storefinder.data.PointOfServiceDistanceData">
+		<property name="pointOfService" type="de.hybris.platform.storelocator.model.PointOfServiceModel"/>
+		<property name="distanceKm" type="double"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.storefinder.data.StoreFinderSearchPageData&lt;RESULT>"
+	      extends="de.hybris.platform.commerceservices.search.pagedata.SearchPageData&lt;RESULT>">
+		<property name="locationText" type="String"/>
+		<property name="sourceLatitude" type="double"/>
+		<property name="sourceLongitude" type="double"/>
+		<property name="boundNorthLatitude" type="double"/>
+		<property name="boundEastLongitude" type="double"/>
+		<property name="boundSouthLatitude" type="double"/>
+		<property name="boundWestLongitude" type="double"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.store.data.GeoPoint">
+		<property name="latitude" type="double"/>
+		<property name="longitude" type="double"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.impersonation.ImpersonationContext">
+		<property name="catalogVersions" type="java.util.Collection&lt;de.hybris.platform.catalog.model.CatalogVersionModel>"/>
+		<property name="user" type="de.hybris.platform.core.model.user.UserModel"/>
+		<property name="language" type="de.hybris.platform.core.model.c2l.LanguageModel"/>
+		<property name="currency" type="de.hybris.platform.core.model.c2l.CurrencyModel"/>
+		<property name="taxGroup" type="de.hybris.platform.europe1.enums.UserTaxGroup"/>
+		<property name="site" type="de.hybris.platform.basecommerce.model.site.BaseSiteModel"/>
+		<property name="order" type="de.hybris.platform.core.model.order.AbstractOrderModel"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.setup.data.ImportData">
+		<property name="productCatalogName" type="String"/>
+		<property name="contentCatalogNames" type="java.util.List&lt;String&gt;"/>
+		<property name="storeNames" type="java.util.List&lt;String&gt;"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+		<property name="includeInSync" type="java.lang.Boolean"/>
+		<property name="copyByValue" type="java.lang.Boolean"/>
+		<property name="untranslatable" type="java.lang.Boolean"/>
+		<property name="qualifier" type="java.lang.String"/>
+	</bean>
+
+
+	<bean class="de.hybris.platform.commerceservices.setup.data.ImpexMacroParameterData">
+		<property name="contentCatalog" type="String"/>
+		<property name="productCatalog" type="String"/>
+		<property name="siteUid" type="String"/>
+		<property name="storeUid" type="String"/>
+		<property name="configExtensionName" type="String"/>
+		<property name="addonExtensionName" type="String"/>
+		<property name="solrIndexedType" type="String"/>
+		<property name="channel" type="String"/>
+		<property name="additionalParameterMap" type="java.util.Map&lt;String,String&gt;"/>
+		<property name="supportedUiExperienceLevels" type="java.util.List&lt;de.hybris.platform.commerceservices.enums.UiExperienceLevel&gt;"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.service.data.CommerceCartParameter">
+		<property name="cart" type="de.hybris.platform.core.model.order.CartModel">
+			<description>The CartModel</description>
+		</property>
+		<property name="product" type="de.hybris.platform.core.model.product.ProductModel">
+			<description>The ProductModel</description>
+		</property>
+		<property name="quantity" type="long">
+			<description>The quantity to add</description>
+		</property>
+		<property name="unit" type="de.hybris.platform.core.model.product.UnitModel">
+			<description>The units to add</description>
+		</property>
+		<property name="createNewEntry" type="boolean">
+			<description>Should create new Entry</description>
+		</property>
+		<property name="pointOfService" type="de.hybris.platform.storelocator.model.PointOfServiceModel">
+			<description>The PointOfServiceModel</description>
+		</property>
+		<property name="entryNumber" type="long">
+			<description>The entry number to update</description>
+		</property>
+		<property name="enableHooks" type="boolean">
+			<description>Should the method hooks be executed</description>
+		</property>
+		<property name="user" type="de.hybris.platform.core.model.user.UserModel">
+			<description>The current user</description>
+		</property>
+		<property name="baseSite" type="de.hybris.platform.basecommerce.model.site.BaseSiteModel">
+			<description>The current base site</description>
+		</property>
+		<property name="guid" type="String">
+			<description>A unique identifier</description>
+		</property>
+		<property name="recalculate" type="boolean">
+			<description>Should cart be calculated or recalculated</description>
+		</property>
+		<property name="deliveryCountryIso" type="String">
+			<description>Country ISO code of delivery address</description>
+		</property>
+		<property name="deliveryZipCode" type="String">
+			<description>Delivery zip code</description>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.service.data.CommerceCheckoutParameter">
+		<property name="cart" type="de.hybris.platform.core.model.order.CartModel">
+			<description>The CartModel</description>
+		</property>
+		<property name="address" type="de.hybris.platform.core.model.user.AddressModel">
+			<description>the Address</description>
+		</property>
+		<property name="isDeliveryAddress" type="boolean">
+			<description>Delivery address flag</description>
+		</property>
+		<property name="deliveryMode" type="de.hybris.platform.core.model.order.delivery.DeliveryModeModel">
+			<description>The delivery mode</description>
+		</property>
+		<property name="paymentInfo" type="de.hybris.platform.core.model.order.payment.PaymentInfoModel">
+			<description>payment information</description>
+		</property>
+		<property name="securityCode" type="String">
+			<description>The security code for payment authorizations</description>
+		</property>
+		<property name="paymentProvider" type="String">
+			<description>the code of the payment provider</description>
+		</property>
+		<property name="authorizationAmount" type="java.math.BigDecimal">
+			<description>The amount for authorize</description>
+		</property>
+		<property name="salesApplication" type="de.hybris.platform.commerceservices.enums.SalesApplication">
+			<description>The enum for sales application</description>
+		</property>
+		<property name="enableHooks" type="boolean">
+			<description>Should the method hooks be executed</description>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.service.data.CommerceTaxEstimateResult">
+		<property name="tax" type="java.math.BigDecimal">
+			<description>the total tax</description>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.service.data.CommerceOrderResult">
+		<property name="order" type="de.hybris.platform.core.model.order.OrderModel">
+			<description>the OrderModel</description>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.commerceservices.service.data.CommerceOrderParameter">
+		<property name="order" type="de.hybris.platform.core.model.order.AbstractOrderModel">
+			<description>the order</description>
+		</property>
+		<property name="additionalValues" type="java.util.List&lt;java.lang.String>"/>
+	</bean>
+
+
+</beans>

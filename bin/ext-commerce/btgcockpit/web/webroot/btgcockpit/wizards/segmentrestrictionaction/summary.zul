@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+<zk xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:h="http://www.w3.org/1999/xhtml" 
+		xmlns:zk="http://www.zkoss.org/2005/zk"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd ">
+		
+		<zscript>
+			de.hybris.platform.cockpit.model.meta.TypedObject altItem = getAttr("altComponent");
+			boolean altItemSelected = Boolean.TRUE.equals(getAttr("altComponentSelected"));
+			boolean showCopy = !wizardBean.isComponentSelected() &amp;&amp; Boolean.FALSE.equals(getAttr("addToExistingPage"));
+		</zscript>
+		
+		<div style="text-align: left;">
+			<div sclass="wizardPageDescription">
+				<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.summary.description')}"/>
+			</div>
+			<div style="margin: 30px; font-size: 10px;" >
+				<div>
+					<label class="wizardPageDescriptionHeaderLabel" value="${c:l('btgcockpit.wizard.segmentRestrictionAction.summary.default')}" if="${!wizardBean.restrictionInverted}"/>
+					<label class="wizardPageDescriptionHeaderLabel" value="${c:l('btgcockpit.wizard.segmentRestrictionAction.summary.inverted')}" if="${wizardBean.restrictionInverted}"/>
+					<div style="margin: 10px;">
+						<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.summary.copy')}" visible="${showCopy}"/>
+						<label value="${wizardBean.restrictedCmsItem.object.name}" style="font-weight: bold;"/>
+						<label value=" (${wizardBean.restrictedCmsItem.object.type})"/>
+					</div>
+				</div>
+			</div>
+			<div style="margin: 30px; font-size: 10px;" if="${!wizardBean.restrictionInverted &amp;&amp; wizardBean.extInverseHandling}">
+				<div>
+					<label class="wizardPageDescriptionHeaderLabel" value="${c:l('btgcockpit.wizard.segmentRestrictionAction.summary.otherUser')}"/>
+					<div style="margin: 10px;" if="${altItemSelected &amp;&amp; altItem != null}">
+						<label value="${altItem.object.name}" style="font-weight: bold;"/>
+						<label value=" (${altItem.object.type})" />
+					</div>
+					<div style="margin: 10px;" if="${!(altItemSelected &amp;&amp; altItem != null)}">
+						<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.summary.copy')}" />
+						<label value="${wizardBean.restrictedCmsItem.object.name}" style="font-weight: bold;"/>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+</zk>

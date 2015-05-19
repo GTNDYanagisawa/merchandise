@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+           
+	<!--
+	The hybris platform provides one single Spring application context for beans located at the jalo layer.
+	Each extension can add beans to this context by specifying them at this configuration file.
+	 
+	You can use and/or redefine beans defined at configuration files of other extensions as well as
+	adding new one.
+		
+	If you want to locate this file at a different location or want to use several files for better,
+	structuring, please use the '<yourextension>.application-context' property at your project.properties file.
+	There you can specify a comma separated list of files where first is tried to find a file per classpath and
+	then per file system.
+	
+	Please be aware of the special 'tenant' scope. If you have a multi tenant system you mostly have to use this
+	scope instead of the default Spring 'singleton' scope.
+	
+	If you want to configure beans for your web module please have a look at
+	your web/webroot/WEB-INF/<extname>-web-spring.xml.
+	-->
+	
+	<!--  Example how to override a manager -->
+	<!--
+	<bean id="core.productManager"   class="de.hybris.platform.subscriptionservices.jalo.SubscriptionservicesProductManager" 	init-method="init"	destroy-method="destroy"  />
+	-->
+	
+	
+ 	<!--  Example how to configure the class to use for jalo session creation -->
+	<!--
+	<bean id="jalosession"   class="de.hybris.platform.jalo.JaloSessionFactory">
+		<property name="targetClassName" value="de.hybris.platform.subscriptionservices.jalo.SubscriptionservicesJaloSession"/>
+	</bean>
+	-->
+
+	
+	<!--  Example how to override an item  -->
+	<!-- 
+	<bean id="de.hybris.platform.jalo.product.Product" class="de.hybris.platform.subscriptionservices.jalo.SubscriptionservicesProduct" scope="prototype" />		
+ 	-->
+
+	<!--  
+	 Example how to register and use an AOP aspect 
+     Also see http://static.springframework.org/spring/docs/2.5.x/reference/aop.html	
+     -->
+	
+	<!-- 
+	<bean id="subscriptionservicesProfBean" class="de.hybris.platform.subscriptionservices.aop.SubscriptionservicesProfilingAspect"/>
+	<aop:config proxy-target-class="true">
+  		<aop:aspect id="subscriptionservicesProfAspect" ref="subscriptionservicesProfBean" >
+    	  <aop:pointcut id="profiledMethods" 
+	      	expression="execution(* getModificationTime(..))" />  	            
+	   		<aop:around pointcut-ref="profiledMethods" method="profile" />
+  		</aop:aspect>
+	</aop:config>
+	 -->
+
+	
+	<!-- some other examples of a pointcut that matches everything:
+
+    	  <aop:pointcut id="profiledMethods" 
+	      	expression="bean(de.hybris.platform.jalo.user.Customer) &amp;&amp; 
+	      	            !execution(* getPK(..))" />  	            
+	       <aop:pointcut id="profiledMethods" expression="execution(* *(..))" />	
+	  -->
+	  
+	<bean id="subscriptionServicesSystemSetup" class="de.hybris.platform.subscriptionservices.setup.SubscriptionServicesSystemSetup" parent="commerceServicesSystemSetup" />
+	
+    <alias alias="commerceCartService" name="subscriptionCommerceCartService" />
+	<alias alias="subscriptionCommerceCartService" name="defaultSubscriptionCommerceCartService"/>
+	<bean id="defaultSubscriptionCommerceCartService"  class="de.hybris.platform.subscriptionservices.subscription.impl.DefaultSubscriptionCommerceCartService"
+	    	 parent="defaultCommerceCartService">
+	    <property name="billingTimeService" ref="billingTimeService" />
+	    <property name="masterCartBillingTimeCode" value="paynow"/>
+	    <property name="subscriptionProductStockQuantity" value="1000"/>
+	    <property name="commercePriceService" ref="subscriptionCommercePriceService"/>
+	    <property name="baseStoreService" ref="baseStoreService"/>
+	    <property name="commerceStockService" ref="commerceStockService"/>
+	    <property name="subscriptionCommerceCartStrategy" ref="subscriptionCommerceCartStrategy"/>
+	</bean>
+
+	<alias alias="subscriptionCommerceCartStrategy" name="defaultSubscriptionCommerceCartStrategy"/>
+	<bean id="defaultSubscriptionCommerceCartStrategy"  class="de.hybris.platform.subscriptionservices.subscription.impl.DefaultSubscriptionCommerceCartStrategy"
+	    	 parent="abstractCommerceCartStrategy">
+	</bean>	
+
+	<alias alias="billingTimeDao" name="defaultBillingTimeDao"/>
+	<bean id="defaultBillingTimeDao" class="de.hybris.platform.subscriptionservices.daos.impl.DefaultBillingTimeDao" parent="abstractItemDao" />
+	
+	<alias alias="billingTimeService" name="defaultBillingTimeService"/>
+	<bean id="defaultBillingTimeService" class="de.hybris.platform.subscriptionservices.subscription.impl.DefaultBillingTimeService" >
+	    <property name="billingTimeDao" ref="billingTimeDao" />
+	</bean>
+
+    <bean id="chargeEntryValidateInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.ChargeEntryValidateInterceptor" parent="abstractParentChildValidateInterceptor" />
+	
+	<bean id="chargeEntryValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="chargeEntryValidateInterceptor"/>
+		<property name="typeCode" value="ChargeEntry"/>
+	</bean>
+
+    <bean id="chargeEntryIDGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" >
+        <property name="key" value="ChargeEntryId"/>
+        <property name="digits" value="8"/>
+        <property name="start" value="00000000"/>
+        <property name="numeric" value="false"/>
+    </bean>
+
+    <bean id="chargeEntryIdPrepareInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.ChargeEntryIdPrepareInterceptor" >
+        <property name="chargeEntryIDGenerator" ref="chargeEntryIDGenerator"/>
+    </bean>     
+
+    <bean id="chargeEntryPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+        <property name="interceptor" ref="chargeEntryIdPrepareInterceptor"/>
+        <property name="typeCode" value="ChargeEntry"/>
+    </bean>
+
+    <bean id="usageChargeValidateInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.UsageChargeValidateInterceptor" parent="abstractParentChildValidateInterceptor" />
+
+	<bean id="usageChargeValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="usageChargeValidateInterceptor"/>
+		<property name="typeCode" value="UsageCharge"/>
+	</bean>
+
+    <bean id="usageChargeIDGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" >
+        <property name="key" value="UsageChargeId"/>
+        <property name="digits" value="8"/>
+        <property name="start" value="00000000"/>
+        <property name="numeric" value="false"/>
+    </bean>
+
+    <bean id="usageChargeIdPrepareInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.UsageChargeIdPrepareInterceptor" >
+        <property name="usageChargeIDGenerator" ref="usageChargeIDGenerator"/>
+    </bean>     
+
+    <bean id="usageChargePrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+        <property name="interceptor" ref="usageChargeIdPrepareInterceptor"/>
+        <property name="typeCode" value="UsageCharge"/>
+    </bean>
+    
+    <bean id="usageChargeLoadInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.UsageChargeLoadInterceptor" />     
+
+    <bean id="usageChargeLoadInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+        <property name="interceptor" ref="usageChargeLoadInterceptor"/>
+        <property name="typeCode" value="UsageCharge"/>
+    </bean>
+    
+    <bean id="tierUsageChargeEntryValidateInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.TierUsageChargeEntryValidateInterceptor"/>
+	
+	<bean id="tierUsageChargeEntryValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="tierUsageChargeEntryValidateInterceptor"/>
+		<property name="typeCode" value="TierUsageChargeEntry"/>
+	</bean>
+	
+	<bean id="overageUsageChargeEntryValidateInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.OverageUsageChargeEntryValidateInterceptor" parent="abstractParentChildValidateInterceptor"/>
+	
+	<bean id="overageUsageChargeEntryValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="overageUsageChargeEntryValidateInterceptor"/>
+		<property name="typeCode" value="OverageUsageChargeEntry"/>
+	</bean>
+    
+    <bean id="usageChargeEntryModelSortService" class="de.hybris.platform.subscriptionservices.model.impl.UsageChargeEntryModelSortService"/>
+    
+    <bean id="usageChargeValidationService" class="de.hybris.platform.subscriptionservices.model.impl.DefaultUsageChargeValidationService" >
+		<property name="sortService" ref="usageChargeEntryModelSortService"/>
+	</bean>
+	
+    <bean id="recurringChargeEntryValidateInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.RecurringChargeEntryValidateInterceptor" />
+	
+	<bean id="recurringChargeEntryValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="recurringChargeEntryValidateInterceptor"/>
+		<property name="typeCode" value="RecurringChargeEntry"/>
+	</bean>
+	
+	<bean id="recurringChargeEntryModelSortService" class="de.hybris.platform.subscriptionservices.model.impl.RecurringChargeEntryModelSortService" />
+	
+	<bean id="recurringChargeEntryValidationService" class="de.hybris.platform.subscriptionservices.model.impl.DefaultRecurringChargeEntryValidationService" >
+		<property name="sortService" ref="recurringChargeEntryModelSortService"/>
+	</bean>
+	
+	<bean id="oneTimeChargeEntryValidationService" class="de.hybris.platform.subscriptionservices.model.impl.DefaultOneTimeChargeEntryValidationService" />
+	
+	<bean id="oneTimeChargeEntryValidateInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.OneTimeChargeEntryValidateInterceptor" parent="abstractParentChildValidateInterceptor"/>
+	
+	<bean id="oneTimeChargeEntryValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="oneTimeChargeEntryValidateInterceptor"/>
+		<property name="typeCode" value="OneTimeChargeEntry"/>
+	</bean>
+
+    <bean id="subscriptionPricePlanValidateInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.SubscriptionPricePlanValidateInterceptor" parent="abstractParentChildValidateInterceptor" />
+
+	<bean id="subscriptionPricePlanValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="subscriptionPricePlanValidateInterceptor"/>
+		<property name="typeCode" value="SubscriptionPricePlan"/>
+	</bean>
+	
+	<bean id="subscriptionPricePlanLoadInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.SubscriptionPricePlanLoadInterceptor" />    
+
+    <bean id="subscriptionPricePlanLoadInterceptorrMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+        <property name="interceptor" ref="subscriptionPricePlanLoadInterceptor"/>
+        <property name="typeCode" value="SubscriptionPricePlan"/>
+    </bean>
+    
+    <bean id="validationMessagesSubscriptionPricePlanAttribute" class="de.hybris.platform.subscriptionservices.model.ValidationMessagesSubscriptionPricePlanAttribute"/>
+	
+	<bean id="multiAbstractOrderRemoveInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.MultiAbstractOrderRemoveInterceptor" />
+	<bean id="multiAbstractOrderRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="multiAbstractOrderRemoveInterceptor"/>
+		<property name="typeCode" value="AbstractOrder"/>
+	</bean>
+
+    <bean id="abstractOrderLoadInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.AbstractOrderLoadInterceptor" />     
+
+    <bean id="abstractOrderLoadInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+        <property name="interceptor" ref="abstractOrderLoadInterceptor"/>
+        <property name="typeCode" value="AbstractOrder"/>
+    </bean>
+    
+	<alias alias="commerceCheckoutService" name="subscriptionCommerceCheckoutService"/>
+	<alias alias="subscriptionCommerceCheckoutService" name="defaultSubscriptionCommerceCheckoutService"/>
+ 	<bean id="defaultSubscriptionCommerceCheckoutService" class="de.hybris.platform.subscriptionservices.subscription.impl.DefaultSubscriptionCommerceCheckoutService" parent="defaultEntitlementCheckoutService" >
+	    <property name="l10NService" ref="l10nService" />
+	</bean>
+
+	<alias name="defaultSubscriptionCustomerAccountDao" alias="customerAccountDao"/>
+	<bean id="defaultSubscriptionCustomerAccountDao" class="de.hybris.platform.subscriptionservices.daos.impl.DefaultSubscriptionCustomerAccountDao" parent="defaultCustomerAccountDao" >
+	</bean>
+
+	<bean id="termLimitValueProvider" class="de.hybris.platform.subscriptionservices.search.solrfacetsearch.provider.impl.TermLimitValueProvider" parent="abstractPropertyFieldValueProvider" >
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+	
+	<bean id="productBillingTimeValueProvider" class="de.hybris.platform.subscriptionservices.search.solrfacetsearch.provider.impl.ProductBillingTimeValueProvider" parent="abstractPropertyFieldValueProvider" >
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<bean id="subscriptionProductPriceValueProvider" class="de.hybris.platform.subscriptionservices.search.solrfacetsearch.provider.impl.SubscriptionProductPriceValueProvider" parent="abstractPropertyFieldValueProvider" >
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="priceService" ref="priceService" />
+		<property name="commercePriceService" ref="subscriptionCommercePriceService" />
+		<property name="sessionService" ref="sessionService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	
+	<bean id="priceRowsValidProductAttribute" class="de.hybris.platform.subscriptionservices.model.PriceRowsValidProductAttribute"/>
+
+    <bean id="currencyUsageChargeAttribute" class="de.hybris.platform.subscriptionservices.model.CurrencyUsageChargeAttribute"/>
+    <bean id="currencyChargeEntryAttribute" class="de.hybris.platform.subscriptionservices.model.CurrencyChargeEntryAttribute"/>
+    <bean id="billingTimeChargeEntryAttribute" class="de.hybris.platform.subscriptionservices.model.BillingTimeChargeEntryAttribute"/>	
+
+    <bean id="billingTimeUsageChargeAttribute" class="de.hybris.platform.subscriptionservices.model.BillingTimeUsageChargeAttribute"/>
+
+	<alias alias="currentFactoryFindPricingStrategy" name="currentFactoryFindSubscriptionPricingStrategy"/>
+	<bean id="currentFactoryFindSubscriptionPricingStrategy" class="de.hybris.platform.subscriptionservices.subscription.impl.FindSubscriptionPricingWithCurrentPriceFactoryStrategy"  parent="abstractBusinessService" >
+		<property name="commercePriceService" ref="subscriptionCommercePriceService"/>
+	</bean>
+	
+	<alias alias="subscriptionCommercePriceService" name="defaultSubscriptionCommercePriceService" />
+	<bean id="defaultSubscriptionCommercePriceService" class="de.hybris.platform.subscriptionservices.price.impl.DefaultSubscriptionCommercePriceService"  parent="defaultCommercePriceService">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<!-- overriding europe1 manager to filter subscription price rows -->
+	<bean id="europe1.manager"   class="de.hybris.platform.subscriptionservices.jalo.ExtendedCatalogAwareEurope1PriceFactory" init-method="init" destroy-method="destroy">
+ 		<property name="retrieveChannelStrategy" ref="retrieveChannelStrategy"/>
+	</bean>
+
+    <bean id="abstractParentChildValidateInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.AbstractParentChildValidateInterceptor" abstract="true" >
+        <property name="parentChildModifierService" ref="parentChildModifierService" />
+    </bean>
+
+	<alias alias="parentChildModifierService" name="defaultSubscriptionParentChildModifierService"/>
+	<bean id="defaultSubscriptionParentChildModifierService"
+		class="de.hybris.platform.subscriptionservices.model.impl.DefaultSubscriptionParentChildModifierService">
+	    <property name="modelService" ref="modelService" />
+	</bean>
+	
+	<alias alias="customerResolutionService" name="defaultCustomerResolutionService"/>
+	<bean id="defaultCustomerResolutionService" class="de.hybris.platform.subscriptionservices.subscription.impl.DefaultCustomerResolutionService">
+		<property name="userService" ref="userService"/>
+		<property name="i18NService" ref="i18NService"/>
+	</bean>
+		
+    <bean id="subscriptionIDGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" >
+        <property name="key" value="Id"/>
+        <property name="digits" value="8"/>
+        <property name="start" value="00000000"/>
+        <property name="numeric" value="false"/>
+    </bean>
+
+    <bean id="subscriptionIdPrepareInterceptor" class="de.hybris.platform.subscriptionservices.interceptor.impl.SubscriptionIdPrepareInterceptor" >
+        <property name="subscriptionIDGenerator" ref="subscriptionIDGenerator"/>
+    </bean>     
+
+    <bean id="subscriptionIdPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+        <property name="interceptor" ref="subscriptionIdPrepareInterceptor"/>
+        <property name="typeCode" value="Subscription"/>
+    </bean>
+</beans>

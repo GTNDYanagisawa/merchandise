@@ -1,0 +1,1526 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved.
+	This software is the confidential and proprietary information of hybris ("Confidential
+	Information"). You shall not disclose such Confidential Information and shall
+	use it only in accordance with the terms of the license agreement you entered
+	into with hybris. -->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns:util="http://www.springframework.org/schema/util"
+		 xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!--TODO: remove when port ticket PLA-13861 is resolved -->
+	<alias name="commerceAbstractPopulatingConverter" alias="abstractPopulatingConverter"/>
+	<bean id="commerceAbstractPopulatingConverter"
+			class="de.hybris.platform.commerceservices.converter.impl.AbstractPopulatingConverter" abstract="true"/>
+
+
+	<!-- Import the mock payment service (which is configured as the default) -->
+	<import resource="/commerceservices/mock-payment-spring.xml"/>
+
+	<bean id="commerceServicesSystemSetup" class="de.hybris.platform.commerceservices.setup.CommerceServicesSystemSetup">
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="importService" ref="importService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias name="defaultLanguageResolver" alias="languageResolver"/>
+	<bean id="defaultLanguageResolver" class="de.hybris.platform.commerceservices.i18n.impl.CommerceLanguageResolver"
+			>
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<!-- Abstract bean used as a parent for beans that modify a populator list. -->
+	<bean id="modifyPopulatorList" class="de.hybris.platform.commerceservices.converter.config.ModifyPopulatorList"
+			abstract="true"/>
+
+	<!-- Load the ModifyPopulatorListBeanPostProcessor that looks for ModifyPopulatorList beans. -->
+	<bean class="de.hybris.platform.commerceservices.converter.config.ModifyPopulatorListBeanPostProcessor"/>
+
+	<bean id="contactEmailAttribute" class="de.hybris.platform.commerceservices.model.ContactEmailAttribute">
+		<property name="customerEmailResolutionService" ref="customerEmailResolutionService"/>
+	</bean>
+	<bean id="abstractSiteEventListener" class="de.hybris.platform.commerceservices.event.AbstractSiteEventListener"
+			parent="abstractEventListener" abstract="true"/>
+
+	<alias name="defaultGuidKeyGenerator" alias="guidKeyGenerator"/>
+	<bean id="defaultGuidKeyGenerator" class="de.hybris.platform.commerceservices.util.GuidKeyGenerator"/>
+
+	<alias alias="commerceCartService" name="defaultCommerceCartService"/>
+	<bean id="defaultCommerceCartService"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceCartService">
+		<property name="modelService" ref="modelService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="commerceCartDao" ref="commerceCartDao"/>
+		<property name="cartValidationStrategy" ref="cartValidationStrategy"/>
+		<property name="commerceCartCalculationStrategy" ref="commerceCartCalculationStrategy"/>
+		<property name="commerceCartEstimateTaxesStrategy" ref="commerceCartEstimateTaxesStrategy"/>
+		<property name="commerceCartHashCalculationStrategy" ref="commerceCartHashCalculationStrategy"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="staleCartRemovalStrategy" ref="staleCartRemovalStrategy"/>
+		<property name="commerceAddToCartStrategy" ref="commerceAddToCartStrategy"/>
+		<property name="commerceUpdateCartEntryStrategy" ref="commerceUpdateCartEntryStrategy"/>
+		<property name="commerceCartRestorationStrategy" ref="commerceCartRestorationStrategy"/>
+		<property name="commerceCartSplitStrategy" ref="commerceCartSplitStrategy"/>
+		<property name="commerceRemoveEntriesStrategy" ref="commerceRemoveEntriesStrategy"/>
+		<property name="commerceCartMergingStrategy" ref="commerceCartMergingStrategy"/>
+	</bean>
+
+	<alias alias="commerceRemoveEntriesStrategy" name="defaultCommerceRemoveEntriesStrategy"/>
+	<bean id="defaultCommerceRemoveEntriesStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceRemoveEntriesStrategy">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias name="defaultAbstractCommerceCartStrategy" alias="abstractCommerceCartStrategy"/>
+	<bean id="defaultAbstractCommerceCartStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.AbstractCommerceCartStrategy" abstract="true">
+		<property name="productService" ref="productService"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="commerceStockService" ref="commerceStockService"/>
+		<property name="entryOrderChecker" ref="commerceOrderEntryModifiableChecker"/>
+		<property name="cartEntryDao" ref="cartEntryDao"/>
+		<property name="commerceCartCalculationStrategy" ref="commerceCartCalculationStrategy"/>
+	</bean>
+
+	<alias name="defaultAbstractCommerceAddToCartStrategy" alias="abstractCommerceAddToCartStrategy"/>
+	<bean name="defaultAbstractCommerceAddToCartStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.AbstractCommerceAddToCartStrategy" abstract="true"
+			parent="abstractCommerceCartStrategy"/>
+
+	<util:list id="commerceAddToCartMethodHooks"
+				  value-type="de.hybris.platform.commerceservices.order.hook.CommerceAddToCartMethodHook"/>
+
+	<alias name="defaultCommerceAddToCartStrategy" alias="commerceAddToCartStrategy"/>
+	<bean id="defaultCommerceAddToCartStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceAddToCartStrategy"
+			parent="abstractCommerceAddToCartStrategy">
+		<property name="commerceAddToCartMethodHooks" ref="commerceAddToCartMethodHooks"/>
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<!--<alias name="commerceAddToCartStrictStrategy" alias="commerceAddToCartStrategy"/>-->
+	<bean id="commerceAddToCartStrictStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.CommerceAddToCartStrictStrategy"
+			parent="defaultCommerceAddToCartStrategy"/>
+
+	<!--  Adding before and after strategies via a listMergeDirective
+
+		 <bean id="commerceAddToCartMethodHooksListMergeDirective" depends-on="commerceAddToCartMethodHooks" parent="listMergeDirective" >
+			<property name="add" ref="myBean" />
+		</bean>
+	-->
+	<util:list id="commerceUpdateCartEntryMethodHooks"
+				  value-type="de.hybris.platform.commerceservices.order.hook.CommerceUpdateCartEntryHook"/>
+
+	<alias name="defaultCommerceUpdateCartEntryStrategy" alias="commerceUpdateCartEntryStrategy"/>
+	<bean id="defaultCommerceUpdateCartEntryStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceUpdateCartEntryStrategy"
+			parent="abstractCommerceCartStrategy">
+		<property name="commerceUpdateCartEntryHooks" ref="commerceUpdateCartEntryMethodHooks"/>
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<!--<alias name="commerceUpdateCartEntryStrictStrategy" alias="commerceUpdateCartEntryStrategy"/>-->
+	<bean id="commerceUpdateCartEntryStrictStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.CommerceUpdateCartEntryStrictStrategy"
+			parent="abstractCommerceCartStrategy">
+		<property name="commerceUpdateCartEntryHooks" ref="commerceUpdateCartEntryMethodHooks"/>
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<alias name="defaultCommerceCartSplitStrategy" alias="commerceCartSplitStrategy"/>
+	<bean id="defaultCommerceCartSplitStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceCartSplitStrategy"
+			parent="abstractCommerceCartStrategy">
+		<property name="commerceUpdateCartEntryStrategy" ref="commerceUpdateCartEntryStrategy"/>
+		<property name="commerceAddToCartStrategy" ref="commerceAddToCartStrategy"/>
+	</bean>
+
+	<alias name="defaultCommerceCartRestorationStrategy" alias="commerceCartRestorationStrategy"/>
+	<bean id="defaultCommerceCartRestorationStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceCartRestorationStrategy"
+			parent="abstractCommerceCartStrategy">
+		<property name="timeService" ref="timeService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="cartFactory" ref="cartFactory"/>
+		<property name="commerceAddToCartStrategy" ref="commerceAddToCartStrategy"/>
+		<property name="guidKeyGenerator" ref="guidKeyGenerator"/>
+	</bean>
+
+	<alias name="defaultCommerceCartMergingStrategy" alias="commerceCartMergingStrategy"/>
+	<bean id="defaultCommerceCartMergingStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceCartMergingStrategy"
+			parent="abstractCommerceCartStrategy">
+		<property name="userService" ref="userService"/>
+		<property name="commerceCartService" ref="commerceCartService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="commerceAddToCartStrategy" ref="commerceAddToCartStrategy"/>
+	</bean>
+
+	<alias name="defaultCommerceWebServicesCartService" alias="commerceWebServicesCartService"/>
+	<bean id="defaultCommerceWebServicesCartService" parent="defaultCommerceCartService">
+		<property name="cartValidationStrategy" ref="cartValidationWithoutCartAlteringStrategy"/>
+	</bean>
+
+	<util:list id="commerceCartCalculationMethodHooks"
+				  value-type="de.hybris.platform.commerceservices.order.hook.CommerceCartCalculationMethodHook"/>
+
+	<alias alias="commerceCartCalculationStrategy" name="defaultCommerceCartCalculationStrategy"/>
+	<bean id="defaultCommerceCartCalculationStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceCartCalculationStrategy">
+		<property name="calculationService" ref="calculationService"/>
+		<property name="promotionsService" ref="promotionsService"/>
+		<property name="timeService" ref="timeService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="commerceCartCalculationMethodHooks" ref="commerceCartCalculationMethodHooks"/>
+	</bean>
+
+	<alias alias="checkoutCartCalculationStrategy" name="defaultCheckoutCartCalculationStrategy"/>
+	<bean id="defaultCheckoutCartCalculationStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCheckoutCartCalculationStrategy"
+			parent="defaultCommerceCartCalculationStrategy">
+		<property name="externalTaxesService" ref="externalTaxesService"/>
+	</bean>
+
+
+	<alias alias="commerceCartEstimateTaxesStrategy" name="defaultCommerceCartEstimateTaxesStrategy"/>
+	<bean id="defaultCommerceCartEstimateTaxesStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceCartEstimateTaxesStrategy"/>
+
+	<alias alias="commerceCartHashCalculationStrategy" name="defaultCartHashCalculationStrategy"/>
+	<bean id="defaultCartHashCalculationStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceCartHashCalculationStrategy"/>
+
+
+	<alias alias="commerceCartDao" name="defaultCommerceCartDao"/>
+	<bean id="defaultCommerceCartDao" class="de.hybris.platform.commerceservices.order.dao.impl.DefaultCommerceCartDao"
+			parent="abstractItemDao"/>
+
+	<alias name="defaultCartEntryDao" alias="cartEntryDao"/>
+	<bean id="defaultCartEntryDao" class="de.hybris.platform.commerceservices.order.dao.impl.DefaultCartEntryDao"
+			parent="abstractItemDao"/>
+
+	<alias alias="commerceCardTypeService" name="defaultCommerceCardTypeService"/>
+	<bean id="defaultCommerceCardTypeService"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceCardTypeService">
+		<property name="enumerationService" ref="enumerationService"/>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<alias alias="commerceOrderEntryModifiableChecker" name="orderEntryModifiableChecker"/>
+	<bean id="orderEntryModifiableChecker"
+			class="de.hybris.platform.commerceservices.order.impl.OrderEntryModifiableChecker"/>
+
+	<alias alias="countryZoneDeliveryModeDao" name="defaultCountryZoneDeliveryModeDao"/>
+	<bean id="defaultCountryZoneDeliveryModeDao"
+			class="de.hybris.platform.commerceservices.delivery.dao.impl.DefaultCountryZoneDeliveryModeDao"
+			parent="abstractItemDao"
+			/>
+
+	<alias name="defaultPickupDeliveryModeDao" alias="pickupDeliveryModeDao"/>
+	<bean id="defaultPickupDeliveryModeDao"
+			class="de.hybris.platform.commerceservices.delivery.dao.impl.DefaultPickupDeliveryModeDao"
+			parent="abstractItemDao"/>
+
+	<alias name="defaultStorePickupDao" alias="storePickupDao"/>
+	<bean id="defaultStorePickupDao" parent="abstractItemDao"
+			class="de.hybris.platform.commerceservices.delivery.dao.impl.DefaultStorePickupDao"/>
+
+	<alias name="defaultPickupStrategy" alias="pickupStrategy"/>
+	<bean id="defaultPickupStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.DefaultPickupStrategy">
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="defaultPickupInStoreMode" value="DISABLED"/>
+	</bean>
+
+	<alias name="defaultPickupAvailabilityStrategy" alias="pickupAvailabilityStrategy"/>
+	<bean id="defaultPickupAvailabilityStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.DefaultPickupAvailabilityStrategy">
+		<property name="pickupStrategy" ref="pickupStrategy"/>
+		<property name="stockLevelProductStrategy" ref="stockLevelProductID"/>
+		<property name="storePickupDao" ref="storePickupDao"/>
+	</bean>
+
+	<alias alias="addressVerificationService" name="defaultAddressVerificationService"/>
+	<bean id="defaultAddressVerificationService"
+			class="de.hybris.platform.commerceservices.address.impl.DefaultAddressVerificationService"/>
+
+	<alias alias="deliveryService" name="defaultDeliveryService"/>
+	<bean id="defaultDeliveryService" class="de.hybris.platform.commerceservices.delivery.impl.DefaultDeliveryService">
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="deliveryModeDao" ref="deliveryModeDao"/>
+		<property name="deliveryAddressesLookupStrategy" ref="deliveryAddressesLookupStrategy"/>
+		<property name="deliveryModeLookupStrategy" ref="deliveryModeLookupStrategy"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias alias="commerceCheckoutService" name="defaultCommerceCheckoutService"/>
+	<bean id="defaultCommerceCheckoutService"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceCheckoutService">
+		<property name="paymentService" ref="paymentService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="i18nService" ref="i18nService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="deliveryService" ref="deliveryService"/>
+		<property name="commerceCartCalculationStrategy" ref="checkoutCartCalculationStrategy"/>
+		<property name="orderService" ref="orderService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="promotionsService" ref="promotionsService"/>
+		<property name="calculationService" ref="calculationService"/>
+		<property name="externalTaxesService" ref="externalTaxesService"/>
+		<property name="commercePlaceOrderStrategy" ref="commercePlaceOrderStrategy"/>
+		<property name="commercePaymentAuthorizationStrategy" ref="commercePaymentAuthorizationStrategy"/>
+		<property name="commercePaymentInfoStrategy" ref="commercePaymentInfoStrategy"/>
+		<property name="commerceDeliveryModeValidationStrategy" ref="commerceDeliveryModeValidationStrategy"/>
+		<property name="commercePaymentProviderStrategy" ref="commercePaymentProviderStrategy"/>
+		<property name="commerceDeliveryAddressStrategy" ref="commerceDeliveryAddressStrategy"/>
+		<property name="commerceDeliveryModeStrategy" ref="commerceDeliveryModeStrategy"/>
+	</bean>
+
+	<alias alias="commercePaymentInfoStrategy" name="defaultCommercePaymentInfoStrategy"/>
+	<bean id="defaultCommercePaymentInfoStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommercePaymentInfoStrategy">
+		<property name="commerceCartCalculationStrategy" ref="checkoutCartCalculationStrategy"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias alias="commerceDeliveryModeStrategy" name="defaultCommerceDeliveryModeStrategy"/>
+	<bean id="defaultCommerceDeliveryModeStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceDeliveryModeStrategy">
+		<property name="commerceCartCalculationStrategy" ref="checkoutCartCalculationStrategy"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="deliveryService" ref="deliveryService"/>
+	</bean>
+
+	<alias alias="commerceDeliveryAddressStrategy" name="defaultCommerceDeliveryAddressStrategy"/>
+	<bean id="defaultCommerceDeliveryAddressStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceDeliveryAddressStrategy">
+		<property name="commerceCartCalculationStrategy" ref="checkoutCartCalculationStrategy"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="commerceDeliveryModeValidationStrategy" ref="commerceDeliveryModeValidationStrategy"/>
+		<property name="deliveryService" ref="deliveryService"/>
+	</bean>
+
+	<alias alias="commercePaymentProviderStrategy" name="defaultCommercePaymentProviderStrategy"/>
+	<bean id="defaultCommercePaymentProviderStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommercePaymentProviderStrategy">
+		<property name="baseStoreService" ref="baseStoreService"/>
+	</bean>
+
+	<alias alias="commerceDeliveryModeValidationStrategy" name="defaultCommerceDeliveryModeValidationStrategy"/>
+	<bean id="defaultCommerceDeliveryModeValidationStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceDeliveryModeValidationStrategy">
+		<property name="commerceCartCalculationStrategy" ref="checkoutCartCalculationStrategy"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="deliveryService" ref="deliveryService"/>
+
+	</bean>
+
+
+	<util:list id="authorizePaymentHooks"
+				  value-type="de.hybris.platform.commerceservices.order.hook.AuthorizePaymentMethodHook"/>
+
+	<alias alias="commercePaymentAuthorizationStrategy" name="defaultPaymentAuthorizationStrategy"/>
+	<bean id="defaultPaymentAuthorizationStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommercePaymentAuthorizationStrategy">
+		<property name="generateMerchantTransactionCodeStrategy" ref="generateMerchantTransactionCodeStrategy"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="i18nService" ref="i18nService"/>
+		<property name="paymentService" ref="paymentService"/>
+		<property name="authorizePaymentHooks" ref="authorizePaymentHooks"/>
+		<property name="configurationService" ref="configurationService"/>
+
+	</bean>
+
+
+	<util:list id="commercePlaceOrderMethodHooks"
+				  value-type="de.hybris.platform.commerceservices.order.hook.CommercePlaceOrderMethodHook"/>
+	<alias alias="commercePlaceOrderStrategy" name="defaultCommercePlaceOrderStrategy"/>
+	<bean id="defaultCommercePlaceOrderStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommercePlaceOrderStrategy">
+		<property name="paymentService" ref="paymentService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="deliveryService" ref="deliveryService"/>
+		<property name="orderService" ref="orderService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="promotionsService" ref="promotionsService"/>
+		<property name="calculationService" ref="calculationService"/>
+		<property name="externalTaxesService" ref="externalTaxesService"/>
+		<property name="commercePlaceOrderMethodHooks" ref="commercePlaceOrderMethodHooks"/>
+		<property name="configurationService" ref="configurationService"/>
+
+	</bean>
+
+	<alias alias="customerAccountService" name="defaultCustomerAccountService"/>
+	<bean id="defaultCustomerAccountService"
+			class="de.hybris.platform.commerceservices.customer.impl.DefaultCustomerAccountService">
+		<property name="userService" ref="userService"/>
+		<property name="paymentService" ref="paymentService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="i18nService" ref="i18nService"/>
+		<property name="passwordEncoderService" ref="passwordEncoderService"/>
+		<property name="secureTokenService" ref="secureTokenService"/>
+		<property name="tokenValiditySeconds" value="1800"/>
+		<property name="customerAccountDao" ref="customerAccountDao"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="eventService" ref="eventService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="customerEmailResolutionService" ref="customerEmailResolutionService"/>
+		<property name="passwordEncoding" value="md5"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="customerNameStrategy" ref="defaultCustomerNameStrategy"/>
+		<property name="timeService" ref="timeService"/>
+		<property name="monthsForOrderExpiry"
+					 value="#{configurationService.configuration.getProperty('guest.orderstatuspage.access.expiry.month')}"/>
+	</bean>
+
+	<alias name="defaultCustomerAccountDao" alias="customerAccountDao"/>
+	<bean id="defaultCustomerAccountDao"
+			class="de.hybris.platform.commerceservices.customer.dao.impl.DefaultCustomerAccountDao"
+			parent="abstractItemDao"
+			>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias alias="customerEmailResolutionService" name="defaultCustomerEmailResolutionService"/>
+	<bean id="defaultCustomerEmailResolutionService"
+			class="de.hybris.platform.commerceservices.customer.impl.DefaultCustomerEmailResolutionService">
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<alias alias="commerceCommonI18NService" name="defaultCommerceCommonI18NService"/>
+	<bean id="defaultCommerceCommonI18NService"
+			class="de.hybris.platform.commerceservices.i18n.impl.DefaultCommerceCommonI18NService">
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="i18nService" ref="i18nService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<alias alias="priceService" name="netPriceService"/>
+	<bean id="netPriceService" class="de.hybris.platform.commerceservices.price.impl.NetPriceService"
+			parent="abstractBusinessService">
+		<property name="netGrossStrategy" ref="netGrossStrategy"/>
+		<property name="timeService" ref="timeService"/>
+	</bean>
+
+	<alias alias="commercePriceService" name="defaultCommercePriceService"/>
+	<bean id="defaultCommercePriceService"
+			class="de.hybris.platform.commerceservices.price.impl.DefaultCommercePriceService">
+		<property name="priceService" ref="priceService"/>
+	</bean>
+
+	<alias alias="commerceProductService" name="defaultCommerceProductService"/>
+	<bean id="defaultCommerceProductService"
+			class="de.hybris.platform.commerceservices.product.impl.DefaultCommerceProductService">
+		<property name="stockService" ref="stockService"/>
+		<property name="warehouseService" ref="warehouseService"/>
+	</bean>
+
+	<alias alias="commerceStockService" name="defaultCommerceStockService"/>
+	<bean id="defaultCommerceStockService"
+			class="de.hybris.platform.commerceservices.stock.impl.DefaultCommerceStockService">
+		<property name="commerceStockLevelCalculationStrategy" ref="commerceStockLevelCalculationStrategy"/>
+		<property name="stockService" ref="stockService"/>
+		<property name="warehouseSelectionStrategy" ref="warehouseSelectionStrategy"/>
+		<property name="storePickupDao" ref="storePickupDao"/>
+		<property name="stockLevelStatusStrategy" ref="stockLevelStatusStrategy"/>
+		<property name="stockLevelProductStrategy" ref="stockLevelProductID"/>
+	</bean>
+
+	<alias alias="warehouseSelectionStrategy" name="defaultWarehouseSelectionStrategy"/>
+	<bean id="defaultWarehouseSelectionStrategy"
+			class="de.hybris.platform.commerceservices.stock.strategies.impl.DefaultWarehouseSelectionStrategy">
+		<property name="commerceWarehouseDao" ref="commerceWarehouseDao"/>
+	</bean>
+
+	<alias alias="commerceWarehouseDao" name="defaultCommerceWarehouseDao"/>
+	<bean id="defaultCommerceWarehouseDao"
+			class="de.hybris.platform.commerceservices.stock.dao.impl.DefaultCommerceWarehouseDao"
+			parent="abstractItemDao"/>
+
+	<alias name="defaultCommerceProductSearchService" alias="commerceProductSearchService"/>
+	<alias name="defaultCommerceSolrProductSearchService" alias="defaultCommerceProductSearchService"/>
+	<bean id="defaultCommerceSolrProductSearchService"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.impl.DefaultSolrProductSearchService"
+			>
+		<property name="searchQueryPageableConverter" ref="commerceSearchQueryPageableConverter"/>
+		<property name="searchRequestConverter" ref="commerceSolrSearchRequestConverter"/>
+		<property name="searchResponseConverter" ref="commerceSolrSearchResponseConverter"/>
+	</bean>
+
+	<alias name="defaultCommerceSolrAutocompleteService" alias="commerceAutocompleteService"/>
+	<bean id="defaultCommerceSolrAutocompleteService"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.impl.DefaultSolrProductSearchAutocompleteService"
+			>
+		<property name="facetSearchConfigService" ref="facetSearchConfigService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="solrAutoSuggestService" ref="solrAutoSuggestService"/>
+		<property name="solrIndexedTypeCodeResolver" ref="solrIndexedTypeCodeResolver"/>
+		<property name="solrFacetSearchConfigSelectionStrategy" ref="solrFacetSearchConfigSelectionStrategy"/>
+	</bean>
+
+	<alias alias="indexer" name="commerceIndexer"/>
+	<bean id="commerceIndexer"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.indexer.impl.CommerceIndexer">
+		<property name="solrDocumentFactory" ref="solrDocumentFactory"/>
+		<property name="solrService" ref="solrService"/>
+		<property name="impersonationService" ref="impersonationService"/>
+	</bean>
+
+	<alias name="defaultCommerceSearchQueryPageableConverter" alias="commerceSearchQueryPageableConverter"/>
+	<bean id="defaultCommerceSearchQueryPageableConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+					 value="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchRequest"/>
+		<property name="populators">
+			<list>
+				<ref bean="commerceSearchSolrQueryPopulator"/>
+				<ref bean="commerceSearchPagePopulator"/>
+				<ref bean="commerceSearchSortPopulator"/>
+				<ref bean="commerceSearchTextPopulator"/>
+				<ref bean="commerceSearchFiltersPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCommerceSearchSolrQueryPopulator" alias="commerceSearchSolrQueryPopulator"/>
+	<bean id="defaultCommerceSearchSolrQueryPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchSolrQueryPopulator">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="facetSearchConfigConverter" ref="solrFacetSearchConfigConverter"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="solrFacetSearchConfigSelectionStrategy" ref="solrFacetSearchConfigSelectionStrategy"/>
+	</bean>
+
+	<alias name="defaultSolrFacetSearchConfigSelectionStrategy" alias="solrFacetSearchConfigSelectionStrategy"/>
+	<bean id="defaultSolrFacetSearchConfigSelectionStrategy"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.strategies.impl.DefaultSolrFacetSearchConfigSelectionStrategy"
+			>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="facetSearchConfigDao" ref="facetSearchConfigDao"/>
+	</bean>
+
+	<alias name="defaultCommerceIndexedTypePopulator" alias="commerceIndexedTypePopulator"/>
+	<bean id="defaultCommerceIndexedTypePopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.CommerceIndexedTypePopulator"
+			>
+		<property name="indexedTypeSortConverter" ref="indexedTypeSortConverter"/>
+	</bean>
+
+	<alias name="defaultCommerceIndexConfigPopulator" alias="commerceIndexConfigPopulator"/>
+	<bean id="defaultCommerceIndexConfigPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.CommerceIndexConfigPopulator"
+			>
+		<property name="baseSiteService" ref="baseSiteService"/>
+	</bean>
+
+	<alias name="commerceIndexedTypeConverter" alias="solrIndexedTypeConverter"/>
+	<bean id="commerceIndexedTypeConverter" parent="defaultSolrIndexedTypeConverter">
+		<property name="populators">
+			<list merge="true">
+				<ref bean="commerceIndexedTypePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="commerceIndexConfigConverter" alias="solrIndexConfigConverter"/>
+	<bean id="commerceIndexConfigConverter" parent="defaultSolrIndexConfigConverter">
+		<property name="populators">
+			<list merge="true">
+				<ref bean="commerceIndexConfigPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultIndexedTypeSortPopulator" alias="indexedTypeSortPopulator"/>
+	<bean id="defaultIndexedTypeSortPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.IndexedTypeSortPopulator">
+	</bean>
+
+	<alias name="defaultIndexedTypeSortConverter" alias="indexedTypeSortConverter"/>
+	<bean id="defaultIndexedTypeSortConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+					 value="de.hybris.platform.commerceservices.search.solrfacetsearch.config.IndexedTypeSort"/>
+		<property name="populators">
+			<list>
+				<ref bean="indexedTypeSortPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCommerceSearchPagePopulator" alias="commerceSearchPagePopulator"/>
+	<bean id="defaultCommerceSearchPagePopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchPagePopulator"/>
+
+	<alias name="defaultCommerceSearchSortPopulator" alias="commerceSearchSortPopulator"/>
+	<bean id="defaultCommerceSearchSortPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchSortPopulator"/>
+
+	<alias name="defaultCommerceSearchTextPopulator" alias="commerceSearchTextPopulator"/>
+	<bean id="defaultCommerceSearchTextPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchTextPopulator">
+		<property name="freeTextQueryBuilders">
+			<list>
+				<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.DefaultFreeTextQueryBuilder">
+					<property name="propertyName" value="ean"/>
+					<property name="boost" value="100"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.DefaultFreeTextQueryBuilder">
+					<property name="propertyName" value="code"/>
+					<property name="boost" value="90"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.DefaultFreeTextQueryBuilder">
+					<property name="propertyName" value="name"/>
+					<property name="boost" value="50"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.DefaultFreeTextQueryBuilder">
+					<property name="propertyName" value="manufacturerName"/>
+					<property name="boost" value="40"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.ClassificationFreeTextQueryBuilder">
+					<property name="boost" value="30"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.DefaultFreeTextQueryBuilder">
+					<property name="propertyName" value="keywords"/>
+					<property name="boost" value="20"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.search.solrfacetsearch.querybuilder.impl.DefaultFreeTextQueryBuilder">
+					<property name="propertyName" value="categoryName"/>
+					<property name="boost" value="10"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCommerceSearchFiltersPopulator" alias="commerceSearchFiltersPopulator"/>
+	<bean id="defaultCommerceSearchFiltersPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchFiltersPopulator"
+			/>
+
+
+	<alias name="defaultCommerceSolrSearchRequestConverter" alias="commerceSolrSearchRequestConverter"/>
+	<bean id="defaultCommerceSolrSearchRequestConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+					 value="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchResponse"/>
+		<property name="populators">
+			<list>
+				<ref bean="solrSearchRequestResponsePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+
+	<alias name="defaultSolrSearchRequestResponsePopulator" alias="solrSearchRequestResponsePopulator"/>
+	<bean id="defaultSolrSearchRequestResponsePopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SolrSearchRequestResponsePopulator"
+			>
+		<property name="solrFacetSearchService" ref="commerceFacetSearchService"/>
+		<property name="solrKeywordRedirectService" ref="solrKeywordRedirectService"/>
+	</bean>
+
+	<alias name="defaultCommerceSolrSearchResponseConverter" alias="commerceSolrSearchResponseConverter"/>
+	<bean id="defaultCommerceSolrSearchResponseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+					 value="de.hybris.platform.commerceservices.search.facetdata.ProductCategorySearchPageData"/>
+		<property name="populators">
+			<list>
+				<ref bean="commerceSearchResponseQueryPopulator"/>
+				<ref bean="commerceSearchResponsePaginationPopulator"/>
+				<ref bean="commerceSearchResponseResultsPopulator"/>
+				<ref bean="commerceSearchResponseFacetsPopulator"/>
+				<ref bean="commerceSearchResponseFacetFilterPopulator"/>
+				<ref bean="commerceSearchResponseFacetSortPopulator"/>
+				<ref bean="commerceSearchResponseBreadcrumbsPopulator"/>
+				<ref bean="commerceSearchResponseSortsPopulator"/>
+				<ref bean="commerceSearchResponseFreeTextSearchPopulator"/>
+				<ref bean="commerceSearchResponseCategoryCodePopulator"/>
+				<ref bean="commerceSearchResponseSubCategoriesPopulator"/>
+				<ref bean="commerceSearchResponseSpellingSuggestionPopulator"/>
+				<ref bean="commerceSearchResponseKeywordRedirectPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="commerceIndexedPropertyConverter" alias="indexedPropertyConverter"/>
+	<bean id="commerceIndexedPropertyConverter" parent="defaultIndexedPropertyConverter">
+		<property name="populators">
+			<list merge="true">
+				<ref bean="commerceIndexedPropertyPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="commerceCategoryFacetDisplayNameProvider" alias="categoryFacetDisplayNameProvider"/>
+	<bean id="commerceCategoryFacetDisplayNameProvider"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.CommerceCategoryFacetDisplayNameProvider">
+		<property name="categoryService" ref="categoryService"/>
+	</bean>
+
+	<alias name="defaultCommerceSearchResponseQueryPopulator" alias="commerceSearchResponseQueryPopulator"/>
+	<bean id="defaultCommerceSearchResponseQueryPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseQueryPopulator"/>
+
+	<alias name="defaultCommerceSearchResponsePaginationPopulator" alias="commerceSearchResponsePaginationPopulator"/>
+	<bean id="defaultCommerceSearchResponsePaginationPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponsePaginationPopulator"/>
+
+	<alias name="defaultCommerceSearchResponseResultsPopulator" alias="commerceSearchResponseResultsPopulator"/>
+	<bean id="defaultCommerceSearchResponseResultsPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseResultsPopulator">
+		<property name="searchResultConverter" ref="solrDocumentSearchResultConverter"/>
+	</bean>
+
+	<alias name="defaultCommerceSearchResponseFacetsPopulator" alias="commerceSearchResponseFacetsPopulator"/>
+	<bean id="defaultCommerceSearchResponseFacetsPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseFacetsPopulator"/>
+
+	<alias name="defaultCommerceSearchResponseFacetFilterPopulator" alias="commerceSearchResponseFacetFilterPopulator"/>
+	<bean id="defaultCommerceSearchResponseFacetFilterPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseFacetFilterPopulator"/>
+
+	<alias name="defaultCommerceSearchResponseFacetSortPopulator" alias="commerceSearchResponseFacetSortPopulator"/>
+	<bean id="defaultCommerceSearchResponseFacetSortPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseFacetSortPopulator"/>
+
+	<alias name="defaultCommerceSearchResponseBreadcrumbsPopulator" alias="commerceSearchResponseBreadcrumbsPopulator"/>
+	<bean id="defaultCommerceSearchResponseBreadcrumbsPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseBreadcrumbsPopulator"/>
+
+	<alias name="defaultCommerceSearchResponseSortsPopulator" alias="commerceSearchResponseSortsPopulator"/>
+	<bean id="defaultCommerceSearchResponseSortsPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseSortsPopulator"/>
+
+	<alias name="defaultCommerceSearchResponseFreeTextSearchPopulator"
+			 alias="commerceSearchResponseFreeTextSearchPopulator"/>
+	<bean id="defaultCommerceSearchResponseFreeTextSearchPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseFreeTextSearchPopulator"/>
+
+	<alias name="defaultCommerceSearchResponseCategoryCodePopulator"
+			 alias="commerceSearchResponseCategoryCodePopulator"/>
+	<bean id="defaultCommerceSearchResponseCategoryCodePopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseCategoryCodePopulator"/>
+
+	<alias name="defaultCommerceSearchResponseSubCategoriesPopulator"
+			 alias="commerceSearchResponseSubCategoriesPopulator"/>
+	<bean id="defaultCommerceSearchResponseSubCategoriesPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseSubCategoriesPopulator">
+		<property name="commerceCategoryService" ref="commerceCategoryService"/>
+	</bean>
+
+	<alias name="defaultCommerceSearchResponseKeywordRedirectPopulator"
+			 alias="commerceSearchResponseKeywordRedirectPopulator"/>
+	<bean id="defaultCommerceSearchResponseKeywordRedirectPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseKeywordRedirectPopulator">
+		<property name="typeService" ref="typeService"/>
+		<property name="keywordRedirectUrlResolvers">
+			<map>
+				<entry key="SolrProductRedirect" value-ref="productKeywordRedirectUrlResolver"/>
+				<entry key="SolrCategoryRedirect" value-ref="categoryKeywordRedirectUrlResolver"/>
+				<entry key="SolrURIRedirect" value-ref="uriKeywordRedirectUrlResolver"/>
+			</map>
+		</property>
+	</bean>
+
+	<alias name="defaultCommerceIndexedPropertyPopulator" alias="commerceIndexedPropertyPopulator"/>
+	<bean id="defaultCommerceIndexedPropertyPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.CommerceIndexedPropertyPopulator">
+	</bean>
+
+	<!-- keyword redirect URL builders -->
+	<alias name="defaultProductKeywordRedirectUrlResolver" alias="productKeywordRedirectUrlResolver"/>
+	<bean id="defaultProductKeywordRedirectUrlResolver"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.keywordredirect.impl.ProductKeywordRedirectUrlResolver">
+		<property name="productModelUrlResolver" ref="productModelUrlResolver"/>
+	</bean>
+
+	<alias name="defaultCategoryKeywordRedirectUrlResolver" alias="categoryKeywordRedirectUrlResolver"/>
+	<bean id="defaultCategoryKeywordRedirectUrlResolver"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.keywordredirect.impl.CategoryKeywordRedirectUrlResolver">
+		<property name="categoryModelUrlResolver" ref="categoryModelUrlResolver"/>
+	</bean>
+
+	<alias name="defaultUriKeywordRedirectUrlResolver" alias="uriKeywordRedirectUrlResolver"/>
+	<bean id="defaultUriKeywordRedirectUrlResolver"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.keywordredirect.impl.UriKeywordRedirectUrlResolver"/>
+
+	<alias name="defaultCommerceSearchResponseSpellingSuggestionPopulator"
+			 alias="commerceSearchResponseSpellingSuggestionPopulator"/>
+	<bean id="defaultCommerceSearchResponseSpellingSuggestionPopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SearchResponseSpellingSuggestionPopulator"/>
+
+	<alias alias="pagedFlexibleSearchService" name="defaultPagedFlexibleSearchService"/>
+	<bean id="defaultPagedFlexibleSearchService"
+			class="de.hybris.platform.commerceservices.search.flexiblesearch.impl.DefaultPagedFlexibleSearchService">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<alias alias="storeSessionService" name="defaultStoreSessionService"/>
+	<bean id="defaultStoreSessionService"
+			class="de.hybris.platform.commerceservices.storesession.impl.DefaultStoreSessionService">
+		<property name="languageResolver" ref="languageResolver"/>
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="commerceCartService" ref="commerceCartService"/>
+		<property name="cartService" ref="cartService"/>
+	</bean>
+
+	<alias alias="cartFactory" name="commerceCartFactory"/>
+	<bean id="commerceCartFactory" class="de.hybris.platform.commerceservices.order.impl.CommerceCartFactory">
+		<property name="netGrossStrategy" ref="netGrossStrategy"/>
+		<property name="keyGenerator" ref="orderCodeGenerator"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="guidKeyGenerator" ref="guidKeyGenerator"/>
+	</bean>
+
+	<alias alias="createOrderFromCartStrategy" name="defaultCreateOrderFromCartStrategy"/>
+	<bean id="defaultCreateOrderFromCartStrategy"
+			class="de.hybris.platform.order.strategies.impl.DefaultCreateOrderFromCartStrategy">
+		<property name="cartValidator" ref="cartValidator"/>
+		<property name="cloneAbstractOrderStrategy" ref="cloneAbstractOrderStrategy"/>
+		<property name="keyGenerator"
+					 ref="#{configurationService.configuration.getProperty('commerceservices.orderCode.keyGenerator')}"/>
+	</bean>
+
+	<alias name="defaultCommerceCategoryService" alias="commerceCategoryService"/>
+	<bean id="defaultCommerceCategoryService"
+			class="de.hybris.platform.commerceservices.category.impl.DefaultCommerceCategoryService">
+		<property name="categoryService" ref="categoryService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+	</bean>
+
+	<alias name="defaultImpersonationService" alias="impersonationService"/>
+	<bean id="defaultImpersonationService"
+			class="de.hybris.platform.commerceservices.impersonation.impl.DefaultImpersonationService">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="i18nService" ref="commonI18NService"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="userService" ref="userService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+	</bean>
+
+	<!-- Strategies -->
+	<alias alias="netGrossStrategy" name="commerceNetGrossStrategy"/>
+	<bean id="commerceNetGrossStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.CommerceNetGrossStrategy">
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="defaultNetGrossStrategy" ref="defaultNetGrossStrategy"/>
+		<property name="cartService" ref="cartService"/>
+	</bean>
+	<bean id="defaultNetGrossStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.DefaultNetGrossStrategy"/>
+
+	<alias alias="secureTokenService" name="defaultSecureTokenService"/>
+	<bean id="defaultSecureTokenService"
+			class="de.hybris.platform.commerceservices.security.impl.DefaultSecureTokenService">
+		<property name="signatureKeyHex"
+					 value="#{configurationService.configuration.getProperty('commerceservices.securetoken.signature-key')}"/>
+		<property name="encryptionKeyHex"
+					 value="#{configurationService.configuration.getProperty('commerceservices.securetoken.encryption-key')}"/>
+	</bean>
+
+	<alias alias="stockLevelStatusStrategy" name="commerceStockLevelStatusStrategy"/>
+	<bean id="commerceStockLevelStatusStrategy"
+			class="de.hybris.platform.commerceservices.stock.strategies.impl.CommerceStockLevelStatusStrategy"
+			parent="abstractBusinessService">
+		<property name="defaultLowStockThreshold" value="5"/>
+		<property name="commerceStockLevelCalculationStrategy" ref="commerceStockLevelCalculationStrategy"/>
+	</bean>
+
+	<alias alias="commerceStockLevelCalculationStrategy" name="defaultCommerceStockLevelCalculationStrategy"/>
+	<bean id="defaultCommerceStockLevelCalculationStrategy"
+			class="de.hybris.platform.commerceservices.stock.strategies.impl.DefaultCommerceAvailabilityCalculationStrategy"
+			/>
+
+	<alias name="defaultDeliveryAddressesLookupStrategy" alias="deliveryAddressesLookupStrategy"/>
+	<bean id="defaultDeliveryAddressesLookupStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.DefaultDeliveryAddressesLookupStrategy"
+			>
+		<property name="customerAccountService" ref="customerAccountService"/>
+		<property name="checkoutCustomerStrategy" ref="checkoutCustomerStrategy"/>
+	</bean>
+
+	<alias name="defaultDeliveryModeLookupStrategy" alias="deliveryModeLookupStrategy"/>
+	<bean id="defaultDeliveryModeLookupStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.DefaultDeliveryModeLookupStrategy">
+		<property name="countryZoneDeliveryModeDao" ref="countryZoneDeliveryModeDao"/>
+		<property name="pickupDeliveryModeDao" ref="pickupDeliveryModeDao"/>
+	</bean>
+
+	<alias name="defaultCartValidationStrategy" alias="cartValidationStrategy"/>
+	<bean id="defaultCartValidationStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.DefaultCartValidationStrategy">
+		<property name="modelService" ref="modelService"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="productService" ref="productService"/>
+		<property name="commerceStockService" ref="commerceStockService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<alias name="defaultCartValidationWithoutCartAlteringStrategy" alias="cartValidationWithoutCartAlteringStrategy"/>
+	<bean id="defaultCartValidationWithoutCartAlteringStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.CartValidationWithoutCartAlteringStrategy">
+		<property name="productService" ref="productService"/>
+		<property name="commerceStockService" ref="commerceStockService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+	</bean>
+
+	<alias name="defaultGenerateMerchantTransactionCodeStrategy" alias="generateMerchantTransactionCodeStrategy"/>
+	<bean id="defaultGenerateMerchantTransactionCodeStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.DefaultGenerateMerchantTransactionCodeStrategy"/>
+
+	<alias alias="checkoutCustomerStrategy" name="defaultCheckoutCustomerStrategy"/>
+	<bean id="defaultCheckoutCustomerStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.DefaultCheckoutCustomerStrategy">
+		<property name="userService" ref="userService"/>
+		<property name="cartService" ref="cartService"/>
+	</bean>
+
+	<!-- Define new commerceFacetSearchService. Do not replace the existing solrFacetSearchService. -->
+	<alias name="defaultCommerceFacetSearchService" alias="commerceFacetSearchService"/>
+	<bean id="defaultCommerceFacetSearchService" parent="defaultFacetSearchService">
+		<property name="solrQueryConverter" ref="commerceSolrQueryConverter"/>
+	</bean>
+
+	<alias name="defaultCommerceSolrQueryConverter" alias="commerceSolrQueryConverter"/>
+	<bean id="defaultCommerceSolrQueryConverter" parent="solrQueryConverter">
+		<property name="fieldOperator" value="OR"/>
+		<property name="facetSort" value="COUNT"/>
+	</bean>
+
+	<alias name="defaultSolrDocumentSearchResultConverter" alias="solrDocumentSearchResultConverter"/>
+	<bean id="defaultSolrDocumentSearchResultConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commerceservices.search.resultdata.SearchResultValueData"/>
+		<property name="populators">
+			<list>
+				<ref bean="solrDocumentSearchResultValuePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultSolrDocumentSearchResultValuePopulator" alias="solrDocumentSearchResultValuePopulator"/>
+	<bean id="defaultSolrDocumentSearchResultValuePopulator"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.populators.SolrDocumentSearchResultValuePopulator"
+			>
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+	</bean>
+
+	<bean id="commerceClassificationPropertyValueProvider"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.CommerceClassificationPropertyValueProvider"
+			parent="classificationPropertyValueProvider"/>
+
+	<bean id="classificationPropertySplitValueProvider"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.ClassificationPropertySplitValueProvider"
+			parent="commerceClassificationPropertyValueProvider">
+		<property name="splitRegex" value="/"/>
+	</bean>
+
+	<bean id="optionalModelPropertyFieldValueProvider"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.OptionalModelPropertyFieldValueProvider"
+			parent="modelPropertyFieldValueProvider">
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<bean id="productReviewAverageRatingValueProvider"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.ProductReviewAverageRatingValueProvider"
+			parent="abstractPropertyFieldValueProvider">
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="customerReviewService" ref="customerReviewService"/>
+	</bean>
+
+	<bean id="productKeywordsValueProvider"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.ProductKeywordsValueProvider"
+			parent="abstractPropertyFieldValueProvider">
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<bean id="abstractImageValueProvider" abstract="true"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.ImageValueProvider"
+			>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="mediaContainerService" ref="mediaContainerService"/>
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+	</bean>
+
+	<alias name="defaultProductStockLevelStatusValueProvider" alias="productStockLevelStatusValueProvider"/>
+	<bean id="defaultProductStockLevelStatusValueProvider"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.ProductStockLevelStatusValueProvider"
+			parent="abstractPropertyFieldValueProvider">
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="commerceStockService" ref="commerceStockService"/>
+	</bean>
+
+	<bean id="productInStockFlagValueProvider"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.ProductInStockFlagValueProvider"
+			parent="abstractPropertyFieldValueProvider">
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="commerceStockService" ref="commerceStockService"/>
+	</bean>
+
+	<bean id="productStoreStockValueProvider"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.ProductStoreStockValueProvider"
+			parent="abstractPropertyFieldValueProvider">
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="commerceStockService" ref="commerceStockService"/>
+	</bean>
+
+	<bean id="productPickupAvailabilityValueProvider"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.ProductPickupAvailabilityValueProvider"
+			parent="abstractPropertyFieldValueProvider">
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="pickupAvailabilityStrategy" ref="pickupAvailabilityStrategy"/>
+	</bean>
+
+	<alias name="defaultCategorySource" alias="abstractCategorySource"/>
+	<bean id="defaultCategorySource" abstract="true"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.DefaultCategorySource"
+			>
+		<property name="modelService" ref="modelService"/>
+		<property name="categoriesQualifier" value="supercategories"/>
+		<property name="includeClassificationClasses" value="false"/>
+		<property name="categoryService" ref="categoryService"/>
+	</bean>
+
+	<bean id="allCategoriesSource" parent="abstractCategorySource"/>
+
+	<bean id="categoryPathValueProvider"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.CategoryPathValueProvider"
+			parent="abstractPropertyFieldValueProvider">
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="categoryService" ref="categoryService"/>
+		<property name="categorySource" ref="allCategoriesSource"/>
+	</bean>
+
+	<bean id="defaultTopValuesProvider"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.DefaultTopValuesProvider"/>
+
+	<bean id="pointOfServiceFacetDisplayNameProvider"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.provider.impl.PointOfServiceFacetDisplayNameProvider">
+		<property name="pointOfServiceService" ref="pointOfServiceService"/>
+	</bean>
+
+	<alias name="defaultThreadContextService" alias="threadContextService"/>
+	<bean id="defaultThreadContextService"
+			class="de.hybris.platform.commerceservices.threadcontext.impl.DefaultThreadContextService"/>
+
+	<!-- UrlResolvers -->
+
+	<alias name="defaultCategoryModelUrlResolver" alias="categoryModelUrlResolver"/>
+	<bean id="defaultCategoryModelUrlResolver"
+			class="de.hybris.platform.commerceservices.url.impl.DefaultCategoryModelUrlResolver">
+		<property name="threadContextService" ref="threadContextService"/>
+		<property name="commerceCategoryService" ref="commerceCategoryService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="pattern" value="/{category-path}/c/{category-code}"/>
+	</bean>
+
+	<alias name="defaultProductModelUrlResolver" alias="productModelUrlResolver"/>
+	<bean id="defaultProductModelUrlResolver"
+			class="de.hybris.platform.commerceservices.url.impl.DefaultProductModelUrlResolver">
+		<property name="threadContextService" ref="threadContextService"/>
+		<property name="commerceCategoryService" ref="commerceCategoryService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="defaultPattern" value="/{category-path}/{product-name}/p/{product-code}"/>
+	</bean>
+
+	<alias name="defaultPointOfServiceUrlResolver" alias="pointOfServiceUrlResolver"/>
+	<bean id="defaultPointOfServiceUrlResolver"
+			class="de.hybris.platform.commerceservices.url.impl.DefaultPointOfServiceUrlResolver">
+		<property name="threadContextService" ref="threadContextService"/>
+		<property name="pattern" value="/store/{store-name}?lat={latitude}&amp;long={longitude}"/>
+	</bean>
+
+	<alias name="defaultHomepageContentPageUrlResolver" alias="homepageContentPageUrlResolver"/>
+	<bean id="defaultHomepageContentPageUrlResolver"
+			class="de.hybris.platform.commerceservices.url.impl.DefaultHomepageContentPageUrlResolver">
+		<property name="threadContextService" ref="threadContextService"/>
+		<property name="pattern" value="/"/>
+	</bean>
+
+	<alias name="defaulCustomPageUrlResolver" alias="customPageUrlResolver"/>
+	<bean id="defaulCustomPageUrlResolver"
+			class="de.hybris.platform.commerceservices.url.impl.DefaulCustomPageUrlResolver">
+		<property name="threadContextService" ref="threadContextService"/>
+		<property name="pattern" value=""/>
+	</bean>
+
+	<alias name="defaultContentPageUrlResolver" alias="contentPageUrlResolver"/>
+	<bean id="defaultContentPageUrlResolver"
+			class="de.hybris.platform.commerceservices.url.impl.DefaultContentPageUrlResolver">
+		<property name="threadContextService" ref="threadContextService"/>
+		<property name="pattern" value="/"/>
+	</bean>
+
+	<!-- customer original ID -->
+	<bean id="originalUidUserDetailsService"
+			class="de.hybris.platform.commerceservices.spring.security.OriginalUidUserDetailsService"/>
+
+	<!-- Remove credit card validation interceptor -->
+	<bean id="creditCardPaymentInfoValidatorMapping"
+			class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor">
+			<null/>
+		</property>
+		<property name="typeCode" value="CreditCardPaymentInfo"/>
+	</bean>
+
+	<bean id="customerOriginalUIDPrepareInterceptor"
+			class="de.hybris.platform.commerceservices.customer.impl.CustomerOriginalUidPrepareInterceptor"/>
+
+	<bean id="customerOriginalUIDPrepareMapping"
+			class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="customerOriginalUIDPrepareInterceptor"/>
+		<property name="typeCode" value="customer"/>
+		<!-- property name="replacedInterceptors" ref="MandatoryAttributesValidator"/ -->
+	</bean>
+
+	<bean id="migrateFacetSortAttributeEventListener"
+			class="de.hybris.platform.commerceservices.event.MigrateFacetSortAttribute"
+			parent="abstractEventListener">
+		<property name="modelService" ref="modelService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="facetSort2sortProvidersMapping">
+			<map>
+				<entry key="Alpha" value="facetNameSortProviderAscending"/>
+			</map>
+		</property>
+	</bean>
+
+	<alias alias="exportProductService" name="defaultExportProductService"/>
+	<bean id="defaultExportProductService"
+			class="de.hybris.platform.commerceservices.product.impl.DefaultExportProductService">
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<!-- Product References -->
+	<alias name="defaultCommerceProductReferenceService" alias="commerceProductReferenceService"/>
+	<bean id="defaultCommerceProductReferenceService"
+			class="de.hybris.platform.commerceservices.product.impl.DefaultCommerceProductReferenceService">
+		<property name="modelService" ref="modelService"/>
+		<property name="productService" ref="productService"/>
+		<property name="productReferenceTargetStrategies">
+			<map key-type="de.hybris.platform.catalog.enums.ProductReferenceTypeEnum">
+				<!-- Add a strategy for a specific reference type -->
+				<!-- <entry key="SIMILAR" value-ref="..."/> -->
+			</map>
+		</property>
+		<property name="defaultProductReferenceTargetStrategy" ref="crossSellingProductReferenceTargetStrategy"/>
+	</bean>
+
+	<alias name="defaultCrossSellingProductReferenceTargetStrategy" alias="crossSellingProductReferenceTargetStrategy"/>
+	<bean id="defaultCrossSellingProductReferenceTargetStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.ChainProductReferenceTargetStrategy">
+		<property name="productReferenceTargetStrategies">
+			<list>
+				<ref bean="loneLeafVariantProductReferenceTargetStrategy"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultLoneLeafVariantProductReferenceTargetStrategy"
+			 alias="loneLeafVariantProductReferenceTargetStrategy"/>
+	<bean id="defaultLoneLeafVariantProductReferenceTargetStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.LoneLeafVariantProductReferenceTargetStrategy"/>
+
+	<!-- Storefinder -->
+	<alias name="defaultStoreFinderService" alias="storeFinderService"/>
+	<bean id="defaultStoreFinderService"
+			class="de.hybris.platform.commerceservices.storefinder.impl.DefaultStoreFinderService">
+		<property name="pointOfServiceDao" ref="pointOfServiceDao"/>
+		<property name="geoWebServiceWrapper" ref="geoServiceWrapper"/>
+		<!-- <property name="siteConfigService" ref="siteConfigService"/> -->
+		<property name="pointOfServicePagedGenericDao" ref="pointOfServicePagedGenericDao"/>
+		<property name="pointOfServiceGenericDao" ref="pointOfServiceGenericDao"/>
+	</bean>
+
+	<alias name="defaultPointOfServiceGenericDao" alias="pointOfServiceGenericDao"/>
+	<bean name="defaultPointOfServiceGenericDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="PointOfService"/>
+	</bean>
+
+	<alias name="defaultPointOfServicePagedGenericDao" alias="pointOfServicePagedGenericDao"/>
+	<bean name="defaultPointOfServicePagedGenericDao"
+			class="de.hybris.platform.commerceservices.search.dao.impl.DefaultPagedGenericDao">
+		<constructor-arg value="PointOfService"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultCustomerNameStrategy" alias="customerNameStrategy"/>
+	<bean id="defaultCustomerNameStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.DefaultCustomerNameStrategy"/>
+
+	<!-- External Taxes -->
+
+	<alias name="defaultDecideExternalTaxesStrategy" alias="decideExternalTaxesStrategy"/>
+	<bean id="defaultDecideExternalTaxesStrategy"
+			class="de.hybris.platform.commerceservices.externaltax.impl.DefaultDecideExternalTaxesStrategy"/>
+
+	<alias name="defaultApplyExternalTaxesStrategy" alias="applyExternalTaxesStrategy"/>
+	<bean id="defaultApplyExternalTaxesStrategy"
+			class="de.hybris.platform.externaltax.impl.DefaultApplyExternalTaxesStrategy"/>
+
+	<alias name="defaultCalculateExternalTaxesStrategy" alias="calculateExternalTaxesStrategy"/>
+	<bean id="defaultCalculateExternalTaxesStrategy"
+			class="de.hybris.platform.commerceservices.externaltax.impl.DefaultCalculateExternalTaxesStrategy"/>
+
+	<alias name="defaultCalculateExternalTaxesFallbackStrategy" alias="calculateExternalTaxesFallbackStrategy"/>
+	<bean id="defaultCalculateExternalTaxesFallbackStrategy"
+			class="de.hybris.platform.commerceservices.externaltax.impl.DefaultCalculateExternalTaxesFallbackStrategy"/>
+
+	<alias name="defaultRecalculateExternalTaxesStrategy" alias="recalculateExternalTaxesStrategy"/>
+	<bean id="defaultRecalculateExternalTaxesStrategy"
+			class="de.hybris.platform.commerceservices.externaltax.impl.DefaultRecalculateExternalTaxesStrategy">
+		<property name="modelService" ref="modelService"/>
+		<property name="commerceCartHashCalculationStrategy" ref="commerceCartHashCalculationStrategy"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<alias name="defaultDeliveryFromAddressStrategy" alias="estimatedDeliveryFromAddressStrategy"/>
+	<alias name="defaultDeliveryFromAddressStrategy" alias="deliveryFromAddressStrategy"/>
+	<bean id="defaultDeliveryFromAddressStrategy"
+			class="de.hybris.platform.commerceservices.externaltax.impl.DefaultDeliveryFromAddressStrategy">
+		<property name="baseStoreService" ref="baseStoreService"/>
+	</bean>
+
+	<alias name="defaultTaxAreaLookupStrategy" alias="taxAreaLookupStrategy"/>
+	<bean id="defaultTaxAreaLookupStrategy"
+			class="de.hybris.platform.commerceservices.externaltax.impl.DefaultTaxAreaLookupStrategy"/>
+
+	<alias name="defaultTaxCodeStrategy" alias="taxCodeStrategy"/>
+	<bean id="defaultTaxCodeStrategy"
+			class="de.hybris.platform.commerceservices.externaltax.impl.DefaultTaxCodeStrategy">
+		<property name="productTaxCodeService" ref="productTaxCodeService"/>
+		<property name="taxAreaLookupStrategy" ref="taxAreaLookupStrategy"/>
+		<property name="productService" ref="productService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<alias name="defaultExternalTaxesService" alias="externalTaxesService"/>
+	<bean id="defaultExternalTaxesService"
+			class="de.hybris.platform.commerceservices.externaltax.impl.DefaultExternalTaxesService">
+		<property name="calculateExternalTaxesStrategy" ref="calculateExternalTaxesStrategy"/>
+		<property name="applyExternalTaxesStrategy" ref="applyExternalTaxesStrategy"/>
+		<property name="decideExternalTaxesStrategy" ref="decideExternalTaxesStrategy"/>
+		<property name="recalculateExternalTaxesStrategy" ref="recalculateExternalTaxesStrategy"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<!-- External Taxes END -->
+
+	<!-- Helpers -->
+
+	<alias name="defaultDistanceHelper" alias="distanceHelper"/>
+	<bean id="defaultDistanceHelper"
+			class="de.hybris.platform.commerceservices.storefinder.helpers.impl.DefaultDistanceHelper">
+		<property name="pointOfServiceService" ref="pointOfServiceService"/>
+		<property name="enumerationService" ref="enumerationService"/>
+	</bean>
+
+	<!-- Helpers END-->
+
+	<!-- Prototype Beans for Data POJOs -->
+	<bean id="referenceData" class="de.hybris.platform.commerceservices.product.data.ReferenceData" scope="prototype"/>
+	<bean id="pageableData" class="de.hybris.platform.commerceservices.search.pagedata.PageableData" scope="prototype"/>
+	<bean id="paginationData" class="de.hybris.platform.commerceservices.search.pagedata.PaginationData"
+			scope="prototype"/>
+	<bean id="searchPageData" class="de.hybris.platform.commerceservices.search.pagedata.SearchPageData"
+			scope="prototype"/>
+	<bean id="sortData" class="de.hybris.platform.commerceservices.search.pagedata.SortData" scope="prototype"/>
+	<bean id="breadcrumbData" class="de.hybris.platform.commerceservices.search.facetdata.BreadcrumbData"
+			scope="prototype"/>
+	<bean id="facetData" class="de.hybris.platform.commerceservices.search.facetdata.FacetData" scope="prototype"/>
+	<bean id="facetRefinement" class="de.hybris.platform.commerceservices.search.facetdata.FacetRefinement"
+			scope="prototype"/>
+	<bean id="facetSearchPageData" class="de.hybris.platform.commerceservices.search.facetdata.FacetSearchPageData"
+			scope="prototype"/>
+	<bean id="facetValueData" class="de.hybris.platform.commerceservices.search.facetdata.FacetValueData"
+			scope="prototype"/>
+	<bean id="productCategorySearchPageData"
+			class="de.hybris.platform.commerceservices.search.facetdata.ProductCategorySearchPageData" scope="prototype"/>
+	<bean id="productSearchPageData" class="de.hybris.platform.commerceservices.search.facetdata.ProductSearchPageData"
+			scope="prototype"/>
+	<bean id="spellingSuggestionData" class="de.hybris.platform.commerceservices.search.facetdata.SpellingSuggestionData"
+			scope="prototype"/>
+	<bean id="sortQueryData" class="de.hybris.platform.commerceservices.search.flexiblesearch.data.SortQueryData"
+			scope="prototype"/>
+	<bean id="searchResultValueData" class="de.hybris.platform.commerceservices.search.resultdata.SearchResultValueData"
+			scope="prototype"/>
+	<bean id="autocompleteSuggestion"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.AutocompleteSuggestion"
+			scope="prototype"/>
+	<bean id="indexedPropertyValueData"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.IndexedPropertyValueData"
+			scope="prototype"/>
+	<bean id="searchQueryPageableData"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SearchQueryPageableData"
+			scope="prototype"/>
+	<bean id="solrDocumentData" class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrDocumentData"
+			scope="prototype"/>
+	<bean id="solrSearchQueryData"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchQueryData"
+			scope="prototype"/>
+	<bean id="solrSearchQueryTermData"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchQueryTermData"
+			scope="prototype"/>
+	<bean id="solrSearchRequest"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchRequest"
+			scope="prototype"/>
+	<bean id="solrSearchResponse"
+			class="de.hybris.platform.commerceservices.search.solrfacetsearch.data.SolrSearchResponse"
+			scope="prototype"/>
+	<bean id="indexedTypeSort" class="de.hybris.platform.commerceservices.search.solrfacetsearch.config.IndexedTypeSort"
+			scope="prototype"/>
+	<bean id="storeFinderSearchPageData"
+			class="de.hybris.platform.commerceservices.storefinder.data.StoreFinderSearchPageData"
+			scope="prototype"/>
+	<bean id="pointOfServiceDistanceData"
+			class="de.hybris.platform.commerceservices.storefinder.data.PointOfServiceDistanceData"
+			scope="prototype"/>
+
+	<!-- Cart Restoration -->
+	<bean id="jalosession" class="de.hybris.platform.jalo.JaloSessionFactory">
+		<property name="targetClassName" value="de.hybris.platform.commerceservices.jalo.CommerceJaloSession"/>
+	</bean>
+
+	<!-- Promotions  -->
+	<alias alias="commercePromotionDao" name="defaultCommercePromotionDao"/>
+	<bean id="defaultCommercePromotionDao"
+			class="de.hybris.platform.commerceservices.promotion.dao.impl.DefaultCommercePromotionDao"
+			parent="abstractItemDao"/>
+
+	<alias alias="commercePromotionService" name="defaultCommercePromotionService"/>
+	<bean id="defaultCommercePromotionService"
+			class="de.hybris.platform.commerceservices.promotion.impl.DefaultCommercePromotionService"
+			parent="abstractBusinessService">
+		<property name="commercePromotionDao" ref="commercePromotionDao"/>
+	</bean>
+
+	<alias alias="commercePromotionRestrictionDao" name="defaultCommercePromotionRestrictionDao"/>
+	<bean id="defaultCommercePromotionRestrictionDao"
+			class="de.hybris.platform.commerceservices.promotion.dao.impl.DefaultCommercePromotionRestrictionDao"
+			parent="abstractItemDao"/>
+
+	<alias alias="commercePromotionRestrictionService" name="defaultCommercePromotionRestrictionService"/>
+	<bean id="defaultCommercePromotionRestrictionService"
+			class="de.hybris.platform.commerceservices.promotion.impl.DefaultCommercePromotionRestrictionService"
+			parent="abstractBusinessService">
+		<property name="commercePromotionRestrictionDao" ref="commercePromotionRestrictionDao"/>
+	</bean>
+
+	<!-- Directives and Bean Post Processors -->
+
+	<bean id="listMergeBeanPostProcessor"
+			class="de.hybris.platform.commerceservices.spring.config.ListMergeDirectiveBeanPostProcessor"/>
+	<bean id="listMergeDirective" class="de.hybris.platform.commerceservices.spring.config.ListMergeDirective"
+			abstract="true"/>
+	<bean id="mapMergeBeanPostProcessor"
+			class="de.hybris.platform.commerceservices.spring.config.MapMergeDirectiveBeanPostProcessor"/>
+	<bean id="mapMergeDirective" class="de.hybris.platform.commerceservices.spring.config.MapMergeDirective"
+			abstract="true"/>
+
+
+	<!-- Base system setup bean -->
+	<bean id="abstractCoreSystemSetup"
+			class="de.hybris.platform.commerceservices.setup.AbstractSystemSetup"
+			abstract="true">
+		<property name="setupImpexService" ref="setupImpexService"/>
+		<property name="setupSyncJobService" ref="setupSyncJobService"/>
+		<property name="setupSolrIndexerService" ref="setupSolrIndexerService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="eventService" ref="eventService"/>
+	</bean>
+
+	<!-- Helper setup services used by the system setup bean -->
+
+	<alias name="defaultSetupImpexService" alias="setupImpexService"/>
+	<bean id="defaultSetupImpexService"
+			class="de.hybris.platform.commerceservices.setup.impl.DefaultSetupImpexService">
+		<property name="importService" ref="defaultImportService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<!-- Define Import Services -->
+
+	<alias name="defaultAbstractDataImportService" alias="abstractDataImportService"/>
+	<bean id="defaultAbstractDataImportService"
+			class="de.hybris.platform.commerceservices.dataimport.AbstractDataImportService"
+			abstract="true">
+		<property name="setupImpexService" ref="setupImpexService"/>
+		<property name="setupSyncJobService" ref="setupSyncJobService"/>
+		<property name="setupSolrIndexerService" ref="setupSolrIndexerService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="eventService" ref="eventService"/>
+	</bean>
+
+	<alias name="defaultCoreDataImportService" alias="coreDataImportService"/>
+	<bean id="defaultCoreDataImportService"
+			class="de.hybris.platform.commerceservices.dataimport.impl.CoreDataImportService"
+			parent="abstractDataImportService"/>
+
+	<alias name="defaultSampleDataImportService" alias="sampleDataImportService"/>
+	<bean id="defaultSampleDataImportService"
+			class="de.hybris.platform.commerceservices.dataimport.impl.SampleDataImportService"
+			parent="abstractDataImportService"/>
+
+	<util:list id="contentCatalogSyncRootTypeCodes">
+		<value>CMSItem</value>
+		<value>CMSRelation</value>
+		<value>Media</value>
+		<value>MediaContainer</value>
+		<value>BTGItem</value>
+	</util:list>
+	<util:list id="productCatalogSyncRootTypeCodes"/>
+
+	<util:map id="contentCatalogEditSyncDescriptors" key-type="java.lang.Class" value-type="java.util.List"/>
+
+	<util:map id="productCatalogEditSyncDescriptors" key-type="java.lang.Class" value-type="java.util.List">
+		<entry key="de.hybris.platform.jalo.Item">
+			<list>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="comments"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="assignedCockpitItemTemplates"/>
+				</bean>
+			</list>
+		</entry>
+		<entry key="de.hybris.platform.jalo.product.Product">
+			<list>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="sequenceId"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="productReviews"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="restrictions"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="productCarouselComponents"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="productListComponents"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="productDetailComponents"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="productFeatureComponents"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="copyByValue" value="true"/>
+					<property name="qualifier" value="galleryImages"/>
+				</bean>
+			</list>
+		</entry>
+
+		<entry key="de.hybris.platform.europe1.jalo.PriceRow">
+			<list>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="sequenceId"/>
+				</bean>
+			</list>
+		</entry>
+
+		<entry key="de.hybris.platform.category.jalo.Category">
+			<list>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="linkcomponents"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="productCarouselComponents"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="restrictions"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="productListComponents"/>
+				</bean>
+				<bean class="de.hybris.platform.commerceservices.setup.data.EditSyncAttributeDescriptorData">
+					<property name="includeInSync" value="false"/>
+					<property name="qualifier" value="categoryFeatureComponents"/>
+				</bean>
+			</list>
+		</entry>
+	</util:map>
+
+	<alias name="defaultSetupSyncJobService" alias="setupSyncJobService"/>
+	<bean id="defaultSetupSyncJobService"
+			class="de.hybris.platform.commerceservices.setup.impl.DefaultSetupSyncJobService">
+		<property name="modelService" ref="modelService"/>
+		<property name="contentCatalogRootTypeCodes" ref="contentCatalogSyncRootTypeCodes"/>
+		<property name="productCatalogRootTypeCodes" ref="productCatalogSyncRootTypeCodes"/>
+		<property name="contentCatalogEditSyncDescriptors" ref="contentCatalogEditSyncDescriptors"/>
+		<property name="productCatalogEditSyncDescriptors" ref="productCatalogEditSyncDescriptors"/>
+	</bean>
+
+	<alias name="defaultSetupSolrIndexerService" alias="setupSolrIndexerService"/>
+	<bean id="defaultSetupSolrIndexerService"
+			class="de.hybris.platform.commerceservices.setup.impl.DefaultSetupSolrIndexerService">
+		<property name="cronJobService" ref="cronJobService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<bean id="impexMacroParameterData" class="de.hybris.platform.commerceservices.setup.data.ImpexMacroParameterData"
+			scope="prototype"/>
+
+	<alias name="defaultStaleCartRemovalStrategy" alias="staleCartRemovalStrategy"/>
+	<bean id="defaultStaleCartRemovalStrategy"
+			class="de.hybris.platform.commerceservices.strategies.impl.DefaultStaleCartRemovalStrategy">
+		<property name="modelService" ref="modelService"/>
+		<property name="commerceCartDao" ref="commerceCartDao"/>
+	</bean>
+
+	<bean id="commerceCartParameter" class="de.hybris.platform.commerceservices.service.data.CommerceCartParameter"
+			scope="prototype">
+		<property name="enableHooks" value="true"/>
+	</bean>
+</beans>

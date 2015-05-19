@@ -1,0 +1,35 @@
+# 
+# Create the Electronics CN BaseStore
+#
+
+$productCatalog=electronics-cnProductCatalog
+$classificationCatalog=electronics-cnClassification
+$currencies=CNY
+$net=false
+$storeUid=electronics-cn
+$defaultCurrency=CNY
+#$languages=zh,en
+$languages=zh
+$defaultLanguage=zh
+$deliveryCountries=CN
+$orderProcessCode=order-process
+$pickupInStoreMode=DISABLED
+$customerAllowedToIgnoreSuggestions=true
+$paymentProvider=Mockup
+$expressCheckoutEnabled=false
+
+INSERT_UPDATE PromotionGroup;Identifier[unique=true];
+;electronics-cnPromoGrp;
+
+# Base Store
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);currencies(isocode);net;taxGroup(code);storelocatorDistanceUnit(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);deliveryCountries(isocode);submitOrderProcessCode;pickupInStoreMode(code);customerAllowedToIgnoreSuggestions;paymentProvider;expressCheckoutEnabled;maxRadiusForPoSSearch;
+;$storeUid;$productCatalog,$classificationCatalog;$currencies;$net;cn-taxes;km;$defaultCurrency;$languages;$defaultLanguage;$deliveryCountries;$orderProcessCode;$pickupInStoreMode;$customerAllowedToIgnoreSuggestions;$paymentProvider;$expressCheckoutEnabled;300;
+
+INSERT_UPDATE BaseStore2DeliveryModeRel;source(uid)[unique=true];target(code)[unique=true]
+;electronics-cn;premium-net
+;electronics-cn;standard-net
+;electronics-cn;premium-gross
+;electronics-cn;standard-gross
+;electronics-cn;pickup
+;electronics-cn;free-standard-shipping
+

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean id="CsTicketValidatorInterceptor" class="de.hybris.platform.ticket.interceptors.CsTicketValidationInterceptor" scope="tenant"/>
+
+	<bean id="CsTicketValidatorInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" scope="tenant">
+		<property name="interceptor" ref="CsTicketValidatorInterceptor"/>
+		<property name="typeCode" value="CsTicket"/>
+	</bean>
+
+	<bean id="CsTicketPrepareInterceptor" class="de.hybris.platform.ticket.interceptors.CsTicketPrepareInterceptor" scope="tenant">
+		<property name="initialTicketState">
+			<util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.NEW"/>
+		</property>
+		<property name="keyGenerator" ref="csTicketCodeGenerator"/>
+	</bean>
+
+	<bean id="CsTicketPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" scope="tenant">
+		<property name="interceptor" ref="CsTicketPrepareInterceptor"/>
+		<property name="typeCode" value="CsTicket"/>
+	</bean>
+
+	<bean id="CsTicketEventPrepareInterceptor" class="de.hybris.platform.ticket.interceptors.CsTicketEventPrepareInterceptor" scope="tenant">
+		<property name="keyGenerator" ref="defaultCsTicketEventCodeGenerator"/>
+		<property name="commentService" ref="commentService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<bean id="CsTicketEventPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" scope="tenant">
+		<property name="interceptor" ref="CsTicketEventPrepareInterceptor"/>
+		<property name="typeCode" value="CsTicketEvent"/>
+	</bean>
+
+</beans>

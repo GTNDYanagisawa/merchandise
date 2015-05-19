@@ -1,0 +1,74 @@
+# ImpEx for Importing Prices
+#% impex.setLocale( Locale.GERMAN ); 
+
+# Macros / Replacement Parameter definitions
+$productCatalog=sbgProductCatalog
+
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default=Staged])[unique=true,default=$productCatalog:Staged]
+
+$billingEvent=billingEvent(code)[default='onfirstbill']
+
+# Insert Subscription Price Plan
+INSERT_UPDATE SubscriptionPricePlan;&pricePlan;product(code, $catalogVersion)[unique=true];$catalogVersion;currency(isocode)[default=USD,unique=true];unit(code)[default=pieces]
+;pricePlan_BASIC_TV;BASIC_TV;
+;pricePlan_BIG_TV;BIG_TV;
+;pricePlan_PREMIUM_TV;PREMIUM_TV;
+;pricePlan_DELUXE_TV;DELUXE_TV;
+
+# Insert Onetime Charge Entries
+INSERT_UPDATE OneTimeChargeEntry;id[unique=true];subscriptionPricePlanOneTime(&pricePlan);price;$billingEvent;$catalogVersion
+;OCE_PN_BASIC_TV;pricePlan_BASIC_TV;25;paynow;
+;OCE_OFB_BIG_TV;pricePlan_BIG_TV;15;onfirstbill;
+;OCE_OFB_PREMIUM_TV;pricePlan_PREMIUM_TV;15;onfirstbill;
+
+INSERT_UPDATE RecurringChargeEntry;id[unique=true];subscriptionPricePlanRecurring(&pricePlan);price;cycleStart;cycleEnd;$catalogVersion
+;RCE_BASIC_TV_FROM_1_TO_1;pricePlan_BASIC_TV;0;1;1
+;RCE_BASIC_TV_FROM_2_ONWARDS;pricePlan_BASIC_TV;29;2;
+;RCE_BIG_TV_FROM_1_TO_3;pricePlan_BIG_TV;29;1;3
+;RCE_BIG_TV_FROM_4_ONWARDS;pricePlan_BIG_TV;45;4;
+;RCE_PREMIUM_TV_FROM_1_TO_3;pricePlan_PREMIUM_TV;29;1;3
+;RCE_PREMIUM_TV_FROM_4_TO_6;pricePlan_PREMIUM_TV;45;4;6
+;RCE_PREMIUM_TV_FROM_7_ONWARDS;pricePlan_PREMIUM_TV;60;7;
+;RCE_DELUXE_TV_FROM_1_TO_3;pricePlan_DELUXE_TV;45;1;3
+;RCE_DELUXE_TV_FROM_4_TO_6;pricePlan_DELUXE_TV;60;4;6
+;RCE_DELUXE_TV_FROM_7_ONWARDS;pricePlan_DELUXE_TV;85;7;
+
+INSERT_UPDATE PerUnitUsageCharge;id[unique=true];subscriptionPricePlanUsage(&pricePlan);usageUnit(id);usageChargeType(code);$catalogVersion
+;documentary_on_demand_pricePlan_BASIC_TV;pricePlan_BASIC_TV;documentaries_on_demand;each_respective_tier
+;movie_on_demand_pricePlan_BASIC_TV;pricePlan_BASIC_TV;movies_on_demand;each_respective_tier
+;blockbuster_on_demand_pricePlan_BASIC_TV;pricePlan_BASIC_TV;blockbusters_on_demand;each_respective_tier
+;documentary_on_demand_pricePlan_BIG_TV;pricePlan_BIG_TV;documentaries_on_demand;each_respective_tier
+;movie_on_demand_pricePlan_BIG_TV;pricePlan_BIG_TV;movies_on_demand;each_respective_tier
+;blockbuster_on_demand_pricePlan_BIG_TV;pricePlan_BIG_TV;blockbusters_on_demand;each_respective_tier
+;documentary_on_demand_pricePlan_PREMIUM_TV;pricePlan_PREMIUM_TV;documentaries_on_demand;highest_applicable_tier
+;movie_on_demand_pricePlan_PREMIUM_TV;pricePlan_PREMIUM_TV;movies_on_demand;highest_applicable_tier
+;blockbuster_on_demand_pricePlan_PREMIUM_TV;pricePlan_PREMIUM_TV;blockbusters_on_demand;highest_applicable_tier
+
+INSERT_UPDATE VolumeUsageCharge;id[unique=true];subscriptionPricePlanUsage(&pricePlan);usageUnit(id);$catalogVersion
+;movie_on_demand_pricePlan_DELUXE_TV;pricePlan_DELUXE_TV;movies_on_demand;
+;blockbuster_on_demand_pricePlan_DELUXE_TV;pricePlan_DELUXE_TV;blockbusters_on_demand;
+
+INSERT_UPDATE TierUsageChargeEntry;id[unique=true];usageCharge(id, $catalogVersion);tierStart;tierEnd;price;$catalogVersion
+;documentary_on_demand_pricePlan_BIG_TV_FROM_1_TO_5;documentary_on_demand_pricePlan_BIG_TV;1;5;3,0;
+;movie_on_demand_pricePlan_BIG_TV_FROM_1_TO_5;movie_on_demand_pricePlan_BIG_TV;1;5;4,0;
+;blockbuster_on_demand_pricePlan_BIG_TV_FROM_1_TO_5;blockbuster_on_demand_pricePlan_BIG_TV;1;5;5,0;
+;documentary_on_demand_pricePlan_PREMIUM_TV_FROM_1_TO_5;documentary_on_demand_pricePlan_PREMIUM_TV;1;5;1,50;
+;movie_on_demand_pricePlan_PREMIUM_TV_FROM_1_TO_5;movie_on_demand_pricePlan_PREMIUM_TV;1;5;2,00;
+;blockbuster_on_demand_pricePlan_PREMIUM_TV_FROM_1_TO_5;blockbuster_on_demand_pricePlan_PREMIUM_TV;1;5;3,00;
+;movie_on_demand_pricePlan_DELUXE_TV_FROM_1_TO_10;movie_on_demand_pricePlan_DELUXE_TV;1;10;5,00;
+;movie_on_demand_pricePlan_DELUXE_TV_FROM_11_TO_20;movie_on_demand_pricePlan_DELUXE_TV;11;20;8,00;
+;blockbuster_on_demand_pricePlan_DELUXE_TV_FROM_1_TO_10;blockbuster_on_demand_pricePlan_DELUXE_TV;1;10;15,00;
+;blockbuster_on_demand_pricePlan_DELUXE_TV_FROM_11_TO_20;blockbuster_on_demand_pricePlan_DELUXE_TV;11;20;25,00;
+
+INSERT_UPDATE OverageUsageChargeEntry;id[unique=true];usageCharge(id, $catalogVersion);price;$catalogVersion
+;documentary_on_demand_pricePlan_BASIC_TV_overage;documentary_on_demand_pricePlan_BASIC_TV;3,0
+;movie_on_demand_pricePlan_BASIC_TV_overage;movie_on_demand_pricePlan_BASIC_TV;4,0
+;blockbuster_on_demand_pricePlan_BASIC_TV_overage;blockbuster_on_demand_pricePlan_BASIC_TV;5,0
+;documentary_on_demand_pricePlan_BIG_TV_overage;documentary_on_demand_pricePlan_BIG_TV;2,0
+;movie_on_demand_pricePlan_BIG_TV_overage;movie_on_demand_pricePlan_BIG_TV;3,0
+;blockbuster_on_demand_pricePlan_BIG_TV_overage;blockbuster_on_demand_pricePlan_BIG_TV;4,0
+;documentary_on_demand_pricePlan_PREMIUM_TV_overage;documentary_on_demand_pricePlan_PREMIUM_TV;1,20
+;movie_on_demand_pricePlan_PREMIUM_TV_overage;movie_on_demand_pricePlan_PREMIUM_TV;1,50
+;blockbuster_on_demand_pricePlan_PREMIUM_TV_overage;blockbuster_on_demand_pricePlan_PREMIUM_TV;2,50
+;movie_on_demand_pricePlan_DELUXE_TV_overage;movie_on_demand_pricePlan_DELUXE_TV;0,30
+;blockbuster_on_demand_pricePlan_DELUXE_TV_overage;blockbuster_on_demand_pricePlan_DELUXE_TV;1,00

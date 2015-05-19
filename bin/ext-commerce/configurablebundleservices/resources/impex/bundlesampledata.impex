@@ -1,0 +1,125 @@
+$catalog-id=subscriptionSampleCatalog
+$catalog-version=Staged
+$catalogversion=catalogVersion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+$syncJobCode=sync $catalog-id:Staged->Online
+$ruleType=ruleType(code)[default='ANY']
+$lang=en
+
+INSERT_UPDATE BundleTemplateStatus;id[unique=true];status(code)[default=approved];$catalogversion
+;Status_SMART
+
+INSERT_UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];$catalogversion;parentTemplate(id);status(id)
+;SmartPhonePackage;;;;Status_SMART
+;SmartPhoneDeviceSelection;;;SmartPhonePackage;Status_SMART
+;SmartPhonePlanSelection;;;SmartPhonePackage;Status_SMART
+;SmartPhoneInternetSelection;;;SmartPhonePackage;Status_SMART
+;SmartPhoneAddonSelection;;;SmartPhonePackage;Status_SMART
+;SmartPhoneTvBasicSelection;;;SmartPhonePackage;Status_SMART
+;SmartPhoneTvExtrasSelection;;;SmartPhonePackage;Status_SMART
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];products(code, $catalogversion);$catalogversion
+;SmartPhoneDeviceSelection;;GALAXY_NEXUS,GALAXY_S2,MOTOROLA_RAZR,HTC_INCREDIBLE_S,APPLE_IPHONE_4S_16GB,APPLE_IPHONE_4S_32GB;
+;SmartPhonePlanSelection;;SMART_STANDARD_1Y,SMART_STANDARD_2Y,SMART_STANDARD_3Y,SMART_ADVANCED_1000_12M,SMART_ADVANCED_1000_24M,SMART_ADVANCED_1000_36M,SMART_ADVANCED_2000_12M,SMART_ADVANCED_2000_24M,SMART_ADVANCED_2000_36M,SMART_ADVANCED_5000_12M,SMART_ADVANCED_5000_24M,SMART_ADVANCED_5000_36M,SMART_ADVANCED_NOLIM_12M,SMART_ADVANCED_NOLIM_24M,SMART_ADVANCED_NOLIM_36M;
+;SmartPhoneInternetSelection;;INTERNET_PACK_1G,INTERNET_PACK_MAX;
+;SmartPhoneAddonSelection;;FRIENDS_AND_FAMILY,WEEKENDER,HOTSPOT_OPTION;
+;SmartPhoneTvBasicSelection;;TV_MOBILE_BASIC;
+;SmartPhoneTvExtrasSelection;;TV_MOBILE_EXTRAS_NEWS,TV_MOBILE_EXTRAS_DOCU;
+
+UPDATE BundleTemplate;id[unique=true];name[lang=$lang];$catalogversion
+;SmartPhonePackage;"SmartPhone Package";
+;SmartPhoneDeviceSelection;"SmartPhone Device Component";
+;SmartPhonePlanSelection;"SmartPhone Plan Component";
+;SmartPhoneInternetSelection;"SmartPhone Internet Component";
+;SmartPhoneAddonSelection;"SmartPhone Addon Component";
+;SmartPhoneTvBasicSelection;"SmartPhone TvBasic Component";
+;SmartPhoneTvExtrasSelection;"SmartPhone TvExtras Component";
+
+INSERT_UPDATE PickExactlyNBundleSelectionCriteria;id[unique=true];n;$catalogversion
+;SmartPhoneDeviceSelection_PickExactly1;1
+;SmartPhonePlanSelection_PickExactly1;1
+
+INSERT_UPDATE PickNToMBundleSelectionCriteria;id[unique=true];n;m;$catalogversion
+;SmartPhoneInternetSelection_Pick0To1;0;1
+;SmartPhoneAddonSelection_Pick0To100;0;100
+;SmartPhoneTvBasicSelection_Pick0To1;0;1
+;SmartPhoneTvExtrasSelection_Pick0To2;0;2
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0];bundleSelectionCriteria(id, $catalogversion);$catalogversion
+;SmartPhoneDeviceSelection;;SmartPhoneDeviceSelection_PickExactly1
+;SmartPhonePlanSelection;;SmartPhonePlanSelection_PickExactly1
+;SmartPhoneInternetSelection;;SmartPhoneInternetSelection_Pick0To1
+;SmartPhoneAddonSelection;;SmartPhoneAddonSelection_Pick0To100
+;SmartPhoneTvBasicSelection;;SmartPhoneTvBasicSelection_Pick0To1
+;SmartPhoneTvExtrasSelection;;SmartPhoneTvExtrasSelection_Pick0To2
+
+# Bundle dependencies
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];requiredBundleTemplates(id,version[default=1.0]);$catalogversion
+;SmartPhoneInternetSelection;;SmartPhonePlanSelection
+;SmartPhoneAddonSelection;;SmartPhonePlanSelection
+;SmartPhoneTvBasicSelection;;SmartPhonePlanSelection
+;SmartPhoneTvExtrasSelection;;SmartPhonePlanSelection,SmartPhoneTvBasicSelection
+
+INSERT_UPDATE ChangeProductPriceBundleRule;$catalogversion;id[unique=true];currency(isocode)[default=USD, unique=true];bundleTemplate(id, version, $catalogversion)[unique=true];ruleType(code)[default=ANY];conditionalProducts(code, $catalogversion);targetProducts(code, $catalogversion);price
+;;price_IPHONE4S32GB_with_SMART_ADVANCED_2000_12M;;SmartPhoneDeviceSelection:1.0;ALL;SMART_ADVANCED_2000_12M;APPLE_IPHONE_4S_32GB;350
+;;price_IPHONE4S32GB_with_SMART_ADVANCED_5000_12M;;SmartPhoneDeviceSelection:1.0;ALL;SMART_ADVANCED_5000_12M;APPLE_IPHONE_4S_32GB;330
+;;price_IPHONE4S32GB_with_SMART_ADVANCED_NOLIM_12M;;SmartPhoneDeviceSelection:1.0;ALL;SMART_ADVANCED_NOLIM_12M;APPLE_IPHONE_4S_32GB;310
+
+INSERT_UPDATE DisableProductBundleRule;id[unique=true];$catalogversion;bundleTemplate(id,version[default=1.0],$catalogversion);conditionalProducts(code,$catalogversion);targetProducts(code,$catalogversion);$ruleType
+;SmartPhoneAddonSelection_Disable_FRIENDS_AND_FAMILY_When_WEEKENDER;;SmartPhoneAddonSelection;WEEKENDER;FRIENDS_AND_FAMILY
+;SmartPhoneDeviceSelection_Disable_IPHONE_When_CheapPlans;;SmartPhoneDeviceSelection;SMART_STANDARD_1Y,SMART_STANDARD_2Y,SMART_STANDARD_3Y,SMART_ADVANCED_1000_12M,SMART_ADVANCED_1000_24M,SMART_ADVANCED_1000_36M;APPLE_IPHONE_4S_16GB,APPLE_IPHONE_4S_32GB
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;productmanagergroup;cockpitgroup;;;;;;;
+
+# Access Rights for Products & Catalog;;;;;;;;;
+;;;;ItemSyncTimestamp;+;;;
+;;;;SyncItemJob;+;;;
+;;;;Type;+;;;
+;;;;Product;+;+;+;+;+;
+;;;;Category;+;+;+;+;+;
+;;;;variantType;+;+;+;+;+;
+;;;;Catalog;+;;;
+;;;;CatalogVersion;+;;;
+;;;;Media;+;+;+;+;+;
+;;;;MediaContainer;+;+;+;+;+;
+;;;;MediaFormat;+;+;+;+;+;
+;;;;MediaFolder;+;+;+;+;+;
+;;;;Vendor;+;+;+;+;+;
+;;;;StockLevel;+;+;+;+;+;
+;;;;Tax;+;+;+;+;+;
+;;;;TaxRow;+;+;+;+;+;
+;;;;PriceRow;+;+;+;+;+;
+;;;;ProductFeature;+;+;+;+;+;
+;;;;ProductReference;+;+;+;+;+;
+;;;;Warehouse;+;+;+;+;+;
+;;;;BundleTemplate;+;+;-;-;-;
+;;;;BundleTemplate.products;+;+;+;+;-;
+;;;;BundleTemplate.bundleSelectionCriteria;+;-;-;-;-;
+;;;;BundleTemplate.requiredBundleTemplates;+;-;-;-;-;
+;;;;BundleTemplate.dependentBundleTemplates;+;-;-;-;-;
+;;;;BundleTemplate.parentTemplate;+;-;-;-;-;
+;;;;BundleTemplate.childTemplates;+;-;-;-;-;
+;;;;BundleTemplate.status;+;-;-;-;-;
+;;;;ChangeProductPriceBundleRule;+;+;+;+;+;
+;;;;DisableProductBundleRule;+;+;+;+;+;
+;;;;BundleSelectionCriteria;+;-;-;-;-;
+;;;;BillingTime;+;-;-;-;-;
+;;;;ClassAttributeAssignment;+;+;+;+;+;
+;;;;ClassificationClass;+;+;+;+;+;
+;;;;ClassificationAttribute;+;+;+;+;+;
+;;;;ClassificationAttributeTypeEnum;+;+;+;+;+;
+;;;;ClassificationAttributeVisibilityEnum;+;+;+;+;+;
+;;;;ClassificationAttributeValueList;+;+;+;+;+;
+;;;;ClassificationAttributeUnit;+;+;+;+;+;
+
+$END_USERRIGHTS;;;;;
+
+
+#
+# Add BundleTemplate and BundleTemplateStatus as rootTypes to the synchronization
+# 
+$sourceversion=sourceversion(catalog(id[default=$catalog-id]),version[default=Staged])[unique=true,default=$catalog-id:Staged]
+$targetversion=targetversion(catalog(id[default=$catalog-id]),version[default=Online])[unique=true,default=$catalog-id:Online]
+UPDATE CatalogVersionSyncJob;code[unique=true];roottypes(code)[mode=append];
+;$syncJobCode;BundleTemplate,BundleTemplateStatus;

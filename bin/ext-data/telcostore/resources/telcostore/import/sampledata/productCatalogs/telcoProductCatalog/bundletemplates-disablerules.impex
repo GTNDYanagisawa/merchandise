@@ -1,0 +1,33 @@
+$productCatalog=telcoProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$ruleType=ruleType(code)[default='ANY']
+
+INSERT_UPDATE DisableProductBundleRule;id[unique=true];$catalogVersion;bundleTemplate(id,version[default=1.0],$catalogVersion);conditionalProducts(code,$catalogVersion);targetProducts(code,$catalogVersion);$ruleType
+;DisableProductBundleRule_1;;SMAR_InternetPackage;Y_SMART_UNLIMITED_24M,Y_SMART_UNLIMITED_18M,Y_SMART_UNLIMITED_12M;INTERNET_PACK_SMART
+
+# Cheap plans disabled with iPhone 3GS
+;DisableProductBundleRule_2;;SMAR_ServicePlan;3417130,3417125,3417124,3417123,5909755;Y_SMART_600_12M,Y_SMART_600_18M,Y_SMART_600_24M
+
+# Friends & Family, Weekender disabled with ySmart Unlimited
+;DisableProductBundleRule_3;;SMAR_PopularAddOns;Y_SMART_UNLIMITED_24M,Y_SMART_UNLIMITED_18M,Y_SMART_UNLIMITED_12M,WEEKENDER;FRIENDS_AND_FAMILY
+
+## Tablet Package
+# yData Casual disabled with with iPad 
+;DisableProductBundleRule_7;;TABL_ServicePlan;1976032;Y_DATA_CASUAL
+
+# Mobile TV disabled with Kindle Fire
+;DisableProductBundleRule_8;;TABL_MobileTV;1974125;MOBILE_TV
+
+# Mobile TV disabled with iPad and data smart, and with samsung tablet and data casual
+;DisableProductBundleRule_9;;TABL_MobileTV;1976032,Y_DATA_SMART;MOBILE_TV;ALL
+;DisableProductBundleRule_10;;TABL_MobileTV;2007055,Y_DATA_CASUAL;MOBILE_TV;ALL
+
+## Prepaid Package
+# Surf & Text disabled with some basic phones
+;DisableProductBundleRule_11;;PAYG_ServicePlan:3.14;4204425, 4204426, 4204427, 4204429, 4204430, 4204431, 4204432, 4204433, 4204647, 4204657, 4488521, 4488527, 4727800, 4784305, 5687446, 5913000, 5913023, 5913024, 5913025, 5913028, 5913029, 5913030, 5913032, 5913033, 5913037, 5913039, 5913040, 5913041, 5913042, 5913043, 5913044, 5913050, 5913058, 5913062, 6051297, 6099719, 6099720, 6154796, 6154798, 6157037, 6175504, 6188053, 6268517;Y_GO_SURF_AND_TEXT
+
+;DisableProductBundleRule_1;;SARC_InternetPackage;Y_SMART_UNLIMITED_24M,Y_SMART_UNLIMITED_18M,Y_SMART_UNLIMITED_12M;INTERNET_PACK_SMART
+# Cheap plans disabled with iPhone 3GS
+;DisableProductBundleRule_2;;SARC_ServicePlan;3417130,3417125,3417124,3417123,5909755;Y_SMART_600_12M,Y_SMART_600_18M,Y_SMART_600_24M
+# Friends & Family, Weekender disabled with ySmart Unlimited
+;DisableProductBundleRule_3;;SARC_PopularAddOns;Y_SMART_UNLIMITED_24M,Y_SMART_UNLIMITED_18M,Y_SMART_UNLIMITED_12M,WEEKENDER;FRIENDS_AND_FAMILY

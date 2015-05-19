@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?page title="SectionPanelTest"?>
+
+<?init 				class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+
+<window xmlns="http://www.zkoss.org/2005/zul"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:h="http://www.w3.org/1999/xhtml"
+		xmlns:zk="http://www.zkoss.org/2005/zk"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd "
+		width="100%" height="100%" mode="embedded" border="none" shadow="false">
+	
+	<style src="/cockpit/css/cockpit.css" /> 
+	<style src="/css/defaultstyles.css"/>
+	
+	<borderlayout>
+		<center>
+			<vbox width="100%" style="background:lightblue">
+				<button label="Create Sample Section Panel Model">
+					<attribute name="onClick">
+					</attribute>
+
+				</button>
+				<button label="Add Sample Section To Model" onClick="sectionPanelController.addDefaultSection()"/>
+				<button label="Clear Section Panel Model" onClick="sectionPanelController.clearModel()"/>
+				<button label="Create Sample Messages" onClick="sectionPanelController.createSampleMessages()"/>
+			</vbox>
+		</center>
+		<east width="30em" splittable="true" collapsible="true" minsize="20" autoscroll="true" flex="true">
+			<zscript>
+				<![CDATA[
+					import de.hybris.platform.cockpit.components.sectionpanel.*;
+					
+					DefaultSectionPanelController sectionPanelController = new DefaultSectionPanelController();
+					SectionPanelModel model = new DefaultSectionPanelModel();
+					sectionPanelController.setSectionPanelModel(model);
+					model.setLabel("Section Label");
+			
+					List rows = new ArrayList();
+					DefaultSection section = new DefaultSection();
+					section.setVisible(true);
+					section.setLabel("Base Attributes");
+			
+					rows.add(new DefaultSectionRow("Code"));
+					rows.add(new DefaultSectionRow("Name"));
+					rows.add(tmpMsgRow = new DefaultSectionRow("EAN"));
+					rows.add(new DefaultSectionRow("Remark"));
+					rows.add(new DefaultSectionRow("Delivery Time"));
+					rows.add(new DefaultSectionRow("Online Date"));
+					rows.add(new DefaultSectionRow("Description"));
+			
+					for (SectionRow sectionRow : rows)
+					{
+						((DefaultSectionRow) sectionRow).setVisible(true);
+					}
+			
+					model.addSection(section);
+					model.setRows(section, rows);
+			
+			
+					List rows2 = new ArrayList();
+					DefaultSection section2 = new DefaultSection();
+					section2.setVisible(true);
+					section2.setLabel("my Attributes");
+			
+					PropertyValueHolder pvh;
+					rows2.add(tmpMsgRow2 = new PropertyValueHolder("minOrderQuantity"));
+					((PropertyValueHolder) tmpMsgRow2).setValue(new Integer(1));
+					rows2.add(pvh = new PropertyValueHolder("maxOrderQuantity"));
+					pvh.setValue(new Integer(1000));
+					rows2.add(pvh = new PropertyValueHolder("Manufacturer Name"));
+					pvh.setValue("Monster AG");
+					rows2.add(pvh = new PropertyValueHolder("Manufacturer AID"));
+					pvh.setValue("MS347868");
+					rows2.add(pvh = new PropertyValueHolder("numberContentUnits"));
+					pvh.setValue(new Integer(133));
+			
+					for (SectionRow sectionRow : rows2)
+					{
+						((DefaultSectionRow) sectionRow).setVisible(true);
+					}
+			
+					model.addSection(section2);
+					model.setRows(section2, rows2);
+			
+			
+					List rows3 = new ArrayList();
+					DefaultSection section3 = new DefaultSection();
+					section3.setVisible(true);
+					section3.setLabel("other Attributes");
+			
+					rows3.add(pvh = new PropertyValueHolder("Some Boolean"));
+					pvh.setValue(new Boolean(true));
+					pvh.setVisible(true);
+			
+			
+					rows3.add(pvh = new PropertyValueHolder("Localized Value"));
+					pvh.setVisible(true);
+					pvh.setLocalized(true);
+					Map locmap = new HashMap();
+					locmap.put("de", "deutsch");
+					locmap.put("en", "english");
+					pvh.setValue(locmap);
+			
+					model.addSection(section3);
+					model.setRows(section3, rows3);
+				]]>
+			</zscript>
+			<sectionpanel id="panel" model="@{model}" width="100%" height="100%" flatSectionLayout="true"
+							sectionReorderAllowed="true"
+							sectionRowRenderer="${editorAreaTestController.sectionRowRenderer}"
+							onRowHide="self.model.hideRow(event.data)"		
+							onRowShow="self.model.showRow(event.data)"					
+							onSectionHide="self.model.hideSection(event.data)"
+							onSectionShow="self.model.showSection(event.data)"/>
+		</east>
+	</borderlayout>
+</window>

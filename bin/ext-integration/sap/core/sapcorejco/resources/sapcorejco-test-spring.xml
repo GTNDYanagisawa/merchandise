@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<alias alias="sapCoreRFCDirectoryDestinationProviderPaths" name="sapCoreDefaultRFCDirectoryDestinationProviderPaths" />
+	<bean id="sapCoreDefaultRFCDirectoryDestinationProviderPaths" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>
+				<!-- e.g. -->
+				<!-- <value>../../../ext-sapintegration/sap.hybris.frw.test/demoapp/</value> -->
+				<!-- <value>C:\dev\hybris\w52\hybris\bin\ext-sapintegration\sap.hybris.frw.test\demoapp\</value> -->
+			</list>
+		</constructor-arg>
+	</bean>
+
+
+	<alias alias="sapCoreRFCDirectoryDestinationProviderExtensions" name="sapCoreDefaultRFCDirectoryDestinationProviderExtensions" />
+	<bean id="sapCoreDefaultRFCDirectoryDestinationProviderExtensions" class="java.util.ArrayList">
+		<constructor-arg>
+			<list>				
+				<value>sapinternalessentials</value>  
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<alias alias="sapCoreRFCDirectoryDestinationProvider" name="sapCoreDefaultRFCDirectoryDestinationProvider" />
+	<bean id="sapCoreDefaultRFCDirectoryDestinationProvider" class=" de.hybris.platform.sap.core.jco.test.RFCDirectoryDestinationDataProvider"
+		init-method="init">
+		<property name="directoryPaths" ref="sapCoreRFCDirectoryDestinationProviderPaths" />
+		<property name="extensionNames" ref="sapCoreRFCDirectoryDestinationProviderExtensions" />
+	</bean>
+
+	<!-- ====================== -->
+	<!-- JMX MBeans -->
+	<!-- ====================== -->
+	<alias alias="sapCoreJCoConnectionMBean" name="sapCoreDefaultJCoConnectionMBean" />
+	<bean id="sapCoreDefaultJCoConnectionMBean"
+		class="de.hybris.platform.sap.core.jco.jmx.impl.JCoConnectionMBeanImpl" scope="tenant">
+		<property name="beanInterface"
+			value="de.hybris.platform.sap.core.jco.jmx.JCoConnectionMBean" />
+		<property name="jmxPath" value="jcoconnections=JCo Connections" />
+		<property name="longLifetime" value="180" />
+	</bean>
+</beans>

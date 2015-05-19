@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:file="http://www.springframework.org/schema/integration/file"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/file
+		http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<alias name="defaultFtpConfigTemplate" alias="ftpConfigTemplate"/>
+	<bean id="defaultFtpConfigTemplate" class="de.hybris.platform.acceleratorservices.dataexport.generic.config.ConfigurableFtpSessionFactory" >
+		<property name="host" value="localhost"/>
+		<property name="port" value="21"/>
+		<property name="username" value="anonymous"/>
+		<property name="password" value="anon@localhost"/>
+		<property name="clientMode" value="0"/>
+		<property name="fileType" value="2"/>
+		<property name="bufferSize" value="100000" />
+	</bean>
+
+	<alias name="defaultTransportService" alias="transportService"/>
+	<bean id="defaultTransportService" class="de.hybris.platform.acceleratorservices.dataexport.generic.impl.DefaultUploadTransportService" >
+		<property name="sessionFactory" ref="ftpConfigTemplate"/>
+		<property name="fileNameGenerator">
+			<bean class="org.springframework.integration.file.DefaultFileNameGenerator">
+				<property name="expression" value="headers.remoteFilename"/>
+			</bean>
+		</property>
+		<aop:scoped-proxy />
+	</bean>
+
+	<alias name="defaultUploadDataProcessorService" alias="uploadDataProcessorService"/>
+	<bean id="defaultUploadDataProcessorService" class="de.hybris.platform.acceleratorservices.dataexport.generic.impl.DefaultUploadDataProcessorService" >
+		<property name="cronJobDao" ref="cronJobDao"/>
+		<aop:scoped-proxy />
+	</bean>
+
+	<!-- generic transfer pipeline start -->
+
+	<int:channel id="uploadDataEventChannel"/>
+
+	<!-- Hybris event listener that pushes events onto the upload channel -->
+	<bean id="uploadDataEventListener" class="de.hybris.platform.acceleratorservices.dataexport.generic.event.ExportMessageSendingEventListener" parent="abstractEventListener">
+		<property name="eventClass" value="de.hybris.platform.acceleratorservices.dataexport.generic.event.UploadDataEvent"/>
+		<property name="channel" ref="uploadDataEventChannel" />
+		<property name="errorHandler">
+			<bean class="org.springframework.integration.channel.MessagePublishingErrorHandler"/>
+		</property>
+	</bean>
+
+	<!-- define custom error channel -->
+	<int:channel id="uploadDataErrorChannel"/>
+	<int:header-enricher input-channel="uploadDataEventChannel" output-channel="uploadFileScannerChannel">
+		<int:header name="directory" value="#{exportDataBaseDirectory}"/>
+		<int:header name="filenameRegex" value="^(.*).tsv"/>
+		<int:error-channel ref="uploadDataErrorChannel"/>
+	</int:header-enricher>
+
+	<int:channel id="uploadFileScannerChannel"/>
+
+	<!-- 1) Scan for files -->
+	<int:service-activator id="uploadDataScanner" ref="uploadDataProcessorService" method="findFiles" input-channel="uploadFileScannerChannel" output-channel="uploadDataFileInputChannel"/>
+
+	<int:channel id="uploadDataFileInputChannel"/>
+
+	<!-- 2) split each detected file within the message a deal with them separately -->
+	<int:splitter input-channel="uploadDataFileInputChannel" output-channel="uploadDataFileInputPostEnrich"/>
+
+	<!-- 3) add the configuration for this file to the header -->
+	<int:channel id="uploadDataFileInputPostEnrich"/>
+	<int:header-enricher input-channel="uploadDataFileInputPostEnrich" output-channel="uploadDataPostEnrich">
+		<int:header name="cronjob" ref="uploadDataProcessorService" method="getUploadCronJob"/>
+	</int:header-enricher>
+
+	<!-- name of the uploaded file on the remote system -->
+	<int:channel id="uploadDataPostEnrich"/>
+	<int:header-enricher input-channel="uploadDataPostEnrich" output-channel="uploadDataFileInputPostFilenameEnrich">
+		<int:header name="remoteFilename" expression="headers.cronjob.code + '.tsv'"/>
+	</int:header-enricher>
+
+	<int:channel id="uploadDataFileInputPostFilenameEnrich"/>
+
+	<!-- 4) move the file to a processing directory -->
+	<file:outbound-gateway request-channel="uploadDataFileInputPostFilenameEnrich" reply-channel="transportProcessingChannel"
+		directory="#{exportDataBaseDirectory}/processing" delete-source-files="true"/>
+
+	<int:publish-subscribe-channel id="transportProcessingChannel"/>
+
+	<!-- 5) push the file out to the external location -->
+	<int:outbound-channel-adapter id="transportFileAdapter" ref="transportService" method="handleMessage"
+		channel="transportProcessingChannel" order="1"/>
+
+	<!-- 6) move the file to the complete folder -->
+	<file:outbound-gateway request-channel="transportProcessingChannel" reply-channel="nullChannel"
+		directory="#{exportDataBaseDirectory}/complete" delete-source-files="true" order="2"/>
+
+	<!-- generic transfer pipeline end -->
+
+	<int:channel id="moveErrorFileChannel"/>
+	<int:service-activator ref="uploadDataProcessorService" method="handlerError" input-channel="uploadDataErrorChannel" output-channel="moveErrorFileChannel"/>
+
+	<file:outbound-gateway request-channel="moveErrorFileChannel" reply-channel="nullChannel"
+		directory="#{exportDataBaseDirectory}/error" delete-source-files="true"/>
+</beans>
+

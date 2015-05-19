@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+	[y] hybris Platform
+	
+	Copyright (c) 2000-2013 hybris AG
+	All rights reserved.
+	
+	This software is the confidential and proprietary information of hybris
+	("Confidential Information"). You shall not disclose such Confidential
+	Information and shall use it only in accordance with the terms of the
+	license agreement you entered into with hybris.
+	
+	 
+-->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+	<collectiontypes>
+		<collectiontype code="SampleWizardStringList"
+			elementtype="java.lang.String" autocreate="true" generate="false"
+			type="list" />
+		<collectiontype code="SampleWizardUnitSet" elementtype="Unit"
+			autocreate="true" generate="false" type="set" />		
+	</collectiontypes>
+
+	<enumtypes>
+		<enumtype code="HistoryActionType" autocreate="true"
+			generate="true">
+			<value code="created" />
+			<value code="modified" />
+			<value code="removed" />
+			<value code="viewed" />
+			<value code="unspecified" />
+		</enumtype>		
+
+	</enumtypes>
+
+	<maptypes />
+
+	<relations>
+		
+	</relations>
+
+	<itemtypes>
+
+		<itemtype code="WizardBusinessItem" generate="true"
+			jaloclass="de.hybris.platform.hmc.jalo.WizardBusinessItem"
+			jaloonly="true" extends="LocalizableItem" autocreate="true">
+			<attributes />
+			<model generate="false"/>
+		</itemtype>
+
+
+		<itemtype code="SampleWizard" generate="true"
+			jaloclass="de.hybris.platform.hmc.jalo.SampleWizard"
+			jaloonly="true" extends="WizardBusinessItem" autocreate="true">
+			<attributes>
+				<attribute type="java.lang.Integer"
+					qualifier="seconds">
+					<modifiers optional="true" read="true" write="true"
+						search="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="localized:java.lang.String"
+					qualifier="localizedField">
+					<modifiers optional="true" read="true" write="true"
+						search="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="SampleWizardStringList"
+					qualifier="stringList">
+					<modifiers optional="true" read="true" write="true"
+						search="false" />
+					<persistence type="property" />
+					<defaultvalue>
+						Arrays.asList( new String[]{ "Blah", "Fasel",
+						"WasAuchImmer" } )
+					</defaultvalue>
+				</attribute>
+				<attribute type="SampleWizardUnitSet"
+					qualifier="unitList">
+					<modifiers optional="true" read="true" write="true"
+						search="false" />
+					<persistence type="property" />
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+
+
+		<itemtype code="HMCHistoryEntry" generate="true"
+			jaloclass="de.hybris.platform.hmc.jalo.HMCHistoryEntry"
+			extends="GenericItem" autocreate="true">
+			<deployment table="HMCHistoryEntries" typecode="333"/>
+			<attributes>
+				<attribute qualifier="user" type="User">
+					<description>User</description>
+					<modifiers read="true" write="true" search="true"
+						optional="false"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="timestamp"
+					type="java.util.Date">
+					<description>Timestamp</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="actionType"
+					type="HistoryActionType">
+					<description>type of action</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="comment"
+					type="java.lang.String">
+					<description>Comment</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="referencedItem" type="Item">
+					<description>Item</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		
+		<itemtype code="ComposedType" generate="false"
+			autocreate="false">
+			<attributes>
+				<attribute qualifier="hmcIcon" type="Media">
+					<description>HMCIcon</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="logHMCChanges" type="java.lang.Boolean">
+					<description>whether or not log changes to items of this type via hmc</description>
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+					<modifiers read="true" write="true" search="true" optional="false"/>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Item" generate="false" autocreate="false">
+			<attributes>
+				<!-- replaced by 1-n relation !
+				<attribute qualifier="savedValues" type="SavedValuesCollection">
+					<modifiers read="true" write="false" search="true" optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				-->
+			</attributes>
+		</itemtype>
+
+		<itemtype code="User" generate="false" autocreate="false">
+			<attributes>
+				<!-- moved to core 
+              <attribute qualifier="hmcLoginDisabled" type="java.lang.Boolean">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute> 
+				<attribute autocreate="true" qualifier="userprofile" type="UserProfile">
+               		<modifiers read="true" write="true" partof="true"/>
+               		<persistence type="property"/>
+            	</attribute>
+             -->
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="UserGroup" generate="false"
+			autocreate="false">
+			<attributes>
+             <attribute qualifier="hmcLoginDisabled" type="java.lang.Boolean">
+                <modifiers read="true" write="true" search="true" optional="true" />
+                <persistence type="property" />
+             </attribute>
+           <!-- moved to core    
+             <attribute qualifier="writeableLanguages" type="LanguageCollection">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="readableLanguages" type="LanguageCollection">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute> 
+				<attribute qualifier="hmcXML"
+					type="java.lang.String">
+					<modifiers read="true" write="true" search="false" optional="true" dontOptimize="true" />
+					<persistence type="property" />
+				</attribute>
+           -->
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ImportExportUserRightsWizard" generate="true" autocreate="true" 
+			extends="WizardBusinessItem" jaloonly="true"	
+			jaloclass="de.hybris.platform.hmc.jalo.ImportExportUserRightsWizard">
+			<attributes>
+				<attribute qualifier="exportAllPrincipals" type="java.lang.Boolean">
+					<modifiers read="true" write="true" search="false" optional="false" />
+					<persistence type="property" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="fieldseperatorchar" type="java.lang.Character">
+					<modifiers read="true" write="true" search="false" optional="false" />
+					<persistence type="property" />
+					<defaultvalue>Character.valueOf(';')</defaultvalue>
+				</attribute>
+				<attribute qualifier="textseperatorchar" type="java.lang.Character">
+					<modifiers read="true" write="true" search="false" optional="false" />
+					<persistence type="property" />
+					<defaultvalue>Character.valueOf('"')</defaultvalue>
+				</attribute>
+				<attribute qualifier="dataseperatorchar" type="java.lang.Character">
+					<modifiers read="true" write="true" search="false" optional="false" />
+					<persistence type="property" />
+					<defaultvalue>Character.valueOf(',')</defaultvalue>
+				</attribute>
+
+			</attributes>
+
+		</itemtype>
+
+		<itemtype code="ImportUserRightsWizard" generate="true" autocreate="true" 
+			extends="ImportExportUserRightsWizard" jaloonly="true"	
+			jaloclass="de.hybris.platform.hmc.jalo.ImportUserRightsWizard">
+			<attributes>
+				<attribute qualifier="importmedia" type="Media">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ExportUserRightsWizard" generate="true" autocreate="true" 
+			extends="ImportExportUserRightsWizard" jaloonly="true"	
+				jaloclass="de.hybris.platform.hmc.jalo.ExportUserRightsWizard">
+			<attributes>
+				<attribute qualifier="exportmedia" type="Media">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+
+<!-- WARNING: This is the Spring WEB configuration file. If you want to replace 
+	items or managers you have to do this from the extensions core configuration 
+	file (cmscockpit/resources/cmscockpit-application-context.xml) -->
+
+<!-- WARNING: This file is imported in cmscockpit-web-spring.xml therfore you don't need 
+	to list it in your deployment descriptor -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+	
+	<!--#### Navigation perspective #### -->
+	<alias alias="navigationNodesInspectorRenderer" name="defaultNavigationNodesInspectorRenderer" />
+	<bean id="defaultNavigationNodesInspectorRenderer" class="de.hybris.platform.cmscockpit.components.inspector.impl.NavigationNodesInspectorRenderer" scope="tenant">
+		<property name="navigationNodeConfig">
+			<map>
+				<entry key="cmscockpit.navigationnodes.inspector.properties" value="uid,name,title,visible" />
+				<entry key="cmscockpit.navigationnodes.inspector.navigation" value="parent,children"/>
+				<entry key="cmscockpit.navigationnodes.inspector.linkedItems" value="entries"/>
+				<entry key="cmscockpit.navigationnodes.inspector.administration" value="pk,creationtime,modifiedtime"/>
+			</map>
+		</property>
+		<property name="contentPageConfig">
+			<map>
+				<entry key="cmscockpit.navigationnodes.inspector.properties" value="uid,masterTemplate,label,defaultPage,homepage" />
+				<entry key="cmscockpit.navigationnodes.inspector.contextVisibility" value="restrictions" />
+				<entry key="cmscockpit.navigationnodes.inspector.navigation" value="navigationNodeList" />
+				<entry key="cmscockpit.navigationnodes.inspector.administration" value="pk,contentSlots,creationtime,modifiedtime" />
+			</map>
+		</property>
+		<property name="mediaConfig">
+			<map>
+				<entry key="cmscockpit.navigationnodes.inspector.properties" value="realFileName,altText,code,url,mime" />
+				<entry key="cmscockpit.navigationnodes.inspector.administration" value="pk" />
+			</map>
+		</property>
+		<property name="linkConfig">
+			<map>
+				<entry key="cmscockpit.navigationnodes.inspector.properties" value="uid,visible,linkName,external,contentPage,product,category,url,target" />
+				<entry key="cmscockpit.navigationnodes.inspector.contextVisibility" value="restrictions" />
+				<entry key="cmscockpit.navigationnodes.inspector.administration" value="pk,slots,creationtime,modifiedtime" />
+			</map>
+		</property>
+		<property name="valueService" ref="valueService" />
+		<property name="typeService" ref="cockpitTypeService" />
+		<property name="mediaInfoService" ref="mediaInfoService" />
+	</bean>
+	
+	<bean id="NavigationNodePerspective"
+		class="de.hybris.platform.cmscockpit.session.impl.NavigationNodePerspective"
+		scope="session" parent="BasePerspective" autowire="byName">
+		<property name="uid" value="cmscockpit.perspective.navigation" />
+		<property name="label" value="cmscockpit.perspective.navigation" />
+		 <property name="customCsaURI" value="/cmscockpit/catalogCSA.zul" />
+		<property name="navigationArea">
+			<ref bean="NavigationNodeNavigationArea" />
+		</property>
+		<property name="browserArea">
+			<bean class="de.hybris.platform.cmscockpit.session.impl.NavigationNodeBrowserArea">
+				<!-- <property name="rootSearchTypeCode" value="AbstractPage" />  todo change to navigationNode -->
+				<property name="viewURI" value="/cmscockpit/navigationNodesBrowser.zul" />
+				<property name="defaultBrowserClass" value="de.hybris.platform.cmscockpit.session.impl.NavigationNodeBrowserModel"/>
+				<property name="defaultBrowserViewMapping">
+					<map>
+						<entry key="cockpitgroup" value="GRID" />
+						<entry key="cmsmanagergroup" value="GRID" />
+					</map>
+				</property>
+	            <property name="inspectorRenderer" ref="navigationNodesInspectorRenderer"/>
+	            <property name="openInspectorOnSelect" value="true"/>				
+			</bean>
+		</property>
+		<property name="editorArea">
+			<bean id="navigationEditorAreaModel" parent="BaseEditorAreaModel">
+				<!--<property name="editorAreaController">
+					<ref bean="CatalogViewEditorAreaController" />
+				</property>
+			--></bean>
+		</property>
+		<property name="popupEditorArea">
+			<bean id="navigationPopupEditor" parent="BasePopupEditor">
+				<!--<property name="editorAreaController">
+					<ref bean="CmsPopupEditorAreaController" />
+				</property>
+			--></bean>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService" />
+	</bean>
+	
+	<bean id="NavigationNodeNavigationArea" class="de.hybris.platform.cmscockpit.session.impl.NavigationNodeNavigationArea" parent="BaseNavigationArea">
+		<property name="sectionModel">
+			<ref bean="NavigationNodeNavigationAreaSectionModel" />
+		</property>
+		<property name="sections">
+			<list>
+				<!-- <ref bean="CatalogSpecialCollectionsSection" />-->
+				<ref bean="WebsiteSelectorSection" />
+				<!-- <ref bean="CatalogQuerySection" />
+				<ref bean="CmsUndoSection" />-->
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="NavigationNodeNavigationAreaSectionModel" class="de.hybris.platform.cmscockpit.components.navigationarea.NavigationNodeNavigationAreaModel"
+		scope="session">
+	</bean>
+	
+	<bean id="WebsiteSelectorSection"
+		class="de.hybris.platform.cmscockpit.components.sectionpanel.WebsitesSelectorSection"
+		scope="session" autowire="byName">
+		<property name="localizedLabel" value="navigationarea.websites" />
+		<property name="initiallySelected" value="false" />
+		<property name="visible" value="true" />
+		<property name="subSections">
+			<list>
+				<ref bean="WebsiteCatalogVersionSelectorSection" />
+			</list>
+		</property>
+		<!-- comment out the next lines in order to use the default cockpit selector 
+			renderer -->
+		<property name="renderer">
+			<bean
+				class="de.hybris.platform.cmscockpit.components.sectionpanel.renderer.SiteSectionSelectorSectionRenderer"
+				autowire="byName" />
+		</property>
+		<property name="navigationAreaModel" ref="NavigationNodeNavigationAreaSectionModel" />
+	</bean>
+
+	<bean id="WebsiteCatalogVersionSelectorSection"
+		class="de.hybris.platform.cmscockpit.components.sectionpanel.WebsiteCatalogVersionSelectorSection"
+		scope="prototype" autowire="byName">
+		<property name="localizedLabel" value="navigationarea.catalogs" />
+		<property name="initiallySelected" value="false" />
+		<property name="visible" value="true" />
+		<!-- comment out the next lines in order to use the default cockpit selector 
+			renderer -->
+		<property name="renderer">
+			<bean class="de.hybris.platform.cmscockpit.components.sectionpanel.renderer.CatalogVersionSectionSelectorSectionRenderer"
+				autowire="byName" />
+		</property>
+		<property name="navigationAreaModel" ref="NavigationNodeNavigationAreaSectionModel" />
+	</bean>
+	
+	<bean id="navigationNodeController" class="de.hybris.platform.cmscockpit.navigationnode.browserarea.tree.NavigationNodeController"
+		scope="session">
+		<property name="typeService" ref="cockpitTypeService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="cmsNavigationService" ref="cmsNavigationService"/>
+		<property name="navigationNodeWizardId" value="defaultNavigationNodeWizard"/>
+		<property name="relatedResourceWizardId" value="defaultNavigationItemsWizard"/>
+	</bean>
+
+	<bean id="relatedItemListController" class="de.hybris.platform.cmscockpit.navigationnode.browserarea.list.RelatedItemListController" scope="session">
+		<property name="cmsNavigationService" ref="cmsNavigationService"/>
+	</bean>
+	<bean id="navigationNodeRenderer" class="de.hybris.platform.cmscockpit.navigationnode.browserarea.tree.NavigationNodeRenderer" scope="tenant">
+		<property name="labelService" ref="labelService"/>
+	</bean>
+	
+	<alias name="cmscockpitNavigationNodeConfig" alias="cmscockpitNavigationNodeConfig"/>
+	<bean id="cmscockpitNavigationNodeConfig" scope="tenant" class="org.springframework.beans.factory.config.ListFactoryBean" >
+	<property name="sourceList">
+			<list>
+				<value>ContentPage</value> 
+				<value>Media</value>
+				<value>CMSLinkComponent.ExternalLink</value>
+			</list>
+	</property>		
+	</bean>
+	
+	<!-- Wizards for creating navigation node -->
+	<import resource="cmscockpit-spring-navigation-node-wizard.xml"/>
+	
+	<!-- Wizards for creating items for navigation node -->
+	<import resource="cmscockpit-spring-navigation-items-wizard.xml"/>
+	
+</beans>

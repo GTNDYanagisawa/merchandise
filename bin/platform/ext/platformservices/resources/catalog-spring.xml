@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+	
+	<alias alias="catalogService" name="defaultCatalogService"/>
+	<bean id="defaultCatalogService" class="de.hybris.platform.catalog.impl.DefaultCatalogService" parent="abstractBusinessService">
+		<property name="catalogDao" ref="catalogDao"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+	</bean>
+	
+	<alias alias="catalogVersionService" name="defaultCatalogVersionService"/>
+	<bean id="defaultCatalogVersionService" class="de.hybris.platform.catalog.impl.DefaultCatalogVersionService" parent="abstractBusinessService">
+		<property name="catalogVersionDao" ref="catalogVersionDao"/>
+		<property name="userService" ref="userService"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+	</bean>
+
+	<alias alias="catalogTypeService" name="defaultCatalogTypeService"/>
+	<bean id="defaultCatalogTypeService" class="de.hybris.platform.catalog.impl.DefaultCatalogTypeService" parent="abstractBusinessService">
+		<property name="catalogTypeDao" ref="catalogTypeDao"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>	
+	</bean>
+	
+	<alias name="defaultCatalogTypeDao" alias="catalogTypeDao"/>
+	<bean id="defaultCatalogTypeDao" class="de.hybris.platform.category.daos.impl.DefaultCatalogTypeDao">
+		<property name="composedTModelGenericDao" ref="composedTModelGenericDao"/>
+	</bean>
+
+	<bean name="composedTModelGenericDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="ComposedType" />
+	</bean>
+	
+	<alias alias="catalogDao" name="defaultCatalogDao"/>
+	<bean id="defaultCatalogDao" class="de.hybris.platform.catalog.daos.impl.DefaultCatalogDao" />
+	
+	<alias alias="catalogVersionDao" name="defaultCatalogVersionDao"/>
+	<bean id="defaultCatalogVersionDao" class="de.hybris.platform.catalog.daos.impl.DefaultCatalogVersionDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<alias alias="productReferenceService" name="defaultProductReferenceService"/>
+	<bean id="defaultProductReferenceService" class="de.hybris.platform.catalog.references.impl.DefaultProductReferenceService" parent="abstractBusinessService">
+		<property name="productReferencesDao" ref="productReferencesDao"/>
+	</bean>
+	
+	<alias name="defaultProductReferencesDao" alias="productReferencesDao"/>
+	<bean id="defaultProductReferencesDao" class="de.hybris.platform.catalog.references.daos.impl.DefaultProductReferencesDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<!-- Generic validator for checking unique catalog version keys -->
+	<bean id="uniqueCatalogItemValidator" class="de.hybris.platform.product.impl.UniqueCatalogItemInterceptor">
+		<property name="catalogTypeService" ref="catalogTypeService"/>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+	
+	<!-- Exclude priceRows, catalogversion is not mandatory  -->
+	<bean id="pdtRowVoidInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="VoidInterceptor"/>
+ 		<property name="typeCode" value="PDTRow"/>
+ 		<property name="replacedInterceptors" ref="uniqueCatalogItemValidator"/>
+ 	</bean>
+
+	<bean id="uniqueClassificationItemValidator" class="de.hybris.platform.product.impl.UniqueClassificationSystemItemInterceptor"  parent="uniqueCatalogItemValidator">
+		<property name="catalogTypeService" ref="catalogTypeService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="categoryService" ref="categoryService" />
+	</bean>
+
+	<!-- Preparer which generates codes for new SyncItemJob models if none has been specified -->
+	<bean id="SyncItemJobPreparer" class="de.hybris.platform.catalog.impl.SyncItemJobPreparer" />
+	
+	<bean id="uniqueCatalogItemValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="uniqueCatalogItemValidator"/>
+		<property name="typeCode" value="Item"/>
+	</bean>
+	
+	<bean id="syncItemJobPrepareMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="SyncItemJobPreparer"/>
+		<property name="typeCode" value="SyncItemJob"/>
+	</bean>
+	
+	<bean id="classAttributeAssignmentUniqueClassificationItemValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="uniqueClassificationItemValidator"/>
+		<property name="typeCode" value="ClassAttributeAssignment"/>
+		<property name="replacedInterceptors" ref="uniqueCatalogItemValidator"/>
+	</bean>
+	
+	<bean id="itemSyncTimeStampValidator" class="de.hybris.platform.catalog.impl.ItemSyncTimeStampValidator" />	
+		
+	<bean id="itemSyncTimeStampPreparer" class="de.hybris.platform.catalog.impl.ItemSyncTimeStampPreparer">
+		<!-- property name="modelService" ref="modelService"/-->		
+	</bean>
+	
+	<bean id="productFeaturePrepareInterceptor" class="de.hybris.platform.catalog.impl.ProductFeaturePrepareInterceptor" />	
+	
+	
+	<bean id="itemSyncTimeStampValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="itemSyncTimeStampValidator"/>
+		<property name="typeCode" value="ItemSyncTimestamp"/>
+		<!-- property name="replacedInterceptors" ref="MandatoryAttributesValidator"/-->
+	</bean>		
+	
+	<bean id="itemSyncTimeStampPrepareMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="itemSyncTimeStampPreparer"/>
+		<property name="typeCode" value="ItemSyncTimestamp"/>
+	</bean>
+	
+	<bean id="productFeaturePrepareMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="productFeaturePrepareInterceptor"/>
+		<property name="typeCode" value="ProductFeature"/>
+	</bean>
+	
+	<bean id="syncAttributeDescriptorConfigValidator" class="de.hybris.platform.catalog.impl.SyncAttributeDescriptorConfigValidator">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>	
+		
+	<bean id="syncAttributeDescriptorConfigPreparer" class="de.hybris.platform.catalog.impl.SyncAttributeDescriptorConfigPreparer" />	
+	
+	
+	<bean id="syncAttributeDescriptorConfigValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="syncAttributeDescriptorConfigValidator"/>
+		<property name="typeCode" value="SyncAttributeDescriptorConfig"/>
+	</bean>		
+	
+	<bean id="syncAttributeDescriptorConfigPrepareMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="syncAttributeDescriptorConfigPreparer"/>
+		<property name="typeCode" value="SyncAttributeDescriptorConfig"/>
+	</bean>
+
+	<bean id="catalogVersionSyncScheduleMediaPreparer" class="de.hybris.platform.catalog.impl.CatalogVersionSyncScheduleMediaPreparer">
+			<property name="mediaService" ref="mediaService"/>			
+	</bean>	
+
+	<!-- Catalog -->
+	<bean id="catalogPrepareInterceptor" class="de.hybris.platform.catalog.interceptors.CatalogPrepareInterceptor">
+		<property name="catalogService" ref="catalogService"/>
+	</bean>
+	<bean id="prepareCatalogMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="catalogPrepareInterceptor"/>
+		<property name="typeCode" value="Catalog"/>
+	</bean>
+	
+	<bean id="catalogURLPatternsValidator" class="de.hybris.platform.catalog.interceptors.CatalogURLPatternsValidator" />
+	<bean id="catalogURLPatternsValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="catalogURLPatternsValidator"/>
+		<property name="typeCode" value="Catalog"/>
+	</bean>
+
+	<bean id="catalogVersionSyncScheduleMediaValidator" class="de.hybris.platform.catalog.interceptors.CatalogVersionSyncScheduleMediaValidator" />
+	<bean id="catalogVersionSyncScheduleMediaValidatorMapping"
+			class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="catalogVersionSyncScheduleMediaValidator"/>
+		<property name="typeCode" value="CatalogVersionSyncScheduleMedia"/>
+	</bean>
+
+	<bean id="checkVersionsRemoveInterceptor" class="de.hybris.platform.catalog.interceptors.CheckVersionsRemoveInterceptor">
+		<property name="catalogVersionDao" ref="catalogVersionDao"/>
+		<property name="l10nService" ref="l10nService"/>
+	</bean>		
+	
+	<bean id="checkVersionsRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="checkVersionsRemoveInterceptor"/>
+		<property name="typeCode" value="Catalog"/>
+		<property name="order" value="1"/>
+	</bean>
+	
+	<bean id="checkVersionsRemoveInterceptorCatalogVersionMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="checkVersionsRemoveInterceptor"/>
+		<property name="typeCode" value="CatalogVersion"/>		
+	</bean>
+
+	<bean id="defaultCatalogRemoveInterceptor" class="de.hybris.platform.catalog.interceptors.DefaultCatalogRemoveInterceptor">
+		<property name="l10nService" ref="l10nService"/>
+	</bean>		
+	
+	<bean id="defaultCatalogRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="defaultCatalogRemoveInterceptor"/>
+		<property name="typeCode" value="Catalog"/>
+		<property name="order" value="0"/>
+	</bean>
+
+	<bean id="syncTimestampsRemoveInterceptor"  class="de.hybris.platform.catalog.interceptors.SyncTimestampsRemoveInterceptor">
+		<property name="itemSyncTimestampDao" ref="itemSyncTimestampDao"/>			
+	</bean>
+	
+	<bean id="syncTimestampsRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="syncTimestampsRemoveInterceptor"/>
+		<property name="typeCode" value="Item"/>		
+	</bean>
+
+	<bean id="syncTimestapsForCatalogRemoveInterceptor"  class="de.hybris.platform.catalog.interceptors.SyncTimestapsForCatalogVersionRemoveInterceptor">
+		<property name="itemSyncTimestampDao" ref="itemSyncTimestampDao"/>		
+	</bean>
+	
+	<alias name="defaultItemSyncTimestampDao" alias="itemSyncTimestampDao"/>
+	<bean name="defaultItemSyncTimestampDao" class="de.hybris.platform.catalog.daos.impl.DefaultItemSyncTimestampDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="syncTimestapsForCatalogRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="syncTimestapsForCatalogRemoveInterceptor"/>
+		<property name="typeCode" value="CatalogVersion"/>		
+	</bean>
+
+	<bean id="productRemoveInterceptor"  class="de.hybris.platform.catalog.interceptors.ProductRemoveInterceptor">		
+		<property name="productReferencesDao" ref="productReferencesDao"/>
+	</bean>
+	
+	<bean id="productRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="productRemoveInterceptor"/>
+		<property name="typeCode" value="Product"/>		
+	</bean>
+
+	<!-- Catalog END -->
+	
+	<!-- Keyword -->
+	<alias name="defaultKeywordService" alias="keywordService"/>
+	<bean id="defaultKeywordService" class="de.hybris.platform.catalog.impl.DefaultKeywordService">
+		<property name="keywordDao" ref="keywordDao"/>
+	</bean>
+
+	<alias name="defaultKeywordDao" alias="keywordDao"/>
+	<bean id="defaultKeywordDao" class="de.hybris.platform.catalog.daos.impl.DefaultKeywordDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<!-- Keyword END -->
+	
+	<!-- CatalogVersion -->
+	
+	<bean id="catalogVersionPrepareInterceptor" class="de.hybris.platform.catalog.interceptors.CatalogVersionPrepareInterceptor" />
+	
+	<bean id="prepareCatalogVersionsMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="catalogVersionPrepareInterceptor"/>
+		<property name="typeCode" value="CatalogVersion"/>
+	</bean>
+	
+	<!-- CatalogVersion END -->
+	
+	<!-- FlexibleSearch preprocessors -->
+	<bean id="catalogVersionQueryPreprocessor" class="de.hybris.platform.catalog.search.preprocessor.CatalogVersionQueryPreprocessor">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+	</bean>
+	
+	<bean id="europe1.manager" class="de.hybris.platform.catalog.jalo.CatalogAwareEurope1PriceFactory" init-method="init"	destroy-method="destroy">
+		<property name="retrieveChannelStrategy" ref="retrieveChannelStrategy"/>
+	</bean>
+		
+</beans>

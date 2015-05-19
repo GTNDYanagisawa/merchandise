@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- ~ [y] hybris Platform ~ ~ Copyright (c) 2000-2013 hybris AG ~ All rights 
+	reserved. ~ ~ This software is the confidential and proprietary information 
+	of hybris ~ ("Confidential Information"). You shall not disclose such Confidential 
+	~ Information and shall use it only in accordance with the terms of the ~ 
+	license agreement you entered into with hybris. -->
+
+<!-- ATTENTION: This is just an example file. You have to edit it according 
+	to your needs. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+	<relations>
+		<relation code="BaseStore2OndemandBaseStorePreferenceRel"
+			generate="true" localized="false" autocreate="true">
+			<description>This relation connects BaseStore to a OndemandTenantBaseStorePreference.</description>
+			<sourceElement type="BaseStore" cardinality="one"
+				qualifier="baseStore" />
+			<targetElement type="OndemandBaseStorePreference"
+				cardinality="many" qualifier="ondemandBaseStorePreferences"
+				collectiontype="list" />
+		</relation>
+	</relations>
+
+	<itemtypes>
+		<typegroup name="Ondemand BaseStore Preference Types">
+			<itemtype code="OndemandBaseStorePreference" extends="GenericItem"
+				jaloclass="de.hybris.platform.integration.commons.jalo.OndemandBaseStorePreference"
+				autocreate="true" generate="true">
+				<deployment table="OnDemStorePref" typecode="6222" />
+				<attributes>
+					<attribute qualifier="externalCallsEnabled" type="boolean">
+						<persistence type="property" />
+						<modifiers unique="false" optional="false" />
+					</attribute>
+					<attribute qualifier="atsFormula" type="java.lang.String">
+						<persistence type="property"/>
+						<modifiers unique="false" optional="true"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+
+		<typegroup name="Order">
+			<itemtype code="AbstractOrder" autocreate="false" generate="false">
+				<description>Extending AbstractOrder type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="deliveryFromAddress" type="Address">
+						<description>The address where the order is to be shipped from.</description>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+
+	</itemtypes>
+</items>

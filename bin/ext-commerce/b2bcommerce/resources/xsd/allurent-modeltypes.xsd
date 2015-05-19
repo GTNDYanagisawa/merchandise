@@ -1,0 +1,1276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2009 Allurent, Inc. All Rights Reserved. No use, copying or 
+	distribution of this work may be made except in accordance with a valid license 
+	agreement from Allurent. This notice must be included on all copies, modifications 
+	and derivatives of this work. Allurent makes no representations or warranties 
+	about the suitability of the software, either express or implied, including 
+	but not limited to the implied warranties of merchantability, fitness for 
+	a particular purpose, or non-infringement. Allurent shall not be liable for 
+	any damages suffered by licensee as a result of using, modifying or distributing 
+	this software or its derivatives. Allurent on Demand version: 3.0 Generated: 
+	2010.02.12 at 10:00:04 EST Build: @VERSION_ID@ -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="getProducts">
+		<xsd:annotation>
+			<xsd:documentation>
+				Response for returning information about a product
+				of product subclass.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="ProductList">
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="getCategories">
+		<xsd:annotation>
+			<xsd:documentation>
+				Response for returning information about
+				categories.
+            </xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="CategoryList">
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="addToCartResponse">
+		<xsd:annotation>
+			<xsd:documentation>
+				Response to a request to add an item to the cart.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="code" type="xsd:string" minOccurs="1">
+					<xsd:annotation>
+						<xsd:documentation>
+							Result code for the add to cart request.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="message" type="xsd:string" minOccurs="0">
+					<xsd:annotation>
+						<xsd:documentation>
+							Optional message explaining the add to cart
+							code that can be displayed to
+							the end user.
+                                </xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="Asset">
+		<xsd:annotation>
+			<xsd:documentation>
+				An asset is an entity that is external to the
+				system.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="title" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Title of the asset.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="description" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Description of the asset.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="role" type="xsd:string" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						The purpose of the asset.&#10; This is typically
+						one of the following
+						values:&#10; large&#10; standard&#10; swatch
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="format" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						MIME type of the asset.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="identifier" type="xsd:string"
+				minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						URI of the asset, typically a URL.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="AssetList">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Asset" type="Asset" />
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="Category">
+		<xsd:annotation>
+			<xsd:documentation>
+				A category represents a group of categories and
+				products in the&#10;
+				catalog.
+            </xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="uri" type="xsd:string" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>URI of the object.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="title" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Title of the category.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="description" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Description of the category.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="relatedAssets" type="AssetList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						List of assets associated with the
+						category.&#10; For instance, URL
+						links to related pages.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="childCategories" type="CategoryList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Categories this category is a parent of.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="childProducts" type="ProductList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Products this category is a parent of.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="customProperties" type="PropertyList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						additional properties associated with this
+						Category.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="CategoryList">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Category" type="Category" />
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="Dimension">
+		<xsd:annotation>
+			<xsd:documentation>
+				Describes how a child product varies.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="property" type="xsd:string" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						URI of the property that child vary by
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="displayName" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Text to show in UI for name of this dimension.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="DimensionList">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Dimension" type="Dimension" />
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="Product">
+		<xsd:annotation>
+			<xsd:documentation>
+				A product represents an item in the catalog.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="uri" type="xsd:string" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>URI of the object.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="productId" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						productId associated with the product
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="availability" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						If set to "notAvailable", indicates that the
+						product is unavailable.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="title" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Title of the product.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="category" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Basic category for analytics purposes
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="structure" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="ProductStructure" type="ProductStructure">
+							<xsd:annotation>
+								<xsd:documentation>
+									Information about how child products are
+									associated with&#10; this
+									product.
+                                </xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="childProducts" type="ProductList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Child products. For a Product instance the
+						children are Skus. Skus&#10;
+						are leaf nodes in the catalog tree and
+						do not have child products.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="longTitle" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						long Title
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="longDescription" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						long Description
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="mfgStyle" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						manufacturer style
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="brand" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Brand" type="Brand">
+							<xsd:annotation>
+								<xsd:documentation>
+									product brand
+                                </xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="description" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Description of the product.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="inventoryStatus" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Inventory status of the product.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="availableDate" type="xsd:date"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Date that the product is available.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="prices" type="Prices" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						list of Price
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="extendedAttributes" type="AttributeList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Dynamic product properties defined at runtime.
+						This is essentially&#10; a
+						map of name-value pairs and provides a
+						way to extend the data&#10;
+						model.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="crosssells" type="ProductList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Cross-sell products associated with this
+						product.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="relatedAssets" type="AssetList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						List of assets associated with the product.&#10;
+						For instance, URL
+						links to related pages.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="assetViews" type="AssetViews"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						List of AssetViews for this product. There is
+						one asset view&#10; for
+						each alternative image, including the main
+						image.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="promo" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Promo" type="Promo">
+							<xsd:annotation>
+								<xsd:documentation>
+									Product promotional message.
+								</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="sizeChart" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="SizeChart" type="SizeChart">
+							<xsd:annotation>
+								<xsd:documentation>
+									Product size chart.
+                                </xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="rating" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Rating" type="Rating">
+							<xsd:annotation>
+								<xsd:documentation>
+									Product review rating.
+                                </xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="customProperties" type="PropertyList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						additional properties associated with this
+						Product.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="maxPurchaseQuantity" type="xsd:int"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						This property is used to indicate the maximum
+						quantity of a Product
+						that can be purchased at one time. This value
+						maybe&#10; set on
+						the Product level or set on each individual Sku.
+						The value of
+						maxPurchaseQuantity must always be &gt;= 1.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="ProductList">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Product" type="Product" />
+			<xsd:element name="Sku" type="Sku" />
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="LargeProductList">
+		<xsd:annotation>
+			<xsd:documentation>A large list type.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="uri" type="xsd:string" />
+			<xsd:element name="length" type="xsd:int" />
+			<xsd:element minOccurs="0" maxOccurs="unbounded" name="ranges"
+				type="LargeProductListRange" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="LargeProductListRange">
+		<xsd:annotation>
+			<xsd:documentation>A subrange of LargeProductList.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="startIndex" type="xsd:int" />
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:element name="Product" type="Product" />
+				<xsd:element name="Sku" type="Sku" />
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="Sku">
+		<xsd:annotation>
+			<xsd:documentation>
+				A Sku is a fully specified product (i.e., both
+				color and&#10; size of
+				the product have been chosen). Skus have no
+				children.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="uri" type="xsd:string" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>URI of the object.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="productId" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						productId associated with the product
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="availability" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						If set to "notAvailable", indicates that the
+						product is unavailable.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="title" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Title of the product.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="category" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Basic category for analytics purposes
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="structure" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="ProductStructure" type="ProductStructure">
+							<xsd:annotation>
+								<xsd:documentation>
+									Information about how child products are
+									associated with&#10; this
+									product.
+                                </xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="childProducts" type="ProductList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Child products. For a Product instance the
+						children are Skus. Skus&#10;
+						are leaf nodes in the catalog tree and
+						do not have child products.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="longTitle" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						long Title
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="longDescription" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						long Description
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="mfgStyle" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						manufacturer style
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="brand" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Brand" type="Brand">
+							<xsd:annotation>
+								<xsd:documentation>
+									product brand
+                                </xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="description" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Description of the product.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="inventoryStatus" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Inventory status of the product.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="availableDate" type="xsd:date"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Date that the product is available.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="prices" type="Prices" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						list of Price
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="extendedAttributes" type="AttributeList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Dynamic product properties defined at runtime.
+						This is essentially&#10; a
+						map of name-value pairs and provides a
+						way to extend the data&#10;
+						model.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="crosssells" type="ProductList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Cross-sell products associated with this
+						product.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="relatedAssets" type="AssetList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						List of assets associated with the product.&#10;
+						For instance, URL
+						links to related pages.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="assetViews" type="AssetViews"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						List of AssetViews for this product. There is
+						one asset view&#10; for
+						each alternative image, including the main
+						image.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="promo" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Promo" type="Promo">
+							<xsd:annotation>
+								<xsd:documentation>
+									Product promotional message.
+								</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="sizeChart" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="SizeChart" type="SizeChart">
+							<xsd:annotation>
+								<xsd:documentation>
+									Product size chart.
+                                </xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="rating" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Rating" type="Rating">
+							<xsd:annotation>
+								<xsd:documentation>
+									Product review rating.
+                                </xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="customProperties" type="PropertyList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						additional properties associated with this
+						Product.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="maxPurchaseQuantity" type="xsd:int"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						This property is used to indicate the maximum
+						quantity of a Product
+						that can be purchased at one time. This value
+						maybe&#10; set on
+						the Product level or set on each individual Sku.
+						The value of
+						maxPurchaseQuantity must always be &gt;= 1.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="skuId" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Identifier.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="variant" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Variant id.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="variantDescription" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Variant description.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="variantDisplaySequence" type="xsd:int"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Variant display sequence.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="color" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Color id.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="colorDescription" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Color description.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="colorDisplaySequence" type="xsd:int"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Color display sequence.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="size" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Size id.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="sizeDescription" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Size description.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="sizeDisplaySequence" type="xsd:int"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Size display sequence.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="dimensionValues" type="DimensionValueList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Dynamic dimension values.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="ProductStructure">
+		<xsd:annotation>
+			<xsd:documentation>
+				Used to describe how the child products should be
+				treated.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="type" type="xsd:string" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Selection type to use for the products.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="dimensions" type="DimensionList"
+				minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						The list of dimensions the child products vary
+						across.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="Brand">
+		<xsd:annotation>
+			<xsd:documentation>
+				Brand
+            </xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="id" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Brand Indentifier
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="name" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Brand Name
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="Attribute">
+		<xsd:annotation>
+			<xsd:documentation>
+				Dynamically defined product property. In addition
+				to the properties&#10;
+				defined in the data model a product can have
+				one or more
+				product&#10; attributes which are a map of name value
+				pairs plus
+				some meta-data.&#10; This is the primary extension point
+				for the
+				product model.
+            </xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="name" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						attribute Name
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="value" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						attribute Value
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="displaySequence" type="xsd:int"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						attribute Display Sequence
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="AttributeList">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Attribute" type="Attribute" />
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="Property">
+		<xsd:annotation>
+			<xsd:documentation>
+				Self describing property that is defined at
+				runtime. A property&#10; or
+				list of properties can be used to augment
+				the fixed properties&#10;
+				predefined in the data model.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="name" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						name of the property.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="typeName" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						name of datatype of the propety value.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="value" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						property value.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="PropertyList">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Property" type="Property" />
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="DimensionValue">
+		<xsd:annotation>
+			<xsd:documentation>
+				Dynamically defined dimension value used when the
+				legacy dimensions&#10;
+				(variant, color, and size) are not sufficient
+				to model products.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="name" type="xsd:string" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Name of the dimension.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="description" type="xsd:string"
+				minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Text to show in UI for this dimension value
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="value" type="xsd:string" minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Dimension value.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="displaySequence" type="xsd:int"
+				minOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Dimension display sequence.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="DimensionValueList">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="DimensionValue" type="DimensionValue" />
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="AssetView">
+		<xsd:annotation>
+			<xsd:documentation>
+				A view of a product, for example "main",
+				"alternate1". Asset views
+				are sometimes&#10; referred to as
+				alternative images.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="name" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Name of the asset view. Examples names include
+						"main", "alternate1",
+						"alternate2".
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="assets" type="AssetList" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						A list of assets associated with view for the
+						given Product. &#10;
+						An example would be a asset list for the view
+						main.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="AssetViews">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="AssetView" type="AssetView" />
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="Promo">
+		<xsd:annotation>
+			<xsd:documentation>
+				Promotion that can be associated with a product.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="id" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Promotion identifier.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="title" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Promotion title.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="body" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Promotion body.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="promoType" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Promotion type. For example, "BASIC",
+						"SHIPPING", "VALUE", "GIFTWRAP"
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="discount" type="xsd:decimal"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Promotion discount, indicating the savings
+						provided by this promotion.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="Rating">
+		<xsd:annotation>
+			<xsd:documentation>
+				The rating for a product.
+            </xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="format" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Identifier indicating whether an image or rating
+						number is being used.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="baseRatingImageURI" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						URI for the rating image to display.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ratingNumber" type="xsd:decimal"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						The numeric rating value to display.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="description" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						The textual description of this rating. Can be
+						used to populate&#10;
+						a tooltip or label near the product rating,
+						for example.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="SizeChart">
+		<xsd:annotation>
+			<xsd:documentation>
+				The size chart for a product. It could be an XHTML
+				string&#10; or an
+				image URL.
+            </xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="format" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Identifier indicating whether an image or XHTML
+						is being used to &#10;
+						convey the size chart.
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="chartImageURL" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						URL for the size chart image to display.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="chartHTML" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						The XHTML version of the size chart.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="source" type="xsd:string" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						The URL of the X/HTML version of the size chart.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="Price">
+		<xsd:annotation>
+			<xsd:documentation>
+				Price model.
+            </xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="priceType" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Price type
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="pricingUnit" type="xsd:string"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						The text to describe the price.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="amount" type="xsd:decimal" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Price amount (either amount must be given or
+						both minAmount and
+						maxAmount must be specified)
+                    </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="minAmount" type="xsd:decimal"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Minimum price amount (either minAmount and
+						maxAmount must be given or
+						amount must be specified)
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="maxAmount" type="xsd:decimal"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Maximum price amount (either minAmount and
+						maxAmount must be given or
+						amount must be specified)
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="Prices">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Price" type="Price" />
+		</xsd:choice>
+	</xsd:complexType>
+	<xsd:complexType name="ProductSpecification">
+		<xsd:annotation>
+			<xsd:documentation>
+				Holds information about a complete or partial
+				specification of&#10;
+				choices made to narrow which product is picked.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:all>
+			<xsd:element name="product" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Product" type="Product">
+							<xsd:annotation>
+								<xsd:documentation>
+									Product this specification applies to.
+								</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="quantity" type="xsd:int" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Quantity of this product selected.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="childSpecifications" type="ProductSpecificationList"
+				minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
+						Child specifications of this product.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:all>
+	</xsd:complexType>
+	<xsd:complexType name="ProductSpecificationList">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="ProductSpecification" type="ProductSpecification" />
+		</xsd:choice>
+	</xsd:complexType>
+</xsd:schema>

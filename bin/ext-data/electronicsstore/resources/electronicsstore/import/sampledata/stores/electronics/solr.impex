@@ -1,0 +1,84 @@
+#
+# Add additional sample solr index configuration
+# - indexed properties for the classification features that we want to index
+#
+$classSystemVersion=systemVersion(catalog(id[default='ElectronicsClassification']),version[default='1.0'])
+$classCatalogVersion=catalogVersion(catalog(id[default='ElectronicsClassification']),version[default='1.0'])
+$classAttribute=classificationAttribute(code,$classSystemVersion)
+$classClass=classificationClass(code,$classCatalogVersion)
+$classAttributeAssignment=classAttributeAssignment($classClass,$classAttribute,$classSystemVersion)
+$contentCatalogName=electronicsContentCatalog
+$contentCatalogVersion=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalogName]),CatalogVersion.version[default=Staged])[default=$contentCatalogName:Staged]
+$productCatalog=electronicsProductCatalog
+$productCatalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+
+# Define price range set
+INSERT_UPDATE SolrValueRangeSet;name[unique=true];qualifier;type;solrValueRanges(&rangeValueRefID)
+;MegaPixelRange;;double;rangeRefMegaPixel4,rangeRefMegaPixel5,rangeRefMegaPixel6,rangeRefMegaPixel7,rangeRefMegaPixel8,rangeRefMegaPixel9,rangeRefMegaPixel10,rangeRefMegaPixel11,rangeRefMegaPixel12,rangeRefMegaPixel13,rangeRefMegaPixel14,rangeRefMegaPixel15,rangeRefMegaPixel16,rangeRefMegaPixel17,rangeRefMegaPixel18,rangeRefMegaPixel19,rangeRefMegaPixel20,rangeRefMegaPixel30,rangeRefMegaPixel40,rangeRefMegaPixel50
+
+# Define Megapixel ranges
+INSERT_UPDATE SolrValueRange;&rangeValueRefID;solrValueRangeSet(name)[unique=true];name[unique=true];from;to
+;rangeRefMegaPixel4;MegaPixelRange;       < 5 mp;  0;4.9999
+;rangeRefMegaPixel5;MegaPixelRange;   5 - 5.9 mp;  5;5.9999
+;rangeRefMegaPixel6;MegaPixelRange;   6 - 6.9 mp;  6;6.9999
+;rangeRefMegaPixel7;MegaPixelRange;   7 - 7.9 mp;  7;7.9999
+;rangeRefMegaPixel8;MegaPixelRange;   8 - 8.9 mp;  8;8.9999
+;rangeRefMegaPixel9;MegaPixelRange;   9 - 9.9 mp;  9;9.9999
+;rangeRefMegaPixel10;MegaPixelRange;10 - 10.9 mp;  10;10.9999
+;rangeRefMegaPixel11;MegaPixelRange;11 - 11.9 mp;  11;11.9999
+;rangeRefMegaPixel12;MegaPixelRange;12 - 12.9 mp;  12;12.9999
+;rangeRefMegaPixel13;MegaPixelRange;13 - 13.9 mp;  13;13.9999
+;rangeRefMegaPixel14;MegaPixelRange;14 - 14.9 mp;  14;14.9999
+;rangeRefMegaPixel15;MegaPixelRange;15 - 15.9 mp;  15;15.9999
+;rangeRefMegaPixel16;MegaPixelRange;16 - 16.9 mp;  16;16.9999
+;rangeRefMegaPixel17;MegaPixelRange;17 - 17.9 mp;  17;17.9999
+;rangeRefMegaPixel18;MegaPixelRange;18 - 18.9 mp;  18;18.9999
+;rangeRefMegaPixel19;MegaPixelRange;19 - 19.9 mp;  19;19.9999
+;rangeRefMegaPixel20;MegaPixelRange;20 - 29.9 mp;  20;29.9999
+;rangeRefMegaPixel30;MegaPixelRange;30 - 39.9 mp;  30;39.9999
+;rangeRefMegaPixel40;MegaPixelRange;40 - 49.9 mp;  40;49.9999
+;rangeRefMegaPixel50;MegaPixelRange;      50+ mp;  50;9999999
+
+
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);sortableType(code);currency[default=false];localized[default=false];multiValue[default=false];facet[default=false];facetType(code);facetSort(code);priority;visible;fieldValueProvider;customFacetSortProvider;rangeSets(name);$classAttributeAssignment
+;electronicsProductType;Megapixel, 63          ;double;; ;    ; ;true;MultiSelectOr;Custom;1000;true;commerceClassificationPropertyValueProvider;numericFacetSortProviderDesc;MegaPixelRange;57:::Megapixel, 63::::
+;electronicsProductType;Mounting, 1867         ;string;; ;true; ;true;Refine;Alpha;1000;true;commerceClassificationPropertyValueProvider;;;634:::Mounting, 1867::::
+;electronicsProductType;Colour of product, 1766;string;; ;true; ;true;MultiSelectOr;Alpha;1000;true;commerceClassificationPropertyValueProvider;;;3856:::Colour of product, 1766::::
+;electronicsProductType;Lens type, 472   ;string;; ;true;true;true;MultiSelectOr;Alpha;1000;true;classificationPropertySplitValueProvider;;;1094:::Lens type, 472::::
+;electronicsProductType;Resolution, 80         ;string;; ;    ; ;true;Refine;Alpha;1000;true;commerceClassificationPropertyValueProvider;;;631:::Resolution, 80::::
+
+# Import classification features
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);localized[default=true];multiValue[default=false];fieldValueProvider;$classAttributeAssignment
+;electronicsProductType;feature-size    ;text;true;false;commerceClassificationPropertyValueProvider;622:::Size, 1147::::
+;electronicsProductType;feature-videoCap;text;true;false;commerceClassificationPropertyValueProvider;622:::Video memory capacity, 5167::::
+;electronicsProductType;feature-aperture;text;true;false;commerceClassificationPropertyValueProvider;622:::Aperture setting, 5775::::
+;electronicsProductType;feature-picMode ;text;true;true;commerceClassificationPropertyValueProvider;622:::Picture mode, 2030::::
+;electronicsProductType;feature-memCards;text;true;false;commerceClassificationPropertyValueProvider;42:::Compatible memory cards, 730::::
+;electronicsProductType;feature-display ;text;true;false;commerceClassificationPropertyValueProvider;41:::Display, 83::::
+
+# Show the classification features in the product lister
+INSERT_UPDATE ClassAttributeAssignment;$classClass[unique=true];$classAttribute[unique=true];$classSystemVersion[unique=true];listable
+;622;Size, 1147;;true
+;622;Video memory capacity, 5167;;true
+;622;Aperture setting, 5775;;true
+;622;Picture mode, 2030;;true
+;42;Compatible memory cards, 730;;true
+;41;Display, 83;;true
+
+# Redirect page URL
+INSERT_UPDATE SolrURIRedirect;url[unique=true]
+;"/cart"
+;"http://www.hybris.com/multichannel-accelerator"
+
+INSERT_UPDATE SolrPageRedirect;redirectItem(uid,$contentCatalogVersion)[unique=true]
+;faq
+
+INSERT_UPDATE SolrCategoryRedirect;redirectItem(code,$productCatalogVersion)[unique=true]
+;brand_5
+;brand_10
+;902
+
+INSERT_UPDATE SolrProductRedirect;redirectItem(code,$productCatalogVersion)[unique=true]
+;1382080
+;2053266
+;816780

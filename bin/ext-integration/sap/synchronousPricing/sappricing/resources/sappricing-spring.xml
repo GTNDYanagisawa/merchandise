@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+
+
+	<alias alias="calculationService" name="sapCartCalculationService" />
+	<bean id="sapCartCalculationService"
+		class="de.hybris.platform.sap.sappricing.services.impl.SapCartCalculationService"
+		parent="abstractBusinessService">
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="findPriceStrategy" ref="currentFactoryFindPricingStrategy" />
+		<property name="findDiscountsStrategies">
+			<list>
+				<ref bean="currentFactoryFindPricingStrategy" />
+				<ref bean="findOrderDiscountValuesStrategy" />
+			</list>
+		</property>
+		<property name="findTaxesStrategies">
+			<list>
+				<ref bean="currentFactoryFindPricingStrategy" />
+			</list>
+		</property>
+		<property name="findDeliveryCostStrategy" ref="findDeliveryCostStrategy" />
+		<property name="findPaymentCostStrategy" ref="findPaymentCostStrategy" />
+		<property name="orderRequiresCalculationStrategy" ref="orderRequiresCalculationStrategy" />
+		<property name="sapPricingCartService" ref="sapPricingCartService" />
+		<property name="userService" ref="userService" />
+		<property name="sapPricingEnablementService" ref="sapPricingEnablementService" />
+	</bean>
+
+	<alias alias="sapPricingCartService" name="defaultSapPricingCartService" />
+	<bean id="defaultSapPricingCartService"
+		class="de.hybris.platform.sap.sappricing.services.impl.DefaultSapPricingCartService">
+		<property name="bolFactory" ref="sapPricingBolFactory" />
+		<property name="sapPartnerService" ref="sapPartnerService" />
+		<property name="conversionService" ref="sapPricingConversionService" />
+	</bean>
+
+
+	<alias alias="promotionsService" name="sapPromotionsService" />
+	<bean id="sapPromotionsService"
+		class="de.hybris.platform.sap.sappricing.services.impl.DefaultSapPromotionsService"
+		parent="abstractPromotionsService" scope="tenant">
+		<property name="sapPricingEnablementService" ref="sapPricingEnablementService" />
+	</bean>
+
+	<alias name="sapExternalTaxesService" alias="externalTaxesService" />
+	<bean id="sapExternalTaxesService"
+		class="de.hybris.platform.sap.sappricing.services.impl.SapExternalTaxesService">
+		<property name="calculateExternalTaxesStrategy" ref="calculateExternalTaxesStrategy" />
+		<property name="applyExternalTaxesStrategy" ref="applyExternalTaxesStrategy" />
+		<property name="decideExternalTaxesStrategy" ref="decideExternalTaxesStrategy" />
+		<property name="recalculateExternalTaxesStrategy" ref="recalculateExternalTaxesStrategy" />
+		<property name="modelService" ref="modelService" />
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+	<alias alias="priceService" name="defaultSapPricingCatalogService" />
+	<bean id="defaultSapPricingCatalogService"
+		class="de.hybris.platform.sap.sappricing.services.impl.DefaultSapPricingCatalogService"
+		parent="abstractBusinessService">
+		<property name="netGrossStrategy" ref="netGrossStrategy" />
+		<property name="timeService" ref="timeService" />
+		<property name="bolFactory" ref="sapPricingBolFactory" />
+		<property name="sapPartnerService" ref="sapPartnerService" />
+		<property name="sapPricingEnablementService" ref="sapPricingEnablementService" />
+		<property name="conversionService" ref="sapPricingConversionService" />
+	</bean>
+
+	<alias alias="sapPartnerService" name="defaultSapPartnerService" />
+	<bean id="defaultSapPartnerService"
+		class="de.hybris.platform.sap.sappricing.services.impl.DefaultSapPartnerService">
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="moduleConfigurationAccess" ref="sapPricingConfigurationAccess" />
+	</bean>
+
+	<alias alias="sapPricingBolFactory" name="defaultSapPricingBolFactory" />
+	<bean id="defaultSapPricingBolFactory"
+		class="de.hybris.platform.sap.sappricing.services.impl.DefaultSapPricingBolFactory">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+	</bean>
+
+	<alias alias="sapPricingEnablementService" name="defaultSapPricingEnablementService" />
+	<bean id="defaultSapPricingEnablementService"
+		class="de.hybris.platform.sap.sappricing.services.impl.DefaultSapPricingEnablementService">
+		<property name="moduleConfigurationAccess" ref="sapPricingConfigurationAccess" />
+	</bean>
+
+	<alias alias="sapPricingConversionService" name="defaultSapPricingConversionService" />
+	<bean id="defaultSapPricingConversionService"
+		class="de.hybris.platform.sap.sappricing.services.impl.DefaultConversionService">
+		<property name="unitService" ref="sapUnitService" />
+	</bean>
+
+
+	<bean id="sapPricingUrlPattern" parent="sapCoreUrlPatternConfigurerForRequestSequencer">
+		<property name="includeUrlRegExList">
+			<list>
+				<value>.*/p/.*</value> <!-- Product Pages -->
+				<value>.*/cart/.*</value> <!-- Cart Pages -->
+				<value>.*/checkout/.*</value> <!-- Checkout Pages -->
+				<value>/[^/,.]+/[^/,.]+/\w{2}/\w{3}/</value> <!-- Homepage -->
+				<value>/</value> <!-- Homepage -->
+			</list>
+		</property>
+	</bean>
+
+</beans>

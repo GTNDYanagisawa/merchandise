@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:file="http://www.springframework.org/schema/integration/file"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- General setup -->
+	<int:channel id="errorChannel" />
+	<int:service-activator input-channel="errorChannel" ref="errorHandler" method="onError" />
+	<bean id="errorHandler" class="de.hybris.platform.acceleratorservices.dataimport.batch.task.ErrorHandler">
+		<property name="cleanupHelper" ref="cleanupHelper" />
+	</bean>
+	<bean id="cleanupHelper" class="de.hybris.platform.acceleratorservices.dataimport.batch.task.CleanupHelper">
+		<property name="timeStampFormat" value="yyyyMMddHHmmssSSS" />
+	</bean>
+	<bean id="fileOrderComparator" class="de.hybris.platform.acceleratorservices.dataimport.batch.FileOrderComparator">
+		<property name="prefixPriority">
+			<map>
+				<!-- default priority is 0 -->
+				<entry key="base_product" value="2" />
+				<entry key="variant" value="1" />
+			</map>
+		</property>
+	</bean>
+	<bean id="baseDirectory" class="java.lang.String">
+		<constructor-arg value="#{configurationService.configuration.getProperty('acceleratorservices.batch.impex.basefolder')}" />
+	</bean>
+	<!-- Impex import process -->
+	<!-- 1) Scan for files, site dependent -->
+	<!-- check {extensionName}-spring-{siteName}.xml files for spring integration configuration of this first step -->
+	
+	<!-- 2) move the file to processing and setup header, partly site dependent -->
+	<int:service-activator input-channel="batchFilesHeaderInit" output-channel="batchFilesHeader" ref="headerInitTask"
+		method="execute" />
+	<bean id="headerInitTask" class="de.hybris.platform.acceleratorservices.dataimport.batch.task.HeaderInitTask">
+		<property name="sequenceIdParser" ref="batchSequenceIdParser"/>
+		<property name="languageParser" ref="batchLanguageParser"/>
+		<property name="fallbackLanguage" value="en" />
+	</bean>
+	<bean id="batchSequenceIdParser" class="de.hybris.platform.acceleratorservices.dataimport.batch.util.SequenceIdParser">
+		<property name="parser">
+			<bean class="de.hybris.platform.acceleratorservices.util.RegexParser">
+				<property name="regex" value="-(\d+)\.csv" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="batchLanguageParser" class="de.hybris.platform.acceleratorservices.util.RegexParser">
+		<property name="regex" value="-(\w{2})-(\d+)\.csv" />
+	</bean>
+
+	<!-- 3) transform csv to impex file -->
+	<int:service-activator input-channel="batchFilesHeader" output-channel="batchFilesTran" ref="batchTransformerTask"
+		method="execute" />
+	<bean id="batchTransformerTask" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.task.ImpexTransformerTask" 
+		  init-method="initConvertersMap">
+		<property name="fieldSeparator" value="," />
+		<property name="encoding" value="UTF-8" />
+		<property name="linesToSkip" value="0"/>
+		<property name="cleanupHelper" ref="cleanupHelper" />
+	</bean>
+	
+	<!-- Transformer converters mappings -->
+	<bean id="batchProductConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="base_product" 
+		  p:converter-ref="batchProductConverter"/>
+		  
+	<bean id="batchTaxConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="tax" 
+		  p:converter-ref="batchTaxConverter"/>
+
+	<bean id="batchExternalTaxConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="external_tax" 
+		  p:converter-ref="batchExternalTaxConverter"/>
+
+	<bean id="batchPriceConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="price" 
+		  p:converter-ref="batchPriceConverter"/>
+		  
+	<bean id="batchStockConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="stock" 
+		  p:converter-ref="batchStockConverter"/>	  
+	
+	<bean id="batchStockIncrementalConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="inc-stock" 
+		  p:converter-ref="batchStockIncrementalConverter"/>
+	
+	<bean id="batchMerchandiseConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="merchandise" 
+		  p:converter-ref="batchMerchandiseConverter"/>
+
+	<bean id="batchCustomerConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="customer" 
+		  p:converter-ref="batchCustomerConverter"/>
+		  		  	  	  
+	<!-- 4) run impex import -->
+	<int:service-activator input-channel="batchFilesTran" output-channel="batchFilesImp" ref="batchRunnerTask"
+		method="execute" />
+	<bean id="batchRunnerTask" class="de.hybris.platform.acceleratorservices.dataimport.batch.task.AbstractImpexRunnerTask">
+		<property name="sessionService" ref="sessionService" />
+		<property name="importService" ref="importService" />
+		<lookup-method name="getImportConfig" bean="importConfig" /> 
+	</bean>
+	<bean id="importConfig" class="de.hybris.platform.servicelayer.impex.ImportConfig" scope="prototype">
+		<property name="removeOnSuccess" value="true" />
+		<property name="failOnError" value="false" />
+		<property name="synchronous" value="true" />
+		<property name="legacyMode" value="false" />
+		<property name="maxThreads" value="#{configurationService.configuration.getProperty('acceleratorservices.batch.impex.max-threads')}" />
+		<property name="locale" value="en"/>
+	</bean>
+
+	<!-- 5) Cleanup -->
+	<int:service-activator input-channel="batchFilesImp" ref="batchCleanupTask" method="execute" />
+	<bean id="batchCleanupTask" class="de.hybris.platform.acceleratorservices.dataimport.batch.task.CleanupTask">
+		<property name="cleanupHelper" ref="cleanupHelper" />
+	</bean>
+
+	<!-- impex converters -->
+	<!-- product import -->
+	<bean id="defaultImpexProductHeader" class="java.lang.String">
+		<constructor-arg>
+			<value># ImpEx for importing data into $CATALOG$
+				$catalogVersion=catalogversion(catalog(id[default=$CATALOG$]),version[default='Staged'])[unique=true]
+				$approved=approvalstatus(code)[default='check']
+				$lang=$LANGUAGE$</value>
+		</constructor-arg>
+	</bean>
+	
+	<!-- Converters -->
+	<bean id="batchProductConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{defaultImpexProductHeader}
+				# Insert Products
+				INSERT_UPDATE Product;code[unique=true];varianttype(code);name[lang=$lang];description[lang=$lang];ean;manufacturerName;manufacturerAID;unit(code)[default=pieces];$approved;Europe1PriceFactory_PTG(code)[default=eu-vat-full];sequenceId[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.SequenceIdTranslator];$catalogVersion
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{S}</value>
+		</property>
+		<property name="rowFilter">
+			<bean class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexRowFilter">
+				<property name="expression" value="!row[1]"/>
+			</bean>
+		</property>
+		<property name="type" value="Product"/>
+	</bean>
+	<bean id="batchPriceConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value># ImpEx for Importing Prices into $CATALOG$
+				$catalog=$CATALOG$
+				#% impex.setLocale(Locale.ENGLISH); 
+				INSERT_UPDATE PriceRow;product(code,catalogversion(catalog(id),version))[unique=true];price[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.PriceTranslator];currency(isocode)[unique=true];net[default=$NET$];unit(code)[default=pieces];unitFactor[default=1];minqtd[default=1];catalogversion(catalog(id),version);sequenceId[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.SequenceIdTranslator]
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0}:$catalog:Staged;{+1};{+2};{3};;;;$catalog:Staged;{S}
+;{+0}:$catalog:Online;{+1};{+2};{3};;;;$catalog:Online;{S}</value>
+		</property>
+	</bean>
+	<bean id="batchTaxConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{defaultImpexProductHeader}
+				# Insert tax
+				UPDATE Product;code[unique=true];Europe1PriceFactory_PTG(code)[default=eu-vat-full];sequenceId[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.GreaterSequenceIdTranslator];$catalogVersion
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0};{1};{S}</value>
+		</property>
+	</bean>
+	<bean id="batchExternalTaxConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{defaultImpexProductHeader}
+				# Insert external tax
+				INSERT_UPDATE ProductTaxCode;productCode[unique=true];taxCode;taxArea[unique=true]
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0};{+1};{+2}</value>
+		</property>
+	</bean>
+
+	<bean id="batchStockConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{defaultImpexProductHeader}
+				# Insert stock
+				UPDATE Product;code[unique=true];@stock[translator=de.hybris.platform.acceleratorservices.dataimport.batch.stock.StockTranslator,adapter=stockImportAdapter];$catalogVersion
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0};{+1}:{2}</value>
+		</property>
+	</bean>
+	<bean id="stockImportAdapter" class="de.hybris.platform.acceleratorservices.dataimport.batch.stock.impl.DefaultStockImportAdapter" >
+		<property name="modelService" ref="modelService" />
+		<property name="warehouseService" ref="warehouseService" />
+		<property name="stockService" ref="stockService" />
+		<property name="warehouseCode" value="default"/>
+	</bean>
+	<bean id="batchStockIncrementalConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{defaultImpexProductHeader}
+				# Insert stock
+				UPDATE Product;code[unique=true];@stock[translator=de.hybris.platform.acceleratorservices.dataimport.batch.stock.StockTranslator,adapter=stockIncrementalImportAdapter];$catalogVersion
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0};{+1}:{2}</value>
+		</property>
+	</bean>
+	<bean id="stockIncrementalImportAdapter" class="de.hybris.platform.acceleratorservices.dataimport.batch.stock.impl.IncrementalStockImportAdapter" >
+		<property name="modelService" ref="modelService" />
+		<property name="warehouseService" ref="warehouseService" />
+		<property name="stockService" ref="stockService" />
+		<property name="warehouseCode" value="default"/>
+	</bean>
+	<bean id="batchMerchandiseConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{defaultImpexProductHeader}
+				# Insert references
+				INSERT_UPDATE ProductReference;source(code,$catalogVersion)[unique=true];referenceType(code);target(code,$catalogVersion)[unique=true];active[default=true];preselected[default=false]
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0};{+1};{+2}</value>
+		</property>
+	</bean>
+
+	<bean id="batchCustomerConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{defaultImpexProductHeader}
+				# Insert Customer
+				$passwordEncoding=md5
+				$defaultPassword=1234
+				$setName=name[cellDecorator=de.hybris.platform.acceleratorservices.dataimport.batch.decorator.CustomerNameDecorator]
+				$setPassword=@password[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.RandomPasswordTranslator][default='$passwordEncoding:$defaultPassword']
+				INSERT Customer;uid[unique=true];$setName;title(code);$setPassword
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0};{1} {2};{3};</value>
+		</property>
+	</bean>	
+	
+	<!-- AOP -->
+	<aop:config proxy-target-class="false">
+		<aop:pointcut id="taskPointcut" expression="execution(* de.hybris.platform.acceleratorservices.dataimport.batch.HeaderTask.*(..))" />
+		<aop:aspect ref="timeMeasurementAspect">
+			<aop:around pointcut-ref="taskPointcut" method="measure" />
+		</aop:aspect>
+		<aop:aspect ref="tenantActivationAspect">
+			<aop:around pointcut-ref="taskPointcut" method="execute" />
+		</aop:aspect>
+		<aop:aspect ref="exceptionHandlerAspect">
+			<aop:around pointcut-ref="taskPointcut" method="execute" />
+		</aop:aspect>
+	</aop:config>
+	<bean id="timeMeasurementAspect" class="de.hybris.platform.acceleratorservices.dataimport.batch.aop.TimeMeasurementAspect" />
+	<bean id="tenantActivationAspect" class="de.hybris.platform.acceleratorservices.dataimport.batch.aop.TenantActivationAspect" />
+	<bean id="exceptionHandlerAspect" class="de.hybris.platform.acceleratorservices.dataimport.batch.aop.ExceptionHandlerAspect" />
+</beans>

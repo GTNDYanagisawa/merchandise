@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+
+<!-- WARNING: This is the Spring WEB configuration file. If you want to replace 
+	items or managers you have to do this from the extensions core configuration 
+	file (ySapConfiguration/resources/ySapConfiguration-spring.xml) -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="de.hybris.platform.sap.productconfig.frontend"
+		scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+
+	<bean id="listMergeBeanPostProcessor"
+		class="de.hybris.platform.commerceservices.spring.config.ListMergeDirectiveBeanPostProcessor" />
+
+	<bean id="listMergeDirective"
+		class="de.hybris.platform.commerceservices.spring.config.ListMergeDirective"
+		abstract="true" />
+
+	<bean id="sapProductConfigBeforeViewHandler"
+		class="de.hybris.platform.sap.productconfig.frontend.beforeview.ProductDetailsBeforeViewHandler">
+	</bean>
+	
+	<bean id="sapProductConfigSearchBeforeViewHandler"
+		class="de.hybris.platform.sap.productconfig.frontend.beforeview.ProductSerachBeforeViewHandler">
+	</bean>
+
+	<bean id="beforeViewHandlerAdapter" abstract="true"
+		class="de.hybris.platform.addonsupport.interceptors.BeforeViewHandlerAdapter">
+		<property name="proxyInterfaceName"
+			value="de.hybris.platform.yb2bacceleratorstorefront.interceptors.BeforeViewHandler" />
+	</bean>
+	
+
+	<bean depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add">
+			<bean parent="beforeViewHandlerAdapter">
+				<property name="adaptee" ref="sapProductConfigBeforeViewHandler" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add">
+			<bean parent="beforeViewHandlerAdapter">
+				<property name="adaptee" ref="sapProductConfigSearchBeforeViewHandler" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="sapProductConfigBreadcrumbBuilder"
+		class="de.hybris.platform.sap.productconfig.frontend.breadcrumb.ProductConfigureBreadcrumbBuilder">
+		<property name="browseHistory" ref="browseHistory" />
+		<property name="productModelUrlResolver" ref="productModelUrlResolver" />
+		<property name="categoryModelUrlResolver" ref="categoryModelUrlResolver" />
+	</bean>
+
+	<bean id="sapProductConfigButtonComponentRenderer"
+		class="de.hybris.platform.sap.productconfig.frontend.component.renderer.ProductConfigurationButtonComponentRenderer">
+		<property name="typeService" ref="typeService" />
+		<property name="uiExperienceService" ref="defaultUiExperienceService" />
+		<property name="cmsComponentService" ref="cmsComponentService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+    <bean id="sapProductConfigButtonComponentRendererMapping"
+		class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationButtonComponent" />
+		<property name="renderer" ref="sapProductConfigButtonComponentRenderer" />
+	</bean>
+
+   <!--
+	<bean id="sapProductConfigButtonComponentRendererMapping"
+		parent="addonCmsComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationButtonComponent" />
+		<property name="renderer" ref="sapProductConfigButtonComponentRenderer" />
+	</bean>
+	-->
+
+	<bean id="sapProductConfigFormComponentRenderer"
+		class="de.hybris.platform.sap.productconfig.frontend.component.renderer.ProductConfigurationFormComponentRenderer">
+		<property name="typeService" ref="typeService" />
+		<property name="uiExperienceService" ref="defaultUiExperienceService" />
+		<property name="cmsComponentService" ref="cmsComponentService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<bean id="sapProductConfigFormComponentRendererMapping"
+		class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationFormComponent" />
+		<property name="renderer" ref="sapProductConfigFormComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigAddConfigToCartComponentRenderer"
+		class="de.hybris.platform.sap.productconfig.frontend.component.renderer.ProductAddConfigToCartComponentRenderer">
+		<property name="typeService" ref="typeService" />
+		<property name="uiExperienceService" ref="defaultUiExperienceService" />
+		<property name="cmsComponentService" ref="cmsComponentService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<bean id="sapProductConfigAddConfigToCartComponentRendererMapping"
+		class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductAddConfigToCartComponent" />
+		<property name="renderer" ref="sapProductConfigAddConfigToCartComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigImageComponentRenderer"
+		class="de.hybris.platform.sap.productconfig.frontend.component.renderer.ProductConfigurationImageComponentRenderer">
+		<property name="typeService" ref="typeService" />
+		<property name="uiExperienceService" ref="defaultUiExperienceService" />
+		<property name="cmsComponentService" ref="cmsComponentService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<bean id="sapProductConfigImageComponentRendererMapping"
+		class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationImageComponent" />
+		<property name="renderer" ref="sapProductConfigImageComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigTitleSummaryComponentRenderer"
+		class="de.hybris.platform.sap.productconfig.frontend.component.renderer.ProductConfigurationTitleSummaryComponentRenderer">
+		<property name="typeService" ref="typeService" />
+		<property name="uiExperienceService" ref="defaultUiExperienceService" />
+		<property name="cmsComponentService" ref="cmsComponentService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<bean id="sapProductConfigTitleSummaryComponentRendererMapping"
+		class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationTitleSummaryComponent" />
+		<property name="renderer" ref="sapProductConfigTitleSummaryComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigTabNavigationComponentRenderer"
+		class="de.hybris.platform.sap.productconfig.frontend.component.renderer.ProductConfigurationTabNavigationComponentRenderer">
+		<property name="typeService" ref="typeService" />
+		<property name="uiExperienceService" ref="defaultUiExperienceService" />
+		<property name="cmsComponentService" ref="cmsComponentService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<bean id="sapProductConfigTabNavigationComponentRendererMapping"
+		class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationTabNavigationComponent" />
+		<property name="renderer" ref="sapProductConfigTabNavigationComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigSpecificationComponentRenderer"
+		class="de.hybris.platform.sap.productconfig.frontend.component.renderer.ProductConfigurationSpecificationComponentRenderer">
+		<property name="typeService" ref="typeService" />
+		<property name="uiExperienceService" ref="defaultUiExperienceService" />
+		<property name="cmsComponentService" ref="cmsComponentService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<bean id="sapProductConfigSpecificationComponentRendererMapping"
+		class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationSpecificationComponent" />
+		<property name="renderer" ref="sapProductConfigSpecificationComponentRenderer" />
+	</bean>
+
+
+	<alias name="sapProductConfigDefaultCssClassResolver" alias="sapProductConfigCssClassResolver" />
+	<bean id="sapProductConfigDefaultCssClassResolver"
+		class="de.hybris.platform.sap.productconfig.frontend.util.impl.CSSClassResolverImpl">
+	</bean>
+
+	<bean id="sapProductConfigPriceSummaryComponentRenderer"
+		class="de.hybris.platform.sap.productconfig.frontend.component.renderer.ProductConfigurationPriceSummaryComponentRenderer">
+		<property name="typeService" ref="typeService" />
+		<property name="uiExperienceService" ref="defaultUiExperienceService" />
+		<property name="cmsComponentService" ref="cmsComponentService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<bean id="sapProductConfigPriceSummaryComponentRendererMapping"
+		class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationPriceSummaryComponent" />
+		<property name="renderer" ref="sapProductConfigPriceSummaryComponentRenderer" />
+	</bean>
+
+
+</beans>

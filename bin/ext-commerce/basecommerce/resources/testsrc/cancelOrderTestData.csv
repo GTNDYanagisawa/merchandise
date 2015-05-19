@@ -1,0 +1,177 @@
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$testCategory0-id=testCategory0
+$testCategory1-id=testCategory1
+$testCategory2-id=testCategory2
+$testCategory3-id=testCategory3
+
+$testProduct0-id=testProduct0
+$testProduct1-id=testProduct1
+$testProduct2-id=testProduct2
+$testProduct3-id=testProduct3
+$testProduct4-id=testProduct4
+$testProduct5-id=testProduct5
+$testProduct6-id=testProduct6
+$testProduct7-id=testProduct7
+$testProduct8-id=testProduct8
+
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+
+INSERT_UPDATE Language;isocode[unique=true];active;
+;de;true;
+;en;true;
+
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];
+;de;Deutsch;German;
+;en;Englisch;English;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;€
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=de];name[lang=en];active;
+;AT;Österreich;Austria;true;
+;DE;Deutschland;Germany;true;
+
+INSERT_UPDATE Usergroup;uid[unique=true];
+;customergroup;
+
+INSERT_UPDATE Title;code[unique=true];name[lang=de];name[lang=en];
+;dr;Dr.;dr.;
+;prof;Prof.;prof.;
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=de];name[lang=en];conversion;
+;quantity;pieces;Pieces;Pieces;1
+
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password
+;ppetersonson;K2006-C0001;Peter Petersonson;a good customer from denmark;en;USD;customergroup;1234
+;demo;K2006-C0000;Klaus Demokunde;The StoreFoundation Demo Customer;en;USD;customergroup;1234
+;sbrueck;K2006-C0003;Sabine Brück;;en;USD;customergroup;1234
+;ahertz;K2006-C0005;Anja Hertz;;en;USD;customergroup;1234
+
+INSERT_UPDATE Address;owner(Customer.uid)[unique=true];streetname[unique=true];streetnumber[unique=true];postalcode[unique=true];duplicate[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;gender(code);middlename;phone1;title(code);url;company;fax;department
+;demo;testStrasse;1;28277;false;Bremen;DE;true;true;true;true;Klaus;Demokunde;develop@hybris.de;MALE;;;dr;;hybris GmbH;
+;ahertz;testStrasse;1;28277;false;Bremen;DE;false;false;false;true;Anja;Hertz;ahertz@na-du.de;FEMALE;;;;;hybris GmbH;
+;ppetersonson;testStrasse;1;103 25;false;Stockholm;AT;true;true;true;false;Peter;Petersonson;peter.petersonson@gmx.dk;MALE;
+;sbrueck;testStrasse;1;49456;false;Bakum;DE;true;true;false;true;Sabine;Brück;2653265637.2345732354634@t-online.de;FEMALE;
+;;
+INSERT_UPDATE StandardPaymentMode;code[unique=true];name[lang=de];name[lang=en];description[lang=de];description[lang=en];active;paymentinfotype(code)
+;creditcard;Kreditkarte;creditcard;Bezahlung per Keditkarte;payment with creditcard;true;CreditCardPaymentInfo
+;debitentry;Bankeinzug;Bank Collection;Bezahlung per Bankeinzug;payment with bank collection;true;DebitPaymentInfo
+;invoice;Rechnung;Invoice;per Rechnung bezahlen;payment with invoice;true;InvoicePaymentInfo
+;advance;Vorkasse;Advance;per Vorkasse bezahlen;payment in advance;true;AdvancePaymentInfo
+;;
+INSERT_UPDATE StandardPaymentModeValue;paymentmode(code)[unique=true];currency(isoCode)[unique=true];value;;;;
+;creditcard;EUR;0;;;;
+;creditcard;USD;0;;;;
+;debitentry;EUR;0;;;;;;
+;debitentry;USD;0;;;;;;
+;invoice;EUR;1,5;;;;;;
+;invoice;USD;1,4;;;;;;
+;advance;EUR;0;;;;;;
+;advance;USD;0;;;;;;
+;;
+INSERT_UPDATE DeliveryMode;code[unique=true];active;net;supportedpaymentmodes(code);
+;courier;true;false;creditcard;Kreditkarte;creditcard,debitentry,invoice,advance;
+;postService;true;false;creditcard,debitentry,invoice,advance;
+;collect;true;false;invoice,advance;
+;;
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog
+;$catalog-id;$catalog-id;$catalog-id;true
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode)
+;$catalog-id;$catalog-version;true;EUR;de,en
+
+INSERT_UPDATE Category;code[unique=true];$catalogversion;name[lang=de];name[lang=en];$supercategories
+;$testCategory0-id;;$testCategory0-id;$testCategory0-id;
+;$testCategory1-id;;$testCategory1-id;$testCategory1-id;$testCategory0-id
+;$testCategory2-id;;$testCategory2-id;$testCategory2-id;$testCategory0-id
+;$testCategory3-id;;$testCategory3-id;$testCategory3-id;$testCategory2-id
+
+INSERT_UPDATE Product;code[unique=true];$catalogversion;name[lang=de];name[lang=en];unit(code);$prices;approvalStatus(code);owner(Principal.uid);startLineNumber;$supercategories
+;$testProduct0-id;;$testProduct0-idde;$testProduct0-iden;pieces;157 EUR;approved;admin;0;$testCategory0-id
+;$testProduct1-id;;$testProduct1-idde;$testProduct1-iden;pieces;157 EUR;approved;admin;0;$testCategory0-id,$testCategory1-id
+;$testProduct2-id;;$testProduct2-idde;$testProduct2-iden;pieces;157 EUR;approved;admin;0;$testCategory0-id,$testCategory2-id
+;$testProduct3-id;;$testProduct3-idde;$testProduct3-iden;pieces;157 EUR;approved;admin;0;$testCategory0-id,$testCategory3-id
+;$testProduct4-id;;$testProduct4-idde;$testProduct4-iden;pieces;157 EUR;approved;admin;0;$testCategory0-id,$testCategory3-id
+
+;$testProduct5-id;;$testProduct5-idde;$testProduct5-iden;pieces;57 EUR;approved;admin;0;$testCategory0-id,$testCategory3-id
+;$testProduct6-id;;$testProduct6-idde;$testProduct6-iden;pieces;67 EUR;approved;admin;0;$testCategory0-id,$testCategory3-id
+;$testProduct7-id;;$testProduct7-idde;$testProduct7-iden;pieces;77 EUR;approved;admin;0;$testCategory0-id,$testCategory3-id
+;$testProduct8-id;;$testProduct8-idde;$testProduct8-iden;pieces;87 EUR;approved;admin;0;$testCategory0-id,$testCategory3-id
+
+
+INSERT_UPDATE Vendor;name[lang=de];name[lang=en];code[unique=true];
+;Default Vendor;Default Vendor;defaultVendor;
+
+INSERT_UPDATE Warehouse;name[lang=de];name[lang=en];code[unique=true];default;vendor(code);
+;Default Warehouse;Default Warehouse;defaultWarehouse;true;defaultVendor;
+
+INSERT_UPDATE Order;code[unique=true];user(uid);date[dateformat=dd.MM.yyyy HH:mm];currency(isocode);net;deliveryMode(code);paymentMode(code);Discounts(code);calculated
+;O-K2010-C0000-001;demo;26.01.2010 10:58;EUR;false;;advance;;false
+"#%   impex.getLastImportedItem().setDeliveryAddress(impex.getLastImportedItem().getUser().getDefaultDeliveryAddress());impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getDefaultPaymentAddress());";
+;O-K2010-C0005-001;ahertz;26.01.2010 11:16;EUR;false;;invoice;;false
+"#%   impex.getLastImportedItem().setDeliveryAddress(impex.getLastImportedItem().getUser().getDefaultDeliveryAddress());impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getDefaultPaymentAddress());";
+;O-K2010-C0001-001;ppetersonson;26.01.2010 10:58;EUR;false;;advance;;false
+"#%   impex.getLastImportedItem().setDeliveryAddress(impex.getLastImportedItem().getUser().getDefaultDeliveryAddress());impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getDefaultPaymentAddress());";
+;O-K2010-C0002-001;sbrueck;26.01.2010 11:16;EUR;false;;invoice;;false
+"#%   impex.getLastImportedItem().setDeliveryAddress(impex.getLastImportedItem().getUser().getDefaultDeliveryAddress());impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getDefaultPaymentAddress());";
+
+INSERT_UPDATE OrderEntry;order(code)[unique=true];product(code,catalogVersion(catalog(id),version))[unique=true];quantity;calculated;unit(code);entryNumber[unique=true];deliveryMode(code);
+;O-K2010-C0000-001;testProduct0:testCatalog:Online;1;false;pieces;0;courier;
+;O-K2010-C0000-001;testProduct1:testCatalog:Online;1;false;pieces;1;courier;
+;O-K2010-C0000-001;testProduct2:testCatalog:Online;2;false;pieces;2;collect;
+;O-K2010-C0001-001;testProduct3:testCatalog:Online;1;false;pieces;0;courier;
+;O-K2010-C0001-001;testProduct4:testCatalog:Online;1;false;pieces;1;courier;
+;O-K2010-C0002-001;testProduct0:testCatalog:Online;5;false;pieces;0;courier;
+;O-K2010-C0005-001;testProduct1:testCatalog:Online;1;false;pieces;0;courier;
+;O-K2010-C0005-001;testProduct2:testCatalog:Online;1;false;pieces;1;courier;
+;O-K2010-C0005-001;testProduct3:testCatalog:Online;1;false;pieces;2;courier;
+;O-K2010-C0005-001;testProduct4:testCatalog:Online;8;false;pieces;3;courier;
+;O-K2010-C0005-001;testProduct5:testCatalog:Online;1;false;pieces;4;courier;
+;O-K2010-C0005-001;testProduct6:testCatalog:Online;1;false;pieces;5;collect;
+;O-K2010-C0005-001;testProduct7:testCatalog:Online;1;false;pieces;6;collect;
+;O-K2010-C0005-001;testProduct8:testCatalog:Online;1;false;pieces;7;courier;
+;O-K2010-C0005-001;testProduct0:testCatalog:Online;1;false;pieces;8;collect;
+
+;;
+UPDATE Order;code[unique=true];status(code)
+;O-K2010-C0000-001;CREATED
+#%   impex.getLastImportedItem().recalculate();
+;O-K2010-C0005-001;CREATED
+#%   impex.getLastImportedItem().recalculate();
+;O-K2010-C0001-001;CREATED
+#%   impex.getLastImportedItem().recalculate();
+;O-K2010-C0002-001;CREATED
+#%   impex.getLastImportedItem().recalculate();
+;;
+INSERT_UPDATE Consignment;code[unique=true];status(code);order(code);shippingAddress(owner(Customer.uid),streetname,streetnumber);warehouse(code);deliveryMode(code);
+;aO-K2010-C0000-001;READY;O-K2010-C0000-001;demo:testStrasse:1;defaultWarehouse;courier;
+;bO-K2010-C0000-001;READY;O-K2010-C0000-001;demo:testStrasse:1;defaultWarehouse;collect;
+;aO-K2010-C0005-001;SHIPPED;O-K2010-C0005-001;ahertz:testStrasse:1;defaultWarehouse;courier;
+;bO-K2010-C0005-001;READY;O-K2010-C0005-001;ahertz:testStrasse:1;defaultWarehouse;collect;
+;aO-K2010-C0002-001;SHIPPED;O-K2010-C0002-001;sbrueck:testStrasse:1;defaultWarehouse;courier;
+
+INSERT_UPDATE ConsignmentEntry;quantity;shippedQuantity;orderEntry(order(code), entryNumber)[unique=true];consignment(code);
+;1;0;O-K2010-C0000-001:0;aO-K2010-C0000-001;
+;1;0;O-K2010-C0000-001:1;aO-K2010-C0000-001;
+;2;0;O-K2010-C0000-001:2;bO-K2010-C0000-001;
+;1;1;O-K2010-C0005-001:0;aO-K2010-C0005-001;
+;1;1;O-K2010-C0005-001:1;aO-K2010-C0005-001;
+;1;1;O-K2010-C0005-001:2;aO-K2010-C0005-001;
+;8;8;O-K2010-C0005-001:3;aO-K2010-C0005-001;
+;1;1;O-K2010-C0005-001:4;aO-K2010-C0005-001;
+;1;1;O-K2010-C0005-001:5;aO-K2010-C0005-001;
+;1;0;O-K2010-C0005-001:6;bO-K2010-C0005-001;
+;1;0;O-K2010-C0005-001:7;bO-K2010-C0005-001;
+;1;0;O-K2010-C0005-001:8;bO-K2010-C0005-001;
+;5;5;O-K2010-C0002-001:0;aO-K2010-C0002-001;
+
+INSERT_UPDATE OrderCancelConfig;orderCancelAllowed;cancelAfterWarehouseAllowed;completeCancelAfterShippingStartedAllowed;partialCancelAllowed;partialOrderEntryCancelAllowed;queuedOrderWaitingTime;
+;true;true;true;true;true;100;
+

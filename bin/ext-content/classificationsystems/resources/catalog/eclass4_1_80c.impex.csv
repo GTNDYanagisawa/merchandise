@@ -1,0 +1,191 @@
+# ---------------------------------------------------------
+# --- eClass 4.1.80c 
+# --- create system and version
+# ---------------------------------------------------------
+
+#% impex.info("creating classification system $systemName $systemVersion in language $systemLanguage ...");
+
+INSERT_UPDATE ClassificationSystem[cacheUnique=true]; id[unique=true]
+; $systemName ;
+
+INSERT_UPDATE ClassificationSystemversion[cacheUnique=true]; version[unique=true] ; catalog(id)[unique=true]; inclPacking[default=true]; inclDuty[default=true]; inclFreight[default=true]; inclAssurance[default=true];
+; $systemVersion ; $systemName; 
+
+#% impex.info("done system");
+
+# ---------------------------------------------------------
+# --- eClass 4.1.80c
+# --- create classes 
+# --- from eclass4_1_80c.csv
+# ---------------------------------------------------------
+$sysVer=catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$idkl=externalID
+$kennung=
+$versionsnummer=revision
+$revisionsnummer=
+$klassifikationsnummer=code
+$bezeichnung=name[lang='$systemLanguage']
+$ebene=
+$knzunterebene=
+$knzschagwort=
+$knzbml=
+$superClass=superCategories(code,$sysVer)[srcCell='5',cellDecorator='de.hybris.platform.catalog.jalo.classification.eclass.EClassSuperCategoryDecorator']
+# AAT090002;AAT090;002;001;20000000;Packmittel;1;1;;
+# AAT091002;AAT091;002;001;20010000;Ampulle (Packmittel);2;1;;
+# ...
+# ---------------------------------------------------------
+#% impex.info("creating classes ...");
+
+INSERT_UPDATE ClassificationClass[cacheUnique=true];$sysVer[virtual=true,unique=true];$idkl[unique=true];$kennung;$versionsnummer;$revisionsnummer;$klassifikationsnummer;$bezeichnung;$ebene;$knzunterebene;$knzschagwort;$knzbml;$superClass
+
+#% impex.includeExternalDataMedia( "eclass4_1_80c.csv", 1, -1 );
+
+#% impex.info("done classes");
+
+# ---------------------------------------------------------
+# --- eClass 4.1.80c 
+# --- create and assign keywords 
+# --- from eclass4_1_sw_80c.csv
+# ---------------------------------------------------------
+$sysVer=catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$language=language(isocode[default='$systemLanguage'])
+$idkl=categories(ClassificationClass.externalID,catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))[lang='$systemLanguage',mode=append]
+$klassifikationsnummer=
+$bezeichnung=keyword
+$ebene=
+# AAT092002;20010100;Glasampulle (Packmittel);3
+# AAT104002;20030103;Klotzbodenbeutel (Kunststoff);4
+# ...
+# ---------------------------------------------------------
+#% impex.info("creating keywords ...");
+
+INSERT_UPDATE ClassificationKeyword[cacheUnique=true]; $sysVer[virtual=true,unique=true];$language[virtual=true,unique=true];$idkl;$klassifikationsnummer;$bezeichnung[unique=true];$ebene
+
+#% impex.includeExternalDataMedia( "eclass4_1_sw_80c.csv", 1, -1 );
+
+#% impex.info("done keywords");
+
+
+# ---------------------------------------------------------
+# --- eClass 4.1.80c 
+# --- create attributes 
+# --- from eclass4_1_mm.csv
+# ---------------------------------------------------------
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$idmm=externalID
+$kennung=code
+$versionsnummer=
+$revisionsnummer=
+$bevorzugter_name=name[lang='$systemLanguage']
+$kurzbezeichnung=
+$langbeschreibung=
+$synonym1=
+$synonym2=
+$feldformat=
+$formelzeichen=
+$masseinheit=
+# AAA000001;AAA000;001;01;Werkstoff Sitzring;WkStfSzRi;Werkstoffe für Sitzring werden durch ihre chem. Zusammensetzung oder durch ihre Handelsbezeichnungen gekennzeichnet!;;;X..30;;
+# AAA001001;AAA001;001;01;Hersteller;Herst;Firmenname des Geräteherstellers [KodierterName Hersteller];;;X..30;;
+# ...
+# ---------------------------------------------------------
+#% impex.info("creating attributes ...");
+
+INSERT_UPDATE ClassificationAttribute[cacheUnique=true];$sysVer[virtual=true,unique=true];$idmm[unique=true];$kennung;$versionsnummer;$revisionsnummer;$bevorzugter_name;$kurzbezeichnung;$langbeschreibung;$synonym1$synonym2$feldformat$formelzeichen$masseinheit
+
+#% impex.includeExternalDataMedia( "eclass4_1_mm.csv", 1, -1 );
+
+#% impex.info("done attributes");
+
+# ---------------------------------------------------------
+# --- eClass 4.1.80c 
+# --- create values 
+# --- from eclass4_1_we.csv
+# ---------------------------------------------------------
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$idwe=externalID
+$kennung=code
+$versionsnummer=
+$revisionsnummer=
+$bevorzugter_name=name[lang='$systemLanguage']
+$kurzbezeichnung=
+$definition=
+# AAA040001;AAA040;001;01;Klasse 1 nach DIN IEC 584;Klasse 1;
+# AAA041001;AAA041;001;01;Klasse 2 nach DIN IEC 584;Klasse 2;
+# ...
+# ---------------------------------------------------------
+#% impex.info("creating values ...");
+
+INSERT_UPDATE ClassificationAttributeValue[cacheUnique=true];$sysVer[virtual=true,unique=true];$idwe[unique=true];$kennung;$versionsnummer;$revisionsnummer;$bevorzugter_name;$kurzbezeichnung;$definition
+
+#% impex.includeExternalDataMedia( "eclass4_1_we.csv", 1, -1 );
+
+#% impex.info("done values");
+
+# ---------------------------------------------------------
+# --- eClass 4.1.80c 
+# --- assign classes to attributes 
+# --- from eclass4_1_mlmm.csv
+# ---------------------------------------------------------
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$idkl=classificationClass(ClassificationClass.externalID,catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$klassifikationsnummer=
+$idmm=classificationAttribute(externalID,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+# AAA344001;21040223;CBB018001
+# AAA344001;21040223;CBA102001
+# ...
+# ---------------------------------------------------------
+# simply create assignments - their data is filled later !!!
+#% impex.info("assigning attributes ...");
+
+INSERT_UPDATE ClassAttributeAssignment[cacheUnique=true]; $sysVer[virtual=true,unique=true];$idkl[unique=true];$klassifikationsnummer;$idmm[unique=true]
+
+#% impex.includeExternalDataMedia( "eclass4_1_mlmm.csv", 1, -1 );
+
+#% impex.info("done class2atr");
+
+# ---------------------------------------------------------
+# --- eClass 4.1.80c 
+# --- set attribute type in class-attribute-assignments
+# --- from eclass4_1_mm.csv
+# ---------------------------------------------------------
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$idmm=classificationAttribute(externalID,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$kennung=
+$versionsnummer=
+$revisionsnummer=
+$bevorzugter_name=
+$kurzbezeichnung=
+$langbeschreibung=
+$synonym1=
+$synonym2=
+$feldformat=attributeType[translator=de.hybris.platform.catalog.jalo.classification.eclass.EClassAttributeTypeTranslator]
+$formelzeichen=
+$masseinheit=unit[translator='de.hybris.platform.catalog.jalo.classification.eclass.EClassUnitTranslator',systemName='$systemName',systemVersion='$systemVersion']
+# ---------------------------------------------------------
+#% impex.info("setting attribute type and unit ...");
+
+UPDATE ClassAttributeAssignment[cacheUnique=true,batchmode=true];$sysVer[virtual=true,unique=true];$idmm[unique=true];$kennung;$versionsnummer;$revisionsnummer;$bevorzugter_name;$kurzbezeichnung;$langbeschreibung;$synonym1;$synonym2;$feldformat;$formelzeichen;$masseinheit
+
+#% impex.includeExternalDataMedia( "eclass4_1_mm.csv", 1, -1 );
+
+#% impex.info("done attribute type and unit");
+
+# ---------------------------------------------------------
+# --- eClass 4.1.80c 
+# --- assign values to class-attribute-assignments
+# --- from eclass4_1_mw.csv
+# ---------------------------------------------------------
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$idmm=attribute(externalID,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$idwe=value(externalID,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+# AAA000001;AAA003001
+# AAA000001;AAA004001
+# ...
+# ---------------------------------------------------------
+#% impex.info("assigning values ...");
+
+INSERT_UPDATE AttributeValueAssignment[cacheUnique=true];$sysVer[virtual=true,unique=true];$idmm[unique=true];$idwe[unique=true]
+
+#% impex.includeExternalDataMedia( "eclass4_1_mw.csv", 1, -1 );
+
+#% impex.info("completed $systemName - $systemVersion ");

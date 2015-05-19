@@ -1,0 +1,132 @@
+/*
+	Script           :	102
+	Author           :	RR
+	Description      :  Crossreference source script
+*/
+
+#include "internal/types.h"
+
+int SYNC_STATE_LOADERROR = -4;
+int SYNC_STATE_NO_MARK = -3;
+int SYNC_STATE_OBJECT_NOT_FOUND = -2;
+int SYNC_STATE_CHANGED = -1;
+int SYNC_STATE_DELETED = 0;
+int SYNC_STATE_OKAY = 1;
+int SYNC_STATE_NOT_UNIQUE = 2;
+
+int INFO_TARGET_ITEM_PK = 0;
+int INFO_LINK_ID = 1;
+int INFO_REPLACEMENT_TYPE = 2;
+
+
+int main ()
+{
+	char *pg = alloc(10000);
+	char *infos1;
+	char *targetFound;
+	char *replacementType = alloc(500);
+	char *linkId = alloc(500);
+	char *targetItemPk = alloc(500);
+	
+	wlog( "", "Crossreferences called, placeholder %d (%d), ID1 [%d], ID2 [%d], ID3 [%d], StringID [%s] \n", gPlaceholderID, gRepagination, gRecordID, gRecordID2, gRecordID3, gRecordStringID );	
+	
+	infos1 = placeholder::sget_value( gFrame, "Infos1", gStart,  0);	
+	
+	extractCrossreferenceInfo(targetItemPk, infos1, INFO_TARGET_ITEM_PK);
+	extractCrossreferenceInfo(linkId, infos1, INFO_LINK_ID);
+	extractCrossreferenceInfo(replacementType, infos1, INFO_REPLACEMENT_TYPE);
+	
+	if (!replacementType || strlen(replacementType) == 0)
+	{
+		getCrossreferenceReplacementType(replacementType, linkId);
+	}
+
+	targetFound = hyperlink::find1(
+			0,        // result variable (0=unused)
+			replacementType,   // result type (DocumentPage)
+			0,        // 0 = return first found
+			0,        // 0 = search in current document
+			"",       // Link name
+			3,        // ClassID (3 = "Produkt")
+			12,       // ID1, 12 = nodeType "Product"
+			0,        // ID2
+			0,        // ID3
+			targetItemPk,   // StringID (Object-PK)
+			0);        // Search in other book documents (0=no)
+
+	if( targetFound  &&  strlen(targetFound) > 0 )
+	{
+		strcpy( pg, targetFound );
+	}
+	else
+	{
+		strcpy( pg, "n/a" );
+		placeholder::set_sync( SYNC_STATE_OBJECT_NOT_FOUND );
+		*gSyncChanged = 1;
+	}
+
+	textmodel::replace( pg );	// replace the complete content of the crossreference placeholder
+	
+	
+
+	// Cleanup
+	release( pg );
+	release( infos1 );
+	release( targetFound );
+	release( replacementType );
+	
+	return 0;
+} 
+
+int getCrossreferenceReplacementType (char * replacemenettype, char * id)
+{
+	char * buffer = alloc (500);
+	int err = 0;
+	Query qu = sql::query (soap::connection());
+	
+	if(qu)
+	{
+		err = query::set_method (qu, "GET_crossreferenceReplacemenetType");//0
+		err = err + query::send (qu, "linkId = ?\n");//1
+		err = err + query::input(qu, kString, id);//1
+		err = err + query::output (qu, kString, buffer, 500);//1
+		if(err == 3){
+			if(query::exec (qu))
+			{
+				query::fetch (qu);
+				strcpy (replacemenettype, buffer);
+				wlog ("", "Got crossreference replacement type [%s] for LinkId [%d]\n", replacemenettype, id);
+			}
+			else
+			{
+				wlog("", "There was a query::exec error in 102.crpt, method getCrossreferenceReplacementType(). \n");
+				return 1;
+			}
+		}
+		else
+		{
+			wlog("", "There was a query::set_method error in 102.crpt, method getCrossreferenceReplacementType(). \n");
+			return 1;
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful! error in method getCrossreferenceReplacementType() in 102.crpt. \n");
+		return 1;
+	}
+
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in script 102.crpt, method getCrossreferenceReplacementType(). \n");
+		return 1;
+	}
+	// Cleanup
+	release( buffer );
+	return 0;
+}
+
+int extractCrossreferenceInfo( char * output, char * input, int pageInfoField )
+{
+	strcpy( output, strtoken(input, ':', pageInfoField) );
+	return 0;
+}

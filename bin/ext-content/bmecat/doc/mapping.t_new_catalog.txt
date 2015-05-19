@@ -1,0 +1,212 @@
+bmecat.xml --> T_NEW_CATALOG element
+
+T_NEW_CATALOG(prev_version :-- ignored )(start)
+	FEATURE_SYSTEM(start)
+		FEATURE_SYSTEM_NAME --> 
+		FEATURE_SYSTEM_DESCR --> 
+		FEATURE_GROUP(start)
+			FEATURE_GROUP_ID --> 
+			FEATURE_GROUP_NAME --> 
+			FEATURE_TEMPLATE(type --> )(start)
+				FT_NAME --> 
+				FT_UNIT --> 
+				FT_ORDER --> 
+			FEATURE_TEMPLATE(end)
+			FEATURE_GROUP_DESCR -->
+		FEATURE_GROUP(end)
+	FEATURE_SYSTEM(end)
+	CLASSIFICATION_SYSTEM(start)
+		CLASSIFICATION_SYSTEM_NAME --> 
+		CLASSIFICATION_SYSTEM_FULLNAME --> 
+		CLASSIFICATION_SYSTEM_VERSION --> 
+		CLASSIFICATION_SYSTEM_DESCR --> 
+		CLASSIFICATION_SYSTEM_LEVELS --> 
+		CLASSIFICATION_SYSTEM_LEVEL_NAMES(start)
+			CLASSIFICATION_SYSTEM_LEVEL_NAME(type --> ) --> 
+		CLASSIFICATION_SYSTEM_LEVEL_NAMES(end)
+		ALLOWER_VALUES(start)
+			ALLOWER_VALUE(start)
+				ALLOWED_VALUE_ID --> 
+				ALLOWER_VALUE_NAME --> 
+				ALLOWED_VALUE_DESCR --> 
+			ALLOWER_VALUE(end)
+		ALLOWER_VALUES(end)
+		UNITS(start)
+			UNIT(system --> )(start)
+				UNIT_ID --> 
+				UNIT_NAME --> 
+				UNIT_DESCR --> 
+			UNIT(end)
+		UNITS(end)
+		CLASSIFICATION_SYSTEM_FEATURE_TEMPLATES(start)
+			CLASSIFICATION_SYSTEM_FEATURE_TEMPLATE(start)
+				FT_ID --> 
+				FT_NAME --> 
+				FT_DESCR --> 
+			CLASSIFICATION_SYSTEM_FEATURE_TEMPLATE(end)
+		CLASSIFICATION_SYSTEM_FEATUREN_TEMPLATES(end)
+		CLASSIFICATION_GROUPS(start)
+			CLASSIFICATION_GROUP(type --> , level --> )(start)
+					CLASSIFICATION_GROUP_ID --> 
+					CLASSIFICATION_GROUP_NAME --> 
+					CLASSIFICATION_GROUP_DESCR --> 
+					CLASSIFICATION_GROUP_SYNONYMS(start)
+						SYNONYM --> 
+					CLASSIFICATION_GROUP_SYNONYMS(end)
+					CLASSIFICATION_GROUP_FEATURE_TEMPLATES(start)
+						CLASSIFICATION_GROUP_FEATURE_TEMPLATE(start)
+							FT_IDREF --> 
+							FT_MANDATORY --> 
+							FT_DATATYPE --> 
+							FT_UNIT --> 
+							FT_ORDER --> 
+							FT_ALLOWED_VALUES(start)
+								ALLOWED_VALUE_IDREF(order --> ) --> 
+							FT_ALLOWED_VALUES(end)
+						CLASSIFICATION_GROUP_FEATURE_TEMPLATE(end)
+					CLASSIFICATION_GROUP_FEATURE_TEMPLATES(end)
+					CLASSIFICATION_GROUP_PARENT_ID --> 
+			CLASSIFICATION_GROUP(end)
+		CLASSIFICATION_GROUPS(end)
+	CLASSIFICATION_SYSTEM(end)
+	CATALOG_GROUP_SYSTEM(start)
+		GROUP_SYSTEM_ID --> groupsystem.csv[Group system ID]
+		GROUP_SYSTEM_NAME --> groupsystem.csv[Group system name]
+		CATALOG_STRUCTURE(type --> categories.csv[Type](ignored by import))(start)
+			GROUP_ID --> categories.csv[Group ID(code)]
+			GROUP_NAME --> categories.csv[Group Name]
+			GROUP_DESCRIPTION --> categories.csv[Description]
+			PARENT_ID --> categories.csv[Patent ID]
+			GROUP_ORDER --> categories.csv[Order]
+			MIME_INFO(start)
+				--: in context "CATALOG_STRUCTURE"
+				MIME(start)
+					MIME_TYPE --> medias[Type]
+					MIME_SOURCE --> categories.csv[Mime filename], medias.csv[Code](without slash), medias.csv[Source]
+						--: MIME_ROOT + MIME_SOURCE --> medias.csv[Root source](complete path)
+					MIME_DESCR --> medias.csv[Description]
+					MIME_ALT --> medias.csv[Alt text]
+					MIME_PURPOSE --> medias.csv[Purpose]
+						--: used in Product
+					MIME_ORDER --> medias.csv[Order]
+						--: no such attribute in hybris system
+				MIME(end) 
+			MIMI_INFO(end)
+			USER_DEFINED_EXTENSIONS 
+				--: must be specially negotiated with the customers
+			KEYWORD --> categories.csv[Keywords]
+		CATALOG_STRUCTURE(end)
+		GROUP_SYSTEM_DESCRIPTION --> groupsystem.csv[Group system description]
+	CATALOG_GROUP_SYSTEM(end)
+	ARTICLE(mode --> products.csv[Article mode])(start)
+		--: mode must be "new" if specified because it is inside T_NEW_CATALOG; other values are ignored
+		SUPPLIER_AID --> products.csv[Supplier AID], productprices.csv[Supplier AID], productreferences.csv[Supplier AID], articlefeatures.csv[Supplier AID], articlefeaturedetails.csv[Supplier AID], articlefeaturevariants.csv[Supplier AID]
+		ARTICLE_DETAILS(start)
+			DESCRIPTION_SHORT --> products.csv[Short description]
+			DESCRIPTION_LONG --> products.csv[Long description]
+			MANUFACTURER_TYPE_DESCR --> products.csv[Manufacturer type description]
+			EAN --> products.csv[Ean]
+			SUPPLIER_ALT_AID --> products.csv[Supplier alternative AID] 
+			BUYER_AID(type --> products.csv[Buyer AID type and value]) --> products.csv[Buyer AID type and value]
+			MANUFACTURER_AID --> products.csv[Manufacturer AID]
+			MANUFACTURER_NAME --> products.csv[Manufacturer name]
+			ERP_GROUP_BUYER --> products.csv[Erp group buyer]
+			ERP_GROUP_SUPPLIER --> products.csv[Erp group supplier]
+			DELIVERY_TIME --> products.csv[Delivery time]
+			SPECIAL_TREATMENT_CLASS(type --> products.csv[Special treatment class type and value]) --> products.csv[Special treatment class type and value]
+			KEYWORD --> products.csv[Keywords]
+			REMARKS --> products.csv[Remarks]
+			SEGMENT --> products.csv[Segment]
+			ARTICLE_ORDER --> products.csv[Order]
+			ARTICLE_STATUS(type --> products.csv[Article status type and value]) --> products.csv[Article status type and value]
+		ARTICLE_DETAILS(end)
+		ARTICLE_FEATURES(start)
+			REFERENCE_FEATURE_SYSTEM_NAME --> articlefeatures.csv[Feature system name]
+			REFERENCE_FEATURE_GROUP_ID --> articlefeatures.csv[Feature group id]
+				--: either REFERENCE_FEATURE_GROUP_ID or REFERENCE_FEATURE_GROUP_NAME
+			REFERENCE_FEATURE_GROUP_NAME --> articlefeatures.csv[Feauture group name]
+				--: either REFERENCE_FEATURE_GROUP_ID or REFERENCE_FEATURE_GROUP_NAME
+			FEATURE(start)
+				FNAME --> articlefeaturedetails.csv[Feature name], articlefeaturevariants.csv[Feature name]
+				VARIANTS(start)
+					VARIANT(start)
+						FVALUE --> articlefeaturevariants.csv[Feature value]
+						SUPPLIER_AID_SUPPLEMENT --> articlefeaturevariants.csv[Supplier AID supplement]
+					VARIANT(end)
+					VORDER --> articlefeaturevariants.csv[Variant order]
+				VARIANTS(end)
+					--: either VARIANTS or FVALUE 
+				FVALUE --> articlefeaturedetails.csv[Feature value]
+					--: either VARIANTS or FVALUE 
+				FUNIT --> articlefeaturedetails.csv[Feature unit]
+				FORDER --> articlefeaturedetails.csv[Feature order]
+				FDESCR --> articlefeaturedetails.csv[Feature description]
+				FVALUE_DETAILS --> articlefeaturedetails.csv[Feature value details]
+			FEATURE(end)
+		ARTICLE_FEATURES(end)
+		ARTICLE_ORDER_DETAILS(start)
+			ORDER_UNIT --> products.csv[Order unit]
+			CONTENT_UNIT --> products.csv[Content unit]
+			NO_CU_PER_OU --> products.csv[Number of content units]
+			PRICE_QUANTITY --> products.csv[Price quantity]
+			QUANTITY_MIN --> products.csv[Min order quantity]
+			QUANTITY_INTERVAL --> products.csv[Interval order quantity]
+		ARTICLE_ORDER_DETAILS(end)
+		ARTICLE_PRICE_DETAILS(start)
+			DATETIME(type="valid_start_date")(start)
+				DATE --> productprices.csv[Start date]
+				TIME --> productprices.csv[Start date]
+				TIMEZONE --> productprices.csv[Start date]
+			DATETIME(end)
+			DATETIME(type="valid_end_date")(start)
+				DATE --> productprices.csv[End date]
+				TIME --> productprices.csv[End date]
+				TIMEZONE --> productprices.csv[End date]
+			DATETIME(end)
+			DAILY_PRICE --> productprices.csv[Daily price]
+			ARTICLE_PRICE(start)
+				PRICE_AMOUNT --> productprices.csv[Amount]
+				PRICE_CURRENCY --> productprices.csv[Currency]
+				TAX --> productprices.csv[Tax]
+				PRICE_FACTOR --> productprices.csv[Price factor]
+				LOWER_BOUND --> productprices.csv[Lower bound]
+				TERRITORY --> productprices.csv[Territory]
+					--: ATTENTION! no such attribute in the hybris system for the ARTICLE_PRICE element, although it makes sense 
+			ARTICLE_PRICE(end)
+		ARTICLE_PRICE_DETAILS(end)
+		MIME_INFO(start)
+			MIME(start)
+				MIME_TYPE --> medias.csv[Type]
+				MIME_SOURCE --> medias.csv[Code](without slash), medias.csv[Source]
+					--: MIME_ROOT + MIME_SOURCE --> medias.csv[Root source](complete path)
+					--: combined with MIME_SOURCE, the reference for the product to the media
+					--: products.csv[Purpose normal] if MIME_PURPOSE is defined as "normal"
+					--: products.csv[Purpose thumbnail] if MIME_PURPOSE is defined as "thumbnail"
+					--: products.csv[Purpose data_sheet] if MIME_PURPOSE is defined as "data_sheet"
+					--: products.csv[Purpose detail] if MIME_PURPOSE is defined as "detail"
+					--: products.csv[Purpose logo] if MIME_PURPOSE is defined as "logo"
+					--: products.csv[Purpose others] if MIME_PURPOSE is defined as "others" or nothing is specified
+					--: products.csv[Purpose not defined] if MIME_PURPOSE is not specified
+				MIME_DESCR --> medias.csv[Description]
+				MIME_ALT --> medias.csv[Alt text]
+				MIME_PURPOSE --> medias.csv[Purpose]
+					--: no such attribute in hybris system, but specified in the products.csv file
+				MIME_ORDER --> medias.csv[Order]
+					--: no such attribute in hybris system, ignored 
+			MIME(end)
+		MIME_INFO(end)
+		USER_DEFINED_EXTENSIONS 
+			--: must be specially negotiated with the customers
+		ARTICLE_REFERENCE(type --> productreferences.csv[Type], quantity --> productreferences.csv[Quantity])(start)
+			ART_ID_TO --> productreferences.csv[Article reference]
+			CATALOG_ID --> productreferences.csv[Catalog ID]
+			CATALOG_VERSION --> productreferences.csv[Catalog Version]
+		ARTICLE_REFERENCE(end)
+	ARTICLE(end)
+	ARTICLE_TO_CATALOGGROUP_MAP(start)
+		ART_ID --> productnew2category.csv[Article ID]
+		CATALOG_GROUP_ID --> productnew2category.csv[Catalog group ID]
+		ARTICLE_TO_CATALOGGROUP_MAP_ORDER --> productnew2category.csv[Article to catalog group order]
+			:-- no such attribute in hybris system, ignored when impex script is executed
+	ARTICLE_TO_CATALOGGROUP_MAP(end)
+T_NEW_CATALOG(end)

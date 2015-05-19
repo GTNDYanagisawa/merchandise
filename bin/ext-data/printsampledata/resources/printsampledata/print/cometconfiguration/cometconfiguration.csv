@@ -1,0 +1,16 @@
+﻿INSERT_UPDATE CometConfiguration; code[unique=true];name[lang=en];name[lang=de];publicationController;imageRoot;translatorConfiguration(code);defaultConfiguration;defaultDeleteAutoCometJob(code);pagePreviewSize;serverWorkingPath;
+
+"#% afterEach:
+import de.hybris.platform.printsampledata.jalo.PrintsampledataManager;
+import de.hybris.platform.print.jalo.PrintManager;
+if( PrintsampledataManager.getInstance().getPrintFilehandlingRoot() != null && PrintsampledataManager.getInstance().getPrintFilehandlingRoot().exists() )
+{
+   impex.getLastImportedItem().setServerTemplatePath( new File(PrintsampledataManager.getInstance().getPrintFilehandlingRoot(), impex.getLastImportedItem().getCode().toLowerCase() + ""/templates"").getAbsolutePath() );
+}
+";
+;SampleConfiguration;Sample Configuration;Beispiel-Konfiguration;DefaultPublicationController;;DefaultTranslatorConfiguration;true;ONLYWHENSUCCESSFUL;1600;$HOME/werk2_print/workdir;
+;DefaultConfiguration;Standard Configuration;Standard-Konfiguration;DefaultPublicationController;;DefaultTranslatorConfiguration;false;ONLYWHENSUCCESSFUL;1600;$HOME/werk2_print/workdir;
+"#%
+
+import de.hybris.platform.print.jalo.PrintManager;
+PrintManager.getInstance().loadCometConfigFromZip( PrintManager.getInstance().getCometConfigurationByCode( ""SampleConfiguration"" ), PrintManager.class.getResource( ""/printsampledata/comet/SampleConfiguration.zip"" ) );";

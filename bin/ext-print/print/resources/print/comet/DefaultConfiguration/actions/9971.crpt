@@ -1,0 +1,93 @@
+/*
+	Script           :  9971
+	Author           :  RR
+	Description      :  Move comment to notes layer
+*/
+
+#include "internal/types.h"
+#include "internal/text.h"
+
+int gBufferSize = 50000;
+int classID	= 3;
+char *notesLayerName = "notes";
+
+int main ()
+{
+	int selectError = 0;
+	char *buffer = alloc( gBufferSize );
+	int err = 0;
+	ItemRef thisFrame = gFrame;
+	char *originalLayerName = layer::get_name(thisFrame);
+	Query qu = sql::query( soap::connection() );
+
+	if(qu)
+	{
+		if( layer::index(notesLayerName) < 0 )
+		{
+			// The notes layer does not exist, create it
+			layer::add_i( notesLayerName, layer::count() + 1 );
+		}
+
+		if(	query::set_method( qu, "GET_attribute" ) &&
+			query::send( qu, "qualifier = Placement.notes\n" ) &&
+			query::send( qu, "id = ?\n" ) &&
+			query::send( qu, "language = ?\n" ) &&
+			query::input( qu, kString, gRecordStringID ) &&
+			query::input( qu, kString, layer::get_name(thisFrame) ) &&
+			query::output( qu, kString, buffer, gBufferSize ))
+		{
+			if(query::exec( qu ))
+			{
+				query::fetch( qu );
+
+				// replace complete content of the current frame
+				err = frame::replace( thisFrame, buffer );
+				if(err != 0)
+				{
+					wlog("", "Error [%i], message: [%s] in frame::replace, script 9971.crpt. \n", err, serror(err));
+				}
+
+				// moving frame to notes layer
+				err = frame::move_to_layer( thisFrame, notesLayerName );
+				if(err != 0)
+				{
+					wlog("", "Error [%i], message: [%s] in frame::move_to_layer, script 9971.crpt. \n", err, serror(err));
+				}
+
+				// select original layer again (just to be sure)
+				err = layer::select( originalLayerName );
+				if(err != 0)
+				{
+					wlog("", "Error [%i], message: [%s] in layer::select, script 9971.crpt. \n", err, serror(err));
+				}
+			}
+			else
+			{
+				wlog("", "There was a query:exec error in 9971.crpt, method main(). \n");
+				err = 1;
+			}
+		}
+		else
+		{
+			wlog("", "There was query send/input errors in 9971.crpt, method main(). \n");	
+			err = 2;
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful in script 9971.crpt, method main(). \n");
+		err = 3;
+	}
+
+	if( query::close(qu) != 0)
+	{	
+		wlog("", "There was an error during SOAP connection close in script 9971.crpt, method main(). \n");
+	}	
+
+	// Cleanup
+	release( buffer );
+	release( originalLayerName );
+	// since thisFrame points to gFrame, dont release it.   item::release( thisFrame );
+
+	return 0;
+}

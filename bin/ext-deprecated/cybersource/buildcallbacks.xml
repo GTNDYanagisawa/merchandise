@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<project name="cybersource_buildcallbacks" >
+	
+	<macrodef name="cybersource_before_build">
+		<sequential>
+
+			<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+				<classpath>
+					<fileset dir="${platformhome}/resources/ant/lib">
+						<include name="*.jar" />
+					</fileset>
+				</classpath>
+			</taskdef>
+
+			<mkdir dir="${ext.cybersource.path}/gensrc" />
+
+			<xjc schema="${ext.cybersource.path}/resources/www.cybersource.com/CyberSourceTransaction_1.49.xsd" package="de.hybris.platform.cybersource.api.v1_49" destdir="${ext.cybersource.path}/gensrc">
+				<produces dir="${ext.cybersource.path}/gensrc/de/hybris/platform/cybersource/api/v1_49">
+					<include name="*.java" />
+				</produces>
+				<depends file="${ext.cybersource.path}/resources/www.cybersource.com/CyberSourceTransaction_1.49.xsd" />
+			</xjc>
+
+			<!-- BEWARE: Don't reformat lines below. Leading spaced need to remain as they are -->
+			<replace dir="${ext.cybersource.path}/gensrc">
+				<include name="**/ObjectFactory.java" />
+				<replacetoken><![CDATA[public ObjectFactory() {
+    }]]></replacetoken>
+				<replacevalue><![CDATA[public ObjectFactory() { // empty constructor
+    }]]></replacevalue>
+				
+			</replace>
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="cybersource_before_compile_core">
+		<sequential>
+			<echo>Copying security key files (*.p12) from ${ext.cybersource.path}/resources/security/ to ${platformhome}/../../config/security/</echo>
+			<copy overwrite="false" verbose="true" failonerror="false" toDir="${platformhome}/../../config/security/">
+				<fileset dir="${ext.cybersource.path}/resources/security">
+					<include name="*.p12"/>
+				</fileset>
+			</copy>
+			<copy file="${ext.cybersource.path}/resources/security/cybersource_readme.txt" overwrite="false" verbose="true" failonerror="true" toDir="${platformhome}/../../config/security/" />
+		</sequential>
+	</macrodef>
+</project>
+
+
+		

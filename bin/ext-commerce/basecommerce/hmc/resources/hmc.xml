@@ -1,0 +1,759 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+	<explorertree>
+		<group name="order">
+			<typeref type="OrderHistoryEntry" description="order.history.description" />
+			<typeref type="Consignment" description="consignment.description" />
+			<typeref type="ConsignmentEntry" description="consignment.entry.description" />
+			<typeref type="FraudReport" description="fraudreport.entry.description" />
+
+		</group>
+		<group name="group.basecommerce" description="group.basecommerce.description">
+			<typeref type="BaseStore" description="typeref.cmssite.description" />
+			<typeref type="OrderCancelConfig" description="ordercancelconfig.description" />
+		</group>
+		<group name="group.basecommerce.deeplink" description="group.basecommerce.deeplink.description">
+			<typeref type="DeeplinkUrl" description="deeplinkurl.description" />
+			<typeref type="DeeplinkUrlRule" description="deeplinkurl.rule.description" />
+		</group>
+	</explorertree>
+
+	<type name="OrderHistoryEntry" mode="append">
+
+		<organizer>
+			<search mode="append">
+				<condition attribute="order" />
+				<condition attribute="timestamp" />
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout mode="replace">
+						<attribute name="order" width="150"></attribute>
+						<attribute name="timestamp" width="100"></attribute>
+						<attribute name="description" width="200"></attribute>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="order" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties" position="0">
+					<section name="order.history.section">
+						<listlayout>
+							<attribute name="timestamp" />
+							<attribute name="previousOrderVersion" />
+							<attribute name="employee" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="order.history.tracking" position="1">
+					<section name="order.history.details">
+						<listlayout>
+							<attribute name="description" editable="false" width="400" />
+							<attribute name="documents" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	<type name="Order" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="order.history.tab" mode="append">
+					<section name="order.history.section">
+						<listlayout mode="append">
+							<attribute name="historyEntries" width="600" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="order.consignments.tab" mode="append">
+					<section name="order.consignments.section">
+						<listlayout mode="append">
+							<attribute name="consignments" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="order.cronjob.tab">
+					<section name="order.cronjob.ordertemplate">
+						<listlayout>
+
+							<attribute name="orderTemplateCronJob" />
+						</listlayout>
+					</section>
+					<section name="order.cronjob.scheduleorder">
+						<listlayout>
+							<attribute name="orderScheduleCronJob" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="order.fraud.tab">
+					<section name="order.fraud.section">
+						<listlayout>
+							<attribute name="fraudReports">
+								<referencecollectioneditor editable="false"
+									attribute="fraudReports" add="false" create="false">
+									<itemlayout>
+										<attribute name="code" />
+										<attribute name="status" />
+										<attribute name="timestamp" width="250" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="Consignment" mode="append">
+
+		<organizer>
+			<search mode="replace">
+				<condition attribute="order" />
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout mode="replace">
+						<attribute name="order" width="100"></attribute>
+						<attribute name="trackingID" width="100"></attribute>
+						<attribute name="deliveryMode" width="100"></attribute>
+						<attribute name="shippingDate" width="100"></attribute>
+						<attribute name="namedDeliveryDate" width="100"></attribute>
+						<attribute name="status" width="100"></attribute>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="order" />
+							<attribute name="trackingID" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties" position="0">
+					<section name="consignment.details">
+						<listlayout>
+							<attribute name="deliveryMode" />
+							<attribute name="shippingDate" />
+							<attribute name="namedDeliveryDate" />
+							<attribute name="status" />
+						</listlayout>
+					</section>
+					<section name="consignment.entries">
+						<listlayout>
+							<attribute name="consignmentEntries" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+
+	</type>
+
+	<type name="ConsignmentEntry" mode="append">
+
+		<organizer>
+			<search mode="replace">
+				<condition attribute="quantity" />
+				<condition attribute="shippedQuantity" />
+				<condition attribute="orderEntry" />
+				<condition attribute="consignment" />
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout mode="replace">
+						<attribute name="consignment" width="200"></attribute>
+						<attribute name="orderEntry" width="200"></attribute>
+						<attribute name="quantity" width="100"></attribute>
+						<attribute name="shippedQuantity" width="100"></attribute>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="consignment" />
+							<attribute name="orderEntry" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties">
+					<section name="consignment.details">
+						<columnlayout>
+							<row>
+								<attribute name="quantity" />
+								<attribute name="shippedQuantity" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+
+	</type>
+
+	<type name="BaseStore" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="uid" />
+				<condition attribute="name" />
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout mode="replace">
+						<attribute name="uid" width="200"></attribute>
+						<attribute name="name" width="200"></attribute>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="uid" />
+							<attribute name="name" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="properties" position="0">
+					<section name="section.basecommerce.catalogs">
+						<listlayout>
+							<attribute name="catalogs" width="300" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="locations">
+					<section name="section.basecommerce.locations">
+						<listlayout mode="append">
+							<attribute name="pointsOfService">
+								<referencecollectioneditor attribute="pointsOfService"
+									create="true">
+									<itemlayout>
+										<attribute name="name" />
+										<attribute name="type" />
+										<attribute name="address" />
+										<attribute name="geocodeTimestamp" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="FraudReport" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" />
+				<condition attribute="order" />
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout mode="replace">
+						<attribute name="code" width="200"></attribute>
+						<attribute name="order" width="200"></attribute>
+						<attribute name="timestamp" width="100"></attribute>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="code" />
+							<attribute name="order" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="tab.details">
+					<section name="sec.details">
+						<listlayout mode="append">
+							<attribute name="provider" editable="false" />
+							<attribute name="timestamp" editable="false" />
+							<attribute name="status" editable="false" />
+							<attribute name="explanation" editable="false" />
+						</listlayout>
+					</section>
+					<section name="sec.symptoms">
+						<columnlayout>
+							<row>
+								<attribute name="fraudSymptomScorings">
+									<referencecollectioneditor editable="false"
+										attribute="fraudSymptomScorings">
+										<itemlayout>
+											<attribute name="name" />
+											<attribute name="score" />
+											<attribute name="explanation" />
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="PointOfService" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="name" />
+			</search>
+			<result defaultview="list">
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="name" width="100" />
+						<attribute name="type" width="100" />
+						<attribute name="description" width="200" />
+						<attribute name="address" width="200" />
+						<attribute name="geocodeTimestamp" width="100" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="append">
+					<listlayout>
+						<attribute name="name" />
+					</listlayout>
+				</essentials>
+				<tab name="tab.address">
+					<section name="sec.type" position="0">
+						<columnlayout>
+							<row>
+								<attribute name="type" />
+								<attribute name="mapIcon" />
+							</row>
+						</columnlayout>
+						<listlayout>
+							<attribute name="description" />
+						</listlayout>
+					</section>
+					<section name="sec.geodata" position="1">
+						<columnlayout>
+							<row>
+								<attribute name="geocodeTimestamp" editable="false" />
+								<action classname="de.hybris.platform.basecommerce.hmc.GeoCodePOSAction"
+									type="item" name="geocode" />
+							</row>
+							<row>
+								<attribute name="latitude" editable="false" />
+								<attribute name="longitude" editable="false" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="sec.address" position="2">
+						<listlayout>
+							<attribute name="address" editable="true" >
+								<referenceeditor>
+									<preset targetattribute="owner"/>
+								</referenceeditor>
+							</attribute>
+						</listlayout>
+					</section>
+					<section name="sec.availability" position="3">
+						<listlayout>
+							<attribute name="openingSchedule" editable="true"   />														
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="append">
+			<itemlayout>
+				<attribute name="name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="OpeningSchedule" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" />
+				<condition attribute="name" />				
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code" width="200" />
+						<attribute name="name" width="100" />						
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+			<essentials>
+					<columnlayout>
+						<row>				
+							<attribute name="code" />
+							<attribute name="name" />														
+						</row>
+					</columnlayout>
+			</essentials>
+				<tab name="tab.common" position="0" mode="append">
+					<section name="sec.openings" mode="append">
+						   <columnlayout>
+							<row>
+								<attribute name="openingDays">
+									<referencecollectioneditor editable="false"  >
+										<itemlayout>											
+											<attribute name="openingTime" />
+											<attribute name="closingTime" />											
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="code">
+			<itemlayout>
+				<attribute name="code"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+
+	<type name="OpeningDay" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="openingTime" />
+				<condition attribute="closingTime" />
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout mode="replace">
+						<attribute name="openingTime" width="200"></attribute>
+						<attribute name="closingTime" width="200"></attribute>						
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="openingTime" />
+							<attribute name="closingTime" />
+						</row>
+					</columnlayout>
+				</essentials>
+				</editor>
+			</organizer>	
+	</type>
+
+	<type name="SpecialOpeningDay" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="date" />
+				<condition attribute="name" />
+				<condition attribute="closed" />
+				<condition attribute="message" />
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout mode="append">
+						<attribute name="date" width="100"/>
+						<attribute name="name" width="150"/>						
+						<attribute name="closed" width="75"/>
+						<attribute name="message" width="200"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="append" >
+					<columnlayout >						
+						<row position="1">							
+							<attribute name="name" width="150"/>												
+							<attribute name="message" width="200"/>
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="tab.common"  mode="append">
+					<section name="sec.details" position="1">
+						<listlayout>
+							<attribute name="date" width="100"/>
+							<attribute name="closed" width="75"/>
+						</listlayout>
+					</section>
+				</tab>
+				</editor>
+		</organizer>
+	</type>
+	
+	<type name="WeekdayOpeningDay" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="dayOfWeek" />				
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout mode="append">
+						<attribute name="dayOfWeek" width="150"/>						
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="append">
+					<columnlayout>
+						<row>
+							<attribute name="dayOfWeek" width="150"/>							
+						</row>
+					</columnlayout>
+				</essentials>
+				</editor>
+			</organizer>
+	</type>
+	
+
+	<type name="GeocodeAddressesCronJob" mode="append">
+		<organizer>
+			<editor>
+				<exclude>
+					<exclusion attribute="finishedItems" />
+					<exclusion attribute="pendingItems" />
+				</exclude>
+				<tab name="tab.cronjob.common" mode="append">
+					<section name="sec.geoaddress.specific" mode="append">
+						<listlayout>
+							<attribute name="batchSize"></attribute>
+							<attribute name="internalDelay"></attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="DeeplinkUrl" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="code" />
+				<condition attribute="name" />
+				<condition attribute="baseUrl" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code" width="200" />
+						<attribute name="name" width="100" />
+						<attribute name="baseUrl" width="100" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.common" position="0" mode="replace">
+					<section name="properties" mode="append">
+						<listlayout>
+							<attribute name="code" />
+							<attribute name="name" />
+							<attribute name="baseUrl" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="DeeplinkUrlRule" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="baseUrlPattern" />
+				<condition attribute="destUrlTemplate" />
+				<condition attribute="applicableType" />
+				<condition attribute="useForward" />
+				<condition attribute="priority" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="baseUrlPattern" width="300" />
+						<attribute name="applicableType" width="100" />
+						<attribute name="useForward" width="100" />
+						<attribute name="priority" width="100" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.common" position="0" mode="replace">
+					<section name="properties" mode="append">
+						<listlayout>
+							<attribute name="baseUrlPattern" />
+							<attribute name="destUrlTemplate" />
+							<attribute name="applicableType" />
+							<attribute name="useForward" />
+							<attribute name="priority" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ReturnEntry" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="reachedDate" />
+				<condition attribute="status" />
+				<condition attribute="action" />
+				<condition attribute="orderEntry" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="reachedDate" width="100" />
+						<attribute name="status" width="100" />
+						<attribute name="action" width="100" />
+						<attribute name="orderEntry" width="100" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.common" position="0" mode="replace">
+					<section name="properties" mode="append">
+						<listlayout>
+							<attribute name="reachedDate" width="100" />
+							<attribute name="status" width="100" />
+							<attribute name="action" width="100" />
+							<attribute name="orderEntry" width="100" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ReturnRequest" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="code" />
+				<condition attribute="rma" />
+				<condition attribute="replacementOrder" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code" width="200" />
+						<attribute name="rma" width="100" />
+						<attribute name="replacementOrder" width="100" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.common" position="0" mode="replace">
+					<section name="properties" mode="append">
+						<listlayout>
+							<attribute name="code" width="200" />
+							<attribute name="rma" width="100" />
+							<attribute name="replacementOrder" width="100" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ReplacementOrder" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="fulfilmentStatus" />
+			</search>
+			<result>
+				<listview mode="append">
+					<itemlayout>
+						<attribute name="fulfilmentStatus" width="100" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.common" position="0" mode="append">
+					<section name="properties" mode="append">
+						<listlayout>
+							<attribute name="fulfilmentStatus" width="100" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	
+	<type name="OrderCancelConfig" mode="append">
+		<organizer>
+			<editor>
+				<tab name="tab.common" position="0" mode="append">
+					<section name="properties" mode="append">
+						<listlayout>
+							<attribute name="orderCancelAllowed"/>
+							<attribute name="cancelAfterWarehouseAllowed"/>
+							<attribute name="completeCancelAfterShippingStartedAllowed"/>
+							<attribute name="partialCancelAllowed"/>
+							<attribute name="partialOrderEntryCancelAllowed"/>
+							<attribute name="queuedOrderWaitingTime"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	
+	<type name="BaseSite" mode="append"  >
+		<organizer mode="append">
+			<search mode="replace" autoperform="true">
+				<condition attribute="uid" operator="contains" />
+				<condition attribute="name" operator="contains" />			
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="uid" width="100" />
+						<attribute name="name" width="200" />						
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials>
+					<listlayout>
+						<attribute name="uid" />
+						<attribute name="name" />						
+					</listlayout>
+				</essentials>
+				<tab name="properties" position="0">					
+					<section name="section.basesite.basestores">
+						<listlayout>
+							<attribute name="stores" />							
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="name" mode="replace">
+			<itemlayout>
+				<attribute name="name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+</configuration>

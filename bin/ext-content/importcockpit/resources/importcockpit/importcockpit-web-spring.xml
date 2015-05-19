@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only
+		in accordance with the terms of the license agreement you entered into with hybris.
+	-->
+
+
+	<!--
+		WARNING: This is the Spring WEB configuration file. If you want to replace items or managers you have to do this from the
+		extensions core configuration file (productcockpit/resources/productcockpit-spring.xml)
+	-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+							http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd"
+	default-autowire="byName">
+
+    <bean id="UICockpitSession" class="de.hybris.platform.cockpit.session.impl.UISessionImpl" scope="session">
+        <property name="initialSessionListeners">
+            <list></list>
+        </property>
+        <property name="availablePerspectives">
+            <list>
+                <ref bean="importCockpitPerspective"/>
+            </list>
+        </property>
+        <property name="usingTestIDs" value="true"/>
+        <property name="dragOverPerspectivesEnabled" value="true"/>
+        <property name="cachePerspectivesEnabled" value="true"/>
+        <property name="requestHandler" ref="RequestHandler"/>
+        <property name="pushContainers">
+            <list value-type="de.hybris.platform.cockpit.session.impl.PushCreationContainer">
+                <ref bean="WorkflowPushContainer" />
+				<ref bean="CommentPushContainer" />
+            </list>
+        </property>
+        <property name="sendEventsImmediately" value="false" />
+    </bean>
+    
+	<bean id="BaseEditorAreaModel" class="de.hybris.platform.cockpit.session.impl.EditorArea" abstract="true" scope="session">
+		<property name="viewURI" value="/importcockpit/baseEditorArea.zul"/>
+		<property name="systemService" ref="systemService"/>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="undoManager" ref="undoManager"/>
+		<property name="valueService" ref="valueService"/>
+	</bean>
+	
+	<bean id="LoginForm" class="de.hybris.platform.cockpit.forms.login.LoginForm" scope="session">
+		<property name="viewComponentURI" value="/importcockpit/dialog/loginDialog.zul"/>
+		<property name="exceptionToLabelConverter" ref="authenticationExceptionToLabelConverter"/>
+	</bean>
+
+    <bean id="WorkflowPushContainer" class="de.hybris.platform.cockpit.session.impl.PushCreationContainer" scope="session">
+        <constructor-arg value="de.hybris.platform.importcockpit.session.impl.CronJobsPushController" index="0"/>
+        <constructor-arg index="1">
+            <map>
+                <entry key="updateInterval" value="500"/>
+            </map>
+        </constructor-arg>
+    </bean>
+    
+	<bean id="CommentPushContainer" class="de.hybris.platform.cockpit.session.impl.PushCreationContainer" scope="session">
+		<constructor-arg value="de.hybris.platform.cockpit.session.impl.CommentPushController" index="0" />
+		<constructor-arg index="1">
+			<map>
+				<entry key="updateInterval" value="30000" />
+				<entry key="cockpitTypeService">
+					<ref bean="typeService"/>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+
+    <bean id="RequestHandler" class="de.hybris.platform.cockpit.session.impl.DefaultRequestHandler" scope="session">
+        <property name="requestEventHandlers">
+            <map>
+                <entry key="activation">
+                    <bean class="de.hybris.platform.cockpit.session.impl.ActivationEventHandler">
+                        <property name="prefix" value="act"/>
+                    </bean>
+                </entry>
+                <entry key="search">
+                    <bean class="de.hybris.platform.cockpit.session.impl.SearchEventHandler">
+                        <property name="prefix" value="srch"/>
+                    </bean>
+                </entry>
+                <entry key="celum">
+                    <bean class="de.hybris.platform.cockpit.session.impl.CelumEventHandler"/>
+                </entry>
+				<entry key="msg">
+					<bean class="de.hybris.platform.cockpit.session.impl.NotificationEventHandler">
+						<property name="prefix" value="msg" />
+					</bean>
+				</entry>
+            </map>
+        </property>
+    </bean>
+    
+	<!-- filter -->	
+	<bean id="importCockpitFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+		<constructor-arg>
+			<list>		
+				<ref bean="log4jFilter"/>
+				<ref bean="dynamicTenantActivationFilter"/>				
+				<ref bean="sessionFilter"/>
+				<ref bean="importCockpitDataSourceSwitchingFilter"/>
+				<ref bean="importCockpitCatalogVersionActivationFilter"/>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="importCockpitDataSourceSwitchingFilter" class="de.hybris.platform.servicelayer.web.DataSourceSwitchingFilter">
+	</bean>
+	
+	 <bean id="importCockpitCatalogVersionActivationFilter" class="de.hybris.platform.servicelayer.web.DynamicCatalogVersionActivationFilter" scope="tenant">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="catalogService" ref="catalogService"/>
+		<aop:scoped-proxy/>
+	</bean>
+	
+</beans>

@@ -1,0 +1,36 @@
+# ImpEx for Importing Supplier Media into Powertools Store
+
+# Macros / Replacement Parameter definitions
+$productCatalog=powertoolsProductCatalog
+$productCatalogName=Powertools Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$superCategories=superCategories(code, $catalogVersion)
+$thumbnail=thumbnail(code, $catalogVersion)
+$siteResource=jar:de.hybris.platform.b2bacceleratorsampledata.constants.B2BAcceleratorSampleDataConstants&/b2bacceleratorsampledata/import/productCatalogs/$productCatalog
+
+
+INSERT_UPDATE Media;code[unique=true];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];$catalogVersion
+;/thumbs/SUP32.jpg;SUP32.jpg;$siteResource/images/thumbs/SUP32.jpg;
+;/thumbs/SUP169.jpg;SUP169.jpg;$siteResource/images/thumbs/SUP169.jpg;
+;/thumbs/SUP191.jpg;SUP191.jpg;$siteResource/images/thumbs/SUP191.jpg;
+;/thumbs/SUP240.jpg;SUP240.jpg;$siteResource/images/thumbs/SUP240.jpg;
+;/thumbs/SUP692.jpg;SUP692.jpg;$siteResource/images/thumbs/SUP692.jpg;
+;/thumbs/SUP753.jpg;SUP753.jpg;$siteResource/images/thumbs/SUP753.jpg;
+;/thumbs/SUP912.jpg;SUP912.jpg;$siteResource/images/thumbs/SUP912.jpg;
+;/thumbs/SUP980.jpg;SUP980.jpg;$siteResource/images/thumbs/SUP980.jpg;
+;/thumbs/SUP1518.jpg;SUP1518.jpg;$siteResource/images/thumbs/SUP1518.jpg;
+;/thumbs/SUP4434.jpg;SUP4434.jpg;$siteResource/images/thumbs/SUP4434.jpg;
+;/thumbs/SUP4515.jpg;SUP4515.jpg;$siteResource/images/thumbs/SUP4515.jpg;
+
+UPDATE Category;code[unique=true];$thumbnail;allowedPrincipals(uid)[default='customergroup'];$catalogVersion
+;brand_32;/thumbs/SUP32.jpg
+;brand_169;/thumbs/SUP169.jpg
+;brand_191;/thumbs/SUP191.jpg
+;brand_240;/thumbs/SUP240.jpg
+;brand_692;/thumbs/SUP692.jpg
+;brand_753;/thumbs/SUP753.jpg
+;brand_912;/thumbs/SUP912.jpg
+;brand_980;/thumbs/SUP980.jpg
+;brand_1518;/thumbs/SUP1518.jpg
+;brand_4434;/thumbs/SUP4434.jpg
+;brand_4515;/thumbs/SUP4515.jpg

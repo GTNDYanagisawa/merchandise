@@ -1,0 +1,27 @@
+*** Settings ***
+Resource          EmsClient_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+
+
+*** Test Cases ***
+
+Test_Grant_Mapping_XML_Verification_MeteredCondition_MaxQuantity_123
+	[Documentation]    Create entitlement test and verify XML - mapping testing
+	${entitlementData} =         build entitlement with id "entitlementId" with maxQuantity "123" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData><grantTime>2012-07-11T03:21:15Z</grantTime><userId/><grantSource/><grantSourceId/><entitlementType>entitlementId</entitlementType><status>ACTIVE</status><conditions><com.hybris.services.entitlements.condition.ConditionData><properties><entry><string>maxQuantity</string><string>123</string></entry></properties><type>metered</type></com.hybris.services.entitlements.condition.ConditionData></conditions></com.hybris.services.entitlements.api.GrantData>"
+
+Test_Grant_Mapping_XML_Verification_MeteredCondition_MaxQuantity_ZeroValue_PASS
+	[Documentation]    Create entitlement with zero quantity value and verify XML - mapping testing
+	${entitlementData} =         build entitlement with id "entitlementId" with maxQuantity "0" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData><grantTime>2012-07-11T03:21:15Z</grantTime><userId/><grantSource/><grantSourceId/><entitlementType>entitlementId</entitlementType><status>ACTIVE</status><conditions><com.hybris.services.entitlements.condition.ConditionData><properties><entry><string>allowOverage</string><string>true</string></entry><entry><string>maxQuantity</string><string>0</string></entry></properties><type>metered</type></com.hybris.services.entitlements.condition.ConditionData></conditions></com.hybris.services.entitlements.api.GrantData>"
+
+Test_Grant_Mapping_XML_Verification_MeteredCondition_MaxQuantity_MinusOneValue_PASS
+	[Documentation]    Create entitlement with zero quantity value and verify XML - mapping testing
+	${entitlementData} =         build entitlement with id "entitlementId" with maxQuantity "-1" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData><grantTime>2012-07-11T03:21:15Z</grantTime><userId/><grantSource/><grantSourceId/><entitlementType>entitlementId</entitlementType><status>ACTIVE</status><conditions><com.hybris.services.entitlements.condition.ConditionData><properties><entry><string>allowOverage</string><string>true</string></entry><entry><string>maxQuantity</string><string>0</string></entry></properties><type>metered</type></com.hybris.services.entitlements.condition.ConditionData></conditions></com.hybris.services.entitlements.api.GrantData>"
+
+Test_Grant_Mapping_XML_Verification_MeteredCondition_MaxQuantity_EmptyValue_FAIL
+	[Documentation]    Create entitlement with empty quantity value and verify XML - mapping testing
+	Run keyword and expect error
+	...                ValueError: Argument at position 3 cannot be coerced to integer
+	...                build entitlement with id "entitlementId" with maxQuantity "${null}" granted at "2012-07-11T03:21:15Z"

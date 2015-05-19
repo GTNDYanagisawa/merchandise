@@ -1,0 +1,48 @@
+﻿"#% import de.hybris.platform.printsampledata.jalo.PrintsampledataManager";
+"#% impex.enableExternalImpExSyntaxParsing( true )";
+"#% impex.enableExternalDataCodeExecution( true )";
+"#% impex.setDumpingAllowed( false )";
+
+
+
+##############################################################################################################################
+### Import settings for the Print Sample data import
+
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/importparameters.csv""), ""utf-8"", 0, 0 );";
+
+$catalogID=apparelProductCatalog;
+$catalogVersionID=Staged;
+
+
+
+##############################################################################################################################
+### Macros for the CometConfiguration import
+
+$cometConfig=cometConfig(code[default='$cometConfigID']);
+$catalogversion=catalogversion(catalog(id[default='$catalogID']),version[default='$catalogVersionID']);
+$categories=categories(code,$catalogversion);
+$superCategories=supercategories(code,$catalogversion);
+$placeholderTemplate=placeholderTemplate(code, cometConfig(code[default='$cometConfigID']));
+$assignment=classAttributeAssignment(classificationAttribute(code,systemVersion(catalog(id),version)),classificationClass(code,catalogVersion(catalog(id),version)))
+$table=table(TableBlock.code,TableBlock.$catalogversion);
+
+
+
+
+"#% impex.info(""CometConfiguration import: Creating paragraph styles, character styles, cell styles etc...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/cometconfiguration/styles.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""CometConfiguration import: Creating MediaContainers...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/cometconfiguration/mediacontainer.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""CometConfiguration import: Creating page formats...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/cometconfiguration/pageformats.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""CometConfiguration import: Creating the CometConfiguration item...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/cometconfiguration/cometconfiguration.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""CometConfiguration import: Creating Placeholders...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/cometconfiguration/placeholders.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""CometConfiguration import: Creating LayoutTemplates...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/cometconfiguration/layouttemplates.csv""), ""utf-8"", 0, 0 );";

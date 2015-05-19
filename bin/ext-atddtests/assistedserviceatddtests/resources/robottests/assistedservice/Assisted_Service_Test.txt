@@ -1,0 +1,317 @@
+*** Settings ***
+Resource          assistedservice/Assisted_Service_Keywords.txt
+Resource		  commerce/CommerceServices_Keywords.txt
+Test Setup        import asm sample data
+
+*** Variables ***
+
+### as agent:
+${user1_asagentgroup}=    user1_asagentgroup
+${user2_asagentgroup}=    user2_asagentgroup
+${username}=    asagent
+
+### non-as agents:
+${wrongExistedUsername}=   notagent
+
+## doesn't belong to any group:
+${user_no_group}=    user_no_group
+
+## belongs to asagentgroup parent group:
+${user_employeegroup}=    user_employeegroup
+
+## doesn't belong to asagentgroup parent group:
+${user_admingroup}=    user_admingroup
+
+# There is a common password for all registered users:
+${password}=    1234
+${correctCustomer}=    ascustomer
+${correctCustomerCart}=    ascustomerCart
+
+*** Test Cases ***
+
+Test_AssistedService_AgentLogin_ASM_On
+	[Documentation]    Login AS agent using correct credentials when ASM is ON (activated)
+	launch assisted service mode
+	login AS agent with credentials "${user1_asagentgroup}" "${password}"
+
+Test_AssistedService_AgentLogin_ASM_Off_byDefault
+	[Documentation]    Login AS agent using correct credentials when ASM is OFF by default
+	Run Keyword And Expect Error    AssistedServiceFacadeException: Assisted Service mode inactive*
+	...    login AS agent with credentials "${user1_asagentgroup}" "${password}"
+
+Test_AssistedService_AgentLogin_ASM_On_Off
+	[Documentation]    Login AS agent using correct credentials when ASM is switched ON->OFF
+	launch assisted service mode
+	quit Assisted Service Mode
+	Run Keyword And Expect Error    AssistedServiceFacadeException: Assisted Service mode inactive*
+	...    login AS agent with credentials "${user1_asagentgroup}" "${password}"
+
+Test_AssistedService_AgentLogin_ASM_On_Off_On
+	[Documentation]    Login AS agent using correct credentials when ASM is switched ON->OFF->ON
+	launch assisted service mode
+	quit Assisted Service Mode
+	launch assisted service mode
+	login AS agent with credentials "${user1_asagentgroup}" "${password}"
+
+    launch assisted service mode
+    Run Keyword And Expect Error    AssistedServiceFacadeException: User does not belong to the correct user group*
+    ...    login AS agent with credentials "${wrongExistedUsername}" "${password}"
+
+Test_AssistedService_AgentLogin_NonExistingUserExistingPassword_ASM_On
+	[Documentation]    Login with not registered username when ASM is ON (activated)
+	launch assisted service mode
+	Run Keyword And Expect Error    AssistedServiceFacadeException: Unknown user id*
+	...    login AS agent with credentials "NON-EXISTING_USERNAME" "${password}"
+
+Test_AssistedService_AgentLogin_ExistingUserIncorrectPassword_ASM_On
+	[Documentation]    Login with incorrect password when ASM is ON (activated)
+	launch assisted service mode
+	Run Keyword And Expect Error    AssistedServiceFacadeException: User Name and Password doesn't match*
+	...    login AS agent with credentials "${user1_asagentgroup}" "WRONG_PASSWORD"
+
+Test_AssistedService_AgentLogin_NonExistingUserNonExistingPassword_ASM_On
+	[Documentation]    Login with not registered username when ASM is ON (activated)
+	launch assisted service mode
+	Run Keyword And Expect Error    AssistedServiceFacadeException: Unknown user id*
+	...    login AS agent with credentials "NON-EXISTING_USERNAME" "WRONG_PASSWORD"
+
+Test_AssistedService_AgentLogin_NonAsmUserIncorrectPassword_ASM_On
+	[Documentation]    Login with non ASM user (doesn't belong do asagentgroup) when ASM is ON (activated)
+	launch assisted service mode
+	Run Keyword And Expect Error    AssistedServiceFacadeException: User Name and Password doesn't match*
+	...    login AS agent with credentials "${user_no_group}" "WRONG_PASSWORD"
+
+Test_AssistedService_AgentLogin_NonAsmUser_ASM_On_No1
+	[Documentation]    Login with non ASM user (doesn't belong to any user group) when ASM is ON (activated)
+	launch assisted service mode
+	Run Keyword And Expect Error    AssistedServiceFacadeException: User does not belong to the correct user group*
+	...    login AS agent with credentials "${user_no_group}" "${password}"
+
+Test_AssistedService_AgentLogin_NonAsmUser_ASM_On_No2
+	[Documentation]    Login with non ASM user (belongs to user group that is a parent group for asagentgroup) when ASM is ON (activated)
+	launch assisted service mode
+	Run Keyword And Expect Error    AssistedServiceFacadeException: User does not belong to the correct user group*
+	...    login AS agent with credentials "${user_employeegroup}" "${password}"
+
+Test_AssistedService_AgentLogin_NonAsmUser_ASM_On_No3
+	[Documentation]    Login with non ASM user (belongs to user group that is not associated with asagentgroup) when ASM is ON (activated)
+	launch assisted service mode
+	Run Keyword And Expect Error    AssistedServiceFacadeException: User does not belong to the correct user group*
+	...    login AS agent with credentials "${user_admingroup}" "${password}"
+
+#####
+### LOGOUT/LOGIN/LOGIN-LOGOUT:
+
+Test_AssistedService_AgentLogout_ASM_Off_byDefault
+	[Documentation]    Logs out logged in AS agent when ASM is OFF (byDefault)
+	Run Keyword And Expect Error    AssistedServiceFacadeException: Assisted Service mode inactive*
+	...    logout AS agent
+
+Test_AssistedService_AgentLogout_ASM_On
+	[Documentation]    Logs out NOT logged in AS agent when ASM is ON (activated)
+	launch assisted service mode
+	Run Keyword And Expect Error    AssistedServiceFacadeException: There is no logged in agent*
+	...    logout AS agent
+
+Test_AssistedService_AgentLogin_Logout_ASM_On_Off
+	[Documentation]    Logs out logged in AS agent when ASM is OFF
+	launch assisted service mode
+	login AS agent with credentials "${user1_asagentgroup}" "${password}"
+	quit Assisted Service Mode
+	Run Keyword And Expect Error    AssistedServiceFacadeException: Assisted Service mode inactive*
+	...    logout AS agent
+
+Test_AssistedService_AgentLogin_Logout_ASM_On
+	[Documentation]    Logs out logged in AS agent when ASM is ON (activated)
+	launch assisted service mode
+	login AS agent with credentials "${user1_asagentgroup}" "${password}"
+	logout AS agent
+
+Test_AssistedService_AgentLogin_Logout_Logout_ASM_On
+	[Documentation]    Logs out twice logged in AS agent when ASM is ON (activated)
+	launch assisted service mode
+	login AS agent with credentials "${user1_asagentgroup}" "${password}"
+	logout AS agent
+	Run Keyword And Expect Error    AssistedServiceFacadeException: There is no logged in agent*
+	...    logout AS agent
+
+Test_AssistedService_AgentLogin_Logout_Login_ASM_On
+	[Documentation]    Logs in-out-in an AS agent  when ASM is ON (activated)
+	launch assisted service mode
+	login AS agent with credentials "${user1_asagentgroup}" "${password}"
+	logout AS agent
+	login AS agent with credentials "${user1_asagentgroup}" "${password}"
+
+#####
+## 2 ASM AGENTS AT ONCE:
+
+Test_AssistedService_2AgentsLogin_ASM_On_No2
+	[Documentation]    Test if logging in a new asagent when other one is logged in, leads to logging out the previous asagent user automatically
+	launch assisted service mode
+	login AS agent with credentials "${user1_asagentgroup}" "${password}"
+	login AS agent with credentials "${user2_asagentgroup}" "${password}"
+	login AS agent with credentials "${user1_asagentgroup}" "${password}"
+
+Test_AssistedService_2AgentsLogin_Logout_ASM_On_Complex
+	[Documentation]    Logs in and logs out using 2 asm agents
+	launch assisted service mode
+	login AS agent with credentials "${user1_asagentgroup}" "${password}"
+	login AS agent with credentials "${user2_asagentgroup}" "${password}"
+	logout AS agent 
+	login AS agent with credentials "${user2_asagentgroup}" "${password}"
+	logout AS agent       
+	login AS agent with credentials "${user2_asagentgroup}" "${password}"
+	login AS agent with credentials "${user1_asagentgroup}" "${password}"
+	logout AS agent  
+	login AS agent with credentials "${user2_asagentgroup}" "${password}"
+
+Test_Agent_Logout
+    [Documentation]    Verifies that logout goes without exceptions
+    
+    launch assisted service mode
+    login AS agent with credentials "${username}" "${password}"
+    logout AS agent
+  
+Emulate_customer_with_existing_customer_id_and_existing_cart_id
+    [Documentation]    Personifies customer by exisiting customer id and existing cart id
+    launch Assisted Service Mode
+    login AS agent with credentials "${username}" "${password}"
+    emulate customer with customer id "${correctCustomer}" and cart id "${correctCustomerCart}"
+    verify session customer has id "${correctCustomer}"
+
+Emulate_customer_with_existing_customer_id_and_existing_cart_id_and_disabled_ASM_mode
+    [Documentation]    We should to get exception 'ASM mode inactive. Will not add customer and/or cart to the session.'
+    launch assisted service mode
+    login AS agent with credentials "${username}" "${password}"
+    quit Assisted Service Mode
+   
+    Run Keyword And Expect Error    AssistedServiceFacadeException: Assisted Service mode inactive.*
+    ...   emulate customer with customer id "${correctCustomer}" and cart id "${correctCustomerCart}"
+    
+Emulate_customer_with_existing_customer_id_and_non_existing_cart_id
+    [Documentation]    We should to get exception 'Cart ID not found'
+    launch assisted service mode
+    login AS agent with credentials "${username}" "${password}"
+    Run Keyword And Expect Error    AssistedServiceFacadeException: Cart ID not found*
+    ...   emulate customer with customer id "${correctCustomer}" and cart id "incorrectTestUserCart"
+   
+    
+Emulate_customer_with_non_existing_customer_id_and_existing_cart_id
+    [Documentation]    We should to get exception 'Unknown customer id. Will not add customer and/or cart to the session.'
+    launch assisted service mode
+    login AS agent with credentials "${username}" "${password}"
+    Run Keyword And Expect Error    AssistedServiceFacadeException: Unknown customer id. Will not add customer and/or cart to the session.*
+    ...   emulate customer with customer id "incorrectTestUser" and cart id "${correctCustomerCart}"
+    
+Emulate_customer_with_non_existing_customer_id_and_non_existing_cart_id
+    [Documentation]    We should to get exception 'Unknown customer id. Will not add customer and/or cart to the session.'
+    launch assisted service mode
+    login AS agent with credentials "${username}" "${password}"
+    Run Keyword And Expect Error    AssistedServiceFacadeException: Unknown customer id. Will not add customer and/or cart to the session.*
+    ...   emulate customer with customer id "incorrectTestUser" and cart id "incorrectTestUserCart"
+    
+Emulate_customer_with_anonymous_customer_id_and_existing_cart_id
+    [Documentation]    No needs to check customer id
+    launch assisted service mode
+    login AS agent with credentials "${username}" "${password}"
+    emulate customer with cart id "anonymousCart" only
+    verify session customer has id "anonymous"
+    
+Emulate_customer_with_existing_customer_id
+    [Documentation]    No needs to check cart id
+    launch assisted service mode
+    login AS agent with credentials "${username}" "${password}"
+    emulate customer with customer id "${correctCustomer}" only
+    verify session customer has id "${correctCustomer}"
+    
+Emulate_customer_with_asagent_customer_id
+    [Documentation]    Personifies customer by asagent. We should to get exception 'This id belongs to non-customer person. Will not add customer and/or cart to the session.'
+    launch Assisted Service Mode
+    login AS agent with credentials "${username}" "${password}"  
+    Run Keyword And Expect Error    AssistedServiceFacadeException: This id belongs to non-customer person. Will not add customer and/or cart to the session.*
+    ...   emulate customer with customer id "${username}" only
+    
+Test_suggest_customer
+    [Documentation]    Suggest customer by username or email
+    launch Assisted Service Mode
+    login AS agent with credentials "${username}" "${password}" 
+    
+    ${suggestedList}=    suggest customers    John
+    ${length}=    Get Length    ${suggestedList}
+    Should be Equal As Numbers    ${length}   3
+    
+   	${suggestedList}=    suggest customers    brendan
+    ${length}=    Get Length    ${suggestedList}
+    Should be Equal As Numbers    ${length}   1
+    
+   	${suggestedList}=    suggest customers    anonymous
+    ${length}=    Get Length    ${suggestedList}
+    Should be Equal As Numbers    ${length}   0
+    
+Test_suggest_customer_ASM_off
+    Run Keyword And Expect Error    AssistedServiceFacadeException: Assisted Service mode inactive.*
+    ...   suggest customers    John
+       
+Test_suggest_customer_ASM_on_AgentNotLogged
+    launch Assisted Service Mode
+    Run Keyword And Expect Error    AssistedServiceFacadeException: Assisted Service Agent is not logged in.*
+    ...   suggest customers    John
+    
+Bind_customer_to_anonymous_cart
+    [Documentation]    Pick up the anonymous cart on login as assisted service agent.  
+    add product "HW1210-3422" to cart
+    launch Assisted Service Mode
+    login AS agent with credentials "${username}" "${password}"
+    bind customer with customer id "${correctCustomer}" to emulated cart
+    verify session customer has id "${correctCustomer}"
+    verify session cart user has id "${correctCustomer}"
+    verify session cart contains product with code "HW1210-3422"
+
+Bind_customer_ASM_off
+	[Documentation]    Binding a customer must throw an exception when the Assisted Service mode is turned off.
+	add product "HW1210-3422" to cart
+    Run Keyword And Expect Error    AssistedServiceFacadeException: Assisted Service mode inactive.*
+    ...   bind customer with customer id "${correctCustomer}" to emulated cart
+
+Bind_customer_ASM_on_AgentNotLogged
+	[Documentation]    Binding a customer must throw an exception when the Assisted Service agent is not logged in.
+	add product "HW1210-3422" to cart
+    launch Assisted Service Mode
+    Run Keyword And Expect Error    AssistedServiceFacadeException: Assisted Service Agent is not logged in.*
+    ...   bind customer with customer id "${correctCustomer}" to emulated cart
+
+Bind_customer_UnknownCustomer
+	[Documentation]    Binding a customer must throw an exception when the customer to bind does not exist.
+	add product "HW1210-3422" to cart
+    launch Assisted Service Mode
+    login AS agent with credentials "${username}" "${password}"
+    Run Keyword And Expect Error    AssistedServiceFacadeException: Unknown Cart ID. Cart will not be bound.*
+    ...   bind customer with customer id "UNKNOWN USER" to emulated cart
+    
+Bind_customer_CartNotAnonymous
+	[Documentation]    Binding a customer must throw an exception when the cart is not anonymous.
+    launch Assisted Service Mode
+    login AS agent with credentials "${username}" "${password}"
+	emulate customer with customer id "${correctCustomer}" and cart id "${correctCustomerCart}"
+    Run Keyword And Expect Error    AssistedServiceFacadeException: Only anonymous cart can be bound to customer.*
+    ...   bind customer with customer id "test.customer@asm.com" to emulated cart
+    
+Stop_emulating_customer
+	[Documentation]    Customer Cart shouldn't be lost when AS agent stops emulation
+	launch Assisted Service Mode
+	login AS agent with credentials "${username}" "${password}"
+	emulate customer with customer id "${correctCustomer}" only
+	add product "HW1210-3422" to cart
+	${customerCart}=    get current session cart
+	stop emulate customer
+	${afterEndSessionCart}=    get cart by code "${customerCart.code}" 
+	Should Be Equal As Strings    ${customerCart.user.uid}    ${afterEndSessionCart.user.uid}
+	Should Be Equal As Strings    ${customerCart.totalPrice}    ${afterEndSessionCart.totalPrice}        
+
+Test_get_carts_for_customer
+    [Documentation]    tests the facade layer method for retrieving customer carts
+    ${customerCarts}=    get carts for customer with id "${correctCustomer}"
+    ${customerCartsSize}=    Get Length    ${customerCarts}
+    Should Be Equal As Numbers    ${customerCartsSize}    1
+    ${actualCart}=    get first cart for customer with id "${correctCustomer}"
+    Should Be Equal    ${actualCart.code}    ${correctCustomerCart}

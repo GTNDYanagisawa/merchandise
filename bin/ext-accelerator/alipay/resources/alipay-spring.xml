@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2012 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+			http://www.springframework.org/schema/util
+	        http://www.springframework.org/schema/util/spring-util-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+	
+	<alias alias="paymentService"  name="defaultAlipayPaymentService"/>
+	<alias alias="alipayPaymentService" name="defaultAlipayPaymentService"/>
+	<bean id="defaultAlipayPaymentService" class="de.hybris.platform.chinaaccelerator.alipay.service.impl.DefaultAlipayPaymentService" parent="defaultPaymentService" scope="tenant">
+		<property name="requestDataConverter" ref="requestDataConverter"/>
+		<property name="modelService" ref="modelService" />
+		<property name="alipayService" ref="alipayService" />
+		<property name="alipayConfiguration" ref="alipayConfiguration"/>
+		<property name="paymentTransactionEntryPopulator" ref="paymentTransactionEntryPopulator"/>
+		<property name="paymentTransactionPopulator" ref="paymentTransactionPopulator"/>
+		<property name="uiExperienceService" ref="uiExperienceService"/>
+		<!-- TODO: CHECK IF OK	<property name="siteAgentServiceTypeMap" ref="alipayMobileSupportedPaymentMode"/> -->
+		<lookup-method name="getBusinessProcessService" bean="businessProcessService"/>	
+		<property name="typeService" ref="typeService"/>	
+		<property name="paymentTransactionKeyGenerator" ref="paymentTransactionKeyGenerator"/>	
+	</bean>
+	
+	<bean id="alipayPaymentTransactionDao" class="de.hybris.platform.chinaaccelerator.alipay.order.dao.impl.AlipayPaymentTransactionDaoImpl" scope="tenant">
+	</bean>
+	
+	<bean id="alipayPaymentTransactionEntryDao" class="de.hybris.platform.chinaaccelerator.alipay.order.dao.impl.AlipayPaymentTransactionEntryDaoImpl" scope="tenant">
+	</bean>
+	
+	<bean id="paymentTransactionEntryPopulator" class="de.hybris.platform.chinaaccelerator.alipay.data.converter.AlipayPaymentTransactionEntryPopulator" scope="tenant">
+		<property name="modelService" ref="modelService" />
+		<property name="formatFactory" ref="formatFactory" />		
+		<property name="typeService" ref="typeService"/>	
+		<property name="alipayPaymentTransactionEntryDao" ref="alipayPaymentTransactionEntryDao" />
+		<property name="paymentTransactionKeyGenerator" ref="paymentTransactionKeyGenerator"/>	
+	</bean>
+	
+	<bean id="paymentTransactionPopulator" class="de.hybris.platform.chinaaccelerator.alipay.data.converter.AlipayPaymentTransactionPopulator" scope="tenant">
+		<property name="modelService" ref="modelService" />
+		<property name="formatFactory" ref="formatFactory" />	
+		<property name="typeService" ref="typeService"/>	
+		<property name="paymentTransactionKeyGenerator" ref="paymentTransactionKeyGenerator"/>	
+	</bean>
+	
+	<alias alias="alipaySubmitOrderStrategy" name="defaultAlipaySubmitOrderStrategy" />
+	<bean id="defaultAlipaySubmitOrderStrategy" class="de.hybris.platform.chinaaccelerator.alipay.order.strategies.AlipaySubmitOrderStrategy" scope="tenant">
+		<property name="alipayPaymentService" ref="alipayPaymentService" />
+	</bean>
+	
+	<alias alias="requestDataConverter" name="defaultAlipayRequestDataConverter"/>
+	<bean id="defaultAlipayRequestDataConverter" class="de.hybris.platform.chinaaccelerator.alipay.data.converter.AlipayRequestDataConverter" scope="tenant">
+		<property name="alipayConfiguration" ref="alipayConfiguration"/>
+	</bean>
+	
+	<bean id="alipayConfiguration" class="de.hybris.platform.chinaaccelerator.alipay.data.AlipayConfiguration" scope="tenant">
+		<property name="web_partner" value="${web.partner}"/>
+		<property name="web_key" value="${web.key}"/>
+		<property name="web_seller_email" value="${web.seller.email}"/>
+		<property name="web_gateway" value="${web.gateway}"/>
+		<property name="basepath" value="${basepath}"/>
+		<property name="returnBaseUrl" value="${returnBaseUrl}"/>
+		<property name="test_amount" value="${alipay.test.amount}"/>
+		<property name="test_mode" value="${alipay.testmode}"/>
+		<property name="is_supply_returnurl" value="${is.supply.returnurl}"/>
+		<property name="request_timeout" value="${request.timeout}"/>
+		<property name="request_subject" value="${request.subject}"/>	
+		<property name="https_verify_url" value="${web.https.verify.url}"/>		
+		<property name="alipay_timezone" value="${alipay.timezone}"/>			
+	</bean>
+	
+	<bean id="alipayService" class="de.hybris.platform.chinaaccelerator.alipay.util.AlipayService" scope="tenant">
+		<property name="direct_pay_service_api_name" value="${direct.pay.service.api.name}"/>
+		<property name="direct_pay_paymethod_name" value="${direct.pay.paymethod.name}"/>
+		<property name="express_paymethod_name" value="${express.paymethod.name}"/>
+		<property name="close_trade_service_api_name" value="${close.trade.service.api.name}"/>
+		<property name="check_trade_service_api_name" value="${check.trade.service.api.name}"/>
+		<property name="alipayConfiguration" ref="alipayConfiguration"/>
+	</bean>
+	
+		
+	<alias alias="paymentTransactionKeyGenerator" name="alipayPayTransKeyGenerator"/>
+	<bean id="alipayPayTransKeyGenerator" class="de.hybris.platform.chinaaccelerator.alipay.order.PrefixablePersistentKeyGenerator" init-method="init" scope="tenant">
+		<property name="key" value="alipay_payment_trans_code"/>
+		<property name="digits" value="10"/>
+		<property name="start" value="0000000000"/>
+		<property name="prefix" value=""/>
+		<property name="numeric" value="true"/> <!-- TODO: CHECK IF OK comment rephrase or remove --><!-- IMPORTANT because Alipay does not supports of 3 consecutive of 0, i.e. fail at any occurrence of just-000, in the code we are replacing all the 0 as A. -->
+	</bean>
+	
+	<bean id="alipayNotifyService" class="de.hybris.platform.chinaaccelerator.alipay.service.impl.AlipayNotifyServiceImpl" scope="tenant" />
+	
+	<bean id="paymentSystemSetup" class="de.hybris.platform.chinaaccelerator.alipay.setup.PaymentSystemSetup" parent="abstractCoreSystemSetup">
+	</bean>
+			
+			
+</beans>

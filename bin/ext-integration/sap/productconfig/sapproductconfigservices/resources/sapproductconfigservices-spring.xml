@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	  <property name="properties" ref="hybrisProperties"/>
+	</bean>
+
+	<alias name="sapProductConfigDefaultConfigurationService" alias="sapProductConfigConfigurationService" />
+	<bean id="sapProductConfigDefaultConfigurationService"
+		class="de.hybris.platform.sap.productconfig.services.impl.ProductConfigurationServiceImpl">
+		<property name="configurationProviderFactory" ref="sapProductConfigConfigurationProviderFactory"/>
+		<property name="maxLocksPerMap" value="${sapproductconfigservices.maxLocksPerMap}"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>	
+	
+	<alias name="sapProductConfigFindPricingStrategy" alias="currentFactoryFindPricingStrategy" />
+	<bean id="sapProductConfigFindPricingStrategy"
+			class="de.hybris.platform.sap.productconfig.services.impl.FindPricingForConfigurableProductsStrategy"
+			parent="abstractBusinessService">
+		<property name="prodConfService" ref="sapProductConfigConfigurationService"></property>
+		<property name="configurableSource" value="${sapproductconfigservices.configurable_fieldname}" />
+			
+	</bean>
+</beans>

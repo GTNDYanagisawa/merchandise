@@ -1,0 +1,65 @@
+﻿"#% import de.hybris.platform.printsampledata.jalo.PrintsampledataManager";
+"#% impex.enableExternalImpExSyntaxParsing( true )";
+"#% impex.enableExternalDataCodeExecution( true )";
+"#% impex.setDumpingAllowed( false )";
+
+
+
+##############################################################################################################################
+### Import settings for the Print Sample data import
+
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/importparameters.csv""), ""utf-8"", 0, 0 );";
+
+$publicationID=electronics$publicationYear;
+$catalogID=electronicsProductCatalog;
+$catalogVersionID=Online;
+
+
+
+##############################################################################################################################
+### Macros for the CometConfiguration import
+
+$catalogversion=catalogversion(catalog(id[default='$catalogID']),version[default='$catalogVersionID']);
+
+$publication=publication(code[default='$publicationID']);
+$cometConfig=cometConfig(code[default='$cometConfigID']);
+$layoutTemplate=layoutTemplate(code, cometConfig(code[default='$cometConfigID']));
+$placeholderTemplate=placeholderTemplate(code, cometConfig(code[default='$cometConfigID']));
+
+$media=media(code,$catalogversion);
+$product=item(Product.code,Product.$catalogversion);
+$contentblock=item(ContentBlock.code,ContentBlock.$catalogversion);
+$tableAsItem=item(TableBlock.code,TableBlock.$catalogversion);
+
+$chapter=chapter(code,$publication);
+$superchapter=superChapter(code,$publication);
+$page=page(code,$publication);
+
+$assignment=classAttributeAssignment(classificationAttribute(code,systemVersion(catalog(id),version)),classificationClass(code,catalogVersion(catalog(id),version)));
+
+
+
+"#% impex.info(""Hardware publication import: Creating publication...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationElectronics/publication.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationElectronics/publication_de.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationElectronics/publication_en.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""Hardware publication import: Creating layout templates...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationElectronics/layouttemplates.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""Hardware publication import:  Creating master pages...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationElectronics/masterpages.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""Hardware publication import: Creating chapter structure...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationElectronics/chapters.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationElectronics/chapters_de.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationElectronics/chapters_en.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""Hardware publication import: Creating pages...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationElectronics/pages.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationElectronics/pages_de.csv""), ""utf-8"", 0, 0 );";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationElectronics/pages_en.csv""), ""utf-8"", 0, 0 );";
+
+"#% impex.info(""Hardware publication import: Place content...."")";
+"#% impex.includeExternalData(PrintsampledataManager.class.getResourceAsStream(""/printsampledata/print/publicationElectronics/placements.csv""), ""utf-8"", 0, 0 );";
+

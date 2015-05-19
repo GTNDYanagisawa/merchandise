@@ -1,0 +1,35 @@
+$catalogVersion=catalogVersion(catalog(id[default='hwcatalog']),version[default='Online'])[unique=true,default='hwcatalog:Online'];
+
+INSERT_UPDATE PromotionGroup;Identifier[unique=true];
+;prGroup1;
+;prGroup2;
+;prGroup3;
+
+#Data for Product promotions
+INSERT PromotionPriceRow;&id;Currency(isocode);price;
+;1001;EUR;200;
+
+INSERT_UPDATE ProductFixedPricePromotion;code[unique=true];enabled;products(code,$catalogVersion);PromotionGroup(Identifier);priority;productFixedUnitPrice(&id);
+;productFixedPricePromotion1;true;HW1210-3411;prGroup1;2000;1001;
+;productFixedPricePromotion2;true;HW1210-3411;prGroup3;2000;1001;
+
+INSERT_UPDATE PromotionOrderRestriction;descriptionPattern[unique=true, lang=en];promotion(code);
+;promotionOrderRestriction1;productFixedPricePromotion1;
+;promotionOrderRestriction2;productFixedPricePromotion2;
+
+INSERT_UPDATE PromotionUserRestriction;descriptionPattern[unique=true, lang=en];positive;promotion(code);
+;promotionUserRestriction1;true;productFixedPricePromotion2;
+
+
+#Data for Order promotion
+INSERT_UPDATE PromotionPriceRow;Currency[unique=true](isocode);price[unique=true];;;;;;
+;EUR;100;;;;;;
+;USD;150;;;;;;
+;EUR;10;;;;;;
+
+INSERT_UPDATE OrderThresholdDiscountPromotion;code[unique=true];title;enabled;thresholdTotals(price,currency(isocode));discountPrices(price,currency(isocode));PromotionGroup(Identifier);priority;
+;OrderThresholdDiscountPromotion1;10 EUR Discount for Orders more than 100 EUR or 150 USD;true;100:EUR,150:USD;10:EUR;prGroup2;1000;
+
+INSERT_UPDATE PromotionOrderRestriction;descriptionPattern[unique=true, lang=en];promotion(code);
+;promotionOrderRestriction3;OrderThresholdDiscountPromotion1;
+

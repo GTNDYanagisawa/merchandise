@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+<project name="print_buildcallbacks">
+	<macrodef name="print_before_build">
+		<sequential>
+			<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+				<classpath>
+					<fileset dir="${platformhome}/resources/ant/lib">
+						<include name="*.jar" />
+					</fileset>
+				</classpath>
+			</taskdef>
+			<outofdate>
+				<sourcefiles>
+					<fileset file="${ext.print.path}/resources/print/comet/psc_notes.xsd" />
+				</sourcefiles>
+				<targetfiles path="${ext.print.path}/gensrc/de/hybris/platform/print/comet/notes/definition/xml" />
+				<sequential>
+					<echo>generating JAXB for notes/comments classes</echo>
+					<mkdir dir="${ext.print.path}/gensrc" />
+					<xjc schema="${ext.print.path}/resources/print/comet/psc_notes.xsd" package="de.hybris.platform.print.comet.notes.definition.xml" destdir="${ext.print.path}/gensrc">
+						<arg value="-npa" />
+						<produces dir="${ext.print.path}/gensrc/de/hybris/platform/print/comet/notes/definition/xml">
+							<include name="*.java" />
+						</produces>
+						<depends file="${ext.print.path}/resources/print/comet/psc_notes.xsd" />
+					</xjc>
+					<echo>replacing Notes XSD namespace annotation</echo>
+					<replace casesensitive="false" file="${ext.print.path}/gensrc/de/hybris/platform/print/comet/notes/definition/xml/Notes.java">
+						<replacetoken><![CDATA[@XmlRootElement(name = "notes", namespace = "http://comet.werk-ii.com/psc_notes")]]></replacetoken>
+						<replacevalue><![CDATA[@XmlRootElement(name = "notes") //xsd namespace removed by buildcallback because comet can't handle it ]]></replacevalue>
+					</replace>
+					<replace dir="${ext.processing.path}/gensrc">
+						<include name="**/ObjectFactory.java" />
+						<replacetoken>
+							<![CDATA[public ObjectFactory() {]]>
+						</replacetoken>
+						<replacevalue>
+							<![CDATA[public ObjectFactory() {//empty constructor]]>
+						</replacevalue>
+					</replace>
+					<replace dir="${ext.processing.path}/gensrc">
+						<include name="**/Wait.java" />
+						<replacetoken>
+							<![CDATA[return prependProcessCode;]]>
+						</replacetoken>
+						<replacevalue>
+							<![CDATA[return prependProcessCode.booleanValue();]]>
+						</replacevalue>
+					</replace>
+				</sequential>
+			</outofdate>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="print_after_dist">
+		<sequential>
+			<echo message="Remove internal example data..." />
+			<delete file="${destdir}/resources/sampledata/7_hybris.impex" failonerror="false" />
+			<delete file="${destdir}/resources/sampledata/7_1_hybris.csv" failonerror="false" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="print_after_build">
+		<sequential>
+			<zip destfile="${ext.print.path}/resources/print/comet/DefaultConfiguration.zip"
+				basedir="${ext.print.path}/resources/print/comet/DefaultConfiguration"
+				includes="**/*.*"
+				excludes="**/.svn"
+			/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="print_before_clean">
+		<sequential>
+			<delete file="${ext.print.path}/resources/print/comet/DefaultConfiguration.zip" failonerror="false" />
+		</sequential>
+	</macrodef>
+</project>

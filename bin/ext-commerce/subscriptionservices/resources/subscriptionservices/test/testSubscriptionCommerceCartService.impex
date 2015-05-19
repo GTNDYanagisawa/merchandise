@@ -1,0 +1,265 @@
+$catalog-id=testCatalog
+$catalog-version=Online
+$catalog-version-staged=Staged
+
+$testCategory0-staged-id=testCategory0-staged
+$testCategory1-staged-id=testCategory1-staged
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$catalogversionResolver=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+$catalogversion-staged=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version-staged]
+$catalogversionResolver-staged=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version-staged])[unique=true,default=$catalog-id:$catalog-version-staged]
+
+$approved=approvalstatus(code)[default='approved']
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+$supercategories-staged=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version-staged]))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$billingTime=billingFrequency(code)[default='monthly']
+$termOfServiceRenewal=termOfServiceRenewal(code)[default='auto_renewing']
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode)
+;$catalog-id;$catalog-version-staged;true;USD
+
+INSERT_UPDATE Category;code[unique=true];$catalogversion-staged;name[lang=de];name[lang=en];$supercategories-staged;
+;$testCategory0-staged-id;;$testCategory0-staged-id;$testCategory0-staged-id;
+;$testCategory1-staged-id;;$testCategory1-staged-id;$testCategory1-staged-id;$testCategory0-staged-id;
+
+INSERT_UPDATE BillingFrequency;code[unique=true];order;cartAware[default=true]
+;monthly;5
+;quarterly;6
+;yearly;7
+
+INSERT_UPDATE BillingEvent;code[unique=true];order;cartAware[default=true]
+;paynow;1
+;onfirstbill;2
+;oncancellation;0;false
+
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password;
+;telco;K2006-C0008;Wim Telco;;en;USD;customergroup;1234;
+
+INSERT_UPDATE Address;owner(Customer.uid)[unique=true];streetname[unique=true];streetnumber[unique=true];postalcode[unique=true];duplicate[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;gender(code);middlename;phone1;title(code);url;company;fax;department
+;telco;Feldweg;7;18551;false;Sagard;US;true;false;true;true;Arin;Brode;arin@wow-europe.com;MALE;;;;;hybris GmbH;;
+
+INSERT_UPDATE Customer;uid[unique=true];defaultPaymentaddress(owner(Customer.uid), streetname, streetnumber, postalcode,duplicate);defaultShipmentAddress(owner(Customer.uid), streetname, streetnumber, postalcode, duplicate);
+;telco;telco:Feldweg:7:18551:false;telco:Feldweg:7:18551:false;
+
+INSERT_UPDATE Cart;user(uid);code[unique=true];currency(isocode);date[dateformat=dd.MM.yyyy HH:mm:ss];net;calculated;
+;telco;telcoCart1;USD;21.05.2012 00:00:00;false;false;
+
+INSERT_UPDATE Vendor;code[unique=true];name[lang=en];name[lang=de];
+;telco;Telco;Telco;
+
+
+INSERT_UPDATE Product;code[unique=true];$supercategories;manufacturerName;manufacturerAID;description[lang=en];unit(code)[default=pieces];ean;variantType(code);$catalogversion
+;2047052;;Apple;MB496T/A;21.03.2009;;
+;2093587;;Apple;MB489T/A;09.04.2009;;
+;3417123;;Apple;MC133T/A;27.06.2009;;885909319237
+;3417124;;Apple;MC132T/A;27.06.2009;;885909318896
+;3417125;;Apple;MC131T/A;27.06.2009;;885909362059
+;3417130;;Apple;MC134T/A;27.06.2009;;885909319596
+;GALAXY_NEXUS;;Samsung;Samsung;27.06.2009;;8806071785585
+;GALAXY_S2;;Samsung;Samsung;27.06.2009;;8806071648507
+;APPLE_IPHONE_4S_16GB;;Apple;Apple;27.06.2009;;802971153485
+;APPLE_IPHONE_4S_32GB;;Apple;Apple;27.06.2009;;802971153486
+;MOTOROLA_RAZR;;Motorola;Motorola;27.06.2009;;6947681511507
+;HTC_INCREDIBLE_S;;htc;htc;27.06.2009;;843163074606
+;NO_STOCK_PRODUCT;;isnich;isnich;27.06.2009;;000000000000
+
+INSERT_UPDATE Product;code[unique=true];$supercategories-staged;manufacturerName;manufacturerAID;description[lang=en];unit(code)[default=pieces];ean;variantType(code);$catalogversion-staged
+;SYNC_PRODUCT;;isnich;isnich;27.06.2009;;000000000001
+
+UPDATE Product;code[unique=true];$prices;$approved;$catalogversion;Europe1PriceFactory_PTG(code)
+;2047052;193 USD
+;2093587;200 USD
+;3417123;500 USD
+;3417124;300 USD
+;3417125;200 USD
+;3417130;300 USD
+;GALAXY_NEXUS;600 USD
+;GALAXY_S2;650 USD
+;APPLE_IPHONE_4S_16GB;850 USD
+;APPLE_IPHONE_4S_32GB;950 USD
+;MOTOROLA_RAZR;650 USD
+;HTC_INCREDIBLE_S;600 USD
+;NO_STOCK_PRODUCT;299 USD
+
+UPDATE Product;code[unique=true];$prices;$approved;$catalogversion-staged;Europe1PriceFactory_PTG(code)
+;SYNC_PRODUCT;299 USD
+
+INSERT_UPDATE StockLevel;productCode[unique=true];available[default=10];warehouse(code)[unique=true,default=warehouse_s];inStockStatus(code)[default=notSpecified];maxPreOrder[default=0];maxStockLevelHistoryCount[default=-1];overSelling[default=0];preOrder[default=0];reserved[default=0]
+;2047052
+;2093587
+;3417123
+;3417124
+;3417125
+;3417130
+;GALAXY_NEXUS
+;GALAXY_S2
+;APPLE_IPHONE_4S_16GB
+;APPLE_IPHONE_4S_32GB
+;MOTOROLA_RAZR
+;HTC_INCREDIBLE_S
+;NO_STOCK_PRODUCT;0
+;SYNC_PRODUCT
+
+INSERT_UPDATE Product;code[unique=true];stockLevels(productCode,warehouse(code)[default=warehouse_s]);vendors(code)[default=telco];$catalogversion
+;2047052;2047052:warehouse_s
+;2093587;2093587:warehouse_s
+;3417123;3417123:warehouse_s
+;3417124;3417124:warehouse_s
+;3417125;3417125:warehouse_s
+;3417130;3417130:warehouse_s
+;GALAXY_NEXUS;GALAXY_NEXUS:warehouse_s
+;GALAXY_S2;GALAXY_S2:warehouse_s
+;APPLE_IPHONE_4S_16GB;APPLE_IPHONE_4S_16GB:warehouse_s
+;APPLE_IPHONE_4S_32GB;APPLE_IPHONE_4S_32GB:warehouse_s
+;MOTOROLA_RAZR;MOTOROLA_RAZR:warehouse_s
+;HTC_INCREDIBLE_S;HTC_INCREDIBLE_S:warehouse_s
+;NO_STOCK_PRODUCT;NO_STOCK_PRODUCT:warehouse_s
+
+INSERT_UPDATE Product;code[unique=true];stockLevels(productCode,warehouse(code)[default=warehouse_s]);vendors(code)[default=telco];$catalogversion-staged
+;SYNC_PRODUCT;SYNC_PRODUCT:warehouse_s
+
+INSERT_UPDATE BillingPlan;id[unique=true];name[lang=en];billingCycleDay(code);billingCycleType(code);$billingTime
+;MonthlyPlan;Monthly Plan;;subscription_start;
+;QuarterlyPlan;Quarterly Plan;;subscription_start;quarterly
+;YearlyPlan;Yearly Plan;;subscription_start;yearly
+
+INSERT_UPDATE SubscriptionTerm;id[unique=true];name[lang=en];termOfServiceFrequency(code);termOfServiceNumber(code);termOfServiceRenewal(code);billingPlan(id);cancellable
+;none;No contract;none;;auto_renewing;MonthlyPlan;true
+;monthly_1;1 Month contract - monthly billing;monthly;1;auto_renewing;MonthlyPlan;false
+;annually_1;1 Year contract - monthly billing;annually;1;auto_renewing;MonthlyPlan;false
+;annually_2;2 Years contract - monthly billing;annually;2;auto_renewing;MonthlyPlan;false
+;annually_3;3 Years contract - monthly billing;annually;3;auto_renewing;MonthlyPlan;false
+;quarterly_2;2 Years contract - quarterly billing;annually;2;auto_renewing;QuarterlyPlan;false
+;yearly_2;2 Years contract - yearly billing;annually;2;auto_renewing;YearlyPlan;false
+
+INSERT_UPDATE SubscriptionProduct;code[unique=true];$supercategories;manufacturerAID;unit(code);subscriptionTerm(id);ean;$approved;$catalogversion
+;Y_STARTER_100_1Y;;AID_Y_STARTER_100_1Y;pieces;annually_1; 
+;Y_STARTER_100_2Y;;AID_Y_STARTER_100_2Y;pieces;annually_2; 
+;Y_STARTER_200_1Y;;AID_Y_STARTER_200_1Y;pieces;annually_1;
+;Y_STARTER_200_2Y;;AID_Y_STARTER_200_2Y;pieces;quarterly_2;
+;Y_STARTER_300_1Y;;AID_Y_STARTER_300_1Y;pieces;annually_1;
+;Y_STARTER_300_2Y;;AID_Y_STARTER_300_2Y;pieces;yearly_2;
+;PLAN_STANDARD_1Y;;PLAN_STANDARD_1Y;pieces;annually_1;
+;PLAN_STANDARD_2Y;;PLAN_STANDARD_2Y;pieces;annually_2;
+;PLAN_STANDARD_3Y;;PLAN_STANDARD_3Y;pieces;annually_3; 
+;PLAN_ADVANCED_1Y;;PLAN_ADVANCED_1Y;pieces;annually_1;
+;PLAN_ADVANCED_2Y;;PLAN_ADVANCED_2Y;pieces;annually_2; 
+;PLAN_ADVANCED_3Y;;PLAN_ADVANCED_3Y;pieces;annually_3; 
+;ACTIVATION_FEE;;ACTIVATION_FEE;pieces ;monthly_1;
+;SERVICE_FEE_MONTHLY;;SERVICE_FEE;pieces ;monthly_1;
+
+INSERT_UPDATE StockLevel;productCode[unique=true];available[default=10];warehouse(code)[unique=true,default=warehouse_s];inStockStatus(code)[default=forceInStock];maxPreOrder[default=0];maxStockLevelHistoryCount[default=-1];overSelling[default=0];preOrder[default=0];reserved[default=0]
+;Y_STARTER_100_1Y;
+;Y_STARTER_100_2Y;
+;Y_STARTER_200_1Y;
+;Y_STARTER_200_2Y;
+;Y_STARTER_300_1Y;
+;Y_STARTER_300_2Y;
+;PLAN_STANDARD_1Y;
+;PLAN_STANDARD_2Y;
+;PLAN_STANDARD_3Y;
+;PLAN_ADVANCED_1Y;
+;PLAN_ADVANCED_2Y;
+;PLAN_ADVANCED_3Y;
+;ACTIVATION_FEE;
+;SERVICE_FEE_MONTHLY;
+
+INSERT_UPDATE Product;code[unique=true];stockLevels(productCode,warehouse(code)[default=warehouse_s]);vendors(code)[default=telco];$catalogversion
+;Y_STARTER_100_1Y;Y_STARTER_100_1Y:warehouse_s
+;Y_STARTER_100_2Y;Y_STARTER_100_2Y:warehouse_s
+;Y_STARTER_100_2Y;Y_STARTER_100_2Y:warehouse_s
+;Y_STARTER_200_2Y;Y_STARTER_200_2Y:warehouse_s
+;Y_STARTER_300_1Y;Y_STARTER_300_1Y:warehouse_s
+;Y_STARTER_300_2Y;Y_STARTER_300_2Y:warehouse_s
+;PLAN_STANDARD_1Y;PLAN_STANDARD_1Y:warehouse_s
+;PLAN_STANDARD_2Y;PLAN_STANDARD_2Y:warehouse_s
+;PLAN_STANDARD_3Y;PLAN_STANDARD_3Y:warehouse_s
+;PLAN_ADVANCED_1Y;PLAN_ADVANCED_1Y:warehouse_s
+;PLAN_ADVANCED_2Y;PLAN_ADVANCED_2Y:warehouse_s
+;PLAN_ADVANCED_3Y;PLAN_ADVANCED_3Y:warehouse_s
+;ACTIVATION_FEE;ACTIVATION_FEE:warehouse_s
+;SERVICE_FEE_MONTHLY;SERVICE_FEE_MONTHLY:warehouse_s
+
+INSERT_UPDATE SubscriptionProduct;code[unique=true];$supercategories-staged;manufacturerAID;unit(code);subscriptionTerm(id);ean;$approved;$catalogversion-staged
+;SYNC_PLAN;$testCategory1-staged-id;SYNC_PLAN;pieces;monthly_1;
+;SYNC_FEE;$testCategory1-staged-id;SYNC_FEE;pieces;monthly_1;
+
+INSERT_UPDATE SubscriptionPricePlan;&pricePlan;product(code, $catalogversionResolver)[unique=true];$catalogversionResolver;currency(isocode)[default=USD,unique=true];unit(code)[default=pieces]
+;pricePlan_Y_STARTER_100_1Y;Y_STARTER_100_1Y;
+;pricePlan_Y_STARTER_100_2Y;Y_STARTER_100_2Y;
+;pricePlan_Y_STARTER_200_1Y;Y_STARTER_200_1Y;
+;pricePlan_Y_STARTER_200_2Y;Y_STARTER_200_2Y;
+;pricePlan_Y_STARTER_300_1Y;Y_STARTER_300_1Y;
+;pricePlan_Y_STARTER_300_2Y;Y_STARTER_300_2Y;
+;pricePlan_PLAN_STANDARD_1Y;PLAN_STANDARD_1Y;
+;pricePlan_PLAN_STANDARD_2Y;PLAN_STANDARD_2Y;
+;pricePlan_PLAN_STANDARD_3Y;PLAN_STANDARD_3Y;
+;pricePlan_PLAN_ADVANCED_1Y;PLAN_ADVANCED_1Y;
+;pricePlan_PLAN_ADVANCED_2Y;PLAN_ADVANCED_2Y;
+;pricePlan_PLAN_ADVANCED_3Y;PLAN_ADVANCED_3Y;
+;pricePlan_ACTIVATION_FEE;ACTIVATION_FEE;
+;pricePlan_SERVICE_FEE_MONTHLY;SERVICE_FEE_MONTHLY;
+
+INSERT_UPDATE RecurringChargeEntry;id[unique=true];subscriptionPricePlanRecurring(&pricePlan);price;cycleStart;cycleEnd;$catalogversionResolver
+;RCE_Y_STARTER_100_1Y_MONTHLY;  pricePlan_Y_STARTER_100_1Y;29;1;
+;RCE_Y_STARTER_200_1Y_MONTHLY;  pricePlan_Y_STARTER_200_1Y;39;1;
+;RCE_Y_STARTER_200_2Y_QUARTERLY;pricePlan_Y_STARTER_200_2Y;39;1;
+;RCE_Y_STARTER_300_1Y_MONTHLY;  pricePlan_Y_STARTER_300_1Y;49;1;
+;RCE_Y_STARTER_300_2Y_YEARLY;   pricePlan_Y_STARTER_300_2Y;49;1;
+;RCE_PLAN_STANDARD_1Y_MONTHLY;  pricePlan_PLAN_STANDARD_1Y;40;1;
+;RCE_PLAN_STANDARD_2Y_MONTHLY;  pricePlan_PLAN_STANDARD_2Y;40;1;
+;RCE_PLAN_STANDARD_3Y_MONTHLY;  pricePlan_PLAN_STANDARD_3Y;40;1;
+;RCE_PLAN_ADVANCED_1Y_MONTHLY;  pricePlan_PLAN_ADVANCED_1Y;60;1;
+;RCE_PLAN_ADVANCED_2Y_MONTHLY;  pricePlan_PLAN_ADVANCED_2Y;60;1;
+;RCE_PLAN_ADVANCED_3Y_MONTHLY;  pricePlan_PLAN_ADVANCED_3Y;60;1;
+;RCE_SERVICE_FEE_MONTHLY;       pricePlan_SERVICE_FEE_MONTHLY;1;1
+
+INSERT_UPDATE OneTimeChargeEntry;id[unique=true];subscriptionPricePlanOneTime(&pricePlan);price;billingEvent(code);$catalogversionResolver
+;OTCE_Y_STARTER_100_2Y_PAYNOW;  pricePlan_Y_STARTER_100_2Y;29;paynow;
+;OTCE_ACTIVATION_FEE_ONFIRSTBILL;pricePlan_ACTIVATION_FEE;15;onfirstbill;
+
+UPDATE SubscriptionProduct;code[unique=true];$prices;$approved;$catalogversion-staged;Europe1PriceFactory_PTG(code)
+;SYNC_PLAN;9 USD
+;SYNC_FEE;8 USD
+
+INSERT_UPDATE SubscriptionPricePlan;&pricePlan;product(code, $catalogversionResolver-staged)[unique=true];$catalogversionResolver-staged;currency(isocode)[default=USD,unique=true];unit(code)[default=pieces]
+;pricePlan_SYNC_PLAN;SYNC_PLAN;
+;pricePlan_SYNC_FEE;SYNC_FEE;
+
+INSERT_UPDATE RecurringChargeEntry;id[unique=true];subscriptionPricePlanRecurring(&pricePlan);price;cycleStart;cycleEnd;$catalogversionResolver-staged
+;RCE_SYNC_PLANY_MONTHLY;pricePlan_SYNC_PLAN;29;1;
+
+INSERT_UPDATE OneTimeChargeEntry;id[unique=true];subscriptionPricePlanOneTime(&pricePlan);price;billingEvent(code);$catalogversionResolver-staged
+;OTCE_SYNC_FEE_ONFIRSTBILL;pricePlan_SYNC_FEE;29;onfirstbill;
+
+INSERT_UPDATE SubscriptionProduct;code[unique=true];$supercategories;manufacturerAID;unit(code);subscriptionTerm(id);ean;$approved;$catalogversion
+;FRIENDS_AND_FAMILY;;AID_FRIENDS_AND_FAMILY;pieces;monthly_1;
+;WEEKENDER;;AID_WEEKENDER;pieces;monthly_1;
+;HOTSPOT_OPTION;;AID_HOTSPOT_OPTION;pieces;monthly_1;
+
+UPDATE SubscriptionProduct;code[unique=true];$prices;$approved;$catalogversion;Europe1PriceFactory_PTG(code)
+;FRIENDS_AND_FAMILY;15 USD
+;WEEKENDER;15 USD
+;HOTSPOT_OPTION;25 USD
+
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);submitOrderProcessCode
+;testStore;$catalog-id;order-process
+
+INSERT_UPDATE UsageUnit;id[unique=true];accumulative[default=false];name[lang=en];namePlural[lang=en]
+;phone_minutes;;minute;minutes
+;sms;;text message;text messages
+;mobile_data;;MB;MBs
+
+INSERT_UPDATE Entitlement;id[unique=true];usageUnit(id)
+;ME_PHONE_MIN;phone_minutes
+;ME_SMS_TEXTS;sms
+;ME_DATA_MB;mobile_data
+
+INSERT_UPDATE SubscriptionProduct;code[unique=true] ;$supercategories;manufacturerAID ;unit(code);subscriptionTerm(id);ean;$approved;$catalogversion
+;SPWME ;;AID_Y_STARTER_100_1Y;pieces ;monthly_1; 
+
+INSERT_UPDATE ProductEntitlement;id[unique=true];quantity;entitlement(id);timeUnit(code)[default='month'];timeUnitStart[default=1];timeUnitDuration[default=null];subscriptionProduct(code, $catalogversionResolver);$catalogversion
+;MSE_TrialPeriod ;100;ME_PHONE_MIN;month;1;3;SPWME
+;MSE_NormalPeriod;100;ME_PHONE_MIN;month;4;7;SPWME

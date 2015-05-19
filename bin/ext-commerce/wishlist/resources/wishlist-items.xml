@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype code="Wishlist2EntryPriority" generate="true" autocreate="true">
+			<value code="highest" />
+			<value code="high" />
+			<value code="medium" />
+			<value code="low" />
+			<value code="lowest" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		<relation code="User2Wishlist2" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="user" type="User" cardinality="one">
+				<modifiers read="true" write="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="wishlist" type="WishList2" cardinality="many" collectiontype="list">
+				<modifiers read="true" write="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="WishList22Entry" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="wishlist" type="Wishlist2" cardinality="one">
+				<modifiers read="true" write="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="entries" type="Wishlist2Entry" cardinality="many" collectiontype="list">
+				<modifiers read="true" write="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+		<itemtype code="Wishlist2" extends="GenericItem" jaloclass="de.hybris.platform.wishlist2.jalo.Wishlist2" autocreate="true"
+			generate="true">
+			<deployment table="Wishlist2" typecode="701" />
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<modifiers read="true" write="true" initial="false" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="description" type="java.lang.String">
+					<modifiers read="true" write="true" initial="false" optional="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>varchar2(4000)</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>					
+					</persistence>
+				</attribute>
+				<attribute qualifier="default" type="java.lang.Boolean">
+					<modifiers read="true" write="true" initial="false" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Wishlist2Entry" extends="GenericItem" jaloclass="de.hybris.platform.wishlist2.jalo.Wishlist2Entry"
+			autocreate="true" generate="true">
+			<deployment table="Wishlist2Entry" typecode="702" />
+			<attributes>
+				<attribute qualifier="product" type="Product">
+					<modifiers read="true" write="true" initial="false" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="desired" type="java.lang.Integer">
+					<modifiers read="true" write="true" initial="false" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="received" type="java.lang.Integer">
+					<modifiers read="true" write="true" initial="false" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="priority" type="Wishlist2EntryPriority">
+					<modifiers read="true" write="true" initial="false" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="addedDate" type="java.util.Date">
+					<modifiers read="true" write="true" initial="false" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="comment" type="java.lang.String">
+					<modifiers read="true" write="true" initial="false" optional="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>varchar2(4000)</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>					
+					</persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

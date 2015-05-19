@@ -1,0 +1,70 @@
+/*
+	You may use one of the following special globals here :
+
+	int 		gScriptType	(one of kActionBefore, kActionAfterMove, kActionAfterResize, kActionAfter)
+	float 		gPageWidthOrg
+	float		gPageHeightOrg
+	float		gPageWidthNew
+	float		gPageHeightNew
+	float		gResizeX
+	float		gResizeY
+	int		gPage
+	ItemRef	gOrgFrame
+*/
+
+#include "internal/types.h"
+
+int main ()
+{
+	float       top, bottom, left, right, newHeight, newWidth;
+	float       horizontScale, verticalScale, imageScaleOldX, imageScaleOldY, imageScaleX, imageScaleY,newScale;
+	int          err;
+
+	// Anpassugn am Anfang durchfuehren
+	if (gScriptType != kActionBefore) return 0;	
+	
+	// Skalierungsfaktor Horizontal und Vertikal ermitteln
+	horizontScale = gPageWidthNew / gPageWidthOrg;
+	verticalScale = gPageHeightNew / gPageHeightOrg; 
+
+	// Ermitteln Box Koordinaten
+	err = frame::bbox(gFrame,&left,&top,&right, &bottom);
+
+	// Ermitteln Bildskalierung
+	err = frame::image_getscale(gFrame,&imageScaleOldX,&imageScaleOldY);
+	if (err != 0)
+	{
+		wlog("", "Error [%i], message: [%s], while fetching frame coordination in script 20042.crpt", err, serror(err));	
+	}
+	else
+	{
+		// Welche Skalierung soll verwendet werden
+		if (horizontScale < verticalScale) 
+			newScale = horizontScale;
+		else 
+			newScale = verticalScale;
+
+		// Ermitteln Skalierung
+		imageScaleX = imageScaleOldX * newScale ;
+		imageScaleY = imageScaleOldY * newScale ;
+
+		newWidth = (right - left ) * newScale ;
+		newHeight = (bottom - top) * newScale;
+
+		err = frame::resize(gFrame,newWidth,newHeight);
+		if (err != 0)
+		{
+			wlog("", "Error [%i], message: [%s], while resizing frame in script 20042.crpt", err, serror(err));	
+		}
+		else
+		{
+			err =	frame::image_scale(gFrame,imageScaleX,imageScaleY);
+			if (err != 0)
+			{
+				wlog("", "Error [%i], message: [%s], while scaling image in script 20042.crpt", err, serror(err));	
+			}
+		}
+	}
+
+	return 0;
+}

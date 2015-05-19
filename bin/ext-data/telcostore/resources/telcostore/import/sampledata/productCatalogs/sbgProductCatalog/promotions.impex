@@ -1,0 +1,23 @@
+# ImpEx for Importing Promotions
+#% impex.setLocale( Locale.GERMAN ); 
+
+# Macros / Replacement Parameter definitions
+$productCatalog=sbgProductCatalog
+
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default=Online])[unique=true,default=$productCatalog:Online]
+
+
+INSERT PromotionPriceRow;&id;Currency(isocode);price;
+;threshold_30;USD;30;
+;discount_5;USD;5;
+;big_tv_price;USD;0;
+
+INSERT_UPDATE OrderThresholdDiscountPromotion;code[unique=true];enabled;PromotionGroup(Identifier);priority;thresholdTotals(&id);discountPrices(&id)
+;orderThresholdDiscountPromotion30_5;true;telcoPromoGrp;2000;threshold_30;discount_5;
+
+INSERT_UPDATE ProductFixedPricePromotion;code[unique=true];enabled;PromotionGroup(Identifier);priority;productFixedUnitPrice(&id);products(code, $catalogVersion)
+;productFixedPricePromotion_BIG_TV;true;telcoPromoGrp;2000;big_tv_price;BIG_TV
+
+INSERT_UPDATE PromotionBillingTimeRestriction;descriptionPattern[unique=true, lang=en];promotion(code);positive;billingTimes(code)
+;promotionBillingTimeRestrictionMonthlyPositive;orderThresholdDiscountPromotion30_5;true;monthly
+;promotionBillingTimeRestrictionOnFirstBillPositive;productFixedPricePromotion_BIG_TV;true;onfirstbill

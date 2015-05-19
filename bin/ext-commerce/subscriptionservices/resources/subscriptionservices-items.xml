@@ -1,0 +1,667 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<!--
+  ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="items.xsd">
+
+    <collectiontypes>
+        <collectiontype code="CategoryCollectionType" elementtype="Category" autocreate="true" generate="false"/>
+        <collectiontype code="SubscriptionPricePlanCollectionType" elementtype="SubscriptionPricePlan" autocreate="true" generate="false"/>
+        <collectiontype code="BillingTimeCollection" elementtype="BillingTime" autocreate="true" generate="false"/>
+     </collectiontypes>
+
+    <enumtypes>
+
+        <enumtype code="TermOfServiceFrequency" autocreate="true" generate="true" dynamic="false">
+            <value code="none"/>
+            <value code="monthly"/>
+            <value code="quarterly"/>
+            <value code="annually"/>
+        </enumtype>
+
+        <enumtype code="TermOfServiceRenewal" autocreate="true" generate="true" dynamic="false">
+            <value code="non_renewing"/>
+            <value code="auto_renewing"/>
+            <value code="renews_once"/>
+            <value code="renews_twice"/>
+            <value code="renews_three_times"/>
+        </enumtype>
+
+        <enumtype code="BillingCycleType" autocreate="true" generate="true" dynamic="false">
+            <value code="end_of_month"/>
+            <value code="day_of_month"/>
+            <value code="subscription_start"/>
+        </enumtype>
+
+        <enumtype code="UsageChargeType" autocreate="true" generate="true" dynamic="false">
+            <value code="highest_applicable_tier"/>
+            <value code="each_respective_tier"/>
+        </enumtype>
+
+        <enumtype code="SubscriptionStatus" autocreate="true" generate="true" dynamic="false">
+            <value code="active"/>
+            <value code="expired"/>
+            <value code="cancelled"/>
+        </enumtype>
+    </enumtypes>
+
+    <relations>
+
+        <!-- The 1-to-many relationship between AbstractOrder (master) and AbstractOrder (children) -->
+        <relation
+            generate="true"
+            localized="false"
+            code="AbstractMasterOrder2AbstractChildOrderRelation"
+            autocreate="true">
+            <sourceElement type="AbstractOrder" qualifier="parent" cardinality="one"/>
+            <targetElement type="AbstractOrder" qualifier="children" cardinality="many"/>
+        </relation>
+
+        <!-- The 1-to-many relationship between AbstractOrderEntry (master cart entry) and AbstractOrderEntry (child cart entries) -->
+        <relation
+            generate="true"
+            localized="false"
+            code="MasterAbstractOrderEntry2ChildAbstractOrderEntriesRelation"
+            autocreate="true">
+            <sourceElement type="AbstractOrderEntry" qualifier="masterEntry" cardinality="one"/>
+            <targetElement type="AbstractOrderEntry" qualifier="childEntries" cardinality="many"/>
+        </relation>
+
+        <relation
+            generate="true"
+            localized="false"
+            code="SubscriptionPricePlan2OneTimeChargeEntryRelation"
+            autocreate="true">
+            <sourceElement type="SubscriptionPricePlan" qualifier="subscriptionPricePlanOneTime" cardinality="one"/>
+            <targetElement type="OneTimeChargeEntry" qualifier="oneTimeChargeEntries" cardinality="many">
+              <modifiers partof="true"></modifiers>
+            </targetElement>
+        </relation>
+
+        <relation
+            generate="true"
+            localized="false"
+            code="SubscriptionPricePlan2RecurringChargeEntryRelation"
+            autocreate="true">
+            <sourceElement type="SubscriptionPricePlan" qualifier="subscriptionPricePlanRecurring" cardinality="one"/>
+            <targetElement type="RecurringChargeEntry" qualifier="recurringChargeEntries" cardinality="many">
+              <modifiers partof="true"></modifiers>
+            </targetElement>
+        </relation>
+
+        <relation
+            generate="true"
+            localized="false"
+            code="SubscriptionPricePlan2UsageChargeRelation"
+            autocreate="true">
+            <sourceElement type="SubscriptionPricePlan" qualifier="subscriptionPricePlanUsage" cardinality="one"/>
+            <targetElement type="UsageCharge" qualifier="usageCharges" cardinality="many">
+              <modifiers partof="true"></modifiers>
+            </targetElement>
+        </relation>
+
+        <relation
+            generate="true"
+            localized="false"
+            code="UsageCharge2UsageChargeEntryRelation"
+            autocreate="true">
+            <sourceElement type="UsageCharge" qualifier="usageCharge" cardinality="one"/>
+            <targetElement type="UsageChargeEntry" qualifier="usageChargeEntries" cardinality="many">
+              <modifiers partof="true"></modifiers>
+            </targetElement>
+        </relation>
+
+        <relation
+            generate="true"
+            localized="false"
+            code="SubscriptionTerm2SubscriptionProductRelation"
+            autocreate="true">
+            <sourceElement type="SubscriptionTerm" qualifier="subscriptionTerm" cardinality="one">
+               <modifiers initial="true" optional="false"/>
+            </sourceElement>
+            <targetElement type="SubscriptionProduct" qualifier="subscriptionProducts" cardinality="many"/>
+        </relation>
+
+    </relations>
+
+  <itemtypes>
+    <itemtype code="SubscriptionProduct" autocreate="false"  generate="false">
+      <attributes>
+        <attribute qualifier="priceRowsValid" type="java.lang.Boolean" >
+                    <description>Price Rows Valid</description>
+                    <modifiers write="false"/>
+          <persistence type="dynamic" attributeHandler="priceRowsValidProductAttribute" />
+                </attribute>
+      </attributes>
+    </itemtype>
+
+    <itemtype code="PriceRowsValidConstraint" autocreate="true" generate="true" extends="AttributeConstraint"
+             jaloclass="de.hybris.platform.subscriptionservices.jalo.PriceRowsValidConstraint">
+            <description>Custom constraint which checks if the priceRowsValid attribute is true.</description>
+            <attributes>
+              <attribute type="java.lang.String" qualifier="priceRowType">
+          <description>The price row type</description>
+          <modifiers read="true" write="true" search="true" optional="false" initial="false" />
+          <persistence type="property" />
+        </attribute>
+                <attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+                    <modifiers write="false" initial="true" optional="false"/>
+                    <defaultvalue>
+                        de.hybris.platform.subscriptionservices.constraints.PriceRowsValid.class
+                    </defaultvalue>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+    <itemtype code="SubscriptionProduct" extends="Product" autocreate="true"
+            generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.SubscriptionProduct">
+            <attributes>
+              <attribute redeclare="true" qualifier="europe1Prices" type="SubscriptionPricePlanCollectionType" />
+                <attribute qualifier="supercategories" redeclare="true" type="CategoryCollectionType">
+                    <modifiers read="true" write="true" search="true" optional="false"/>
+                </attribute>
+                <attribute qualifier="unit" type="Unit" redeclare="true">
+                    <modifiers write="true" optional="false"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="BillingTime" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.BillingTime"
+            extends="GenericItem" abstract="true"
+            autocreate="true">
+            <deployment table="BillingFrequency" typecode="6304"/>
+            <attributes>
+                <attribute qualifier="code" type="java.lang.String" >
+                    <description>Code</description>
+                    <modifiers unique="true" initial="true" optional="false" write="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="nameInCart" type="localized:java.lang.String">
+                    <description>Name of frequency in cart</description>
+                    <persistence type="property" />
+                </attribute>
+                <attribute qualifier="nameInOrder" type="localized:java.lang.String">
+                    <description>Name of frequency in order</description>
+                    <persistence type="property" />
+                </attribute>
+                <attribute qualifier="description" type="localized:java.lang.String">
+                    <description>Description</description>
+                    <persistence type="property" />
+                </attribute>
+                <attribute qualifier="order" type="java.lang.Integer">
+                    <description>Sequence</description>
+                    <persistence type="property" />
+                </attribute>
+                <attribute qualifier="cartAware" type="java.lang.Boolean">
+                    <description>Cart Aware</description>
+                    <persistence type="property" />
+                    <defaultvalue>Boolean.valueOf(true)</defaultvalue>
+                </attribute>
+            </attributes>
+
+            <indexes>
+                <index name="codeIdx" unique="true">
+                    <key attribute="code"/>
+                </index>
+            </indexes>
+        </itemtype>
+
+        <itemtype code="BillingFrequency" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.BillingFrequency"
+            extends="BillingTime"
+            autocreate="true">
+            <attributes>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="BillingEvent" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.BillingEvent"
+            extends="BillingTime"
+            autocreate="true">
+            <attributes>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="AbstractOrder"  autocreate="false"  generate="false" jaloclass="de.hybris.platform.subscriptionservices.jalo.order.AbstractOrder">
+            <attributes>
+                <attribute type="BillingTime" qualifier="billingTime">
+                    <description>Billing Time</description>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="AbstractOrderEntry"  autocreate="false"  generate="false" jaloclass="de.hybris.platform.subscriptionservices.jalo.order.AbstractOrderEntry">
+            <attributes>
+                <attribute type="java.lang.String" qualifier="xmlProduct">
+                    <description>xmlProduct</description>
+                    <persistence type="property">
+                        <columntype database="oracle">
+                            <value>CLOB</value>
+                        </columntype>
+                        <columntype database="mysql">
+                            <value>TEXT</value>
+                        </columntype>
+                        <columntype database="sqlserver">
+                            <value>TEXT</value>
+                        </columntype>
+                        <columntype>
+                            <value>HYBRIS.LONG_STRING</value>
+                        </columntype>
+                    </persistence>
+                </attribute>
+                <attribute qualifier="originalSubscriptionId" type="java.lang.String" >
+                    <description>YTODO to be added to the new entry configuration: Id of the original subscription that is upgraded</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="originalOrderEntry" type="OrderEntry" >
+                    <description>YTODO to be added to the new entry configuration: Reference to the original entry of the subscription that is upgraded</description>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="SubscriptionPricePlan" extends="PriceRow" autocreate="true"
+            generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.SubscriptionPricePlan">
+            <attributes>
+              	<attribute qualifier="price" type="java.lang.Double" redeclare="true" generate="true" autocreate="true">
+                    <persistence type="jalo"/>
+        		</attribute>
+                <attribute qualifier="name" type="localized:java.lang.String" >
+                    <description>Name</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="validationMessages" type="StringCollection" >
+                    <description>Validation Messages</description>
+                    <modifiers write="false"/>
+          			<persistence type="dynamic" attributeHandler="validationMessagesSubscriptionPricePlanAttribute" />
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="ChargeEntry" abstract="true" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.ChargeEntry"
+            extends="GenericItem"
+            autocreate="true">
+            <deployment table="ChargeEntries" typecode="6320"/>
+            <custom-properties>
+                <property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+                <property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+                <property name="uniqueKeyAttributeQualifier"><value>"id"</value></property>
+            </custom-properties>
+            <attributes>
+                <attribute type="java.lang.String" qualifier="id">
+                    <description>Identifier</description>
+                    <persistence type="property"/>
+                    <modifiers initial="true" optional="true" write="false"/>
+                </attribute>
+                <attribute qualifier="catalogVersion" type="CatalogVersion">
+                    <description>Catalog Version</description>
+                    <modifiers initial="true" write="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="price" type="java.lang.Double" >
+                    <description>Price</description>
+                    <persistence type="property"/>
+                    <modifiers optional="false"/>
+                </attribute>
+		        <attribute qualifier="currency" type="Currency">
+		          	<description>Currency from parent</description>
+		         	<modifiers write="false"/>
+		          	<persistence type="dynamic" attributeHandler="currencyChargeEntryAttribute" />
+		        </attribute>
+        		<attribute qualifier="billingTime" type="BillingTime">
+          			<description>Billing Time</description>
+                    <modifiers write="false"/>
+          			<persistence type="dynamic" attributeHandler="billingTimeChargeEntryAttribute" />
+        		</attribute>
+            </attributes>
+            <indexes>
+				<index name="versionIdx" unique="false">
+	         		<key attribute="catalogVersion"/>
+         		</index>
+         		<index name="idVersionIdx" unique="false">
+					<key attribute="id"/>
+					<key attribute="catalogVersion"/>
+				</index>
+			</indexes>
+        </itemtype>
+
+        <itemtype code="OneTimeChargeEntry" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.OneTimeChargeEntry"
+            extends="ChargeEntry"
+            autocreate="true">
+              <attributes>
+                <attribute qualifier="name" type="localized:java.lang.String" >
+                    <description>Name</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="BillingEvent" qualifier="billingEvent">
+                    <description>Billing Event</description>
+                    <persistence type="property"/>
+                    <modifiers optional="false"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="RecurringChargeEntry" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.RecurringChargeEntry"
+            extends="ChargeEntry"
+            autocreate="true">
+            <attributes>
+                <attribute qualifier="cycleStart" type="java.lang.Integer" >
+                    <description>CycleStart</description>
+                    <persistence type="property"/>
+                    <modifiers optional="false"/>
+                </attribute>
+                <attribute qualifier="cycleEnd" type="java.lang.Integer" >
+                    <description>CycleEnd</description>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="UsageChargeEntry" abstract="true" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.UsageChargeEntry"
+            extends="ChargeEntry"
+            autocreate="true">
+            <attributes>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="TierUsageChargeEntry" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.TierUsageChargeEntry"
+            extends="UsageChargeEntry"
+            autocreate="true">
+            <attributes>
+                <attribute qualifier="tierStart" type="java.lang.Integer" >
+                    <description>Tier Start</description>
+                    <persistence type="property"/>
+                    <modifiers optional="false"/>
+                </attribute>
+                <attribute qualifier="tierEnd" type="java.lang.Integer" >
+                    <description>Tier End</description>
+                    <persistence type="property"/>
+                    <modifiers optional="false"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="OverageUsageChargeEntry" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.OverageUsageChargeEntry"
+            extends="UsageChargeEntry"
+            autocreate="true">
+            <attributes>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="UsageCharge" abstract="true" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.UsageCharge"
+            extends="GenericItem"
+            autocreate="true">
+            <deployment table="UsageCharges" typecode="6322"/>
+            <custom-properties>
+                <property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+                <property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+                <property name="uniqueKeyAttributeQualifier"><value>"id"</value></property>
+            </custom-properties>
+            <attributes>
+                <attribute type="java.lang.String" qualifier="id">
+                    <description>Identifier</description>
+                    <persistence type="property"/>
+                    <modifiers initial="true" optional="true" write="false"/>
+                </attribute>
+                <attribute qualifier="catalogVersion" type="CatalogVersion">
+                    <description>Catalog Version</description>
+                    <modifiers initial="true" write="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="name" type="localized:java.lang.String" >
+                    <description>Name</description>
+                    <persistence type="property"/>
+                </attribute>
+        		<attribute qualifier="currency" type="Currency">
+          			<description>Currency from parent</description>
+                    <modifiers write="false"/>
+         			<persistence type="dynamic" attributeHandler="currencyUsageChargeAttribute" />
+        		</attribute>
+        		<attribute qualifier="billingTime" type="BillingTime">
+          			<description>Billing Time</description>
+                    <modifiers write="false"/>
+          			<persistence type="dynamic" attributeHandler="billingTimeUsageChargeAttribute" />
+       			</attribute>
+                <attribute qualifier="usageUnit" type="UsageUnit" >
+                    <description>Usage Unit</description>
+          			<persistence type="property"/>
+                    <modifiers optional="false"/>
+       			</attribute>
+            </attributes>
+            <indexes>
+            	<index name="versionIdx" unique="false">
+	         		<key attribute="catalogVersion"/>
+	         	</index>
+	         	<index name="idVersionIdx" unique="false">
+					<key attribute="id"/>
+					<key attribute="catalogVersion"/>
+				</index>
+			</indexes>
+        </itemtype>
+
+        <itemtype code="VolumeUsageCharge" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.VolumeUsageCharge"
+            extends="UsageCharge"
+            autocreate="true">
+            <attributes>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="PerUnitUsageCharge" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.PerUnitUsageCharge"
+            extends="UsageCharge"
+            autocreate="true">
+            <attributes>
+                <attribute qualifier="usageChargeType" type="UsageChargeType" >
+                    <description>Usage Charge Type</description>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="SubscriptionTerm" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.SubscriptionTerm"
+            extends="GenericItem" 
+            autocreate="true" >
+            <deployment table="SubscriptionTerms" typecode="6323"/>
+            <attributes>
+                <attribute type="java.lang.String" qualifier="id">
+                    <description>Identifier</description>
+                    <persistence type="property"/>
+                    <modifiers unique="true" initial="true" optional="false" write="false"/>
+                </attribute>
+              <attribute type="localized:java.lang.String" qualifier="name">
+                <description>Name</description>
+                    <persistence type="property"/>
+              </attribute>
+                <attribute type="java.lang.Integer" qualifier="termOfServiceNumber">
+                    <description>Term of Service Number</description>
+                    <persistence type="property" />
+                </attribute>
+                <attribute qualifier="cancellable" type="java.lang.Boolean">
+                    <description>Cancellable</description>
+                    <persistence type="property" />
+                    <defaultvalue>Boolean.valueOf(true)</defaultvalue>
+                </attribute>
+                <attribute type="TermOfServiceRenewal" qualifier="termOfServiceRenewal">
+                    <description>Term of Service Renewal</description>
+                    <persistence type="property" />
+                </attribute>
+                <attribute type="TermOfServiceFrequency" qualifier="termOfServiceFrequency">
+                    <description>Term of Service Frequency</description>
+                    <persistence type="property" />
+                </attribute>
+                <attribute type="BillingPlan" qualifier="billingPlan">
+                    <description>Billing Plan</description>
+                    <persistence type="property" />
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="BillingPlan" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.BillingPlan"
+            extends="GenericItem"
+            autocreate="true" >
+            <deployment table="BillingPlans" typecode="6324"/>
+            <attributes>
+                <attribute type="java.lang.String" qualifier="id">
+                    <description>Identifier</description>
+                    <persistence type="property"/>
+                    <modifiers unique="true" initial="true" optional="false" write="false"/>
+                </attribute>
+                <attribute qualifier="name" type="localized:java.lang.String" >
+                    <description>Name</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.Integer" qualifier="billingCycleDay">
+                    <description>Billing Cycle Day</description>
+                    <persistence type="property" />
+                </attribute>
+                <attribute type="BillingCycleType" qualifier="billingCycleType">
+                    <description>Billing Cycle Type</description>
+                    <persistence type="property" />
+                </attribute>
+                <attribute type="BillingFrequency" qualifier="billingFrequency">
+                    <description>Billing Frequency</description>
+                    <persistence type="property" />
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="Subscription" generate="true" jaloclass="de.hybris.platform.subscriptionservices.jalo.Subscription"
+            extends="GenericItem"
+            autocreate="true" >
+            <deployment table="Subscriptions" typecode="6327"/>
+            <attributes>
+                <attribute type="java.lang.String" qualifier="id">
+                    <description>Identifier</description>
+                    <persistence type="property"/>
+                    <modifiers unique="true" initial="true" optional="false" write="false"/>
+                </attribute>
+                <attribute type="java.lang.String" qualifier="name" >
+                    <description>Name</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.String" qualifier="description">
+                    <description>Description</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.String" qualifier="productCode">
+                    <description>Product Code</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.String" qualifier="orderNumber">
+                    <description>Order Identifier</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.Integer" qualifier="orderEntryNumber">
+                    <description>Order Entry Identifier</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.String" qualifier="billingsystemId">
+                    <description>Billingsystem Identifier</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.util.Date" qualifier="startDate">
+                    <description>Startdate</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.util.Date" qualifier="endDate">
+                    <description>Enddate</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.String" qualifier="renewalType">
+                    <description>Renewal Type</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.String" qualifier="subscriptionStatus">
+                    <description>Status</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.Boolean" qualifier="cancellable">
+                    <description>Cancellable</description>
+                    <persistence type="property"/>
+                    <defaultvalue>Boolean.valueOf(true)</defaultvalue>
+                </attribute>
+                <attribute type="java.lang.String" qualifier="billingFrequency">
+                    <description>Billing Frequency</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.Integer" qualifier="contractDuration">
+                    <description>Contract Duration</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.String" qualifier="contractFrequency">
+                    <description>Contract Frequency</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.util.Date" qualifier="placedOn">
+                    <description>Placed on</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.util.Date" qualifier="cancelledDate">
+                    <description>Cancellation Date</description>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.String" qualifier="customerId">
+                    <description>Customer Id</description>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+    <itemtype code="PromotionBillingTimeRestriction"
+      extends="AbstractPromotionRestriction"
+      jaloclass="de.hybris.platform.subscriptionservices.jalo.PromotionBillingTimeRestriction"
+      autocreate="true"
+      generate="true">
+
+      <attributes>
+        <attribute
+          qualifier="descriptionPattern"
+          redeclare="true"
+          type="localized:java.lang.String">
+          <description>The description of the restriction (supports message pattern).</description>
+          <modifiers read="true" write="true" search="false" optional="true"/>
+          <persistence type="property">
+            <columntype>
+              <value>HYBRIS.LONG_STRING</value>
+            </columntype>
+          </persistence>
+        </attribute>
+
+        <attribute
+          qualifier="positive"
+          type="java.lang.Boolean">
+          <defaultvalue>Boolean.TRUE</defaultvalue>
+          <description>Specifies if this restriction is a positive (true) or negative (false) one.</description>
+          <persistence type="property"/>
+          <modifiers search="false" optional="false"/>
+        </attribute>
+
+        <attribute
+          qualifier="billingTimes"
+          autocreate="true"
+          generate="true"
+          type="BillingTimeCollection">
+          <description>The billing frequencies/events the promotion is not applied for</description>
+          <persistence type="property"/>
+          <modifiers read="true" write="true" search="false" optional="true"/>
+        </attribute>
+      </attributes>
+
+    </itemtype>
+
+  </itemtypes>
+
+</items>

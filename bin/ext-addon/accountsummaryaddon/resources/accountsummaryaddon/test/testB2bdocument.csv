@@ -1,0 +1,64 @@
+#%impex.setLocale(Locale.CANADA)
+
+REMOVE B2BDocument[ batchmode=true];itemtype (code)[unique=true]
+;B2BDocument
+
+REMOVE B2BDocumentType[ batchmode=true];itemtype (code)[unique=true]
+;B2BDocumentType
+
+REMOVE DocumentMedia[ batchmode=true];itemtype (code)[unique=true]
+;DocumentMedia
+
+
+## Document insert
+INSERT_UPDATE B2BDocumentType;code[unique=true];name[lang=en];includeInOpenBalance;displayInAllList
+;Purchase Order;Purchase Order;true;true
+;Invoice;Invoice;true;true
+;Credit Note;Credit Note;true;true
+;Debit Note;Debit Note;true;true
+;Statement;Statement;false;false
+;Test;Test;false;true
+
+
+
+
+INSERT_UPDATE B2BDocument;documentNumber[unique=true];Unit(uid);amount;currency(isocode);date[dateformat=yyyy-MM-dd];documentType(code)[unique=true];dueDate[dateformat=yyyy-MM-dd hh:mm:ss];openAmount;status(code,itemtype(code))
+;PUR-002;Custom Retail;75.31;USD;2013-08-09;Purchase Order;2013-08-16 12:00:00;75.54;open:DocumentStatus;
+;INV-002;Pronto Services;85.54;USD;2013-08-12;Invoice;2013-09-13 12:00:00;25.54;open:DocumentStatus;
+;CRN-002;Pronto Services;85.20;USD;2013-08-12;Invoice;2013-09-14 12:00:00;15.54;open:DocumentStatus;
+;DBN-001;Custom Retail;25.28;USD;2013-10-12;Debit Note;2013-11-13 12:00:00;25.54;closed:DocumentStatus;
+;DBN-002;Custom Retail;26.28;USD;2013-10-13;Debit Note;2013-11-14 12:00:00;26.54;open:DocumentStatus;
+;INV-003;Pronto Goods;85.54;USD;2013-08-12;Invoice;2013-08-02 12:10:00;25.54;open:DocumentStatus;
+;CRN-003;Pronto Goods;85.20;USD;2013-08-12;Invoice;2013-08-14 12:00:00;15.54;open:DocumentStatus;
+;INV-004;Pronto;85.54;USD;2013-08-12;Invoice;2013-08-02 12:10:00;25.54;open:DocumentStatus;
+;INC-004;Pronto;85.54;USD;2013-08-11;Invoice;2013-08-12 12:10:00;21.51;open:DocumentStatus;
+;CRN-004;Pronto;85.20;USD;2013-08-12;Invoice;2013-08-13 12:00:00;15.54;open:DocumentStatus;
+;INV-005;Services East;85.54;USD;2013-08-12;Invoice;2013-08-10 12:00:00;25.54;open:DocumentStatus;
+;CRN-005;Services East;85.20;USD;2013-08-12;Credit Note;2013-07-07 12:00:00;12.54;open:DocumentStatus;
+;TES-005;Services East;85.20;USD;2013-08-11;Test;2013-08-11 12:00:00;15.54;open:DocumentStatus;
+;CRN-006;Rustic Services;85.20;USD;2013-08-12;Credit Note;2013-07-08 12:00:00;12.54;closed:DocumentStatus;
+;STA-001;Pronto Goods;85.20;USD;2013-08-12;Statement;2013-07-08 12:00:00;12.54;open:DocumentStatus;
+
+
+
+## Add restriction to only result documents link with b2bunit's user
+
+INSERT_UPDATE SearchRestriction;code[unique=true];name[lang=en];query;principal(UID);restrictedType(code);active;generate
+;b2busergroup_restriction;Restrict B2BDocument visibility;{item:Unit} IN (?session.branch);b2bcustomergroup;B2BDocument;true;true
+
+ 
+
+
+#insert_update MaxConstraint;active[allownull=true];annotation[forceWrite=true];creationtime[forceWrite=true,dateformat=dd.MM.yyyy hh:mm:ss];descriptor(enclosingType(code),qualifier);id[unique=true,allownull=true];message[lang=de];message[lang=en];owner(pk);qualifier;severity(code,itemtype(code));target;type(code);value[allownull=true]
+#;true;javax.validation.constraints.Max;07.10.2011 11:39:49;B2BDocument:amount;amountMaximumConstraint;;This amount is too high.;;amount;ERROR:Severity;de.hybris.platform.accountsummaryaddon.model.B2BDocumentModel;B2BDocument;10
+
+## data for document media
+INSERT_UPDATE DocumentMedia;code[unique=true];mime;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];
+;documentMedia1;image/jpeg;jar:/accountsummaryaddon/test/documentMediaPicture.jpg;
+;documentMedia2;image/jpeg;jar:/accountsummaryaddon/test/documentMediaPicture.jpg;
+;documentMedia3;image/jpeg;jar:/accountsummaryaddon/test/documentMediaPicture.jpg;
+
+UPDATE B2BDocument;documentNumber[unique=true];documentMedia(code);
+;PUR-002;documentMedia1;
+;INV-002;documentMedia2;
+;CRN-006;documentMedia3;

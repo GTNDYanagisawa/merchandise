@@ -1,0 +1,541 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+	[y] hybris Platform
+	
+	Copyright (c) 2000-2013 hybris AG
+	All rights reserved.
+	
+	This software is the confidential and proprietary information of hybris
+	("Confidential Information"). You shall not disclose such Confidential
+	Information and shall use it only in accordance with the terms of the
+	license agreement you entered into with hybris.
+	
+	
+-->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype code="AttributeConfigurationCollection"
+			elementtype="AttributeConfiguration" autocreate="true"
+			generate="false" />
+		<collectiontype code="IndexConfigurationCollection"
+			elementtype="IndexConfiguration" autocreate="true" generate="false" />
+		<collectiontype code="IndexUpdateCollection"
+			elementtype="IndexUpdate" autocreate="true" generate="false" />
+		<collectiontype code="LanguageConfigurationCollection"
+			elementtype="LanguageConfiguration" autocreate="true"
+			generate="false" />
+		<collectiontype code="lucene_AttributeDescriptorCollection"
+			elementtype="AttributeDescriptor" autocreate="true" generate="false" />
+
+	</collectiontypes>
+
+
+	<maptypes>
+		<!--  debug code -->
+		<maptype code="TestLocMap" argumenttype="Language"
+			returntype="StringCollection" autocreate="true" generate="true" />
+
+	</maptypes>
+
+	<relations>
+
+		<relation code="IndexTypeRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="IndexTypeRel" typecode="595" />
+			<sourceElement qualifier="indexConfigurations" type="IndexConfiguration" collectiontype="collection" cardinality="many" ordered="false">
+				<modifiers read="true" write="false" search="true" optional="true" private="true" />
+			</sourceElement>
+			<targetElement qualifier="includedTypes" type="ComposedType" collectiontype="collection" cardinality="many" ordered="true">
+				<description>
+					Only types specified here will be used within the
+					index. Types not specified will not be indexed.
+					Attribute created via the IndexTypeRelation
+					relation.
+				</description>
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+
+	</relations>
+
+	<itemtypes>
+
+		<itemtype code="AbstractLuceneItem" generate="true"
+			abstract="true"
+			extends="GenericItem" autocreate="true"
+			jaloclass="de.hybris.platform.lucenesearch.jalo.AbstractLuceneItem">
+		</itemtype>
+
+		<itemtype code="AttributeDescriptor" generate="false"
+			autocreate="false">
+			<attributes>
+				<attribute qualifier="forceLuceneIndexable"
+					type="java.lang.Boolean">
+					<description></description>
+					<modifiers optional="false" write="true" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="hmcIndexField"
+					type="java.lang.String">
+					<description></description>
+					<modifiers optional="true" write="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="RebuildIndexJob" extends="Job" generate="true"
+			autocreate="true" singleton="true"
+			jaloclass="de.hybris.platform.lucenesearch.jalo.RebuildIndexJob">
+		</itemtype>
+
+		<itemtype code="UpdateIndexJob" extends="Job" generate="true"
+			autocreate="true" singleton="true"
+			jaloclass="de.hybris.platform.lucenesearch.jalo.UpdateIndexJob">
+			<attributes>
+				<attribute qualifier="maxUpdatesPerRun"
+					type="java.lang.Integer">
+					<description>
+						The maximum number of items updated per
+						UpdateIndexJob run.
+					</description>
+					<modifiers read="true" write="true" optional="true" />
+					<defaultvalue>
+						Integer.valueOf(4 * 60 * 10)
+					</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="IndexUpdate" extends="AbstractLuceneItem"
+			generate="true" autocreate="true"
+			jaloclass="de.hybris.platform.lucenesearch.jalo.IndexUpdate">
+			<deployment table="IndexUpdates" typecode="594" />
+			<custom-properties>
+				<property name="systemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="indexConfiguration"
+					type="IndexConfiguration">
+					<description>
+						The IndexConfiguration this IndexUpdate belongs
+						to.
+					</description>
+					<modifiers initial="true" read="true" write="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="inProgress"
+					type="java.lang.Boolean">
+					<description></description>
+					<modifiers read="true" write="true"
+						optional="false" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="item" type="Item">
+					<description></description>
+					<modifiers read="true" write="false"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="itemPK"
+					type="de.hybris.platform.core.PK">
+					<description></description>
+					<modifiers initial="true" read="true" write="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="remove"
+					type="java.lang.Boolean">
+					<description></description>
+					<modifiers read="true" write="true" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="updateIndexCronJob"
+					type="CronJob">
+					<description></description>
+					<modifiers initial="true" read="true" write="false" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="idxCfg">
+					<key attribute="indexConfiguration" />
+				</index>
+				<index name="idxCronJob">
+					<key attribute="updateIndexCronJob" />
+				</index>
+				<index name="idxItem">
+					<key attribute="itemPK" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="LuceneIndex" generate="true"
+			extends="AbstractLuceneItem" autocreate="true"
+			jaloclass="de.hybris.platform.lucenesearch.jalo.LuceneIndex">
+			<deployment table="LuceneIndexes" typecode="590" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>
+						The identifier of the LuceneIndex.
+					</description>
+					<modifiers optional="false" write="false"
+						initial="true" unique="true" />
+					<persistence type="property" />
+					<custom-properties>
+						<property name="hmcIndexField">
+							<value>"thefield"</value>
+						</property>
+					</custom-properties>
+				</attribute>
+				<attribute qualifier="indexConfigurations"
+					type="IndexConfigurationCollection">
+					<description>
+						The IndexConfiguration objects belonging to this
+						LuceneIndex.
+					</description>
+					<modifiers write="true" partof="true"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="languageConfigurations"
+					type="LanguageConfigurationCollection">
+					<description>
+						The LanguageConfiguration objects belonging to
+						this LuceneIndex.
+					</description>
+					<modifiers write="true" partof="true"
+						optional="true" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="pendingUpdatesCount"
+					type="java.lang.Integer">
+					<description>
+						The number of all IndexUpdate objects belonging
+						to this index.
+					</description>
+					<modifiers optional="true" write="false"
+						search="false" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="postQueryFilterClassName"
+					type="java.lang.String">
+					<description>
+						Optionally, specify a PostQueryFilter
+						implementation here.
+					</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="rebuildEndTimestamp"
+					type="java.util.Date">
+					<description>
+						When the last rebuild of this LuceneIndex has
+						ended.
+					</description>
+					<modifiers optional="true" write="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="rebuildStartTimestamp"
+					type="java.util.Date">
+					<description>
+						When the last rebuild of this LuceneIndex has
+						started.
+					</description>
+					<modifiers optional="true" write="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="testLoc" type="TestLocMap">
+					<description></description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="upToDate"
+					type="java.lang.Boolean">
+					<description>
+						Indicates whether the LuceneIndex needs to be
+						updated or not.
+					</description>
+					<modifiers write="false" optional="false" />
+					<persistence type="jalo" />
+				</attribute>
+
+			</attributes>
+			<indexes>
+				<index name="idxCode">
+					<key attribute="code" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="LanguageConfiguration" generate="true"
+			extends="AbstractLuceneItem" autocreate="true"
+			jaloclass="de.hybris.platform.lucenesearch.jalo.LanguageConfiguration">
+			<deployment table="LangCfgs" typecode="593" />
+			<attributes>
+				<attribute qualifier="analyzerDefinition"
+					type="java.lang.String">
+					<description>
+						Specifies the analyzer class used to normalize
+						the documents of this LanguageConfiguration. You
+						need to specify a Java statement that returns a
+						org.apache.lucene.analysis.Analyzer instance,
+						such as "return new
+						org.apache.lucene.analysis.snowball.SnowballAnalyzer("German",
+						GermanAnalyzer.GERMAN_STOP_WORDS );"
+					</description>
+					<modifiers optional="true" write="true"
+						search="false" dontOptimize="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="indexedLanguage"
+					type="Language">
+					<description>
+						The system language in which the index is to be
+						built.
+					</description>
+					<modifiers optional="false" write="false"
+						initial="true" unique="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="luceneIndex" type="LuceneIndex">
+					<description>
+						The LuceneIndex to which the
+						LanguageConfiguration belongs.
+					</description>
+					<modifiers optional="false" unique="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="idxLucIdx">
+					<key attribute="luceneIndex" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="IndexConfiguration" generate="true"
+			extends="AbstractLuceneItem" autocreate="true"
+			jaloclass="de.hybris.platform.lucenesearch.jalo.IndexConfiguration">
+			<deployment table="IndexConfigurations" typecode="591" />
+			<attributes>
+				<attribute qualifier="activationAttribute"
+					type="AttributeDescriptor"
+					isSelectionOf="availableActivationAttributes">
+					<description>
+						Optional descriptor of boolean attribute.
+						Instances must have the value true in this
+						attribute to be indexed. Is limited to the
+						values of the availableActivationAttributes
+						attribute.
+					</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="allAvailableAttributes"
+					type="lucene_AttributeDescriptorCollection">
+					<description>
+						Returns all attributes of the type specified by
+						the indexedType attribute. Jalo-only attribute.
+					</description>
+					<modifiers optional="false" write="false" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="attributeConfigurations"
+					type="AttributeConfigurationCollection">
+					<modifiers optional="true" write="true"
+						partof="true" />
+					<persistence type="jalo" />
+					<description>
+						All AttributeConfiguration objects that belong
+						to this IndexConfiguration. Jalo-only attribute.
+					</description>
+				</attribute>
+				<attribute qualifier="availableActivationAttributes"
+					type="lucene_AttributeDescriptorCollection">
+					<description>
+						all AttributeDescriptors of the indexed type.
+						Jalo-only attribute. Deprecated.
+					</description>
+					<modifiers optional="false" write="false" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="availableGroupingAttributes"
+					type="lucene_AttributeDescriptorCollection">
+					<description>
+						all groupable AttributeDescriptors of the
+						indexed type. Jalo-only attribute. Deprecated.
+					</description>
+					<modifiers optional="false" write="false" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="availableIndexableAttributes"
+					type="lucene_AttributeDescriptorCollection">
+					<description>
+						Gets all available attributes of the specified
+						type which are indexable. Jalo-only attribute.
+					</description>
+					<modifiers optional="false" write="false" />
+					<persistence type="jalo" />
+				</attribute>
+				<attribute qualifier="groupingAttribute"
+					type="AttributeDescriptor"
+					isSelectionOf="availableGroupingAttributes">
+					<description>
+						Optional descriptor of an attribute that puts
+						the indexed item into one or more groups; see
+						the documentation of LucenesearchManager
+						for a description of grouping. Is limited to the
+						values of the availableGroupingAttributes
+						attribute.
+					</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="indexedDataFactoryClassName"
+					type="java.lang.String">
+					<description>
+						Optionally, you can specify an IndexedDataFactory 
+						Uses the DefaultIndexedDataFactory by default.
+					</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="indexedDataParams"
+					type="java.lang.String">
+					<description>
+						Additional parameters which may be evaluated by
+						the associated IndexedDataFactory.
+					</description>
+					<modifiers optional="true" write="true"
+						search="false" dontOptimize="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="indexedType"
+					type="ComposedType">
+					<description>
+						The item type whose instances will be indexed.
+						Initial attribute, cannot be edited after the
+						IndexConfiguration has been created.
+					</description>
+					<modifiers optional="false" write="false"
+						initial="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="luceneIndex" type="LuceneIndex">
+					<description>
+						The LuceneIndex to which this IndexConfiguration
+						belongs.
+					</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="pendingUpdates"
+					type="IndexUpdateCollection">
+					<description>
+						A collection of all IndexUpdate objects that
+						refer to objects of the given type which
+						currently exist and which have to be updated.
+						Jalo-only attribute. Entries are retrieved via a
+						FlexibleSearch statement.
+					</description>
+					<modifiers optional="true" write="true"
+						search="false" />
+					<persistence type="jalo" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="idxLucIdx">
+					<key attribute="luceneIndex" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AttributeConfiguration" generate="true"
+			extends="AbstractLuceneItem" autocreate="true"
+			jaloclass="de.hybris.platform.lucenesearch.jalo.AttributeConfiguration">
+			<deployment table="AttributeConfigurations" typecode="592" />
+			<attributes>
+				<attribute qualifier="availableIndexableAttributes"
+					type="lucene_AttributeDescriptorCollection">
+					<description>
+						Direct mapping of the
+						availableIndexableAttribute attribute of the
+						IndexConfiguration to which the
+						AttributeConfiguration is assigned. Jalo-only
+						attribute.
+					</description>
+					<modifiers optional="false" write="false" />
+					<persistence type="jalo" />
+				</attribute>
+
+				<attribute qualifier="exact" type="java.lang.Boolean">
+					<description>
+						Indicates whether this attribute text must be indexed
+						exactly (for example, without any stemming
+						mechanism), such as codes or identification
+						numbers. Defaults to Boolean.FALSE.
+					</description>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<modifiers optional="false" write="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="fieldName"
+					type="java.lang.String">
+					<description>
+						Field name within the lucene index where the
+						attribute will be stored.
+					</description>
+					<modifiers optional="true" write="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="indexConfiguration"
+					type="IndexConfiguration">
+					<description>
+						The IndexConfiguration to which this
+						configuration belongs.
+					</description>
+					<modifiers optional="false" write="false"
+						initial="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="indexedAttribute"
+					type="AttributeDescriptor"
+					isSelectionOf="availableIndexableAttributes">
+					<description>
+						Gets the attribute definition this configuration
+						represents. Is limited to the values of the
+						availableIndexableAttributes attribute.
+					</description>
+					<modifiers optional="false" write="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="storeData"
+					type="java.lang.Boolean">
+					<description>
+						Specifies whether the original text has to be stored
+						inside the lucene index as well. Defaults to
+						Boolean.TRUE.
+					</description>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<modifiers optional="false" write="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="weight" type="java.lang.Double">
+					<description>
+						The weighting of the attribute within the Lucene
+						index. Must be greater than 0. Defaults to new
+						Double(1.0).
+					</description>
+					<defaultvalue>new Double(1.0)</defaultvalue>
+					<modifiers optional="false" write="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

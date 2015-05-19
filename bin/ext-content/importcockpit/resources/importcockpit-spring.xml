@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+
+	<alias alias="ctxID2FactoryMappings" name="defaultCtxID2FactoryMappings" />
+	<bean id="defaultCtxID2FactoryMappings"
+		class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="sourceMap">
+			<map>
+         	<entry><key><value>editorArea</value></key><value>editorConfigurationFactory</value></entry>
+         	<entry><key><value>base</value></key><value>baseConfigurationFactory</value></entry>
+				<entry><key><value>listViewSelector</value></key><value>listViewConfigurationFactory</value></entry>
+				<entry><key><value>wizardConfig</value></key><value>wizardConfigurationFactory</value></entry>
+				<entry><key><value>listViewContentBrowser</value></key><value>listViewConfigurationFactory</value></entry>
+				<entry><key><value>listViewContentBrowserContext</value></key><value>listViewConfigurationFactory</value></entry>
+				<entry><key><value>listViewTaskContentBrowser</value></key><value>listViewConfigurationFactory</value></entry>
+				<entry><key><value>gridView</value></key><value>gridViewConfigurationFactory</value></entry>
+				<entry><key><value>advancedSearch</value></key><value>advancedSearchConfigurationFactory</value></entry>
+				<entry><key><value>listViewEditorSection</value></key><value>listViewConfigurationFactory</value></entry>
+				<entry><key><value>listViewBrowserSection</value></key><value>listViewConfigurationFactory</value></entry>
+				<entry><key><value>listContentElementSection</value></key><value>listViewConfigurationFactory</value></entry>
+				<entry><key><value>gridViewPersonalize</value></key><value>gridViewConfigurationFactory</value></entry>
+				<entry><key><value>contentEditor</value></key><value>contentEditorConfigurationFactory</value></entry>
+				<entry><key><value>contentElement</value></key><value>contentElementConfigurationFactory</value></entry>
+				<entry><key><value>liveEditPreviewArea</value></key><value>editorConfigurationFactory</value></entry>
+				<entry><key><value>listViewBtgMembership</value></key><value>listViewConfigurationFactory</value></entry>
+				<entry><key><value>mappingLine</value></key><value>mappingLineConfigurationFactory</value></entry>
+				<entry><key><value>targets</value></key><value>targetsConfigurationFactory</value></entry>
+         </map>
+      </property>
+	</bean>
+
+	<!-- Dynamic Attribute Value Providers -->
+	<alias alias="nextExecutionTimeAttribute" name="defaultNextExecutionTimeAttribute" />
+	<bean id="defaultNextExecutionTimeAttribute" class="de.hybris.platform.importcockpit.model.impl.NextExecutionTimeAttribute" scope="tenant"/>
+
+	<!-- Import Cockpit Cron Job Service-->
+	<alias alias="importCockpitCronJobService" name="defaultImportCockpitCronJobService"/>
+	<bean id="defaultImportCockpitCronJobService" class="de.hybris.platform.importcockpit.services.cronjob.impl.DefaultImportCockpitCronJobService"
+	 parent="cronJobService" scope="tenant">
+		<property name="importCockpitMappingService" ref="importCockpitMappingService" />
+		<property name="impexGenerationService" ref="impExMediaGenerationService" />
+		<property name="importCockpitCronJobDao" ref="importCockpitCronJobDao"/>
+		<property name="modelValidationService" ref="mappingModelValidationService"/>
+		<property name="importCockpitCronJobLogDao" ref="importCockpitCronJobLogDao"/>
+	</bean>
+	
+	<!-- Import Cockpit Media Service-->
+	<alias alias="importCockpitMediaService" name="defaultImportCockpitMediaService"/>
+	<bean id="defaultImportCockpitMediaService" class="de.hybris.platform.importcockpit.services.media.impl.DefaultImportCockpitMediaService"  parent="abstractBusinessService" scope="tenant">
+		<property name="mediaService" ref="mediaService"/>
+	</bean>
+	
+	<!-- Import Cockpit Classification Service-->
+	<alias alias="importCockpitClassificationService" name="defaultImportCockpitClassificationService"/>
+	<bean id="defaultImportCockpitClassificationService" class="de.hybris.platform.importcockpit.services.classification.impl.DefaultImportCockpitClassificationService" scope="tenant">
+		<property name="importCockpitClassificationDao" ref="importCockpitClassificationDao"/>
+	</bean>
+
+	<!-- Import Cockpit Mapping Service -->
+    <alias alias="importCockpitMappingService" name="defaultImportCockpitMappingService"/>
+    <bean id="defaultImportCockpitMappingService" class="de.hybris.platform.importcockpit.services.mapping.impl.DefaultImportCockpitMappingService" scope="tenant">
+    	<property name="importCockpitMappingDao" ref="importCockpitMappingDao"/>
+	    <property name="importCockpitMediaService" ref="importCockpitMediaService" />
+	    <property name="mappingLineConfigService" ref="mappingLineConfigService"/>
+	    <property name="mappingLineTypeService" ref="mappingLineTypeService"/>
+	    <property name="transformationService" ref="mappingTransformationService"/>
+	    <property name="mediaService" ref="mediaService"/>
+	    <property name="typeService" ref="typeService"/>
+	    <property name="modelService" ref="modelService"/>
+	    <property name="modelValidationService" ref="mappingModelValidationService"/>
+    </bean>
+
+	<!-- Mapping Line Service-->
+	<alias alias="mappingLineService" name="defaultMappingLineService"/>
+	<bean id="defaultMappingLineService" class="de.hybris.platform.importcockpit.services.mapping.impl.DefaultMappingLineService" scope="tenant">
+		<property name="typeService" ref="typeService"/>
+	    <property name="mappingLineTypeService" ref="mappingLineTypeService"/>
+		<property name="mappingLineConfigService" ref="mappingLineConfigService"/>
+	</bean>
+	
+	<!-- Mapping Line Configuration Service-->
+	<alias alias="mappingLineConfigService" name="defaultMappingLineConfigService"/>
+	<bean id="defaultMappingLineConfigService" class="de.hybris.platform.importcockpit.services.mapping.impl.DefaultMappingLineConfigService" scope="tenant">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+	
+	<!-- Mapping Line Type Service-->
+	<alias alias="mappingLineTypeService" name="defaultMappingLineTypeService"/>
+	<bean id="defaultMappingLineTypeService" class="de.hybris.platform.importcockpit.services.mapping.impl.DefaultMappingLineTypeService" scope="tenant">
+		<property name="typeService" ref="typeService"/>
+		<property name="mappingLineConfigService" ref="mappingLineConfigService"/>
+	</bean>
+	
+	<!-- Mapping Transformation Service -->
+	<alias alias="mappingTransformationService" name="defaultMappingTransformationService"/>
+    <bean id="defaultMappingTransformationService" class="de.hybris.platform.importcockpit.services.mapping.impl.DefaultMappingTransformationService" scope="tenant">
+    	<property name="typeService" ref="typeService"/>
+    	<property name="variantsService" ref="variantsService"/>
+    </bean>
+	    
+	<!-- Mapping Model Validation Service -->
+	<alias alias="mappingModelValidationService" name="defaultMappingModelValidationService"/>
+    <bean id="defaultMappingModelValidationService" class="de.hybris.platform.importcockpit.services.mapping.validation.impl.DefaultMappingModelValidationService" scope="tenant">
+    	<property name="sourceValidationStrategy" ref="sourceMappingValidationStrategy"/>
+    	<property name="attributeCollectionValidationStrategy" ref="attributeCollectionMappingValidationStrategy"/>
+    	<property name="impexModeValidationStrategy" ref="impexModeMappingValidationStrategy"/>
+    </bean>	
+    
+    <!-- Mapping Model Validation Strategy Services --> 
+    <alias alias="mappingModelValidationStrategy" name="defaultMappingModelValidationStrategy"/>
+    <bean id="defaultMappingModelValidationStrategy" class="de.hybris.platform.importcockpit.services.mapping.validation.strategy.impl.AbstractMappingValidationStrategy" abstract="true">
+    	<property name="importCockpitMediaService" ref="importCockpitMediaService"/>
+    	<property name="mappingLineTypeService" ref="mappingLineTypeService"/>
+    	<property name="mappingLineConfigService" ref="mappingLineConfigService"/>
+    	<property name="typeService" ref="typeService"/>
+    </bean>	
+    
+	<alias alias="sourceMappingValidationStrategy" name="defaultSourceMappingValidationStrategy"/>
+    <bean id="defaultSourceMappingValidationStrategy" class="de.hybris.platform.importcockpit.services.mapping.validation.strategy.impl.DefaultSrcMappingValidationStrategy" 
+    	parent="mappingModelValidationStrategy" scope="tenant"/>  
+    	
+	<alias alias="attributeCollectionMappingValidationStrategy" name="defaultAttributeCollectionMappingValidationStrategy"/>
+    <bean id="defaultAttributeCollectionMappingValidationStrategy" class="de.hybris.platform.importcockpit.services.mapping.validation.strategy.impl.DefaultAttributeCollectionMappingValidationStrategy" 
+    	parent="mappingModelValidationStrategy" scope="tenant"/>  
+    	
+    <alias alias="impexModeMappingValidationStrategy" name="defaultImpexModeMappingValidationStrategy"/>
+    <bean id="defaultImpexModeMappingValidationStrategy" class="de.hybris.platform.importcockpit.services.mapping.validation.strategy.impl.DefaultImpexModeMappingValidationStrategy" 
+    	parent="mappingModelValidationStrategy" scope="tenant"/>  
+	
+	<!-- ImpEx Transformation Service for generating impex files during the job -->
+	<alias alias="impExMediaGenerationService" name="defaultImpExMediaGenerationService"/>
+	<bean id="defaultImpExMediaGenerationService" class="de.hybris.platform.importcockpit.services.impex.impl.DefaultImpExMediaGenerationService" parent="abstractBusinessService" scope="tenant">
+		<property name="mappingService" ref="importCockpitMappingService" />
+		<property name="importCockpitMediaService" ref="importCockpitMediaService" />
+		<property name="transformationService" ref="impExTransformationService"/>
+		<property name="headerGeneratorOperation" ref="headerGeneratorOperation" />
+		<property name="fileGeneratorOperation" ref="fileGeneratorOperation"/>
+    </bean>
+	
+	<alias alias="impExTransformationService" name="defaultImpExTransformationService"/>
+	<bean id="defaultImpExTransformationService" class="de.hybris.platform.importcockpit.services.impex.impl.DefaultImpExTransformationService" scope="tenant">
+		<property name="importCockpitMediaService" ref="importCockpitMediaService" />
+    	<property name="dataGeneratorOperation" ref="dataGeneratorOperation" />
+    	<property name="fileGeneratorOperation" ref="fileGeneratorOperation"/>
+    </bean>
+
+ 	<!-- ImpEx Operations -->
+	<alias alias="impexGeneratorOperation" name="defaultImpexGeneratorOperation"/>
+	<bean id="defaultImpexGeneratorOperation" class="de.hybris.platform.importcockpit.services.impex.generator.operations.impl.AbstractImpexGeneratorOperation" abstract="true">
+    	<property name="mappingService" ref="importCockpitMappingService" />
+     	<property name="catalogTypeService" ref="catalogTypeService" />
+     	<property name="mappingLineService" ref="mappingLineService" />
+    </bean>
+    
+	<alias alias="headerGeneratorOperation" name="defaultHeaderGeneratorOperation"/>
+	<bean id="defaultHeaderGeneratorOperation" class="de.hybris.platform.importcockpit.services.impex.generator.operations.impl.DefaultHeaderGeneratorOperation" 
+		parent="impexGeneratorOperation" scope="tenant"/>
+	
+	<alias alias="dataGeneratorOperation" name="defaultDataGeneratorOperation"/>
+	<bean id="defaultDataGeneratorOperation" class="de.hybris.platform.importcockpit.services.impex.generator.operations.impl.DefaultDataGeneratorOperation" parent="impexGeneratorOperation" scope="tenant">
+		<property name="formatBuilder" ref="formatBuilder"/>
+	</bean>
+
+	<alias alias="fileGeneratorOperation" name="defaultFileGeneratorOperation"/>
+	<bean id="defaultFileGeneratorOperation" class="de.hybris.platform.importcockpit.services.impex.generator.operations.impl.DefaultFileGeneratorOperation" 
+		parent="impexGeneratorOperation" scope="tenant"/>
+		
+    <!-- DAOs -->
+	<alias alias="importCockpitCronJobDao" name="defaultImportCockpitCronJobDao"/>
+	<bean id="defaultImportCockpitCronJobDao" class="de.hybris.platform.importcockpit.daos.impl.DefaultImportCockpitCronJobDao" parent="cronJobDao" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<alias alias="importCockpitCronJobLogDao" name="defaultImportCockpitCronJobLogDao"/>
+	<bean id="defaultImportCockpitCronJobLogDao" class="de.hybris.platform.importcockpit.daos.impl.DefaultImportCockpitCronJobLogDao" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<alias alias="importCockpitMappingDao" name="defaultImportCockpitMappingDao"/>
+	<bean id="defaultImportCockpitMappingDao" class="de.hybris.platform.importcockpit.daos.impl.DefaultImportCockpitMappingDao" scope="tenant">
+		<constructor-arg value="ImportCockpitMappingModel"></constructor-arg>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<alias alias="importCockpitClassificationDao" name="defaultImportCockpitClassificationDao"/>
+	<bean id="defaultImportCockpitClassificationDao" class="de.hybris.platform.importcockpit.daos.impl.DefaultImportCockpitClassificationDao" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<alias alias="formatBuilder" name="defaultFormatBuilder"/>
+	<bean id="defaultFormatBuilder" class="de.hybris.platform.importcockpit.format.impl.DefaultFormatBuilder" scope="tenant" />
+	
+	<alias alias="importCockpitMappingUtils" name="defaultImportCockpitMappingUtils"/>
+	<bean id="defaultImportCockpitMappingUtils" class="de.hybris.platform.importcockpit.components.contentbrowser.util.ImportCockpitMappingUtils">
+		<property name="importCockpitMediaService" ref="importCockpitMediaService"/>
+	</bean>
+	
+</beans>

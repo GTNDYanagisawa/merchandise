@@ -1,0 +1,277 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+
+<project name="solrfacetsearch_buildcallbacks">
+
+	<macrodef name="solrfacetsearch_after_build">
+		<sequential>
+			<if>
+				<available file="${ext.solrfacetsearch.path}/classes/de/hybris/platform/solrfacetsearch/ysolr/" type="dir" />
+				<then>
+					<outofdate>
+						<sourcefiles>
+							<fileset dir="${ext.solrfacetsearch.path}/src/de/hybris/platform/solrfacetsearch/ysolr" />
+						</sourcefiles>
+						<targetfiles path="${ext.solrfacetsearch.path}/resources/solr/server/hybris/hybriscomponents.${hybris.build.version}.jar" />
+						<sequential>
+							<echo>Packaging solr components</echo>
+							<delete>
+								<fileset dir="${ext.solrfacetsearch.path}/resources/solr/server/hybris/" includes="hybriscomponents*.jar" />
+							</delete>
+							<jar destfile="${ext.solrfacetsearch.path}/resources/solr/server/hybris/hybriscomponents.${hybris.build.version}.jar">
+								<fileset dir="${ext.solrfacetsearch.path}/classes">
+									<include name="de/hybris/platform/solrfacetsearch/ysolr/**" />
+								</fileset>
+								<manifest>
+									<attribute name="Built-By" value="hybris" />
+									<section name="common">
+										<attribute name="Implementation-Title" value="hybris solr components" />
+										<attribute name="Implementation-Version" value="${hybris.build.version}-${DSTAMP}" />
+										<attribute name="Implementation-Vendor" value="hybris" />
+									</section>
+								</manifest>
+							</jar>
+							<echo>Packaging solr standalone war</echo>
+							<mkdir dir="${ext.solrfacetsearch.path}/_war"/>
+							<unzip dest="${ext.solrfacetsearch.path}/_war" src="${ext.solrfacetsearch.path}/resources/solr/server/webapps/solr.war" />
+							<delete>
+								<fileset dir="${ext.solrfacetsearch.path}/_war/WEB-INF/lib/" includes="hybriscomponents*.jar"/>
+							</delete>
+							<copy file="${ext.solrfacetsearch.path}/resources/solr/server/hybris/hybriscomponents.${hybris.build.version}.jar" tofile="${ext.solrfacetsearch.path}/_war/WEB-INF/lib/hybriscomponents.${hybris.build.version}.jar"/>
+							<war destfile="${ext.solrfacetsearch.path}/resources/solr/server/webapps/solr-tmp.war" >
+								<fileset dir="${ext.solrfacetsearch.path}/_war" />
+							</war>
+							<delete dir="${ext.solrfacetsearch.path}/_war"/>
+							<delete dir="${ext.solrfacetsearch.path}/resources/solr/server/webapps/">
+								<filename name="solr.war"/>
+							</delete>
+							<move file="${ext.solrfacetsearch.path}/resources/solr/server/webapps/solr-tmp.war" tofile="${ext.solrfacetsearch.path}/resources/solr/server/webapps/solr.war"/>
+						</sequential>
+					</outofdate>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="solrfacetsearch_before_build">
+		<sequential>
+			<taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+				<classpath>
+					<fileset dir="${platformhome}/resources/ant/lib">
+						<include name="*.jar" />
+					</fileset>
+				</classpath>
+			</taskdef>
+			<mkdir dir="${ext.solrfacetsearch.path}/gensrc" />
+
+			<outofdate>
+				<sourcefiles>
+					<fileset file="${ext.solrfacetsearch.path}/resources/config/SolrFacetConfig.xsd"/>
+				</sourcefiles>
+				<targetfiles path="${ext.solrfacetsearch.path}/gensrc/de/hybris/platform/solrfacetsearch/config/xml" />
+				<sequential>
+
+					<echo>JAXB for solr configuration</echo>
+					<xjc schema="${ext.solrfacetsearch.path}/resources/config/SolrFacetConfig.xsd" package="de.hybris.platform.solrfacetsearch.config.xml" destdir="${ext.solrfacetsearch.path}/gensrc">
+						<produces dir="${ext.solrfacetsearch.path}/gensrc/de/hybris/platform/solrfacetsearch/config/xml">
+							<include name="*.java" />
+						</produces>
+						<depends file="${ext.solrfacetsearch.path}/resources/config/SolrFacetConfig.xsd" />
+					</xjc>
+
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/FsQuery.java" />
+						<replacetoken>return injectLastIndexTime;</replacetoken>
+						<replacevalue>return injectLastIndexTime.booleanValue();</replacevalue>
+					</replace>
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/FsQuery.java" />
+						<replacetoken>public boolean getInjectLastIndexTime()</replacetoken>
+						<replacevalue>public boolean isInjectLastIndexTime()</replacevalue>
+					</replace>
+
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/FsQuery.java" />
+						<replacetoken>return injectCurrentDate;</replacetoken>
+						<replacevalue>return injectCurrentDate.booleanValue();</replacevalue>
+					</replace>
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/FsQuery.java" />
+						<replacetoken>public boolean getInjectCurrentDate()</replacetoken>
+						<replacevalue>public boolean isInjectCurrentDate()</replacevalue>
+					</replace>
+
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/FsQuery.java" />
+						<replacetoken>return injectCurrentTime;</replacetoken>
+						<replacevalue>return injectCurrentTime.booleanValue();</replacevalue>
+					</replace>
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/FsQuery.java" />
+						<replacetoken>public boolean getInjectCurrentTime()</replacetoken>
+						<replacevalue>public boolean isInjectCurrentTime()</replacevalue>
+					</replace>
+
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/EndpointURL.java" />
+						<replacetoken>return timeout;</replacetoken>
+						<replacevalue>return timeout.intValue();</replacevalue>
+					</replace>
+
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/EndpointURL.java" />
+						<replacetoken>return master;</replacetoken>
+						<replacevalue>return master.booleanValue();</replacevalue>
+					</replace>
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/EndpointURL.java" />
+						<replacetoken>public boolean getMaster()</replacetoken>
+						<replacevalue>public boolean isMaster()</replacevalue>
+					</replace>
+
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/ItemType.java" />
+						<replacetoken>return variant;</replacetoken>
+						<replacevalue>return variant.booleanValue();</replacevalue>
+					</replace>
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/ItemType.java" />
+						<replacetoken>public boolean getVariant()</replacetoken>
+						<replacevalue>public boolean isVariant()</replacevalue>
+					</replace>
+
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/Property.java" />
+						<replacetoken>return localized;</replacetoken>
+						<replacevalue>return localized.booleanValue();</replacevalue>
+					</replace>
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/Property.java" />
+						<replacetoken>public boolean getLocalized()</replacetoken>
+						<replacevalue>public boolean isLocalized()</replacevalue>
+					</replace>
+
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/Property.java" />
+						<replacetoken>return facet;</replacetoken>
+						<replacevalue>return facet.booleanValue();</replacevalue>
+					</replace>
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/Property.java" />
+						<replacetoken>public boolean getFacet()</replacetoken>
+						<replacevalue>public boolean isFacet()</replacevalue>
+					</replace>
+
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/Property.java" />
+						<replacetoken>return multiValue;</replacetoken>
+						<replacevalue>return multiValue.booleanValue();</replacevalue>
+					</replace>
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/Property.java" />
+						<replacetoken>public boolean getMultiValue()</replacetoken>
+						<replacevalue>public boolean isMultiValue()</replacevalue>
+					</replace>
+
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/Property.java" />
+						<replacetoken>return currency;</replacetoken>
+						<replacevalue>return currency.booleanValue();</replacevalue>
+					</replace>
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/Property.java" />
+						<replacetoken>public boolean getCurrency()</replacetoken>
+						<replacevalue>public boolean isCurrency()</replacevalue>
+					</replace>
+
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/Clusterconfig.java" />
+						<replacetoken>return embeddedMaster;</replacetoken>
+						<replacevalue>return embeddedMaster.booleanValue();</replacevalue>
+					</replace>
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/Clusterconfig.java" />
+						<replacetoken>public boolean getEmbeddedMaster()</replacetoken>
+						<replacevalue>public boolean isEmbeddedMaster()</replacevalue>
+					</replace>
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/ObjectFactory.java" />
+						<replacetoken><![CDATA[public ObjectFactory() {]]></replacetoken>
+						<replacevalue><![CDATA[public ObjectFactory() { // empty constructor]]></replacevalue>
+					</replace>
+				</sequential>
+			</outofdate>
+
+			<outofdate>
+				<sourcefiles>
+					<fileset file="${ext.solrfacetsearch.path}/resources/indexer/solrSearchAddDocuments.xsd" />
+				</sourcefiles>
+				<targetfiles path="${ext.solrfacetsearch.path}/gensrc/de/hybris/platform/solrfacetsearch/indexer/xml/add" />
+				<sequential>
+					<echo>JAXB for add solr documents</echo>
+					<xjc schema="${ext.solrfacetsearch.path}/resources/indexer/solrSearchAddDocuments.xsd" package="de.hybris.platform.solrfacetsearch.indexer.xml.add" destdir="${ext.solrfacetsearch.path}/gensrc">
+						<produces dir="${ext.solrfacetsearch.path}/gensrc/de/hybris/platform/solrfacetsearch/indexer/xml/add">
+							<include name="*.java" />
+						</produces>
+						<depends file="${ext.solrfacetsearch.path}/resources/indexer/solrSearchAddDocuments.xsd" />
+					</xjc>
+					<!-- BEWARE: Don't reformat lines below. Leading spaced need to remain as they are -->
+					<replace dir="${ext.solrfacetsearch.path}/gensrc/de/hybris/platform/solrfacetsearch/indexer/xml/add">
+						<include name="**/ObjectFactory.java" />
+						<replacetoken><![CDATA[public ObjectFactory() {]]></replacetoken>
+						<replacevalue><![CDATA[public ObjectFactory() { // empty constructor]]></replacevalue>
+					</replace>
+				</sequential>
+			</outofdate>
+
+			<outofdate>
+				<sourcefiles>
+					<fileset file="${ext.solrfacetsearch.path}/resources/indexer/solrSearchDeleteDocuments.xsd" />
+				</sourcefiles>
+				<targetfiles path="${ext.solrfacetsearch.path}/gensrc/de/hybris/platform/solrfacetsearch/indexer/xml/delete" />
+				<sequential>
+					<xjc schema="${ext.solrfacetsearch.path}/resources/indexer/solrSearchDeleteDocuments.xsd" package="de.hybris.platform.solrfacetsearch.indexer.xml.delete" destdir="${ext.solrfacetsearch.path}/gensrc">
+						<produces dir="${ext.solrfacetsearch.path}/gensrc/de/hybris/platform/solrfacetsearch/indexer/xml/delete">
+							<include name="*.java" />
+						</produces>
+						<depends file="${ext.solrfacetsearch.path}/resources/indexer/solrSearchDeleteDocuments.xsd" />
+					</xjc>
+					<!-- BEWARE: Don't reformat lines below. Leading spaced need to remain as they are -->
+					<replace dir="${ext.solrfacetsearch.path}/gensrc">
+						<include name="**/ObjectFactory.java" />
+						<replacetoken><![CDATA[public ObjectFactory() {]]></replacetoken>
+						<replacevalue><![CDATA[public ObjectFactory() { // empty constructor]]></replacevalue>
+					</replace>
+				</sequential>
+			</outofdate>
+			
+			<if>
+				<available file="${HYBRIS_CONFIG_DIR}/solr/embedded"/>
+				<then/>
+				<else>
+					<echo>Copying default embedded solr configuration to ${HYBRIS_CONFIG_DIR}</echo>
+					<copy todir="${HYBRIS_CONFIG_DIR}/solr/embedded">
+						<fileset dir="${ext.solrfacetsearch.path}/resources/solr/server">
+							<include name="conf/**"/>
+                            <include name="solr.xml"/>
+						</fileset>
+					</copy>
+				</else>
+			</if>
+			
+		</sequential>
+	</macrodef>
+	
+</project>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd"
+    default-autowire="byName">
+    
+   <alias alias="defaultNavigationNodeWizard" name="defaultNavigationNodeWizard" />
+	<bean id="defaultNavigationNodeWizard" scope="prototype" class="de.hybris.platform.cmscockpit.wizard.DefaultNavigationNodeWizard">
+		<property name="title" value="cmscockpit.wizard.navigation.node.title"/>
+		<property name="typeService" ref="cockpitTypeService"/>
+		<property name="defaultController" ref="defaultNavigationNodeController"/>
+		<property name="genericRandomNameProducer" ref="genericRandomNameProducer"/>
+		<property name="pages">
+			<list>
+				<ref bean="navigationNode_basicDataPage"/>
+				<ref bean="navigationNode_assignmentPage"/>
+				<ref bean="navigationNode_decisionPage"/>
+				<ref bean="navigationNode_resourceSelectorPage"/>
+				<ref bean="navigationNode_innerWizardPage"/>
+				<ref bean="navigationNode_uplodaMediaPage"/>
+			</list>
+		</property>
+		<property name="supportedTypes" ref="cmscockpitNavigationNodeConfig"/>
+		<property name="mediaMimeTypes" ref="cmscockpitNavigationNodeMediaTypes"/>
+		<property name="pageRoot" value="/cmscockpit/wizards/navigationnode"/>
+		<property name="defaultInnerWizardPageController" ref="navigationNodeMandatoryPageController"/>
+		<property name="navigationNodeInnerWizard" ref="navigationNodeInnerWizard"/>
+	</bean>
+	
+	<alias alias="cmscockpitNavigationNodeMediaTypes" name="defaultCmscockpitNavigationNodeMediaTypes"/>
+	<bean id="defaultCmscockpitNavigationNodeMediaTypes" scope="tenant" class="org.springframework.beans.factory.config.ListFactoryBean" >
+	<property name="sourceList">
+			<list>
+				<value>image/jpeg</value> 
+				<value>image/gif</value>
+				<value>image/png</value>
+			</list>
+	</property>		
+	</bean>
+	
+	<alias alias="defaultNavigationNodeController" name="defaultNavigationNodeController" />
+	<bean id="defaultNavigationNodeController" class="de.hybris.platform.cmscockpit.wizard.controller.DefaultNavigationNodeWizardController" scope="prototype">
+		<property name="typeService" ref="cockpitTypeService"/>
+		<property name="modelHelper" ref="cockpitModelHelper"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="transitions">
+			<list>
+				<bean class="de.hybris.platform.cockpit.wizards.Transition">
+					<property name="source" value="navigationNode_assignmentPage"/>
+					<property name="ifAttributesTrue" value="modeSelected"/>
+					<property name="destination" value="navigationNode_decisionPage"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.wizards.Transition">
+					<property name="source" value="navigationNode_decisionPage"/>
+					<property name="ifAttributesTrue" value="createModeEnabled"/>
+					<property name="destination" value="navigationNode_innerWizardPage"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.wizards.Transition">
+					<property name="source" value="navigationNode_decisionPage"/>
+					<property name="ifAttributesFalse" value="createModeEnabled"/>
+					<property name="destination" value="navigationNode_resourceSelectorPage"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.wizards.Transition">
+					<property name="source" value="navigationNode_innerWizardPage"/>
+					<property name="ifAttributesTrue" value="mediaModeSelected"/>
+					<property name="destination" value="navigationNode_uplodaMediaPage"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="navigationNode_basicDataPage" name="defaultNavigationNode_basicDataPage" />
+	<bean id="defaultNavigationNode_basicDataPage" class="de.hybris.platform.cockpit.wizards.generic.DefaultGenericItemPage" scope="prototype">
+		<property name="id" value="navigationNode_basicDataPage"/>
+		<property name="title" value="cmscockpit.wizard.navigation.nodes.basic.data.title" />
+		<property name="componentURI" value="navigationNode_basicDataPage.zul"/>
+	</bean>
+	
+	<alias alias="navigationNode_assignmentPage" name="defaultNavigationNode_assignmentPage" />
+	<bean id="defaultNavigationNode_assignmentPage" class="de.hybris.platform.cockpit.wizards.generic.DefaultGenericItemPage" scope="prototype">
+		<property name="id" value="navigationNode_assignmentPage"/>
+		<property name="title" value="cmscockpit.wizard.navigation.nodes.assignment.title" />
+		<property name="componentURI" value="navigationNode_assignmentPage.zul"/>
+	</bean>
+
+	<alias alias="navigationNode_decisionPage" name="defaultNavigationNode_decisionPage" />
+	<bean id="defaultNavigationNode_decisionPage" class="de.hybris.platform.cockpit.wizards.generic.DefaultGenericItemPage" scope="prototype">
+		<property name="id" value="navigationNode_decisionPage"/>
+		<property name="title" value="cmscockpit.wizard.navigation.nodes.decision.title" />
+		<property name="componentURI" value="navigationNode_decisionPage.zul"/>
+	</bean>
+	
+	<alias alias="navigationNode_innerWizardPage" name="defaultNavigationNode_innerWizardPage" />
+	<bean id="defaultNavigationNode_innerWizardPage" class="de.hybris.platform.cockpit.wizards.generic.GenericItemMandatoryPage" scope="prototype">
+		<property name="id" value="navigationNode_innerWizardPage"/>
+		<property name="title" value="cmscockpit.wizard.navigation.nodes.innerWizard.title" />
+		<property name="componentURI" value="navigationNode_innerWizardPage.zul"/>
+		<property name="defaultController">
+			<null/>
+		</property>
+	</bean>
+	
+	<alias alias="navigationNode_resourceSelectorPage" name="defaultNavigationNode_resourceSelectorPage" />
+	<bean id="defaultNavigationNode_resourceSelectorPage" class="de.hybris.platform.cockpit.wizards.generic.ResourceSelectorPage" scope="prototype">
+		<property name="id" value="navigationNode_resourceSelectorPage"/>
+		<property name="title" value="cmscockpit.wizard.navigation.nodes.selector.title" />
+		<property name="componentURI" value="navigationNode_resourceSelectorPage.zul"/>
+		<property name="width" value="600px"/>
+		<property name="height" value="490px"/>
+		<property name="multiple" value="true"/>
+	</bean>
+	
+	<alias alias="navigationNode_uplodaMediaPage" name="defaultNavigationNode_uplodaMediaPage" />
+	<bean id="defaultNavigationNode_uplodaMediaPage" class="de.hybris.platform.cockpit.wizards.generic.UploadMediaPage" scope="prototype">
+		<property name="id" value="navigationNode_uplodaMediaPage"/>
+		<property name="title" value="cmscockpit.wizard.navigation.nodes.innerWizard.title" />
+		<property name="componentURI" value="navigationNode_uploadMediaPage.zul"/>
+		<property name="controller" ref="uploadMediaPageController"/>
+		
+	</bean>
+	
+	<alias alias="uploadMediaPageController" name="defaultUploadMediaPageController" />
+	<bean id="defaultUploadMediaPageController" class="de.hybris.platform.cmscockpit.wizard.controller.UploadMediaPageController" scope="prototype">
+		<property name="mediaService" ref="mediaService"/>
+		<property name="mediaInfoService" ref="mediaInfoService"/>
+	</bean>
+	
+	<alias alias="navigationNodeMandatoryPageController" name="defaultNavigationNodeMandatoryPageController"/>	
+	<bean id="defaultNavigationNodeMandatoryPageController" class="de.hybris.platform.cmscockpit.wizard.controller.NavigationNodeMandatoryPageController" scope="prototype"/>
+	
+	<alias alias="navigationNodeInnerWizard" name="defaultNavigationNodeInnerWizard"/>
+	<bean id="defaultNavigationNodeInnerWizard" class="de.hybris.platform.cockpit.wizards.generic.GenericItemWizard" scope="prototype">
+		<property name="componentURI" value="/cockpit/wizards/defaultWizardFrame.zul"/>
+		<property name="pages">
+			<list>
+			</list>
+		</property>
+	</bean>
+	
+</beans>

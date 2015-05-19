@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+
+	<alias alias="sapCommonConfigurationAccess" name="sapCommonDefaultConfigurationAccess" />
+	<bean id="sapCommonDefaultConfigurationAccess" parent="sapCoreModuleConfigurationAccess">
+		<property name="moduleId" value="common" />
+	</bean>
+
+	<!-- Standard Beans -->
+	<alias alias="sapCommonAddress" name="sapCommonDefaultAddress" />
+	<bean id="sapCommonDefaultAddress" scope="prototype"
+		class="de.hybris.platform.sap.sapcommonbol.businesspartner.businessobject.impl.AddressImpl">
+	</bean>
+
+	<!-- Business Objects (BO) -->
+	<alias alias="sapCommonConverter" name="sapCommonDefaultConverter" />
+	<bean id="sapCommonDefaultConverter" parent="sapCoreBusinessObject"
+		class="de.hybris.platform.sap.sapcommonbol.common.businessobject.impl.ConverterImpl">
+		<property name="moduleConfigurationAccess" ref="sapCommonConfigurationAccess" />
+	</bean>
+	
+	<!-- Backend Objects (BE) -->
+	<bean id="sapCommonDefaultConverterBeERP"
+		class="de.hybris.platform.sap.sapcommonbol.common.backendobject.impl.ConverterBackendERP"
+		scope="sapSession" parent="sapCoreBackendObjectJCo">
+	</bean>
+
+</beans>

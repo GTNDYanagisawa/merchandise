@@ -1,0 +1,14 @@
+*** Settings ***
+Library           de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Library			  de.hybris.platform.commerceservicesatddtests.keywords.CommerceServicesKeywordLibrary
+Library			  de.hybris.platform.configurablebundleatddtests.bundlecartfacade.keywords.BundleCartFacadeKeyWords
+
+*** Keywords ***
+
+import bundlecartdata sampledata
+    [Documentation]    Imports the bundlecart test data
+    ${legacyMode}=    Set Variable    false
+    set impex legacy mode    ${legacyMode}    
+    import impex from resource    /impex/testBundleCartFacade.csv
+    reset impex legacy mode
+    prepare session    testSite

@@ -1,0 +1,59 @@
+# ImpEx for Importing Categories into Telco Store
+
+# Macros / Replacement Parameter definitions
+$productCatalog=telcoProductCatalog
+$productCatalogName=Telco Product Catalog
+
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$supercategories=source(code, $catalogVersion)[unique=true]
+$categories=target(code, $catalogVersion)[unique=true]
+
+# Insert Categories
+INSERT_UPDATE Category;code[unique=true];allowedPrincipals(uid)[default='customergroup'];$catalogVersion
+;1
+;devices
+;smartphone
+;basicphone
+;tablet
+;accessories
+;bluetoothandwired
+;chargersanddocs
+;casesandcovers
+;batteries
+;memorycards
+;screenprotectors
+;plans
+;voiceplans
+;dataplans
+;smartphoneplans
+;addons
+;classics
+;internet
+;entertainment
+;travellers
+;mobiletv
+
+# Insert Category Structure
+INSERT_UPDATE CategoryCategoryRelation;$categories;$supercategories
+;devices;1
+;accessories;1
+;plans;1
+;addons;1
+;smartphone;devices
+;basicphone;devices
+;tablet;devices
+;bluetoothandwired;accessories
+;chargersanddocs;accessories
+;casesandcovers;accessories
+;batteries;accessories
+;memorycards;accessories
+;screenprotectors;accessories
+;voiceplans;plans
+;dataplans;plans
+;smartphoneplans;plans
+;classics;addons
+;internet;addons
+;entertainment;addons
+;travellers;addons
+;mobiletv;addons
+

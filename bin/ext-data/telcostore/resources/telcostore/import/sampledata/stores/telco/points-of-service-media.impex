@@ -1,0 +1,23 @@
+# ImpEx for Importing Media into Telco Store
+
+# Macros / Replacement Parameter definitions
+$productCatalog=telcoProductCatalog
+$productCatalogName=Telco Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$media=@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator]
+$siteResource=jar:de.hybris.platform.telcostore.constants.TelcostoreConstants&/telcostore/import/sampledata/stores/telco
+$medias=medias(code, $catalogVersion)
+
+# Create medias
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];$media;mime[default='image/jpg'];$catalogVersion;folder(qualifier)[forceWrite=true]
+;365Wx246H;/365Wx246H/telco_store_01;$siteResource/images/storefinder/telco_store_365x246_01.jpg;;;images
+;365Wx246H;/365Wx246H/telco_store_02;$siteResource/images/storefinder/telco_store_365x246_02.jpg;;;images
+;365Wx246H;/365Wx246H/telco_store_03;$siteResource/images/storefinder/telco_store_365x246_03.jpg;;;images
+;65Wx65H;/65Wx65H/telco_store_01;$siteResource/images/storefinder/telco_store_65x65_01.jpg;;;images
+;65Wx65H;/65Wx65H/telco_store_02;$siteResource/images/storefinder/telco_store_65x65_02.jpg;;;images
+;65Wx65H;/65Wx65H/telco_store_03;$siteResource/images/storefinder/telco_store_65x65_03.jpg;;;images
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$catalogVersion
+;telco_store_01;/365Wx246H/telco_store_01,/65Wx65H/telco_store_01
+;telco_store_02;/365Wx246H/telco_store_02,/65Wx65H/telco_store_02
+;telco_store_03;/365Wx246H/telco_store_03,/65Wx65H/telco_store_03

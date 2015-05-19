@@ -1,0 +1,1028 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+ 
+  
+-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+
+<!-- Configuration for extension bmecat -->
+
+   <explorertree>
+      <group name="catalog" expand="false">
+         <group name="catalogimport" expand="false" position="9" description="group.catalogimport.description">
+            <!-- <typeref type="BMECatImportWizard" description="typeref.bmecatimportwizard.description"/> -->
+            <typeref type="BMECatImportWithCsvWizard" description="typeref.bmecatimportwithcsvwizard.description" />
+            <typeref type="BMECatExportWizard" description="typeref.bmecatexportwizard.description"/>
+            <typeref type="BMECatJobMedia" description="typeref.BMECatJobMedia.description"/>
+         </group>
+      </group>
+   </explorertree>
+   
+   <type name="CatalogVersion" mode="append">
+	<organizer>
+		<editor>
+		<tab name="tab.catalog.bmecat">
+			<section name="section.bmecat" mode="append">
+				<listlayout>
+					<attribute name="importedVersions" labelwidth="100" width="224"/>
+				</listlayout>
+			</section>
+		</tab>
+		</editor>
+	</organizer>
+   </type>
+   
+   <type name="BMECatJobMedia" mode="append">
+		<organizer>
+			<search autoperform="true">
+				<condition mode="delete" attribute="catalogVersion"/>
+			</search>
+			<result mode="append">
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="creationtime" width="130" />
+						<attribute name="code" width="300" />
+					</itemlayout>
+				</listview>
+			</result>
+		</organizer>
+   </type>
+   
+   <type name="BMECatImportBatchJob" mode="append" useselector="true">
+      <organizer>
+         <editor>
+            <tab name="tab.bmecatimport.defaultmappings" position="0">
+               <section name="section.bmecatimport.unitmappings" mode="append">
+                   <listlayout>
+                     <attribute name="defaultUnitMappings" labelwidth="100"/>
+                   </listlayout>
+               </section>
+               <section name="section.bmecatimport.currencymappings" mode="append">
+                   <listlayout>
+                     <attribute name="defaultCurrencyMappings" labelwidth="100"/>
+                  </listlayout>
+               </section>
+               <section name="section.bmecatimport.countrymappings" mode="append">
+                  <listlayout>
+                     <attribute name="defaultCountryMappings" labelwidth="100"/>
+                  </listlayout>
+               </section>
+               <section name="copy">
+               	<listlayout>
+		               <table>
+		                  <tr><td width="13px"/>
+		                  <td><action type="item" classname="de.hybris.platform.catalog.hmc.ItemCopyAction" name="action.itemcopyaction"/></td></tr>
+		               </table>
+		            </listlayout>
+		         </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+               
+   <type name="BMECatImportCronJob" mode="append">
+      <organizer>
+         <result>
+            <listview mode="append">
+               <itemlayout>
+                  <attribute name="mediasmedia" width="100"/>
+               </itemlayout>
+            </listview>
+         </result>
+         <editor>
+            <tab name="tab.cronjob.common">
+               <section name="section.cronjob.common" mode="replace">
+                   <listlayout>
+                      <attribute name="jobMedia" />
+                      <attribute name="active" mode="delete"/>
+                   </listlayout>
+               </section>
+            </tab>
+            
+         <!--<tab name="tab.bmecatcronjob.import.info">
+               <section name="section.bmecatcronjob.import.info">
+                   <listlayout>
+                     <attribute name="cataloginfoavailable"/>
+                     <attribute name="catalogid"/>
+                     <attribute name="catalogversionname"/>
+                     <attribute name="transactionmode"/>
+                     <attribute name="localizationupdate"/>
+                     <attribute name="previousupdateversion"/>
+                   </listlayout>
+               </section>
+               <section name="section.bmecatcronjob.import.info.details">
+                   <listlayout>
+                     <attribute name="buyername"/>
+                     <attribute name="suppliername"/>
+                     <attribute name="articlecount"/>
+                     <attribute name="categorycount"/>
+                     <attribute name="keywordcount"/>
+                     <attribute name="mimecount"/>
+                     <attribute name="defaultcurrencyisocode"/>
+                     <attribute name="importlanguageisocode"/>
+                   </listlayout>
+               </section>
+            </tab> -->
+            <tab name="tab.bmecatcronjob.import.config">
+               <section name="section.bmecatcronjob.import.config">
+                  <columnlayout leftwidth="370" rightwidth="370">
+                     <row>
+                        <attribute name="catalog" labelwidth="100" width="224"/>
+                        <attribute name="catalogversion" labelwidth="100" width="224"/>
+                     </row>
+					<!--
+                     <row>
+                        <attribute name="buyer" labelwidth="100" width="224"/>
+                        <attribute name="supplier" labelwidth="100" width="224"/>
+                     </row>
+                     <row>
+                        <text name="text.bmecatcronjob.import.config.import"/>
+                     </row>
+                     <row>
+                        <attribute name="importagreement" labelwidth="100" width="224">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                     <row>
+                        <attribute name="importsupplier" labelwidth="100" width="224">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                     <row>
+                        <attribute name="importbuyer" labelwidth="100" width="224">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                     -->
+                  </columnlayout>
+               </section>
+               <section name="section.bmecatcronjob.import.config.media">
+                  <listlayout>
+                     <text name="text.bmecatcronjob.import.config.media"/>
+                     <attribute name="referencemedias" labelwidth="100"/>
+                     <attribute name="mediasmedia" labelwidth="100"/>
+                     <!-- <attribute name="mediasfileoptional"/>  -->
+                  </listlayout>
+               </section>
+               <section name="section.bmecatcronjob.import.config.mappings">
+                  <listlayout>
+                     <text name="text.bmecatcronjob.import.config.mappings"/>
+                     <attribute name="importlanguage" labelwidth="100"/>
+                     <attribute name="keywordtype" labelwidth="100"/>
+                     <attribute name="defaultcurrency" labelwidth="100"/>
+                     <attribute name="countrymappings" labelwidth="100"/>
+                     <attribute name="currencymappings" labelwidth="100"/>
+                     <text name="text.bmecatcronjob.import.config.mappings.steps"/>
+                     <attribute name="unitmappings" labelwidth="100"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+
+   <type name="BMECatExportCronJob" mode="append">
+      <organizer>
+         <editor>
+            <exclude>
+               <exclusion attribute="pendingSteps"/>
+               <exclusion attribute="processedSteps"/>
+               <exclusion attribute="currentStep"/>
+            </exclude>
+            <tab name="tab.cronjob.common">
+               <section name="section.cronjob.common" mode="replace">
+                  <listlayout>
+                     <attribute name="jobMedia" labelwidth="100"/>
+                     <attribute name="exportedMedias" labelwidth="100"/>
+                  </listlayout>
+               </section>
+               <section name="section.bmecat.export">
+                  <listlayout>
+                     <attribute name="exportCatalogVersion" labelwidth="100"/>
+                     <attribute name="transactionMode" labelwidth="100"/>
+                     <attribute name="exportLanguages" labelwidth="100"/>
+                     <attribute name="classificationSystemVersions" labelwidth="100"/>
+                     <attribute name="classificationSystemNumberFormat" labelwidth="100"/>
+                     <attribute name="Hybris2BMECatMimePurposeMapping" labelwidth="100"/>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="tab.cronjob.timeschedule">
+               <section name="section.cronjob.processing" mode="replace">
+                  <table>
+                     <tr>
+                        <td width="16">
+                        </td>
+                        <td>
+                           <action 
+                              type="item" 
+                              classname="de.hybris.platform.cronjob.hmc.PerformCronJobAction"
+                              name="action.performbmecatexportcronjob"
+                           />
+                        </td>
+                     </tr>
+                  </table>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+
+   <type name="BMECatCatalogStep" mode="append">
+      <organizer>
+         <editor>
+            <tab name="tab.bmecat.catalogstep.config">
+               <section name="section.bmecat.catalogstep.catalog">
+                  <listlayout>
+                     <attribute name="catalogtype" labelwidth="100"/>
+                     <attribute name="catalogattributemapping" labelwidth="100"/>
+                     <attribute name="catalogversiontype" labelwidth="100"/>
+                     <attribute name="catalogversionattributemapping" labelwidth="100"/>
+                  </listlayout>
+               </section>
+               <section name="section.bmecat.catalogstep.companies">
+                  <listlayout>
+                     <attribute name="suppliertype" labelwidth="100"/>
+                     <attribute name="supplierattributemapping" labelwidth="100"/>
+                     <attribute name="buyertype" labelwidth="100"/>
+                     <attribute name="buyerattributemapping" labelwidth="100"/>
+                     <attribute name="addresstype" labelwidth="100"/>
+                     <attribute name="addressattributemapping" labelwidth="100"/>
+                  </listlayout>
+               </section>
+               <section name="section.bmecat.catalogstep.agreement">
+                  <listlayout>
+                     <attribute name="agreementtype" labelwidth="100"/>
+                     <attribute name="agreementattributemapping" labelwidth="100"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+   
+   <type name="BMECatCategoryStep" mode="append">
+      <organizer>
+         <editor>
+            <tab name="tab.bmecat.categorystep.config">
+               <section name="section.bmecat.categorystep.config">
+                  <listlayout>
+                     <attribute name="categoryType" labelwidth="100"/>
+                     <attribute name="categoryAttributeMapping" labelwidth="100"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+   
+   <type name="BMECatArticleStep" mode="append">
+      <organizer>
+         <editor>
+            <tab name="tab.bmecat.articlestep.config">
+               <section name="section.bmecat.articlestep.config">
+                  <listlayout>
+                     <attribute name="articleType" labelwidth="100"/>
+                     <attribute name="articleAttributeMapping" labelwidth="100"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+   
+   <type name="BMECatMediaStep" mode="append">
+      <organizer>
+         <editor>
+            <tab name="tab.bmecat.mediastep.config">
+               <section name="section.bmecat.mediastep.config">
+                  <listlayout>
+                     <attribute name="MediaType" labelwidth="100"/>
+                  </listlayout>
+               </section>
+               <section name="section.bmecat.mediastep.configproduct">
+                  <listlayout>
+                     <attribute name="ProductType" labelwidth="100"/>
+                     <attribute name="ProductMimePurposeMapping" labelwidth="100"/>
+                  </listlayout>
+               </section>
+               <section name="section.bmecat.mediastep.configcategory">
+                  <listlayout>
+                     <attribute name="CategoryType" labelwidth="100"/>
+                     <attribute name="CategoryMimePurposeMapping" labelwidth="100"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+
+   <type name="BMECatArticle2CategoryStep" mode="append">
+      <organizer>
+         <editor>
+            <tab name="tab.bmecat.articlestep.config">
+               <section name="section.bmecat.articlestep.config">
+                  <listlayout>
+                     <attribute name="articleType" labelwidth="100"/>
+                     <attribute name="articleAttributeMapping" labelwidth="100"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+
+   <!-- wizards -->
+
+   <type name="BMECatImportWizard" icon="images/ext/catalog/e_catalog_import.gif" mode="append">
+      <organizer>
+         <editor>
+            <exclude>
+               <exclusion attribute="owner" />
+            </exclude>
+            
+            <tab name="tab0_job" position="0">
+               <section name="section.bmecatimportwizard.job">
+                  <listlayout>
+                     <text name="text.bmecatimportwizard.job"/>
+                     <attribute name="importJob" labelwidth="100"/>
+                  </listlayout>
+               </section>               
+            </tab>
+            
+            <tab name="tab1_files" position="1">
+               <section name="section.bmecatimportwizard.files">
+                  <listlayout>
+                     <text name="text.bmecatimportwizard.files"/>
+                     <attribute name="file" labelwidth="100">                     
+                        <uploadtomediaeditor presettype="BMECatJobMedia"/>
+                     </attribute>
+                     <attribute name="mediaFile" labelwidth="100">
+                        <uploadtomediaeditor presettype="BMECatJobMedia"/>
+                     </attribute>
+                  </listlayout>
+               </section>
+               <section name="section.bmecatimportwizard.medias">
+                  <listlayout>
+                     <text name="text.bmecatimportwizard.medias"/>
+                     <attribute name="mediasNotIncluded" labelwidth="100">
+                        <advancedbooleaneditor 
+							wrapvalues="true"
+							truename="bmecat.import.mediasnotincluded.true" 
+							falsename="bmecat.import.mediasnotincluded.false"
+							nullname="bmecat.import.mediasnotincluded.null"/>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+            
+            <tab name="tab2_catalog_informations" position="2">
+               <section name="section.bmecatimportwizard.info_catalogfile">
+                  <listlayout>
+                     <table>
+                        <tr height="30">
+                           <td><text name="text.bmecatimportwizard.info"/></td>
+                        </tr>
+                        <tr height="30">
+                           <td><attribute name="catalogDate" labelwidth="100"/></td>
+                        </tr>
+                        <tr height="30">
+                           <td><attribute name="transactionMode" labelwidth="100"/></td>
+                        </tr>
+                        <tr height="30">
+                           <td><attribute name="categoryCount" labelwidth="100"/></td>
+                        </tr>
+                        <tr height="30">
+                           <td><attribute name="categoryAssignmentsCount" labelwidth="100"/></td>
+                        </tr>
+                        <tr height="30">
+                           <td><attribute name="articleCount" labelwidth="100"/></td>
+                        </tr>
+                        <tr height="30">
+                           <td><attribute name="mediaCount" labelwidth="100"/></td>
+                        </tr>
+                        <tr height="30">
+                           <td><attribute name="keywordCount" labelwidth="100"/></td>
+                        </tr>
+                        <!--
+                        <tr height="30">
+                           <td><attribute name="territories" labelwidth="100"/></td>
+                        </tr>
+                        -->
+                     </table>
+                  </listlayout>
+               </section>
+            </tab>
+            
+            <tab name="tab3_targets_and_mode" position="3">
+               <section name="section.bmecatimportwizard.targets">
+                  <columnlayout leftwidth="370" rightwidth="370">
+                     <row height="20">
+                        <text name="text.bmecatimportwizard.targets"/>
+                     </row>
+                     <row height="20">
+                        <attribute name="catalogName" labelwidth="100" width="224"/>
+                        <attribute name="catalog" labelwidth="100" width="224"/>
+                     </row>
+                     <row height="20">
+                        <attribute name="catalogVersionName" labelwidth="100" width="224"/>
+                        <attribute name="catalogVersion" labelwidth="100" width="224"/>
+                     </row>
+                     <row height="20">
+                        <attribute name="catalogLanguageISO" labelwidth="100" width="224"/>
+                        <attribute name="catalogLanguage" labelwidth="100" width="224"/>
+                     </row>                                 
+                  </columnlayout>
+               </section>
+               <section name="section.bmecatimportwizard.mode">
+                  <listlayout>
+                     <text name="text.bmecatimportwizard.mode"/>
+                     <attribute name="localizationUpdate"/>
+                  </listlayout>
+               </section>
+            </tab>
+            
+            <tab name="tab4_mappings" position="4">
+               <section name="section.bmecatimportwizard.mappings">
+                  <columnlayout leftwidth="370" rightwidth="370">
+                     <row height="60">
+                        <text name="text.bmecatimportwizard.mappings"/>
+                     </row>
+                     <row height="40">
+                        <text name="text.bmecatimportwizard.source"/>
+                        <text name="text.bmecatimportwizard.target"/>
+                     </row>
+                    <!-- 
+               <row height="40">
+                        <attribute name="supplierName" labelwidth="100" width="224"/>
+                        <attribute name="supplier" labelwidth="100" width="224"/>
+                     </row>
+                     <row height="40">
+                        <attribute name="buyerName" labelwidth="100" width="224"/>
+                         <attribute name="buyer" labelwidth="100" width="224"/>
+                     </row>
+                     -->
+               <row height="60">
+                        <attribute name="defaultCurrencyISO" labelwidth="100" width="224"/>
+                        <attribute name="defaultCurrency" labelwidth="100" width="224"/>
+                     </row>
+                     <row>
+                        <text name="text.bmecatimportwizard.currencies"/>
+                        <text name="text.bmecatimportwizard.units"/>
+                     </row>
+                     <row>
+                        <attribute name="currencyMappings" hidelabel="true" labelwidth="0" width="324">
+                           <mapeditor remove="false" add="false" valuename="mapping.currencies.label.value" keyname="mapping.currencies.label.key"/>
+                        </attribute>
+                        <attribute name="unitMappings" hidelabel="true" labelwidth="0" width="324">
+                           <mapeditor remove="false" add="false" valuename="mapping.units.label.value" keyname="mapping.units.label.key"/>
+                        </attribute>
+                     </row>
+                     <row>
+                        <text name="text.bmecatimportwizard.pricetypes"/>
+                        <text name="text.bmecatimportwizard.taxtypes"/>
+                     </row>                     
+                     <row>
+                        <attribute name="priceTypeMappings" hidelabel="true" labelwidth="0" width="324"/>
+                        <attribute name="taxTypeMappings" hidelabel="true" labelwidth="0" width="324">
+                           <mapeditor remove="false" add="false" valuename="mapping.taxmapping.label.value" keyname="mapping.taxmapping.label.key"/>
+                        </attribute>
+                      </row>     
+                      <row>
+                        <text name="text.bmecatimportwizard.classifications"/>
+                     </row>                     
+                     <row>
+                        <attribute name="classificationMappings" hidelabel="true" labelwidth="0" width="324">
+                           <mapeditor remove="false" add="false" valuename="mapping.classification.label.value" keyname="mapping.classification.label.key"/>
+                        </attribute>
+                      </row>                    
+                  </columnlayout>
+               </section>
+            </tab>        
+                
+            <tab name="tab5_further_settings" position="5">
+               <section name="section.bmecatimportwizard.email_settings">
+                  <listlayout>
+                      <text name="text.bmecatimportwizard.email_settings"/>
+                  </listlayout>
+                  <columnlayout leftwidth="250" rightwidth="450">
+                     <row>
+                        <attribute name="sendEmail" labelwidth="100" width="150">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                        <attribute name="emailAddress" labelwidth="100" width="200"/>
+                     </row>
+                  </columnlayout>
+               </section>
+               <section name="section.bmecatimportwizard.log_and_undo">
+                  <columnlayout leftwidth="250" rightwidth="450">
+                     <row>
+                         <text name="text.bmecatimportwizard.log"/>
+                     </row>
+                     <row height="60">
+                        <attribute name="keepLogs" labelwidth="100" width="224">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                     <row>
+                         <text name="text.bmecatimportwizard.undo"/>
+                     </row>
+                     <row>
+                        <attribute name="enableUndo" labelwidth="100" width="224">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                  </columnlayout>
+               </section>
+            </tab>
+            
+            <tab name="tab6_error" position="6">
+               <section name="section.bmecatimportwizard.error">
+                  <listlayout>
+                     <text name="text.bmecatimportwizard.error"/>
+                     <attribute name="bmeCatImportCronJob" labelwidth="100"/>
+                  </listlayout>
+               </section>
+            </tab>            
+         </editor>
+      </organizer>
+   </type>
+   
+	<!-- bmecat import wizard with csv files -->
+	<type name="BMECatImportWithCsvWizard" icon="images/ext/catalog/e_catalog_import.gif" mode="append">
+		<organizer>
+			<editor>
+				<exclude>
+					<exclusion attribute="owner"/>
+				</exclude>
+
+				<tab name="tab0_job" position="0">
+					<section name="section.bmecatimportwizard.job">
+						<listlayout>
+							<text name="text.bmecatimportwizard.job"/>
+							<attribute name="importJob" labelwidth="100"/>
+						</listlayout>
+					</section>
+				</tab>
+
+				<tab name="tab1_files" position="1">
+					<section name="section.bmecatimportwizard.files">
+						<listlayout>
+							<text name="text.bmecatimportwizard.files"/>
+							<attribute name="file" labelwidth="100">
+								<uploadtomediaeditor presettype="BMECatJobMedia"/>
+							</attribute>
+							<attribute name="mediaFile" labelwidth="100">
+								<uploadtomediaeditor presettype="BMECatJobMedia"/>
+							</attribute>
+						</listlayout>
+					</section>
+					<section name="section.bmecatimportwizard.medias">
+						<listlayout>
+							<text name="text.bmecatimportwizard.medias"/>
+							<attribute name="mediasNotIncluded" labelwidth="100">
+								<advancedbooleaneditor wrapvalues="true"
+									truename="bmecat.import.mediasnotincluded.true"
+									falsename="bmecat.import.mediasnotincluded.false"
+									nullname="bmecat.import.mediasnotincluded.null"/>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+
+				<tab name="tab2_catalog_informations" position="2">
+					<section name="section.bmecatimportwizard.info_catalogfile">
+						<listlayout>
+							<table>
+								<tr height="30">
+									<td><text name="text.bmecatimportwizard.info"/></td>
+								</tr>
+								<tr height="30">
+									<td><attribute name="catalogDate" labelwidth="100"/></td>
+								</tr>
+								<tr height="30">
+									<td><attribute name="transactionMode" labelwidth="100"/></td>
+								</tr>
+								<tr height="30">
+									<td><attribute name="categoryCount" labelwidth="100"/></td>
+								</tr>
+								<tr height="30">
+									<td><attribute name="categoryAssignmentsCount" labelwidth="100"/></td>
+								</tr>
+								<tr height="30">
+									<td><attribute name="articleCount" labelwidth="100"/></td>
+								</tr>
+								<tr height="30">
+									<td><attribute name="mediaCount" labelwidth="100"/></td>
+								</tr>
+								<tr height="30">
+									<td><attribute name="keywordCount" labelwidth="100"/></td>
+								</tr>
+								<!--
+								<tr height="30">
+									<td><attribute name="territories" labelwidth="100"/></td>
+								</tr>
+								-->
+							</table>
+						</listlayout>
+					</section>
+				</tab>
+
+				<tab name="tab3_targets_and_mode" position="3">
+					<section name="section.bmecatimportwizard.targets">
+						<columnlayout leftwidth="370" rightwidth="370">
+							<row height="20">
+								<text name="text.bmecatimportwizard.targets"/>
+							</row>
+							<row height="40">
+								<text name="text.bmecatimportwizard.source"/>
+								<text name="text.bmecatimportwizard.target"/>
+							</row>
+							<!--
+							<row height="40">
+								<attribute name="supplierName" labelwidth="100" width="224"/>
+								<attribute name="supplier" labelwidth="100" width="224"/>
+							</row>
+							<row height="40">
+								<attribute name="buyerName" labelwidth="100" width="224"/>
+								<attribute name="buyer" labelwidth="100" width="224"/>
+							</row>
+							-->
+							<row height="20">
+								<attribute name="catalogName" labelwidth="100" width="224"/>
+								<attribute name="catalog" labelwidth="100" width="224"/>
+							</row>
+							<row height="20">
+								<attribute name="catalogVersionName" labelwidth="100" width="224"/>
+								<attribute name="catalogVersion" labelwidth="100" width="224"/>
+							</row>
+							<row height="20">
+								<attribute name="catalogLanguageISO" labelwidth="100" width="224"/>
+								<attribute name="catalogLanguage" labelwidth="100" width="224"/>
+							</row>
+							<row height="20">
+								<attribute name="defaultCurrencyISO" labelwidth="100" width="224"/>
+								<attribute name="defaultCurrency" labelwidth="100" width="224"/>
+							</row>
+						</columnlayout>
+					</section>
+					<section name="section.bmecatimportwizard.mode">
+						<listlayout>
+							<text name="text.bmecatimportwizard.mode"/>
+							<attribute name="localizationUpdate"/>
+						</listlayout>
+					</section>
+				</tab>
+
+				<tab name="tab4_mappings" position="4">
+					<section name="section.bmecatimportwizard.mappings">
+						<columnlayout leftwidth="370" rightwidth="370">
+							<row height="4	0">
+								<text name="text.bmecatimportwizard.mappings"/>
+							</row>
+							<row>
+								<text name="text.bmecatimportwizard.currencies"/>
+								<text name="text.bmecatimportwizard.units"/>
+							</row>
+							<row>
+								<attribute name="currencyMappings" hidelabel="true" labelwidth="0" width="324">
+									<mapeditor remove="false" add="false" valuename="mapping.currencies.label.value" keyname="mapping.currencies.label.key"/>
+								</attribute>
+								<attribute name="unitMappings" hidelabel="true" labelwidth="0" width="324">
+									<mapeditor remove="false" add="false" valuename="mapping.units.label.value" keyname="mapping.units.label.key"/>
+								</attribute>
+							</row>
+							<row>
+								<text name="text.bmecatimportwizard.pricetypes"/>
+								<text name="text.bmecatimportwizard.taxtypes"/>
+							</row>
+							<row>
+								<attribute name="priceTypeMappings" hidelabel="true" labelwidth="0" width="324">
+									<mapeditor remove="false" add="false" valuename="mapping.pricetypemapping.label.value" keyname="mapping.pricetypemapping.label.key"/>
+								</attribute>
+								<attribute name="taxTypeMappings" hidelabel="true" labelwidth="0" width="324">
+									<mapeditor remove="false" add="false" valuename="mapping.taxmapping.label.value" keyname="mapping.taxmapping.label.key"/>
+								</attribute>
+							</row>
+							<row>
+								<text name="text.bmecatimportwizard.classifications"/>
+							</row>
+							<row>
+								<attribute name="classificationMappings" hidelabel="true" labelwidth="0" width="324">
+									<mapeditor remove="false" add="false" valuename="mapping.classification.label.value" keyname="mapping.classification.label.key"/>
+								</attribute>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+
+				<tab name="tab5_impex_script" position="5">
+					<section name="section.bmecatimportwizard.impex_script">
+						<listlayout>
+							<text name="text.bmecatimportwizard.impexscriptfiles"/>
+							<attribute name="impexScriptFile" labelwidth="100">
+								<uploadtomediaeditor presettype="BMECatImpExScriptMedia"/>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+
+				<tab name="tab6_further_settings" position="6">
+					<section name="section.bmecatimportwizard.email_settings">
+						<listlayout>
+							<text name="text.bmecatimportwizard.email_settings"/>
+						</listlayout>
+						<columnlayout leftwidth="250" rightwidth="450">
+							<row>
+								<attribute name="sendEmail" labelwidth="100" width="150">
+									<advancedbooleaneditor truename="true" falsename="false"/>
+								</attribute>
+								<attribute name="emailAddress" labelwidth="100" width="200"/>
+							</row>
+						</columnlayout>
+					</section>
+					<section name="section.bmecatimportwizard.log_and_undo">
+						<columnlayout leftwidth="250" rightwidth="450">
+							<row>
+								<text name="text.bmecatimportwizard.log"/>
+							</row>
+							<row height="60">
+								<attribute name="keepLogs" labelwidth="100" width="224">
+									<advancedbooleaneditor truename="true" falsename="false"/>
+								</attribute>
+							</row>
+							<row>
+								<text name="text.bmecatimportwizard.undo"/>
+							</row>
+							<row>
+								<attribute name="enableUndo" labelwidth="100" width="224">
+									<advancedbooleaneditor truename="true" falsename="false"/>
+								</attribute>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+
+				<tab name="tab7_error" position="7">
+					<section name="section.bmecatimportwizard.error">
+						<listlayout>
+							<text name="text.bmecatimportwizard.error"/>
+							<attribute name="bmecatImportWithCsvCronJob" labelwidth="100"/>
+						</listlayout>
+					</section>
+				</tab>
+
+			</editor>
+		</organizer>
+	</type>
+	
+  <type name="BMECatExportWizard" icon="images/ext/catalog/e_catalog_export.gif" mode="append">
+      <organizer>
+         <editor>
+            <exclude>
+               <exclusion attribute="owner" />
+	       <exclusion attribute="Hybris2BMECatMimePurposeMapping" />
+            </exclude>
+            
+            <tab name="tab.bmecatexportwizard.essentials" position="0">
+            	<section name="section.bmecatexportwizard.essentials">
+                  <listlayout>
+                     <text name="text.bmecatexportwizard.config"/>
+                  </listlayout>
+               </section>
+               <section name="section.bmecatexportwizard.catalogversion">
+                  <listlayout>
+                     <attribute name="exportCatalogVersion" labelwidth="100"/>
+                  </listlayout>
+               </section>
+               <section name="section.bmecatexportwizard.languages">
+                  <listlayout>
+                     <attribute name="exportLanguages" labelwidth="100">
+                        <referencecollectioneditor autoperform="true"/>
+                     </attribute>
+                  </listlayout>
+               </section>
+               <section name="section.bmecatexportwizard.reference">
+                  <listlayout>
+                  	<text name="text.bmecatexportwizard.reference"/>
+                     <attribute name="referenceDate" labelwidth="100"/>
+                     <attribute name="referenceCustomer" labelwidth="100"/>
+                  </listlayout>
+               </section>
+            </tab>
+            
+            <tab name="tab.bmecatexportwizard.exportedproduct_size" position="1">
+               <section name="tab.bmecatexportwizard.exportedproduct_size">
+                  <listlayout>
+                  	<table>
+                  		<tr height="30">
+									<td><text name="text.bmecatexportwizard.exportedproduct_size"/></td>
+								</tr>
+                  		<tr height="30">
+									<td><attribute name="exportedProductSize" labelwidth="160" width="150"/></td>
+								</tr>
+                   	  <tr height="30">
+									<td><attribute name="existedProductSize" labelwidth="160" width="150"/></td>
+								</tr>
+								<tr height="50">
+									<td><text name="text.bmecatexportwizard.tip" width="400"/></td>
+								</tr>
+                  	</table>
+                  </listlayout>
+               </section>
+            </tab>
+
+            <tab name="tab.bmecatexportwizard.classificationsystems" position="2">
+               <section name="section.bmecatexportwizard.classificationsystems">
+                  <listlayout>
+                  	<text name="text.bmecatexportwizard.classificationsystems"/>
+                     <attribute name="classificationSystemVersions" labelwidth="100">
+                     	<referencecollectioneditor autoperform="true">
+                     		<itemlayout>
+                     			<attribute name="catalog" width="150"/>
+                     			<attribute name="version" width="150"/>
+                     		</itemlayout>
+                     	</referencecollectioneditor>
+                     </attribute>
+                     <attribute name="classificationSystemNumberFormat" labelwidth="100"/>
+                  </listlayout>
+               </section>
+            </tab>
+            
+            <tab name="tab.bmecatexportwizard.medias_prices" position="3">
+				<!--
+               <section name="section.bmecatexportwizard.medias">
+                  <listlayout>
+                  	<text name="text.bmecatexportwizard.mediamapping"/>
+                     <attribute name="Hybris2BMECatMimePurposeMapping" labelwidth="100">
+                        <mapeditor add="true" remove="true" keyname="mapping.medias.label.key" valuename="mapping.medias.label.value"/>
+                     </attribute>
+                  </listlayout>
+               </section>
+               	-->
+               <section name="section.bmecatexportwizard.filter">
+                  <columnlayout leftwidth="370" rightwidth="370">
+                     <row>
+                        <attribute name="suppressEmptyCategories" labelwidth="100" width="224">
+									<advancedbooleaneditor truename="true" falsename="false"/>
+   	                  </attribute>
+                        <attribute name="suppressProductsWithoutPrice" labelwidth="100" width="224">
+									<advancedbooleaneditor truename="true" falsename="false"/>
+	                     </attribute>
+                     </row>
+                  </columnlayout>
+               </section>
+               <section name="section.bmecatexportwizard.price">
+                  <listlayout>
+                     <attribute name="exportCurrency" labelwidth="100" width="224"/>
+                     <attribute name="priceTypeMapping" labelwidth="100">
+                        <mapeditor add="true" remove="true" keyname="bmecatexport.priceType" valuename="bmecatexport.userpricegroup"/>
+                     </attribute>
+                     <attribute name="udpNet" labelwidth="100" width="224"/>
+                  </listlayout>
+               </section>
+            </tab>
+            
+            <tab name="tab.bmecatexportwizard.summary" position="4">
+               <section name="section.bmecatexportwizard.summary">
+                  <listlayout>
+                     <text name="bmecat.export.done.success"/>
+                     <attribute name="jobMedia" labelwidth="100"/>
+                     <attribute name="exportedMedias" labelwidth="100"/>
+                  </listlayout>
+               </section>
+            </tab>
+            
+            <tab name="tab.bmecatexportwizard.error" position="4">
+               <section name="section.bmecatexportwizard.error">
+                  <listlayout>
+                     <text name="text.bmecatexportwizard.error"/>
+                     <attribute name="bmeCatExportCronJob" labelwidth="100"/>
+                  </listlayout>
+               </section>
+            </tab>  
+            
+         </editor>
+      </organizer>
+   </type>
+   
+   <type name="ArticleAttributeEnum" mode="append">
+      <organizer/>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="CategoryAttributeEnum" mode="append">
+      <organizer/>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="CatalogAttributeEnum" mode="append">
+      <organizer/>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="CatalogVersionAttributeEnum" mode="append">
+      <organizer/>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="CompanyAttributeEnum" mode="append">
+      <organizer/>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="AddressAttributeEnum" mode="append">
+      <organizer/>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="AgreementAttributeEnum" mode="append">
+      <organizer/>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="ArticleReference" mode="append">
+      <organizer/>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="TransactionModeEnum" mode="append">
+      <organizer/>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="BMECatMimePurposeEnum" mode="append">
+      <organizer/>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="HybrisMimePurposeEnum" mode="append">
+      <organizer/>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="BMECatPriceTypeEnum" mode="append">
+      <organizer/>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+</configuration>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SegmSuccessOverTime" language="groovy" pageWidth="600" pageHeight="400" whenNoDataType="AllSectionsNoDetail" columnWidth="600" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" resourceBundle="localization/btgcockpit-locales">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="ssotDS">
+		<parameter name="segment" class="java.lang.String">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<parameter name="FROM" class="java.util.Date"/>
+		<parameter name="TO" class="java.util.Date"/>
+		<queryString>
+			<![CDATA[SELECT min({h.creationtime}) AS CREATIONTIME, {h.fulfilled} AS FULFILLED, count({h.PK}) AS AMOUNT
+FROM {BTGSegmentResult as h JOIN BTGSegment as s ON {s.PK}={h.segment}}
+WHERE {s.uid}=$P{segment} AND {h.creationtime} >= $P{FROM} AND {h.creationtime} < $P{TO} AND {h.forced}=false
+GROUP BY year({h.creationtime}), month({h.creationtime}), day({h.creationtime}), {h.fulfilled}]]>
+		</queryString>
+		<field name="CREATIONTIME" class="java.sql.Timestamp"/>
+		<field name="FULFILLED" class="java.lang.Boolean"/>
+		<field name="AMOUNT" class="java.lang.Long"/>
+		<group name="FULFILLED">
+			<groupExpression><![CDATA[$F{FULFILLED}]]></groupExpression>
+		</group>
+	</subDataset>
+	<parameter name="segment" class="java.lang.String"/>
+	<parameter name="FROM" class="java.util.Date"/>
+	<parameter name="TO" class="java.util.Date"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="50" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="600" height="50"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[new String ($R{title.segmsuccessovertime}.getBytes("ISO-8859-1"), "UTF-8")]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<summary>
+		<band height="350" splitType="Stretch">
+			<timeSeriesChart>
+				<chart>
+					<reportElement x="0" y="0" width="600" height="350"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<timeSeriesDataset>
+					<dataset>
+						<datasetRun subDataset="ssotDS">
+							<datasetParameter name="segment">
+								<datasetParameterExpression><![CDATA[$P{segment}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="FROM">
+								<datasetParameterExpression><![CDATA[$P{FROM}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="TO">
+								<datasetParameterExpression><![CDATA[$P{TO}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+					</dataset>
+					<timeSeries>
+						<seriesExpression><![CDATA[$F{FULFILLED}.booleanValue() == true ? new String($R{legend.passed}.getBytes("ISO-8859-1"), "UTF-8") : new String($R{legend.notpassed}.getBytes("ISO-8859-1"), "UTF-8")]]></seriesExpression>
+						<timePeriodExpression><![CDATA[$F{CREATIONTIME}]]></timePeriodExpression>
+						<valueExpression><![CDATA[$F{AMOUNT}]]></valueExpression>
+						<labelExpression><![CDATA[$F{AMOUNT}]]></labelExpression>
+					</timeSeries>
+				</timeSeriesDataset>
+				<timeSeriesPlot>
+					<plot/>
+					<timeAxisFormat>
+						<axisFormat tickLabelMask="yyyy-MM-dd">
+							<labelFont/>
+							<tickLabelFont/>
+						</axisFormat>
+					</timeAxisFormat>
+					<valueAxisFormat>
+						<axisFormat>
+							<labelFont/>
+							<tickLabelFont/>
+						</axisFormat>
+					</valueAxisFormat>
+					<domainAxisMinValueExpression><![CDATA[new org.joda.time.DateMidnight($P{FROM}).toDate()]]></domainAxisMinValueExpression>
+					<domainAxisMaxValueExpression><![CDATA[new org.joda.time.DateMidnight($P{TO}).plusDays(1).toDate()]]></domainAxisMaxValueExpression>
+					<rangeAxisMinValueExpression><![CDATA[0]]></rangeAxisMinValueExpression>
+				</timeSeriesPlot>
+			</timeSeriesChart>
+		</band>
+	</summary>
+</jasperReport>

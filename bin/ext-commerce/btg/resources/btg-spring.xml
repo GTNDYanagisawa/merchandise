@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="defaultBTGEvaluationService" alias="btgEvaluationService"/>
+	<bean id="defaultBTGEvaluationService" class="de.hybris.platform.btg.services.impl.DefaultBTGEvaluationService" scope="tenant">
+		<property name="catalogService" ref="catalogService"/>
+		<property name="segmentService" ref="segmentService"/>
+ 		<property name="segmentEvaluatorRegistry" ref="segmentEvaluatorRegistry"/>
+		<property name="ruleEvaluatorRegistry" ref="ruleEvaluatorRegistry"/>
+	</bean>
+
+	<alias name="defaultBTGResultService" alias="btgResultService"/>
+	<bean id="defaultBTGResultService" class="de.hybris.platform.btg.services.impl.DefaultBTGResultService" scope="tenant">
+		<property name="catalogService" ref="catalogService"/>
+		<property name="segmentService" ref="segmentService"/>
+		<property name="segmentEvaluatorRegistry" ref="segmentEvaluatorRegistry"/>
+		<property name="conditionEvaluatorRegistry" ref="conditionEvaluatorRegistry"/>
+		<property name="ruleEvaluatorRegistry" ref="ruleEvaluatorRegistry"/>
+		<property name="btgDao" ref="btgDao"/>
+	</bean>
+
+	<alias name="defaultBTGConfigurationService" alias="btgConfigurationService"/>
+	<bean id="defaultBTGConfigurationService" class="de.hybris.platform.btg.services.impl.DefaultBTGConfigurationService" scope="tenant">
+		<property name="typeService" ref="typeService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias name="defaultExpressionService" alias="expressionService"/>
+	<bean id="defaultExpressionService" class="de.hybris.platform.btg.services.impl.DefaultExpressionService" scope="tenant">
+		<property name="btgConfigurationService" ref="btgConfigurationService" />
+		<property name="typeService" ref="typeService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="operandValueProviderRegistry" ref="operandValueProviderRegistry"/>
+		<property name="expressionEvaluatorRegistry" ref="expressionEvaluatorRegistry"/>
+		<property name="rightOperandTypes">
+			<list>
+				<value>de.hybris.platform.btg.model.BTGAbstractReferenceOperandModel</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Segments -->
+	<alias alias="segmentEvaluatorRegistry" name="defaultSegmentEvaluatorRegistry" />
+	<bean id="defaultSegmentEvaluatorRegistry" class="de.hybris.platform.btg.segment.impl.DefaultSegmentEvaluatorRegistry" scope="tenant">
+		<property name="segmentEvaluators" >
+			<map>
+				<entry key="OPTIMIZED" value-ref="segmentEvaluator"/>
+				<entry key="FULL" value-ref="segmentEvaluator"/>
+			</map>
+		</property>
+	</bean>
+
+	<alias name="defaultSegmentService" alias="segmentService"/>
+	<bean id="defaultSegmentService" class="de.hybris.platform.btg.segment.impl.DefaultSegmentService" scope="tenant">
+		<property name="btgDao" ref="btgDao"/>
+	</bean>
+
+	<alias name="defaultSegmentEvaluator" alias="segmentEvaluator"/>
+	<bean id="defaultSegmentEvaluator" class="de.hybris.platform.btg.segment.impl.DefaultSegmentEvaluator" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="btgDao" ref="btgDao"/>
+		<property name="actionService" ref="actionService"/>
+		<property name="ruleEvaluatorRegistry" ref="ruleEvaluatorRegistry"/>
+		<property name="outputActionContextProvider" ref="outputActionContextProvider"/>
+		<property name="btgInvalidationDataContainer" ref="btgInvalidationDataContainer" />
+	</bean>
+
+
+	<!-- output Actions -->
+
+	<bean id="assignToGroup" class="de.hybris.platform.btg.outputaction.impl.AssignToGroup" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+	
+	<bean id="btgDummyAction" class="de.hybris.platform.btg.outputaction.impl.BtgDummyAction" scope="tenant"/>
+	
+	<!-- DAO -->
+ 	<alias name="resultCachingBTGDaoDecorator" alias="btgDao"/>
+	<bean id="defaultBTGDao" class="de.hybris.platform.btg.dao.impl.DefaultBTGDao" parent="abstractItemDao" scope="tenant"/>
+	
+	<bean id="resultCachingBTGDaoDecorator" class="de.hybris.platform.btg.dao.impl.ResultCachingBTGDaoDecorator" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="btgDao" ref="defaultBTGDao"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+	
+	<!-- Invalidation -->
+	<alias name="defaultBTGInvalidationDataContainer" alias="btgInvalidationDataContainer"/>
+	<bean id="defaultBTGInvalidationDataContainer" class="de.hybris.platform.btg.invalidation.impl.DefaultBTGInvalidationDataContainer" scope="tenant">
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+	
+	
+	<!-- Rules -->
+	<alias name="defaultRuleEvaluatorRegistry" alias="ruleEvaluatorRegistry"/>
+	<bean id="defaultRuleEvaluatorRegistry" class="de.hybris.platform.btg.rule.impl.DefaultRuleEvaluatorRegistry" scope="tenant">
+		<property name="ruleEvaluators" >
+			<map>
+				<entry key="OPTIMIZED" value-ref="ruleEvaluator"/>
+				<entry key="FULL" value-ref="ruleEvaluator"/>
+			</map>
+		</property>
+
+	</bean>
+
+	<alias name="defaultRuleEvaluator" alias="ruleEvaluator"/>
+	<bean id="defaultRuleEvaluator" class="de.hybris.platform.btg.rule.impl.DefaultRuleEvaluator" scope="tenant">
+		<property name="conditionEvaluatorRegistry" ref="conditionEvaluatorRegistry"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="btgDao" ref="btgDao"/>
+		<property name="btgInvalidationDataContainer" ref="btgInvalidationDataContainer" />
+	</bean>
+
+	<!-- Conditions -->
+	<alias name="defaultConditionEvaluatorRegistry" alias="conditionEvaluatorRegistry"/>
+	<bean id="defaultConditionEvaluatorRegistry" class="de.hybris.platform.btg.condition.impl.DefaultConditionEvaluatorRegistry"  scope="tenant"/>
+
+	<bean id="btgExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.DefaultBTGExpressionEvaluator" scope="tenant">
+		<property name="operandValueProviderRegistry" ref="operandValueProviderRegistry"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="btgDao" ref="btgDao"/>
+		<property name="expressionEvaluatorRegistry" ref="expressionEvaluatorRegistry"/>
+		<property name="btgInvalidationDataContainer" ref="btgInvalidationDataContainer" />
+	</bean>
+
+	<alias name="defaultExpressionEvaluatorRegistry" alias="expressionEvaluatorRegistry"/>
+	<bean id="defaultExpressionEvaluatorRegistry" class="de.hybris.platform.btg.condition.impl.DefaultExpressionEvaluatorRegistry" scope="tenant">
+		<property name="expressionEvaluators">
+			<map>
+				<entry key="java.lang.Integer" value-ref="intExpressionEvaluator"/>
+				<entry key="java.lang.Long" value-ref="longExpressionEvaluator"/>
+				<entry key="java.lang.Double" value-ref="doubleExpressionEvaluator"/>
+				<entry key="java.lang.String" value-ref="stringExpressionEvaluator"/>
+				<entry key="java.util.Collection" value-ref="collectionExpressionEvaluator"/>
+				<entry key="java.lang.Boolean" value-ref="booleanExpressionEvaluator"/>
+				<entry key="java.util.Date" value-ref="dateExpressionEvaluator"/>
+				<entry key="java.util.Map" value-ref="mappedNumericEvaluator"/>
+				<entry key="de.hybris.platform.util.PriceValue" value-ref="priceEvaluator"/>
+				<entry key="de.hybris.platform.btg.condition.operand.types.PriceValuesCollection" value-ref="priceCollectionExpressionEvaluator"/>
+				<entry key="de.hybris.platform.btg.condition.operand.types.ProductSet" value-ref="productCollectionExpressionEvaluator"/>
+				<entry key="de.hybris.platform.btg.condition.operand.types.CategorySet" value-ref="categoryCollectionExpressionEvaluator"/>
+				<entry key="de.hybris.platform.btg.condition.operand.types.ContentpageSet" value-ref="contentpageCollectionExpressionEvaluator"/>
+				<entry key="de.hybris.platform.btg.condition.operand.types.UrlSet" value-ref="regExpCollectionExpressionEvaluator"/>
+				<entry key="de.hybris.platform.btg.condition.operand.types.KeyValuePairSet" value-ref="keyValuePairCollectionExpressionEvaluator"/>
+	            <entry key="de.hybris.platform.btg.condition.operand.types.JavaEnumSet" value-ref="userGenderCollectionExpressionEvaluator"/>
+	            <entry key="de.hybris.platform.btg.condition.operand.types.CountrySet" value-ref="userCountryCollectionExpressionEvaluator"/>
+	            <entry key="de.hybris.platform.btg.condition.operand.types.PostalCodeSet" value-ref="userAddressPostalCodeExpressionEvaluator"/>
+	            <entry key="de.hybris.platform.btg.condition.operand.types.PrincipalGroupSet" value-ref="userGroupsCollectionExpressionEvaluator"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Conditions - evaluators-->
+	<bean id="intExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.NumericExpressionEvaluator" scope="tenant">
+		<constructor-arg name="numberType" value="java.lang.Integer"/>
+	</bean> 	
+	<bean id="longExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.NumericExpressionEvaluator" scope="tenant">
+		<constructor-arg name="numberType" value="java.lang.Long"/>
+	</bean> 	
+	<bean id="doubleExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.NumericExpressionEvaluator" scope="tenant">
+		<constructor-arg name="numberType" value="java.lang.Double"/>
+	</bean>
+
+	<bean id="dateExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.DateExpressionEvaluator" scope="tenant"/>
+
+	<bean id="stringExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.StringExpressionEvaluator" scope="tenant"/>
+
+	<bean id="plainCollectionExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.PlainCollectionExpressionEvaluator" scope="tenant"/>
+
+	<bean id="collectionExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.CollectionExpressionEvaluator" scope="tenant">
+		<property name="elementExpEval" ref="intExpressionEvaluator"/>
+		<property name="collectionExpEval" ref="plainCollectionExpressionEvaluator"/>
+	</bean>
+
+	<bean id="stringCollectionExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.CollectionExpressionEvaluator" scope="tenant">
+		<property name="elementExpEval" ref="stringExpressionEvaluator"/>
+		<property name="collectionExpEval" ref="plainCollectionExpressionEvaluator"/>
+	</bean>
+
+	<bean id="priceCollectionExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.CollectionExpressionEvaluator" scope="tenant">
+		<property name="elementExpEval" ref="priceEvaluator"/>
+		<property name="collectionExpEval" ref="plainCollectionExpressionEvaluator"/>
+		<property name="elementMode" value="true"/>
+	</bean>
+
+	<bean id="productCollectionExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.ProductCollectionExpressionEvaluator" scope="tenant">
+		<constructor-arg name="operatorMap">
+			<map>
+				<entry key="contains">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.ProductSet</value>
+					</set>
+				</entry>
+				<entry key="containsAny">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.ProductSet</value>
+					</set>
+				</entry>
+				<entry key="notContains">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.ProductSet</value>
+					</set>
+				</entry>
+				<entry key="size">
+					<set>
+						<value>java.lang.Integer</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>		
+	</bean>
+
+	<bean id="categoryCollectionExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.CategoryCollectionExpressionEvaluator" scope="tenant">
+		<constructor-arg name="operatorMap">
+			<map>
+				<entry key="contains">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.CategorySet</value>
+					</set>
+				</entry>
+				<entry key="containsAny">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.CategorySet</value>
+					</set>
+				</entry>
+				<entry key="notContains">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.CategorySet</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>		
+	</bean>
+
+	<bean id="contentpageCollectionExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.ContentpageCollectionExpressionEvaluator" scope="tenant">
+		<constructor-arg name="operatorMap">
+			<map>
+				<entry key="contains">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.ContentpageSet</value>
+					</set>
+				</entry>
+				<entry key="containsAny">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.ContentpageSet</value>
+					</set>
+				</entry>
+				<entry key="notContains">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.ContentpageSet</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<bean id="regExpCollectionExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.RegExpCollectionExpressionEvaluator" scope="tenant">
+		<constructor-arg name="operatorMap">
+			<map>
+				<entry key="containsAny">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.RegExpSet</value>
+					</set>
+				</entry>
+				<entry key="notContains">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.RegExpSet</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>	
+
+	<bean id="keyValuePairCollectionExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.KeyValuePairCollectionExpressionEvaluator" scope="tenant">
+		<constructor-arg name="operatorMap">
+			<map>
+				<entry key="contains">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.KeyValuePairSet</value>
+					</set>
+				</entry>
+				<entry key="containsAny">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.KeyValuePairSet</value>
+					</set>
+				</entry>
+				<entry key="notContains">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.KeyValuePairSet</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>	
+	
+	<bean id="userGenderCollectionExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.PlainCollectionExpressionEvaluator" scope="tenant">
+		<constructor-arg name="operatorMap">
+			<map>
+				<entry key="containsAny">
+					<set>
+						<value>de.hybris.platform.core.enums.Gender</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="userCountryCollectionExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.PlainCollectionExpressionEvaluator" scope="tenant">
+		<constructor-arg name="operatorMap">
+			<map>
+				<entry key="containsAny">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.CountrySet</value>
+					</set>
+				</entry>
+				<entry key="notContains">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.CountrySet</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="userAddressPostalCodeExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.UserAddressPostalCodeExpressionEvaluator" scope="tenant">
+		<constructor-arg name="operatorMap">
+			<map>
+				<entry key="containsAny">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.StringSet</value>
+					</set>
+				</entry>
+				<entry key="notContains">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.StringSet</value>
+					</set>
+				</entry>
+				<entry key="startsWith">
+					<set>
+						<value>java.lang.String</value>
+					</set>
+				</entry>
+				<entry key="startsNotWith">
+					<set>
+						<value>java.lang.String</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+		<property name="delegateCollectionExpressionEvaluator" ref="plainCollectionExpressionEvaluator"/>	
+	</bean>
+
+	<bean id="userGroupsCollectionExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.PlainCollectionExpressionEvaluator" scope="tenant">
+		<constructor-arg name="operatorMap">
+			<map>
+				<entry key="contains">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.PrincipalGroupSet</value>
+					</set>
+				</entry>
+				<entry key="containsAny">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.PrincipalGroupSet</value>
+					</set>
+				</entry>
+				<entry key="notContains">
+					<set>
+						<value>de.hybris.platform.btg.condition.operand.types.PrincipalGroupSet</value>
+					</set>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="booleanExpressionEvaluator" class="de.hybris.platform.btg.condition.impl.BooleanExpressionEvaluator" scope="tenant"/>
+
+	<bean id="mappedNumericEvaluator" class="de.hybris.platform.btg.condition.impl.MappedNumericEvaluator" scope="tenant"/>
+
+	<bean id="priceEvaluator" class="de.hybris.platform.btg.condition.impl.PriceExpressionEvaluator" scope="tenant"/>
+
+	<!-- Script operands -->
+	<bean id="mediaScriptOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.MediaScriptOperandValueProvider" scope="tenant">
+		<property name="mediaService" ref="mediaService"/>
+	</bean>
+	
+	<bean id="stringScriptOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.StringScriptOperandValueProvider"/>
+
+	<!-- Conditions - Operands -->
+	<alias name="defaultOperandValueProviderRegistry" alias="operandValueProviderRegistry"/>
+	<bean name="defaultOperandValueProviderRegistry" class="de.hybris.platform.btg.condition.operand.factory.DefaultOperandValueProviderRegistry" scope="tenant"/>
+
+	<!-- order operands value providers -->
+	<bean id="abstractOrderOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.AbstractOrderOperandValueProvider" scope="tenant" abstract="true">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	<bean id="orderProductsOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.OrderProductsOperandValueProvider" scope="tenant" parent="abstractOrderOperandValueProvider"/>
+	<bean id="orderSumOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.OrderSumOperandValueProvider" scope="tenant" parent="abstractOrderOperandValueProvider"/>
+	<bean id="ordersSumsOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.OrdersSumsOperandValueProvider" scope="tenant" parent="abstractOrderOperandValueProvider"/>
+	<bean id="orderCategoriesOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.OrderCategoriesOperandValueProvider" scope="tenant" parent="abstractOrderOperandValueProvider"/>
+	<bean id="lastOrderDateOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.LastOrderDateOperandValueProvider" scope="tenant" parent="abstractOrderOperandValueProvider"/>
+	<bean id="numberOfOrdersOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.NumberOfOrdersOperandValueProvider" scope="tenant" parent="abstractOrderOperandValueProvider"/>
+	<bean id="numberOfOrdersRelativeDateOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.NumberOfOrdersRelativeDateOperandValueProvider" scope="tenant" parent="abstractOrderOperandValueProvider"/>
+	<!-- order operands value providers END-->
+
+	<!-- cart operands value providers -->
+	<bean id="abstractCartOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.AbstractCartOperandValueProvider" scope="tenant" abstract="true">
+		<property name="cartService" ref="cartService"/>
+	</bean>
+	<bean id="cartTotalSumOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.CartTotalSumOperandValueProvider" scope="tenant" parent="abstractCartOperandValueProvider"/>
+	<bean id="cartCategoriesOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.CartCategoriesOperandValueProvider" scope="tenant" parent="abstractCartOperandValueProvider">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>	
+	</bean>
+	<bean id="cartProductsOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.CartProductsOperandValueProvider" scope="tenant" parent="abstractCartOperandValueProvider"/>
+	<bean id="cartProductQuantityOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.CartProductQuantityOperandValueProvider" scope="tenant" parent="abstractCartOperandValueProvider"/>
+	<bean id="cartIsEmptyOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.CartIsEmptyOperandValueProvider" scope="tenant" parent="abstractCartOperandValueProvider"/>	
+	<!-- cart operands value providers END -->
+
+	<!-- reference operands value providers -->
+	<bean id="doubleLiteralOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.DoubleLiteralOperandValueProvider" scope="tenant"/>
+	<bean id="stringLiteralOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.StringLiteralOperandValueProvider" scope="tenant"/>
+	<bean id="integerLiteralOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.IntegerLiteralOperandValueProvider" scope="tenant"/>
+	<bean id="booleanLiteralOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.BooleanLiteralOperandValueProvider" scope="tenant"/>
+	<bean id="genderEnumLiteralOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.GenderEnumLiteralOperandValueProvider" scope="tenant"/>
+	<bean id="referenceDateOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ReferenceDateOperandValueProvider" scope="tenant" />
+	<bean id="referenceExactDateOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ReferenceExactDateOperandValueProvider" scope="tenant" />	
+	<bean id="referencePriceOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ReferencePriceOperandValueProvider" scope="tenant"/>
+	<bean id="referenceProductsOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ReferenceProductsOperandValueProvider" scope="tenant"/>
+	<bean id="referenceCategoriesOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ReferenceCategoriesOperandValueProvider" scope="tenant"/>
+	<bean id="referenceContentpagesOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ReferenceContentpagesOperandValueProvider" scope="tenant"/>
+	<bean id="referenceRegexListOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ReferenceRegexListOperandValueProvider" scope="tenant"/>
+	<bean id="referenceKeyValuePairListOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ReferenceKeyValuePairListOperandValueProvider" scope="tenant"/>
+	<bean id="referenceStringListOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ReferenceStringListOperandValueProvider" scope="tenant"/>
+	<bean id="referenceCountriesOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ReferenceCountriesOperandValueProvider" scope="tenant"/>
+	<bean id="referencePrincipalGroupsOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ReferencePrincipalGroupsOperandValueProvider" scope="tenant"/>
+	<!-- reference operands value providers END -->
+
+	<!-- customer operands value providers -->
+	<bean id="abstractPropertyOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.AbstractPropertyOperandValueProvider" scope="tenant" abstract="true" parent="abstractBusinessService">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+	<bean id="userGenderOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.UserGenderOperandValueProvider" scope="tenant"/>
+	<bean id="userCountryOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.UserCountryOperandValueProvider" scope="tenant"/>
+	<bean id="userAddressPostalCodeOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.UserAddressPostalCodeOperandValueProvider" scope="tenant"/>
+	<bean id="userMemberOfGroupsOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.UserMemberOfGroupsOperandValueProvider" scope="tenant"/>
+	
+	<!-- customer operands value providers END -->
+
+	<!-- wcms operand value providers -->
+	<bean id="abstractWCMSOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.AbstractWCMSOperandValueProvider" scope="tenant" abstract="true">
+<!--		<property name="ruleDataContainerFactory" ref="ruleDataContainerFactory" />-->
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>		
+	</bean>	
+	
+	<bean id="visitedContentpagesOperandValueProvider" parent="abstractWCMSOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.VisitedContentpagesOperandValueProvider" scope="tenant">
+		<property name="ruleDataContainer" ref="contentPageVisitedRuleDataContainer"/>
+	</bean>
+	
+	<bean id="viewedProductsOperandValueProvider" parent="abstractWCMSOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ViewedProductsOperandValueProvider" scope="tenant" >
+		<property name="ruleDataContainer" ref="productVisitedRuleDataContainer"/>
+	</bean>
+	
+	<bean id="viewedCategoriesOperandValueProvider" parent="abstractWCMSOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ViewedCategoriesOperandValueProvider" scope="tenant">
+		<property name="ruleDataContainer" ref="categoryVisitedRuleDataContainer"/>
+	</bean>
+	
+	<bean id="referalUrlOperandValueProvider" parent="abstractWCMSOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.ReferalUrlOperandValueProvider" scope="tenant">
+		<property name="ruleDataContainer" ref="refererHeaderUsedRuleDataContainer"/>
+	</bean>
+	
+	<bean id="urlParameterOperandValueProvider" parent="abstractWCMSOperandValueProvider" class="de.hybris.platform.btg.condition.operand.valueproviders.UrlParameterOperandValueProvider" scope="tenant">
+		<property name="ruleDataContainer" ref="requestParametersUsedRuleDataContainer"/>
+	</bean>
+			
+	<!-- interceptors -->
+	<bean id="btgExpressionInterceptor" class="de.hybris.platform.btg.condition.interceptor.BTGExpressionInterceptor" scope="tenant"/>
+
+	<bean id="btgExpressionInterceptorInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" scope="tenant">
+		<property name="interceptor" ref="btgExpressionInterceptor"/>
+		<property name="typeCode" value="BTGExpression"/>
+	</bean>
+
+	<bean id="btgResultInterceptor" class="de.hybris.platform.btg.result.interceptor.BTGResultInterceptor" scope="tenant">
+		<property name="resultSequenceGenerator" ref="defaultBtgResultSequenceGenerator" />
+	</bean>
+
+	<bean id="btgResultInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" scope="tenant">
+		<property name="interceptor" ref="btgResultInterceptor"/>
+		<property name="typeCode" value="BTGAbstractResult"/>
+	</bean>
+	
+	<bean id="btgCmsRestrictionActionDefinitionInterceptor" class="de.hybris.platform.btg.result.interceptor.BtgOutputActionDefinitionModelInterceptor" scope="tenant">
+		<property name="outputActionCodeGen" ref="defaultBtgOutputActionCodeGenerator"/>
+		<property name="outputActionUidGen" ref="defaultBtgOutputActionUidGenerator"/>
+	</bean>
+
+	<bean id="btgOutputActionDefinitionModelInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" scope="tenant">
+		<property name="interceptor" ref="btgCmsRestrictionActionDefinitionInterceptor"/>
+		<property name="typeCode" value="BTGOutputActionDefinition"/>
+	</bean>
+
+	<bean id="btgReferencePriceOperandInitInterceptor" class="de.hybris.platform.btg.condition.interceptor.BTGReferencePriceOperandInitInterceptor" scope="tenant">
+		<property name="i18nService" ref="i18nService" />
+	</bean>	
+	<bean id="btgReferencePriceOperandInitInterceptorMapping" scope="tenant"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="btgReferencePriceOperandInitInterceptor" />
+		<property name="typeCode" value="BTGReferencePriceOperand" />
+	</bean>
+	<bean id="btgReferenceDateOperandInitInterceptor" class="de.hybris.platform.btg.condition.interceptor.BTGReferenceDateOperandInitInterceptor" scope="tenant">
+		<property name="btgConfigurationService" ref="btgConfigurationService" />
+	</bean>
+	<bean id="btgReferenceDateOperandInitInterceptorMapping" scope="tenant"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="btgReferenceDateOperandInitInterceptor" />
+		<property name="typeCode" value="BTGReferenceDateOperand" />
+	</bean>
+	<bean id="btgNumberOfOrdersRelativeDateOperandInitInterceptor" class="de.hybris.platform.btg.condition.interceptor.BTGNumberOfOrdersRelativeDateOperandInitInterceptor" scope="tenant">
+		<property name="btgConfigurationService" ref="btgConfigurationService" />
+	</bean>
+	<bean id="btgNumberOfOrdersRelativeDateOperandInitInterceptorMapping" scope="tenant"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="btgNumberOfOrdersRelativeDateOperandInitInterceptor" />
+		<property name="typeCode" value="BTGNumberOfOrdersRelativeDateOperand" />
+	</bean>
+	
+	<bean id="btgSegmentRestrictionEvaluator" class="de.hybris.platform.btg.servicelayer.services.evaluator.impl.BtgSegmentRestrictionEvaluator" scope="tenant" >
+		<property name="btgResultService" ref="btgResultService" />
+		<property name="userService" ref="userService" />
+		<property name="modelService" ref="modelService" />
+		<property name="evaluationContextProvider" ref="btgSessionEvaluationContextProvider" />
+	</bean>
+	
+	<bean id="btgSessionEvaluationContextProvider" class="de.hybris.platform.btg.servicelayer.services.evaluator.impl.SessionBTGEvaluationContextProvider" scope="tenant">
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+	
+	<bean id="btgSegmentRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping" scope="tenant" >
+		<property name="restrictionTypeCode" value="BTGSegmentRestriction"/>
+		<property name="restrictionEvaluator" ref="btgSegmentRestrictionEvaluator"/>
+	</bean>
+	
+	<bean id="productVisitedBTGRuleDataEventListener" class="de.hybris.platform.btg.events.ProductVisitedBTGRuleDataEventListener" >
+		<lookup-method name="getRuleDataContainerViaLookup" bean="productVisitedRuleDataContainer" />
+		<property name="tenantService" ref="tenantService" />
+		<property name="clusterService" ref="clusterService" />
+	</bean>
+	
+	<bean id="contentPageVisitedBTGRuleDataEventListener" class="de.hybris.platform.btg.events.ContentPageVisitedBTGRuleDataEventListener">
+		<lookup-method name="getRuleDataContainerViaLookup" bean="contentPageVisitedRuleDataContainer" />
+		<property name="tenantService" ref="tenantService" />
+		<property name="clusterService" ref="clusterService" />
+	</bean>
+
+	<bean id="categoryVisitedBTGRuleDataEventListener" class="de.hybris.platform.btg.events.CategoryVisitedBTGRuleDataEventListener">
+		<lookup-method name="getRuleDataContainerViaLookup" bean="categoryVisitedRuleDataContainer" />
+		<property name="tenantService" ref="tenantService" />
+		<property name="clusterService" ref="clusterService" />
+	</bean>
+
+	<bean id="requestParametersUsedBTGRuleDataEventListener" class="de.hybris.platform.btg.events.RequestParametersUsedBTGRuleDataEventListener">
+		<lookup-method name="getRuleDataContainerViaLookup" bean="requestParametersUsedRuleDataContainer" />
+		<property name="tenantService" ref="tenantService" />
+		<property name="clusterService" ref="clusterService" />
+	</bean>
+	
+	<bean id="refererHeaderUsedBTGRuleDataEventListener" class="de.hybris.platform.btg.events.RefererHeaderUsedBTGRuleDataEventListener">
+		<lookup-method name="getRuleDataContainerViaLookup" bean="refererHeaderUsedRuleDataContainer" />
+		<property name="tenantService" ref="tenantService" />
+		<property name="clusterService" ref="clusterService" />
+	</bean>
+
+	
+	<!--  BTG Rule Data Containers  -->
+	
+	<bean id="productVisitedRuleDataContainer" class="de.hybris.platform.btg.rule.impl.JaloSessionRuleDataContainer" scope="tenant">
+		<property name="sessionService" ref="sessionService" />
+		<property name="containerMapAttributeKey" value="productVisitedRuleDataContainer" />
+	</bean>
+	
+	<bean id="categoryVisitedRuleDataContainer" class="de.hybris.platform.btg.rule.impl.JaloSessionRuleDataContainer" scope="tenant">
+		<property name="sessionService" ref="sessionService" />
+		<property name="containerMapAttributeKey" value="categoryVisitedRuleDataContainer" />
+	</bean>
+
+	<bean id="contentPageVisitedRuleDataContainer" class="de.hybris.platform.btg.rule.impl.JaloSessionRuleDataContainer" scope="tenant">
+		<property name="sessionService" ref="sessionService" />
+		<property name="containerMapAttributeKey" value="contentPageVisitedRuleDataContainer" />
+	</bean>
+
+	<bean id="requestParametersUsedRuleDataContainer" class="de.hybris.platform.btg.rule.impl.JaloSessionRuleDataContainer" scope="tenant">
+		<property name="sessionService" ref="sessionService" />
+		<property name="containerMapAttributeKey" value="requestParametersUsedRuleDataContainer" />
+	</bean>
+		
+	<bean id="refererHeaderUsedRuleDataContainer" class="de.hybris.platform.btg.rule.impl.JaloSessionRuleDataContainer" scope="tenant">
+		<property name="sessionService" ref="sessionService" />
+		<property name="containerMapAttributeKey" value="refererHeaderUsedRuleDataContainer" />
+	</bean>
+
+
+	<bean id="defaultBtgOutputActionUidGenerator"
+		class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+		init-method="init" scope="tenant">
+		<property name="key" value="CANCELREC" />
+		<property name="digits" value="8" />
+		<property name="start" value="00000000" />
+		<property name="numeric" value="true" />
+	</bean>
+	
+	<bean id="defaultBtgOutputActionCodeGenerator"
+		class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+		init-method="init" scope="tenant">
+		<property name="key" value="CANCELREC" />
+		<property name="digits" value="8" />
+		<property name="start" value="00000000" />
+		<property name="numeric" value="true" />
+	</bean>
+	
+	<bean id="defaultBtgResultSequenceGenerator"
+		class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+		init-method="init" scope="tenant">
+		<property name="key" value="CANCELREC" />
+		<property name="digits" value="8" />
+		<property name="start" value="00000000" />
+		<property name="numeric" value="true" />
+	</bean>
+	
+	<alias alias="outputActionContextProvider" name="defaultOutputActionContextProvider" />
+	
+	<bean id="defaultOutputActionContextProvider" class="de.hybris.platform.btg.outputaction.impl.DefaultOutputActionContextProvider" 
+			init-method="initialize" scope="tenant">
+			<property name="typeService" ref="typeService"/>
+	</bean>
+			
+	<bean id="btgOutputActionContextCreator" class="de.hybris.platform.btg.outputaction.impl.BtgOutputActionContextCreator" scope="tenant"/>
+	
+	<!--  BTG Rule Data Containers END -->
+	
+	<!--  BTG dynamic attributes  -->
+	
+	<bean id="BtgSegmentRestriction_descriptionAttributeHandler" class="de.hybris.platform.btg.handlers.BtgSegmentRestrictionDescriptionAttributeHandler" scope="tenant" >
+		<property name="l10nService" ref="l10nService" />
+	</bean>
+	
+	<!--  BTG dynamic attributes END -->
+
+</beans>

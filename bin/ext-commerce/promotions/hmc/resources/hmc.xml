@@ -1,0 +1,1328 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+
+	<!-- Configuration for extension promotions -->
+
+	<explorertree>
+		<group name="marketing">
+			<typeref type="PromotionGroup" description="type.promotiongroup.description"/>
+			<typeref type="AbstractPromotion" description="type.promotion.description"/>
+
+			<!--
+			<group name="createpromotion">
+				<typeref type="CreateProductBOGOFPromotionWizard" description="type.createproductbogofpromotionwizard.description"/>
+			</group>
+			-->
+		</group>
+	</explorertree>
+
+	<!-- *** PROMOTION GROUP *** -->
+
+	<type name="PromotionGroup" mode="append">
+		<organizer>
+			<search mode="replace" autoperform="true">
+				<condition attribute="identifier"/>
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="identifier" width="260"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="replace">
+					<listlayout>
+							<attribute name="identifier" labelwidth="100" width="260"/>
+					</listlayout>
+				</essentials>
+
+				<tab name="tab.promotiongroup.properties" position="0">
+					<section name="section.promotiongroup.promotions">
+						<listlayout>
+							<attribute name="promotions" labelwidth="100" width="224">
+								<referencecollectioneditor
+									presetattribute="promotionGroup"
+									create="true"
+									add="true"
+									remove="true"
+									autosave="true">
+									<itemlayout>
+										<attribute name="promotionType" width="160"/>
+										<attribute name="code" width="110"/>
+										<attribute name="title" width="350"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="identifier"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<!-- *** PROMOTIONS *** -->
+
+	<type name="AbstractPromotion" icon="ext/promotions/images/promotion.gif" mode="append">
+		<organizer>
+			<search mode="replace" autoperform="true">
+				<condition attribute="code"/>
+				<condition attribute="title"/>
+				<condition attribute="enabled"/>
+				<condition attribute="immutableKeyHash" operator="is null" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="promotionType" width="160"/>
+						<attribute name="code" width="110" />
+						<attribute name="title" width="350" />
+						<attribute name="enabled" width="60" />
+						<attribute name="priority" width="60" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials mode="replace">
+					<columnlayout leftwidth="370" rightwidth="370">
+						<row>
+							<attribute name="code" labelwidth="100" width="224"/>
+							<attribute name="title" labelwidth="100" width="224"/>
+						</row>
+						<row>
+							<customchip jsp="/ext/promotions/StylesheetChip.jsp" />
+						</row>
+					</columnlayout>
+				</essentials>
+
+				<tab name="tab.promotion.properties" position="0">
+					<section name="section.promotion.description">
+					</section>
+					<section name="section.promotion.details">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="promotionGroup" labelwidth="100" />
+							</row>
+							<row>
+								<attribute name="description" labelwidth="100" width="400">
+									<textareaeditor />
+								</attribute>
+							</row>
+							<row>
+								<attribute name="enabled" labelwidth="100" />
+							</row>
+							<row>
+								<attribute name="priority" labelwidth="100" width="224"/>
+								<text name="text.promotion.priority" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.restrictions" position="1">
+					<section name="section.promotion.restrictions">
+						<listlayout>
+							<text name="text.promotion.daterange" />
+							<attribute name="startDate" labelwidth="100" width="224"/>
+							<attribute name="endDate" labelwidth="100" width="224"/>
+							<text name="text.promotion.restrictions" />
+							<attribute name="restrictions" labelwidth="100" width="224">
+								<referencecollectioneditor
+									presetattribute="promotion"
+									create="true"
+									add="true"
+									remove="true"
+									autosave="true">
+									<itemlayout>
+										<attribute name="restrictionType" width="150"/>
+										<attribute name="renderedDescription" width="250"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.media" position="2">
+					<section name="section.promotion.media">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="detailsURL" labelwidth="100" />
+								<text name="text.promotion.detailsurl" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="code"/>
+				<attribute name="title"/>
+				<attribute name="enabled"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="ProductPromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.products">
+						<listlayout>
+							<text name="text.productpromotion.qualifyingproductscategories" />
+							<attribute name="products" labelwidth="100">
+								<referencecollectioneditor autoperform="true" resortable="true" add="true" remove="true" create="false">
+									<itemlayout>
+										<attribute name="code" width="274"/>
+										<attribute name="name" width="274"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="categories" labelwidth="100">
+								<referencecollectioneditor autoperform="true" resortable="true" add="true" remove="true" create="false">
+									<itemlayout>
+										<attribute name="code" width="274"/>
+										<attribute name="name" width="274"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.media" mode="append">
+					<section name="section.promotion.media" mode="append">
+						<columnlayout>
+							<row>
+								<attribute name="productBanner" labelwidth="100">
+									<mediaeditor/>
+								</attribute>
+								<text name="text.productpromotion.productbanner" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<!-- *** PRODUCT PROMOTIONS *** -->
+
+	<type name="ProductBOGOFPromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.productbogofpromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.products" mode="append">
+						<columnlayout leftwidth="370">
+							<row>
+								<text name="text.productbogofpromotion.qualifyingoverview" />
+							</row>
+							<row>
+								<attribute name="qualifyingCount" labelwidth="100" />
+								<text name="text.productbogofpromotion.qualifyingcount" />
+							</row>
+							<row>
+								<attribute name="freeCount" labelwidth="100" />
+								<text name="text.productbogofpromotion.freecount" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.productbogofpromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productbogofpromotion.messagefiredargs" />
+							</row>
+							<row>
+								<text name="text.productbogofpromotion.messagecouldhavefired" />
+							</row>
+							<row>
+								<attribute name="messageCouldHaveFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productbogofpromotion.messagecouldhavefiredargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ProductMultiBuyPromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.productmultibuypromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.products" mode="append">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="qualifyingCount" labelwidth="100" />
+								<text name="text.productmultibuypromotion.qualifyingcount" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="section.promotion.prices">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="bundlePrices" labelwidth="100">
+									<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+										<itemlayout>
+											<attribute name="currency" width="60"/>
+											<attribute name="price" width="60"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<text name="text.productmultibuypromotion.bundleprices" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.productmultibuypromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productmultibuypromotion.messagefiredargs" />
+							</row>
+							<row>
+								<text name="text.productmultibuypromotion.messagecouldhavefired" />
+							</row>
+							<row>
+								<attribute name="messageCouldHaveFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productmultibuypromotion.messagecouldhavefiredargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ProductSteppedMultiBuyPromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.productsteppedmultibuypromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.prices">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="qualifyingCountsAndBundlePrices" labelwidth="100">
+									<referencecollectioneditor autoperform="true" resortable="true" add="true" remove="true" create="true">
+										<itemlayout>
+											<attribute name="quantity" width="100"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<text name="text.productsteppedmultibuypromotion.qualifyingcountsandbundleprices" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.productsteppedmultibuypromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productsteppedmultibuypromotion.messagefiredargs" />
+							</row>
+							<row>
+								<text name="text.productsteppedmultibuypromotion.messagecouldhavefired" />
+							</row>
+							<row>
+								<attribute name="messageCouldHaveFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productsteppedmultibuypromotion.messagecouldhavefiredargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ProductBundlePromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.productbundlepromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.prices">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="bundlePrices" labelwidth="100">
+									<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+										<itemlayout>
+											<attribute name="currency" width="60"/>
+											<attribute name="price" width="60"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<text name="text.productbundlepromotion.bundleprices" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.productbundlepromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productbundlepromotion.messagefiredargs" />
+							</row>
+							<row>
+								<text name="text.productbundlepromotion.messagecouldhavefired" />
+							</row>
+							<row>
+								<attribute name="messageCouldHaveFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productbundlepromotion.messagecouldhavefiredargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ProductPerfectPartnerPromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.productperfectpartnerpromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.products" mode="append">
+						<listlayout>
+							<text name="text.productperfectpartnerpromotion.partnerproducts" />
+							<attribute name="partnerProducts" labelwidth="100">
+								<referencecollectioneditor autoperform="true" resortable="true" add="true" remove="true" create="false">
+									<itemlayout>
+										<attribute name="code" width="274"/>
+										<attribute name="name" width="274"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+					<section name="section.promotion.prices">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="partnerPrices" labelwidth="100">
+									<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+										<itemlayout>
+											<attribute name="currency" width="60"/>
+											<attribute name="price" width="60"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<text name="text.productperfectpartnerpromotion.partnerprices" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.productperfectpartnerpromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productperfectpartnerpromotion.messagefiredargs" />
+							</row>
+							<row>
+								<text name="text.productperfectpartnerpromotion.messagecouldhavefired" />
+							</row>
+							<row>
+								<attribute name="messageCouldHaveFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productperfectpartnerpromotion.messagecouldhavefiredargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ProductOneToOnePerfectPartnerPromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<exclude>
+					<exclusion attribute="products" />
+					<exclusion attribute="categories" />
+				</exclude>
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.productonetooneperfectpartnerpromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.products" mode="replace">
+						<listlayout>
+							<text name="text.productonetooneperfectpartnerpromotion.baseproduct" />
+							<attribute name="baseProduct" />
+							<text name="text.productonetooneperfectpartnerpromotion.partnerproduct" />
+							<attribute name="partnerProduct" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.prices">
+						<listlayout>
+							<text name="text.productonetooneperfectpartnerpromotion.bundleprices" />
+							<attribute name="bundlePrices" labelwidth="100">
+								<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+									<itemlayout>
+										<attribute name="currency" width="60"/>
+										<attribute name="price" width="60"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.productonetooneperfectpartnerpromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productonetooneperfectpartnerpromotion.messagefiredargs" />
+							</row>
+							<row>
+								<text name="text.productonetooneperfectpartnerpromotion.messagecouldhavefired" />
+							</row>
+							<row>
+								<attribute name="messageCouldHaveFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productonetooneperfectpartnerpromotion.messagecouldhavefiredargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ProductPerfectPartnerBundlePromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<exclude>
+					<exclusion attribute="products" />
+					<exclusion attribute="categories" />
+				</exclude>
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.productperfectpartnerbundlepromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.products" mode="replace">
+						<listlayout>
+							<text name="text.productperfectpartnerbundlepromotion.baseproduct" />
+							<attribute name="baseProduct" />
+							<text name="text.productperfectpartnerbundlepromotion.partnerproducts" />
+							<attribute name="partnerProducts" labelwidth="100">
+								<referencecollectioneditor autoperform="true" resortable="true" add="true" remove="true" create="false">
+									<itemlayout>
+										<attribute name="code" width="274"/>
+										<attribute name="name" width="274"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<text name="text.productperfectpartnerbundlepromotion.qualifyingcount" />
+							<attribute name="qualifyingCount" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.prices">
+						<listlayout>
+							<text name="text.productperfectpartnerbundlepromotion.bundleprices" />
+							<attribute name="bundlePrices" labelwidth="100">
+								<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+									<itemlayout>
+										<attribute name="currency" width="60"/>
+										<attribute name="price" width="60"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.productperfectpartnerbundlepromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productperfectpartnerbundlepromotion.messagefiredargs" />
+							</row>
+							<row>
+								<text name="text.productperfectpartnerbundlepromotion.messagecouldhavefired" />
+							</row>
+							<row>
+								<attribute name="messageCouldHaveFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productperfectpartnerbundlepromotion.messagecouldhavefiredargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ProductFixedPricePromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.productfixedpricepromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.prices">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="productFixedUnitPrice" labelwidth="100">
+									<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+										<itemlayout>
+											<attribute name="currency" width="60"/>
+											<attribute name="price" width="60"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<text name="text.productfixedpricepromotion.productfixedunitprice" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.productfixedpricepromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productfixedpricepromotion.messagefiredargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ProductPercentageDiscountPromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.productpercentagediscountpromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.prices">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="percentageDiscount" labelwidth="100" />
+								<text name="text.productpercentagediscountpromotion.percentagediscount" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.productpercentagediscountpromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.productpercentagediscountpromotion.messagefiredargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<!-- *** ORDER PROMOTIONS *** -->
+
+	<type name="OrderThresholdPerfectPartnerPromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.orderthresholdperfectpartnerpromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.products" mode="append">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="discountProduct" labelwidth="100" />
+								<text name="text.orderthresholdperfectpartnerpromotion.discountproduct" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="section.promotion.prices">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="productPrices" labelwidth="100">
+									<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+										<itemlayout>
+											<attribute name="currency" width="60"/>
+											<attribute name="price" width="60"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<text name="text.orderthresholdperfectpartnerpromotion.productprices" />
+							</row>
+							<row>
+								<attribute name="thresholdTotals" labelwidth="100">
+									<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+										<itemlayout>
+											<attribute name="currency" width="60"/>
+											<attribute name="price" width="60"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<text name="text.orderthresholdperfectpartnerpromotion.thresholdtotals" />
+							</row>
+							<row>
+								<attribute name="includeDiscountedPriceInThreshold" labelwidth="100" />
+								<text name="text.orderthresholdperfectpartnerpromotion.includediscountedpriceinthreshold" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.orderthresholdperfectpartnerpromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.orderthresholdperfectpartnerpromotion.messagefiredargs" />
+							</row>
+							<row>
+								<text name="text.orderthresholdperfectpartnerpromotion.messagecouldhavefired" />
+							</row>
+							<row>
+								<attribute name="messageCouldHaveFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.orderthresholdperfectpartnerpromotion.messagecouldhavefiredargs" />
+							</row>
+							<row>
+								<text name="text.orderthresholdperfectpartnerpromotion.messageproductnothreshold" />
+							</row>
+							<row>
+								<attribute name="messageProductNoThreshold" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.orderthresholdperfectpartnerpromotion.messageproductnothresholdargs" />
+							</row>
+							<row>
+								<text name="text.orderthresholdperfectpartnerpromotion.messagethresholdnoproduct" />
+							</row>
+							<row>
+								<attribute name="messageThresholdNoProduct" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.orderthresholdperfectpartnerpromotion.messagethresholdnoproductargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="OrderThresholdFreeGiftPromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.orderthresholdfreegiftpromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.products" mode="append">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="giftProduct" labelwidth="100" />
+								<text name="text.orderthresholdfreegiftpromotion.giftproduct" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="section.promotion.prices">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="thresholdTotals" labelwidth="100">
+									<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+										<itemlayout>
+											<attribute name="currency" width="60"/>
+											<attribute name="price" width="60"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<text name="text.orderthresholdfreegiftpromotion.thresholdtotals" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.orderthresholdfreegiftpromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.orderthresholdfreegiftpromotion.messagefiredargs" />
+							</row>
+							<row>
+								<text name="text.orderthresholdfreegiftpromotion.messagecouldhavefired" />
+							</row>
+							<row>
+								<attribute name="messageCouldHaveFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.orderthresholdfreegiftpromotion.messagecouldhavefiredargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="OrderThresholdDiscountPromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.orderthresholddiscountpromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.prices">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="thresholdTotals" labelwidth="100">
+									<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+										<itemlayout>
+											<attribute name="currency" width="60"/>
+											<attribute name="price" width="60"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<text name="text.orderthresholddiscountpromotion.thresholdtotals" />
+							</row>
+							<row>
+								<attribute name="discountPrices" labelwidth="100">
+									<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+										<itemlayout>
+											<attribute name="currency" width="60"/>
+											<attribute name="price" width="60"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<text name="text.orderthresholddiscountpromotion.discountPrices" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.orderthresholddiscountpromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.orderthresholddiscountpromotion.messagefiredargs" />
+							</row>
+							<row>
+								<text name="text.orderthresholddiscountpromotion.messagecouldhavefired" />
+							</row>
+							<row>
+								<attribute name="messageCouldHaveFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.orderthresholddiscountpromotion.messagecouldhavefiredargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="OrderThresholdFreeVoucherPromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.orderthresholdfreevoucherpromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.products" mode="append">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="freeVoucher" labelwidth="100" />
+								<text name="text.orderthresholdfreevoucherpromotion.freevoucher" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="section.promotion.prices">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="thresholdTotals" labelwidth="100">
+									<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+										<itemlayout>
+											<attribute name="currency" width="60"/>
+											<attribute name="price" width="60"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<text name="text.orderthresholdfreevoucherpromotion.thresholdtotals" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.orderthresholdfreevoucherpromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.orderthresholdfreevoucherpromotion.messagefiredargs" />
+							</row>
+							<row>
+								<text name="text.orderthresholdfreevoucherpromotion.messagecouldhavefired" />
+							</row>
+							<row>
+								<attribute name="messageCouldHaveFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.orderthresholdfreevoucherpromotion.messagecouldhavefiredargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="OrderThresholdChangeDeliveryModePromotion" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.description" mode="replace" position="0">
+						<listlayout>
+							<text name="text.orderthresholdchangedeliverypromotion.detaileddescription" />
+						</listlayout>
+					</section>
+					<section name="section.promotion.deliverymode" mode="append">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="deliveryMode" labelwidth="100" />
+								<text name="text.orderthresholdchangedeliverypromotion.deliverymode" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="section.promotion.prices">
+						<columnlayout leftwidth="370">
+							<row>
+								<attribute name="thresholdTotals" labelwidth="100">
+									<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+										<itemlayout>
+											<attribute name="currency" width="60"/>
+											<attribute name="price" width="60"/>
+										</itemlayout>
+									</referencecollectioneditor>
+								</attribute>
+								<text name="text.orderthresholdchangedeliverypromotion.thresholdtotals" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.promotion.messages" mode="append">
+					<section name="section.promotion.messages" mode="append">
+						<columnlayout leftwidth="500">
+							<row>
+								<text name="text.promotion.messages.overview" />
+							</row>
+							<row>
+								<text name="text.orderthresholdchangedeliverypromotion.messagefired" />
+							</row>
+							<row>
+								<attribute name="messageFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.orderthresholdchangedeliverypromotion.messagefiredargs" />
+							</row>
+							<row>
+								<text name="text.orderthresholdchangedeliverypromotion.messagecouldhavefired" />
+							</row>
+							<row>
+								<attribute name="messageCouldHaveFired" labelwidth="100" width="400">
+									<textareaeditor expanded="true" rows="5" />
+								</attribute>
+								<text name="text.orderthresholdchangedeliverypromotion.messagecouldhavefiredargs" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<!-- *** RESTRICTIONS *** -->
+
+	<type name="AbstractPromotionRestriction" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="promotion"/>
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="restrictionType" width="150"/>
+						<attribute name="renderedDescription" width="150"/>
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="restrictionType" width="150"/>
+						<attribute name="renderedDescription" width="150"/>
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="restrictionType" width="150"/>
+						<attribute name="renderedDescription" width="150"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<essentials mode="replace">
+					<listlayout>
+						<attribute name="promotion" labelwidth="100" width="224"/>
+						<attribute name="descriptionPattern" labelwidth="100" width="224"/>
+					</listlayout>
+				</essentials>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="restrictionType"/>
+				<attribute name="renderedDescription"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="PromotionProductRestriction" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.restriction.properties" mode="append">
+					<section name="section.restriction.products" mode="append" position="2">
+						<listlayout>
+							<attribute name="products" labelwidth="100">
+								<referencecollectioneditor autoperform="true" resortable="true" add="true" remove="true" create="false">
+									<itemlayout>
+										<attribute name="code" width="274"/>
+										<attribute name="name" width="274"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="PromotionUserRestriction" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.restriction.properties" mode="append">
+					<section name="section.restriction.users" mode="append" position="2">
+						<listlayout>
+							<attribute name="users" labelwidth="100">
+								<referencecollectioneditor create="false" add="true" remove="true">
+									<itemlayout>
+										<attribute name="uid" width="274"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="positive" labelwidth="100" width="400">
+								<advancedbooleaneditor truename="promotionuserrestriction.positive.true" falsename="promotionuserrestriction.positive.false"/>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+<!--  *** 	The PromotionStoreRestriction is not longer part of 
+			the promotions extension, since it has a dependency to the 
+			Store object which is part of the cms / ex-commerce
+	<type name="PromotionStoreRestriction" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.restriction.properties" mode="append">
+					<section name="section.restriction.stores" mode="append" position="2">
+						<listlayout>
+							<attribute name="stores" labelwidth="100">
+								<referencecollectioneditor create="false" add="true" remove="true">
+									<itemlayout>
+										<attribute name="code" width="274"/>
+										<attribute name="name" width="274"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="positive" labelwidth="100" width="400">
+								<advancedbooleaneditor truename="promotionstorerestriction.positive.true" falsename="promotionstorerestriction.positive.false"/>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+-->
+
+	<!-- *** PromotionQuantityAndPricesRow *** -->
+
+	<type name="PromotionQuantityAndPricesRow" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.promotion.properties" mode="append">
+					<section name="section.promotion.prices">
+						<listlayout>
+							<attribute name="quantity" width="60"/>
+							<attribute name="prices" labelwidth="100">
+								<referencecollectioneditor editable="true" externalcreate="false" resortable="false" remove="true" create="true">
+									<itemlayout>
+										<attribute name="currency" width="60"/>
+										<attribute name="price" width="60"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<!-- *** Extend AbstractOrder *** -->
+
+	<type name="AbstractOrder" mode="append">
+		<organizer>
+			<editor>
+				<customtab name="tab.abstractorder.promotions" classname="de.hybris.platform.promotions.hmc.OrderPromotionsTabChip" mode="append" position="2" />
+				<tab name="payment_and_delivery">
+					<section name="payment" mode="append">
+						<table>
+							<tr>
+                        <td width="16px">
+                        </td>
+								<td>
+									<action classname="de.hybris.platform.promotions.hmc.OrderCartCalculateWithPromotionsAction" 
+										type="item"
+										name="action.ordercartwithpromotions.calculate"										
+                              toolbaricon="order_calculate"
+                              icon="images/icons/order_calculate_main.gif"
+                              showtoolbarlabel="true"
+                              hidebutton="true"
+									/>
+								</td>
+							</tr>
+						</table>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<!-- *** CREATE PROMOTION WIZARDS *** -->
+
+	<type name="CreateProductBOGOFPromotionWizard" mode="append">
+		<organizer>
+			<editor mode="append">
+				<!-- <exclude>
+					<exclusion attribute="owner" />
+				</exclude> -->
+				<tab name="tab.createpromotion.selectType" mode="append" position="0">
+					<section name="section.createnewproductwizard.one">
+						<listlayout>
+							<attribute name="code" labelwidth="100" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.createpromotion.details" mode="append" position="1">
+				</tab>
+				<tab name="tab.createpromotion.custom" mode="append" position="2">
+				</tab>
+				<tab name="tab.createpromotion.messages" mode="append" position="3">
+				</tab>
+				<tab name="tab.createpromotion.summary" mode="append" position="4">
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="Product" mode="append">
+		<organizer>
+			<editor>
+				<tab name="tab.product.categorysystem" mode="append">
+					<section name="section.product.productreferences">
+						<listlayout>
+							<attribute name="promotions"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+</configuration>
+

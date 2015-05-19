@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<alias name="defaultProcessDefinitionFactory" alias="processDefinitionFactory"/>
+	<bean id="defaultProcessDefinitionFactory" lazy-init="false" class="de.hybris.platform.processengine.definition.DefaultProcessDefinitionFactory">
+		<property name="definitionsCache" ref="processDefinitionsCache" />
+		<property name="xmlDefinitionsReader" ref="xmlProcessDefinitionsReader"/>
+	</bean>
+
+	<bean id="processDefinitionsCache" class="de.hybris.platform.processengine.definition.ProcessDefinitionsCache">
+		<property name="processDefinitionsProvider" ref="processDefinitionsProvider" />
+	</bean>
+
+	<bean id="xmlProcessDefinitionsReader" class="de.hybris.platform.processengine.definition.XMLProcessDefinitionsReader">
+		<constructor-arg ref="scriptingLanguagesService" />
+	</bean>
+	
+	<bean id="processDefinitionsProvider" class="de.hybris.platform.processengine.definition.ProcessDefinitionsProvider">
+		<constructor-arg ref="xmlProcessDefinitionsReader" />
+		<constructor-arg ref="flexibleSearchService" />
+	</bean>
+
+	<bean id="abstractAction" class="de.hybris.platform.processengine.action.AbstractAction" abstract="true">
+		<property name="modelService" ref="modelService"/>
+		<property name="processParameterHelper" ref="processParameterHelper"/>
+	</bean>
+
+	<bean id="noAction" class="de.hybris.platform.processengine.standard.NoAction" />
+	
+	<bean id="processengine.taskExecutionTransactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+		<property name="transactionManager" ref="txManager"/>
+	</bean>
+
+	<!-- ================ DAO Definitions ======================= -->
+	<alias name="defaultBusinessProcessServiceDao" alias="businessProcessServiceDao"/>
+	<bean id="defaultBusinessProcessServiceDao" class="de.hybris.platform.processengine.impl.DefaultBusinessProcessServiceDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<!-- ================ Helpers =============================== -->
+	<alias name="defaultProcessFactory" alias="processFactory"/>
+	<bean id="defaultProcessFactory" class="de.hybris.platform.processengine.helpers.impl.DefaultProcessFactory">
+		<property name="processDefinitionFactory" ref="processDefinitionFactory"/>
+	</bean>
+
+	<bean id="processParameterHelper" class="de.hybris.platform.processengine.helpers.impl.DefaultProcessParameterHelper">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<!-- ================ Service Definitions =================== -->
+
+	<alias name="defaultBusinessProcessService" alias="businessProcessService"/>
+	<bean id="defaultBusinessProcessService" class="de.hybris.platform.processengine.impl.DefaultBusinessProcessService" parent="abstractBusinessService">
+		<property name="processDefinitionFactory" ref="processDefinitionFactory" />
+		<property name="processFactory" ref="processFactory" />
+		<property name="processParameterHelper" ref="processParameterHelper"/>
+		<property name="taskService" ref="taskService"/>
+		<property name="businessProcessServiceDao" ref="businessProcessServiceDao"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="transactionTemplate">
+			<bean class="org.springframework.transaction.support.TransactionTemplate">
+				<property name="transactionManager" ref="txManager" />
+				<!-- just to make sure: -->
+				<property name="propagationBehaviorName" value="PROPAGATION_REQUIRED"/>
+				<property name="isolationLevelName" value="ISOLATION_READ_COMMITTED"/>
+				<property name="readOnly" value="false"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="taskRunner" class="de.hybris.platform.processengine.process.ProcessengineTaskRunner">
+		<property name="transactionTemplate" ref="processengine.taskExecutionTransactionTemplate"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="processDefinitionFactory" ref="processDefinitionFactory"/>
+		<property name="processParameterHelper" ref="processParameterHelper"/>
+	</bean>
+
+	<!-- ================ Action Framework Plugin =================== -->
+	<bean id="processActionExecutionStrategy" class="de.hybris.platform.processengine.actionstrategy.ProcessActionExecutionStrategy" parent="abstractBusinessService">
+		<property name="processService" ref="businessProcessService"/>
+		<property name="processCodeGenerator" ref="processCodeGenerator"/>
+	</bean>
+
+	<bean id="processengineTaskExecutionStrategy" class="de.hybris.platform.processengine.task.impl.ProcessengineTaskExecutionStrategy" parent="defaultTaskExecutionStrategy">
+		<property name="runnerClass" value="de.hybris.platform.processengine.process.ProcessengineTaskRunner"/>
+	</bean>
+
+</beans>

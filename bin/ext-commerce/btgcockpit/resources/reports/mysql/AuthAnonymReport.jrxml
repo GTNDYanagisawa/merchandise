@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AuthAnonymReport" language="groovy" pageWidth="600" pageHeight="400" whenNoDataType="AllSectionsNoDetail" columnWidth="600" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" resourceBundle="localization/btgcockpit-locales">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="aaDS">
+		<parameter name="segment" class="java.lang.String"/>
+		<parameter name="catalogVersion" class="java.lang.String">
+			<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[SELECT CASE {u.uid} WHEN 'anonymous' THEN 'legend.anonymous' ELSE 'legend.authenticated' END as USER, count({h.fulfilled}) AS FULFILLED
+FROM {BTGSegmentResult as h JOIN User as u ON {h.user}={u.PK} JOIN BTGSegment as s ON {s.PK}={h.segment} JOIN CatalogVersion as cv ON {cv.PK}={s.catalogVersion}}
+WHERE {s.uid}=$P{segment}  AND {h.forced}=false AND {cv.version}=$P{catalogVersion}
+GROUP BY USER]]>
+		</queryString>
+		<field name="USER" class="java.lang.String"/>
+		<field name="FULFILLED" class="java.lang.Long"/>
+	</subDataset>
+	<parameter name="segment" class="java.lang.String"/>
+	<parameter name="catalogVersion" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="50" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="600" height="50"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[new String($R{title.knownunknown}.getBytes("ISO-8859-1"), "UTF-8")]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<summary>
+		<band height="350" splitType="Stretch">
+			<pieChart>
+				<chart>
+					<reportElement x="0" y="0" width="600" height="350"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend position="Right"/>
+				</chart>
+				<pieDataset>
+					<dataset>
+						<datasetRun subDataset="aaDS">
+							<datasetParameter name="segment">
+								<datasetParameterExpression><![CDATA[$P{segment}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="catalogVersion">
+								<datasetParameterExpression><![CDATA[$P{catalogVersion}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+					</dataset>
+					<keyExpression><![CDATA[str($F{USER})]]></keyExpression>
+					<valueExpression><![CDATA[$F{FULFILLED}]]></valueExpression>
+				</pieDataset>
+				<piePlot labelFormat="{2}">
+					<plot/>
+					<itemLabel color="#000000" backgroundColor="#FFFFFF"/>
+				</piePlot>
+			</pieChart>
+		</band>
+	</summary>
+</jasperReport>

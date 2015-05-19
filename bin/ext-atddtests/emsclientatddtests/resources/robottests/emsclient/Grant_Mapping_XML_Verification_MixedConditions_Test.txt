@@ -1,0 +1,101 @@
+*** Settings ***
+Resource          EmsClient_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+
+
+*** Test Cases ***
+
+###############################################################################
+######### 
+# For KW "build ems grant data" parameters are:
+#
+# ${entitlementId} | ${NULL}         | ${NULL}     | ${NULL}             | ${NULL}       | ${NULL}          | ${NULL}       | ${NULL}      | ${NULL}
+#
+#  entitlementType | conditionString | maxQuantity | entitlementTimeUnit | timeUnitStart | timeUnitDuration | conditionPath | conditionGeo | dateCreatedAt
+###########
+
+### MIXED:
+# use KW call directly:
+#${entitlementId} =    Set Variable    entitlementId
+#${stringCondition} =    Set Variable    somestringCondition
+#${conditionPath} =    Set Variable    /source/source1
+#${conditionGeo} =    Set Variable    Germany/Bavaria/Munich
+#${timeUnit} =    Set Variable    day
+#${timeUnitStart} =    Set Variable    1
+#${timeUnitDuration} =    Set Variable    3
+#${dateCreatedAt} =    Set Variable    2012-07-11T03:21:15Z
+#${maxQuantity} =    Set Variable    5
+#${result}=    build ems grant data    ${entitlementId}    ${stringCondition}    ${maxQuantity}    ${timeUnit}    ${timeUnitStart}    ${timeUnitDuration}    ${conditionPath}    ${conditionGeo}    ${dateCreatedAt}
+###############################################################################
+
+Test_Grant_Mapping_XML_Verification_AllConditions
+	[Documentation]    Create entitlement with mixed conditions - allconditions: metered, string, path, geo, timeframe
+	${entitlementId} =    Set Variable    entitlementId
+	${stringCondition} =    Set Variable    someStringCondition or NOT
+	${conditionPath} =    Set Variable    /source/source1
+	${conditionGeo} =    Set Variable    Germany/Bavaria/Munich, A/B
+	${timeUnit} =    Set Variable    DAY
+	${timeUnitStart} =    Set Variable    1
+	${timeUnitDuration} =    Set Variable    3
+	${maxQuantity} =    Set Variable    5
+	${dateCreatedAt} =    Set Variable    2012-07-11T03:21:15Z
+	${entitlementData}=    build ems grant data    ${entitlementId}    ${stringCondition}    ${maxQuantity}    ${timeUnit}    ${timeUnitStart}    ${timeUnitDuration}    ${conditionPath}    ${conditionGeo}    ${dateCreatedAt}
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData>
+		<grantTime>${dateCreatedAt}</grantTime>
+		<userId/>
+		<grantSource/>
+		<grantSourceId/>
+		<entitlementType>entitlementId</entitlementType>
+		<status>ACTIVE</status>
+		<conditions>
+			<com.hybris.services.entitlements.condition.ConditionData>
+				<properties>
+					<entry>
+						<string>string</string>
+						<string>${stringCondition}</string>
+					</entry>
+				</properties>
+				<type>string</type>
+			</com.hybris.services.entitlements.condition.ConditionData>
+			<com.hybris.services.entitlements.condition.ConditionData>
+				<properties>
+					<entry>
+						<string>maxQuantity</string>
+						<string>${maxQuantity}</string>
+					</entry>
+				</properties>
+				<type>metered</type>
+			</com.hybris.services.entitlements.condition.ConditionData>
+			<com.hybris.services.entitlements.condition.ConditionData>
+				<properties>
+					<entry>
+						<string>geoPath</string>
+						<string>${conditionGeo}</string>
+					</entry>
+				</properties>
+				<type>geo</type>
+			</com.hybris.services.entitlements.condition.ConditionData>
+			<com.hybris.services.entitlements.condition.ConditionData>
+				<properties>
+					<entry>
+						<string>startTime</string>
+						<string>2012-07-11T03:21:15Z</string>
+					</entry>
+					<entry>
+						<string>endTime</string>
+						<string>2012-07-14T03:21:15Z</string>
+					</entry>
+				</properties>
+				<type>timeframe</type>
+			</com.hybris.services.entitlements.condition.ConditionData>
+			<com.hybris.services.entitlements.condition.ConditionData>
+				<properties>
+					<entry>
+						<string>path</string>
+						<string>${conditionPath}</string>
+					</entry>
+				</properties>
+				<type>path</type>
+			</com.hybris.services.entitlements.condition.ConditionData>
+		</conditions>
+	</com.hybris.services.entitlements.api.GrantData>"

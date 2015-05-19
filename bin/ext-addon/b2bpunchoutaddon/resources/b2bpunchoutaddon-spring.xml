@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<alias name="defaultPunchOutConfigurationService" alias="punchOutConfigurationService"/>
+	<bean id="defaultPunchOutConfigurationService" class="de.hybris.platform.b2bpunchoutaddon.services.impl.DefaultPunchOutConfigurationService">
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="cipherService" ref="cipherService"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="punchOutSessionService" ref="punchOutSessionService"/>
+		<property name="punchOutCredentialService" ref="punchOutCredentialService"/>
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService"/>
+		<property name="punchOutSessionUrlPath" value="${b2bpunchoutaddon.mapping.punchout.session.request}"/>
+	</bean>
+	
+	<alias name="b2bpunchoutaddonSupportedTransactionURLPaths" alias="supportedTransactionURLPaths"/>
+	<util:map id="b2bpunchoutaddonSupportedTransactionURLPaths">
+		<entry key="PunchOutSetUpRequest" value="${b2bpunchoutaddon.mapping.punchout.setup.request}"/>
+		<entry key="OrderRequest" value="${b2bpunchoutaddon.mapping.order.request}"/>
+	</util:map>
+
+	<util:properties id="b2bPunchOutAddOnProps">
+		<prop key="b2bpunchoutaddon.mapping.punchout.session.request">#{configurationService.configuration.getProperty('b2bpunchoutaddon.mapping.punchout.session.request')}</prop>
+		<prop key="b2bpunchoutaddon.mapping.punchout.setup.request">#{configurationService.configuration.getProperty('b2bpunchoutaddon.mapping.punchout.setup.request')}</prop>
+		<prop key="b2bpunchoutaddon.mapping.profile.request">#{configurationService.configuration.getProperty('b2bpunchoutaddon.mapping.profile.request')}</prop>
+		<prop key="b2bpunchoutaddon.mapping.action.placerequisition">#{configurationService.configuration.getProperty('b2bpunchoutaddon.mapping.action.placerequisition')}</prop>
+	</util:properties>
+
+    <bean id="b2bpunchoutinitialDataSystemSetup" class="de.hybris.platform.b2bpunchoutaddon.setup.InitialDataSystemSetup"  parent="abstractCoreSystemSetup"/>
+
+
+</beans>

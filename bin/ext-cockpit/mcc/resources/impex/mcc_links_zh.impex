@@ -1,0 +1,41 @@
+# Do not translate; Do not translate; To be translated; To be translated;
+# ImpEx for Importing Chinese Localisations for the MCC;;;;
+
+$lang=zh;;;;
+$catalogVersion=catalogVersion(catalog(id[default='Default']),version[default='Online'])[unique=true,default='Default:Online'];;;;
+
+UPDATE Catalog;id[unique=true];name[lang=$lang];;
+;Default;默认目录;;
+
+UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];languages(isocode)[mode=append];
+;Default;Online;$lang;
+;Default;Staged;$lang;
+
+UPDATE StaticLink;code[unique=true];title[lang=$lang];description[lang=$lang];
+;reportCockpit;报表 Cockpit;用于创建可完全定制和灵活显示的复杂报表。;
+;admincockpit;管理 Cockpit;hybris 系统管理和验证规则的处理。;
+;hmc2;用户与用户组管理 (hMC);灵活直观的用户管理。;
+;hmc;Management Console (hMC);管理您的 hybris 系统的所有核心组件。;
+;hac;Administration Console;提供实用工具的概要视图，便于系统管理。;
+;productcockpit;产品 Cockpit (PCM);采用直观的用户界面简化类别和产品管理，提高海量数据管理效率。;
+;importcockit;导入 Cockpit;使用直观的图形化导入工具，降低导入复杂度，合并来自多个库的产品数据。;
+#;mam;hybris DAM 服务器 (Celum);安装后可直接访问基于 Celum 的 hybris 数字资产管理 (DAM) 服务器;
+;hmc3;营销工具 (hMC);集中管理所有渠道的营销活动。;
+;hmc4;订单管理 (hMC);管理您的订单、付款和交货模式。;
+
+"#% if: !de.hybris.platform.jalo.extension.ExtensionManager.getInstance().isExtensionInstalled(""btgcockpit"")";;;;
+;cmscockpit;Web 内容管理模块 (WCMS);采用集成的 Web 内容管理界面创建、管理和发布在线及移动内容。;
+#% endif:;;;;
+
+"#% if: de.hybris.platform.jalo.extension.ExtensionManager.getInstance().isExtensionInstalled(""btgcockpit"")";;;;
+;cmscockpit;WCMS Cockpit（具有高级个性化功能）;用于维护网站的 Web 内容发布系统，拥有包括客户细分在内的高级个性化功能。;
+#% endif:;;;;
+
+;cscockpit;客户服务 Cockpit (CS);采用单一集成式用户界面提供客户服务和销售支持。;
+;printcockpit;Print Cockpit;（半）自动创建印刷出版物，并发布至 DTP 程序。;
+;webfrontends;Web 前端：;;
+;storetemplate;店铺模板;网店的前端实例（以源代码形式提供）。;
+;mobiletemplate;移动模板;移动前端。请注意，该模板包含 3 个不同的视觉演示，具体取决于所用手机的功能。版本包括：WAP 1、WAP 2 和 HTML5。请使用相应的移动设备查看。;
+
+;instore;InStore;hybris InStore 是一款平板设备专属的应用程序。零售商通过 NFC 和条形码扫描技术，可立即识别产品、获取丰富的产品信息并检查各店铺的供货情况，从而可以当场直接回复客户询盘。;
+;omscockpit;OMS Cockpit;hybris 订单管理服务可让客户配置一组供货公式、履约策略、订单拆分规则和工作流步骤，从而获得最适合其业务需求的 OmniCommerce 解决方案。;

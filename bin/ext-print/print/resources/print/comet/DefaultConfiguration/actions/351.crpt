@@ -1,0 +1,38 @@
+/*
+	Script           :	351
+	Author           :	RR
+	Description      :	Produktorientierter Rasteraufbau
+*/
+#include "internal/types.h"
+#include "internal/products.h"
+
+/*********************************************************************
+ MAIN script
+ Starts the processig of selected products
+*********************************************************************/
+int main ()
+{
+	Product pr;
+	ProductList prList;
+	int flags = 0;
+
+	// get list of selected items
+	prList = productlist::get( "selected" );
+
+	// Produktorientiert
+	flags += kIntersectionsAllowed;
+	// flags += kShowErrors;
+
+	// Rasterorientiert
+	// flags += kUseDefaultGrid;
+
+	productlist::build_list( prList, flags, 0, 0, 0, -1, layer::get_name(gFrame), "A-Mustervorlage", 1 );
+
+	// Cleanup
+	productlist::release( prList, DONT_DELETE_PRODUCTLIST_ELEMENTS );
+	// product::release( pr );		// There is no alloc() for this product, so dont call a release() here!
+
+	showmessage( "Finished grid based Buildup" );
+	return 0;
+}
+

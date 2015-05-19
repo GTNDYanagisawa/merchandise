@@ -1,0 +1,17 @@
+$solrValueRanges=solrValueRanges(name);
+$defaultSortOrder=defaultSortOrder;
+$document=document(code);
+$solrSearchConfig=solrSearchConfig(pageSize);
+$catalogVersions=catalogVersions(catalog(id[default='hwcatalog']),version[default='Online'])[unique=true,default='hwcatalog:Online']
+$solrValueRangeSets = solrValueRangeSets(name)
+$solrValueRangeSet = solrValueRangeSet(name)
+;;
+INSERT_UPDATE  Media;code[unique=true];catalogVersion(catalog(id),version)[allowNull=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];
+;RestrictionTestIndexConfig;;text/plain;RestrictionTestFacetConfig.xml;jar:/test/RestrictionTestFacetConfig.xml;
+;;
+
+INSERT_UPDATE  SolrSearchConfig;pageSize[unique=true];$defaultSortOrder;
+;20;score;
+;;
+INSERT_UPDATE  SolrFacetSearchConfig;name[unique=true];description;$document;$solrSearchConfig;currencies(isocode);languages(isocode);$catalogVersions;$solrValueRangeSets;
+;RestrictionTestIndexConfig;test SOLR configuration;RestrictionTestIndexConfig;20;EUR;en;hwcatalog:Online;;

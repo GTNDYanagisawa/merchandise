@@ -1,0 +1,47 @@
+﻿# Create the importcockpit catalog and related catalog version
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en]
+;importcockpit;importcockpit;importcockpit
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true]
+;importcockpit;default
+
+#$catalogVersion=catalogVersion(catalog(id),version)[default='importcockpit:default']
+# Set hMC configurations for user groups (see also CORE-4072);
+
+
+# Create the User/UserGroup Definitions
+INSERT_UPDATE UserGroup;UID[unique=true];groups(uid)[mode=append]
+;importcockpitgroup;employeegroup
+;importcockpitgroup;cockpitgroup
+
+INSERT_UPDATE UserGroup;UID[unique=true];locname[lang=de];locname[lang=en];description;groups(uid)
+;importcockpitgroup;Import Cockpit-Gruppe;Import Cockpit Group;;
+
+INSERT_UPDATE Employee;UID[unique=true];password;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid)
+;importmanager;1234;en;EUR;importcockpitgroup,admingroup;
+
+
+# Create the user rights assignments
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;importcockpitgroup;cockpitgroup,employeegroup;;;;;;;
+
+# import cockpit items
+# add stuff here
+;;;;ImportCockpitInputMedia;+;+;+;+;+
+;;;;ImportCockpitCronJob;+;+;+;+;+
+;;;;ImportCockpitMapping;+;+;+;+;+
+;;;;ImpExMedia;+;+;+;+;+
+;;;;CronJob;+;+;+;+;+
+
+# Access Rights for Products & Catalog;;;;;;;;;
+;;;;ItemSyncTimestamp;+;;;
+;;;;SyncItemJob;+;;;
+;;;;Type;+;;;
+;;;;Product;+;;;
+;;;;Category;+;;;
+;;;;VariantType;+;;;
+;;;;Catalog;+;;;
+;;;;CatalogVersion;+;;;
+
+$END_USERRIGHTS;;;;;

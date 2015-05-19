@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+
+	<!-- Configuration for extension b2bapprovalprocess -->
+
+	<explorertree>
+		<group name="b2bapprovalprocessgroup" description="group.b2bapprovalprocess.description">
+			<typeref type="B2BPermission" description="b2bapprovalprocessgroup.permissions.description"/>
+		</group>
+	</explorertree>
+
+	<!-- BEGIN B2B Permissions -->
+	<type name="B2BPermission" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" operator="contains"/>
+				<condition attribute="Unit" operator="contains"/>
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code"/>
+						<attribute name="Unit"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="Unit"/>
+					</listlayout>
+				</essentials>
+
+				<tab name="tab.b2bpermission.general" position="1">
+					<section name="section.b2bpermission.general.properties"
+					         position="1">
+						<listlayout>
+							<attribute name="code"/>
+							<attribute name="active"/>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.b2bcostcenter.hierarchy" position="2">
+					<section name="section.b2bpermission.hierarchy.descendants"
+					         position="1">
+						<listlayout>
+							<attribute name="customers"/>
+							<attribute name="usergroups"/>
+						</listlayout>
+					</section>
+
+				</tab>
+
+			</editor>
+		</organizer>
+
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code"/>
+				<attribute name="Unit"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	<!-- END B2B Permissions -->
+
+
+	<type name="B2BOrderThresholdTimespanPermission" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" operator="contains"/>
+				<condition attribute="currency" operator="contains"/>
+				<condition attribute="Unit" operator="contains"/>
+				<condition attribute="threshold" operator="contains"/>
+				<condition attribute="range" operator="contains"/>
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code" width="200"/>
+						<attribute name="currency" width="200"/>
+						<attribute name="threshold" width="200"/>
+						<attribute name="range" width="200"/>
+						<attribute name="Unit" width="200"/>
+					</itemlayout>
+				</listview>
+			</result>
+
+			<editor>
+				<tab name="tab.b2bpermission.general" position="1" mode="append">
+					<section name="section.b2bpermission.general.properties"
+					         position="1">
+						<listlayout>
+							<attribute name="code" width="200"/>
+							<attribute name="currency" width="200"/>
+							<attribute name="threshold" width="200"/>
+							<attribute name="range" width="200"/>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.b2bcostcenter.hierarchy" position="2">
+
+					<section name="section.b2bpermission.hierarchy.descendants"
+					         position="1">
+						<listlayout>
+							<attribute name="usergroups"/>
+						</listlayout>
+					</section>
+				</tab>
+
+
+			</editor>
+		</organizer>
+
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code"/>
+				<attribute name="currency"/>
+				<attribute name="threshold"/>
+				<attribute name="range"/>
+				<attribute name="Unit"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="B2BOrderThresholdPermission" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" operator="contains"/>
+				<condition attribute="currency" operator="contains"/>
+				<condition attribute="Unit" operator="contains"/>
+				<condition attribute="threshold" operator="contains"/>
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code" width="200"/>
+						<attribute name="currency" width="200"/>
+						<attribute name="threshold" width="200"/>
+						<attribute name="Unit" width="200"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.b2bpermission.general" position="1" mode="append">
+					<section name="section.b2bpermission.general.properties"
+					         position="1">
+						<listlayout>
+							<attribute name="threshold"/>
+							<attribute name="currency"/>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.b2bcostcenter.hierarchy" position="2">
+
+					<section name="section.b2bpermission.hierarchy.descendants"
+					         position="1">
+						<listlayout>
+							<attribute name="usergroups"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code"/>
+				<attribute name="currency"/>
+				<attribute name="threshold"/>
+				<attribute name="Unit"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="B2BComment" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" operator="contains"/>
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="code"/>
+					</listlayout>
+				</essentials>
+				<tab name="tab.b2bcomment.general" position="1" mode="append">
+					<section name="section.b2bcomment.properties" position="1">
+						<listlayout>
+							<attribute name="comment"/>
+							<attribute name="modifiedDate"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+</configuration>

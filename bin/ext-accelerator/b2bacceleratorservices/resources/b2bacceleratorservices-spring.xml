@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias name="defaultB2BDeliveryAddressesLookupStrategy" alias="b2bDeliveryAddressesLookupStrategy"/>
+	<bean name="defaultB2BDeliveryAddressesLookupStrategy"
+		class="de.hybris.platform.b2bacceleratorservices.strategies.impl.DefaultB2BDeliveryAddressesLookupStrategy"
+		>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="fallbackDeliveryAddressesLookupStrategy" ref="deliveryAddressesLookupStrategy"/>
+	</bean>
+
+	<alias alias="b2bDeliveryService" name="defaultB2BDeliveryService"/>
+	<bean id="defaultB2BDeliveryService" parent="deliveryService">
+		<property name="deliveryAddressesLookupStrategy" ref="b2bDeliveryAddressesLookupStrategy"/>
+	</bean>
+
+	<alias name="defaultB2BCommerceCheckoutService" alias="b2bCommerceCheckoutService"/>
+	<bean name="defaultB2BCommerceCheckoutService" parent="defaultCommerceCheckoutService">
+		<property name="orderService" ref="b2bOrderService"/>
+		<property name="deliveryService" ref="b2bDeliveryService"/>
+		<property name="commercePlaceOrderStrategy" ref="b2bCommercePlaceOrderStrategy"/>
+		<property name="commerceDeliveryAddressStrategy" ref="b2bCommerceDeliveryAddressStrategy"/>
+	</bean>
+	
+	<alias name="defaultB2BCommercePlaceOrderStrategy" alias="b2bCommercePlaceOrderStrategy"/>
+	<bean name="defaultB2BCommercePlaceOrderStrategy" parent="defaultCommercePlaceOrderStrategy">
+		<property name="orderService" ref="b2bOrderService"/>
+	</bean>
+	 
+	<alias name="defaultB2BCommerceDeliveryAddressStrategy" alias="b2bCommerceDeliveryAddressStrategy"/>
+	<bean name="defaultB2BCommerceDeliveryAddressStrategy" parent="defaultCommerceDeliveryAddressStrategy">
+		<property name="deliveryService" ref="b2bDeliveryService"/>
+	</bean>
+
+	<bean id="defaultB2BQuoteEvaluationStrategy"
+		class="de.hybris.platform.b2b.strategies.impl.DefaultB2BQuoteEvaluationStrategy"
+		>
+		<property name="quoteLimit" value="10000" />
+		<property name="quoteLimitCurrency" value="USD" />
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="b2bCurrencyConversionService" ref="b2bCurrencyConversionService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<alias name="defaultAcceleratorB2BApprovalBusinessProcessStrategy" alias="b2bApprovalBusinessProcessStrategy" />
+	<bean id="defaultAcceleratorB2BApprovalBusinessProcessStrategy" class="de.hybris.platform.b2b.strategies.impl.DefaultB2BApprovalBusinessProcessStrategy" parent="defaultB2BApprovalBusinessProcessStrategy" >
+		<property name="processCode" value="accApproval"/>
+		<property name="processName" value="CREATED"/>
+	</bean>
+	
+	<alias alias="dynamicAttributesOrderStatusDisplay" name ="b2bacceleratorDynamicAttributesOrderStatusDisplayByMap"/>
+	<bean id="b2bacceleratorDynamicAttributesOrderStatusDisplayByMap" parent="acceleratorDynamicAttributesOrderStatusDisplayByMap">
+		<property name="statusDisplayMap">
+			<map merge="true">
+				<entry key="PENDING_APPROVAL" value="pending.approval"/>
+				<entry key="PENDING_APPROVAL_FROM_MERCHANT" value="pending.merchant.approval"/>
+				<entry key="PENDING_QUOTE" value="pending.quote"/>
+				<entry key="APPROVED_QUOTE" value="quote.approved"/>
+				<entry key="REJECTED_QUOTE" value="quote.rejected"/>
+				<entry key="APPROVED" value="approved"/>
+				<entry key="REJECTED" value="rejected"/>
+				<entry key="APPROVED_BY_MERCHANT" value="merchant.approved"/>
+				<entry key="REJECTED_BY_MERCHANT" value="merchant.rejected"/>
+				<entry key="ASSIGNED_TO_ADMIN" value="assigned.admin"/>
+				<entry key="B2B_PROCESSING_ERROR" value="error"/>
+			</map>
+		</property>
+	</bean>
+
+
+	<bean id="b2bAcceleratorCartToOrderJob" class="de.hybris.platform.b2bacceleratorservices.order.impl.B2BAcceleratorCartToOrderJob"  parent="abstractJobPerformable">
+		<property name="businessProcessService" ref="businessProcessService"/>
+		<property name="triggerService" ref="triggerService"/>
+		<property name="i18NService" ref="i18NService"/>
+	</bean>
+
+	<alias name="defaultB2BAcceleratorScheduleOrderService" alias="b2bAcceleratorScheduleOrderService"/>
+
+	<bean name="defaultB2BAcceleratorScheduleOrderService"
+		class="de.hybris.platform.b2bacceleratorservices.orderscheduling.impl.B2BAcceleratorScheduleOrderService"
+		parent="defaultScheduleOrderServiceImpl"  >
+		<property name="cartToOrderJobBeanId" value="b2bAcceleratorCartToOrderJob"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="keyGenerator" ref="orderCodeGenerator"/>
+		<property name="triggerService" ref="triggerService"/>
+		<property name="i18NService" ref="i18NService"/>
+	 </bean>
+
+	<alias name="b2bAcceleratorProcessContextResolutionStrategy" alias="b2bProcessContextResolutionStrategy"/>
+	<bean name="b2bAcceleratorProcessContextResolutionStrategy"
+		class="de.hybris.platform.b2bacceleratorservices.process.strategies.impl.B2BAcceleratorProcessContextResolutionStrategy"
+		parent="defaultProcessContextResolutionStrategy"/>
+
+
+	<bean id="b2bAcceleratorCartToOrderCronJobModelDao"
+		class="de.hybris.platform.b2bacceleratorservices.dao.impl.DefaultB2BAcceleratorCartToOrderCronJobModelDao"
+		>
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService" />
+	</bean>
+
+
+	<alias alias="customerEmailResolutionService" name="b2bCustomerEmailResolutionService"/>
+	<bean id="b2bCustomerEmailResolutionService" class="de.hybris.platform.b2bacceleratorservices.customer.impl.B2BCustomerEmailResolutionService" >
+		<property name="defaultCustomerEmailResolutionService" ref="defaultCustomerEmailResolutionService"/>
+	</bean>
+
+
+
+	<alias name="defaultB2BCustomerAccountService" alias="b2bCustomerAccountService"/>
+
+	<bean id="defaultB2BCustomerAccountService" class="de.hybris.platform.b2bacceleratorservices.customer.impl.DefaultB2BCustomerAccountService"
+		parent="defaultCustomerAccountService">
+		<property name="b2bAcceleratorCartToOrderCronJobModelDao" ref="b2bAcceleratorCartToOrderCronJobModelDao"/>
+	</bean>
+
+	<alias name="defaultPagedB2BWorkflowActionDao" alias="pagedB2BWorkflowActionDao"/>
+	<bean name="defaultPagedB2BWorkflowActionDao"
+		class="de.hybris.platform.b2bacceleratorservices.dao.impl.DefaultPagedB2BWorkflowActionDao"
+		>
+		<constructor-arg value="WorkflowAction" />
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+    <alias name="defaultPagedB2BProductDao" alias="pagedB2BProductDao"/>
+    <bean name="defaultPagedB2BProductDao"
+          class="de.hybris.platform.b2bacceleratorservices.dao.impl.DefaultPagedB2BProductDao">
+        <constructor-arg value="Product" />
+        <property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+    </bean>
+
+	<alias name="defaultPagedB2BCustomerDao" alias="pagedB2BCustomerDao"/>
+	<bean name="defaultPagedB2BCustomerDao"
+		class="de.hybris.platform.b2bacceleratorservices.dao.impl.DefaultPagedB2BCustomerDao"
+		>
+		<constructor-arg value="B2BCustomer" />
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultPagedB2BPermissionDao" alias="pagedB2BPermissionDao"/>
+	<bean name="defaultPagedB2BPermissionDao"
+		class="de.hybris.platform.b2bacceleratorservices.dao.impl.DefaultPagedB2BPermissionDao"
+		>
+		<constructor-arg value="B2BPermission" />
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultPagedB2BUserGroupDao" alias="pagedB2BUserGroupDao"/>
+	<bean name="defaultPagedB2BUserGroupDao"
+		class="de.hybris.platform.b2bacceleratorservices.dao.impl.DefaultPagedB2BUserGroupDao"
+		>
+		<constructor-arg value="B2BUserGroup" />
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultB2BCommerceCartService" alias="b2bCommerceCartService"/>
+	<bean name="defaultB2BCommerceCartService" class="de.hybris.platform.b2bacceleratorservices.order.impl.DefaultB2BCommerceCartService"
+	      parent="defaultCommerceCartService">
+		<property name="guidKeyGenerator" ref="guidKeyGenerator"/>
+		<property name="calculationService" ref="calculationService" />
+	</bean>
+
+
+	<alias name="defaultPagedB2BCostCenterDao" alias="pagedB2BCostCenterDao"/>
+	<bean name="defaultPagedB2BCostCenterDao"
+		class="de.hybris.platform.b2bacceleratorservices.dao.impl.DefaultPagedB2BCostCenterDao"
+		>
+		<constructor-arg value="B2BCostCenter" />
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+	
+	<alias name="defaultPagedB2BBudgetDao" alias="pagedB2BBudgetDao"/>
+	<bean name="defaultPagedB2BBudgetDao"
+		class="de.hybris.platform.b2bacceleratorservices.dao.impl.DefaultPagedB2BBudgetDao"
+		>
+		<constructor-arg value="B2BBudget" />
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+
+	<alias name="defaultB2BUserGroupsLookUpStrategy" alias="b2bUserGroupsLookUpStrategy"/>
+	<bean name="defaultB2BUserGroupsLookUpStrategy"
+		class="de.hybris.platform.b2bacceleratorservices.strategies.impl.DefaultB2BUserGroupsLookUpStrategy"
+		>
+		<property name="groups">
+			<list>
+				<value>b2badmingroup</value>
+				<value>b2bcustomergroup</value>
+				<value>b2bmanagergroup</value>
+				<value>b2bapprovergroup</value>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultB2BApprovalProcessLookUpStrategy" alias="b2bApprovalProcessLookUpStrategy"/>
+	<bean name="defaultB2BApprovalProcessLookUpStrategy"
+		class="de.hybris.platform.b2bacceleratorservices.strategies.impl.DefaultB2BApprovalProcessLookUpStrategy"
+		>
+		<property name="processes">
+			<map>
+				<entry key="accApproval" value="Escalation Approval with Merchant Check" />
+			</map>
+		</property>
+	</bean>
+
+	<alias name="defaultB2BGroupCycleValidator" alias="b2bGroupCycleValidator"/>
+	<bean name="defaultB2BGroupCycleValidator"
+		class="de.hybris.platform.b2bacceleratorservices.company.impl.DefaultB2BGroupCycleValidator"
+		>
+	</bean>
+
+	<alias name="defaultCompanyB2BCommerceService" alias="companyB2BCommerceService"/>
+	<bean name="defaultCompanyB2BCommerceService"
+		class="de.hybris.platform.b2bacceleratorservices.company.impl.DefaultCompanyB2BCommerceService">
+		<property name="b2BApproverService" ref="b2bApproverService"/>
+		<property name="b2BUnitService" ref="b2bUnitService"/>
+		<property name="pagedB2BCustomerDao" ref="pagedB2BCustomerDao"/>
+		<property name="pagedB2BBudgetDao" ref="pagedB2BBudgetDao"/>
+		<property name="userService" ref="userService"/>
+		<property name="b2BCustomerService" ref="b2bCustomerService"/>
+		<property name="pagedB2BCostCenterDao" ref="pagedB2BCostCenterDao"/>
+		<property name="b2BCostCenterService" ref="b2bCostCenterService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="b2BBudgetService" ref="b2BBudgetService"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+		<property name="pagedB2BPermissionDao" ref="pagedB2BPermissionDao"/>
+		<property name="b2BPermissionService" ref="b2bPermissionService"/>
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService"/>
+		<property name="pagedB2BUserGroupDao" ref="pagedB2BUserGroupDao"/>
+		<property name="b2BGroupCycleValidator" ref="b2bGroupCycleValidator"/>
+		<property name="b2BApprovalProcessLookUpStrategy" ref="b2bApprovalProcessLookUpStrategy"/>
+		<property name="businessProcessService" ref="businessProcessService"/>
+	</bean>
+
+	<alias name="defaultB2BCommerceBudgetService" alias="b2bCommerceBudgetService"/>
+	<bean name="defaultB2BCommerceBudgetService"
+		class="de.hybris.platform.b2bacceleratorservices.company.impl.DefaultB2BCommerceBudgetService"
+
+		parent="companyB2BCommerceService">
+	</bean>
+
+	<alias name="defaultB2BCommerceCostCenterService" alias="b2bCommerceCostCenterService" />
+	<bean name="defaultB2BCommerceCostCenterService"
+		class="de.hybris.platform.b2bacceleratorservices.company.impl.DefaultB2BCommerceCostCenterService"
+		 parent="companyB2BCommerceService">
+	</bean>
+
+	<alias name="defaultB2BCommercePermissionService" alias="b2bCommercePermissionService" />
+	<bean name="defaultB2BCommercePermissionService"
+		class="de.hybris.platform.b2bacceleratorservices.company.impl.DefaultB2BCommercePermissionService"
+		 parent="companyB2BCommerceService">
+	</bean>
+
+	<alias name="defaultB2BCommerceUnitService" alias="b2bCommerceUnitService" />
+	<bean name="defaultB2BCommerceUnitService"
+		class="de.hybris.platform.b2bacceleratorservices.company.impl.DefaultB2BCommerceUnitService"
+		 parent="companyB2BCommerceService">
+	</bean>
+
+	<alias name="defaultB2BCommerceUserService" alias="b2bCommerceUserService" />
+	<bean name="defaultB2BCommerceUserService"
+		class="de.hybris.platform.b2bacceleratorservices.company.impl.DefaultB2BCommerceUserService"
+		 parent="companyB2BCommerceService">
+	</bean>
+	
+	<alias name="defaultB2BCommerceB2BUserGroupService" alias="b2bCommerceB2BUserGroupService" />
+	<bean name="defaultB2BCommerceB2BUserGroupService"
+		class="de.hybris.platform.b2bacceleratorservices.company.impl.DefaultB2BCommerceB2BUserGroupService"
+		 parent="companyB2BCommerceService">
+	</bean>
+
+	<alias name="defaultB2BProductService" alias="b2bProductService"/>
+	<bean name="defaultB2BProductService"
+		  class="de.hybris.platform.b2bacceleratorservices.product.impl.DefaultB2BProductService">
+		<property name="pagedB2BProductDao" ref="pagedB2BProductDao"/>
+	</bean>
+
+	<bean id="numberOfOrdersAboveAmountRelativeDateOperandValueProvider"
+		class="de.hybris.platform.b2bacceleratorservices.btg.condition.operand.valueproviders.NumberOfOrdersAboveAmountRelativeDateOperandValueProvider"
+		 parent="abstractOrderOperandValueProvider" />
+
+	<bean id="organizationUIDOfUserOperandValueProvider"
+		class="de.hybris.platform.b2bacceleratorservices.btg.condition.operand.valueproviders.OrganizationUIDOfUserOperandValueProvider"
+		 parent="abstractOrderOperandValueProvider">
+		<property name="b2bUnitService" ref="b2bUnitService" />
+	</bean>
+
+	<bean id="organizationUIDsOperandValueProvider"
+		class="de.hybris.platform.b2bacceleratorservices.btg.condition.operand.valueproviders.OrganizationUIDsOperandValueProvider"
+		 parent="abstractOrderOperandValueProvider" />
+
+	<bean id="assignOrganizationToGroup"
+		class="de.hybris.platform.b2bacceleratorservices.btg.outputaction.impl.AssignOrganizationToGroup" >
+		<property name="modelService" ref="modelService"/>
+		<property name="b2BUnitService" ref="b2bUnitService"/>
+	</bean>
+
+	<bean id="unassignOrganizationToGroup"
+		class="de.hybris.platform.b2bacceleratorservices.btg.outputaction.impl.UnAssignOrganizationToGroup"
+		>
+		<property name="modelService" ref="modelService" />
+		<property name="b2BUnitService" ref="b2bUnitService" />
+	</bean>
+	
+	<alias name="defaultB2BFlexibleSearchProductSearchService" alias="b2bFlexibleSearchProductSearchService"/>
+	<bean id="defaultB2BFlexibleSearchProductSearchService"
+		  class="de.hybris.platform.b2bacceleratorservices.search.impl.DefaultB2BFlexibleSearchProductSearchService">
+		<property name="b2BProductService" ref="b2bProductService"/>
+	</bean>
+
+</beans>

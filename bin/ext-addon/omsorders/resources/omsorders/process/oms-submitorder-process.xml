@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2013 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+
+<process xmlns="http://www.hybris.de/xsd/processdefinition" start="omsCheckOrder" name="oms-submitorder-process"
+		 processClass="de.hybris.platform.orderprocessing.model.OrderProcessModel">
+
+	<action id="omsCheckOrder" bean="omsCheckOrderAction">
+		<transition name="OK" to="checkTransactionReviewStatus"/>
+		<transition name="NOK" to="error"/>
+	</action>
+
+	<action id="checkTransactionReviewStatus" bean="omsCheckTransactionReviewStatusAction">
+		<transition name="OK" to="createOmsOrder"/>
+		<transition name="NOK" to="cancelOrder"/>
+		<transition name="WAIT" to="waitForReviewDecision"/>
+	</action>
+
+	<wait id="waitForReviewDecision" then="checkTransactionReviewStatus" prependProcessCode="false">
+		<event>${process.order.code}_ReviewDecision</event>
+	</wait>
+
+	<action id="createOmsOrder" bean="omsCreateOmsOrderAction">
+		<transition name="OK" to="checkOmsSourcing"/>
+		<transition name="NOK" to="failed"/>
+	</action>
+
+	<action id="checkOmsSourcing" bean="omsOrderSourcingCheckAction">
+		<transition name="OK" to="sendOrderPlacedNotification"/>
+	</action>
+
+	<action id="sendOrderPlacedNotification" bean="omsSendOrderPlacedNotificationAction">
+		<transition name="OK" to="success"/>
+	</action>
+
+	<action id="cancelOrder" bean="omsCancelWholeOrderAction">
+		<transition name="OK" to="failed"/>
+	</action>
+
+	<end id="error" state="ERROR">All went wrong.</end>
+	<end id="failed" state="FAILED">Order not placed.</end>
+	<end id="success" state="SUCCEEDED">Order placed.</end>
+
+</process>

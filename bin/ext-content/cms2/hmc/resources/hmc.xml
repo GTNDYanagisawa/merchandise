@@ -1,0 +1,1098 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only
+		in accordance with the terms of the license agreement you entered into with hybris.
+	-->
+<configuration xmlns="hybris.de/schemas/hmc/generic" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+	<explorertree>
+		<group name="cms2" description="typeref.cms.description">
+			<typeref type="CMSSite" description="typeref.cmssite.description" />
+			<typeref type="CMSPageType" description="typeref.cmspagetype.description" />
+			<typeref type="PageTemplate" description="typeref.pagetemplate.description" />
+			<typeref type="ContentSlotForTemplate" description="typeref.contentslotfortemplate.description" />
+			<typeref type="AbstractPage" description="typeref.abstractpage.description" />
+			<typeref type="ContentSlot" description="typeref.contentslot.description" />
+			<typeref type="ContentSlotForPage" description="typeref.contentslotforpage.description" />
+			<typeref type="SimpleCMSComponent" description="typeref.simplecmscomponent.description" />
+			<typeref type="ComponentTypeGroup" description="typeref.componenttypegroup.description"/>
+			<typeref type="AbstractCMSComponentContainer" description="typeref.abstractcmscomponentcontainer.description" />
+			<typeref type="RestrictionType" description="typeref.restrictiontype.description"/>
+			<typeref type="AbstractRestriction" description="typeref.abstractrestriction.description" />
+			<typeref type="CMSNavigationNode" description="typeref.cmsnavigationnode.description" />
+		</group>
+	</explorertree>
+	
+	
+	<type name="ComponentTypeGroup" mode="append">
+		<organizer mode="append">
+			<search mode="replace" autoperform="true">
+				<condition attribute="code" operator="contains" />
+				<condition attribute="description" operator="contains" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="code" />
+						<attribute name="description" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="properties">
+						<listlayout>
+							<text name="txt.componenttypegroup.general" />
+							<attribute name="code" />
+							<attribute name="description" />
+							<attribute name="cmsComponentTypes" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+		<type name="ContentSlotName" mode="append">
+		<organizer mode="append">
+			<search mode="replace" autoperform="true">
+				<condition attribute="name" operator="contains" />
+				<condition attribute="compTypeGroup" operator="contains" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="name" />
+						<attribute name="compTypeGroup" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="properties">
+						<listlayout>
+							<text name="txt.contentslotname.general" />
+							<attribute name="name" />
+							<attribute name="compTypeGroup" />
+							<attribute name="validComponentTypes" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="name" mode="replace">
+			<itemlayout>
+				<attribute name="name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="CMSPageType" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+            <tab name="common" mode="append">
+					<section name="common">
+						<listlayout>
+							<attribute name="templates" />
+							<attribute name="previewDisabled" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.pagetypes.applicablerestrictiontypes" mode="append" position="1">
+					<section name="section.pagetypes.applicablerestricitiontypes" mode="append">
+						<listlayout>
+							<attribute name="restrictionTypes" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CMSSite" mode="append" icon="images/cms2/cmssite.gif">
+		<organizer mode="append">
+			<search mode="replace" autoperform="true">
+				<condition attribute="uid" operator="contains" />
+				<condition attribute="name" operator="contains" />
+				<condition attribute="contentCatalogs" operator="equal" />
+				<condition attribute="active" operator="yes" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="uid" width="100" />
+						<attribute name="name" width="200" />
+						<attribute name="active" width="50" />
+						<attribute name="contentCatalogs" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials>
+					<listlayout>
+						<attribute name="uid" />
+						<attribute name="name" />
+						<attribute name="active" />
+					</listlayout>
+				</essentials>
+				<tab name="properties" position="0">
+					<section name="section.cmssite.contentcatalogs">
+						<listlayout>
+							<text name="txt.cmssite.contentcatalogs" />
+							<attribute name="contentcatalogs" width="300" />
+						</listlayout>
+					</section>
+					<section name="section.basesite.basestores">
+						<listlayout>
+							<text name="txt.cmssite.catalog.default" />
+							<attribute name="defaultCatalog" />
+						</listlayout>
+					</section>
+					<section name="section.cmssite.config">
+						<listlayout>
+							<text name="txt.cmssite.startingpage" />
+							<attribute name="startingPage" />
+							<text name="txt.cmssite.redirect" />
+							<attribute name="redirectURL" />
+							<text name="txt.cmssite.urlpatterns" />
+							<attribute name="urlPatterns" width="300" />
+							<attribute name="productUrlPattern" width="300" />
+						</listlayout>
+					</section>
+					<section name="section.cmssite.active">
+						<listlayout>
+							<text name="txt.cmssite.active" />
+							<attribute name="activeFrom" />
+							<attribute name="activeUntil" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.wcms.cockpit.properties" position="1">
+					<section name="section.cms.component.configuration" position="0">
+						<listlayout>
+							<text name="txt.CMSSite.validComponentTypes" />
+							<attribute name="validComponentTypes" />						
+						</listlayout>
+					</section>
+					<section name="section.wcms.cockpit.preview.information" position="1">
+						<listlayout>
+							<attribute name="openPreviewInNewTab" />
+							<attribute name="previewURL" />
+							<attribute name="defaultPreviewCatalog" />
+							<attribute name="defaultPreviewCategory" />
+							<attribute name="defaultPreviewProduct" />
+							<attribute name="defaultPreviewProduct" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="administration" mode="append">
+					<section name="section.cms.admin" mode="append">
+						<listlayout>
+							<attribute name="startPageLabel" />
+							<attribute name="classificationCatalogs" />
+							<attribute name="productCatalogs" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="name" mode="replace">
+			<itemlayout>
+				<attribute name="name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="CMSItem" mode="append">
+		<organizer mode="append">
+			<search mode="replace" autoperform="true">
+				<condition attribute="uid" operator="contains" />
+				<condition attribute="name" operator="contains" />
+				<condition attribute="catalogVersion" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="uid" width="100" />
+						<attribute name="name" width="200" />
+						<attribute name="catalogVersion" width="300" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials>
+					<listlayout>
+						<attribute name="uid" />
+						<attribute name="name" />
+						<attribute name="catalogVersion" />
+					</listlayout>
+				</essentials>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="name" mode="replace">
+			<itemlayout>
+				<attribute name="name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="ContentSlot" mode="append" icon="images/cms2/contentslot.gif">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="active" operator="yes" mode="append" />
+			</search>
+			<result defaultview="list" mode="append">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="active" width="50" mode="append" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="section.contentslot.active">
+						<listlayout>
+							<text name="txt.contentslot.active" />
+							<attribute name="active" />
+							<attribute name="activeFrom" />
+							<attribute name="activeUntil" />
+						</listlayout>
+					</section>
+					<section name="section.contentslot.components">
+						<listlayout>
+							<text name="txt.contentslot.components" />
+							<attribute name="cmsComponents">
+								<referencecollectioneditor resortable="true" remove="true" create="true" add="true" autosave="true">
+									<itemlayout>
+										<attribute name="name" width="300" />
+										<attribute name="type" width="200" />
+										<attribute name="visible" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="administration" mode="append">
+					<section name="section.cms.admin" mode="append">
+						<listlayout>
+							<attribute name="currentPosition" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="AbstractCMSComponent" mode="append">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="visible" operator="yes" mode="append" />
+			</search>
+			<result defaultview="list" mode="append">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="visible" width="50" mode="append" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="section.cmscomponent.visibility">
+						<listlayout>
+							<attribute name="visible" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.cms.restrictions" position="1">
+					<section name="section.cms.restrictions">
+						<listlayout>
+							<attribute name="restrictions">
+								<referencecollectioneditor create="true" add="true" remove="true" editable="true" resortable="true">
+									<itemeditorlayout>
+										<attribute name="uid" width="50" />
+										<attribute name="name" width="300" />
+										<attribute name="type" width="200" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="onlyOneRestrictionMustApply" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="administration" mode="append">
+					<section name="section.cms.admin" mode="append">
+						<listlayout>
+							<attribute name="container" />
+							<attribute name="type" />
+							<attribute name="typeCode" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="SimpleCMSComponent" mode="append" icon="images/cms2/simplecomponent.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.components.contentslots" position="1">
+					<section name="section.components.contentslots">
+						<listlayout>
+							<text name="txt.components.contentslots" />
+							<attribute name="slots">
+								<referencecollectioneditor create="true" add="false" remove="true" autosave="true" resortable="true"
+									editable="true">
+									<itemlayout>
+										<attribute name="uid" />
+										<attribute name="name" />
+										<attribute name="active" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="AbstractCMSComponentContainer" mode="append" icon="images/cms2/componentcontainer.gif">
+		<organizer mode="append">
+			<result defaultview="list" mode="append">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="simpleCMSComponents" mode="append" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="section.componentcontainer.components">
+						<listlayout>
+							<text name="txt.componentcontainer.components" />
+							<attribute name="simpleCMSComponents">
+								<referencecollectioneditor resortable="true" remove="true" create="true" add="true" autosave="true">
+									<itemlayout>
+										<attribute name="name" width="300" />
+										<attribute name="type" width="200" />
+										<attribute name="visible" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="administration" mode="append">
+					<section name="section.cms.admin" mode="append">
+						<listlayout>
+							<attribute name="currentCMSComponents" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="name" mode="replace">
+			<itemlayout>
+				<attribute name="name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="ABTestCMSComponentContainer" mode="append" icon="images/cms2/contentelementabtest.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" mode="append">
+					<section name="section.abtestcontainer.scope" mode="append">
+						<listlayout>
+							<attribute name="scope" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="PageTemplate" mode="append" icon="images/cms2/pagetemplate.gif">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="active" mode="append" operator="yes" />
+			</search>
+			<result defaultview="list" mode="append">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="active" width="50" mode="append" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials mode="append">
+					<listlayout mode="append">
+						<attribute name="active" mode="append" />
+					</listlayout>
+				</essentials>
+				<tab name="properties" position="0">
+					<section name="section.pagetemplate.contentslots">
+						<listlayout>
+							<text name="text.pagetemplate.availableslots" />
+							<attribute name="availableContentSlots" labelwidth="100">
+								<referencecollectioneditor create="true" add="false" remove="true" autosave="true" resortable="true" presetattribute="template" 
+									editable="true">
+									<itemlayout>
+										<attribute name="name" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<text name="text.pagetemplate.contentslots" />
+							<attribute name="contentSlots" labelwidth="100">
+								<referencecollectioneditor create="false" add="false" remove="false" autosave="false"
+									resortable="false" editable="false">
+									<itemlayout>
+										<attribute name="position" width="100" />
+										<attribute name="contentSlot" width="250" />
+										<attribute name="allowOverwrite" width="300" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.wcms.cockpit.properties" position="1">
+					<section name="section.cms.admin">
+						<listlayout>
+							<attribute name="velocityTemplate">
+								<textareaeditor rows="10" cols="200" expanded="true" />
+							</attribute>
+						</listlayout>
+					</section>
+					<section name="section.cms.restrictions">
+						<listlayout>
+							<attribute name="restrictedPageTypes" />
+						</listlayout>
+					</section>
+					<section name="section.cms.pagetemplate.previewicon">
+						<listlayout>
+							<attribute name="previewIcon" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CMSRelation" mode="append">
+		<organizer mode="append">
+			<search mode="replace" autoperform="true">
+				<condition attribute="uid" operator="contains" />
+				<condition attribute="catalogVersion" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="uid" width="100" />
+						<attribute name="catalogVersion" width="300" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials>
+					<listlayout>
+						<attribute name="uid" />
+						<attribute name="catalogVersion" />
+					</listlayout>
+				</essentials>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="uid" mode="replace">
+			<itemlayout>
+				<attribute name="uid" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="ContentSlotForTemplate" mode="append" icon="images/cms2/contentslotfortemplate.gif">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="position" mode="append" operator="in" />
+				<condition attribute="pageTemplate" mode="append" operator="in" />
+				<condition attribute="contentSlot" mode="append" operator="in" />
+			</search>
+			<result defaultview="list" mode="append">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="position" width="100" mode="append" />
+						<attribute name="pageTemplate" width="200" mode="append" />
+						<attribute name="contentSlot" width="200" mode="append" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="properties">
+						<listlayout>
+							<text name="text.slotfortemplate.allowoverwrite" />
+							<attribute name="allowOverwrite" />
+							<attribute name="position" />
+							<attribute name="pageTemplate" />
+							<attribute name="contentSlot" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ContentSlotForPage" mode="append" icon="images/cms2/contentslotforpage.gif">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="position" mode="append" operator="in" />
+				<condition attribute="page" mode="append" operator="in" />
+				<condition attribute="contentSlot" mode="append" operator="in" />
+			</search>
+			<result defaultview="list" mode="append">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="position" width="100" mode="append" />
+						<attribute name="page" width="200" mode="append" />
+						<attribute name="contentSlot" width="200" mode="append" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="properties">
+						<listlayout>
+							<attribute name="position" />
+							<attribute name="page" />
+							<attribute name="contentSlot" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="AbstractPage" mode="append" icon="images/cms2/abstractpage.gif">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="masterTemplate" mode="append" />
+			</search>
+			<result defaultview="list" mode="append">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="masterTemplate" width="200" />
+						<attribute name="defaultPage" width="50" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials mode="append">
+					<listlayout>
+						<attribute name="approvalStatus" />
+					</listlayout>
+				</essentials>
+				<tab name="properties" position="0">
+					<section name="properties">
+						<listlayout>
+							<text name="text.page.title" />
+							<attribute name="title" />
+							<attribute name="masterTemplate" />
+							<text name="text.page.defaultpage" />
+							<attribute name="defaultPage" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.page.contentslots" position="1">
+					<section name="section.page.contentslots.configuration">
+						<listlayout>
+							<text name="text.page.availablecontentslots" />
+							<attribute name="availableContentSlots" />
+							<text name="text.page.missingcontentslots" />
+							<attribute name="missingContentSlots" />
+						</listlayout>
+					</section>
+					<section name="section.page.contentslots">
+						<listlayout>
+							<text name="text.page.contentslots" />
+							<attribute name="contentSlots">
+								<referencecollectioneditor create="true" add="false" remove="true" editable="true" resortable="false">
+									<itemeditorlayout>
+										<attribute name="position" width="100" />
+										<attribute name="contentSlot" width="200" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.cms.restrictions" position="2">
+					<section name="section.cms.restrictions">
+						<listlayout>
+							<text name="text.page.restrictions" />
+							<attribute name="restrictions">
+								<referencecollectioneditor create="true" add="true" remove="true" editable="true" resortable="true">
+									<itemeditorlayout>
+										<attribute name="uid" width="50" />
+										<attribute name="name" width="300" />
+										<attribute name="type" width="200" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="onlyOneRestrictionMustApply" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="administration" mode="append">
+					<section name="section.cms.admin" mode="append">
+						<listlayout>
+							<attribute name="type" />
+							<attribute name="typeCode" />
+							<attribute name="view" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ContentPage" mode="append" icon="images/cms2/contentpage.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<essentials mode="append">
+					<listlayout mode="append">
+						<text name="text.contentpage.label" />
+						<attribute name="label" mode="append" />
+					</listlayout>
+				</essentials>
+				<tab name="tab.cms.navigationnodes" position="3">
+					<section name="section.navigationnodes">
+						<listlayout>
+							<text name="text.pages.navigationnodes" />
+							<attribute name="navigationNodes">
+								<referencecollectioneditor create="false" add="true" remove="true" editable="false" resortable="true">
+									<itemeditorlayout>
+										<attribute name="uid" width="200" />
+										<attribute name="name" width="200" />
+										<attribute name="title" width="200" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="administration" mode="append">
+					<section name="section.cms.admin" mode="append">
+						<listlayout>
+							<attribute name="labelOrId" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	
+	<type name="RestrictionType" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.restrictiontype.assignedpagetypes" mode="append" position="1">
+					<section name="section.restrictiontype.assignedpagetypes" mode="append">
+						<listlayout>
+							<attribute name="pageTypes" />
+						</listlayout>
+					</section>
+				</tab>
+         </editor>
+		</organizer>
+	</type>
+
+	<type name="AbstractRestriction" mode="append" icon="images/cms2/abstractrestriction.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="properties">
+						<listlayout>
+							<attribute name="description" />
+						</listlayout>
+					</section>
+					<section name="restriction.pages">
+						<listlayout>
+							<text name="text.restriction.pages" />
+							<attribute name="pages">
+								<referencecollectioneditor create="false" add="true" remove="true" autosave="true" editable="false"
+									resortable="false">
+									<itemlayout>
+										<attribute name="uid" width="50" />
+										<attribute name="name" width="100" />
+										<attribute name="type" width="100" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+					<section name="restriction.components">
+						<listlayout>
+							<attribute name="components">
+								<referencecollectioneditor create="false" add="true" remove="true" autosave="true" editable="false"
+									resortable="false">
+									<itemlayout>
+										<attribute name="uid" width="50" />
+										<attribute name="name" width="100" />
+										<attribute name="type" width="100" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="administration" mode="append">
+					<section name="section.cms.admin" mode="append">
+						<listlayout>
+							<attribute name="type" />
+							<attribute name="typeCode" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CMSCatalogRestriction" mode="append" icon="images/cms2/restrictioncatalog.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="section.restriction.objects">
+						<listlayout>
+							<attribute name="catalogs">
+								<referencecollectioneditor create="false" add="true" remove="true" editable="false" resortable="false">
+									<itemeditorlayout>
+										<attribute name="id" width="200" />
+										<attribute name="name" width="200" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CMSCategoryRestriction" mode="append" icon="images/cms2/restrictioncategory.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="section.restriction.objects">
+						<listlayout>
+							<attribute name="recursive" />
+							<attribute name="categories">
+								<referencecollectioneditor create="false" add="true" remove="true" editable="false" resortable="false">
+									<itemeditorlayout>
+										<attribute name="code" width="200" />
+										<attribute name="name" width="200" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="administration" mode="append">
+					<section name="section.cms.admin" mode="append">
+						<listlayout>
+							<attribute name="categoryCodes" width="300" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CMSProductRestriction" mode="append" icon="images/cms2/restrictioncategory.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="section.restriction.objects">
+						<listlayout>
+							<attribute name="products">
+								<referencecollectioneditor create="false" add="true" remove="true" editable="false" resortable="false">
+									<itemeditorlayout>
+										<attribute name="code" width="200" />
+										<attribute name="name" width="200" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="administration" mode="append">
+					<section name="section.cms.admin" mode="append">
+						<listlayout>
+							<attribute name="productCodes" width="300" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CMSUserRestriction" mode="append" icon="images/cms2/restrictionuser.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="section.restriction.objects">
+						<listlayout>
+							<attribute name="users">
+								<referencecollectioneditor create="false" add="true" remove="true" editable="false" resortable="false">
+									<itemeditorlayout>
+										<attribute name="uID" width="200" />
+										<attribute name="name" width="200" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CMSUserGroupRestriction" mode="append" icon="images/cms2/restrictionusergroup.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="section.restriction.objects">
+						<listlayout>
+							<attribute name="userGroups">
+								<referencecollectioneditor create="false" add="true" remove="true" editable="false" resortable="false">
+									<itemeditorlayout>
+										<attribute name="uID" width="200" />
+										<attribute name="name" width="200" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CMSTimeRestriction" mode="append" icon="images/cms2/restrictiontime.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="section.restriction.objects">
+						<listlayout>
+							<attribute name="activeFrom" />
+							<attribute name="activeUntil" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CMSParagraphComponent" mode="append" icon="images/cms2/contentelementparagraph.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="properties" mode="append">
+						<listlayout>
+							<attribute name="content">
+								<wysiwygeditor />
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CMSImageComponent" mode="append" icon="images/cms2/contentelementpicture.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="properties" mode="append">
+						<listlayout>
+							<attribute name="media" width="595" position="0">
+								<mediaeditor />
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CMSLinkComponent" mode="append" icon="images/cms2/contentelementlink.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" position="0">
+					<section name="properties" mode="append">
+						<listlayout>
+							<attribute name="linkName" />
+							<attribute name="external" />
+							<attribute name="contentPage" />
+							<attribute name="category" />
+							<attribute name="product" />
+							<attribute name="url" />
+							<attribute name="target" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="administration" mode="append">
+					<section name="section.cms.admin" mode="append">
+						<listlayout>
+							<attribute name="containers" />
+							<attribute name="productCode" />
+							<attribute name="categoryCode" />
+							<attribute name="contentPageLabelOrId" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="PreviewData" mode="append">
+		<organizer mode="append">
+			<editor>
+				<tab name="properties" position="0">
+					<section name="properties">
+						<listlayout>
+							<attribute name="user" />
+							<attribute name="language" />
+							<attribute name="time" />
+							<attribute name="liveEdit" />
+							<attribute name="catalogVersions" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CMSPreviewTicket" mode="append">
+		<organizer mode="append">
+			<search mode="replace" autoperform="true">
+				<condition attribute="id" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="id" width="50" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="id" />
+					</listlayout>
+				</essentials>
+				<tab name="properties" position="0">
+					<section name="properties">
+						<listlayout>
+							<attribute name="previewData" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="id" mode="replace">
+			<itemlayout>
+				<attribute name="id" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="CMSNavigationNode" mode="append" icon="images/cms2/navigationnode.gif">
+		<organizer mode="append">
+			<editor mode="append">
+				<essentials mode="append">
+					<listlayout mode="append">
+						<text name="text.cmsnavigationnode.title" />
+						<attribute name="title" mode="append" />
+					</listlayout>
+				</essentials>
+				<tab name="properties" position="0">
+					<section name="section.cmsnavigationnode.nodes" mode="append">
+						<listlayout>
+							<text name="text.cmsnavigationnode.parent" />
+							<attribute name="parent" />
+							<text name="text.cmsnavigationnode.children" />
+							<attribute name="children">
+								<referencecollectioneditor create="true" add="true" remove="true" editable="false" resortable="true">
+									<itemeditorlayout>
+										<attribute name="uid" width="200" />
+										<attribute name="name" width="200" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+					<section name="section.cmsnavigationnode.pages" mode="append">
+						<listlayout>
+							<text name="text.cmsnavigationnode.pages" />
+							<attribute name="pages">
+								<referencecollectioneditor create="false" add="true" remove="true" editable="false" resortable="true">
+									<itemeditorlayout>
+										<attribute name="uid" width="200" />
+										<attribute name="name" width="200" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+					<section name="section.cmsnavigationnode.links" mode="append">
+						<listlayout>
+							<text name="text.cmsnavigationnode.links" />
+							<attribute name="links">
+								<referencecollectioneditor create="true" add="true" remove="true" editable="false" resortable="true">
+									<itemeditorlayout>
+										<attribute name="uid" width="200" />
+										<attribute name="name" width="200" />
+										<attribute name="linkName" width="200" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="BaseStore" mode="append">
+		<organizer>
+			<editor>
+				<tab name="properties" position="0">
+					<section name="section.basecommerce.cmssites" mode="append">
+						<listlayout>
+							<attribute name="cmsSites" width="500"   />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ContentPage" mode="append" icon="images/cms2/contentpage.gif">
+	</type>
+
+	<type name="CategoryPage" mode="append" icon="images/cms2/categorypage.gif">
+	</type>
+
+	<type name="ProductPage" mode="append" icon="images/cms2/productpage.gif">
+	</type>
+
+	<type name="CatalogPage" mode="append" icon="images/cms2/catalogpage.gif">
+	</type>
+
+</configuration>

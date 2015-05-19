@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="
+			  http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security.xsd
+           http://cxf.apache.org/jaxws
+           http://cxf.apache.org/schemas/jaxws.xsd">
+
+    <!--
+    	Jersey JAXBContext provider
+	 -->
+    <bean class="de.hybris.platform.webservices.provider.JAXBContextResolver" scope="singleton">
+    	<property name="dtoClassContainer" ref="dtoClassContainer" />
+    	<!-- Dtos not from type system and other needed classes -->
+    	<property name="dtosNotFromTypeSystem" ref="platformNotFromSystemDtosClasses" />
+    </bean>
+
+	<bean id="platformNotFromSystemDtosClasses" class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="sourceList">
+			<list>
+				<value type="java.lang.Class">com.sun.research.ws.wadl.Application</value>
+				<value type="java.lang.Class">de.hybris.platform.webservices.dto.AbstractItemDTO
+				</value>
+				<value type="java.lang.Class">de.hybris.platform.webservices.dto.AbstractCollectionDTO
+				</value>
+				<value type="java.lang.Class">de.hybris.platform.webservices.dto.credentials.PasswordDTO
+				</value>
+				<value type="java.lang.Class">de.hybris.platform.webservices.dto.price.PriceDTO
+				</value>
+				<value type="java.lang.Class">de.hybris.platform.webservices.dto.VariantAttributeDTO
+				</value>
+			</list>
+		</property>
+	</bean>
+
+</beans>

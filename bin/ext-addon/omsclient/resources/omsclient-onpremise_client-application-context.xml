@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  /*
+   * [y] hybris Platform
+   *
+   * Copyright (c) 2000-2013 hybris AG
+   * All rights reserved.
+   *
+   * This software is the confidential and proprietary information of hybris
+   * ("Confidential Information"). You shall not disclose such Confidential
+   * Information and shall use it only in accordance with the terms of the
+   * license agreement you entered into with hybris.
+   *
+   *
+   */
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<import resource="classpath:/META-INF/oms-rest-client-spring.xml" />
+	<import resource="classpath:/META-INF/oms-ui-rest-client-spring.xml" />
+	<import resource="classpath:/META-INF/oms-export-rest-client-spring.xml"/>
+
+	<bean id="omsGenericRestClient" parent="abstractOmsGenericRestClient" lazy-init="true">
+		<property name="endpointProvider">
+        	<bean class="com.hybris.commons.client.SimpleEndpointProvider">
+        		<property name="endpointURI" value="#{configurationService.configuration.getProperty('oms.client.endpoint.uri')}"/>
+        	</bean>
+        </property> 
+	</bean>
+
+	<bean id="omsStaticTenantDecorator" class="com.hybris.commons.client.StaticHeaderValueRestCallDecorator">
+		<property name="headerName" value="X-tenantId"/>
+		<property name="staticValue" value="${oms.defaultTenant}"/>
+	</bean>
+
+	<!-- Define roleDecorator using the static 'accelerator' role -->
+ 	<bean id="omsStaticRoleDecorator" class="com.hybris.commons.client.StaticHeaderValueRestCallDecorator">
+		<property name="headerName" value="X-role"/>
+		<property name="staticValue" value="accelerator"/>
+	</bean>
+
+    <!-- Provides a platform aware current locale information -->
+	<bean id="omsLocaleDecorator" class="com.hybris.platform.coreplus.commons.decorators.LocaleDecorator"/>
+
+    <!--
+     fixed list of decorators since e.g. the archetype hickers-ext-archetype we are expecting to overwrite the hickers project configuration
+     -->
+	<util:list id="omsRestCallDecorators">
+		<ref bean="omsStaticTenantDecorator"/>
+		<ref bean="omsStaticRoleDecorator"/>
+		<ref bean="omsLocaleDecorator"/>
+	</util:list>
+</beans>

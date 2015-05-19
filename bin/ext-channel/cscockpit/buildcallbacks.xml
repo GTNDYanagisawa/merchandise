@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+  
+-->
+<project name="cscockpit_buildcallbacks">
+
+	<property name="cscockpit.base.extension.name" value="cscockpit"/>
+
+	<!-- 
+	    called whenever 'ant ear' is used. this callback can be used to modify the content of the ear file
+			you can for example put a custom ear.properties into the ear file (just use the <copy>-task to copy it 
+			to the ${ear.resources.path}
+	
+	     ${ear.path}: 					path to ear
+	     ${ear.libs.path}: 			path to libs inside ear (as default this comes to ear.path/libs)
+	     ${ear.resources.path}:	path to resources inside ear (as default this comes to ear.path/resources)
+	 -->
+	<macrodef name="cscockpit_before_build">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<and>
+							<equals arg1="${ext.@{extname}.webmodule.available}" arg2="available" />
+							<contains string="${required.extensions.for.@{extname}}" substring="${cscockpit.base.extension.name}"/>
+						</and>
+						<then>
+							<echo level="info" message="Start copying cs cockpit files for extension @{extname}..."/>
+							<copy todir="${ext.@{extname}.path}/web/webroot">
+								<fileset dir="${ext.cscockpit.path}/web/webroot">
+									<include name="cscockpit/**/**.*"/>
+								</fileset>
+							</copy>
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="cscockpit_after_clean">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<and>
+							<equals arg1="${ext.@{extname}.webmodule.available}" arg2="available" />
+							<contains string="${required.extensions.for.@{extname}}" substring="${cscockpit.base.extension.name}"/>
+						</and>
+						<then>
+							<echo level="info" message="Start cleaning up cs cockpit files for extension @{extname}"/>
+							<delete quiet="true" dir="${ext.@{extname}.path}/web/webroot/cscockpit"/>
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+</project>

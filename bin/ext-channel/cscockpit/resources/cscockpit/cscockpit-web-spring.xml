@@ -1,0 +1,767 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+
+<!-- 
+  WARNING: This is the Spring WEB configuration file. If you want to replace
+  items or managers you have to do this from the extensions core configuration 
+  file (cscockpit/resources/cscockpit-spring.xml) 
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/aop 
+			http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!--
+		UICockpitSession represents session in an cockpit application. It manages e.g. the available cockpit perspectives.
+	 -->
+	<alias alias="UICockpitSession" name="defaultCsUICockpitSession"/>
+	<bean id="defaultCsUICockpitSession" class="de.hybris.platform.cockpit.session.impl.UISessionImpl" scope="session">
+		<property name="initialSessionListeners">
+			<list/>
+		</property>
+		<property name="availablePerspectives">
+			<list>
+				<ref bean="cscockpitPerspective"/>
+			</list>
+		</property>
+		<property name="usingTestIDs" value="false"/>
+		<property name="dragOverPerspectivesEnabled" value="true"/>
+		<property name="cachePerspectivesEnabled" value="true"/>
+		<property name="sendEventsImmediately" value="false"/>
+		<property name="requestHandler" ref="csRequestHandler"/>
+		<property name="systemService" ref="systemService"/>
+		<property name="jasperReportsRefresh" ref="jasperReportsRefresh"/>
+		<property name="valueHandlerRegistry" ref="valueHandlerRegistry"/>
+		<property name="labelService" ref="labelService"/>
+		<property name="localizationService" ref="localizationService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="searchService" ref="searchService"/>
+		<property name="uiAccessRightService" ref="uiAccessRightService"/>
+		<property name="newItemService" ref="newItemService"/>
+		<property name="undoManager" ref="undoManager"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="uiConfigurationService" ref="uiConfigurationService"/>
+		<property name="savedQueryService" ref="savedQueryService"/>
+	</bean>
+
+
+	<!-- This can be replaced with ReloadableResourceBundleMessageSource itself as I couldn't figure out how to use appendBasenames in sub-extensions. CscockpitMessageResourceAppender is being used for now -->
+	<alias alias="messageSource" name="defaultCsMessageSource"/>
+	<bean id="defaultCsMessageSource" class="de.hybris.platform.cscockpit.spring.CscockpitReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:/localization/cscockpit-messages</value>
+			</list>
+		</property>
+		<property name="useCodeAsDefaultMessage" value="true"/>
+		<property name="fallbackToSystemLocale" value="true"/>
+		<property name="cacheSeconds" value="1"/>
+	</bean>
+
+	<alias alias="cockpitHotKeyHandler" name="defaultCsWidgetHotKeyHandler"/>
+	<bean id="defaultCsWidgetHotKeyHandler" class="de.hybris.platform.cscockpit.session.impl.DefaultCsWidgetHotKeyHandler"
+	      scope="session">
+
+		<!-- browser (tab) specific hot keys -->
+		<property name="browserCommandMap">
+			<map>
+
+				<entry key="cscockpit.browser.ticketpool">
+					<bean class="de.hybris.platform.cscockpit.widgets.hotkeys.impl.BrowserHotKeyCommand"
+					      parent="csTemplateBrowserHotKeyCommand">
+						<property name="widgetFocusMap">
+							<map>
+								<!--<entry key="key_o" value="orderDetailsWidget"/>-->
+							</map>
+						</property>
+					</bean>
+				</entry>
+
+				<entry key="cscockpit.browser.basket">
+					<bean class="de.hybris.platform.cscockpit.widgets.hotkeys.impl.BasketBrowserHotKeyCommand"
+					      parent="csTemplateBrowserHotKeyCommand">
+						<property name="widgetFocusMap">
+							<map>
+								<entry key="key_s" value="basketSearchWidget"/>
+								<entry key="key_r" value="basketResultWidget"/>
+								<entry key="key_c" value="basketCartWidget"/>
+							</map>
+						</property>
+						<property name="globalHotKeysMap">
+							<map merge="true">
+								<!-- Custom handler for the BasketBrowserHotKeyCommand -->
+								<entry key="key_o" value="triggerCheckout"/>
+							</map>
+						</property>
+						<property name="basketController" ref="csBasketController"/>
+					</bean>
+				</entry>
+
+				<entry key="cscockpit.browser.customer">
+					<bean class="de.hybris.platform.cscockpit.widgets.hotkeys.impl.BrowserHotKeyCommand"
+					      parent="csTemplateBrowserHotKeyCommand">
+						<property name="widgetFocusMap">
+							<map>
+								<entry key="key_d" value="customerEditWidget"/>
+								<entry key="key_e" value="customerEditWidget"/>
+								<entry key="key_o" value="customerOrderHistoryWidget"/>
+								<entry key="key_a" value="customerEditAddressesWidget"/>
+							</map>
+						</property>
+					</bean>
+				</entry>
+
+				<entry key="cscockpit.browser.checkout">
+					<bean class="de.hybris.platform.cscockpit.widgets.hotkeys.impl.CheckoutHotKeyCommand"
+					      parent="csTemplateBrowserHotKeyCommand">
+						<property name="widgetFocusMap">
+							<map>
+								<entry key="key_c" value="checkoutCartWidget"/>
+								<entry key="key_d" value="shippingAddressWidget"/>
+								<entry key="key_p" value="paymentAddressWidget"/>
+								<entry key="key_o" value="placeOrderWidget"/>
+								<entry key="key_s" value="checkoutPaymentWidget"/>
+								<entry key="key_t" value="checkoutCartTotalsWidget"/>
+								<entry key="key_i" value="cartPaymentTransactionsWidget"/>
+							</map>
+						</property>
+						<property name="globalHotKeysMap">
+							<map merge="true">
+								<!-- Custom handler for the BasketBrowserHotKeyCommand -->
+								<entry key="key_b" value="triggerPlaceOrder"/>
+							</map>
+						</property>
+						<property name="checkoutController" ref="csCheckoutController"/>
+						<property name="callContextController" ref="csCallContextController"/>
+						<property name="basketController" ref="csBasketController"/>
+					</bean>
+				</entry>
+
+				<entry key="cscockpit.browser.order">
+					<bean class="de.hybris.platform.cscockpit.widgets.hotkeys.impl.BrowserHotKeyCommand"
+					      parent="csTemplateBrowserHotKeyCommand">
+						<property name="widgetFocusMap">
+							<map>
+								<entry key="key_o" value="orderDetailsWidget"/>
+							</map>
+						</property>
+					</bean>
+				</entry>
+
+				<entry key="cscockpit.browser.ticket">
+					<bean class="de.hybris.platform.cscockpit.widgets.hotkeys.impl.BrowserHotKeyCommand"
+					      parent="csTemplateBrowserHotKeyCommand">
+						<property name="widgetFocusMap">
+							<map>
+								<entry key="key_d" value="ticketHeaderDetailsWidget"/>
+								<entry key="key_e" value="ticketEventsList"/>
+							</map>
+						</property>
+					</bean>
+				</entry>
+
+				<entry key="cscockpit.browser.endCall">
+					<bean class="de.hybris.platform.cscockpit.widgets.hotkeys.impl.BrowserHotKeyCommand"
+					      parent="csTemplateBrowserHotKeyCommand">
+						<property name="widgetFocusMap">
+							<map>
+								<entry key="key_e" value="endCallWidget"/>
+							</map>
+						</property>
+					</bean>
+				</entry>
+
+			</map>
+		</property>
+
+		<!-- widget specific hot keys -->
+		<property name="commandMap">
+			<map>
+				<entry key="basketCartWidget">
+					<!-- Custom hot key handler for the basketCartWidget -->
+					<bean class="de.hybris.platform.cscockpit.widgets.hotkeys.impl.WidgetHotKeyCommand">
+						<property name="widgetConfig" ref="csBasketCartWidgetConfig"/>
+						<property name="keyCommandMap">
+							<map>
+								<!-- Give focus to the quantity field of the selected row -->
+								<entry key="key_q" value="focusQuantity"/>
+							</map>
+						</property>
+					</bean>
+				</entry>
+				<entry key="basketResultWidget">
+					<!-- Custom hot key handler for the basketResultWidget -->
+					<bean class="de.hybris.platform.cscockpit.widgets.hotkeys.impl.WidgetHotKeyCommand">
+						<property name="widgetConfig" ref="csBasketResultWidgetConfig"/>
+						<property name="keyCommandMap">
+							<map>
+								<!-- Give focus to the quantity field of the selected row -->
+								<entry key="key_q" value="focusQuantity"/>
+							</map>
+						</property>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<!-- This is the parent bean template for all the browser specific hot key commands specified in the defaultCsWidgetHotKeyHandler above -->
+	<alias alias="csTemplateBrowserHotKeyCommand" name="defaultCsTemplateBrowserHotKeyCommand"/>
+	<bean id="defaultCsTemplateBrowserHotKeyCommand" class="de.hybris.platform.cscockpit.widgets.hotkeys.impl.BrowserHotKeyCommand"
+	      abstract="true" scope="session">
+		<property name="keyBrowserMap">
+			<map>
+				<!--
+				 Explicit key bindings can be provided for each tab
+				<entry key="key_b" value="cscockpit.browser.basket"/>
+				<entry key="key_e" value="cscockpit.browser.endCall"/>
+				<entry key="key_c" value="cscockpit.browser.customer"/>
+				<entry key="key_o" value="cscockpit.browser.order"/>
+				<entry key="key_p" value="cscockpit.browser.checkout"/>
+				-->
+			</map>
+		</property>
+		<property name="globalHotKeysMap">
+			<map>
+				<entry key="key_f" value="searchCustomerPopup"/>
+				<entry key="key_n" value="newCustomerPopup"/>
+				<entry key="key_t" value="searchOrderPopup"/>
+				<entry key="key_i" value="newTicketPopup"/>
+				<entry key="key_s" value="searchTicketPopup"/>
+				<entry key="key_]" value="rotateBrowserFocusForward"/>
+				<entry key="key_[" value="rotateWidgetFocusForward"/>
+				<entry key="key_{" value="rotateWidgetFocusReverse"/>
+				<entry key="key_}" value="rotateBrowserFocusReverse"/>
+
+				<!-- Focus browser by tab position -->
+				<entry key="key_1" value="focusBrowserByPosition"/>
+				<entry key="key_2" value="focusBrowserByPosition"/>
+				<entry key="key_3" value="focusBrowserByPosition"/>
+				<entry key="key_4" value="focusBrowserByPosition"/>
+				<entry key="key_5" value="focusBrowserByPosition"/>
+				<entry key="key_6" value="focusBrowserByPosition"/>
+				<entry key="key_7" value="focusBrowserByPosition"/>
+				<entry key="key_8" value="focusBrowserByPosition"/>
+				<entry key="key_9" value="focusBrowserByPosition"/>
+				<entry key="key_0" value="focusBrowserByPosition"/>
+			</map>
+		</property>
+		<property name="globalPopupWidgetManager" ref="globalPopupWidgetManager"/>
+		<property name="widgetHelper" ref="widgetHelper"/>
+	</bean>
+
+	<!-- 
+			Cscockpit perspective.
+		 -->
+	<alias alias="cscockpitPerspective" name="defaultCscockpitPerspective"/>
+	<bean id="defaultCscockpitPerspective" scope="session" parent="BasePerspective">
+		<property name="uid" value="cscockpit.perspective.cscockpit"/>
+		<!-- unique ID of the perspective -->
+		<property name="label" value="perspective.cscockpit"/>
+		<!-- localization key for the label of the perspective -->
+		<property name="customCsaURI" value="/cscockpit/cscockpitCSA.zul"/>
+		<!-- file with optional custom client side actions -->
+
+		<property name="navigationArea" ref="cscockpitNavigationArea"/>
+		<property name="browserArea">
+			<bean class="de.hybris.platform.cscockpit.session.impl.OrderedConfigurableBrowserArea">
+				<property name="viewURI" value="/cockpit/baseSearchBrowserArea.zul"/>
+				<property name="defaultBrowserId">
+					<idref bean="csTicketPoolBrowser"/>
+				</property>
+				<property name="supportedBrowserIds">
+					<list>
+						<idref bean="csTicketPoolBrowser"/>
+						<idref bean="csBasketBrowser"/>
+						<idref bean="csEndCallBrowser"/>
+					</list>
+				</property>
+				<property name="modelService" ref="modelService"/>
+			</bean>
+		</property>
+
+		<property name="editorArea">
+			<bean parent="BaseEditorAreaModel">
+				<property name="editorAreaController" ref="cscockpitEditorAreaController"/>
+				<property name="valueHandlerRegistry" ref="valueHandlerRegistry"/>
+				<property name="commonI18NService" ref="commonI18NService"/>
+				<property name="sessionService" ref="sessionService"/>
+			</bean>
+		</property>
+		<property name="popupEditorArea">
+			<bean parent="BasePopupEditor">
+				<property name="editorAreaController" ref="cscockpitPopupEditorAreaController"/>
+				<property name="valueHandlerRegistry" ref="valueHandlerRegistry"/>
+				<property name="systemService" ref="systemService"/>
+				<property name="valueService" ref="valueService"/>
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+				<property name="undoManager" ref="undoManager"/>
+				<property name="commonI18NService" ref="commonI18NService"/>
+				<property name="sessionService" ref="sessionService"/>
+			</bean>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="dragAndDropWrapperService" ref="dragAndDropWrapperService"/>
+	</bean>
+
+	<alias alias="cscockpitNavigationArea" name="defaultCscockpitNavigationArea"/>
+	<bean id="defaultCscockpitNavigationArea" class="de.hybris.platform.cscockpit.session.impl.CscockpitNavigationArea" scope="session"
+	      parent="BaseNavigationArea">
+		<property name="sectionModel" ref="cscockpitNavigationAreaModel"/>
+		<property name="infoSlotRenderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.InfoBoxRenderer"/>
+		</property>
+		<property name="sections">
+			<list>
+				<!-- <ref bean="cscockpitUndoSection" /> -->
+				<ref bean="cscockpitNavCallCtxSection"/>
+				<ref bean="cscockpitNavHelpSection"/>
+			</list>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="objectCollectionService" ref="objectCollectionService"/>
+		<property name="uiComponentCache" ref="uiComponentCache"/>
+		<property name="dynamicQueryService" ref="dynamicQueryService"/>
+		<property name="uiConfigurationService" ref="uiConfigurationService"/>
+		<property name="savedQueryService" ref="savedQueryService"/>
+	</bean>
+
+	<alias alias="cscockpitNavigationAreaModel" name="defaultCscockpitNavigationAreaModel"/>
+	<bean id="defaultCscockpitNavigationAreaModel"
+	      class="de.hybris.platform.cscockpit.components.navigationarea.CscockpitNavigationAreaModel" scope="session">
+		<property name="specialCollectionTypes">
+			<list>
+				<value>blacklist</value>
+				<value>quickcollection</value>
+			</list>
+		</property>
+	</bean>
+
+	<!--	<alias alias="cscockpitUndoSection" name="defaultCscockpitUndoSection"/>-->
+	<!--	<bean id="defaultCscockpitUndoSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection" scope="prototype">-->
+	<!--		<property name="localizedLabel" value="navigationarea.history" />-->
+	<!--		<property name="visible" value="true" />-->
+	<!--		<property name="renderer">-->
+	<!--			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.UndoSectionRenderer" />-->
+	<!--		</property>-->
+	<!--	</bean>-->
+
+	<alias alias="cscockpitNavCallCtxSection" name="defaultCscockpitNavCallCtxSection"/>
+	<bean id="defaultCscockpitNavCallCtxSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection"
+	      scope="prototype">
+		<property name="localizedLabel" value="cscockpit.widget.call.context"/>
+		<property name="visible" value="true"/>
+		<property name="renderer">
+			<bean class="de.hybris.platform.cscockpit.components.navigationarea.renderer.WidgetNavSectionRenderer">
+				<property name="widgetMap">
+					<map>
+						<entry key="navCallContextWidget" value-ref="csCallContextWidgetConfig"/>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="cscockpitNavHelpSection" name="defaultCscockpitNavHelpSection"/>
+	<bean id="defaultCscockpitNavHelpSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection"
+	      scope="prototype">
+		<property name="localizedLabel" value="cscockpit.widget.help"/>
+		<property name="visible" value="true"/>
+		<property name="renderer">
+			<bean class="de.hybris.platform.cscockpit.components.navigationarea.renderer.HelpNavSectionRenderer">
+				<property name="widgetMap">
+					<map>
+						<entry key="navHelpWidget" value-ref="csHelpWidgetConfig"/>
+					</map>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="cscockpitEditorAreaController" name="defaultCscockpitEditorAreaController"/>
+	<bean id="defaultCscockpitEditorAreaController" class="de.hybris.platform.cockpit.session.impl.DefaultEditorAreaController"
+	      scope="session">
+		<property name="sectionRowRenderer">
+			<bean parent="EditorSectionRowRenderer">
+				<property name="systemService" ref="systemService"/>
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+		<property name="editorFactory" ref="EditorFactory"/>
+	</bean>
+
+	<alias alias="cscockpitPopupEditorAreaController" name="defaultCscockpitPopupEditorAreaController"/>
+	<bean id="defaultCscockpitPopupEditorAreaController"
+	      class="de.hybris.platform.cscockpit.session.impl.CscockpitPopupEditorAreaControllerImpl" scope="prototype">
+		<property name="sectionRowRenderer">
+			<bean parent="EditorSectionRowRenderer">
+				<property name="systemService" ref="systemService"/>
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+		<property name="editorFactory" ref="EditorFactory"/>
+	</bean>
+
+	<alias alias="csRequestHandler" name="defaultCsRequestHandler"/>
+	<bean id="defaultCsRequestHandler" class="de.hybris.platform.cockpit.session.impl.DefaultRequestHandler" scope="session">
+		<property name="requestEventHandlers">
+			<map>
+				<entry key="activation">
+					<bean class="de.hybris.platform.cockpit.session.impl.ActivationEventHandler">
+						<property name="prefix" value="act"/>
+					</bean>
+				</entry>
+				<entry key="search">
+					<bean class="de.hybris.platform.cockpit.session.impl.SearchEventHandler">
+						<property name="prefix" value="srch"/>
+					</bean>
+				</entry>
+				<entry key="celum">
+					<bean class="de.hybris.platform.cockpit.session.impl.CelumEventHandler">
+						<property name="mediaService" ref="mediaService"/>
+						<property name="modelService" ref="modelService"/>
+						<property name="cockpitTypeService" ref="cockpitTypeService"/>
+					</bean>
+				</entry>
+				<entry key="msg">
+					<bean class="de.hybris.platform.cockpit.session.impl.NotificationEventHandler">
+						<property name="prefix" value="msg"/>
+					</bean>
+				</entry>
+				<entry key="cs">
+					<bean class="de.hybris.platform.cscockpit.session.impl.CscockpitEventHandler">
+						<property name="callContextController" ref="csCallContextController"/>
+						<property name="basketController" ref="csBasketController"/>
+						<property name="prefix" value="cs"/>
+						<property name="csUrlActivationDao" ref="csUrlActivationDao"/>
+						<property name="cockpitTypeService" ref="cockpitTypeService"/>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Browsers -->
+
+	<!-- Ticket Pool tab -->
+	<alias alias="csTicketPoolBrowser" name="defaultCsTicketPoolBrowser"/>
+	<bean id="defaultCsTicketPoolBrowser" class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel" scope="prototype">
+		<property name="browserSortOrder" value="500"/>
+		<property name="browserCode" value="cscockpit.browser.ticketpool"/>
+		<property name="initiallyOpen" value="true"/>
+		<property name="label" value="cscockpit.browser.ticketpool"/>
+		<property name="extendedLabel" value="cscockpit.browser.ticketpool.ext"/>
+		<property name="viewClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultWidgetContentBrowser"/>
+		<property name="viewTemplateURI" value="/cscockpit/templates/defaultTicketPoolLayout.zul"/>
+		<property name="widgets">
+			<!-- The tab specific widgets in keyboard focus order -->
+			<list>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="ticketPoolWidget"/>
+					<property name="widgetConfig" ref="csTicketPoolWidgetConfig"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Basket composition tab -->
+	<alias alias="csBasketBrowser" name="defaultCsBasketBrowser"/>
+	<bean id="defaultCsBasketBrowser" class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel" scope="prototype">
+		<property name="browserSortOrder" value="1000"/>
+		<property name="browserCode" value="cscockpit.browser.basket"/>
+		<property name="initiallyOpen" value="true"/>
+		<property name="label" value="cscockpit.browser.basket"/>
+		<property name="extendedLabel" value="cscockpit.browser.basket.ext"/>
+		<property name="viewClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultWidgetContentBrowser"/>
+		<property name="viewTemplateURI" value="/cscockpit/templates/defaultBasketLayout.zul"/>
+		<property name="widgets">
+			<!-- The tab specific widgets in keyboard focus order -->
+			<list>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="basketSearchWidget"/>
+					<property name="widgetConfig" ref="csBasketSearchWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="basketCartWidget"/>
+					<property name="widgetConfig" ref="csBasketCartWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="basketResultWidget"/>
+					<property name="widgetConfig" ref="csBasketResultWidgetConfig"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Customer information tab -->
+	<alias alias="csCustomerBrowser" name="defaultCsCustomerBrowser"/>
+	<bean id="defaultCsCustomerBrowser" class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel" scope="prototype">
+		<property name="browserSortOrder" value="2000"/>
+		<property name="browserCode" value="cscockpit.browser.customer"/>
+		<property name="initiallyOpen" value="false"/>
+		<property name="label" value="cscockpit.browser.customer"/>
+		<property name="extendedLabel" value="cscockpit.browser.customer.ext"/>
+		<property name="viewClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultWidgetContentBrowser"/>
+		<property name="viewTemplateURI" value="/cscockpit/templates/defaultCustomerLayout.zul"/>
+		<property name="widgets">
+			<!-- The tab specific widgets in keyboard focus order -->
+			<list>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="customerEditWidget"/>
+					<property name="widgetConfig" ref="csCustomerEditWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="customerOrderHistoryWidget"/>
+					<property name="widgetConfig" ref="csCustomerOrdersWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="customerTokenisedCreditCardsWidget"/>
+					<property name="widgetConfig" ref="csCustomerTokenisedCreditCardsWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="customerTicketListWidget"/>
+					<property name="widgetConfig" ref="csCustomerTicketListWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="customerEditAddressesWidget"/>
+					<property name="widgetConfig" ref="csCustomerEditAddressWidgetConfig"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Cart Checkout tab -->
+	<alias alias="csCheckoutBrowser" name="defaultCsCheckoutBrowser"/>
+	<bean id="defaultCsCheckoutBrowser" class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel" scope="prototype">
+		<property name="browserSortOrder" value="2500"/>
+		<property name="browserCode" value="cscockpit.browser.checkout"/>
+		<property name="initiallyOpen" value="false"/>
+		<property name="label" value="cscockpit.browser.checkout"/>
+		<property name="extendedLabel" value="cscockpit.browser.checkout.ext"/>
+		<property name="viewClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultWidgetContentBrowser"/>
+		<property name="viewTemplateURI" value="/cscockpit/templates/defaultCheckoutLayout.zul"/>
+		<property name="widgets">
+			<!-- The tab specific widgets in keyboard focus order -->
+			<list>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="checkoutCartWidget"/>
+					<property name="widgetConfig" ref="csCheckoutCartWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="shippingAddressWidget"/>
+					<property name="widgetConfig" ref="csShippingAddressWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="paymentAddressWidget"/>
+					<property name="widgetConfig" ref="csPaymentAddressWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="checkoutCartTotalsWidget"/>
+					<property name="widgetConfig" ref="csBasketTotalsWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="checkoutCartAppliedPromotionsWidget"/>
+					<property name="widgetConfig" ref="csCheckoutCartAppliedPromotionsWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="cartPaymentTransactionsWidget"/>
+					<property name="widgetConfig" ref="csCartPaymentTransactionsWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="checkoutPaymentWidget"/>
+					<property name="widgetConfig" ref="csCheckoutPaymentWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="placeOrderWidget"/>
+					<property name="widgetConfig" ref="csPlaceOrderWidgetConfig"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Order information tab -->
+	<alias alias="csOrderBrowser" name="defaultCsOrderBrowser"/>
+	<bean id="defaultCsOrderBrowser" class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel" scope="prototype">
+		<property name="browserSortOrder" value="3000"/>
+		<property name="browserCode" value="cscockpit.browser.order"/>
+		<property name="initiallyOpen" value="false"/>
+		<property name="label" value="cscockpit.browser.order"/>
+		<property name="extendedLabel" value="cscockpit.browser.order.ext"/>
+		<property name="viewClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultWidgetContentBrowser"/>
+		<property name="viewTemplateURI" value="/cscockpit/templates/defaultOrderLayout.zul"/>
+		<property name="widgets">
+			<!-- The tab specific widgets in keyboard focus order -->
+			<list>
+				<!-- Main column -->
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderDetailOrderItemsWidget"/>
+					<property name="widgetConfig" ref="csOrderDetailOrderItemsWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderDetailAppliedPromotionsWidget"/>
+					<property name="widgetConfig" ref="csOrderDetailAppliedPromotionsWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderConsignmentsWidget"/>
+					<property name="widgetConfig" ref="csOrderConsignmentsWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderPaymentTransactionsWidget"/>
+					<property name="widgetConfig" ref="csOrderPaymentTransactionsWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderTicketListWidget"/>
+					<property name="widgetConfig" ref="csOrderTicketListWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderReturnRequestsWidget"/>
+					<property name="widgetConfig" ref="csOrderReturnRequestsWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderHistoryWidget"/>
+					<property name="widgetConfig" ref="csOrderHistoryWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderModificationsHistoryWidget"/>
+					<property name="widgetConfig" ref="csOrderModificationsHistoryWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderActionsWidget"/>
+					<property name="widgetConfig" ref="csOrderActionsWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="fraudReportWidget"/>
+					<property name="widgetConfig" ref="csFraudReportWidgetConfig"/>
+				</bean>
+				
+				<!-- Left column -->
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderDetailsWidget"/>
+					<property name="widgetConfig" ref="csOrderDetailsWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderDetailOrderTotalsWidget"/>
+					<property name="widgetConfig" ref="csOrderDetailOrderTotalsWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderDetailsBillingAddressWidget"/>
+					<property name="widgetConfig" ref="csOrderDetailsBillingAddressWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderDetailsDeliveryAddressWidget"/>
+					<property name="widgetConfig" ref="csOrderDetailsDeliveryAddressWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="orderDetailsOrderPaymentWidget"/>
+					<property name="widgetConfig" ref="csOrderDetailsOrderPaymentWidgetConfig"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Ticket information tab -->
+	<alias alias="csTicketBrowser" name="defaultCsTicketBrowser"/>
+	<bean id="defaultCsTicketBrowser" class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel" scope="prototype">
+		<property name="browserSortOrder" value="6000"/>
+		<property name="browserCode" value="cscockpit.browser.ticket"/>
+		<property name="initiallyOpen" value="false"/>
+		<property name="label" value="cscockpit.browser.ticket"/>
+		<property name="extendedLabel" value="cscockpit.browser.ticket.ext"/>
+		<property name="viewClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultWidgetContentBrowser"/>
+		<property name="viewTemplateURI" value="/cscockpit/templates/defaultTicketLayout.zul"/>
+		<property name="widgets">
+			<!-- The tab specific widgets in keyboard focus order -->
+			<list>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="ticketHeaderDetailsWidget"/>
+					<property name="widgetConfig" ref="csTicketHeaderWidgetConfig"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="ticketEventsList"/>
+					<property name="widgetConfig" ref="csTicketEventsWidgetConfig"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- End call tab -->
+	<alias alias="csEndCallBrowser" name="defaultCsEndCallBrowser"/>
+	<bean id="defaultCsEndCallBrowser" class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel" scope="prototype">
+		<property name="browserSortOrder" value="9000"/>
+		<property name="browserCode" value="cscockpit.browser.endCall"/>
+		<property name="initiallyOpen" value="true"/>
+		<property name="label" value="cscockpit.browser.endCall"/>
+		<property name="extendedLabel" value="cscockpit.browser.endCall.ext"/>
+		<property name="viewClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultWidgetContentBrowser"/>
+		<property name="viewTemplateURI" value="/cscockpit/templates/defaultEndCallLayout.zul"/>
+		<property name="widgets">
+			<!-- The tab specific widgets in keyboard focus order -->
+			<list>
+				<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CsWidgetBrowserModel$WidgetMapKey">
+					<property name="widgetCode" value="endCallWidget"/>
+					<property name="widgetConfig" ref="csEndCallWidgetConfig"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="LoginForm" class="de.hybris.platform.cockpit.forms.login.LoginForm" scope="session">
+		<property name="viewComponentURI" value="/cscockpit/loginDialog.zul"/>
+		<property name="systemService" ref="systemService"/>
+		<property name="loginService" ref="loginService"/>
+		<property name="localeHelper" ref="localeHelper"/>
+		<property name="exceptionToLabelConverter" ref="authenticationExceptionToLabelConverter"/>
+	</bean>
+	
+	<!-- filter -->	
+	<bean id="csCockpitFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+		<constructor-arg>
+			<list>
+				<ref bean="log4jFilter"/>
+				<ref bean="dynamicTenantActivationFilter"/>				
+				<ref bean="sessionFilter"/>
+				<ref bean="csCockpitDataSourceSwitchingFilter"/>
+				<ref bean="csCockpitCatalogVersionActivationFilter"/>
+            <ref bean="csCockpitSecureMediaFilter"/>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="csCockpitDataSourceSwitchingFilter" class="de.hybris.platform.servicelayer.web.DataSourceSwitchingFilter">
+	</bean>
+	
+	 <bean id="csCockpitCatalogVersionActivationFilter" class="de.hybris.platform.servicelayer.web.DynamicCatalogVersionActivationFilter" scope="tenant">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="catalogService" ref="catalogService"/>
+		<aop:scoped-proxy/>
+	</bean>
+ 
+   <bean id="csCockpitSecureMediaFilter" class="de.hybris.platform.servicelayer.web.SecureMediaFilter">
+       <property name="mediaPermissionService" ref="mediaPermissionService"/>
+       <property name="modelService" ref="modelService"/>
+       <property name="userService" ref="userService"/>
+       <property name="mediaService" ref="mediaService"/>
+      <!-- <property name="secureMediaToken" value="securemedias"/>  securemedias is default but you may overwrite it -->
+       <aop:scoped-proxy/>
+     </bean>
+
+</beans>

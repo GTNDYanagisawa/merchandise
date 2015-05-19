@@ -1,0 +1,97 @@
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$catalogVersion=catalogVersion(catalog(id),version)[unique=true]
+
+$passwordEncoding=md5
+$defaultPassword=1234
+$setPassword=@password[translator=de.hybris.platform.impex.jalo.translators.ConvertPlaintextToEncodedUserPasswordTranslator][default='$passwordEncoding:$defaultPassword']
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;
+;de;true;;;;;;
+;en;true;;;;;;
+
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];;;;;
+;de;Deutsch;German;;;;;
+;en;Englisch;English;;;;;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;€
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$
+INSERT_UPDATE Country;isocode[unique=true];name[lang=de];name[lang=en];active;
+;DE;Deutschland;Germany;true;
+;US;Vereinigte Staaten von Amerika;United States of America;true;
+;PL;Polen;Poland;true;
+
+INSERT_UPDATE CMSSite;uid[unique=true];name[lang=de];name[lang=en]
+;webSiteA;web SiteA;web SiteA
+;webSiteB;web SiteB;web SiteB
+;webSiteC;web SiteC;web SiteC
+
+INSERT_UPDATE Customer;uid[unique=true];customerID[unique=true];name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);$setPassword
+;user_a;btgtestcustomerA;A;userA;de;EUR;customergroup;
+;user_b;btgtestcustomerB;B;userB;de;EUR;customergroup;
+;user_c;btgtestcustomerC;C;userC;de;EUR;customergroup;
+
+INSERT_UPDATE Address;owner(Customer.uid)[unique=true];streetname[unique=true];streetnumber[unique=true];postalcode[unique=true];town;country(isocode);billingAddress;shippingAddress;gender(code)
+;user_a;4th Avenue;6;10646;Chicago;US;true;true;"MALE"
+;user_b;Nymphenburger Strasse;86;D-80636;Munich;DE;true;true;"FEMALE"
+;user_c;Warszawska;1;40-126;Katowice;PL;true;true;"FEMALE"
+
+INSERT_UPDATE UserGroup;UID[unique=true];locname[lang=de];locname[lang=en];
+;good_taste;Good taste;Good taste;
+;bad_taste;Bad taste;Bad taste;
+
+UPDATE Customer;uid[unique=true];addresses(owner(Customer.uid),streetname);
+;user_a;user_a:4th Avenue;
+;user_b;user_b:Nymphenburger Strasse;
+;user_c;user_c:Warszawska;
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en]
+;drinksCatalog;Getranke;Drinks
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode)
+;drinksCatalog;Online;true;EUR;de,en
+;drinksCatalog;Staged;true;EUR;de,en
+INSERT_UPDATE Category;code[unique=true];$catalogVersion;name[lang=de];name[lang=en];supercategories( code, catalogVersion(catalog(id),version))
+;AlcoholsOnline;drinksCatalog:Online;Alcohols;Alcohols;
+;AlcoholsStaged;drinksCatalog:Staged;Alcohols;Alcohols;
+;BeersOnline;drinksCatalog:Online;Beers;Beers;AlcoholsOnline:drinksCatalog:Online;
+;BeersStaged;drinksCatalog:Staged;Beers;Beers;AlcoholsStaged:drinksCatalog:Staged;
+;PolishBeersOnline;drinksCatalog:Online;PolishBeers;PolishBeers;BeersOnline:drinksCatalog:Online;
+;PolishBeersStaged;drinksCatalog:Staged;PolishBeers;PolishBeers;BeersStaged:drinksCatalog:Staged;
+;TraditionalBeers;drinksCatalog:Online;TraditionalBeers;TraditionalBeers;BeersOnline:drinksCatalog:Online;
+;GermanBeersOnline;drinksCatalog:Online;GermanBeers;GermanBeers;BeersOnline:drinksCatalog:Online;
+;GermanBeersStaged;drinksCatalog:Staged;GermanBeers;GermanBeers;BeersStaged:drinksCatalog:Staged;
+;SoftDrinksOnline;drinksCatalog:Online;softdrinks;softdrinks;
+;SoftDrinksStaged;drinksCatalog:Staged;softdrinks;softdrinks;
+# some categories with the same code and catalog but different catalog versions
+;Wine;drinksCatalog:Online;Wein;Wine;AlcoholsOnline:drinksCatalog:Online;
+;Wine;drinksCatalog:Staged;Wein;Wine;AlcoholsStaged:drinksCatalog:Staged;
+
+INSERT_UPDATE Product;code[unique=true];$catalogVersion;name[lang=de];name[lang=en];unit(code);$prices;approvalStatus(code);owner(Principal.uid);startLineNumber;supercategories( code, catalogVersion(catalog(id),version))
+;zywiec;drinksCatalog:Online;zywiec_de;zywiec_en;pieces;5,00 EUR;approved;admin;0;PolishBeersOnline:drinksCatalog:Online
+;augustinerhelles;drinksCatalog:Online;augustinerhelles_de;augustinerhelles_en;pieces;5,00 EUR;approved;admin;0;GermanBeersOnline:drinksCatalog:Online
+;hackerpschorr;drinksCatalog:Online;hackerpschorr_de;hackerpschorr_en;pieces;5,00 EUR;approved;admin;0;GermanBeersOnline:drinksCatalog:Online
+;augustinerhelles_st;drinksCatalog:Staged;augustinerhelles_de;augustinerhelles_en;pieces;5,00 EUR;approved;admin;0;BeersStaged:drinksCatalog:Staged
+;hackerpschorr_st;drinksCatalog:Staged;hackerpschorr_de;hackerpschorr_en;pieces;5,00 EUR;approved;admin;0;BeersStaged:drinksCatalog:Staged
+;zywiec_st;drinksCatalog:Staged;zywiec_de;zywiec_en;pieces;5,00 EUR;approved;admin;0;BeersStaged:drinksCatalog:Staged
+;tyskie;drinksCatalog:Online;tyskie_de;tyskie_en;pieces;5,00 EUR;approved;admin;0;PolishBeersOnline:drinksCatalog:Online
+;tyskie_st;drinksCatalog:Online;tyskie_de;tyskie_en;pieces;5,00 EUR;approved;admin;0;PolishBeersStaged:drinksCatalog:Staged
+;otherProduct_0;drinksCatalog:Online;otherProduct_0_de;otherProduct_0_en;pieces;1,00 EUR;approved;admin;0;BeersOnline:drinksCatalog:Online
+;otherProduct_1;drinksCatalog:Online;otherProduct_1_de;otherProduct_1_en;pieces;2,00 EUR;approved;admin;0;BeersOnline:drinksCatalog:Online
+;otherProduct_2;drinksCatalog:Online;otherProduct_2_de;otherProduct_2_en;pieces;3,00 EUR;approved;admin;0;BeersOnline:drinksCatalog:Online
+;otherProduct_3;drinksCatalog:Online;otherProduct_3_de;otherProduct_3_en;pieces;4,00 EUR;approved;admin;0;BeersOnline:drinksCatalog:Online
+;otherProduct_4;drinksCatalog:Online;otherProduct_4_de;otherProduct_4_en;pieces;5,00 EUR;approved;admin;0;BeersOnline:drinksCatalog:Online
+;otherProduct_5;drinksCatalog:Online;otherProduct_5_de;otherProduct_5_en;pieces;6,00 EUR;approved;admin;0;BeersOnline:drinksCatalog:Online
+;otherProduct_6;drinksCatalog:Online;otherProduct_6_de;otherProduct_6_en;pieces;1,50 EUR;approved;admin;0;SoftDrinksOnline:drinksCatalog:Online
+;otherProduct_7;drinksCatalog:Online;otherProduct_7_de;otherProduct_7_en;pieces;2,50 EUR;approved;admin;0;SoftDrinksOnline:drinksCatalog:Online
+;otherProduct_8;drinksCatalog:Online;otherProduct_8_de;otherProduct_8_en;pieces;3,50 EUR;approved;admin;0;SoftDrinksOnline:drinksCatalog:Online
+;otherProduct_9;drinksCatalog:Online;otherProduct_9_de;otherProduct_9_en;pieces;4,50 EUR;approved;admin;0;SoftDrinksOnline:drinksCatalog:Online
+;expensiveProduct_60EUR;drinksCatalog:Online;expensiveProduct_0_de;expensiveProduct_0_en;pieces;60 EUR;approved;admin;0;SoftDrinksOnline:drinksCatalog:Online
+;expensiveProduct_150EUR;drinksCatalog:Online;expensiveProduct_1_de;expensiveProduct_1_en;pieces;150 EUR;approved;admin;0;SoftDrinksOnline:drinksCatalog:Online
+;expensiveProduct_100EUR;drinksCatalog:Online;expensiveProduct_2_de;expensiveProduct_2_en;pieces;100 EUR;approved;admin;0;SoftDrinksOnline:drinksCatalog:Online
+;expensiveProduct_40EUR;drinksCatalog:Online;expensiveProduct_3_de;expensiveProduct_3_en;pieces;40 EUR;approved;admin;0;SoftDrinksOnline:drinksCatalog:Online
+# some products with the same code and catalog but different catalog versions 
+;krostitzer;drinksCatalog:Online;krostitzer_de;krostitzer_en;pieces;5,00 EUR;approved;admin;0;GermanBeersOnline:drinksCatalog:Online
+;krostitzer;drinksCatalog:Staged;krostitzer_de;krostitzer_en;pieces;5,00 EUR;approved;admin;0;BeersStaged:drinksCatalog:Staged
+
+INSERT_UPDATE BTGConfig[unique=true];defaultTimeUnit(code);usedRuleTypes(code);operandMapping(key(code),value(code))[map-delimiter=|]
+BTGConfig;WEEK;ORDER,CART,USER,WCMS;ORDER->BTGCategoriesInOrdersOperand,BTGEachOrderTotalSumOperand,BTGOrderTotalSumOperand,BTGProductsInOrdersOperand,BTGNumberOfOrdersOperand,BTGNumberOfOrdersRelativeDateOperand|CART->BTGCartIsEmptyOperand,BTGCartTotalSumOperand,BTGCategoriesInCartOperand,BTGProductsInCartOperand,BTGQuantityOfProductInCartOperand|WCMS->BTGViewedProductsOperand,BTGViewedCategoriesOperand,BTGVisitedContentpagesOperand,BTGReferalUrlOperand,BTGUrlParameterOperand|USER->BTGUserAddressPostalCodeOperand,BTGUserCountryOperand,BTGUserGenderOperand,BTGUserMemberOfGroupsOperand|SCRIPT->BTGMediaScriptOperand,BTGStringScriptOperand

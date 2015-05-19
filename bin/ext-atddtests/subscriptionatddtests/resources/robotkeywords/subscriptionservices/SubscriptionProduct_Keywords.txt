@@ -1,0 +1,15 @@
+*** Settings ***
+Library        	de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Resource		impex/Impex_Keywords.txt
+
+*** Keywords ***
+create subscription product "${productCode:[^"]+}"
+    [Documentation]    Creates a subscription product with the given code
+    create subscription product "${productCode}" with subscription term "monthly"
+    
+create subscription product "${productCode}" with subscription term "${termId}"
+	[Documentation]    Creates a subscription product with the given code and subscription term
+    @{binding}    create list    productCode    ${productCode}    termId    ${termId}
+    ${templateName}=    Set Variable    impex-templates/subscription-product/subscriptionproduct-insert.impex.vm
+    ${impEx}=    generate impex from template   ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"

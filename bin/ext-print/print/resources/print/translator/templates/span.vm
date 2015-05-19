@@ -1,0 +1,34 @@
+#if($class!='')
+${utility.initializeCharStyle($node)}
+#set($node.attributes.openTag="true")
+#end
+${utility.closeParentsTags($node)}
+#set($counter=0)
+#if($class!='')
+<CharStyle:$class>
+${utility.openForcedParentsTags($node)}
+#end
+#foreach($child in $node.getChildNodes())
+#set($counter=$counter+1)
+#if(($child.nodeName=="textNode" || $child.nodeName=="entity") && $node.attributes.openTag=="false")
+#if($class!='')
+#set($node.attributes.openTag="true")
+<CharStyle:$class>
+${utility.openForcedParentsTags($node)}
+#end
+#end
+#if($child.nodeName=="span" && $node.attributes.openTag=="true" && $class!='')
+#set($node.attributes.openTag="false")
+${utility.closeForcedParentsTags($node)}
+<CharStyle:>
+#end
+$translator.renderTextFromNode($child)
+#end
+#if($counter==0)
+$node.nodeText
+#end
+#if($node.attributes.openTag=="true" && $class!='')
+${utility.closeForcedParentsTags($node)}
+<CharStyle:>
+${utility.openParentsTags($node)}
+#end

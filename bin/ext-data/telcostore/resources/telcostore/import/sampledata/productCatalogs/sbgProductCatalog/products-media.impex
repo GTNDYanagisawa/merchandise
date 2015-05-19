@@ -1,0 +1,82 @@
+# ImPex for Importing Product Media
+
+# Macros / Replacement Parameter definitions
+$productCatalog=sbgProductCatalog
+$storeName=telco
+
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog]
+$media=@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator]
+$thumbnail=thumbnail(code, $catalogVersion)
+$picture=picture(code, $catalogVersion)
+$thumbnails=thumbnails(code, $catalogVersion)
+$detail=detail(code, $catalogVersion)
+$normal=normal(code, $catalogVersion)
+$others=others(code, $catalogVersion)
+$data_sheet=data_sheet(code, $catalogVersion)
+$medias=medias(code, $catalogVersion)
+$galleryImages=galleryImages(qualifier, $catalogVersion)
+$siteResource=jar:de.hybris.platform.telcostore.constants.TelcostoreConstants&/telcostore/import/sampledata/productCatalogs/$productCatalog
+
+# BASIC_TV;basic_plan
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpg'];$catalogVersion;folder(qualifier)[forceWrite=true]
+;1200Wx1200H;/1200Wx1200H/basic_plan.jpg;$siteResource/images/1200Wx1200H/basic_plan.jpg;;;images
+;515Wx515H;/515Wx515H/basic_plan.jpg;$siteResource/images/515Wx515H/basic_plan.jpg;;;images
+;300Wx300H;/300Wx300H/basic_plan.jpg;$siteResource/images/300Wx300H/basic_plan.jpg;;;images
+;96Wx96H;/96Wx96H/basic_plan.jpg;$siteResource/images/96Wx96H/basic_plan.jpg;;;images
+;65Wx65H;/65Wx65H/basic_plan.jpg;$siteResource/images/65Wx65H/basic_plan.jpg;;;images
+;30Wx30H;/30Wx30H/basic_plan.jpg;$siteResource/images/30Wx30H/basic_plan.jpg;;;images
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$catalogVersion
+;basic_plan;/1200Wx1200H/basic_plan.jpg,/515Wx515H/basic_plan.jpg,/300Wx300H/basic_plan.jpg,/96Wx96H/basic_plan.jpg,/65Wx65H/basic_plan.jpg,/30Wx30H/basic_plan.jpg
+
+UPDATE Product;code[unique=true];$picture;$thumbnail;$detail;$normal;$thumbnails;$others;$galleryImages;$catalogVersion
+;BASIC_TV;/300Wx300H/basic_plan.jpg;/96Wx96H/basic_plan.jpg;/1200Wx1200H/basic_plan.jpg;/300Wx300H/basic_plan.jpg;/96Wx96H/basic_plan.jpg;/515Wx515H/basic_plan.jpg,/300Wx300H/basic_plan.jpg,/96Wx96H/basic_plan.jpg,/65Wx65H/basic_plan.jpg,/30Wx30H/basic_plan.jpg;basic_plan
+
+
+# BIG_TV;big_plan
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpg'];$catalogVersion;folder(qualifier)[forceWrite=true]
+;1200Wx1200H;/1200Wx1200H/big_plan.jpg;$siteResource/images/1200Wx1200H/big_plan.jpg;;;images
+;515Wx515H;/515Wx515H/big_plan.jpg;$siteResource/images/515Wx515H/big_plan.jpg;;;images
+;300Wx300H;/300Wx300H/big_plan.jpg;$siteResource/images/300Wx300H/big_plan.jpg;;;images
+;96Wx96H;/96Wx96H/big_plan.jpg;$siteResource/images/96Wx96H/big_plan.jpg;;;images
+;65Wx65H;/65Wx65H/big_plan.jpg;$siteResource/images/65Wx65H/big_plan.jpg;;;images
+;30Wx30H;/30Wx30H/big_plan.jpg;$siteResource/images/30Wx30H/big_plan.jpg;;;images
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$catalogVersion
+;big_plan;/1200Wx1200H/big_plan.jpg,/515Wx515H/big_plan.jpg,/300Wx300H/big_plan.jpg,/96Wx96H/big_plan.jpg,/65Wx65H/big_plan.jpg,/30Wx30H/big_plan.jpg
+
+UPDATE Product;code[unique=true];$picture;$thumbnail;$detail;$normal;$thumbnails;$others;$galleryImages;$catalogVersion
+;BIG_TV;/300Wx300H/big_plan.jpg;/96Wx96H/big_plan.jpg;/1200Wx1200H/big_plan.jpg;/300Wx300H/big_plan.jpg;/96Wx96H/big_plan.jpg;/515Wx515H/big_plan.jpg,/300Wx300H/big_plan.jpg,/96Wx96H/big_plan.jpg,/65Wx65H/big_plan.jpg,/30Wx30H/big_plan.jpg;big_plan
+
+
+# PREMIUM_TV;premium_plan
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpg'];$catalogVersion;folder(qualifier)[forceWrite=true]
+;1200Wx1200H;/1200Wx1200H/premium_plan.jpg;$siteResource/images/1200Wx1200H/premium_plan.jpg;;;images
+;515Wx515H;/515Wx515H/premium_plan.jpg;$siteResource/images/515Wx515H/premium_plan.jpg;;;images
+;300Wx300H;/300Wx300H/premium_plan.jpg;$siteResource/images/300Wx300H/premium_plan.jpg;;;images
+;96Wx96H;/96Wx96H/premium_plan.jpg;$siteResource/images/96Wx96H/premium_plan.jpg;;;images
+;65Wx65H;/65Wx65H/premium_plan.jpg;$siteResource/images/65Wx65H/premium_plan.jpg;;;images
+;30Wx30H;/30Wx30H/premium_plan.jpg;$siteResource/images/30Wx30H/premium_plan.jpg;;;images
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$catalogVersion
+;premium_plan;/1200Wx1200H/premium_plan.jpg,/515Wx515H/premium_plan.jpg,/300Wx300H/premium_plan.jpg,/96Wx96H/premium_plan.jpg,/65Wx65H/premium_plan.jpg,/30Wx30H/premium_plan.jpg
+
+UPDATE Product;code[unique=true];$picture;$thumbnail;$detail;$normal;$thumbnails;$others;$galleryImages;$catalogVersion
+;PREMIUM_TV;/300Wx300H/premium_plan.jpg;/96Wx96H/premium_plan.jpg;/1200Wx1200H/premium_plan.jpg;/300Wx300H/premium_plan.jpg;/96Wx96H/premium_plan.jpg;/515Wx515H/premium_plan.jpg,/300Wx300H/premium_plan.jpg,/96Wx96H/premium_plan.jpg,/65Wx65H/premium_plan.jpg,/30Wx30H/premium_plan.jpg;premium_plan
+
+
+# DELUXE_TV;deluxe_plan
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpg'];$catalogVersion;folder(qualifier)[forceWrite=true]
+;1200Wx1200H;/1200Wx1200H/deluxe_plan.jpg;$siteResource/images/1200Wx1200H/deluxe_plan.jpg;;;images
+;515Wx515H;/515Wx515H/deluxe_plan.jpg;$siteResource/images/515Wx515H/deluxe_plan.jpg;;;images
+;300Wx300H;/300Wx300H/deluxe_plan.jpg;$siteResource/images/300Wx300H/deluxe_plan.jpg;;;images
+;96Wx96H;/96Wx96H/deluxe_plan.jpg;$siteResource/images/96Wx96H/deluxe_plan.jpg;;;images
+;65Wx65H;/65Wx65H/deluxe_plan.jpg;$siteResource/images/65Wx65H/deluxe_plan.jpg;;;images
+;30Wx30H;/30Wx30H/deluxe_plan.jpg;$siteResource/images/30Wx30H/deluxe_plan.jpg;;;images
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$catalogVersion
+;deluxe_plan;/1200Wx1200H/deluxe_plan.jpg,/515Wx515H/deluxe_plan.jpg,/300Wx300H/deluxe_plan.jpg,/96Wx96H/deluxe_plan.jpg,/65Wx65H/deluxe_plan.jpg,/30Wx30H/deluxe_plan.jpg
+
+UPDATE Product;code[unique=true];$picture;$thumbnail;$detail;$normal;$thumbnails;$others;$galleryImages;$catalogVersion
+;DELUXE_TV;/300Wx300H/deluxe_plan.jpg;/96Wx96H/deluxe_plan.jpg;/1200Wx1200H/deluxe_plan.jpg;/300Wx300H/deluxe_plan.jpg;/96Wx96H/deluxe_plan.jpg;/515Wx515H/deluxe_plan.jpg,/300Wx300H/deluxe_plan.jpg,/96Wx96H/deluxe_plan.jpg,/65Wx65H/deluxe_plan.jpg,/30Wx30H/deluxe_plan.jpg;deluxe_plan
+

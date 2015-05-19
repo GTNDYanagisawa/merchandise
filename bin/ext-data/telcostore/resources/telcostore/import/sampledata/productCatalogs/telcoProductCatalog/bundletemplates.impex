@@ -1,0 +1,79 @@
+$productCatalog=telcoProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+
+INSERT_UPDATE BundleTemplateStatus;id[unique=true];status(code)[default=approved];$catalogVersion
+;Status_PAYG;
+;Status_SMAR;
+;Status_TABL;
+;Status_STAR;
+;Status_SODP;
+;Status_SOVP;
+;Status_SARC;archived;
+
+# Insert BundleTemplates
+INSERT_UPDATE BundleTemplate;id[unique=true];parentTemplate(id, version[default=1.0], $catalogVersion);version[default=1.0][unique=true];status(id, $catalogVersion);$catalogVersion;
+;PAYG;;3.14;Status_PAYG;
+;PAYG_Device;PAYG:3.14;3.14;Status_PAYG;
+;PAYG_ServicePlan;PAYG:3.14;3.14;Status_PAYG;
+;SMAR;;;Status_SMAR;
+;SMAR_Device;SMAR;;Status_SMAR;
+;SMAR_ServicePlan;SMAR;;Status_SMAR;
+;SMAR_InternetPackage;SMAR;;Status_SMAR;
+;SMAR_PopularAddOns;SMAR;;Status_SMAR;
+;SMAR_MobileTV;SMAR;;Status_SMAR;
+;SMAR_MobileTVChannels;SMAR;;Status_SMAR;
+;TABL;;;Status_TABL;
+;TABL_Device;TABL;;Status_TABL;
+;TABL_ServicePlan;TABL;;Status_TABL;
+;TABL_PopularAddOns;TABL;;Status_TABL;
+;TABL_MobileTV;TABL;;Status_TABL;
+;TABL_MobileTVChannels;TABL;;Status_TABL;
+;STAR;;;Status_STAR;
+;STAR_Device;STAR;;Status_STAR;
+;STAR_ServicePlan;STAR;;Status_STAR;
+;STAR_InternetPackage;STAR;;Status_STAR;
+;STAR_PopularAddOns;STAR;;Status_STAR;
+;SODP;;1.1;Status_SODP;
+;SODP_ServicePlan;SODP:1.1;1.1;Status_SODP;
+;SODP_PopularAddOns;SODP:1.1;1.1;Status_SODP;
+;SOVP;;1.1;Status_SOVP;
+;SOVP_ServicePlan;SOVP:1.1;1.1;Status_SOVP;
+;SOVP_InternetPackage;SOVP:1.1;1.1;Status_SOVP;
+;SOVP_PopularAddOns;SOVP:1.1;1.1;Status_SOVP;
+;SARC;;;Status_SARC;
+;SARC_Device;SARC;;Status_SARC;
+;SARC_ServicePlan;SARC;;Status_SARC;
+;SARC_InternetPackage;SARC;;Status_SARC;
+;SARC_PopularAddOns;SARC;;Status_SARC;
+;SARC_MobileTV;SARC;;Status_SARC;
+;SARC_MobileTVChannels;SARC;;Status_SARC;
+
+# Set the child templates again to make sure that the sequence of child templates is correct
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];childTemplates(id,version[default=1.0],$catalogVersion);$catalogVersion
+;PAYG;3.14;PAYG_Device:3.14,PAYG_ServicePlan:3.14
+;SMAR;;SMAR_Device,SMAR_ServicePlan,SMAR_InternetPackage,SMAR_PopularAddOns,SMAR_MobileTV,SMAR_MobileTVChannels
+;TABL;;TABL_Device,TABL_ServicePlan,TABL_PopularAddOns,TABL_MobileTV,TABL_MobileTVChannels
+;STAR;;STAR_Device,STAR_ServicePlan,STAR_InternetPackage,STAR_PopularAddOns
+;SODP;1.1;SODP_ServicePlan:1.1,SODP_PopularAddOns:1.1
+;SOVP;1.1;SOVP_ServicePlan:1.1,SOVP_InternetPackage:1.1,SOVP_PopularAddOns:1.1
+;SARC;;SARC_Device,SARC_ServicePlan,SARC_InternetPackage,SARC_PopularAddOns,SARC_MobileTV,SARC_MobileTVChannels
+
+
+# Bundle dependencies
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];requiredBundleTemplates(id,version[default=1.0],$catalogVersion);$catalogVersion
+;SMAR_InternetPackage;;SMAR_ServicePlan
+;SMAR_PopularAddOns;;SMAR_ServicePlan
+;SMAR_MobileTV;;SMAR_ServicePlan
+;SMAR_MobileTVChannels;;SMAR_ServicePlan,SMAR_MobileTV
+;TABL_PopularAddOns;;TABL_ServicePlan
+;TABL_MobileTV;;TABL_ServicePlan
+;TABL_MobileTVChannels;;TABL_ServicePlan,TABL_MobileTV
+;STAR_InternetPackage;;STAR_ServicePlan
+;STAR_PopularAddOns;;STAR_ServicePlan
+;SODP_PopularAddOns;1.1;SODP_ServicePlan:1.1
+;SOVP_InternetPackage;1.1;SOVP_ServicePlan:1.1
+;SOVP_PopularAddOns;1.1;SOVP_ServicePlan:1.1
+;SARC_InternetPackage;;SARC_ServicePlan
+;SARC_PopularAddOns;;SARC_ServicePlan
+;SARC_MobileTV;;SARC_ServicePlan
+;SARC_MobileTVChannels;;SARC_ServicePlan,SARC_MobileTV

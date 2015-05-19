@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+	<context:component-scan base-package="de.hybris.platform.security.captcha.controllers"/>
+
+	<aop:config proxy-target-class="true" expose-proxy="true">
+		<aop:aspect id="prepWidgetAspect" ref="reCaptchaAspect">
+			<aop:around method="prepare"
+			            pointcut="execution(* de.hybris.platform.security.captcha.controllers.pages..*.getWidget(..))"/>
+		</aop:aspect>
+		<aop:aspect id="prepRegistratonReCaptchaAspect" ref="reCaptchaAspect">
+			<aop:around method="prepare"
+			            pointcut="execution(* de.hybris.platform..controllers.pages..*.doLogin(..))"/>
+		</aop:aspect>
+		<aop:aspect id="registratonReCaptchaAspect" ref="reCaptchaAspect">
+			<aop:around method="advise"
+			            pointcut="execution(* de.hybris.platform..controllers.pages..*.doRegister(..))"/>
+		</aop:aspect>
+		<aop:aspect id="prepCheckoutRegistratonReCaptchaAspect" ref="reCaptchaAspect">
+			<aop:around method="prepare"
+			            pointcut="execution(* de.hybris.platform..controllers.pages..*.doCheckoutLogin(..))"/>
+		</aop:aspect>
+		<aop:aspect id="checkoutRegistratonReCaptchaAspect" ref="reCaptchaAspect">
+			<aop:around method="advise"
+			            pointcut="execution(* de.hybris.platform..controllers.pages..*.doCheckoutRegister(..))"/>
+		</aop:aspect>
+		<aop:aspect id="accountEmailUpdateReCaptchaAspect" ref="reCaptchaAspect">
+			<aop:around method="advise"
+			            pointcut="execution(* de.hybris.platform..controllers.pages..*.updateEmail(..))"/>
+		</aop:aspect>
+	</aop:config>
+	<alias name="defaultReCaptchaAspect" alias="reCaptchaAspect"/>
+	<bean name="defaultReCaptchaAspect" class="de.hybris.platform.security.captcha.ReCaptchaAspect">
+		<property name="siteConfigService" ref="siteConfigService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+	</bean>
+
+</beans>

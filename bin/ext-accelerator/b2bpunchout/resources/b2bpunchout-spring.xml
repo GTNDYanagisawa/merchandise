@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+           
+    
+	<alias name="defaultPunchOutCredentialService" alias="punchOutCredentialService"/>
+	<bean id="defaultPunchOutCredentialService" class="de.hybris.platform.b2b.punchout.services.impl.DefaultPunchOutCredentialService">
+		<property name="credentialDao" ref="punchOutCredentialDao"/>
+	</bean>
+	
+	<bean id="punchOutCredentialDao" class="de.hybris.platform.b2b.punchout.daos.impl.DefaultPunchOutCredentialDao"/>
+
+	<alias name="defaultPunchOutService" alias="punchOutService"/>
+	<bean id="defaultPunchOutService" class="de.hybris.platform.b2b.punchout.services.impl.DefaultPunchOutService">
+		<property name="cartService" ref="cartService"/>
+		<property name="commerceCartService" ref="commerceCartService"/>
+		<property name="punchOutCredentialService" ref="punchOutCredentialService"/>
+		<property name="setUpRequestProcessingActions">
+			<list>
+				<ref bean="authenticationCheckPunchOutProcessingAction"/>
+				<ref bean="operationPunchOutProcessingAction"/>
+				<ref bean="editOperationPunchOutSetUpProcessingAction"/>
+				<ref bean="populateResponsePunchOutProcessingAction"/>
+			</list>
+		</property>
+		<property name="punchOutTransactionActions">
+			<list>
+				<ref bean="punchOutOrderMessageHeaderProcessingAction"/>
+				<ref bean="punchOutOrderMessageProcessingAction"/>
+			</list>
+		</property>
+		<property name="purchaseOrderProcessingActions">
+			<list>
+				<ref bean="authenticationCheckPurchaseOrderProcessingAction"/>
+				<ref bean="prepareCartPurchaseOrderProcessingAction"/>
+				<ref bean="populateCartPurchaseOrderProcessingAction"/>
+				<ref bean="placePurchaseOrderProcessingAction"/>
+			</list>
+		</property>
+		<property name="profileRequestProcessingActions">
+			<list>
+				<ref bean="authenticationCheckPunchOutProcessingAction"/>
+				<ref bean="populateProfileResponseProcessingAction"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPopulateProfileResponseProcessingAction" alias="populateProfileResponseProcessingAction"/>
+	<bean id="defaultPopulateProfileResponseProcessingAction" class="de.hybris.platform.b2b.punchout.actions.PopulateProfileResponseProcessingAction">
+		<property name="profileResponsePopulator" ref="profileResponsePopulator"/>
+	</bean>
+
+
+	<alias name="defaultEditOperationPunchOutSetUpProcessingAction" alias="editOperationPunchOutSetUpProcessingAction"/>
+	<bean id="defaultEditOperationPunchOutSetUpProcessingAction" class="de.hybris.platform.b2b.punchout.actions.EditOperationPunchOutSetupProcessingAction">
+		<property name="cartService" ref="cartService"/>
+		<property name="itemOutConverter" ref="itemOutConverter"/>
+	</bean>
+	
+	<alias name="defaultPrepareCartPurchaseOrderProcessingAction" alias="prepareCartPurchaseOrderProcessingAction"/>
+	<bean id="defaultPrepareCartPurchaseOrderProcessingAction" class="de.hybris.platform.b2b.punchout.actions.PrepareCartPurchaseOrderProcessingAction">
+		<property name="b2bCheckoutFlowFacade" ref="b2bCheckoutFlowFacade"/>
+		<property name="punchOutConfigurationService" ref="punchOutConfigurationService"/>
+	</bean>
+
+	<alias name="defaultPlacePurchaseOrderProcessingAction" alias="placePurchaseOrderProcessingAction"/>
+	<bean id="defaultPlacePurchaseOrderProcessingAction" class="de.hybris.platform.b2b.punchout.actions.PlacePurchaseOrderProcessingAction">
+		<property name="b2bCheckoutFlowFacade" ref="b2bCheckoutFlowFacade"/>
+	</bean>
+
+	<alias name="defaultPopulateCartPurchaseOrderProcessingAction" alias="populateCartPurchaseOrderProcessingAction"/>
+	<bean id="defaultPopulateCartPurchaseOrderProcessingAction" class="de.hybris.platform.b2b.punchout.actions.PopulateCartPurchaseOrderProcessingAction">
+		<property name="itemOutConverter" ref="itemOutConverter"/>
+		<property name="orderEntryOverridingPopulator" ref="orderEntryOverridingPopulator"/>
+		<property name="orderRequestCartPopulator" ref="orderRequestCartPopulator"/>
+	</bean>
+
+	<alias name="defaultOrderRequestCartPopulator" alias="orderRequestCartPopulator"/>
+	<bean id="defaultOrderRequestCartPopulator" class="de.hybris.platform.b2b.punchout.populators.impl.DefaultOrderRequestCartPopulator">
+		<property name="addressModelConverter" ref="addressModelConverter"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="cXmlDateUtil" ref="cXmlDateUtil"/>
+		<property name="taxValuePopulator" ref="taxValuePopulator"/>
+	</bean>
+
+	<alias name="defaultItemOutConverter" alias="itemOutConverter"/>
+	<bean id="defaultItemOutConverter" class="de.hybris.platform.b2b.punchout.populators.impl.DefaultItemOutConverter">
+		<property name="cartService" ref="cartService"/>
+		<property name="commerceCartService" ref="commerceCartService"/>
+		<property name="productService" ref="productService"/>
+	</bean>
+
+	<alias name="defaultOrderEntryOverridingPopulator" alias="orderEntryOverridingPopulator"/>
+	<bean id="defaultOrderEntryOverridingPopulator" class="de.hybris.platform.b2b.punchout.populators.impl.DefaultOrderEntryOverridingPopulator">
+		<property name="cartFacade" ref="cartFacade"/>
+		<property name="commerceCartService" ref="commerceCartService"/>
+		<property name="taxValuePopulator" ref="taxValuePopulator"/>
+	</bean>
+
+	<alias name="defaultTaxValuePopulator" alias="taxValuePopulator"/>
+	<bean id="defaultTaxValuePopulator" class="de.hybris.platform.b2b.punchout.populators.impl.DefaultTaxValuePopulator"/>
+	
+	<alias name="defaultAuthenticationCheckPurchaseOrderProcessingAction" alias="authenticationCheckPurchaseOrderProcessingAction"/>
+	<bean id="defaultAuthenticationCheckPurchaseOrderProcessingAction" class="de.hybris.platform.b2b.punchout.actions.AuthenticationCheckPurchaseOrderProcessingAction">
+		<property name="punchOutAuthenticationVerifier" ref="punchOutAuthenticationVerifier"/>
+	</bean>
+
+	<alias name="defaultAuthenticationCheckPunchOutProcessingAction" alias="authenticationCheckPunchOutProcessingAction"/>
+	<bean id="defaultAuthenticationCheckPunchOutProcessingAction" class="de.hybris.platform.b2b.punchout.actions.AuthenticationCheckPunchOutProcessingAction">
+		<property name="punchOutAuthenticationVerifier" ref="punchOutAuthenticationVerifier"/>
+	</bean>
+
+	<alias name="defaultOperationPunchOutProcessingAction" alias="operationPunchOutProcessingAction"/>
+	<bean id="defaultOperationPunchOutProcessingAction" class="de.hybris.platform.b2b.punchout.actions.OperationPunchOutProcessingAction">
+		<property name="newSessionPunchOutProcessingAction" ref="newSessionPunchOutProcessingAction"/>
+		<property name="punchOutSessionService" ref="punchOutSessionService"/>
+	</bean>
+
+	<alias name="defaultPopulateResponsePunchOutProcessingAction" alias="populateResponsePunchOutProcessingAction"/>
+	<bean id="defaultPopulateResponsePunchOutProcessingAction" class="de.hybris.platform.b2b.punchout.actions.PopulateResponsePunchOutProcessingAction">
+		<property name="punchOutConfigurationService" ref="punchOutConfigurationService"/>
+	</bean>
+	
+	<alias name="defaultPunchOutOrderMessageHeaderProcessingAction" alias="punchOutOrderMessageHeaderProcessingAction"/>
+	<bean id="defaultPunchOutOrderMessageHeaderProcessingAction" class="de.hybris.platform.b2b.punchout.actions.PunchOutOrderMessageHeaderProcessingAction">
+		<property name="punchOutConfigurationService" ref="punchOutConfigurationService"/>
+		<property name="punchOutSessionService" ref="punchOutSessionService"/>
+	</bean>
+	
+	<alias name="defaultPunchOutOrderMessageProcessingAction" alias="punchOutOrderMessageProcessingAction"/>
+	<bean id="defaultPunchOutOrderMessageProcessingAction" class="de.hybris.platform.b2b.punchout.actions.PunchOutOrderMessageProcessingAction">
+		<property name="punchOutOrderMessageConverter" ref="punchOutOrderMessageConverter" />
+		<property name="punchOutSessionService" ref="punchOutSessionService"/>
+	</bean>
+
+	<bean id="punchOutAuthenticationVerifier" class="de.hybris.platform.b2b.punchout.actions.AuthenticationVerifier">
+		<property name="punchOutCredentialService" ref="punchOutCredentialService"/>
+	</bean>
+	
+	<bean id="newSessionPunchOutProcessingAction" class="de.hybris.platform.b2b.punchout.actions.NewSessionPunchOutProcessingAction">
+		<property name="punchOutSessionPopulator" ref="punchOutSessionPopulator"/>
+	</bean>
+	
+	<alias name="defaultPunchOutSessionPopulator" alias="punchOutSessionPopulator"/>
+	<bean id="defaultPunchOutSessionPopulator" class="de.hybris.platform.b2b.punchout.populators.impl.DefaultPunchOutSessionPopulator"/>
+	
+	<bean id="punchOutSessionService" class="de.hybris.platform.b2b.punchout.services.impl.DefaultPunchOutSessionService">
+		<property name="configurationService" ref="configurationService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+	
+	<bean id="cipherService" class="de.hybris.platform.b2b.punchout.services.impl.DefaultCipherService">
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+	
+	<alias name="defaultPunchOutOrderMessageConverter" alias="punchOutOrderMessageConverter"/>
+	<bean id="defaultPunchOutOrderMessageConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="punchOutOrderMessageBean"/>
+		<property name="populators">
+			<list>
+				<ref bean="punchOutOrderMessagePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPunchOutItemInConverter" alias="punchOutOrderEntryConverter"/>
+	<bean id="defaultPunchOutItemInConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="itemInBean"/>
+		<property name="populators">
+			<list>
+				<ref bean="punchOutItemInPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPunchOutOrderMessagePopulator" alias="punchOutOrderMessagePopulator"/>
+	<bean id="defaultPunchOutOrderMessagePopulator" class="de.hybris.platform.b2b.punchout.populators.impl.DefaultPunchOutOrderMessagePopulator">
+		<property name="punchOutOrderEntryConverter" ref="punchOutOrderEntryConverter"/>
+	</bean>
+	
+	<alias name="defaultPunchOutItemInPopulator" alias="punchOutItemInPopulator"/>
+	<bean id="defaultPunchOutItemInPopulator" class="de.hybris.platform.b2b.punchout.populators.impl.DefaultPunchOutItemInPopulator" >
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<alias name="defaultAddressModelConverter" alias="addressModelConverter"/>
+	<bean id="defaultAddressModelConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="addressModelBean"/>
+		<property name="populators">
+			<list>
+				<ref bean="addressModelPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultAddressModelPopulator" alias="addressModelPopulator"/>
+	<bean id="defaultAddressModelPopulator" class="de.hybris.platform.b2b.punchout.populators.impl.DefaultAddressModelPopulator">
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	
+	<bean id="punchOutOrderMessageBean" class="org.cxml.PunchOutOrderMessage" scope="prototype"/>
+	<bean id="itemInBean" class="org.cxml.ItemIn" scope="prototype"/>
+	<bean id="addressModelBean" class="de.hybris.platform.core.model.user.AddressModel" scope="prototype"/>
+	
+	<bean id="cXmlDateUtil" class="de.hybris.platform.b2b.punchout.util.CXmlDateUtil"/>
+
+	<alias name="punchOutOrderRequiresCalculationStrategy" alias="orderRequiresCalculationStrategy"/>
+	<bean id="punchOutOrderRequiresCalculationStrategy" class="de.hybris.platform.b2b.punchout.order.PunchOutOrderRequiresCalculationStrategy">
+		<property name="defaultStrategy" ref="defaultOrderRequiresCalculationStrategy" />
+	</bean>
+	
+	<alias name="defaultProfileResponsePopulator" alias="profileResponsePopulator"/>
+	<bean id="defaultProfileResponsePopulator" class="de.hybris.platform.b2b.punchout.populators.impl.DefaultProfileResponsePopulator">
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService"/>
+		<property name="supportedTransactionURLPaths" ref="supportedTransactionURLPaths"/>
+		<property name="cXmlDateUtil" ref="cXmlDateUtil"/>
+	</bean>
+	
+	<alias name="emptySupportedTransactionURLPaths" alias="supportedTransactionURLPaths"/>
+	<util:map id="emptySupportedTransactionURLPaths">
+		<entry key="test" value="doNotUseMe"/>
+	</util:map>
+	
+	<bean id="b2BCustomerPunchOutCredentialMappingValidateInterceptor"
+	      class="de.hybris.platform.b2b.punchout.interceptor.B2BCustomerPunchOutCredentialMappingValidateInterceptor">
+	    <property name="customerService" ref="b2bCustomerService"/>
+	    <property name="punchOutCredentialService" ref="punchOutCredentialService"/>
+		<property name="l10NService" ref="l10nService"/>
+	</bean>
+
+	<bean id="b2BCustomerPunchOutCredentialMappingValidateInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="b2BCustomerPunchOutCredentialMappingValidateInterceptor"/>
+		<property name="typeCode" value="B2BCustomerPunchOutCredentialMapping"/>
+	</bean>
+	
+	<bean id="punchOutCredentialValidateInterceptor"
+	      class="de.hybris.platform.b2b.punchout.interceptor.PunchOutCredentialValidateInterceptor">
+	    <property name="punchOutCredentialService" ref="punchOutCredentialService"/>
+		<property name="l10NService" ref="l10nService"/>
+	</bean>
+
+	<bean id="punchOutCredentialValidateInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="punchOutCredentialValidateInterceptor"/>
+		<property name="typeCode" value="PunchOutCredential"/>
+	</bean>
+	
+	<!-- Empty punchOut configuration. Should be overwritten on the punchOut addon. -->
+	<alias name="emptyPunchOutConfigurationService" alias="punchOutConfigurationService"/>
+	<bean id="emptyPunchOutConfigurationService" class="de.hybris.platform.b2b.punchout.services.impl.EmptyPunchOutConfigurationService">
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService"/>
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+</beans>

@@ -1,0 +1,45 @@
+# ImpEx for Importing Entitlements
+
+# Macros / Replacement Parameter definitions
+$productCatalog=sbgProductCatalog
+
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default=Staged])[unique=true,default=$productCatalog:Staged]
+
+INSERT_UPDATE Entitlement;id[unique=true];usageUnit(id)
+;local_and_us_radio_stations;radio_stations
+;theme_packages;theme_packages
+;video_on_demand;videos_on_demand
+;documentary_on_demand;documentaries_on_demand
+;movie_on_demand;movies_on_demand
+;blockbuster_on_demand;blockbusters_on_demand
+
+INSERT_UPDATE Entitlement;id[unique=true]
+;digital_hd_receiver
+;digital_hd_recorder
+;spotify_premium_account
+
+INSERT_UPDATE ProductEntitlement;id[unique=true];entitlement(id);subscriptionProduct(code, $catalogVersion);quantity;timeUnit(code);timeUnitStart;timeUnitDuration;$catalogVersion
+;local_and_us_radio_stations_BASIC_TV_1;local_and_us_radio_stations;BASIC_TV;30;month;1;1;
+;local_and_us_radio_stations_BASIC_TV_2;local_and_us_radio_stations;BASIC_TV;90;month;2;;
+;local_and_us_radio_stations_BIG_TV;local_and_us_radio_stations;BIG_TV;90;
+;local_and_us_radio_stations_PREMIUM_TV;local_and_us_radio_stations;PREMIUM_TV;90;
+;local_and_us_radio_stations_DELUXE_TV;local_and_us_radio_stations;DELUXE_TV;90;
+;theme_packages_BIG_TV;theme_packages;BIG_TV;6;
+;theme_packages_PREMIUM_TV;theme_packages;PREMIUM_TV;9;
+;theme_packages_DELUXE_TV;theme_packages;DELUXE_TV;12;
+
+INSERT_UPDATE ProductEntitlement;id[unique=true];entitlement(id);subscriptionProduct(code, $catalogVersion);$catalogVersion
+;digital_hd_receiver_BASIC_TV;digital_hd_receiver;BASIC_TV;
+;digital_hd_receiver_BIG_TV;digital_hd_receiver;BIG_TV;
+;digital_hd_recorder_PREMIUM_TV;digital_hd_recorder;PREMIUM_TV;
+;digital_hd_recorder_DELUXE_TV;digital_hd_recorder;DELUXE_TV;
+;spotify_premium_account_BIG_TV;spotify_premium_account;BIG_TV;
+;spotify_premium_account_PREMIUM_TV;spotify_premium_account;PREMIUM_TV;
+;spotify_premium_account_DELUXE_TV;spotify_premium_account;DELUXE_TV;
+
+# 2nd insert of metered ProductEntitlements to make sure that these are displayed after the ProductEntitlements
+INSERT_UPDATE ProductEntitlement;id[unique=true];entitlement(id);subscriptionProduct(code, $catalogVersion);quantity;timeUnit(code);timeUnitStart;timeUnitDuration;$catalogVersion
+;video_on_demand_PREMIUM_TV;video_on_demand;PREMIUM_TV;3
+;video_on_demand_DELUXE_TV;video_on_demand;DELUXE_TV;10
+;documentary_on_demand_DELUXE_TV;documentary_on_demand;DELUXE_TV;-1
+

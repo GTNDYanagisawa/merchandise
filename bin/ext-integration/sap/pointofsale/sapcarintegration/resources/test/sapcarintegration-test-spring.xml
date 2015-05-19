@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<bean id="sapCarConfigurationAccess" parent="sapCoreModuleConfigurationAccess">
+		<property name="moduleId" value="sapcarintegration" />
+	</bean>
+
+	<alias alias="carConfigurationService" name="defaultCarConfigurationServiceMock" />
+	<bean id="defaultCarConfigurationServiceMock"
+		class="de.hybris.platform.sap.sapcarintegration.services.impl.DefaultCarConfigurationServiceMock">
+
+	</bean>
+	
+	
+	<alias alias="carDataProviderService" name="defaultCarDataProviderServiceMockData" />
+	<bean id="defaultCarDataProviderServiceMockData"
+		class="de.hybris.platform.sap.sapcarintegration.services.impl.DefaultCarDataProviderServiceMockData">
+
+	</bean>
+	
+	<alias alias="multichannelDataProviderService" name="defaultMultichannelDataProviderServiceMockData" />
+	<bean id="defaultMultichannelDataProviderServiceMockData"
+		class="de.hybris.platform.sap.sapcarintegration.services.impl.DefaultMultichannelDataProviderServiceMockData">
+
+	</bean>
+
+	<alias alias="carOrderHistoryExtractorService" name="defaultCarOrderHistoryExtractorService" />
+	<bean id="defaultCarOrderHistoryExtractorService"
+		class="de.hybris.platform.sap.sapcarintegration.services.impl.DefaultCarOrderHistoryExtractorService">
+		
+	</bean>
+
+	
+	<alias alias="carOrderHistoryService" name="defaultCarOrderHistoryService" />
+	<bean id="defaultCarOrderHistoryService"
+		class="de.hybris.platform.sap.sapcarintegration.services.impl.DefaultCarOrderHistoryService">
+		<property name="carOrderHistoryExtractorService" ref="carOrderHistoryExtractorService" />
+		<property name="carDataProviderService" ref="carDataProviderService" />
+		
+	</bean>
+
+	
+	<alias alias="multichannelOrderHistoryExtractorService" name="defaultMultichannelOrderHistoryExtractorService" />
+	<bean id="defaultMultichannelOrderHistoryExtractorService" parent="carOrderHistoryExtractorService"
+		class="de.hybris.platform.sap.sapcarintegration.services.impl.DefaultMultichannelOrderHistoryExtractorService">
+		<property name="carConfigurationService" ref="carConfigurationService" />
+	</bean>
+	
+	<alias alias="multichannelOrderHistoryService" name="defaultMultichannelOrderHistoryService" />
+	<bean id="defaultMultichannelOrderHistoryService" parent="carOrderHistoryService"
+		class="de.hybris.platform.sap.sapcarintegration.services.impl.DefaultMultichannelOrderHistoryService">
+		<property name="multichannelDataProviderService" ref="multichannelDataProviderService" />
+		<property name="multichannelOrderHistoryExtractorService" ref="multichannelOrderHistoryExtractorService" />
+		
+		
+	</bean>
+
+
+
+
+</beans>

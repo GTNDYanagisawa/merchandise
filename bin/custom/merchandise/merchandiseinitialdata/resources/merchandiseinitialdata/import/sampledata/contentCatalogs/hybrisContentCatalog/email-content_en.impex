@@ -1,0 +1,18 @@
+$contentCatalog=hybrisContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$picture=media(code, $contentCV);
+$wideContent=CMSImageComponent,BannerComponent
+$siteResource=jar:de.hybris.merchandise.initialdata.setup.InitialDataSystemSetup&/merchandiseinitialdata/import/sampledata/contentCatalogs/$contentCatalog
+   
+# Language
+$lang=en
+   
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpg']
+;;/images/theme/banner-sale-now-on.jpg;banner-sale-now-on.jpg;$siteResource/images/theme/banner-sale-now-on.jpg;
+;;/images/theme/banner-free-delivery.jpg;banner-free-delivery.jpg;$siteResource/images/theme/banner-free-delivery.jpg;
+   
+# CMS Image Components
+INSERT_UPDATE CMSImageComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+;;EmailBannerSaleNowOnImage;/images/theme/banner-sale-now-on.jpg
+;;EmailBannerFreeDeliveryImage;/images/theme/banner-free-delivery.jpg

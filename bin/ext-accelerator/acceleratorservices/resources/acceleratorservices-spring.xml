@@ -1,0 +1,1269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<alias name="defaultCartServiceForAccelerator" alias="cartService"/>
+	<bean id="defaultCartServiceForAccelerator"
+	      class="de.hybris.platform.acceleratorservices.order.impl.DefaultCartServiceForAccelerator"
+	      parent="defaultCartService"/>
+
+	<alias name="defaultFutureStockService" alias="futureStockService"/>
+	<bean id="defaultFutureStockService"
+	      class="de.hybris.platform.acceleratorservices.futurestock.impl.DefaultFutureStockService"/>
+
+	<!-- Import Export Configuration -->
+	<import
+			resource="classpath:/acceleratorservices/integration/google-local-export-spring.xml"/>
+	<import
+			resource="classpath:/acceleratorservices/integration/google-local-upload-spring.xml"/>
+	<import
+			resource="classpath:/acceleratorservices/integration/hot-folder-spring.xml"/>
+
+
+	<bean id="exportDataBaseDirectory" class="java.lang.String">
+		<constructor-arg
+				value="#{configurationService.configuration.getProperty('acceleratorservices.export.basefolder')}"/>
+	</bean>
+
+	<!-- Processing uncollected orders -->
+	<alias name="defaultAcceleratorConsignmentDao" alias="acceleratorConsignmentDao"/>
+	<bean id="defaultAcceleratorConsignmentDao"
+	      class="de.hybris.platform.acceleratorservices.order.dao.impl.DefaultAcceleratorConsignmentDao"/>
+
+	<alias name="defaultReminderUncollectedConsignmentStrategy"
+	       alias="reminderUncollectedConsignmentStrategy"/>
+	<bean id="defaultReminderUncollectedConsignmentStrategy"
+	      class="de.hybris.platform.acceleratorservices.order.strategies.impl.ReminderUncollectedConsignmentStrategy">
+		<property name="modelService" ref="modelService"/>
+		<property name="businessProcessService" ref="businessProcessService"/>
+		<property name="timeThreshold" value="48">
+			<description>Time (in hours) that must pass to send reminder email
+			</description>
+		</property>
+	</bean>
+
+	<alias name="defaultCustomerServiceUncollectedConsignmentStrategy"
+	       alias="customerServiceUncollectedConsignmentStrategy"/>
+	<bean id="defaultCustomerServiceUncollectedConsignmentStrategy"
+	      class="de.hybris.platform.acceleratorservices.order.strategies.impl.CustomerServiceUncollectedConsignmentStrategy">
+		<property name="modelService" ref="modelService"/>
+		<property name="businessProcessService" ref="businessProcessService"/>
+		<property name="timeThreshold" value="120">
+			<description>Time (in hours) that must pass to move order to Customer
+				Service and create a ticket
+			</description>
+		</property>
+	</bean>
+
+	<bean id="uncollectedOrdersJob"
+	      class="de.hybris.platform.acceleratorservices.cronjob.UncollectedOrdersJob"
+	      parent="abstractJobPerformable">
+		<property name="acceleratorConsignmentDao" ref="acceleratorConsignmentDao"/>
+		<property name="reminderUncollectedConsignmentStrategy" ref="reminderUncollectedConsignmentStrategy"/>
+		<property name="customerServiceUncollectedConsignmentStrategy"
+		          ref="customerServiceUncollectedConsignmentStrategy"/>
+		<property name="uncollectedConsignmentStatuses">
+			<set>
+				<value>READY_FOR_PICKUP</value>
+			</set>
+		</property>
+	</bean>
+
+	<bean id="abstractAction" class="de.hybris.platform.processengine.action.AbstractAction"
+	      abstract="true">
+		<property name="modelService" ref="modelService"/>
+		<property name="processParameterHelper" ref="processParameterHelper"/>
+	</bean>
+
+	<bean id="abstractGenerateEmailAction"
+	      class="de.hybris.platform.acceleratorservices.process.email.actions.GenerateEmailAction"
+	      parent="abstractAction" abstract="true">
+		<property name="modelService" ref="modelService"/>
+		<property name="cmsEmailPageService" ref="cmsEmailPageService"/>
+		<property name="contextResolutionStrategy" ref="processContextResolutionStrategy"/>
+		<property name="emailGenerationService" ref="emailGenerationService"/>
+	</bean>
+
+	<bean id="generateConsignmentCollectionReminderEmailAction"
+	      parent="abstractGenerateEmailAction">
+		<property name="frontendTemplateName" value="OrderCollectionReminderEmailTemplate"/>
+	</bean>
+
+	<bean id="generateConsignmentMovedToCSEmailAction" parent="abstractGenerateEmailAction">
+		<property name="frontendTemplateName" value="OrderMoveToCsEmailTemplate"/>
+	</bean>
+
+	<bean id="createConsignmentMovedToCSTicketAction"
+	      class="de.hybris.platform.acceleratorservices.order.actions.CreateConsignmentMovedToCSTicketAction"
+	      parent="abstractAction">
+		<property name="ticketBusinessService" ref="ticketBusinessService"/>
+	</bean>
+
+	<bean id="consignmentCollectionReminderProcessDefinitionResource"
+	      class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource"
+		          value="classpath:/acceleratorservices/processes/consignmentCollectionReminderProcess.xml"/>
+	</bean>
+
+	<bean id="moveConsignmentToCustomerServicesProcessDefinitionResource"
+	      class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource"
+		          value="classpath:/acceleratorservices/processes/moveConsignmentToCustomerServicesProcess.xml"/>
+	</bean>
+
+
+	<!-- Cart Restoration -->
+	<bean id="cartRemovalJob"
+	      class="de.hybris.platform.acceleratorservices.cronjob.CartRemovalJob"
+	      parent="abstractJobPerformable">
+		<property name="commerceCartDao" ref="commerceCartDao"/>
+		<property name="timeService" ref="timeService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<!-- Cart Pickup Consolidation -->
+
+	<alias name="defaultPickupPointOfServiceConsolidationStrategy"
+	       alias="pickupPointOfServiceConsolidationStrategy"/>
+	<bean id="defaultPickupPointOfServiceConsolidationStrategy"
+	      class="de.hybris.platform.acceleratorservices.store.pickup.impl.DefaultPickupPointOfServiceConsolidationStrategy">
+		<property name="commerceStockService" ref="commerceStockService"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="customerLocationService" ref="customerLocationService"/>
+		<property name="storeFinderService" ref="storeFinderService"/>
+	</bean>
+
+	<!-- generic job that starts an export -->
+	<bean id="exportDataJobPerformable"
+	      class="de.hybris.platform.acceleratorservices.dataexport.generic.impl.DefaultExportDataJobPerformable"
+	      parent="abstractJobPerformable">
+		<property name="eventService" ref="eventService"/>
+	</bean>
+
+	<!-- generic job that starts an upload -->
+	<bean id="uploadDataJobPerformable"
+	      class="de.hybris.platform.acceleratorservices.dataexport.generic.impl.DefaultUploadDataJobPerformable"
+	      parent="abstractJobPerformable">
+		<property name="eventService" ref="eventService"/>
+	</bean>
+
+	<alias name="defaultEmailAddressDao" alias="emailAddressDao"/>
+	<bean id="defaultEmailAddressDao"
+	      class="de.hybris.platform.acceleratorservices.email.dao.impl.DefaultEmailAddressDao"/>
+
+	<alias name="defaultEmailPageDao" alias="emailPageDao"/>
+	<bean id="defaultEmailPageDao"
+	      class="de.hybris.platform.acceleratorservices.email.dao.impl.DefaultEmailPageDao"
+	      parent="abstractItemDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultCMSEmailPageService" alias="cmsEmailPageService"/>
+	<bean id="defaultCMSEmailPageService"
+	      class="de.hybris.platform.acceleratorservices.email.impl.DefaultCMSEmailPageService"
+	      parent="abstractBusinessService">
+		<property name="emailPageDao" ref="emailPageDao"/>
+	</bean>
+
+	<alias name="defaultAbstractEmailContext" alias="abstractEmailContext"/>
+	<bean id="defaultAbstractEmailContext"
+	      class="de.hybris.platform.acceleratorservices.process.email.context.AbstractEmailContext"
+	      abstract="true" scope="prototype">
+		<property name="customerEmailResolutionService" ref="customerEmailResolutionService"/>
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="urlEncoderService" ref="urlEncoderService"/>
+	</bean>
+
+	<alias alias="emailContextFactory" name="defaultEmailContextFactory"/>
+	<bean id="defaultEmailContextFactory"
+	      class="de.hybris.platform.acceleratorservices.process.email.context.impl.DefaultEmailContextFactory">
+		<property name="rendererTemplateDao" ref="rendererTemplateDao"/>
+		<property name="cmsPageService" ref="cmsPageService"/>
+		<property name="cmsComponentService" ref="cmsComponentService"/>
+		<property name="rendererService" ref="rendererService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="emailTemplateTranslationStrategy" ref="emailTemplateTranslationStrategy"/>
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService"/>
+		<property name="contextResolutionStrategy" ref="processContextResolutionStrategy"/>
+		<property name="emailContextVariables">
+			<map merge="true">
+				<entry key="commonResourceUrl" value="{baseThemeUrl}/_ui/common"/>
+				<entry key="themeResourceUrl" value="{baseThemeUrl}/_ui/desktop/theme-{theme}"/>
+			</map>
+		</property>
+	</bean>
+
+	<alias alias="emailTemplateTranslationStrategy" name="defaultEmailTemplateTranslationStrategy"/>
+	<bean id="defaultEmailTemplateTranslationStrategy"
+	      class="de.hybris.platform.acceleratorservices.process.strategies.impl.DefaultEmailTemplateTranslationStrategy">
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="defaultLanguageIso" value="en"/>
+	</bean>
+
+	<alias alias="emailService" name="defaultEmailService"/>
+	<bean id="defaultEmailService"
+	      class="de.hybris.platform.acceleratorservices.email.impl.DefaultEmailService"
+	      parent="abstractBusinessService">
+		<property name="mediaService" ref="mediaService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="catalogService" ref="catalogService"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="emailAttachmentsMediaFolderName" value="email-attachments"/>
+		<property name="emailBodyMediaFolderName" value="email-body"/>
+		<property name="emailAddressFetchStrategy" ref="emailAddressFetchStrategy"/>
+	</bean>
+
+	<alias name="defaultEmailAddressFetchStrategy" alias="emailAddressFetchStrategy"/>
+	<bean id="defaultEmailAddressFetchStrategy"
+	      class="de.hybris.platform.acceleratorservices.email.strategy.impl.DefaultEmailAddressFetchStrategy">
+		<property name="modelService" ref="modelService"/>
+		<property name="emailAddressDao" ref="emailAddressDao"/>
+	</bean>
+
+	<alias alias="emailGenerationService" name="defaultEmailGenerationService"/>
+	<bean id="defaultEmailGenerationService"
+	      class="de.hybris.platform.acceleratorservices.email.impl.DefaultEmailGenerationService"
+	      parent="abstractBusinessService">
+		<property name="emailService" ref="emailService"/>
+		<property name="rendererService" ref="rendererService"/>
+		<property name="emailContextFactory" ref="emailContextFactory"/>
+	</bean>
+
+	<bean id="sendEmail"
+	      class="de.hybris.platform.acceleratorservices.process.email.actions.SendEmailAction"
+	      parent="abstractAction">
+		<property name="emailService" ref="emailService"/>
+	</bean>
+
+	<bean id="removeSentEmail"
+	      class="de.hybris.platform.acceleratorservices.process.email.actions.RemoveSentEmailAction"
+	      parent="abstractAction">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+
+	<alias alias="processContextResolutionStrategy" name="defaultProcessContextResolutionStrategy"/>
+	<bean id="defaultProcessContextResolutionStrategy"
+	      class="de.hybris.platform.acceleratorservices.process.strategies.impl.DefaultProcessContextResolutionStrategy">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="cmsSiteService" ref="cmsSiteService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="enableLanguageFallback" value="true"/>
+	</bean>
+
+	<alias alias="siteBaseUrlResolutionService" name="defaultSiteBaseUrlResolutionService"/>
+	<bean id="defaultSiteBaseUrlResolutionService"
+	      class="de.hybris.platform.acceleratorservices.urlresolver.impl.DefaultSiteBaseUrlResolutionService"
+	      parent="abstractBusinessService">
+		<property name="configurationService" ref="configurationService"/>
+		<property name="urlEncoderService" ref="urlEncoderService"/>
+		<property name="contextRoots">
+			<map key-type="de.hybris.platform.commerceservices.enums.SiteChannel">
+				<entry key="B2C"
+				       value="#{configurationService.configuration.getProperty('storefrontContextRoot')}"/>
+				<entry key="B2B"
+				       value="#{configurationService.configuration.getProperty('b2bStorefrontContextRoot')}"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Comparators -->
+
+	<bean id="numericFacetComparator"
+	      class="de.hybris.platform.acceleratorservices.search.comparators.NumericFacetComparator">
+		<property name="pattern" value="[0-9]+(\.[0-9])*"/>
+	</bean>
+
+	<bean id="sizeFacetAttributeComparator"
+	      class="de.hybris.platform.acceleratorservices.search.comparators.FacetValueNameComparator">
+		<property name="comparator" ref="sizeAttributeComparator"/>
+	</bean>
+
+	<bean id="sizeAttributeComparator"
+	      class="de.hybris.platform.acceleratorservices.search.comparators.SizeAttributeComparator">
+		<property name="pattern" value="[0-9]+(\.[0-9])*"/>
+		<property name="sizeSystems">
+			<list><!-- based on EN_13402 -->
+				<value>XXS</value>
+				<value>XS</value>
+				<value>S</value>
+				<value>M</value>
+				<value>L</value>
+				<value>LXL</value>
+				<value>XL</value>
+				<value>XXL</value>
+				<value>3XL</value>
+				<value>4XL</value>
+				<value>5XL</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="pointOfServiceDistanceComparator"
+	      class="de.hybris.platform.acceleratorservices.search.comparators.PointOfServiceDistanceComparator">
+		<property name="localStorePreferencesService" ref="localStorePreferencesService"/>
+		<property name="pointOfServiceService" ref="pointOfServiceService"/>
+	</bean>
+
+	<bean id="distanceFacetAttributeComparator"
+	      class="de.hybris.platform.acceleratorservices.search.comparators.FacetValueNameComparator">
+		<property name="comparator" ref="pointOfServiceDistanceComparator"/>
+	</bean>
+
+	<!-- Sort providers -->
+	<bean id="numericFacetSortProviderAsc"
+	      class="de.hybris.platform.solrfacetsearch.config.impl.DefaultFacetSortProvider">
+		<property name="comparator" ref="numericFacetComparator"/>
+	</bean>
+
+	<bean id="numericFacetSortProviderDesc"
+	      class="de.hybris.platform.solrfacetsearch.config.impl.DefaultFacetSortProvider">
+		<property name="comparator" ref="numericFacetComparator"/>
+		<property name="descending" value="true"/>
+	</bean>
+
+	<bean id="sizeAttributeSortProvider"
+	      class="de.hybris.platform.solrfacetsearch.config.impl.DefaultFacetSortProvider">
+		<property name="comparator" ref="sizeFacetAttributeComparator"/>
+	</bean>
+
+	<bean id="distanceAttributeSortProvider"
+	      class="de.hybris.platform.solrfacetsearch.config.impl.DefaultFacetSortProvider">
+		<property name="comparator" ref="distanceFacetAttributeComparator"/>
+	</bean>
+
+	<!-- Value Providers -->
+	<bean id="promotionFacetDisplayNameProvider"
+	      class="de.hybris.platform.acceleratorservices.search.solrfacetsearch.provider.impl.PromotionFacetDisplayNameProvider">
+		<property name="promotionsDao" ref="promotionsDao"/>
+	</bean>
+
+	<alias alias="promotionsDao" name="defaultPromotionsDao"/>
+	<bean id="defaultPromotionsDao"
+	      class="de.hybris.platform.acceleratorservices.promotions.dao.impl.DefaultPromotionsDao"
+	      parent="abstractItemDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<alias alias="hostConfigService" name="defaultHostConfigService"/>
+	<bean id="defaultHostConfigService"
+	      class="de.hybris.platform.acceleratorservices.config.impl.DefaultHostConfigService">
+		<property name="configurationService" ref="configurationService"/>
+		<property name="uiExperienceService" ref="uiExperienceService"/>
+	</bean>
+
+	<alias alias="siteConfigService" name="defaultSiteConfigService"/>
+	<bean id="defaultSiteConfigService"
+	      class="de.hybris.platform.acceleratorservices.config.impl.DefaultSiteConfigService">
+		<property name="configurationService" ref="configurationService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="uiExperienceService" ref="uiExperienceService"/>
+	</bean>
+
+	<alias alias="uiExperienceService" name="defaultUiExperienceService"/>
+	<bean id="defaultUiExperienceService"
+	      class="de.hybris.platform.acceleratorservices.uiexperience.impl.DefaultUiExperienceService">
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<alias alias="localStorePreferencesService" name="defaultLocalStorePreferencesService"/>
+	<bean id="defaultLocalStorePreferencesService"
+	      class="de.hybris.platform.acceleratorservices.store.impl.DefaultLocalStorePreferencesService">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="storeFinderService" ref="storeFinderService"/>
+		<property name="customerLocationService" ref="customerLocationService"/>
+	</bean>
+
+
+	<alias name="defaultCustomerLocationService" alias="customerLocationService"/>
+	<bean id="defaultCustomerLocationService"
+	      class="de.hybris.platform.acceleratorservices.customer.impl.DefaultCustomerLocationService">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="geoWebServiceWrapper" ref="geoServiceWrapper"/>
+	</bean>
+
+	<bean id="itemSyncTimeStampPreparer"
+	      class="de.hybris.platform.catalog.impl.ItemSyncTimeStampPreparer">
+		<!-- property name="modelService" ref="modelService"/ -->
+	</bean>
+
+	<!-- Address Verification Services -->
+	<alias alias="addressVerificationService" name="mockAddressVerificationService"/>
+	<bean id="mockAddressVerificationService"
+	      class="de.hybris.platform.commerceservices.address.impl.MockAddressVerificationService">
+		<property name="baseStoreService" ref="baseStoreService"/>
+	</bean>
+
+	<!-- Pickup-in-store configuration -->
+	<alias name="defaultAcceleratorCheckoutService" alias="acceleratorCheckoutService"/>
+	<bean id="defaultAcceleratorCheckoutService"
+	      class="de.hybris.platform.acceleratorservices.order.impl.DefaultAcceleratorCheckoutService">
+		<property name="pickupPointOfServiceConsolidationStrategy"
+		          ref="pickupPointOfServiceConsolidationStrategy"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="commerceCartService" ref="commerceCartService"/>
+	</bean>
+
+	<!-- Default implementation only returns PointsOfService of Type STORE -->
+	<alias name="acceleratorPointOfServiceDao" alias="pointOfServiceDao"/>
+	<bean id="acceleratorPointOfServiceDao"
+	      class="de.hybris.platform.acceleratorservices.store.impl.AcceleratorPointOfServiceDao"
+	      parent="abstractItemDao"/>
+
+	<!-- CyberSource Hosted Order Page implemented Service, Converters and Populators -->
+
+	<!-- Accelerator Payment Service -->
+	<alias name="defaultCyberSourceAcceleratorPaymentService" alias="acceleratorPaymentService"/>
+	<bean id="defaultCyberSourceAcceleratorPaymentService"
+	      class="de.hybris.platform.acceleratorservices.payment.impl.DefaultAcceleratorPaymentService">
+		<property name="cartService" ref="cartService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+		<property name="creditCardPaymentSubscriptionDao" ref="creditCardPaymentSubscriptionDao"/>
+		<property name="siteConfigService" ref="siteConfigService"/>
+		<property name="paymentResponseInterpretation" ref="paymentResponseInterpretationStrategy"/>
+		<property name="hopPaymentResponseInterpretation" ref="hopPaymentResponseInterpretationStrategy"/>
+		<property name="paymentDataConverter" ref="paymentDataConverter"/>
+		<property name="paymentFormActionUrlStrategy" ref="paymentFormActionUrlStrategy"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="createSubscriptionRequestStrategy" ref="createSubscriptionRequestStrategy"/>
+		<property name="createSubscriptionResultValidationStrategy" ref="createSubscriptionResultValidationStrategy"/>
+		<property name="signatureValidationStrategy" ref="signatureValidationStrategy"/>
+		<property name="creditCardPaymentInfoCreateStrategy" ref="creditCardPaymentInfoCreateStrategy"/>
+		<property name="paymentTransactionStrategy" ref="paymentTransactionStrategy"/>
+		<property name="clientReferenceLookupStrategy" ref="clientReferenceLookupStrategy"/>
+		<property name="fraudCallbackStrategy" ref="fraudCallbackStrategy"/>
+	</bean>
+
+	<alias name="defaultCreateSubscriptionRequestStrategy" alias="createSubscriptionRequestStrategy"/>
+	<bean id="defaultCreateSubscriptionRequestStrategy" class="de.hybris.platform.acceleratorservices.payment.cybersource.strategies.impl.DefaultCreateSubscriptionRequestStrategy">
+		<property name="cartService" ref="cartService"/>
+		<property name="customerBillToDataConverter" ref="customerBillToDataConverter"/>
+		<property name="customerShipToDataConverter" ref="customerShipToDataConverter"/>
+		<property name="paymentInfoDataConverter" ref="paymentInfoDataConverter"/>
+		<property name="siteConfigService" ref="siteConfigService"/>
+		<property name="customerEmailResolutionService" ref="customerEmailResolutionService"/>
+		<property name="hostedOrderPageVersion" value="7"/>
+	</bean>
+
+	<alias name="defaultCreateSubscriptionResultValidationStrategy" alias="createSubscriptionResultValidationStrategy"/>
+	<bean id="defaultCreateSubscriptionResultValidationStrategy" class="de.hybris.platform.acceleratorservices.payment.cybersource.strategies.impl.DefaultCreateSubscriptionResultValidationStrategy">
+		<property name="erroCodeToFormFieldMappingStrategy" ref="erroCodeToFormFieldMappingStrategy"/>
+	</bean>
+
+	<alias name="defaultSignatureValidationStrategy" alias="signatureValidationStrategy"/>
+	<bean id="defaultSignatureValidationStrategy" class="de.hybris.platform.acceleratorservices.payment.cybersource.strategies.impl.DefaultSignatureValidationStrategy">
+		<property name="siteConfigService" ref="siteConfigService"/>
+		<property name="digestUtils" ref="acceleratorDigestUtils"/>
+
+	</bean>
+	<alias name="defaultCreditCardPaymentInfoCreateStrategy" alias="creditCardPaymentInfoCreateStrategy"/>
+	<bean id="defaultCreditCardPaymentInfoCreateStrategy" class="de.hybris.platform.acceleratorservices.payment.cybersource.strategies.impl.DefaultCreditCardPaymentInfoCreateStrategy">
+		<property name="modelService" ref="modelService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="customerEmailResolutionService" ref="customerEmailResolutionService"/>
+	</bean>
+
+	<alias name="defaultPaymentTransactionStrategy" alias="paymentTransactionStrategy"/>
+	<bean id="defaultPaymentTransactionStrategy" class="de.hybris.platform.acceleratorservices.payment.cybersource.strategies.impl.DefaultPaymentTransactionStrategy">
+		<property name="modelService" ref="modelService"/>
+		<property name="commerceCheckoutService" ref="commerceCheckoutService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="businessProcessService" ref="businessProcessService"/>
+		<property name="paymentService" ref="paymentService"/>
+	</bean>
+
+	<alias name="defaultFraudCallbackStrategy" alias="fraudCallbackStrategy"/>
+	<bean id="defaultFraudCallbackStrategy" class="de.hybris.platform.acceleratorservices.payment.strategies.impl.DefaultFraudCallbackStrategy">
+	</bean>
+
+	<alias name="defaultClientReferenceLookupStrategy" alias="clientReferenceLookupStrategy"/>
+	<bean id="defaultClientReferenceLookupStrategy" class="de.hybris.platform.acceleratorservices.payment.strategies.impl.DefaultClientReferenceLookupStrategy">
+		<property name="cartService" ref="cartService"/>
+	</bean>
+
+	<alias name="defaultAcceleratorDigestUtils" alias="acceleratorDigestUtils"/>
+	<bean id="defaultAcceleratorDigestUtils" class="de.hybris.platform.acceleratorservices.payment.utils.impl.DefaultAcceleratorDigestUtils">
+		<property name="macAlgorithm" value="HmacSHA1"/>
+	</bean>
+
+	<alias name="defaultCreditCardPaymentSubscriptionDao" alias="creditCardPaymentSubscriptionDao"/>
+	<bean id="defaultCreditCardPaymentSubscriptionDao" parent="abstractItemDao"
+	      class="de.hybris.platform.acceleratorservices.payment.dao.impl.DefaultCreditCardPaymentSubscriptionDao"/>
+
+	<alias name="defaultCustomerInfoRequestPopulator" alias="customerInfoHopRequestPopulator"/>
+	<bean id="defaultCustomerInfoRequestPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.request.CustomerInfoRequestPopulator"/>
+
+	<alias name="defaultPaymentInfoRequestPopulator" alias="paymentInfoHopRequestPopulator"/>
+	<bean id="defaultPaymentInfoRequestPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.request.PaymentInfoRequestPopulator"/>
+
+	<alias name="defaultOrderInfoRequestPopulator" alias="orderInfoHopRequestPopulator"/>
+	<bean id="defaultOrderInfoRequestPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.request.OrderInfoRequestPopulator"/>
+
+	<alias name="defaultSignatureRequestPopulator" alias="signatureHopRequestPopulator"/>
+	<bean id="defaultSignatureRequestPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.request.SignatureRequestPopulator">
+		<property name="digestUtils" ref="acceleratorDigestUtils"/>
+	</bean>
+
+	<alias name="defaultSubscriptionSignatureRequestPopulator" alias="subscriptionSignatureHopRequestPopulator"/>
+	<bean id="defaultSubscriptionSignatureRequestPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.request.SubscriptionSignatureRequestPopulator">
+		<property name="digestUtils" ref="acceleratorDigestUtils"/>
+	</bean>
+
+	<alias name="defaultOrderPageAppearanceRequestPopulator" alias="orderPageAppearanceHopRequestPopulator"/>
+	<bean id="defaultOrderPageAppearanceRequestPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.request.OrderPageAppearanceRequestPopulator"/>
+
+	<alias name="defaultOrderPageConfirmationRequestPopulator" alias="orderPageConfirmationRequestPopulator"/>
+	<bean id="defaultOrderPageConfirmationRequestPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.request.OrderPageConfirmationRequestPopulator"/>
+
+	<bean id="abstractResultPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.response.AbstractResultPopulator"
+	      abstract="true">
+		<property name="formatFactory" ref="formatFactory"/>
+	</bean>
+
+	<alias name="defaultAuthReplyHopResultPopulator" alias="authReplyHopResultPopulator"/>
+	<bean id="defaultAuthReplyHopResultPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.response.AuthReplyResultPopulator"
+	      parent="abstractResultPopulator"/>
+
+	<alias name="defaultCustomerInfoResultPopulator" alias="customerInfoHopResultPopulator"/>
+	<bean id="defaultCustomerInfoResultPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.response.CustomerInfoResultPopulator"
+	      parent="abstractResultPopulator"/>
+
+	<alias name="defaultOrderInfoResultPopulator" alias="orderInfoHopResultPopulator"/>
+	<bean id="defaultOrderInfoResultPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.response.OrderInfoResultPopulator"
+	      parent="abstractResultPopulator"/>
+
+	<alias name="defaultPaymentInfoResultPopulator" alias="paymentInfoHopResultPopulator"/>
+	<bean id="defaultPaymentInfoResultPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.response.PaymentInfoResultPopulator"
+	      parent="abstractResultPopulator"/>
+
+	<alias name="defaultSignatureResultPopulator" alias="signatureHopResultPopulator"/>
+	<bean id="defaultSignatureResultPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.response.SignatureResultPopulator"
+	      parent="abstractResultPopulator"/>
+
+	<alias name="defaultSubscriptionInfoResultPopulator" alias="subscriptionInfoHopResultPopulator"/>
+	<bean id="defaultSubscriptionInfoResultPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.response.SubscriptionInfoResultPopulator"
+	      parent="abstractResultPopulator"/>
+
+	<alias name="defaultSubscriptionSignatureResultPopulator" alias="subscriptionSignatureHopResultPopulator"/>
+	<bean id="defaultSubscriptionSignatureResultPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.response.SubscriptionSignatureResultPopulator"
+	      parent="abstractResultPopulator"/>
+
+
+	<!-- SOLR -->
+	<alias name="defaultPageRedirectHmcLabelProvider" alias="pageRedirectHmcLabelProvider"/>
+	<bean id="defaultPageRedirectHmcLabelProvider"
+	      class="de.hybris.platform.acceleratorservices.solr.attribute.DefaultPageRedirectHmcLabelProvider"/>
+
+	<alias name="defaultPageKeywordRedirectUrlResolver" alias="pageKeywordRedirectUrlResolver"/>
+	<bean id="defaultPageKeywordRedirectUrlResolver"
+	      class="de.hybris.platform.acceleratorservices.solr.keywordredirect.PageKeywordRedirectUrlResolver"/>
+
+	<alias name="acceleratorCommerceSearchResponseKeywordRedirectPopulator"
+	       alias="commerceSearchResponseKeywordRedirectPopulator"/>
+	<bean id="acceleratorCommerceSearchResponseKeywordRedirectPopulator"
+	      parent="defaultCommerceSearchResponseKeywordRedirectPopulator">
+		<property name="keywordRedirectUrlResolvers">
+			<map merge="true">
+				<entry key="SolrPageRedirect" value-ref="pageKeywordRedirectUrlResolver"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Fraud -->
+
+	<alias name="acceleratorBlackListSymptom" alias="blackListSymptom"/>
+	<bean id="acceleratorBlackListSymptom"
+	      class="de.hybris.platform.acceleratorservices.fraud.symptom.impl.AcceleratorBlackListSymptom">
+		<property name="symptomName" value="Black list"/>
+		<property name="increment" value="1000"/>
+	</bean>
+
+	<alias name="acceleratorWhiteListSymptom" alias="whiteListSymptom"/>
+	<bean id="acceleratorWhiteListSymptom"
+	      class="de.hybris.platform.acceleratorservices.fraud.symptom.impl.AcceleratorWhiteListSymptom">
+		<property name="symptomName" value="White list"/>
+		<property name="increment" value="-500"/>
+	</bean>
+
+	<alias name="acceleratorFirstTimeOrderSymptom" alias="firstTimeOrderSymptom"/>
+	<bean id="acceleratorFirstTimeOrderSymptom"
+	      class="de.hybris.platform.acceleratorservices.fraud.symptom.impl.AcceleratorFirstTimeOrderSymptom">
+		<property name="symptomName" value="User's first order"/>
+		<property name="increment" value="50"/>
+	</bean>
+
+	<!-- Prototype Beans for Data POJOs -->
+	<bean id="paymentData"
+	      class="de.hybris.platform.acceleratorservices.payment.data.PaymentData"
+	      scope="prototype"/>
+	<bean id="hostedOrderPageRequest"
+	      class="de.hybris.platform.acceleratorservices.payment.data.HostedOrderPageRequest"
+	      scope="prototype"/>
+	<bean id="hostedOrderPageResult"
+	      class="de.hybris.platform.acceleratorservices.payment.data.HostedOrderPageResult"
+	      scope="prototype"/>
+	<bean id="abstractCyberSourceResult"
+	      class="de.hybris.platform.acceleratorservices.payment.data.AbstractPaymentResult"
+	      scope="prototype"/>
+	<bean id="authReplyData"
+	      class="de.hybris.platform.acceleratorservices.payment.data.AuthReplyData"
+	      scope="prototype"/>
+	<bean id="createSubscriptionRequest"
+	      class="de.hybris.platform.acceleratorservices.payment.data.CreateSubscriptionRequest"
+	      scope="prototype"/>
+	<bean id="createSubscriptionResult"
+	      class="de.hybris.platform.acceleratorservices.payment.data.CreateSubscriptionResult"
+	      scope="prototype"/>
+	<bean id="customerBillToData"
+	      class="de.hybris.platform.acceleratorservices.payment.data.CustomerBillToData"
+	      scope="prototype"/>
+	<bean id="customerInfoData"
+	      class="de.hybris.platform.acceleratorservices.payment.data.CustomerInfoData"
+	      scope="prototype"/>
+	<bean id="customerShipToData"
+	      class="de.hybris.platform.acceleratorservices.payment.data.CustomerShipToData"
+	      scope="prototype"/>
+	<bean id="orderInfoData"
+	      class="de.hybris.platform.acceleratorservices.payment.data.OrderInfoData"
+	      scope="prototype"/>
+	<bean id="orderPageAppearanceData"
+	      class="de.hybris.platform.acceleratorservices.payment.data.OrderPageAppearanceData"
+	      scope="prototype"/>
+	<bean id="orderPageConfirmationData"
+	      class="de.hybris.platform.acceleratorservices.payment.data.OrderPageConfirmationData"
+	      scope="prototype"/>
+	<bean id="paymentInfoData"
+	      class="de.hybris.platform.acceleratorservices.payment.data.PaymentInfoData"
+	      scope="prototype"/>
+	<bean id="signatureData"
+	      class="de.hybris.platform.acceleratorservices.payment.data.SignatureData"
+	      scope="prototype"/>
+	<bean id="subscriptionInfoData"
+	      class="de.hybris.platform.acceleratorservices.payment.data.SubscriptionInfoData"
+	      scope="prototype"/>
+	<bean id="subscriptionSignatureData"
+	      class="de.hybris.platform.acceleratorservices.payment.data.SubscriptionSignatureData"
+	      scope="prototype"/>
+	<bean id="metaElementData"
+	      class="de.hybris.platform.acceleratorservices.storefront.data.MetaElementData"
+	      scope="prototype"/>
+
+	<alias name="defaultPaymentInfoDataPopulator" alias="paymentInfoDataPopulator"/>
+	<bean id="defaultPaymentInfoDataPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.PaymentInfoDataPopulator"
+	      parent="abstractResultPopulator"/>
+
+	<!--TODO: remove when port ticket PLA-13861 is resolved -->
+	<alias name="commerceAbstractPopulatingConverter" alias="abstractPopulatingConverter"/>
+	<bean id="commerceAbstractPopulatingConverter" class="de.hybris.platform.commerceservices.converter.impl.AbstractPopulatingConverter" abstract="true"/>
+
+	<alias name="defaultPaymentInfoDataConverter" alias="paymentInfoDataConverter"/>
+	<bean id="defaultPaymentInfoDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorservices.payment.data.PaymentInfoData"/>
+		<property name="populators">
+			<list>
+				<ref bean="paymentInfoDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCreateSubscriptionResultPopulator" alias="createSubscriptionResultPopulator"/>
+	<bean id="defaultCreateSubscriptionResultPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.CreateSubscriptionResultPopulator"
+	      parent="abstractResultPopulator"/>
+
+	<alias name="defaultCreateSubscriptionResultConverter" alias="createSubscriptionResultConverter"/>
+	<bean id="defaultCreateSubscriptionResultConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorservices.payment.data.CreateSubscriptionResult"/>
+		<property name="populators">
+			<list>
+				<ref bean="authReplyHopResultPopulator"/>
+				<ref bean="customerInfoHopResultPopulator"/>
+				<ref bean="paymentInfoHopResultPopulator"/>
+				<ref bean="orderInfoHopResultPopulator"/>
+				<ref bean="signatureHopResultPopulator"/>
+				<ref bean="subscriptionInfoHopResultPopulator"/>
+				<ref bean="subscriptionSignatureHopResultPopulator"/>
+				<ref bean="createSubscriptionResultPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCustomerBillToDataConverter" alias="customerBillToDataConverter"/>
+	<bean id="defaultCustomerBillToDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorservices.payment.data.CustomerBillToData"/>
+		<property name="populators">
+			<list>
+				<ref bean="customerBillToDataPopulator"/>
+
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCustomerBillToDataPopulator" alias="customerBillToDataPopulator"/>
+	<bean id="defaultCustomerBillToDataPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.CustomerBillToDataPopulator"
+	      parent="abstractResultPopulator"/>
+
+	<alias name="defaultCustomerShipToDataConverter" alias="customerShipToDataConverter"/>
+	<bean id="defaultCustomerShipToDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorservices.payment.data.CustomerShipToData"/>
+		<property name="populators">
+			<list>
+				<ref bean="customerShipToDataPopulator"/>
+
+			</list>
+		</property>
+	</bean>
+	<alias name="defaultCustomerShipToDataPopulator" alias="customerShipToDataPopulator"/>
+	<bean id="defaultCustomerShipToDataPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.CustomerShipToDataPopulator"
+	      parent="abstractResultPopulator"/>
+
+	<alias name="defaultPaymentDataPopulator" alias="paymentDataPopulator"/>
+	<bean id="defaultPaymentDataPopulator"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.converters.populators.PaymentDataPopulator"
+	      parent="abstractResultPopulator"/>
+
+	<alias name="defaultPaymentDataConverter" alias="paymentDataConverter"/>
+	<bean id="defaultPaymentDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorservices.payment.data.PaymentData"/>
+		<property name="populators">
+			<list>
+				<ref bean="paymentDataPopulator"/>
+				<ref bean="customerInfoHopRequestPopulator"/>
+				<ref bean="paymentInfoHopRequestPopulator"/>
+				<ref bean="orderInfoHopRequestPopulator"/>
+				<ref bean="signatureHopRequestPopulator"/>
+				<ref bean="subscriptionSignatureHopRequestPopulator"/>
+				<ref bean="orderPageAppearanceHopRequestPopulator"/>
+				<ref bean="orderPageConfirmationRequestPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Fulfilment -->
+
+	<alias alias="dynamicAttributesOrderStatusDisplay"
+	       name="acceleratorDynamicAttributesOrderStatusDisplayByMap"/>
+	<bean id="acceleratorDynamicAttributesOrderStatusDisplayByMap"
+	      class="de.hybris.platform.acceleratorservices.attribute.OrderStatusDisplayDynamicAttributeHandler">
+		<property name="statusDisplayMap">
+			<map>
+				<entry key="CREATED" value="created"/>
+				<entry key="OPEN" value="open"/>
+				<entry key="CANCELLED" value="cancelled"/>
+				<entry key="CANCELLING" value="cancelling"/>
+				<entry key="COMPLETED" value="completed"/>
+				<entry key="CHECKED_INVALID" value="error"/>
+				<entry key="PAYMENT_AMOUNT_NOT_RESERVED" value="error"/>
+				<entry key="PAYMENT_NOT_AUTHORIZED" value="error"/>
+				<entry key="PAYMENT_NOT_CAPTURED" value="error"/>
+				<entry key="PROCESSING_ERROR" value="error"/>
+			</map>
+		</property>
+		<property name="defaultStatus" value="processing"/>
+	</bean>
+
+	<alias alias="dynamicAttributesConsignmentStatusDisplay"
+	       name="acceleratorDynamicAttributesConsignmentStatusDisplayByMap"/>
+	<bean id="acceleratorDynamicAttributesConsignmentStatusDisplayByMap"
+	      class="de.hybris.platform.acceleratorservices.attribute.ConsignmentStatusDisplayDynamicAttributeHandler">
+		<property name="statusDisplayMap">
+			<map key-type="de.hybris.platform.basecommerce.enums.ConsignmentStatus">
+				<entry key="READY_FOR_PICKUP" value="readyforpickup"/>
+				<entry key="PICKUP_COMPLETE" value="pickedup"/>
+				<entry key="SHIPPED" value="shipped"/>
+				<entry key="CANCELLED" value="cancelled"/>
+			</map>
+		</property>
+		<property name="defaultStatus" value="processing"/>
+	</bean>
+
+	<alias alias="orderService" name="acceleratorDefaultOrderService"/>
+	<bean id="acceleratorDefaultOrderService" parent="defaultOrderService">
+		<property name="submitOrderStrategies">
+			<list>
+				<!-- implementation that sends SubmitOrderEvent -->
+				<ref bean="eventPublishingSubmitOrderStrategy"/>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Single Consignment OrderSplitting will create one consignment for the 
+		order -->
+	<alias alias="orderSplittingService" name="singleConsignmentOrderSplittingService"/>
+	<bean id="singleConsignmentOrderSplittingService" parent="defaultOrderSplittingService">
+		<property name="strategiesList">
+			<list>
+				<ref bean="splitToSingleConsignment"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="splitToSingleConsignment"
+	      class="de.hybris.platform.acceleratorservices.ordersplitting.strategy.impl.SplitToSingleConsignment">
+		<property name="warehouseService" ref="warehouseService"/>
+	</bean>
+
+	<alias name="defaultPickupConsignmentService" alias="consignmentService"/>
+	<bean id="defaultPickupConsignmentService" parent="defaultConsignmentService"
+	      class="de.hybris.platform.acceleratorservices.ordersplitting.impl.DefaultPickupConsignmentService">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias name="defaultPaymentResponseInterpretationStrategy" alias="paymentResponseInterpretationStrategy"/>
+	<bean id="defaultPaymentResponseInterpretationStrategy"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.strategies.impl.DefaultPaymentResponseInterpretationStrategy">
+		<property name="createSubscriptionResultConverter" ref="createSubscriptionResultConverter"/>
+	</bean>
+
+	<alias name="defaultHopPaymentResponseInterpretationStrategy"
+	       alias="hopPaymentResponseInterpretationStrategy"/>
+	<bean id="defaultHopPaymentResponseInterpretationStrategy"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.strategies.impl.HopPaymentResponseInterpretationStrategy">
+		<property name="createSubscriptionResultConverter" ref="createSubscriptionResultConverter"/>
+	</bean>
+
+	<alias name="defaultPaymentFormActionUrlStrategy" alias="paymentFormActionUrlStrategy"/>
+	<bean id="defaultPaymentFormActionUrlStrategy"
+	      class="de.hybris.platform.acceleratorservices.payment.cybersource.strategies.impl.DefaultPaymentFormActionUrlStrategy">
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService"/>
+		<property name="siteConfigService" ref="siteConfigService"/>
+	</bean>
+
+	<alias name="requiredAddOnsNameProvider" alias="reqAddOnsNameProvider"/>
+	<bean id="requiredAddOnsNameProvider"
+	      class="de.hybris.platform.acceleratorservices.addonsupport.RequiredAddOnsNameProvider"/>
+
+	<alias name="defaultErroCodeToFormFieldMappingStrategy" alias="erroCodeToFormFieldMappingStrategy"/>
+	<bean
+			class="de.hybris.platform.acceleratorservices.payment.strategies.impl.DefaultErroCodeToFormFieldMappingStrategy"
+			id="defaultErroCodeToFormFieldMappingStrategy">
+		<property name="errorCodeToFieldMapping">
+			<map key-type="java.lang.Integer">
+
+				<!--4000, "The card type is invalid" -->
+				<entry key="4000">
+					<list>
+						<value>card_cardType</value>
+					</list>
+				</entry>
+
+				<!-- 4001, "The card number is invalid" -->
+				<entry key="4001">
+					<list>
+						<value>card_accountNumber</value>
+					</list>
+				</entry>
+
+				<!-- 4002, "The expiration date is invalid" -->
+				<entry key="4002">
+					<list>
+						<value>card_expirationMonth</value>
+						<value>card_expirationYear</value>
+					</list>
+				</entry>
+
+				<!-- 4005, "The card type is missing" -->
+				<entry key="4005">
+					<list>
+						<value>card_cardType</value>
+					</list>
+				</entry>
+
+				<!-- 4006, "The card number is missing" -->
+				<entry key="4006">
+					<list>
+						<value>card_accountNumber</value>
+					</list>
+				</entry>
+
+				<!-- 4007, "The expiration date is missing" -->
+				<entry key="4007">
+					<list>
+						<value>card_expirationMonth</value>
+						<value>card_expirationYear</value>
+					</list>
+				</entry>
+
+				<!-- 4012, "The billing address is invalid" -->
+				<entry key="4012">
+					<list>
+						<value>billTo_country</value>
+						<value>billTo_firstName</value>
+						<value>billTo_lastName</value>
+						<value>billTo_street1</value>
+						<value>billTo_street2</value>
+						<value>billTo_city</value>
+						<value>billTo_state</value>
+						<value>billTo_postalCode</value>
+					</list>
+				</entry>
+
+				<!-- 4016, "The CVN is missing or invalid -->
+				<entry key="4016">
+					<list>
+						<value>card_cvNumber</value>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<!--Url Encoder Service -->
+	<alias name="defaultUrlEncoderService" alias="urlEncoderService"/>
+	<bean id="defaultUrlEncoderService"
+	      class="de.hybris.platform.acceleratorservices.urlencoder.impl.DefaultUrlEncoderService">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="cmsSiteService" ref="cmsSiteService"/>
+		<property name="urlEncodingAttributeManagerMap">
+			<map>
+				<entry key="currency" value-ref="currencyAttributeManager"/>
+				<entry key="language" value-ref="languageAttributeManager"/>
+				<entry key="storefront" value-ref="storeFrontAttributeManager"/>
+			</map>
+		</property>
+	</bean>
+
+	<alias name="abstractUrlEncodingAttributeManager" alias="urlEncodingAttributeManager"/>
+	<bean id="abstractUrlEncodingAttributeManager" abstract="true"
+	      class="de.hybris.platform.acceleratorservices.urlencoder.attributes.impl.AbstractUrlEncodingAttributeManager">
+		<property name="storeSessionService" ref="storeSessionService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="cmsSiteService" ref="cmsSiteService"/>
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService"/>
+	</bean>
+
+	<alias name="defaultLanguageAttributeManager" alias="languageAttributeManager"/>
+	<bean id="defaultLanguageAttributeManager"
+	      class="de.hybris.platform.acceleratorservices.urlencoder.attributes.impl.DefaultLanguageAttributeManager"
+	      parent="urlEncodingAttributeManager"/>
+
+	<alias name="defaultCurrencyAttributeManager" alias="currencyAttributeManager"/>
+	<bean id="defaultCurrencyAttributeManager"
+	      class="de.hybris.platform.acceleratorservices.urlencoder.attributes.impl.DefaultCurrencyAttributeManager"
+	      parent="urlEncodingAttributeManager"/>
+
+	<alias name="defaultStoreFrontAttributeManager" alias="storeFrontAttributeManager"/>
+	<bean id="defaultStoreFrontAttributeManager"
+	      class="de.hybris.platform.acceleratorservices.urlencoder.attributes.impl.DefaultStoreFrontAttributeManager"
+	      parent="urlEncodingAttributeManager"/>
+
+
+	<bean id="abstractSiteMapGenerator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.generator.impl.AbstractSiteMapGenerator"
+	      abstract="true">
+		<property name="impersonationService" ref="impersonationService"/>
+		<property name="rendererService" ref="rendererService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+	</bean>
+
+	<alias name="defaultCategoryPageSiteMapGenerator" alias="categoryPageSiteMapGenerator"/>
+	<bean id="defaultCategoryPageSiteMapGenerator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.generator.impl.CategoryPageSiteMapGenerator"
+	      parent="abstractSiteMapGenerator">
+		<property name="siteMapUrlDataConverter" ref="categoryModelToSiteMapUrlDataConverter"/>
+		<property name="siteMapPageEnum" value="CATEGORY"/>
+	</bean>
+
+	<alias name="defaultProductPageSiteMapGenerator" alias="productPageSiteMapGenerator"/>
+	<bean id="defaultProductPageSiteMapGenerator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.generator.impl.ProductPageSiteMapGenerator"
+	      parent="abstractSiteMapGenerator">
+		<property name="siteMapUrlDataConverter" ref="productModelToSiteMapUrlDataConverter"/>
+		<property name="siteMapPageEnum" value="PRODUCT"/>
+	</bean>
+
+	<alias name="defaultPointOfServicePageSiteMapGenerator" alias="pointOfServicePageSiteMapGenerator"/>
+	<bean id="defaultPointOfServicePageSiteMapGenerator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.generator.impl.PointOfServicePageSiteMapGenerator"
+	      parent="abstractSiteMapGenerator">
+		<property name="siteMapUrlDataConverter" ref="pointOfServiceModelToSiteMapUrlDataConverter"/>
+		<property name="siteMapPageEnum" value="STORE"/>
+	</bean>
+
+	<alias name="defaultHomePageSiteMapGenerator" alias="homePageSiteMapGenerator"/>
+	<bean id="defaultHomePageSiteMapGenerator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.generator.impl.HomePageSiteMapGenerator"
+	      parent="abstractSiteMapGenerator">
+		<property name="siteMapUrlDataConverter" ref="homepageToSiteMapUrlDataConverter"/>
+		<property name="siteMapPageEnum" value="HOMEPAGE"/>
+		<property name="cmsPageService" ref="cmsPageService"/>
+	</bean>
+
+	<alias name="defaultContentPageModelSiteMapGenerator" alias="contentPageModelSiteMapGenerator"/>
+	<bean id="defaultContentPageModelSiteMapGenerator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.generator.impl.ContentPageModelSiteMapGenerator"
+	      parent="abstractSiteMapGenerator">
+		<property name="siteMapUrlDataConverter" ref="contentPageModelToSiteMapUrlDataConverter"/>
+		<property name="siteMapPageEnum" value="CONTENT"/>
+	</bean>
+
+	<alias name="defaultCategoryLandingPageSiteMapGenerator" alias="categoryLandingPageSiteMapGenerator"/>
+	<bean id="defaultCategoryLandingPageSiteMapGenerator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.generator.impl.CategoryLandingPageSiteMapGenerator"
+	      parent="abstractSiteMapGenerator">
+		<property name="siteMapUrlDataConverter" ref="categoryModelToSiteMapUrlDataConverter"/>
+		<property name="siteMapPageEnum" value="CATEGORYLANDING"/>
+
+
+	</bean>
+	<alias name="defaultCustomPageSiteMapGenerator" alias="customPageSiteMapGenerator"/>
+	<bean id="defaultCustomPageSiteMapGenerator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.generator.impl.CustomPageSiteMapGenerator"
+	      parent="abstractSiteMapGenerator">
+		<property name="siteMapUrlDataConverter" ref="customPageToSiteMapUrlDataConverter"/>
+		<property name="siteMapPageEnum" value="CUSTOM"/>
+	</bean>
+
+
+	<alias name="defaultCustomPageToSiteMapUrlDataPopulator" alias="customPageToSiteMapUrlDataPopulator"/>
+	<bean id="defaultCustomPageToSiteMapUrlDataPopulator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.populators.CustomPageToSiteMapUrlDataPopulator">
+		<property name="urlResolver" ref="customPageUrlResolver"/>
+	</bean>
+
+	<alias name="defaultContentPageModelToSiteMapUrlDataPopulator"
+	       alias="contentPageModelToSiteMapUrlDataPopulator"/>
+	<bean id="defaultContentPageModelToSiteMapUrlDataPopulator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.populators.ContentPageModelToSiteMapUrlDataPopulator">
+		<property name="urlResolver" ref="contentPageUrlResolver"/>
+	</bean>
+
+	<alias name="defaultHomepageToSiteMapUrlDataPopulator" alias="homepageToSiteMapUrlDataPopulator"/>
+	<bean id="defaultHomepageToSiteMapUrlDataPopulator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.populators.ContentPageModelToSiteMapUrlDataPopulator">
+		<property name="urlResolver" ref="homepageContentPageUrlResolver"/>
+	</bean>
+
+	<alias name="defaultCategoryModelToSiteMapUrlDataPopulator"
+	       alias="categoryModelToSiteMapUrlDataPopulator"/>
+	<bean id="defaultCategoryModelToSiteMapUrlDataPopulator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.populators.CategoryModelToSiteMapUrlDataPopulator">
+		<property name="urlResolver" ref="categoryModelUrlResolver"/>
+	</bean>
+
+	<alias name="defaultPointOfServiceModellToSiteMapUrlDataPopulator"
+	       alias="pointOfServiceModellToSiteMapUrlDataPopulator"/>
+	<bean id="defaultPointOfServiceModellToSiteMapUrlDataPopulator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.populators.PointOfServiceModellToSiteMapUrlDataPopulator">
+		<property name="urlResolver" ref="pointOfServiceUrlResolver"/>
+	</bean>
+
+	<alias name="defaultProductModelToSiteMapUrlDataPopulator" alias="productModelToSiteMapUrlDataPopulator"/>
+	<bean id="defaultProductModelToSiteMapUrlDataPopulator"
+	      class="de.hybris.platform.acceleratorservices.sitemap.populators.ProductModelToSiteMapUrlDataPopulator">
+		<property name="urlResolver" ref="productModelUrlResolver"/>
+	</bean>
+
+	<alias name="defaultCustomPageToSiteMapUrlDataConverter" alias="customPageToSiteMapUrlDataConverter"/>
+	<bean id="defaultCustomPageToSiteMapUrlDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorservices.sitemap.data.SiteMapUrlData"/>
+		<property name="populators">
+			<list>
+				<ref bean="customPageToSiteMapUrlDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultHomepageToSiteMapUrlDataConverter" alias="homepageToSiteMapUrlDataConverter"/>
+	<bean id="defaultHomepageToSiteMapUrlDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorservices.sitemap.data.SiteMapUrlData"/>
+		<property name="populators">
+			<list>
+				<ref bean="homepageToSiteMapUrlDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultContentPageModelToSiteMapUrlDataConverter"
+	       alias="contentPageModelToSiteMapUrlDataConverter"/>
+	<bean id="defaultContentPageModelToSiteMapUrlDataConverter"
+	      parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorservices.sitemap.data.SiteMapUrlData"/>
+		<property name="populators">
+			<list>
+				<ref bean="contentPageModelToSiteMapUrlDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultProductModelToSiteMapUrlDataConverter" alias="productModelToSiteMapUrlDataConverter"/>
+	<bean id="defaultProductModelToSiteMapUrlDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorservices.sitemap.data.SiteMapUrlData"/>
+		<property name="populators">
+			<list>
+				<ref bean="productModelToSiteMapUrlDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPointOfServiceModelToSiteMapUrlDataConverter"
+	       alias="pointOfServiceModelToSiteMapUrlDataConverter"/>
+	<bean id="defaultPointOfServiceModelToSiteMapUrlDataConverter"
+	      parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorservices.sitemap.data.SiteMapUrlData"/>
+		<property name="populators">
+			<list>
+				<ref bean="pointOfServiceModellToSiteMapUrlDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCategoryModelToSiteMapUrlDataConverter"
+	       alias="categoryModelToSiteMapUrlDataConverter"/>
+	<bean id="defaultCategoryModelToSiteMapUrlDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorservices.sitemap.data.SiteMapUrlData"/>
+		<property name="populators">
+			<list>
+				<ref bean="categoryModelToSiteMapUrlDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="siteMapUrlData"
+	      class="de.hybris.platform.acceleratorservices.sitemap.data.SiteMapUrlData"
+	      scope="prototype"/>
+	<bean id="siteMapContext"
+	      class="de.hybris.platform.acceleratorservices.sitemap.renderer.SiteMapContext"
+	      scope="prototype">
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService"/>
+		<property name="urlEncoderService" ref="urlEncoderService"/>
+	</bean>
+
+	<bean id="siteMapMediaJob"
+	      class="de.hybris.platform.acceleratorservices.cronjob.SiteMapMediaJob"
+	      parent="abstractJobPerformable">
+		<property name="generators">
+			<list>
+				<ref bean="pointOfServicePageSiteMapGenerator"/>
+				<ref bean="productPageSiteMapGenerator"/>
+				<ref bean="categoryPageSiteMapGenerator"/>
+				<ref bean="homePageSiteMapGenerator"/>
+				<ref bean="contentPageModelSiteMapGenerator"/>
+				<ref bean="categoryLandingPageSiteMapGenerator"/>
+				<ref bean="customPageSiteMapGenerator"/>
+			</list>
+		</property>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="activateBaseSiteInSession" ref="activateBaseSiteInSessionStrategy"/>
+		<property name="cmsSiteService" ref="cmsSiteService"/>
+	</bean>
+
+	<!-- URL Decoders -->
+	<bean id="categoryFrontendUrlAntPathPattern" class="java.lang.String">
+		<constructor-arg>
+			<value><![CDATA[/**/c/{code}]]></value>
+		</constructor-arg>
+	</bean>
+
+	<alias name="defaultCategoryFrontendPathMatcherUrlDecoder" alias="categoryFrontendPathMatcherUrlDecoder"/>
+	<bean id="defaultCategoryFrontendPathMatcherUrlDecoder"
+	      class="de.hybris.platform.acceleratorservices.urldecoder.impl.CategoryFrontendPathMatcherUrlDecoder">
+		<property name="pathMatcher">
+			<bean class="org.springframework.util.AntPathMatcher"/>
+		</property>
+		<property name="categoryService" ref="categoryService"/>
+		<property name="pathMatchPattern" ref="categoryFrontendUrlAntPathPattern"/>
+	</bean>
+
+	<bean id="productFrontendUrlAntPathPattern" class="java.lang.String">
+		<constructor-arg>
+			<value><![CDATA[/**/p/{code}]]></value>
+		</constructor-arg>
+	</bean>
+
+	<alias name="defaultProductFrontendPathMatcherUrlDecoder" alias="productFrontendPathMatcherUrlDecoder"/>
+	<bean id="defaultProductFrontendPathMatcherUrlDecoder"
+	      class="de.hybris.platform.acceleratorservices.urldecoder.impl.ProductFrontendPathMatcherUrlDecoder">
+		<property name="pathMatcher">
+			<bean class="org.springframework.util.AntPathMatcher"/>
+		</property>
+		<property name="productService" ref="productService"/>
+		<property name="pathMatchPattern" ref="productFrontendUrlAntPathPattern"/>
+	</bean>
+
+	<bean id="categoryFrontendUrlRegexPattern" class="java.lang.String">
+		<constructor-arg>
+			<value><![CDATA[(?<=/c/)[\.\:\,\*\(\!\'\)\/\\\$\%\+\-\_\#\’A-z0-9]{0,}[^(\?|\&|\;|$)]]]></value>
+		</constructor-arg>
+	</bean>
+	<alias name="defaultCategoryFrontendRegexUrlDecoder" alias="categoryFrontendRegexUrlDecoder"/>
+	<alias name="defaultCategoryFrontendRegexUrlDecoder" alias="categoryFrontendUrlDecoder"/>
+	<bean id="defaultCategoryFrontendRegexUrlDecoder"
+	      class="de.hybris.platform.acceleratorservices.urldecoder.impl.CategoryFrontendRegexUrlDecoder">
+		<property name="categoryService" ref="categoryService"/>
+		<property name="regex" ref="categoryFrontendUrlRegexPattern"/>
+	</bean>
+
+	<bean id="productFrontendUrlRegexPattern" class="java.lang.String">
+		<constructor-arg>
+			<value><![CDATA[(?<=/p/)[\.\:\,\*\(\!\'\)\/\\\$\%\+\-\_\#\’A-z0-9]{0,}[^(\?|\&|\;|$)]]]></value>
+		</constructor-arg>
+	</bean>
+	<alias name="defaultProductFrontendRegexUrlDecoder" alias="productFrontendRegexUrlDecoder"/>
+	<alias name="defaultProductFrontendRegexUrlDecoder" alias="productFrontendUrlDecoder"/>
+	<bean id="defaultProductFrontendRegexUrlDecoder"
+	      class="de.hybris.platform.acceleratorservices.urldecoder.impl.ProductFrontendRegexUrlDecoder">
+		<property name="productService" ref="productService"/>
+		<property name="regex" ref="productFrontendUrlRegexPattern"/>
+	</bean>
+
+
+	<alias name="defaultMetaElementAttributeNameResolver" alias="metaElementAttributeNameResolver"/>
+	<bean id="defaultMetaElementAttributeNameResolver" class="de.hybris.platform.acceleratorservices.metainformation.MetaElementAttributeNameResolver">
+		<property name="mappedNames">
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="httpEquiv" value="http-equiv"/>
+			</map>
+		</property>
+	</bean>
+
+	<!--
+	 htmlElementHelper
+	 Simple helper bean that support writing tags.
+	-->
+	<bean id="htmlElementHelper" class="de.hybris.platform.acceleratorservices.util.HtmlElementHelper"/>
+
+</beans>
+
+

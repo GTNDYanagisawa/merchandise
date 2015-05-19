@@ -1,0 +1,20 @@
+#set($node.attributes.openTagKey="<cStrikethru:1>")
+#set($node.attributes.closeTagKey="<cStrikethru:>")
+${utility.initializeCharStyle($node)}
+#set($counter=0)
+#set($node.attributes.openTag="true")
+<cStrikethru:1>
+#foreach($child in $node.getChildNodes())
+#set($counter=$counter+1)
+#if(($child.nodeName=="textNode" || $child.nodeName=="entity") && $node.attributes.openTag=="false")
+#set($node.attributes.openTag="true")
+<cStrikethru:1>
+#end
+#if($child.nodeName!="textNode" && $child.nodeName!="entity" && $node.attributes.openTag=="true")
+#set($node.attributes.openTag="false")<cStrikethru:>
+#end$translator.renderTextFromNode($child)
+#end
+#if($counter==0)$node.nodeText
+#end
+#if($node.attributes.openTag=="true")<cStrikethru:>
+#end

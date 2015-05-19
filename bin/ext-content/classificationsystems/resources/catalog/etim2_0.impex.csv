@@ -1,0 +1,243 @@
+# ---------------------------------------------------------
+# --- etim 2.0
+# --- create system and version
+# ---------------------------------------------------------
+
+#% impex.info("creating classification system $systemName $systemVersion in language $systemLanguage ...");
+
+INSERT_UPDATE ClassificationSystem[cacheUnique=true]; id[unique=true]
+; $systemName ;
+
+INSERT_UPDATE ClassificationSystemversion[cacheUnique=true];\
+							version[unique=true] ; \
+							catalog(id)[unique=true]; \
+							inclPacking[default=true]; \
+							inclDuty[default=true]; \
+							inclFreight[default=true]; \
+							inclAssurance[default=true];
+; $systemVersion ; $systemName; 
+
+# ---------------------------------------------------------
+# --- etim 2.0
+# --- create top level classes 
+# --- from ETIMARTGROUP.csv
+# ---------------------------------------------------------
+$sysVer=catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$ARTGROUPID=code
+$GROUPDESC_DE=name[lang='$systemLanguage']
+# EG000001;Kabel/Leitungen
+# EG000002;Elektro-Installationsrohre
+# EG000003;Schutzschlauchsysteme
+# EG000004;Kabeltragsysteme
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion top level classes  ...");
+
+INSERT_UPDATE ClassificationClass[cacheUnique=true];\
+								$sysVer[virtual=true,unique=true];\
+								$ARTGROUPID[unique=true];\
+								$GROUPDESC_DE
+
+#% impex.includeExternalDataMedia( "ETIMARTGROUP.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion classes");
+
+# ---------------------------------------------------------
+# --- etim 2.0
+# --- create article classes 
+# --- from ETIMARTCLASS.csv
+# ---------------------------------------------------------
+$sysVer=catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$ARTCLASSID=code
+$ARTGROUPID=superCategories(code,$sysVer)
+$ARTCLASSDESC_DE=name[lang='$systemLanguage']
+$ARTCLASSVERSION=revision
+$ARTCLASSVERDATE=
+# EC000001;EG000017;Sammelschienenklemme;3;30-Mai-05
+# EC000003;EG000020;Fehlerstrom-Schutzschalter;3;30-Mai-05
+# EC000005;EG000047;Aderendhülse;3;30-Mai-05
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion article classes  ...");
+
+INSERT_UPDATE ClassificationClass[cacheUnique=true];\
+								$sysVer[virtual=true,unique=true];\
+								$ARTCLASSID[unique=true];\
+								$ARTGROUPID;\
+								$ARTCLASSDESC_DE;\
+								$ARTCLASSVERSION;\
+								$ARTCLASSVERDATE;
+
+#% impex.includeExternalDataMedia( "ETIMARTCLASS.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion classes");
+
+
+# ---------------------------------------------------------
+# --- etim 2.0
+# --- create and assign keywords 
+# --- from ETIMSYNONYM_DE.csv
+# ---------------------------------------------------------
+$sysVer=catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$language=language(isocode[default='$systemLanguage'])
+$ARTCLASSID=categories(code,catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))[lang='$systemLanguage',mode=append]
+$CLASSSYNONYM=keyword
+
+# EC000001;Abzweigklemme
+# EC000001;Anschlussklemme
+# EC000001;Anschlussklemmensatz
+# EC000001;Aufreihklemme
+
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion keywords ...");
+
+INSERT_UPDATE ClassificationKeyword[cacheUnique=true]; \
+								$sysVer[virtual=true,unique=true];\
+								$language[virtual=true,unique=true];\
+								$ARTCLASSID;\
+								$CLASSSYNONYM[unique=true]
+
+#% impex.includeExternalDataMedia( "ETIMSYNONYM_DE.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion keywords");
+
+
+# ---------------------------------------------------------
+# --- etim 2.0
+# --- create attributes 
+# --- from ETIMFEATURE.csv
+# ---------------------------------------------------------
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$FEATUREID=code
+$FEATUREDESC_DE=name[lang='$systemLanguage']
+
+# EF000001;Nennstrom
+# EF000002;Nennspannung
+# EF000003;Montageart
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion attributes ...");
+
+INSERT_UPDATE ClassificationAttribute[cacheUnique=true];\
+								$sysVer[virtual=true,unique=true];\
+								$FEATUREID[unique=true];\
+								$FEATUREDESC_DE
+
+#% impex.includeExternalDataMedia( "ETIMFEATURE.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion attributes");
+
+# ---------------------------------------------------------
+# --- etim 2.0
+# --- create values 
+# --- from ETIMVALUE.csv
+# ---------------------------------------------------------
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$VALUEID=code
+$VALUEDESC_DE=name[lang='$systemLanguage']
+
+# EV000005;Gewindeaufnahme
+# EV000009;Entlötpinzette
+# EV000010;Entlötkolben
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion values ...");
+
+INSERT_UPDATE ClassificationAttributeValue[cacheUnique=true];\
+								$sysVer[virtual=true,unique=true];\
+								$VALUEID[unique=true];\
+								$VALUEDESC_DE
+
+#% impex.includeExternalDataMedia( "ETIMVALUE.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion values");
+
+# ---------------------------------------------------------
+# --- etim 2.0
+# --- create units
+# --- from ETIMUNIT.csv
+# ---------------------------------------------------------
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$UNITOFMEASID=externalID
+$UNITDESC=code
+
+# EU000002;hPa
+# EU000003;kvar
+# EU000004;Im/W
+# EU000006;DPI
+# ---------------------------------------------------------
+
+#% impex.info("creating $systemName $systemVersion units ...");
+
+INSERT_UPDATE ClassificationAttributeUnit[cacheUnique=true];\
+								$sysVer[virtual=true,unique=true];\
+								$UNITOFMEASID[unique=true];\
+								$UNITDESC;\
+								symbol[allowNull=true,virtual=true,default='']
+
+#% impex.includeExternalDataMedia( "ETIMUNIT.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion units");
+
+
+# ---------------------------------------------------------
+# --- etim 2.0
+# --- assign classes to attributes 
+# --- from ETIMARTCLASSFEATUREMAP.csv
+# ---------------------------------------------------------
+$ARTCLASSFEATURENR=externalID
+$ARTCLASSID=classificationClass(code,catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$FEATUREID=classificationAttribute(code,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$FEATURETYPE=attributeType[translator=de.hybris.platform.catalog.jalo.classification.etim.ETIMAttributeTypeTranslator]
+$UNITOFMEASID=unit(externalID,$sysVer)
+$SORTNR=position
+
+# TODO: implement RANGE flag translator
+
+# 1;EC000001;EF003528;A;;1
+# 2;EC000001;EF000008;N;EU570448;2
+# 3;EC000001;EF000018;N;EU570126;3
+# 4;EC000003;EF001391;N;;1
+# ---------------------------------------------------------
+# simply create assignments - their data is filled later !!!
+#% impex.info("assigning $systemName $systemVersion attributes ...");
+
+INSERT_UPDATE ClassAttributeAssignment[cacheUnique=true]; \
+								$sysVer[virtual=true,unique=true];\
+								$ARTCLASSFEATURENR;\
+								$ARTCLASSID[unique=true];\
+								$FEATUREID[unique=true];\
+								$FEATURETYPE;\
+								$UNITOFMEASID;\
+								$SORTNR
+
+#% impex.includeExternalDataMedia( "ETIMARTCLASSFEATUREMAP.csv", 1, -1 );
+
+#% impex.info("done assigning $systemName $systemVersion attributes");
+
+
+# ---------------------------------------------------------
+# --- etim 2.0
+# --- assign values to class-attribute-assignments
+# --- from ETIMARTCLASSFEATUREVALUEMAP.csv
+# ---------------------------------------------------------
+
+$ARTCLASSFEATUREVALUENR=externalID
+$ARTCLASSFEATURENR=attributeAssignment(externalID,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$VALUEID=value(code,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$SORTNR=position
+
+# 1;1;EV005954;1
+# 2;1;EV005942;2
+# 3;1;EV003132;3
+# 4;1;EV005291;4
+# ---------------------------------------------------------
+#% impex.info("assigning $systemName $systemVersion values ...");
+
+INSERT_UPDATE AttributeValueAssignment[cacheUnique=true];\
+								$sysVer[virtual=true,unique=true];\
+								$ARTCLASSFEATUREVALUENR;\
+								$ARTCLASSFEATURENR[unique=true];\
+								$VALUEID[unique=true];\
+								$SORTNR;
+
+#% impex.includeExternalDataMedia( "ETIMARTCLASSFEATUREVALUEMAP.csv", 1, -1 );
+
+#% impex.info("completed $systemName - $systemVersion ");
+

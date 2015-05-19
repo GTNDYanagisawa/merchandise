@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+	<!--
+		ATTENTION: This is just an example file. You have to edit it according
+		to your needs.
+	-->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<itemtypes>
+
+		<itemtype code="ImportCockpitInputMedia"
+			jaloclass="de.hybris.platform.importcockpit.jalo.ImportCockpitInputMedia"
+			extends="ImpExMedia" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="hasHeaderLine" type="boolean">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+					<defaultvalue>true</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ImportCockpitJob"
+			jaloclass="de.hybris.platform.importcockpit.jalo.ImportCockpitJob"
+			extends="ImpExImportJob" autocreate="true" generate="true">
+			<attributes>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ImportCockpitCronJob"
+			jaloclass="de.hybris.platform.importcockpit.jalo.ImportCockpitCronJob"
+			extends="ImpExImportCronJob" autocreate="true" generate="true">
+			<attributes>
+
+				<attribute qualifier="job" type="ImportCockpitJob"
+					redeclare="true">
+					<modifiers read="true" write="false" initial="true"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="mapping" type="ImportCockpitMapping">
+					<modifiers read="true" write="true" initial="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="mappingValid" type="boolean">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+					<defaultvalue>false</defaultvalue>
+				</attribute>
+
+				<attribute qualifier="inputMedia" type="ImportCockpitInputMedia">
+					<modifiers read="true" write="true" initial="false"
+						optional="false" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="nextExecutionTime" type="java.util.Date">
+					<modifiers read="true" write="false" optional="true" />
+					<persistence type="dynamic" attributeHandler="nextExecutionTimeAttribute" />
+				</attribute>		
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ImportCockpitMapping"
+			jaloclass="de.hybris.platform.importcockpit.jalo.ImportCockpitMapping"
+			extends="Media" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="catalogVersion" type="CatalogVersion" redeclare="true">
+					<modifiers optional="true" unique="false"/>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+
+		<itemtype code="ImpExImportCockpitMedia"
+			jaloclass="de.hybris.platform.importcockpit.jalo.ImpExImportCockpitMedia"
+			extends="ImpExMedia" autocreate="true" generate="true">
+			<attributes>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

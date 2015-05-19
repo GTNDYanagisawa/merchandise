@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+-->
+
+<project name="telcostore_buildcallbacks" >
+	
+	<macrodef name="telcostore_after_build">
+		<sequential>
+			<impexGenerate extname="acceleratorsampledata"/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="telcostore_after_clean">
+		<sequential>
+			<delete file="${ext.acceleratorsampledata.path}/resources-lang/touch_impexgen" failonerror="false"/>
+			
+		</sequential>
+	</macrodef>
+
+    <macrodef name="telcostore_before_dist_copy">
+        <sequential>
+
+            <replaceregexp byline="true">
+                <fileset dir="${ext.telcostore.path}">
+                    <include name="**/*.java"/>
+                    <include name="**/*.jsp"/>
+                    <include name="**/*.tag"/>
+                    <include name="**/*.xml"/>
+                    <include name="**/*.impex"/>
+                    <include name="**/*.csv"/>
+                    <include name="**/*.vm"/>
+                    <include name="**/*.properties"/>
+                    <exclude name="**/buildcallbacks.xml"/>
+                </fileset>
+                <regexp pattern="(.+)TELCO_(START|END)(.+|)"/>
+                <substitution expression=""/>
+            </replaceregexp>
+            
+            <delete>
+                <fileset dir="${ext.telcostore.path}" includes="**/*.deleted"/>
+                <fileset dir="${ext.telcostore.path}" includes="**/leftblankintentionally.txt"/>
+            </delete>
+            
+        </sequential>
+    </macrodef>
+
+	<patternset id="telcostore.localization.pattern"> 
+	    <!-- core and hmc -->
+	    <include name="**/*locales*_en.properties"/>
+	    <exclude name="**/hmc/web/webroot/WEB-INF/classes/**/*"/> 
+	    <exclude name="**/unittest/**/*"/> 
+	    <!-- cockpit (ng) -->
+	    <include name="**/i3-label_en.properties"/>
+	    <include name="**/labels_en.properties"/>
+	    <include name="**/i3-label.properties" if="processing.en"/>
+	    <include name="**/labels.properties" if="processing.en"/> 
+	    <!-- messages -->
+	    <include name="**/*messages_en.properties"/>
+	    <include name="**/*messages.properties" if="processing.en"/> 
+	    <!-- frontend properties files in WEB-INF/messages folder -->
+	    <include name="**/WEB-INF/messages/*_en.properties"/> 
+	    <!-- csv and impex -->
+	    <include name="**/lang-en.properties"/> 
+	    <!-- email localizations from yacceleratorcore -->
+	    <include name="resources/**/messages/*_en.properties"/> 
+	    <!-- include validation messages -->
+	    <include name="resources/**/ValidationMessages.properties"/>
+	</patternset>
+	
+</project>

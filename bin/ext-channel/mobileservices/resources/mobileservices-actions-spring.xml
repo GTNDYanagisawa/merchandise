@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+		   http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Actions for sending messages -->   
+
+	<bean id='mobileSendItemLinkAction'
+		class='de.hybris.platform.mobileservices.text.actions.MobileSendItemLinkActionPerformable'
+		parent="abstractMobileAction" scope="tenant">
+	</bean>
+	
+	<bean id='mobileSendLinkAction'
+		class='de.hybris.platform.mobileservices.text.actions.MobileSendLinkActionPerformable'
+		parent="abstractMobileAction" scope="tenant">
+	</bean>
+	
+	<bean id='mobileSendTextAction'
+		class='de.hybris.platform.mobileservices.text.actions.MobileSendTextActionPerformable'
+		parent="abstractMobileAction" scope="tenant">
+	</bean>
+
+	<!--  Actions for receiving messages -->
+
+	<bean id="mobileReceiveAndSendTextAction"
+		class="de.hybris.platform.mobileservices.text.actions.MobileReceiveAndSendTextActionPerformable"
+		parent="abstractMobileAction" scope="tenant">
+	</bean>
+	
+	<bean id="mobileReceiveAndSendItemAction"
+		class="de.hybris.platform.mobileservices.text.actions.MobileReceiveAndSendItemActionPerformable"
+		parent="abstractMobileAction" scope="tenant">
+		<property name="deeplinkUrlService" ref="deeplinkUrlService" />
+	</bean>
+	
+	<bean id="mobileReceiveAndSubscribeAction"
+		class="de.hybris.platform.mobileservices.text.actions.MobileReceiveAndSubscribeActionPerformable"
+		parent="abstractMobileAction" scope="tenant">
+		<property name="phoneListService" ref="phoneListService" />
+	</bean>
+
+	<!-- Helper -->
+	
+	<bean id="abstractMobileAction" abstract="true"
+		class="de.hybris.platform.mobileservices.text.actions.AbstractMobileActionPerformable">
+		<property name="textService" ref="textService" />
+		<property name="modelService" ref="modelService" />
+		<property name="velocityTemplateHelper" ref="velocityTemplateHelper" />
+		<property name="actionHelper" ref="actionHelper" />
+	</bean>
+	
+
+</beans>

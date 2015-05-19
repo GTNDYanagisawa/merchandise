@@ -1,0 +1,61 @@
+*** Settings ***
+Library           de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Library           de.hybris.platform.commerceservicesatddtests.keywords.CommerceServicesKeywordLibrary
+Resource		  impex/Impex_Keywords.txt
+
+
+*** Keywords ***
+create product "${code:[^"]+}"
+    [Documentation]    Creates a product with the given code
+    @{binding}    create list    productCode    ${code}
+    ${templateName}=    Set Variable    impex-templates/product/product-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+    
+create user price group "${userPriceGroupCode}"
+	[Documentation]    Creates a new UserPriceGroup
+	@{binding}    create list    userPriceGroupCode    ${userPriceGroupCode}
+    ${templateName}=    Set Variable    impex-templates/customer/userpricegroup-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+	
+create customer "${userUID:[^"]+}"
+	[Documentation]    Creates a customer with the given unique ID. The default currency is set.
+	@{binding}    create list    userUID    ${userUID}    userPriceGroupCode    ${EMPTY}    currencyIsocode    ${EMPTY}
+    ${templateName}=    Set Variable    impex-templates/customer/customer-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+
+create customer "${userUID:[^"]+}" with currency "${currencyIsocode}"
+	[Documentation]    Creates a customer with the given unique ID and currency.
+	@{binding}    create list    userUID    ${userUID}    userPriceGroupCode    ${EMPTY}    currencyIsocode    ${currencyIsocode}
+    ${templateName}=    Set Variable    impex-templates/customer/customer-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+
+create customer "${userUID:[^"]+}" with user price group "${userPriceGroupCode}"
+	[Documentation]    Creates a customer with the given unique ID and user price group.  The default currency is set.
+	@{binding}    create list    userUID    ${userUID}    userPriceGroupCode    ${userPriceGroupCode}    currencyIsocode    ${EMPTY}
+    ${templateName}=    Set Variable    impex-templates/customer/customer-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+	
+login as "${userUID}"
+	[Documentation]    log in as the given user
+	login    ${userUID}
+    
+add product "${productCode}" to cart    
+    [Documentation]    Adds the specified product to the cart once
+    add product to cart once   ${productCode}
+
+remove product "${productCode}" from cart
+	[Documentation]    Removes the given product from the cart
+	remove product from cart    ${productCode}
+	
+delete cart entry "${entryNumber}"
+	[Documentation]    Deletes an entry from the cart
+	delete cart entry    ${entryNumber}
+	
+verify that cart total is "${expectedTotal}"
+	[Documentation]    Verifies the master cart total
+	verify cart total	${expectedTotal}

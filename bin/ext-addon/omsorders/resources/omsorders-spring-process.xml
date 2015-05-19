@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2013 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias name="defaultOmsCheckOrderAction" alias="omsCheckOrderAction"/>
+	<bean id="defaultOmsCheckOrderAction"
+		  class="de.hybris.platform.integration.oms.order.process.action.CheckOrderAction" scope="tenant"
+		  parent="abstractAction">
+		<property name="checkOrderService" ref="omsCheckOrderService"/>
+	</bean>
+
+	<alias name="defaultOmsCheckTransactionReviewStatusAction" alias="omsCheckTransactionReviewStatusAction"/>
+	<bean id="defaultOmsCheckTransactionReviewStatusAction"
+		  class="de.hybris.platform.integration.oms.order.process.action.CheckTransactionReviewStatusAction"
+		  scope="tenant" parent="abstractAction">
+		<property name="ticketBusinessService" ref="ticketBusinessService"/>
+	</bean>
+
+	<alias name="defaultOmsCreateOmsOrderAction" alias="omsCreateOmsOrderAction"/>
+	<bean name="defaultOmsCreateOmsOrderAction"
+		  class="de.hybris.platform.integration.oms.order.process.action.CreateOmsOrderAction" parent="abstractAction"
+		  scope="tenant">
+		<property name="omsOrderService" ref="omsOrderService"/>
+		<property name="maxRetryCount" value="${hybris.omsorders.maxRetryCount}"/>
+		<property name="retryDelay" value="${hybris.omsorders.retryDelay}"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="impersonationService" ref="impersonationService"/>
+	</bean>
+
+	<alias name="defaultOmsSendOrderPlacedNotificationAction" alias="omsSendOrderPlacedNotificationAction"/>
+	<bean id="defaultOmsSendOrderPlacedNotificationAction"
+		  class="de.hybris.platform.integration.oms.order.process.action.SendOrderPlacedNotificationAction"
+		  scope="tenant" parent="abstractAction">
+		<property name="eventService" ref="eventService"/>
+	</bean>
+
+	<alias name="defaultOmsCancelWholeOrderAction" alias="omsCancelWholeOrderAction"/>
+	<bean id="defaultOmsCancelWholeOrderAction"
+		  class="de.hybris.platform.integration.oms.order.process.action.CancelWholeOrderAction" scope="tenant"
+		  parent="abstractAction">
+		<property name="paymentService" ref="paymentService"/>
+	</bean>
+
+
+	<alias name="defaultOmsOrderSourcingCheckAction" alias="omsOrderSourcingCheckAction"/>
+	<bean id="defaultOmsOrderSourcingCheckAction"
+		  class="de.hybris.platform.integration.oms.order.process.action.OmsOrderSourcingCheckAction"
+		  scope="tenant" parent="abstractAction">
+		<property name="modelService" ref="modelService"/>
+		<property name="taskService" ref="taskService"/>
+		<property name="delay" value="${omsorders.orderSourcingCheck.delay}"/>
+	</bean>
+
+</beans>
+

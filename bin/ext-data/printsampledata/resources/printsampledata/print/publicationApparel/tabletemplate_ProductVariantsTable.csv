@@ -1,0 +1,57 @@
+﻿###############################################################;
+### Specify the table template objects;
+INSERT_UPDATE TableBlock;code[unique=true];$categories;widthType(code)[default='FIT_TO_FRAME'];width;tableStyle(id);isTemplate[default=false];tableTemplate(code);$catalogversion[unique=true];
+;ProductVariantsTable;tableblocks;AUTO;;Apparel Sizes Table;
+
+
+
+###############################################################;
+### Specify the column and row type;
+INSERT_UPDATE ColumnEntry;$table[unique=true];tablePOS[unique=true];widthType(code)[default='FIXED_WIDTH'];width;widthExpression;locked[default=true];$catalogversion[unique=true];
+;ProductVariantsTable;0;;25;
+;ProductVariantsTable;1;;;"38/columnDataCount"
+;ProductVariantsTable;2;;15;
+
+INSERT_UPDATE RowEntry;$table[unique=true];tablePOS[unique=true];height;maxHeight;locked[default=true];$catalogversion[unique=true];
+;ProductVariantsTable;0;
+;ProductVariantsTable;1;
+
+
+
+###############################################################;
+### Specify cell styles;
+INSERT_UPDATE CellEntry;$table[unique=true];$row[unique=true];$column[unique=true];cellText[lang=en];cellText[lang=de];postProcessingExpression;convert[default=false];colSpan[default='1'];rowSpan[default='1'];mergeHorizontal[default='false'];mergeVertical[default='false'];cellStyle(id);cellStyleExpression;$catalogversion[unique=true];
+;ProductVariantsTable;ProductVariantsTable:::0;ProductVariantsTable:::0;;;"columnData.name";;;;;;Apparel Table Header;
+;ProductVariantsTable;ProductVariantsTable:::0;ProductVariantsTable:::1;;;"columnData.name";;;;;;Apparel Table Header;
+;ProductVariantsTable;ProductVariantsTable:::0;ProductVariantsTable:::2;"Price";"Preis";;;;;;;Apparel Table Header;
+;ProductVariantsTable;ProductVariantsTable:::1;ProductVariantsTable:::0;;;;;;;;;Apparel Table Body left;
+;ProductVariantsTable;ProductVariantsTable:::1;ProductVariantsTable:::1;;;;;;;;;Apparel Table Body left;
+;ProductVariantsTable;ProductVariantsTable:::1;ProductVariantsTable:::2;;;"PriceUtils.formatPrice( PriceUtils.getPriceContainer(rowData).getPrimaryPriceValue() )";;;;;;Apparel Table Body right;
+
+
+
+###############################################################;
+### Specify parameters for columns/rows/table
+INSERT SingleParameterValue;&paramID;hasItem[default='true'];$attributeDescriptorAsItem;
+;variantsTable_attr_code;;Product:code;
+
+
+
+###############################################################;
+### Assigning parameters to column or row entries
+INSERT_UPDATE AxisDataHolder;$table[unique=true];$rowAxis[unique=true];dataProviderClass;
+;ProductVariantsTable;ProductVariantsTable:::1;de.hybris.platform.print.util.table.VariantProductsDataProvider;
+
+INSERT_UPDATE AxisDataHolder;$table[unique=true];$columnAxis[unique=true];dataProviderClass;parameters(key,value(&paramID));
+;ProductVariantsTable;ProductVariantsTable:::0;de.hybris.platform.print.util.table.SingleItemDataProvider;item->variantsTable_attr_code;
+;ProductVariantsTable;ProductVariantsTable:::1;de.hybris.platform.print.util.table.VariantAttributesDataProvider;
+
+
+
+###############################################################;
+### Specify data resolvers for cells
+INSERT_UPDATE CellDataHolder;$table[unique=true];$cell[unique=true];dataResolverClass[default='de.hybris.platform.print.util.table.DefaultDataResolver'];
+;ProductVariantsTable;ProductVariantsTable:::0:ProductVariantsTable:::1;
+;ProductVariantsTable;ProductVariantsTable:::1:ProductVariantsTable:::1;
+
+

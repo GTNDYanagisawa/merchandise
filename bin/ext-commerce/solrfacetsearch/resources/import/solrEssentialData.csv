@@ -1,0 +1,18 @@
+# Create cron job templates
+INSERT_UPDATE ServicelayerJob;code[unique=true];springid
+;solrQueryStatisticsCollectorJob;solrQueryStatisticsCollectorJob
+;solrUpdateSynonymsJob;solrUpdateSynonymsJob
+
+# Create the solr server default configurations
+INSERT_UPDATE SolrServerConfig;name[unique=true];mode(code);embeddedMaster;
+;Embedded (development mode);embedded;true;
+;Local Standalone;standalone;false;
+
+# Create endpoints for default configurations (standalone and cloud)
+INSERT_UPDATE SolrEndpointUrl;url[unique=true];master;solrServerConfig(name);
+;http://localhost:8983/solr;true;Local Standalone;
+
+# Create the solr indexer configuration
+INSERT_UPDATE SolrIndexConfig;name[unique=true];batchSize;numberOfThreads;indexMode(code);
+;Direct;100;1;DIRECT;
+;Two-Phase;100;1;TWO_PHASE;

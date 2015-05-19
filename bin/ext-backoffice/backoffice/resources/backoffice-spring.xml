@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <alias name="platformBackofficeAuthenticationProvider" alias="backofficeAuthenticationProvider"/>
+    <bean id="platformBackofficeAuthenticationProvider"
+          class="com.hybris.backoffice.spring.security.BackofficeAuthenticationProvider">
+        <property name="userDetailsService" ref="backofficeUserDetailsService"/>
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <alias name="defaultBackofficeUserDetailsService" alias="backofficeUserDetailsService"/>
+    <bean id="defaultBackofficeUserDetailsService"
+          class="com.hybris.backoffice.spring.security.BackofficeUserDetailsService">
+        <property name="catalogVersionService" ref="catalogVersionService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="userService" ref="userService"/>
+        <property name="activateCatalogVersions" value="true"/>
+    </bean>
+
+    <alias name="defaultBackofficeRoleDao" alias="backofficeRoleDao"/>
+    <bean id="defaultBackofficeRoleDao" class="com.hybris.backoffice.daos.impl.DefaultBackofficeRoleDao">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+    <alias name="defaultBackofficeEventSender" alias="backofficeEventSender"/>
+    <bean id="defaultBackofficeEventSender" class="com.hybris.backoffice.events.DefaultBackofficeEventSender"/>
+
+    <alias name="defaultBackofficeEventListener" alias="backofficeEventListener"/>
+    <bean id="defaultBackofficeEventListener" class="com.hybris.backoffice.events.BackofficeEventListener"
+          parent="abstractEventListener">
+        <lookup-method name="getBackofficeEventSender" bean="backofficeEventSender"/>
+    </bean>
+
+    <alias name="defaultAfterInitializationEndBackofficeListener" alias="afterInitializationEndBackofficeListener"/>
+    <bean id="defaultAfterInitializationEndBackofficeListener"
+          class="com.hybris.backoffice.events.AfterInitializationEndBackofficeListener" lazy-init="false"
+          parent="abstractEventListener"/>
+</beans>

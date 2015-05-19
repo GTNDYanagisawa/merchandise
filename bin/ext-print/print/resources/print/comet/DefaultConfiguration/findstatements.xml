@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<!-- 
+	file:	 findstatements.xml
+	See: Doku_deDE/InDesign/Plugins/products.html#Standardverfahren
+	
+	id = unique ID
+	classid = In which palette can the find statement be used (3=product search)
+	userid = (Database only) Only users with this id will see the statement. 0 = all users
+	description = A description for this find statement (used for popup)
+	label = Name of this find statement. Will be displayed in the popup
+	sequencenr = Position in the popup list 
+	statement = Search expression. Reference to input values with <searchvalue1> to <searchvalue4>
+	source = (experimental. Dont use)
+	sourcefiles = 
+	path = 
+	alias = 
+	
+	CUSTOM FIND STATEMENTS:
+	candelete = 0=>preconfigured find statement, 1=>custom find statement
+	label1 = Label of search field 1 (top left)
+	label2 = Label of search field 2 (bottom left)
+	label3 = Label of search field 3 (top right)
+	label4 = Label of search field 4 (bottom right)
+	value1 = predefined content of search field 1 (top left)
+	value2 = predefined content of search field 2 (bottom left)
+	value3 = predefined content of search field 3 (top right)
+	value4 = predefined content of search field 4 (bottom right)
+	
+	RESULT:
+	id1						= int: ID1
+	id2						= int: ID2
+	id3						= int: ID3
+	stringid				= char*: String ID (if hasstringids is 1)
+	class					= int: Class ID
+	icon					= int: Icon ID
+	info1					= string: 1. palette column
+	info2					= string: 2. palette column
+	forceDelete				= int: >0 = show object only if used in document. 0 = show object as normal. <0 = Object is displayed but not placeable
+	panelstatement			= int: 0 = no subitems. >=10000 = ID of panelstatement for subitems
+	docID					= int: Document ID (unused)
+	masterpage				= string: Master page name (with prefix. e.g. C-aMasterPage)
+	gridname				= string: Grid name
+	gridElementName			= string: Grid element name
+	gridID					= int: Grid ID
+	gridElementID			= int: Grid element IP
+	pageItemID				= int: Name of the template that shall be used while placing
+	
+-->
+
+<findstatements>
+	<findstatement>
+		<id>2</id>
+		<description>Tooltiptext</description>
+		<classid>3</classid>
+		<userid>0</userid>
+		<statement>
+			getProductList1
+			parent.ID = &lt;parent.ID&gt; 
+			AND parent.ID2 = &lt;parent.ID2&gt; 
+			AND parent.ID3 = &lt;parent.ID3&gt; 
+			AND parent.StringID = &lt;parent.StringID&gt; 
+			AND search.code = &lt;searchvalue1&gt; 
+			AND search.name = &lt;searchvalue2&gt; 
+			AND search.description = &lt;searchvalue3&gt; 
+			AND type = "SearchProductList"
+		</statement>
+		<label>Produktsuche</label>
+		<sequencenr>10</sequencenr>
+		<hasstringids>1</hasstringids>
+		<candelete>0</candelete>
+		<label1>Code</label1>
+		<label2>Name</label2>
+		<label3>Description</label3>
+		<label4></label4>
+		<value1></value1>
+		<value2></value2>
+		<value3></value3>
+		<value4></value4>
+		<source></source>
+		<sourcefile></sourcefile>
+		<path></path>
+		<alias></alias>
+	</findstatement>
+</findstatements>
+
+<!-- 
+	<findstatement>
+		<id>1</id> 
+		<description /> 
+		<classid>3</classid> 
+		<userid>0</userid> 
+		<statement>produktsuche...</statement> 
+		<label>Customized Search</label> 
+		<sequencenr>10</sequencenr> 
+		<hasstringids>1</hasstringids> 
+	</findstatement>
+
+	<findstatement>
+		<id>1</id>
+		<description></description>
+		<classid>3</classid>
+		<userid>0</userid>
+		<statement>
+			"documents.xml" select productid, 0, 0, 3, 2012, id,
+			productname, 0, 10000 node documentdata.document where
+			filename = &lt;document&gt; node pages.page.placing.place
+			orderby id
+		</statement>
+		<label>Produkte des Dokuments</label>
+		<sequencenr>2</sequencenr>
+		<source></source>
+	</findstatement>
+
+ 	<findstatement>
+		<id>1</id>
+		<description>Find Publication components by name, code, ...</description>
+		<classid>3</classid>
+		<userid>0</userid>
+		<statement>
+			getSubProductList1 
+			parent.ID = &lt;parent.ID&gt; 
+			AND parent.ID2 = &lt;parent.ID2&gt; 
+			AND parent.ID3 = &lt;parent.ID3&gt; 
+			AND parent.StringID = &lt;parent.StringID&gt; 
+			AND search.code = &lt;searchvalue1&gt; 
+			AND search.name = &lt;searchvalue2&gt; 
+			AND search.description = &lt;searchvalue3&gt; 
+			AND search.time = &lt;searchvalue4&gt;
+		</statement>
+		<label>Find by Name, Code, ...</label>
+		<sequencenr>10</sequencenr>
+		<source></source>
+ -->

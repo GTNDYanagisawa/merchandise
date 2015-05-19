@@ -1,0 +1,43 @@
+*** Settings ***
+Resource    entitlements/Product_Keywords.txt
+Resource    entitlements/Entitlement_Keywords.txt
+Resource    common/EntitlementStartup_Keywords.txt
+
+Test Setup        import entitlement sampledata
+Test Teardown     reset system
+
+*** Test Cases ***
+
+Test_Entitlement_CreateAndVerifyXML_MeteredCondition_x1
+	[Documentation]    Verifies addition of one metered entitlement without any additional conditions
+	...                All entitlement details(name/usageUnit) are defined in impex file: testEntitlements.csv
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "11"
+	for product "P1" verify that the XML for entitlements matches "<entitlements><entitlement><name>Metered Entitlement 1</name><usageUnit><id>minute</id><namePlural>Minutes</namePlural><name>Minute</name><accumulative>false</accumulative></usageUnit><quantity>11</quantity></entitlement></entitlements>"
+
+Test_Entitlement_CreateAndVerifyXML_MeteredCondition_x2
+	[Documentation]    Verifies addition of two metered entitlements without any additional conditions
+	...                All entitlement details(name/usageUnit) are defined in impex file: testEntitlements.csv
+	create product "P1"
+	for product "P1" add metered entitlement "ME2" with quantity "11"
+	for product "P1" add metered entitlement "ME1" with quantity "2"
+	for product "P1" verify that the XML for entitlements matches "<entitlements><entitlement><name>Metered Entitlement 2</name><usageUnit><id>textMessage</id><namePlural>Text Message</namePlural><name>Text Message</name><accumulative>false</accumulative></usageUnit><quantity>11</quantity></entitlement><entitlement><name>Metered Entitlement 1</name><usageUnit><id>minute</id><namePlural>Minutes</namePlural><name>Minute</name><accumulative>false</accumulative></usageUnit><quantity>2</quantity></entitlement></entitlements>"
+
+Test_Entitlement_CreateAndVerifyXML_MeteredCondition_Quantity_NoValue
+	[Documentation]    Verifies addition of one metered entitlement with no quantity value
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity ""
+	for product "P1" verify that the XML for entitlements matches "<entitlements><entitlement><name>Metered Entitlement 1</name><usageUnit><id>minute</id><namePlural>Minutes</namePlural><name>Minute</name><accumulative>false</accumulative></usageUnit><quantity>0</quantity></entitlement></entitlements>"
+
+Test_Entitlement_CreateAndVerifyXML_MeteredCondition_Quantity_NonNumericValue_FAIL
+	[Documentation]    Verifies addition of one metered entitlement with non numeric quantity value
+	create product "P1"       
+	Run keyword and expect error
+	...                Import of resource impex-templates/entitlement-insert.impex.vm failed: cannot parse number 'a' with format specified pattern '#,##0' due to Unparseable number: "a"
+	...                for product "P1" add metered entitlement "ME1" with quantity "a"
+
+Test_Entitlement_CreateAndVerifyXML_MeteredCondition_Quantity_ZeroValue_PASS
+	[Documentation]    Verifies addition of one metered entitlement with quantity value=0
+	create product "P1"
+	for product "P1" add metered entitlement "ME1" with quantity "0"
+	for product "P1" verify that the XML for entitlements matches "<entitlements><entitlement><name>Metered Entitlement 1</name><usageUnit><id>minute</id><namePlural>Minutes</namePlural><name>Minute</name><accumulative>false</accumulative></usageUnit><quantity>0</quantity></entitlement></entitlements>"

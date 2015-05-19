@@ -1,0 +1,75 @@
+*** Settings ***
+Test Setup        import commercecart sampledata
+Test Teardown     reset system
+Resource          subscriptionservices/SubscriptionProduct_Keywords.txt
+Resource          subscriptionservices/SubscriptionPricePlan_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+Resource		  commerce/SubscriptionCommerce_Keywords.txt
+Resource          entitlements/Product_Keywords.txt
+
+
+*** Test Cases ***
+
+### Temporarily commented out: see https://jira.hybris.com/browse/BIT-300 ###
+#Test_Switch_Currency_One_SubscriptionProduct
+#    set cart currency to "USD"
+#    create subscription product "P1"
+#    for product "P1" add subscription priceplan "PP_USD" with currency "USD"
+#    for subscription priceplan "PP_USD" add "paynow" one time price of "5.75"
+#    for subscription priceplan "PP_USD" add "onfirstbill" one time price of "10"
+#    for subscription priceplan "PP_USD" add recurring charge of "20.99" with cycle start "1"
+#    for product "P1" add subscription priceplan "PP_EUR" with currency "EUR"
+#    for subscription priceplan "PP_EUR" add "paynow" one time price of "20.50"
+#    for subscription priceplan "PP_EUR" add "onfirstbill" one time price of "21"
+#    for subscription priceplan "PP_EUR" add recurring charge of "31.99" with cycle start "1"
+#    add product "P1" to cart
+#    verify that cart total is "5.75"
+#    verify that number of child carts is "2"
+#    verify that cart total for "onfirstbill" is "10"
+#    verify that cart total for "monthly" is "20.99"
+#    set cart currency to "EUR"
+#    verify that cart total is "20.50"
+#    verify that number of child carts is "2"
+#    verify that cart total for "onfirstbill" is "21"
+#    verify that cart total for "monthly" is "31.99"
+
+### Temporarily commented out: see https://jira.hybris.com/browse/BIT-300 ###
+#Test_Switch_Currency_Three_SubscriptionProducts
+#    set cart currency to "USD"
+#    create subscription product "P1"
+#    for product "P1" add subscription priceplan "PP_USD" with currency "USD"
+#    for subscription priceplan "PP_USD" add "paynow" one time price of "5.75"
+#    for subscription priceplan "PP_USD" add "onfirstbill" one time price of "10"
+#    for subscription priceplan "PP_USD" add recurring charge of "20.99" with cycle start "1"
+#    for product "P1" add subscription priceplan "PP_EUR" with currency "EUR"
+#    for subscription priceplan "PP_EUR" add "paynow" one time price of "20.50"
+#    for subscription priceplan "PP_EUR" add "onfirstbill" one time price of "21"
+#    for subscription priceplan "PP_EUR" add recurring charge of "31.99" with cycle start "1"
+#    add product "P1" to cart
+#    add product "P1" to cart
+#    add product "P1" to cart
+#    verify that cart total is "17.25"
+#    verify that number of child carts is "2"
+#    verify that cart total for "onfirstbill" is "30"
+#    verify that cart total for "monthly" is "62.97"
+#    set cart currency to "EUR"
+#    verify that cart total is "61.50"
+#    verify that number of child carts is "2"
+#    verify that cart total for "onfirstbill" is "63"
+#    verify that cart total for "monthly" is "95.97"
+
+Test_Switch_Currency_Change_Xml
+    set cart currency to "USD"
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP_USD" with currency "USD"
+    for subscription priceplan "PP_USD" add "paynow" one time price of "5.75"
+    for subscription priceplan "PP_USD" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP_USD" add recurring charge of "20.99" with cycle start "1"
+    for product "P1" add subscription priceplan "PP_EUR" with currency "EUR"
+    for subscription priceplan "PP_EUR" add "paynow" one time price of "20.50"
+    for subscription priceplan "PP_EUR" add "onfirstbill" one time price of "21"
+    for subscription priceplan "PP_EUR" add recurring charge of "31.99" with cycle start "1"
+    add product "P1" to cart
+    for product "P1" verify that the XML for prices matches "<price class="subscriptionPricePlan"><currencyIso>USD</currencyIso><oneTimeChargeEntries><oneTimeChargeEntry><price><currencyIso>USD</currencyIso><priceType>BUY</priceType><value>5.75</value><formattedValue>$5.75</formattedValue></price><billingTime><description>Pay Now</description><orderNumber>1</orderNumber><name>Pay on Checkout</name><nameInOrder>Paid on order</nameInOrder><code>paynow</code></billingTime></oneTimeChargeEntry><oneTimeChargeEntry><price><currencyIso>USD</currencyIso><priceType>BUY</priceType><value>10.0</value><formattedValue>$10.00</formattedValue></price><billingTime><description>On First Bill</description><orderNumber>2</orderNumber><name>On first bill</name><code>onfirstbill</code></billingTime></oneTimeChargeEntry></oneTimeChargeEntries><name>PP_USD</name><usageCharges class="empty-list"/><recurringChargeEntries><recurringChargeEntry><price><currencyIso>USD</currencyIso><priceType>BUY</priceType><value>20.99</value><formattedValue>$20.99</formattedValue></price><cycleStart>1</cycleStart><cycleEnd>-1</cycleEnd></recurringChargeEntry></recurringChargeEntries></price>"
+    set cart currency to "EUR"
+    for product "P1" verify that the XML for prices matches "<price class="subscriptionPricePlan"><currencyIso>EUR</currencyIso><oneTimeChargeEntries><oneTimeChargeEntry><price><currencyIso>EUR</currencyIso><priceType>BUY</priceType><value>20.5</value><formattedValue>E20.50</formattedValue></price><billingTime><description>Pay Now</description><orderNumber>1</orderNumber><name>Pay on Checkout</name><nameInOrder>Paid on order</nameInOrder><code>paynow</code></billingTime></oneTimeChargeEntry><oneTimeChargeEntry><price><currencyIso>EUR</currencyIso><priceType>BUY</priceType><value>21.0</value><formattedValue>E21.00</formattedValue></price><billingTime><description>On First Bill</description><orderNumber>2</orderNumber><name>On first bill</name><code>onfirstbill</code></billingTime></oneTimeChargeEntry></oneTimeChargeEntries><name>PP_EUR</name><usageCharges class="empty-list"/><recurringChargeEntries><recurringChargeEntry><price><currencyIso>EUR</currencyIso><priceType>BUY</priceType><value>31.99</value><formattedValue>E31.99</formattedValue></price><cycleStart>1</cycleStart><cycleEnd>-1</cycleEnd></recurringChargeEntry></recurringChargeEntries></price>"

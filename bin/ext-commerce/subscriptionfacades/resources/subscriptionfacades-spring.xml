@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+           
+	<import resource="classpath:/subscriptionfacades/ycommercewebservices/spring/typealiasmappings.xml"/>
+
+    <bean id="billingTimeData" class="de.hybris.platform.subscriptionfacades.data.BillingTimeData" scope="prototype"/>
+    <bean id="termOfServiceFrequencyData" class="de.hybris.platform.subscriptionfacades.data.TermOfServiceFrequencyData" scope="prototype"/>
+    <bean id="termOfServiceRenewalData" class="de.hybris.platform.subscriptionfacades.data.TermOfServiceRenewalData" scope="prototype"/>
+    <bean id="subscriptionTermData" class="de.hybris.platform.subscriptionfacades.data.SubscriptionTermData" scope="prototype"/>
+    <bean id="billingPlanData" class="de.hybris.platform.subscriptionfacades.data.BillingPlanData" scope="prototype"/>
+    <bean id="billingCycleTypeData" class="de.hybris.platform.subscriptionfacades.data.BillingCycleTypeData" scope="prototype"/>
+    <bean id="tierUsageChargeEntryData" class="de.hybris.platform.subscriptionfacades.data.TierUsageChargeEntryData" scope="prototype"/>
+    <bean id="overageUsageChargeEntryData" class="de.hybris.platform.subscriptionfacades.data.OverageUsageChargeEntryData" scope="prototype"/>
+    <bean id="usageChargeTypeData" class="de.hybris.platform.subscriptionfacades.data.UsageChargeTypeData" scope="prototype"/>
+    <bean id="usageUnitData" class="de.hybris.platform.entitlementfacades.data.UsageUnitData" scope="prototype"/>
+    <bean id="perUnitUsageChargeData" class="de.hybris.platform.subscriptionfacades.data.PerUnitUsageChargeData" scope="prototype"/>    
+    <bean id="volumeUsageChargeData" class="de.hybris.platform.subscriptionfacades.data.VolumeUsageChargeData" scope="prototype"/>
+    <bean id="recurringChargeEntryData" class="de.hybris.platform.subscriptionfacades.data.RecurringChargeEntryData" scope="prototype"/>
+    <bean id="oneTimeChargeEntryData" class="de.hybris.platform.subscriptionfacades.data.OneTimeChargeEntryData" scope="prototype"/>
+    <bean id="subscriptionPricePlanData" class="de.hybris.platform.subscriptionfacades.data.SubscriptionPricePlanData" scope="prototype"/>
+    <bean id="subscriptionData" class="de.hybris.platform.subscriptionfacades.data.SubscriptionData" scope="prototype"/>
+
+   	<alias name="defaultSubscriptionProductBasicPopulator" alias="subscriptionProductBasicPopulator" />
+	<bean id="defaultSubscriptionProductBasicPopulator" parent="baseProductPopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.SubscriptionProductBasicPopulator">
+		<property name="subscriptionTermConverter" ref="subscriptionTermConverter" />
+	</bean>
+	
+	<!-- append subscription specific populator to default product converter -->
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="productBasicPopulatorList"/>
+		<property name="add" ref="subscriptionProductBasicPopulator"/>
+	</bean>
+	
+	<alias name="defaultSearchResultSubscriptionProductPopulator" alias="searchResultSubscriptionProductPopulator"/>
+    <bean id="defaultSearchResultSubscriptionProductPopulator" class="de.hybris.platform.subscriptionfacades.converters.populator.SearchResultSubscriptionProductPopulator">
+		<property name="productService" ref="productService"/>
+		<property name="subscriptionPricePlanPopulator" ref="subscriptionProductPricePlanPopulator"/>	
+		<property name="termOfServiceRenewalConverter" ref="termOfServiceRenewalConverter"/>
+		<property name="productEntitlementCollectionPopulator" ref="productEntitlementCollectionPopulator"/>
+    </bean>	  
+    
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="commerceSearchResultProductConverter"/>
+		<property name="add" ref="searchResultSubscriptionProductPopulator"/>
+	</bean>
+	
+	<alias name="defaultSubscriptionTermConverter" alias="subscriptionTermConverter"/>
+	<bean id="defaultSubscriptionTermConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="subscriptionTermData"/>
+		<property name="populators">
+			<list>
+				<ref bean="subscriptionTermPopulator"/>
+			</list>
+		</property>			 
+	</bean>
+	
+	<alias name="defaultSubscriptionTermPopulator" alias="subscriptionTermPopulator"/>
+	<bean name="defaultSubscriptionTermPopulator" class="de.hybris.platform.subscriptionfacades.converters.populator.SubscriptionTermPopulator">
+		<property name="billingPlanConverter" ref="billingPlanConverter" />
+		<property name="termOfServiceFrequencyConverter" ref="termOfServiceFrequencyConverter" />
+		<property name="termOfServiceRenewalConverter" ref="termOfServiceRenewalConverter" />	
+	</bean>
+	
+	<alias name="defaultBillingPlanConverter" alias="billingPlanConverter" />
+	<bean id="defaultBillingPlanConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="billingPlanData"/>
+		<property name="populators">
+			<list>
+				<ref bean="billingPlanPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultBillingPlanPopulator" alias="billingPlanPopulator" />
+	<bean id="defaultBillingPlanPopulator" class="de.hybris.platform.subscriptionfacades.converters.populator.BillingPlanPopulator" >
+		<property name="billingCycleTypeConverter" ref="billingCycleTypeConverter"/>
+		<property name="billingTimeConverter" ref="billingTimeConverter"/>
+	</bean>
+    
+    <alias name="defaultTermOfServiceFrequencyConverter" alias="termOfServiceFrequencyConverter"/>
+    <bean id="defaultTermOfServiceFrequencyConverter" parent="abstractPopulatingConverter" >
+        <lookup-method name="createTarget" bean="termOfServiceFrequencyData"/>
+        <property name="populators">
+            <list>
+                <ref bean="termOfServiceFrequencyPopulator"/>
+            </list>
+        </property>
+    </bean>
+    
+	<alias name="defaultTermOfServiceFrequencyPopulator" alias="termOfServiceFrequencyPopulator"/>
+	<bean id="defaultTermOfServiceFrequencyPopulator" class="de.hybris.platform.subscriptionfacades.converters.populator.TermOfServiceFrequencyPopulator" >
+	    <property name="typeService" ref="typeService"/>
+	</bean>    
+    
+    <alias name="defaultTermOfServiceRenewalConverter" alias="termOfServiceRenewalConverter"/>
+    <bean id="defaultTermOfServiceRenewalConverter" parent="abstractPopulatingConverter" >
+        <lookup-method name="createTarget" bean="termOfServiceRenewalData"/>
+        <property name="populators">
+            <list>
+                <ref bean="termOfServiceRenewalPopulator"/>
+            </list>
+        </property>
+    </bean>
+    
+   	<alias name="defaultTermOfServiceRenewalPopulator" alias="termOfServiceRenewalPopulator"/>
+	<bean id="defaultTermOfServiceRenewalPopulator" class="de.hybris.platform.subscriptionfacades.converters.populator.TermOfServiceRenewalPopulator" >
+	    <property name="typeService" ref="typeService"/>
+	</bean>
+	
+    <alias name="defaultBillingTimeConverter" alias="billingTimeConverter"/>
+    <bean id="defaultBillingTimeConverter" parent="abstractPopulatingConverter" >
+        <lookup-method name="createTarget" bean="billingTimeData"/>
+        <property name="populators">
+            <list>
+                <ref bean="billingTimePopulator"/>
+            </list>
+        </property>
+    </bean> 
+
+    <alias name="defaultBillingTimePopulator" alias="billingTimePopulator"/>
+    <bean id="defaultBillingTimePopulator" class="de.hybris.platform.subscriptionfacades.converters.populator.BillingTimePopulator" />
+    
+    <alias name="defaultBillingCycleTypeConverter" alias="billingCycleTypeConverter"/>
+    <bean id="defaultBillingCycleTypeConverter" parent="abstractPopulatingConverter" >
+        <lookup-method name="createTarget" bean="billingCycleTypeData"/>
+        <property name="populators">
+            <list>
+                <ref bean="billingCycleTypePopulator"/>
+            </list>
+        </property>
+    </bean> 
+    
+    <alias name="defaultBillingCycleTypePopulator" alias="billingCycleTypePopulator"/>
+    <bean id="defaultBillingCycleTypePopulator" class="de.hybris.platform.subscriptionfacades.converters.populator.BillingCycleTypePopulator" >
+	    <property name="typeService" ref="typeService"/>
+	</bean>
+
+	<alias name="defaultAbstractSubscriptionOrderPopulator" alias="abstractSubscriptionOrderPopulator" />
+	<bean id="defaultAbstractSubscriptionOrderPopulator" class="de.hybris.platform.subscriptionfacades.order.converters.populator.AbstractSubscriptionOrderPopulator" parent="baseOrderPopulator" abstract="true">
+		<property name="billingTimeConverter" ref="billingTimeConverter" />
+		<property name="cartService" ref="cartService" />
+		<property name="orderService" ref="orderService" />
+	</bean>	 
+	
+	<alias name="defaultSubscriptionOrderPopulator" alias="subscriptionOrderPopulator" />
+	<bean id="defaultSubscriptionOrderPopulator" class="de.hybris.platform.subscriptionfacades.order.converters.populator.SubscriptionOrderPopulator" parent="defaultAbstractSubscriptionOrderPopulator" />	
+
+	<!-- append subscription specific order populator to the default orderConverter-->
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="orderConverter"/>
+		<property name="add" ref="subscriptionOrderPopulator"/>
+	</bean>
+
+	<alias name="defaultSubscriptionCartPopulator" alias="subscriptionCartPopulator" />
+	<bean id="defaultSubscriptionCartPopulator" class="de.hybris.platform.subscriptionfacades.order.converters.populator.SubscriptionCartPopulator" parent="defaultAbstractSubscriptionOrderPopulator" />
+
+	<!-- append subscription specific cart populator to the default cartConverter-->
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="cartConverter"/>
+		<property name="add" ref="subscriptionCartPopulator"/>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="extendedCartConverter"/>
+		<property name="add" ref="subscriptionCartPopulator"/>
+	</bean>
+
+	<alias name="defaultSubscriptionMiniCartPopulator" alias="subscriptionMiniCartPopulator" />
+	<bean id="defaultSubscriptionMiniCartPopulator" class="de.hybris.platform.subscriptionfacades.order.converters.populator.SubscriptionMiniCartPopulator" parent="defaultAbstractSubscriptionOrderPopulator" />
+
+	<!-- append subscription specific cart populator to the default cartConverter-->
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="miniCartConverter"/>
+		<property name="add" ref="subscriptionMiniCartPopulator"/>
+	</bean>
+
+	<alias name="defaultSubscriptionOrderEntryPopulator" alias="subscriptionOrderEntryPopulator" />
+	<bean id="defaultSubscriptionOrderEntryPopulator" class="de.hybris.platform.subscriptionfacades.order.converters.populator.SubscriptionOrderEntryPopulator" parent="defaultOrderEntryPopulator" >
+		<property name="billingTimeConverter" ref="billingTimeConverter" />	
+		<property name="subscriptionOrderPopulator" ref="subscriptionOrderPopulator" />
+		<property name="subscriptionXStreamAliasConverter" ref="subscriptionXStreamAliasConverter"/>
+	</bean>
+
+	<!-- append subscription specific order entry populator to the default orderEntryConverter-->
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="orderEntryConverter"/>
+		<property name="add" ref="subscriptionOrderEntryPopulator"/>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="orderEntryProductConverter"/>
+		<property name="add" ref="subscriptionProductBasicPopulator"/>
+	</bean>
+
+	<alias name="defaultAbstractChargeEntryPopulator" alias="abstractChargeEntryPopulator"/>
+	<bean id="defaultAbstractChargeEntryPopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.AbstractChargeEntryPopulator" abstract="true" >
+		<property name="priceDataFactory" ref="priceDataFactory"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<alias name="defaultAbstractUsageChargeEntryPopulator" alias="abstractUsageChargeEntryPopulator"/>
+	<bean id="defaultAbstractUsageChargeEntryPopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.AbstractUsageChargeEntryPopulator" abstract="true" parent="abstractChargeEntryPopulator" />
+
+	<alias name="defaultTierUsageChargeEntryConverter" alias="tierUsageChargeEntryConverter"/>
+	<bean id="defaultTierUsageChargeEntryConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="tierUsageChargeEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="tierUsageChargeEntryPopulator"/>
+			</list>
+		</property>
+	</bean>	
+
+	<alias name="defaultTierUsageChargeEntryPopulator" alias="tierUsageChargeEntryPopulator"/>
+	<bean id="defaultTierUsageChargeEntryPopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.TierUsageChargeEntryPopulator" parent="abstractUsageChargeEntryPopulator" />
+
+	<alias name="defaultOverageUsageChargeEntryConverter" alias="overageUsageChargeEntryConverter"/>
+	<bean id="defaultOverageUsageChargeEntryConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="overageUsageChargeEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="overageUsageChargeEntryPopulator"/>
+			</list>
+		</property>
+	</bean>	
+
+	<alias name="defaultOverageUsageChargeEntryPopulator" alias="overageUsageChargeEntryPopulator"/>
+	<bean id="defaultOverageUsageChargeEntryPopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.OverageUsageChargeEntryPopulator" parent="abstractUsageChargeEntryPopulator" />
+
+	<alias name="defaultUsageChargeTypeConverter" alias="usageChargeTypeConverter"/>
+	<bean id="defaultUsageChargeTypeConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="usageChargeTypeData"/>
+		<property name="populators">
+			<list>
+				<ref bean="usageChargeTypePopulator"/>
+			</list>
+		</property>
+	</bean>	
+
+	<alias name="defaultUsageChargeTypePopulator" alias="usageChargeTypePopulator"/>
+	<bean id="defaultUsageChargeTypePopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.UsageChargeTypePopulator" >
+	    <property name="typeService" ref="typeService"/>
+    </bean>
+
+	<alias name="defaultUsageUnitConverter"	alias="usageUnitConverter"/>
+	<bean id="defaultUsageUnitConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="usageUnitData"/>
+		<property name="populators">
+			<list>
+				<ref bean="usageUnitPopulator"/>
+			</list>
+		</property>
+	</bean>	
+
+	<alias name="defaultAbstractUsageChargePopulator" alias="abstractUsageChargePopulator"/>
+	<bean id="defaultAbstractUsageChargePopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.AbstractUsageChargePopulator" abstract="true" >
+		<property name="usageUnitConverter" ref="usageUnitConverter"/>
+		<property name="tierUsageChargeEntryConverter" ref="tierUsageChargeEntryConverter"/>
+		<property name="overageUsageChargeEntryConverter" ref="overageUsageChargeEntryConverter"/>
+	</bean>
+
+	<alias name="defaultPerUnitUsageChargeConverter" alias="perUnitUsageChargeConverter"/>
+	<bean id="defaultPerUnitUsageChargeConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="perUnitUsageChargeData"/>
+		<property name="populators">
+			<list>
+				<ref bean="perUnitUsageChargePopulator"/>
+			</list>
+		</property>
+	</bean>	
+
+	<alias name="defaultPerUnitUsageChargePopulator" alias="perUnitUsageChargePopulator"/>
+	<bean id="defaultPerUnitUsageChargePopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.PerUnitUsageChargePopulator" parent="abstractUsageChargePopulator" >
+	    <property name="usageChargeTypeConverter" ref="usageChargeTypeConverter"/>
+	</bean>	
+
+	<alias name="defaultVolumeUsageChargeConverter"	alias="volumeUsageChargeConverter"/>
+	<bean id="defaultVolumeUsageChargeConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="volumeUsageChargeData"/>
+		<property name="populators">
+			<list>
+				<ref bean="volumeUsageChargePopulator"/>
+			</list>
+		</property>
+	</bean>	
+
+	<alias name="defaultVolumeUsageChargePopulator"	alias="volumeUsageChargePopulator"/>
+	<bean id="defaultVolumeUsageChargePopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.VolumeUsageChargePopulator" parent="abstractUsageChargePopulator" />
+
+	<alias name="defaultRecurringChargeEntryConverter"	alias="recurringChargeEntryConverter"/>
+	<bean id="defaultRecurringChargeEntryConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="recurringChargeEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="recurringChargeEntryPopulator"/>
+			</list>
+		</property>
+	</bean>	
+
+	<alias name="defaultRecurringChargeEntryPopulator" alias="recurringChargeEntryPopulator"/>
+	<bean id="defaultRecurringChargeEntryPopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.RecurringChargeEntryPopulator" parent="abstractChargeEntryPopulator" />
+
+	<alias name="defaultOneTimeChargeEntryConverter" alias="oneTimeChargeEntryConverter"/>
+	<bean id="defaultOneTimeChargeEntryConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="oneTimeChargeEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="oneTimeChargeEntryPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultOneTimeChargeEntryPopulator" alias="oneTimeChargeEntryPopulator"/>
+	<bean id="defaultOneTimeChargeEntryPopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.OneTimeChargeEntryPopulator" parent="abstractChargeEntryPopulator" >
+	    <property name="billingTimeConverter" ref="billingTimeConverter"/>
+	</bean>
+
+	<alias name="defaultSubscriptionPricePlanUsageChargeConverter" alias="subscriptionPricePlanUsageChargeConverter"/>
+	<bean id="defaultSubscriptionPricePlanUsageChargeConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="subscriptionPricePlanData"/>
+		<property name="populators">
+			<list>
+				<ref bean="subscriptionPricePlanUsageChargePopulator"/>
+			</list>
+		</property>
+	</bean>	
+
+	<alias name="defaultSubscriptionPricePlanUsageChargePopulator" alias="subscriptionPricePlanUsageChargePopulator"/>
+	<bean id="defaultSubscriptionPricePlanUsageChargePopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.SubscriptionPricePlanUsageChargePopulator" >
+	    <property name="perUnitUsageChargeConverter" ref="perUnitUsageChargeConverter"/>
+        <property name="volumeUsageChargeConverter" ref="volumeUsageChargeConverter"/>
+	</bean>
+
+	<alias name="defaultSubscriptionPricePlanRecurringChargeConverter" alias="subscriptionPricePlanRecurringChargeConverter"/>
+	<bean id="defaultSubscriptionPricePlanRecurringChargeConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="subscriptionPricePlanData"/>
+		<property name="populators">
+			<list>
+				<ref bean="subscriptionPricePlanRecurringChargePopulator"/>
+			</list>
+		</property>
+	</bean>	
+
+	<alias name="defaultSubscriptionPricePlanRecurringChargePopulator" alias="subscriptionPricePlanRecurringChargePopulator"/>
+	<bean id="defaultSubscriptionPricePlanRecurringChargePopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.SubscriptionPricePlanRecurringChargePopulator" >
+	    <property name="recurringChargeEntryConverter" ref="recurringChargeEntryConverter"/>
+	</bean>
+
+	<alias name="defaultSubscriptionPricePlanOneTimeChargeConverter" alias="subscriptionPricePlanOneTimeChargeConverter"/>
+	<bean id="defaultSubscriptionPricePlanOneTimeChargeConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="subscriptionPricePlanData"/>
+		<property name="populators">
+			<list>
+				<ref bean="subscriptionPricePlanOneTimeChargePopulator"/>
+			</list>
+		</property>
+	</bean>	
+
+	<alias name="defaultSubscriptionPricePlanOneTimeChargePopulator" alias="subscriptionPricePlanOneTimeChargePopulator"/>
+	<bean id="defaultSubscriptionPricePlanOneTimeChargePopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.SubscriptionPricePlanOneTimeChargePopulator" >
+	    <property name="oneTimeChargeEntryConverter" ref="oneTimeChargeEntryConverter"/>
+	</bean>
+
+	<alias name="defaultSubscriptionProductPricePlanConverter" alias="subscriptionProductPricePlanConverter"/>
+	<bean id="defaultSubscriptionProductPricePlanConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="ProductData"/>
+		<property name="populators">
+			<list>
+				<ref bean="subscriptionProductPricePlanPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultSubscriptionProductPricePlanPopulator" alias="subscriptionProductPricePlanPopulator"/>
+	<bean id="defaultSubscriptionProductPricePlanPopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.SubscriptionProductPricePlanPopulator" parent="baseProductPopulator" >
+	    <property name="commercePriceService" ref="subscriptionCommercePriceService"/>
+	    <property name="pricePlanUsageChargeConverter" ref="subscriptionPricePlanUsageChargeConverter"/>
+	    <property name="pricePlanRecurringChargePopulator" ref="subscriptionPricePlanRecurringChargePopulator"/>
+	    <property name="pricePlanOneTimeChargePopulator" ref="subscriptionPricePlanOneTimeChargePopulator"/>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="productPricePopulatorList"/>
+		<property name="add" ref="subscriptionProductPricePlanPopulator"/>
+	</bean>
+	
+	<alias name="subscriptionProductStockPopulator" alias="stockPopulator" />
+	<bean id="subscriptionProductStockPopulator" parent="defaultStockPopulator" class="de.hybris.platform.subscriptionfacades.converters.populator.SubscriptionProductStockPopulator">
+		<property name="subscriptionProductStockQuantity" value="1000"/>
+	</bean>
+	
+	<alias name="defaultSubscriptionCartFacade" alias="cartFacade"/>
+	<alias name="defaultSubscriptionCartFacade" alias="commerceWebServicesCartFacade"/>
+	<bean id="defaultSubscriptionCartFacade" class="de.hybris.platform.subscriptionfacades.order.impl.DefaultSubscriptionCartFacade" parent="defaultCartFacade" >
+	 	 <property name="subscriptionCommerceCartService" ref="commerceCartService"/>
+	     <property name="productFacade" ref="productFacade"/>
+	     <property name="subscriptionXStreamAliasConverter" ref="subscriptionXStreamAliasConverter"/>
+         <property name="modelService" ref="modelService"/>
+		 <property name="subscriptionFacade" ref="subscriptionFacade"/>
+	</bean>
+
+	<bean id="subscriptionXStreamAliasConverter" class="de.hybris.platform.subscriptionfacades.converters.SubscriptionXStreamAliasConverter"/>
+		
+
+	<bean id="abstractSubscriptionFacade" class="de.hybris.platform.subscriptionfacades.impl.AbstractSubscriptionFacade" abstract="true">
+		<property name="checkoutFacade" ref="checkoutFacade"/>
+		<property name="productFacade" ref="productFacade"/>
+        <property name="customerAccountService" ref="customerAccountService"/>
+        <property name="baseStoreService" ref="baseStoreService"/>
+        <property name="orderService" ref="orderService"/>
+        <property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<alias name="defaultSubscriptionFacade" alias="subscriptionFacade" />
+	<bean id="defaultSubscriptionFacade" class="de.hybris.platform.subscriptionfacades.impl.DefaultSubscriptionFacade" parent="abstractSubscriptionFacade">
+		<property name="customerResolutionService" ref="customerResolutionService"/>
+	</bean>
+
+	<alias name="defaultCreditCardFacade" alias="creditCardFacade" />
+	<bean id="defaultCreditCardFacade" class="de.hybris.platform.subscriptionfacades.billing.impl.DefaultCreditCardFacade"/>
+</beans>

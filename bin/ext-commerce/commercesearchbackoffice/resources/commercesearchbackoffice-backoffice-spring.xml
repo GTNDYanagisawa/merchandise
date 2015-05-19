@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2011 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias name="defaultSiteService" alias="siteService"/>
+	<bean id="defaultSiteService" class="de.hybris.commercesearchbackoffice.services.impl.DefaultSiteService">
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="cockpitConfigurationSiteProvider" ref="cockpitConfigurationCurrentSiteProvider" />
+		<property name="sessionSiteProvider" ref="sessionCurrentSiteProvider"/>
+	</bean>
+
+	<bean id="sessionCurrentSiteProvider" class="de.hybris.commercesearchbackoffice.cockpitng.config.currentsite.providers.impl.SessionCurrentSiteProvider">
+		<property name="cockpitSessionService" ref="cockpitSessionService"/>
+	</bean>
+		
+	<alias name="defaultLanguageService" alias="languageService"/>
+	<bean id="defaultLanguageService" class="de.hybris.commercesearchbackoffice.services.impl.DefaultLanguageService">
+		<property name="storeSessionFacade" ref="storeSessionFacade"/>
+	</bean>
+										
+	<bean id="commercesearchbackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator" scope="singleton" init-method="init" lazy-init="false">
+  		<property name="location" value="/commercesearchbackoffice-backoffice-labels/"/>
+  		<property name="name" value="labels"/>
+  	</bean>
+  	  	 	  	
+  	<alias name="defaultCockpitConfigurationCurrentSiteProvider" alias="cockpitConfigurationCurrentSiteProvider"/>
+  	<bean id="defaultCockpitConfigurationCurrentSiteProvider" class="de.hybris.commercesearchbackoffice.cockpitng.config.currentsite.providers.impl.CockpitConfigurationCurrentSiteProvider">
+  		<property name="cockpitConfigurationService" ref="cockpitConfigurationService"/>
+  		<property name="cockpitUserService" ref="cockpitUserService"/>
+  		<property name="currentSiteJaxbFactory" ref="currentSiteJaxbFactory"/>
+  	</bean>
+  	
+  	<alias name="defaultCurrentSiteJaxbFactory" alias="currentSiteJaxbFactory"/>
+  	<bean id="defaultCurrentSiteJaxbFactory" class="de.hybris.commercesearchbackoffice.cockpitng.config.currentsite.factories.CurrentSiteJaxbFactory">
+  	</bean>
+  	  	  	  	  
+  	<alias name="defaultBackofficeImpersonationService" alias="backofficeImpersonationService"/>
+  	<bean id="defaultBackofficeImpersonationService" class="de.hybris.commercesearchbackoffice.impersonation.impl.BackofficeImpersonationService" >
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="i18nService" ref="commonI18NService" />
+		<property name="searchRestrictionService" ref="searchRestrictionService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="userService" ref="userService" />
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+	</bean>	
+	
+  	<alias name="defaultSearchStateResolver" alias="searchStateResolver"/>
+	<bean name="defaultSearchStateResolver" class="de.hybris.commercesearchbackoffice.widgets.solrsearch.facade.impl.DefaultSolrSearchStateResolver">
+		<property name="solrSearchQueryEncoder" ref="solrSearchQueryEncoder"/>
+		<property name="solrSearchQueryDecoder" ref="solrSearchQueryDecoder"/>
+	</bean>  	
+</beans>

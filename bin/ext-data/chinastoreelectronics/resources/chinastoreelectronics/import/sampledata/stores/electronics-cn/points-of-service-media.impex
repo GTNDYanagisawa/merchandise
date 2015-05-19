@@ -1,0 +1,23 @@
+# ImpEx for Importing Media into Electronics CN Store
+
+# Macros / Replacement Parameter definitions
+$productCatalog=electronics-cnProductCatalog
+$productCatalogName=Electronics CN Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$media=@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator]
+$siteResource=jar:de.hybris.platform.chinastoreelectronics.constants.ChinastoreelectronicsConstants&/chinastoreelectronics/import/sampledata/stores/electronics-cn
+$medias=medias(code, $catalogVersion)
+
+# Create medias
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];$media;mime[default='image/jpeg'];$catalogVersion;folder(qualifier)
+;365Wx246H;/365Wx246H/electronics_store_01;$siteResource/images/storefinder/electronics_store_365x246_01.jpg;;;images
+;365Wx246H;/365Wx246H/electronics_store_02;$siteResource/images/storefinder/electronics_store_365x246_02.jpg;;;images
+;365Wx246H;/365Wx246H/electronics_store_03;$siteResource/images/storefinder/electronics_store_365x246_03.jpg;;;images
+;65Wx65H;/65Wx65H/electronics_store_01;$siteResource/images/storefinder/electronics_store_65x65_01.jpg;;;images
+;65Wx65H;/65Wx65H/electronics_store_02;$siteResource/images/storefinder/electronics_store_65x65_02.jpg;;;images
+;65Wx65H;/65Wx65H/electronics_store_03;$siteResource/images/storefinder/electronics_store_65x65_03.jpg;;;images
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$catalogVersion
+;electronics_store_01;/365Wx246H/electronics_store_01,/65Wx65H/electronics_store_01
+;electronics_store_02;/365Wx246H/electronics_store_02,/65Wx65H/electronics_store_02
+;electronics_store_03;/365Wx246H/electronics_store_03,/65Wx65H/electronics_store_03

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<alias alias="sapCommonSalesAreaService" name="sapCommonDefaultSalesAreaService" />
+	<bean id="sapCommonDefaultSalesAreaService" class="sap.hybris.integration.models.services.impl.DefaultSalesAreaService">
+		<property name="baseStoreService" ref="baseStoreService" />
+	</bean>
+
+	<bean id="discountTransferHubConfiguration" parent="sapCoreDataHubTransferConfiguration">
+
+		<property name="itemCode" value="Discount" />
+		<property name="rawType" value="RawHybrisDiscount" />
+		<property name="converter" ref="discountDataHubTransferConfigurationConverter" />
+	</bean>
+
+	<alias name="defaultDiscountDataHubTransferConfigurationConverter" alias="discountDataHubTransferConfigurationConverter" />
+	<bean id="defaultDiscountDataHubTransferConfigurationConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+			</list>
+		</property>
+	</bean>
+
+
+
+	<alias name="sapDefaultDeliveryModeMappingPopulator" alias="sapDeliveryModeMappingPopulator" />
+	<bean id="sapDefaultDeliveryModeMappingPopulator" class="de.hybris.platform.sap.model.populators.DefaultDeliveryModeMappingPopulator"
+		scope="prototype" />
+
+	<alias name="sapDefaultDeliveryModeMappingDataHubConverter" alias="sapDeliveryModeMappingDataHubConverter" />
+	<bean id="sapDefaultDeliveryModeMappingDataHubConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+				<ref bean="sapDeliveryModeMappingPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="sapDeliveryModeMappingTransferHubConfiguration" parent="sapCoreDataHubTransferConfiguration">
+
+		<property name="itemCode" value="SapDeliveryMode" />
+		<property name="rawType" value="RawHybrisDeliveryModeMapping" />
+		<property name="converter" ref="sapDeliveryModeMappingDataHubConverter" />
+	</bean>
+
+	<bean id="sapProductSalesAreaToCatalogMappingTransferHubConfiguration" parent="sapCoreDataHubTransferConfiguration">
+		<property name="itemCode" value="SAPProductSalesAreaToCatalogMapping" />
+		<property name="rawType" value="RawHybrisProductSalesAreaToCatalogMapping" />
+		<property name="converter" ref="sapProductSalesAreaToCatalogMappingDataHubConverter" />
+	</bean>
+
+	<alias name="sapDefaultProductSalesAreaToCatalogMappingDataHubConverter" alias="sapProductSalesAreaToCatalogMappingDataHubConverter" />
+	<bean id="sapDefaultProductSalesAreaToCatalogMappingDataHubConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="sapUnitDao" name="sapDefaultUnitDao" />
+	<bean id="sapDefaultUnitDao" class="de.hybris.platform.sap.sapmodel.daos.SAPDefaultUnitDao" parent="unitDao">
+	</bean>
+
+	<alias alias="sapUnitService" name="sapDefaultUnitService" />
+	<bean id="sapDefaultUnitService" class="sap.hybris.integration.models.services.impl.SAPDefaultUnitService" parent="unitService">
+		<property name="sapUnitDao" ref="sapUnitDao" />
+	</bean>
+
+
+	<alias alias="sapNetAttributeHandler" name="sapDefaultNetAttributeHandler" />
+	<bean id="sapDefaultNetAttributeHandler" class="de.hybris.platform.sap.sapmodel.daos.NetAttributeHandler">
+	</bean>
+
+	<bean id="sapPricingSalesAreaTransferHubConfiguration" parent="sapCoreDataHubTransferConfiguration">
+
+		<property name="itemCode" value="SAPPricingSalesAreaToCatalog" />
+		<property name="rawType" value="RawPricingSalesAreaMapping" />
+		<property name="converter" ref="sapPricingSalesAreaDataHubTransferConfigurationConverter" />
+	</bean>
+
+	<alias name="defaultSapPricingSalesAreaDataHubTransferConfigurationConverter" alias="sapPricingSalesAreaDataHubTransferConfigurationConverter" />
+	<bean id="defaultSapPricingSalesAreaDataHubTransferConfigurationConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+				<ref bean="sapPricingCatalogMappingPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="sapBonusBuySiteTransferHubConfiguration" parent="sapCoreDataHubTransferConfiguration">
+
+		<property name="itemCode" value="SAPBonusBuySiteToCatalog" />
+		<property name="rawType" value="RawBonusBuySite" />
+		<property name="converter" ref="sapBonusBuySiteDataHubTransferConfigurationConverter" />
+	</bean>
+
+	<alias name="defaultSapBonusBuySiteDataHubTransferConfigurationConverter" alias="sapBonusBuySiteDataHubTransferConfigurationConverter" />
+	<bean id="defaultSapBonusBuySiteDataHubTransferConfigurationConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+				<ref bean="sapBonusBuySiteToCatalogPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultSapPricingCatalogMappingPopulator" alias="sapPricingCatalogMappingPopulator" />
+	<bean id="defaultSapPricingCatalogMappingPopulator" class="de.hybris.platform.sap.model.populators.SAPPricingCatalogMappingPopulator" />
+
+	<alias name="defaultSapBonusBuySiteToCatalogPopulator" alias="sapBonusBuySiteToCatalogPopulator" />
+	<bean id="defaultSapBonusBuySiteToCatalogPopulator" class="de.hybris.platform.sap.model.populators.SAPBonusBuySiteToCatalogPopulator" />
+
+ 	<!-- product --> 
+	<bean id="unitsTransferHubConfiguration" parent="sapCoreDataHubTransferConfiguration">
+
+		<property name="itemCode" value="Unit" />
+		<property name="rawType" value="RawHybrisUnit" />
+		<property name="converter" ref="unitDataHubTransferConfigurationConverter" />
+	</bean>
+
+	<alias name="defaultUnitDataHubTransferConfigurationConverter" alias="unitDataHubTransferConfigurationConverter" />
+	<bean id="defaultUnitDataHubTransferConfigurationConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+			</list>
+		</property>
+	</bean>
+
+</beans>

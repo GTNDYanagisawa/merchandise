@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<process xmlns="http://www.hybris.de/xsd/processdefinition"
+         start="approvalProcessStartAction" name="approval"
+         processClass="de.hybris.platform.b2b.process.approval.model.B2BApprovalProcessModel">
+
+	<action id="approvalProcessStartAction" bean="approvalProcessStartAction">
+		<transition name="OK" to="checkForApproval"/>
+		<transition name="NOK" to="error"/>
+	</action>
+
+	<action id="checkForApproval" bean="checkForApproval">
+		<transition name="NOK" to="findApprovers"/>
+		<transition name="OK" to="performMerchantCheck"/>
+		<transition name="ERROR" to="error"/>
+	</action>
+
+	<action id="findApprovers" bean="findApprovers">
+		<transition name="OK" to="startWorkflow"/>
+		<transition name="NOK" to="informAdmin"/>
+	</action>
+
+	<action id="informAdmin" bean="informAdmin">
+		<transition name="OK" to="success"/>
+		<transition name="NOK" to="error"/>
+	</action>
+
+	<action id="startWorkflow" bean="startWorkflow">
+		<transition name="OK" to="waitProcess"/>
+	</action>
+
+	<!-- only one wait event is executing throughout the approval process therefore 
+		a single event name is used -->
+	<wait id="waitProcess" then="checkWorkflowResults">
+		<event>APPROVAL_WORKFLOW_COMPLETE_EVENT</event>
+	</wait>
+
+	<action id="checkWorkflowResults" bean="checkWorkflowResults">
+		<transition name="OK" to="performMerchantCheck"/>
+		<transition name="NOK" to="createOrderHistory"/>
+	</action>
+
+	<action id="createOrderHistory" bean="createOrderHistory">
+		<transition name="OK" to="informOfOrderRejection"/>
+	</action>
+	<action id="performMerchantCheck" bean="performMerchantCheck">
+		<transition name="OK" to="informOfOrderApproval"/>
+		<transition name="NOK" to="waitProcessCreditLimit"/>
+		<transition name="ERROR" to="error"/>
+	</action>
+
+	<!-- only one wait event is executing throughout the approval process therefore 
+		a single event name is used -->
+	<wait id="waitProcessCreditLimit" then="checkCreditLimitResults">
+		<event>APPROVAL_WORKFLOW_COMPLETE_EVENT</event>
+	</wait>
+
+	<action id="checkCreditLimitResults" bean="checkCreditLimitResults">
+		<transition name="OK" to="informOfOrderApproval"/>
+		<transition name="NOK" to="informOfOrderRejection"/>
+	</action>
+
+	<action id="informOfOrderRejection" bean="informOfOrderRejection">
+		<transition name="OK" to="approvalProcessCompleteAction"/>
+	</action>
+	<action id="informOfOrderApproval" bean="informOfOrderApproval">
+		<transition name="OK" to="setBookingLineEntries"/>
+	</action>
+
+	<action id="setBookingLineEntries" bean="setBookingLineEntries">
+		<transition name="OK" to="approvalProcessCompleteAction"/>
+		<transition name="NOK" to="error"/>
+	</action>
+	<action id="approvalProcessCompleteAction" bean="approvalProcessCompleteAction">
+		<transition name="OK" to="success"/>
+		<transition name="NOK" to="error"/>
+	</action>
+	<end id="error" state="ERROR">All went wrong.</end>
+	<end id="failed" state="FAILED">Order process failed.</end>
+	<end id="success" state="SUCCEEDED">Order process finished.</end>
+
+</process>

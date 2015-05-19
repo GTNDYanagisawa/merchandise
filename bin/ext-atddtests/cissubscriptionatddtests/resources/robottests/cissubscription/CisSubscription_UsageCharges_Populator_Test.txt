@@ -1,0 +1,176 @@
+*** Settings ***
+Resource          cissubscription/CisSubscription_Keywords.txt
+
+
+*** Test Cases ***
+
+Test_CisSubscription_UsageCharges_Populator_Volume_1xTier_NoOverage
+	[Documentation]    Tests creating usage charge of type volume with 1 tier
+	${tier_charge}=    create tiered charge entry with charge price of "11" with start "1" and end "2"
+	${charges}=    create list  ${tier_charge}
+	${result}=    create volume usage charge "Movie on demand" with usage unit "video" and usage charge entries "${charges}"
+	Should be Equal    ${result.name}   Movie on demand
+	Should be Equal    ${result.unitId}  video
+	Should be Equal    ${result.type}  VOLUME
+	Length Should Be    ${result.tiers}   1
+	Should Be Equal As Numbers    ${result.tiers[0].chargePrice}  11
+	Should Be Equal As Numbers    ${result.tiers[0].numberOfUnits}  1
+
+Test_CisSubscription_UsageCharges_Populator_Volume_2xTier_NoOverage
+	[Documentation]    Tests creating usage charge of type volume with 2 tiers
+	${tier_charge}=    create tiered charge entry with charge price of "11" with start "1" and end "2"
+	${tier_charge2}=    create tiered charge entry with charge price of "9" with start "3" and end "3"
+	${charges}=    create list  ${tier_charge}  ${tier_charge2}
+	${result}=    create volume usage charge "Movie on demand" with usage unit "video" and usage charge entries "${charges}"
+	Should be Equal    ${result.name}   Movie on demand
+	Should be Equal    ${result.unitId}  video
+	Should be Equal    ${result.type}  VOLUME
+	Length Should Be    ${result.tiers}   2
+	Should Be Equal As Numbers    ${result.tiers[0].chargePrice}  11
+	Should Be Equal As Numbers    ${result.tiers[0].numberOfUnits}  1
+	Should Be Equal As Numbers    ${result.tiers[1].chargePrice}  9
+	Should Be Equal As Numbers    ${result.tiers[1].numberOfUnits}  0
+
+Test_CisSubscription_UsageCharges_Populator_Volume_Overage
+	[Documentation]    Tests creating usage charge of type volume with 1 overage charge entry
+	${overage_charge}=    create overage charge entry with charge price of "7"
+	${charges}=    create list  ${overage_charge}
+	${result}=    create volume usage charge "Movie on demand" with usage unit "video" and usage charge entries "${charges}"
+	Should be Equal    ${result.name}   Movie on demand
+	Should be Equal    ${result.unitId}  video
+	Should be Equal    ${result.type}  VOLUME
+	Length Should Be    ${result.tiers}   1
+	Should Be Equal As Numbers    ${result.tiers[0].chargePrice}  7
+	Should Be Equal As Numbers    ${result.tiers[0].numberOfUnits}  0
+
+Test_CisSubscription_UsageCharges_Populator_Volume_2xTier_Overage
+	[Documentation]    Tests creating usage charge of type volume with 2 tiers and 1 overage charge entry
+	${tier_charge}=    create tiered charge entry with charge price of "11" with start "1" and end "2"
+	${tier_charge2}=    create tiered charge entry with charge price of "9" with start "3" and end "3"
+	${overage_charge}=    create overage charge entry with charge price of "7"
+	${charges}=    create list  ${tier_charge}  ${tier_charge2}  ${overage_charge}
+	${result}=    create volume usage charge "Movie on demand" with usage unit "video" and usage charge entries "${charges}"
+	Should be Equal    ${result.name}   Movie on demand
+	Should be Equal    ${result.unitId}  video
+	Should be Equal    ${result.type}  VOLUME
+	Length Should Be    ${result.tiers}   3
+	Should Be Equal As Numbers    ${result.tiers[0].chargePrice}  11
+	Should Be Equal As Numbers    ${result.tiers[0].numberOfUnits}  1
+	Should Be Equal As Numbers    ${result.tiers[1].chargePrice}  9
+	Should Be Equal As Numbers    ${result.tiers[1].numberOfUnits}  0
+	Should Be Equal As Numbers    ${result.tiers[2].chargePrice}  7
+	Should Be Equal As Numbers    ${result.tiers[2].numberOfUnits}  0
+
+Test_CisSubscription_UsageCharges_Populator_PerUnit_HighestApplicable_1xTier_NoOverage
+	[Documentation]    Tests creating usage charge of type per unit usage with highest applicable usage charge type and 1 tier
+	${tier_charge}=    create tiered charge entry with charge price of "11" with start "1" and end "2"
+	${charges}=    create list  ${tier_charge}
+	${result}=    create per unit usage charge "Movie on demand" with usage unit "video" and usage charge type "highest_applicable_tier" and usage charge entries "${charges}"
+	Should be Equal    ${result.name}   Movie on demand
+	Should be Equal    ${result.unitId}  video
+	Should be Equal    ${result.type}  UNIT_HIGHEST_APPLICABLE_TIER
+	Length Should Be    ${result.tiers}   1
+	Should Be Equal As Numbers    ${result.tiers[0].chargePrice}  11
+	Should Be Equal As Numbers    ${result.tiers[0].numberOfUnits}  1
+
+Test_CisSubscription_UsageCharges_Populator_PerUnit_HighestApplicable_2xTier_NoOverage
+	[Documentation]    Tests creating usage charge of type per unit usage with highest applicable usage charge type and 2 tiers
+	${tier_charge}=    create tiered charge entry with charge price of "11" with start "1" and end "2"
+	${tier_charge2}=    create tiered charge entry with charge price of "7" with start "3" and end "3"
+	${charges}=    create list  ${tier_charge}  ${tier_charge2}
+	${result}=    create per unit usage charge "Movie on demand" with usage unit "video" and usage charge type "highest_applicable_tier" and usage charge entries "${charges}"
+	Should be Equal    ${result.name}   Movie on demand
+	Should be Equal    ${result.unitId}  video
+	Should be Equal    ${result.type}  UNIT_HIGHEST_APPLICABLE_TIER
+	Length Should Be    ${result.tiers}   2
+	Should Be Equal As Numbers    ${result.tiers[0].chargePrice}  11
+	Should Be Equal As Numbers    ${result.tiers[0].numberOfUnits}  1
+	Should Be Equal As Numbers    ${result.tiers[1].chargePrice}  7
+	Should Be Equal As Numbers    ${result.tiers[1].numberOfUnits}  0
+
+Test_CisSubscription_UsageCharges_Populator_PerUnit_HighestApplicable_Overage
+	[Documentation]    Tests creating usage charge of type per unit usage with highest applicable usage charge type and 1 overage charge entry
+	${overage_charge}=    create overage charge entry with charge price of "15"
+	${charges}=    create list  ${overage_charge}
+	${result}=    create per unit usage charge "Movie on demand" with usage unit "video" and usage charge type "highest_applicable_tier" and usage charge entries "${charges}"
+	Should be Equal    ${result.name}   Movie on demand
+	Should be Equal    ${result.unitId}  video
+	Should be Equal    ${result.type}  UNIT_HIGHEST_APPLICABLE_TIER
+	Length Should Be    ${result.tiers}   1
+	Should Be Equal As Numbers    ${result.tiers[0].chargePrice}  15
+	Should Be Equal As Numbers    ${result.tiers[0].numberOfUnits}  0
+
+Test_CisSubscription_UsageCharges_Populator_PerUnit_HighestApplicable_2xTier_Overage
+	[Documentation]    Tests creating usage charge of type per unit usage with highest applicable usage charge type and 2 tiers usages and 1 overage charge entry
+	${tier_charge}=    create tiered charge entry with charge price of "11" with start "1" and end "2"
+	${tier_charge2}=    create tiered charge entry with charge price of "7" with start "3" and end "3"
+	${overage_charge}=    create overage charge entry with charge price of "15"
+	${charges}=    create list  ${tier_charge}  ${tier_charge2}  ${overage_charge}
+	${result}=    create per unit usage charge "Movie on demand" with usage unit "video" and usage charge type "highest_applicable_tier" and usage charge entries "${charges}"
+	Should be Equal    ${result.name}   Movie on demand
+	Should be Equal    ${result.unitId}  video
+	Should be Equal    ${result.type}  UNIT_HIGHEST_APPLICABLE_TIER
+	Length Should Be    ${result.tiers}   3
+	Should Be Equal As Numbers    ${result.tiers[0].chargePrice}  11
+	Should Be Equal As Numbers    ${result.tiers[0].numberOfUnits}  1
+	Should Be Equal As Numbers    ${result.tiers[1].chargePrice}  7
+	Should Be Equal As Numbers    ${result.tiers[1].numberOfUnits}  0
+	Should Be Equal As Numbers    ${result.tiers[2].chargePrice}  15
+	Should Be Equal As Numbers    ${result.tiers[2].numberOfUnits}  0
+
+Test_CisSubscription_UsageCharges_Populator_PerUnit_EachRespective_1xTier_NoOverage
+	[Documentation]    Tests creating usage charge of type per unit usage with each respective tier usage charge type and 1 tier
+	${tier_charge}=    create tiered charge entry with charge price of "11" with start "1" and end "2"
+	${charges}=    create list  ${tier_charge}
+	${result}=    create per unit usage charge "Movie on demand" with usage unit "video" and usage charge type "each_respective_tier" and usage charge entries "${charges}"
+	Should be Equal    ${result.name}   Movie on demand
+	Should be Equal    ${result.unitId}  video
+	Should be Equal    ${result.type}  UNIT_EACH_RESPECTIVE_TIER
+	Length Should Be    ${result.tiers}   1
+	Should Be Equal As Numbers    ${result.tiers[0].chargePrice}  11
+	Should Be Equal As Numbers    ${result.tiers[0].numberOfUnits}  1
+
+Test_CisSubscription_UsageCharges_Populator_PerUnit_EachRespective_2xTier_NoOverage
+	[Documentation]    Tests creating usage charge of type per unit usage with each respective tier usage charge type and 2 tiers
+	${tier_charge}=    create tiered charge entry with charge price of "11" with start "1" and end "2"
+	${tier_charge2}=    create tiered charge entry with charge price of "7" with start "3" and end "3"
+	${charges}=    create list  ${tier_charge}  ${tier_charge2}
+	${result}=    create per unit usage charge "Movie on demand" with usage unit "video" and usage charge type "each_respective_tier" and usage charge entries "${charges}"
+	Should be Equal    ${result.name}   Movie on demand
+	Should be Equal    ${result.unitId}  video
+	Should be Equal    ${result.type}  UNIT_EACH_RESPECTIVE_TIER
+	Length Should Be    ${result.tiers}   2
+	Should Be Equal As Numbers    ${result.tiers[0].chargePrice}  11
+	Should Be Equal As Numbers    ${result.tiers[0].numberOfUnits}  1
+	Should Be Equal As Numbers    ${result.tiers[1].chargePrice}  7
+	Should Be Equal As Numbers    ${result.tiers[1].numberOfUnits}  0
+
+Test_CisSubscription_UsageCharges_Populator_PerUnit_EachRespective_Overage
+	[Documentation]    Tests creating usage charge of type per unit usage with each respective tier usage charge type and 1 overage usage charge entry
+	${overage_charge}=    create overage charge entry with charge price of "15"
+	${charges}=    create list  ${overage_charge}
+	${result}=    create per unit usage charge "Movie on demand" with usage unit "video" and usage charge type "each_respective_tier" and usage charge entries "${charges}"
+	Should be Equal    ${result.name}   Movie on demand
+	Should be Equal    ${result.unitId}  video
+	Should be Equal    ${result.type}  UNIT_EACH_RESPECTIVE_TIER
+	Length Should Be    ${result.tiers}   1
+	Should Be Equal As Numbers    ${result.tiers[0].chargePrice}  15
+	Should Be Equal As Numbers    ${result.tiers[0].numberOfUnits}  0
+
+Test_CisSubscription_UsageCharges_Populator_PerUnit_EachRespective_2xTier_Overage
+	[Documentation]    Tests creating usage charge of type per unit usage with each respective tier usage charge type and 2 tiers and 1 overage usage charge entry
+	${tier_charge}=    create tiered charge entry with charge price of "11" with start "1" and end "2"
+	${tier_charge2}=    create tiered charge entry with charge price of "7" with start "3" and end "3"
+	${overage_charge}=    create overage charge entry with charge price of "15"
+	${charges}=    create list  ${tier_charge}  ${tier_charge2}  ${overage_charge}
+	${result}=    create per unit usage charge "Movie on demand" with usage unit "video" and usage charge type "each_respective_tier" and usage charge entries "${charges}"
+	Should be Equal    ${result.name}   Movie on demand
+	Should be Equal    ${result.unitId}  video
+	Should be Equal    ${result.type}  UNIT_EACH_RESPECTIVE_TIER
+	Length Should Be    ${result.tiers}   3
+	Should Be Equal As Numbers    ${result.tiers[0].chargePrice}  11
+	Should Be Equal As Numbers    ${result.tiers[0].numberOfUnits}  1
+	Should Be Equal As Numbers    ${result.tiers[1].chargePrice}  7
+	Should Be Equal As Numbers    ${result.tiers[1].numberOfUnits}  0
+	Should Be Equal As Numbers    ${result.tiers[2].chargePrice}  15
+	Should Be Equal As Numbers    ${result.tiers[2].numberOfUnits}  0

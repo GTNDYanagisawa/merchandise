@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The XML Schema Allurent generates to validate XML data model representations 
+	requires a custom binding definition in order to be passed through JAXB's 
+	XJC tool. The issue stems from the implicit inheritance in the data model 
+	that a Sku has all properties that a Product specifies. The XML Schema representation 
+	of this causes the following error when executing XJC (based on version jaxb-ri-20091104): 
+	> xjc.bat -p com.allurent.model.generated modeltypes.xsd parsing a schema... 
+	compiling a schema... [ERROR] Two declarations cause a collision in the ObjectFactory 
+	class. line 684 of file:/modeltypes.xsd [ERROR] (Related to above error) 
+	This is the other declaration. line 245 of file:/modeltypes.xsd Failed to 
+	produce code. This name collision can be avoided through the use of the following 
+	custom binding definition passed to XJC. -->
+<bindings xmlns="http://java.sun.com/xml/ns/jaxb" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	version="2.0">
+	<bindings schemaLocation="allurent-modeltypes.xsd"
+		node="/xsd:schema/xsd:complexType[@name='Product']/xsd:all/xsd:element[@name='structure']/xsd:complexType">
+		<factoryMethod name="ProductProductStructure" />
+	</bindings>
+</bindings>

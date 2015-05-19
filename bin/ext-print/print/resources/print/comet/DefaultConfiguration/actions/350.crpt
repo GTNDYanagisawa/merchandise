@@ -1,0 +1,37 @@
+/*
+	Script           :	350
+	Author           :	RR
+	Description      :	Gets all watched products and places them in the document by using a specified grid.
+*/
+#include "internal/types.h"
+#include "internal/text.h"
+#include "internal/products.h"
+#include "[soap]/actions/601.crpt"
+
+
+/*********************************************************************
+ MAIN script
+ Starts the processig of all marked products
+*********************************************************************/
+int main ()
+{
+	Product pr;
+	ProductList prList;
+
+	wlog( "", "Start Processing...\n" );
+
+	// get list of selected items
+	prList = productlist::get( "selected" );		// list = all products, watched = only products with an eye symbol, selected = all selected products
+	wlog( "", "Found %d watched products.\n", productlist::length( prList ) );
+
+	for( pr=productlist::first(prList); pr; pr=productlist::next(prList) )
+	{
+		processItem( pr );
+	}
+
+	// Cleanup
+	productlist::release( prList, DONT_DELETE_PRODUCTLIST_ELEMENTS );
+	// product::release( pr );		// There is no alloc() for this product, so dont call a release() here!
+
+    return 0;
+}

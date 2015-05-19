@@ -1,0 +1,59 @@
+*** Settings ***
+Test Setup        import commercecart sampledata
+Test Teardown     reset system
+Resource          commerce/CommerceServices_Keywords.txt
+Resource		  commerce/SubscriptionCommerce_Keywords.txt
+Resource          entitlements/Entitlement_Keywords.txt
+Resource          subscriptionservices/SubscriptionProduct_Keywords.txt
+Resource          subscriptionservices/SubscriptionPricePlan_Keywords.txt
+Resource          subscriptionservices/SubscriptionTerm_Keywords.txt
+Resource          subscriptionservices/SubscriptionUsageCharge_Keywords.txt
+
+
+
+*** Test Cases ***
+Test_XML_Verification_Complex_Currency_USD
+    [Documentation]    Verifies XML
+    create subscription term "T1" with renewal type "auto_renewing" and term frequency "monthly" and term number "10"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add per unit usage charge "PUC1" with usage unit "video" and usage charge type "each_respective_tier"
+    for subscription priceplan "PP1" add volume usage charge "VC1" with usage unit "minute"    
+    for usage charge "PUC1" add overage charge entry "OC11" with price of "11"
+    for usage charge "PUC1" add tiered charge entry "TC11" with price of "12" with start "1" and end "2"
+    for usage charge "PUC1" add tiered charge entry "TC12" with price of "13" with start "3" and end "6"
+    for usage charge "VC1" add overage charge entry "OC21" with price of "25"
+	for usage charge "VC1" add tiered charge entry "TC21" with price of "26" with start "1" and end "5"
+    for usage charge "VC1" add tiered charge entry "TC22" with price of "27" with start "6" and end "10"
+    for product "P1" add metered entitlement "ME1" with quantity "31"
+    for product "P1" add metered entitlement "ME2" with quantity "32"
+    for product "P1" add non metered entitlement "NME1" without conditions
+    for product "P1" add non metered entitlement "NME2" without conditions
+    add product "P1" to cart
+    for product "P1" verify that the XML for subscription term matches "<subscriptionTerm><termOfServiceFrequency><code>monthly</code></termOfServiceFrequency><name>T1</name><termOfServiceRenewal><code>auto_renewing</code></termOfServiceRenewal><billingPlan><billingCycleType><code>subscription_start</code></billingCycleType><name>Monthly Plan</name><billingTime><description>Monthly</description><orderNumber>5</orderNumber><name>Monthly</name><code>monthly</code></billingTime></billingPlan><cancellable>true</cancellable><termOfServiceNumber>10</termOfServiceNumber></subscriptionTerm>"
+    for product "P1" verify that the XML for per unit usage charge "PUC1" matches "<perUnitUsageCharge><usageChargeEntries><tierUsageChargeEntry><price><currencyIso>USD</currencyIso><priceType>BUY</priceType><value>12.0</value><formattedValue>$12.00</formattedValue></price><tierEnd>2</tierEnd><tierStart>1</tierStart></tierUsageChargeEntry><tierUsageChargeEntry><price><currencyIso>USD</currencyIso><priceType>BUY</priceType><value>13.0</value><formattedValue>$13.00</formattedValue></price><tierEnd>6</tierEnd><tierStart>3</tierStart></tierUsageChargeEntry><overageUsageChargeEntry><price><currencyIso>USD</currencyIso><priceType>BUY</priceType><value>11.0</value><formattedValue>$11.00</formattedValue></price></overageUsageChargeEntry></usageChargeEntries><usageUnit><id>video</id><namePlural>Videos</namePlural><name>Video</name><accumulative>false</accumulative></usageUnit><name>PUC1</name><usageChargeType><code>each_respective_tier</code></usageChargeType></perUnitUsageCharge>"
+    for product "P1" verify that the XML for volume usage charge "VC1" matches "<volumeUsageCharge><usageChargeEntries><tierUsageChargeEntry><price><currencyIso>USD</currencyIso><priceType>BUY</priceType><value>26.0</value><formattedValue>$26.00</formattedValue></price><tierEnd>5</tierEnd><tierStart>1</tierStart></tierUsageChargeEntry><tierUsageChargeEntry><price><currencyIso>USD</currencyIso><priceType>BUY</priceType><value>27.0</value><formattedValue>$27.00</formattedValue></price><tierEnd>10</tierEnd><tierStart>6</tierStart></tierUsageChargeEntry><overageUsageChargeEntry><price><currencyIso>USD</currencyIso><priceType>BUY</priceType><value>25.0</value><formattedValue>$25.00</formattedValue></price></overageUsageChargeEntry></usageChargeEntries><usageUnit><id>minute</id><namePlural>Minutes</namePlural><name>Minute</name><accumulative>false</accumulative></usageUnit><name>VC1</name></volumeUsageCharge>"    
+    for product "P1" verify that the XML for entitlements matches "<entitlements><entitlement><name>Metered Entitlement 1</name><usageUnit><id>minute</id><namePlural>Minutes</namePlural><name>Minute</name><accumulative>false</accumulative></usageUnit><quantity>31</quantity></entitlement><entitlement><name>Metered Entitlement 2</name><usageUnit><id>textMessage</id><namePlural>Text Message</namePlural><name>Text Message</name><accumulative>false</accumulative></usageUnit><quantity>32</quantity></entitlement><entitlement><name>Non-Metered Entitlement 1</name><quantity>0</quantity></entitlement><entitlement><name>Non-Metered Entitlement 2</name><quantity>0</quantity></entitlement></entitlements>"	
+    
+Test_XML_Verification_Complex_Currency_EUR
+    [Documentation]    Verifies XML
+    create subscription term "T1" with renewal type "non_renewing" and term frequency "monthly" and term number "11"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "EUR"    
+    for subscription priceplan "PP1" add per unit usage charge "PUC1" with usage unit "usageUnitTest1" and usage charge type "highest_applicable_tier"
+    for subscription priceplan "PP1" add volume usage charge "VC1" with usage unit "textMessage"    
+    for usage charge "PUC1" add overage charge entry "OC11" with price of "1"
+    for usage charge "PUC1" add tiered charge entry "TC11" with price of "2" with start "1" and end "2"
+    for usage charge "PUC1" add tiered charge entry "TC12" with price of "3" with start "3" and end "4"
+    for usage charge "VC1" add overage charge entry "OC21" with price of "5"
+	for usage charge "VC1" add tiered charge entry "TC21" with price of "6" with start "5" and end "7"
+    for usage charge "VC1" add tiered charge entry "TC22" with price of "7" with start "8" and end "11"
+    for product "P1" add metered entitlement "ME1" with quantity "8"
+    for product "P1" add metered entitlement "ME2" with quantity "9"
+    for product "P1" add non metered entitlement "NME1" without conditions
+    for product "P1" add non metered entitlement "NME2" without conditions
+    add product "P1" to cart
+    for product "P1" verify that the XML for subscription term matches "<subscriptionTerm><termOfServiceFrequency><code>monthly</code></termOfServiceFrequency><name>T1</name><termOfServiceRenewal><code>non_renewing</code></termOfServiceRenewal><billingPlan><billingCycleType><code>subscription_start</code></billingCycleType><name>Monthly Plan</name><billingTime><description>Monthly</description><orderNumber>5</orderNumber><name>Monthly</name><code>monthly</code></billingTime></billingPlan><cancellable>true</cancellable><termOfServiceNumber>11</termOfServiceNumber></subscriptionTerm>"
+    for product "P1" verify that the XML for per unit usage charge "PUC1" matches "<perUnitUsageCharge><usageChargeEntries><tierUsageChargeEntry><price><currencyIso>EUR</currencyIso><priceType>BUY</priceType><value>2.0</value><formattedValue>E2.00</formattedValue></price><tierEnd>2</tierEnd><tierStart>1</tierStart></tierUsageChargeEntry><tierUsageChargeEntry><price><currencyIso>EUR</currencyIso><priceType>BUY</priceType><value>3.0</value><formattedValue>E3.00</formattedValue></price><tierEnd>4</tierEnd><tierStart>3</tierStart></tierUsageChargeEntry><overageUsageChargeEntry><price><currencyIso>EUR</currencyIso><priceType>BUY</priceType><value>1.0</value><formattedValue>E1.00</formattedValue></price></overageUsageChargeEntry></usageChargeEntries><usageUnit><id>usageUnitTest1</id><namePlural>usageUnitTest1</namePlural><name>usageUnitTest1</name><accumulative>false</accumulative></usageUnit><name>PUC1</name><usageChargeType><code>highest_applicable_tier</code></usageChargeType></perUnitUsageCharge>"
+    for product "P1" verify that the XML for volume usage charge "VC1" matches "<volumeUsageCharge><usageChargeEntries><tierUsageChargeEntry><price><currencyIso>EUR</currencyIso><priceType>BUY</priceType><value>6.0</value><formattedValue>E6.00</formattedValue></price><tierEnd>7</tierEnd><tierStart>5</tierStart></tierUsageChargeEntry><tierUsageChargeEntry><price><currencyIso>EUR</currencyIso><priceType>BUY</priceType><value>7.0</value><formattedValue>E7.00</formattedValue></price><tierEnd>11</tierEnd><tierStart>8</tierStart></tierUsageChargeEntry><overageUsageChargeEntry><price><currencyIso>EUR</currencyIso><priceType>BUY</priceType><value>5.0</value><formattedValue>E5.00</formattedValue></price></overageUsageChargeEntry></usageChargeEntries><usageUnit><id>textMessage</id><namePlural>Text Message</namePlural><name>Text Message</name><accumulative>false</accumulative></usageUnit><name>VC1</name></volumeUsageCharge>"    
+    for product "P1" verify that the XML for entitlements matches "<entitlements><entitlement><name>Metered Entitlement 1</name><usageUnit><id>minute</id><namePlural>Minutes</namePlural><name>Minute</name><accumulative>false</accumulative></usageUnit><quantity>8</quantity></entitlement><entitlement><name>Metered Entitlement 2</name><usageUnit><id>textMessage</id><namePlural>Text Message</namePlural><name>Text Message</name><accumulative>false</accumulative></usageUnit><quantity>9</quantity></entitlement><entitlement><name>Non-Metered Entitlement 1</name><quantity>0</quantity></entitlement><entitlement><name>Non-Metered Entitlement 2</name><quantity>0</quantity></entitlement></entitlements>"    

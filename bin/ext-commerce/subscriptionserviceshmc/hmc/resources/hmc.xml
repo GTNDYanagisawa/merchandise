@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2013 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+<configuration xmlns="hybris.de/schemas/hmc/generic" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+	<type name="PromotionBillingTimeRestriction" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="tab.restriction.properties" mode="append">
+					<section name="section.restriction.billingtimes" mode="append" position="2">
+						<listlayout>
+							<attribute name="billingTimes" labelwidth="100">
+								<referencecollectioneditor create="false" add="true" remove="true">
+									<itemlayout>
+										<attribute name="code" width="274"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="positive" labelwidth="100" width="400">
+								<advancedbooleaneditor truename="promotionbillingtimerestriction.positive.true" falsename="promotionbillingtimerestriction.positive.false"/>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+
+   <type name="BillingTime" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="code" operator="contains"/>
+            <condition attribute="nameInCart" operator="contains"/>
+            <condition attribute="nameInOrder" operator="contains"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="150"/>
+                  <attribute name="nameInCart" width="150"/>
+                  <attribute name="nameInOrder" width="150"/>
+                  <attribute name="order" width="150"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="150"/>
+                  <attribute name="nameInCart" width="150"/>
+                  <attribute name="nameInOrder" width="150"/>
+                  <attribute name="order" width="150"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+               </itemlayout>
+            </treeview>
+         </result>
+      </organizer>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+</configuration>

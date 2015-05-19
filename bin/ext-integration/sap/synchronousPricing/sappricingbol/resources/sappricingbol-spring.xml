@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<!-- Module Configuration Accesss -->
+	
+	<bean id="sapPricingConfigurationAccess" parent="sapCoreModuleConfigurationAccess">
+		<property name="moduleId" value="sappricingbol" />		
+	</bean>
+	
+	<alias alias="sapPricingBo" name="sapPricingImpl" />
+	<bean id="sapPricingImpl" parent="sapCoreBusinessObject"
+		class="de.hybris.platform.sap.sappricingbol.businessobject.impl.SapPricingImpl">
+		<property name="moduleConfigurationAccess" ref="sapPricingConfigurationAccess" />
+	</bean>
+
+	<bean id="sapDefaultSalestransactionsBeERP"
+		class="de.hybris.platform.sap.sappricingbol.backend.impl.SapPricingBackendERP"
+		scope="sapSession" parent="sapCoreBackendObjectJCo">
+		 <property name="moduleConfigurationAccess" ref="sapPricingConfigurationAccess" />
+		 <property name="defaultConnectionName" value="JCoStatefulServiceUser" />  
+		 <property name="baseMapper" ref="sapPricingBaseMapper" />
+		 <property name="headerMapper" ref="sapPricingHeaderMapper" />
+		 <property name="itemMapper" ref="sapPricingItemMapper" />
+		 <property name="cacheAccess" ref="sapPricingCachedBackendERP" /> 
+	</bean>
+	
+	<alias alias="sapPricingBaseMapper" name="defaultSapPricingBaseMapper" />
+	<bean id="defaultSapPricingBaseMapper" scope="prototype"
+		class="de.hybris.platform.sap.sappricingbol.backend.impl.SapPricingBaseMapper">
+		<property name="moduleConfigurationAccess" ref="sapPricingConfigurationAccess" />
+	</bean>
+	
+	<alias alias="sapPricingHeaderMapper" name="defaultSapPricingHeaderMapper" />
+	<bean id="defaultSapPricingHeaderMapper" parent="sapPricingBaseMapper"
+		class="de.hybris.platform.sap.sappricingbol.backend.impl.SapPricingHeaderMapper">
+	</bean>
+		
+	<alias alias="sapPricingItemMapper" name="defaultSapPricingItemMapper" />
+	<bean id="defaultSapPricingItemMapper" parent="sapPricingBaseMapper"
+		class="de.hybris.platform.sap.sappricingbol.backend.impl.SapPricingItemMapper">
+	</bean>
+
+	<alias alias="sapPricingCachedBackendERP" name="defaultSapPricingCachedBackendERP" />
+	<bean id="defaultSapPricingCachedBackendERP" 
+         class="de.hybris.platform.sap.sappricingbol.backend.impl.SapPricingCachedBackendERP">
+         <property name="moduleConfigurationAccess" ref="sapPricingConfigurationAccess" />
+		   <property name="cacheAccess" ref="sapPricingCacheRegion" />
+	</bean>
+			
+</beans>

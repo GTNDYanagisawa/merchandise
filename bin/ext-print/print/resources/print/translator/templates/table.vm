@@ -1,0 +1,30 @@
+#if($node.getStyleClass()!="")
+<TableStyle:$node.getStyleClass()>
+#end
+<TableStart:$node.getRows(),$node.getCols():$node.getAttributes().headers:$node.getAttributes().footers<tCellDefaultCellType:Text
+$utility.getCellspacing($node)
+>>
+#foreach( $col in [1..$node.getCols()] )
+<ColStart:$utility.getColumnWidth($node,$velocityCount)>
+#end
+#foreach( $y in [1..$node.getRows()] )
+<RowStart:>
+#foreach( $x in [1..$node.getCols()] )
+#if("$!node.getCell($x,$y).getStyleClass()"!="")
+<CellStyle:$node.getCell($x,$y).getStyleClass()><StylePriority:1>
+#else
+#if("$!node.getCell(0,$y).getStyleClass()" != "")
+<CellStyle:$node.getCell(0,$y).getStyleClass()><StylePriority:1>
+#end
+#end
+#if($utility.cellIsRenderable($node.getCell($x,$y)))
+<CellStart:
+$node.getCell($x,$y).getAttributes().rowspan,
+$node.getCell($x,$y).getAttributes().colspan
+$utility.getCellpadding($node)
+$utility.getBorder($node)>$translator.renderContent($node.getCell($x,$y))<CellEnd:>
+#end
+#end
+<RowEnd:>
+#end
+<TableEnd:>

@@ -1,0 +1,30 @@
+bmecat.xml --> T_UPDATE_PRICES element
+
+T_UPDATE_PRICES(prev_version --> productsupdateprice.csv[Previous version] )(start)
+	ARTICLE(mode --> productsupdateprice.csv[Article mode])(start)
+		--: mode should be "update", because this is in the T_UPDATE_PRICES context
+		SUPPLIER_AID --> productsupdateprice.csv[Supplier AID]
+		ARTICLE_PRICE_DETAILS(start)
+			DATETIME(type="valid_start_date")(start)
+				DATE --> productsupdateprice.csv[Start date]
+				TIME --> productsupdateprice.csv[Start date]
+				TIMEZONE --> productsupdateprice.csv[Start date]
+			DATETIME(end)
+			DATETIME(type="valid_end_date")(start)
+				DATE --> productsupdateprice.csv[End date]
+				TIME --> productsupdateprice.csv[End date]
+				TIMEZONE --> productsupdateprice.csv[End date]
+			DATETIME(end)
+			DAILY_PRICE --> productsupdateprice.csv[Daily price]
+			ARTICLE_PRICE(start)
+				PRICE_AMOUNT --> productsupdateprice.csv[Amount]
+				PRICE_CURRENCY --> productsupdateprice.csv[Currency]
+				TAX --> productsupdateprice.csv[Tax]
+				PRICE_FACTOR --> productsupdateprice.csv[Price factor]
+				LOWER_BOUND --> productsupdateprice.csv[Lower bound]
+				TERRITORY --> productsupdateprice.csv[Territory]
+					--: ATTENTION! no such attribute in the hybris system for the ARTICLE_PRICE element 
+			ARTICLE_PRICE(end)
+		ARTICLE_PRICE_DETAILS(end)
+	ARTICLE(end)
+T_UPDATE_PRICES(end)

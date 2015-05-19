@@ -1,0 +1,113 @@
+$currencies=USD
+$defaultCurrency=USD
+$defaultLanguage=en
+$deliveryCountries=US
+;;;;;;;;;;;;;;;;;;;;;;
+$catalog-id=testCatalog;;;;;;;;;;;;;;;;;;;;;;
+$catalog-version=Online;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+$testCategory0-id=testCategory0;;;;;;;;;;;;;;;;;;;;;;
+$testCategory1-id=testCategory1;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version];;;;;;;;;;;;;;;;;;;;;;
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]));;;;;;;;;;;;;;;;;;;;;;
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator];;;;;;;;;;;;;;;;;;;;;;
+$billingFrequency=billingFrequency(code)[default='monthly']
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;;;;;;;;;;;;;;;
+;de;true;;;;;;;;;;;;;;;;;;;;
+;en;true;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];;;;;;;;;;;;;;;;;;;
+;de;Deutsch;German;;;;;;;;;;;;;;;;;;;
+;en;Englisch;English;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=de];name[lang=en];conversion;;;;;;;;;;;;;;;;;
+;pieces;pieces;pieces;pieces;1;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol;;;;;;;;;;;;;;
+;EUR;Euro;Euro;true;true;1;2;E;;;;;;;;;;;;;;
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Title;code[unique=true];name[lang=de];name[lang=en];;;;;;;;;;;;;;;;;;;
+;dr;Dr.;dr.;;;;;;;;;;;;;;;;;;;
+;prof;Prof.;prof.;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Country;isocode[unique=true];name[lang=de];name[lang=en];active;;;;;;;;;;;;;;;;;;
+;DE;Deutschland;Germany;true;;;;;;;;;;;;;;;;;;
+;US;Vereinigte Staaten von Amerika;United States of America;true;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid);;;;;;;;;;;;;;;;;;;;
+;cockpitgroup;;;;;;;;;;;;;;;;;;;;;
+;customergroup;cockpitgroup;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password;;;;;;;;;;;;;;
+;testUser;K2006-C0005;Test User;;en;USD;customergroup;1234;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog;;;;;;;;;;;;;;;;;;
+;$catalog-id;$catalog-id;$catalog-id;true;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode);;;;;;;;;;;;;;;;;;
+;$catalog-id;$catalog-version;true;USD;de,en;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Category;code[unique=true];$catalogversion;name[lang=de];name[lang=en];$supercategories;;;;;;;;;;;;;;;;;
+;$testCategory0-id;;$testCategory0-id;$testCategory0-id;;;;;;;;;;;;;;;;;;
+;$testCategory1-id;;$testCategory1-id;$testCategory1-id;$testCategory0-id;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+#INSERT_UPDATE Cart;user(uid);code[unique=true];currency(isocode);date[dateformat=dd.MM.yyyy HH:mm:ss];net;calculated;;;;;;;;;;;;;;;;
+#;testUser;testUserCart;USD;27.04.2010 00:00:00;false;false;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE PromotionGroup;Identifier[unique=true];;;;;;;;;;;;;;;;;;;;;
+;default;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE PromotionPriceRow;currency(isocode)[unique=true];price[unique=true];;;;;;;;;;;;;;;;;;;;
+;USD;12;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE Vendor;code[unique=true];name[lang=en];name[lang=de];;;;;;;;;;;;;;;;;;;
+;electro;Electro;Electro;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);currencies(isocode);net;taxGroup(code);storelocatorDistanceUnit(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);deliveryCountries(isocode);solrFacetSearchConfiguration(name);submitOrderProcessCode;paymentProvider
+;testStore;$catalog-id;$currencies;false;;km;$defaultCurrency;$defaultLanguage;$defaultLanguage;$deliveryCountries;;;Mockup
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE BaseSite;uid[unique=true];stores(uid);defaultPromotionGroup(Identifier)
+;testSite;testStore;default;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE BillingEvent;code[unique=true];order;cartAware[default=true]
+;paynow;1
+;onfirstbill;2
+;oncancellation;0;false
+;billingEvent1Test;3
+;billingEvent2Test;4
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE BillingFrequency;code[unique=true];order;cartAware[default=true]
+;monthly;5
+;quarterly;6
+;yearly;7
+;;;;;;;;;;;;;;;;;;;;;;
+UPDATE BillingTime;code[unique=true];nameInCart[lang=$defaultLanguage];nameInOrder[lang=$defaultLanguage];description[lang=$defaultLanguage]
+;paynow;Pay on Checkout;Paid on order;Pay Now
+;onfirstbill;On first bill;;On First Bill
+;monthly;Monthly;;Monthly
+;quarterly;Quarterly;;Quarterly
+;yearly;Annually;;Yearly
+;oncancellation;Cancellation fee;;Charged when subscription is canceled
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE BillingPlan;id[unique=true];name[lang=$defaultLanguage];billingCycleDay(code);billingCycleType(code);$billingFrequency
+;MonthlyPlan;Monthly Plan;;subscription_start;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE SubscriptionTerm;id[unique=true];name[lang=$defaultLanguage];termOfServiceFrequency(code);termOfServiceNumber(code);termOfServiceRenewal(code);billingPlan(id);cancellable
+;monthly;1 Month contract - monthly billing;monthly;1;auto_renewing;MonthlyPlan;false;
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT_UPDATE UsageUnit;id[unique=true];name[lang=$defaultLanguage];namePlural[lang=$defaultLanguage];accumulative[default=false]
+;minute;Minute;Minutes
+;video;Video;Videos
+;textMessage;Text Message;Text Message
+;usageUnitTest1;usageUnitTest1;usageUnitTest1
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT MeteredEntitlement;id[unique=true];name[lang=$defaultLanguage];usageUnit(id)
+;ME1;Metered Entitlement 1;minute
+;ME2;Metered Entitlement 2;textMessage
+;;;;;;;;;;;;;;;;;;;;;;
+INSERT NonMeteredEntitlement;id[unique=true];name[lang=$defaultLanguage]
+;NME1;Non-Metered Entitlement 1
+;NME2;Non-Metered Entitlement 2

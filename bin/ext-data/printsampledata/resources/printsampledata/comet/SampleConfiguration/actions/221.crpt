@@ -1,0 +1,109 @@
+/*
+	Script           :  221
+	Description      :  Create Preview PDF for a chapter
+*/
+
+#include "internal/types.h"
+#include "internal/products.h"
+#include "internal/text.h"
+#include "[soap]/actions/601.crpt"
+
+int main ()
+{
+	int err = 0; //errorcode, 0 is ok, all other are bad
+	int pageID1 = 0, pageID2 = 0, pageID3 = 0;
+	char *pageStringID = alloc(256);
+
+	int imageID = 0, classID = 0, forceDelete = 0, panelStatementID = 0, docID = 0, gridID = 0, gridElementID = 0, pageItemID = 0;
+	char *productNumber = alloc(256), *productName = alloc(256), *masterpage = alloc(256), *gridName = alloc(256), *gridElementName = alloc(256);
+
+	Query qu;
+
+	wlog("", "----------------------------------------  build chapter previews for jobid %d ---------------------------------------- \n", gJobID);
+	qu = sql::query( soap::connection() );
+	if( qu ) //estabishing connection was successful
+	{
+		// build query
+		//each successfully send/input retuns 1 (don't ask me why) - so add them and when err == 4 all is ok
+		err = query::send(qu, "getSubProductList1 \n");
+		err = err + query::send(qu, "type = \"ChapterPreviewProductList\" AND \n");
+		err = err + query::send(qu, "jobid = ?");
+		err = err + query::input(qu, kInt, gJobID);
+		if( err != 4 )
+		{
+			wlog("", "There were %i query send/input errors in 221.crpt! \n", (4-err));
+			err = 4-err;
+		}
+		else
+		{
+			query::output( qu, kInt, &pageID1 );		// ID1
+			query::output( qu, kInt, &pageID2 );		// ID2
+			query::output( qu, kInt, &pageID3 );		// ID3
+			query::output( qu, kInt, &imageID );		// image ID
+			query::output( qu, kInt, &classID );		// class ID
+			query::output( qu, kString, productNumber, 256 );// Product number
+			query::output( qu, kString, productName, 256 );	// Product name
+			query::output( qu, kInt, &forceDelete );	// force delete
+			query::output( qu, kInt, &panelStatementID );	// panel statement ID der untergeordneten Baumabfrage
+			query::output( qu, kInt, &docID );		// doc ID
+			query::output( qu, kString, masterpage, 256 );	// masterpage
+			query::output( qu, kString, gridName, 256 );	// grid
+			query::output( qu, kString, gridElementName, 256 );	// grid element
+			query::output( qu, kInt, &gridID );		// grid ID
+			query::output( qu, kInt, &gridElementID );	// grid element ID
+			query::output( qu, kInt, &pageItemID );		// layoutTemplateID
+			query::output( qu, kString, pageStringID, 256 );// String ID
+	
+			err = query::exec (qu);
+			if( err != 1 )
+			{
+				wlog("", "Error [%i], message: [%s], in query:exec in 221.crpt! . \n", err, serror(err));
+				err = 1;		//err is here 0, so we have to return 1 bacause return(0) means all is ok
+			}
+			else
+			{
+				CREATE_FILL_PAGES = 0;
+				while (query::fetch(qu)) //returns 1 (true) if a line was fetched, 0 means no more lines and the while aborts
+				{
+					if(DEBUG_ENABLED)  wlog("","Got page for preview with ID1 [%d], ID2 [%d], ID3 [%d], stringID [%s]\n", pageID1, pageID2, pageID3, pageStringID);
+					err = processItem( createProduct( pageID1, pageID2, pageID3, pageStringID, productNumber, productName, masterpage, pageItemID, gridID, gridName, gridElementID, gridElementName, 0 ) );
+					document::repaint();
+					if( err != 0 ) //the error code is logged, but the method is not aborting
+					{
+						wlog("", "Error [%i], message: [%s], from method processItem() in 221.crpt! Aborting! \n", err, serror(err));
+						break;
+					}
+				}
+				err = createPreviewsByMode( productName, 1, document::pages(gDocument), 1, PREVIEW_MODE_PDF );
+				if( err != 0 )
+				{
+					wlog("", "Error [%i], message: [%s], from method createPreviews() in 221.crpt! Aborting! \n", err, serror(err));
+					break;
+				}
+				CREATE_FILL_PAGES = 1;
+			}
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful! error in method main() in 221.crpt \n");
+	}
+
+	//shutdown the connection
+	err = query::close(qu);
+	if( err != 0 )
+	{
+		wlog("", "Error [%i], message: [%s], during closing the query! error in method main() in 221.crpt \n", err, serror(err));
+	}
+
+	wlog("", "----------------------------------------  chapter previews for jobid %d done ---------------------------------------- \n", gJobID);
+
+	release( pageStringID );
+	release( productNumber );
+	release( productName );
+	release( masterpage );
+	release( gridName );
+	release( gridElementName );
+
+	return 0;
+} 

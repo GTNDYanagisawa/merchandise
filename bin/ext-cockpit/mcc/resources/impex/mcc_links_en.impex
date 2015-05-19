@@ -1,0 +1,41 @@
+# Do not translate; Do not translate; To be translated; To be translated;
+# ImpEx for Importing English Localisations for the MCC;;;;
+
+$lang=en;;;;
+$catalogVersion=catalogVersion(catalog(id[default='Default']),version[default='Online'])[unique=true,default='Default:Online'];;;;
+
+UPDATE Catalog;id[unique=true];name[lang=$lang];;
+;Default;Default-Catalog;;
+
+UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];languages(isocode)[mode=append];
+;Default;Online;$lang;
+;Default;Staged;$lang;
+
+UPDATE StaticLink;code[unique=true];title[lang=$lang];description[lang=$lang];
+;reportCockpit;Report Cockpit;Enables to create complex reports, which are  fully flexible customizable and displayable.;
+;admincockpit;Administration Cockpit;hybris system administration and manipulation of validation rules.;
+;hmc2;User & Usergroup Management (hMC);Flexible and explicit user management.;
+;hmc;Management Console (hMC);Administer all basic core components of your hybris system.;
+;hac;Administration Console;Present a general view of useful tools for system administration.;
+;productcockpit;Product Cockpit (PCM);Streamlines catalog and product management through its intuitive user interface and facilitates efficient mass data management.;
+;importcockit;Import Cockpit;Reduce import complexity and consolidate product data from multiple repositories with an intuitive, graphic import tool.;
+#;mam;hybris DAM Server (Celum);If installed, go directly to the hybris Digital Asset Management Server, based on Celum;
+;hmc3;Marketing Tools (hMC);Manage Marketing Campaigns centrally for all channels.;
+;hmc4;Order Management (hMC);Manage your orders, payment and delivery modes.;
+
+"#% if: !de.hybris.platform.jalo.extension.ExtensionManager.getInstance().isExtensionInstalled(""btgcockpit"")";;;;
+;cmscockpit;Web Content Management Module (WCMS);Create, manage and publish online and mobile content with an integrated Web Content Management Interface.;
+#% endif:;;;;
+
+"#% if: de.hybris.platform.jalo.extension.ExtensionManager.getInstance().isExtensionInstalled(""btgcockpit"")";;;;
+;cmscockpit;WCMS Cockpit with Advanced Personalisation;Web content publishing system for maintaining websites, including Advanced Personalisation functionalities for customer segmentation.;
+#% endif:;;;;
+
+;cscockpit;Customer Service Cockpit (CS);Deliver customer service and sales support within one integrated UI.;
+;printcockpit;Print Cockpit;Create print publications (semi-)automatically and publish them to DTP programs.;
+;webfrontends;Web Frontends:;;
+;storetemplate;StoreTemplate;Frontend example of a web store, delivered in source code.;
+;mobiletemplate;MobileTemplate;Mobile Frontend. Please be aware that this template contains 3 different visual presentations depending on the functionality of the mobile phone you are using. The versions are: WAP 1, WAP 2 and HTML5. Please view on the appropriate mobile device.;
+
+;instore;InStore;hybris InStore is a purpose-built application running on tablet devices. Using NFC and barcode scanning, it enables retailers to immediately identify products, access rich product information and check availability across stores so that they can answer customer inquiries directly on the spot.;
+;omscockpit;OMS Cockpit;hybris Order Management Services enable customers to configure a set of availability formulas, fulfillment strategies, order splitting rules, and workflow steps in order to achieve the best OmniCommerce solution for their business.;

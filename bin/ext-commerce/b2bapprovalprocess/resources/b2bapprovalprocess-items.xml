@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+<!-- ATTENTION: This is just an example file. You have to edit it according 
+	to your needs. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="items.xsd">
+	<enumtypes>
+		<enumtype code="PermissionStatus" autocreate="true" generate="true"
+		          dynamic="true">
+			<value code="APPROVED"/>
+			<value code="REJECTED"/>
+			<value code="PENDING_APPROVAL"/>
+			<value code="OPEN"/>
+			<!-- permission result with no approver. -->
+			<value code="ERROR"/>
+			<value code="FAILURE"/>
+		</enumtype>
+		<enumtype code="WorkflowTemplateType" autocreate="true"
+		          generate="true" dynamic="true">
+			<value code="ORDER_APPROVAL"/>
+			<value code="CREDIT_LIMIT_ALERT"/>
+			<value code="MERCHANT_CHECK"/>
+			<value code="SALES_QUOTES"/>
+		</enumtype>
+		<enumtype code="PermissionType" autocreate="true" generate="true"
+		          dynamic="true">
+			<value code="ORDERTHRESHOLD"/>
+			<value code="BUDGETEXCEEDED"/>
+			<value code="AMOUNTTIMESPAN"/>
+		</enumtype>
+	</enumtypes>
+	<relations>
+		<relation code="B2BUnit2ApproverGroup" localized="false"
+		          generate="true" autocreate="true">
+			<deployment table="unit2approverGrpRel" typecode="10021"/>
+			<sourceElement type="B2BUnit" navigable="false"
+			               cardinality="many">
+				<description>The Parent B2BUnit</description>
+				<modifiers read="true" write="true" search="true"
+				           optional="false"/>
+			</sourceElement>
+			<targetElement type="B2BUserGroup" qualifier="ApproverGroups"
+			               cardinality="many" collectiontype="set" ordered="true">
+				<description>User groups associated to a B2BUnit that hold other employees who can approve orders</description>
+				<modifiers read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+		<relation code="B2BCustomers2ApproverGroups" localized="false"
+		          generate="true" autocreate="true">
+			<deployment table="empl2apprgrpsrel" typecode="10009"/>
+			<sourceElement type="B2BCustomer" collectiontype="set"
+			               cardinality="many" navigable="false">
+				<modifiers read="true" write="true" search="true"/>
+			</sourceElement>
+			<targetElement type="B2BUserGroup" qualifier="ApproverGroups"
+			               cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+		<relation code="B2BCustomers2Approvers" localized="false"
+		          generate="true" autocreate="true">
+			<deployment table="empl2apprsrel" typecode="10023"/>
+			<sourceElement type="B2BCustomer" collectiontype="set"
+			               cardinality="many" navigable="false">
+				<modifiers read="true" write="true" search="true"/>
+			</sourceElement>
+			<targetElement type="B2BCustomer" qualifier="Approvers"
+			               cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+		<relation code="B2BCustomers2PermissionGroups" localized="false"
+		          generate="true" autocreate="true">
+			<deployment table="empl2permgrpsrel" typecode="10012"/>
+			<sourceElement type="B2BCustomer" collectiontype="set"
+			               cardinality="many" navigable="false">
+				<modifiers read="true" write="true" search="true"/>
+			</sourceElement>
+			<targetElement type="B2BUserGroup" qualifier="PermissionGroups"
+			               cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+		<relation code="B2BUserGroups2B2BPermissions" localized="false"
+		          generate="true" autocreate="true">
+			<deployment table="b2bgroups2permissionsrel" typecode="10008"/>
+			<sourceElement type="B2BUserGroup" qualifier="UserGroups"
+			               cardinality="many" collectiontype="list">
+				<modifiers read="true" write="true" search="true"
+				           optional="true"/>
+			</sourceElement>
+			<targetElement type="B2BPermission" qualifier="Permissions"
+			               cardinality="many" collectiontype="list" ordered="true">
+				<modifiers read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+		<relation code="AbstractOrder2B2BPermissionResults"
+		          localized="false" generate="true" autocreate="true">
+			<sourceElement type="AbstractOrder" qualifier="Order"
+			               cardinality="one">
+				<modifiers read="true" write="true" search="true"/>
+			</sourceElement>
+			<targetElement type="B2BPermissionResult" qualifier="PermissionResults"
+			               cardinality="many" collectiontype="collection" ordered="true">
+				<modifiers read="true" write="true" search="true" partof="true"/>
+			</targetElement>
+		</relation>
+		<relation code="Order2ExhaustedApprovers" localized="false"
+		          generate="true" autocreate="true">
+			<deployment table="order2exhtdApprsRel" typecode="10025"/>
+			<sourceElement type="Order" cardinality="many"
+			               collectiontype="set" navigable="false">
+				<modifiers read="true" write="true" search="true"
+				           optional="true"/>
+			</sourceElement>
+			<targetElement type="B2BCustomer" qualifier="exhaustedApprovers"
+			               cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" search="true"
+				           optional="true"/>
+			</targetElement>
+		</relation>
+		<!-- this relationship is used for search restrictions -->
+		<relation code="B2BUnit2B2BPermissions" localized="false"
+		          generate="true" autocreate="true">
+			<sourceElement type="B2BUnit" qualifier="Unit"
+			               cardinality="one">
+				<description>The Parent B2BUnit</description>
+				<modifiers read="true" write="true" search="true"
+				           optional="false"/>
+			</sourceElement>
+			<targetElement type="B2BPermission" qualifier="Permissions"
+			               cardinality="many" collectiontype="set" ordered="true">
+				<description>Permissions associated to a unit B2BUnit</description>
+				<modifiers read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+		<relation code="B2BCustomer2B2BPermissions" localized="false"
+		          generate="true" autocreate="true">
+			<deployment table="customers2Permissions" typecode="10013"/>
+			<sourceElement type="B2BCustomer" qualifier="Customers"
+			               cardinality="many">
+				<modifiers read="true" write="true" search="true"
+				           optional="true"/>
+			</sourceElement>
+			<targetElement type="B2BPermission" qualifier="Permissions"
+			               cardinality="many" collectiontype="set" ordered="true">
+				<description>Permissions associated to a B2BCustomer</description>
+				<modifiers read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+		<relation code="B2BUnit2Approvers" localized="false"
+		          generate="true" autocreate="true">
+			<deployment table="unit2approversRel" typecode="10022"/>
+			<sourceElement type="B2BUnit" navigable="false"
+			               cardinality="many">
+				<description>The Parent B2BUnit</description>
+				<modifiers read="true" write="true" search="true"
+				           optional="false"/>
+			</sourceElement>
+			<targetElement type="B2BCustomer" qualifier="Approvers"
+			               cardinality="many" collectiontype="set" ordered="true">
+				<description>Approvers associated to a customer</description>
+				<modifiers read="true" write="true" search="true"/>
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+		<itemtype code="B2BPermission" jaloclass="de.hybris.platform.b2b.jalo.B2BPermission"
+		          abstract="true" autocreate="true" generate="true">
+			<deployment table="b2bpermissions" typecode="10007"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers optional="false" initial="false" unique="true"/>
+				</attribute>
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<modifiers read="true" write="true" search="true"
+					           optional="false"/>
+					<defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="message" type="localized:java.lang.String">
+					<persistence type="property"/>
+					<modifiers optional="true" initial="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="B2BOrderThresholdPermission"
+		          jaloclass="de.hybris.platform.b2b.jalo.B2BOrderThresholdPermission"
+		          autocreate="true" generate="true" extends="B2BPermission">
+			<attributes>
+				<attribute qualifier="threshold" type="java.lang.Double">
+					<modifiers read="true" write="true" search="true"
+					           optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="currency" type="Currency">
+					<modifiers read="true" write="true" initial="false"
+					           optional="false" search="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="B2BOrderThresholdTimespanPermission"
+		          jaloclass="de.hybris.platform.b2b.jalo.B2BOrderThresholdTimespanPermission"
+		          autocreate="true" generate="true" extends="B2BOrderThresholdPermission">
+			<attributes>
+				<attribute qualifier="range" type="B2BPeriodRange">
+					<modifiers read="true" write="true" search="true"
+					           optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+		<itemtype code="B2BBudgetExceededPermission"
+		          jaloclass="de.hybris.platform.b2b.jalo.B2BBudgetExceededPermission"
+		          autocreate="true" generate="true" extends="B2BPermission">
+			<attributes>
+			</attributes>
+		</itemtype>
+		<itemtype code="B2B2POEPermissionA"
+		          jaloclass="de.hybris.platform.b2b.jalo.B2B2POEPermissionA"
+		          autocreate="true" generate="true" extends="B2BPermission">
+			<attributes>
+			</attributes>
+		</itemtype>
+		<itemtype code="B2B2POEPermissionB"
+		          jaloclass="de.hybris.platform.b2b.jalo.B2B2POEPermissionB"
+		          autocreate="true" generate="true" extends="B2BPermission">
+			<attributes>
+			</attributes>
+		</itemtype>
+		<itemtype code="B2BPermissionResult"
+		          jaloclass="de.hybris.platform.b2b.jalo.B2BPermissionResult"
+		          autocreate="true" generate="true">
+			<deployment table="b2bpermissionresults" typecode="10004"/>
+			<attributes>
+				<attribute qualifier="permission" type="B2BPermission">
+					<modifiers read="true" write="true" search="true"
+					           optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="permissionTypeCode" type="java.lang.String">
+					<modifiers read="true" write="true" search="true"
+					           optional="false"/>
+					<description>the item type code for the permission the result is
+						holding
+						as defined in items.xml
+					</description>
+					<persistence type="property"/>
+					<defaultvalue>"B2BPermission"</defaultvalue>
+				</attribute>
+				<attribute qualifier="status" type="PermissionStatus">
+					<modifiers read="true" write="true" search="true"
+					           optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>em().getEnumerationValue("PermissionStatus", "OPEN")
+					</defaultvalue>
+				</attribute>
+				<attribute qualifier="approver" type="B2BCustomer">
+					<modifiers read="true" write="true" search="true"
+					           optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="note" type="localized:java.lang.String">
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+					<modifiers optional="true" initial="false"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="statusDisplay">
+					<persistence type="dynamic" attributeHandler="dynamicAttributesB2BPermissionResultStatusDisplay"/>
+					<modifiers write="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="B2BApprovalProcess" autocreate="true"
+		          generate="true"
+		          jaloclass="de.hybris.platform.b2b.process.approval.jalo.B2BApprovalProcess"
+		          extends="OrderProcess">
+			<attributes>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="EscalationTask" jaloclass="de.hybris.platform.b2b.jalo.EscalationTask"
+		          extends="Task" generate="true" autocreate="true">
+			<attributes>
+				<attribute qualifier="order" type="Order" generate="true">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AbstractWorkflowAction" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="qualifier" type="java.lang.String">
+					<modifiers read="true" write="true" initial="false"
+					           search="true"/>
+					<persistence type="property"/>
+					<description>Used to qualify an action by a unique name within a context of a workflow</description>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="qualifierIdx">
+					<key attribute="qualifier"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AbstractWorkflowDecision" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="qualifier" type="java.lang.String">
+					<modifiers read="true" write="true" initial="false"
+					           search="true"/>
+					<persistence type="property"/>
+					<description>Used to qualify a Desicion by name</description>
+				</attribute>
+			</attributes>
+
+			<indexes>
+				<index name="qualifierIdx">
+					<key attribute="qualifier"/>
+				</index>
+			</indexes>
+		</itemtype>
+	</itemtypes>
+</items>

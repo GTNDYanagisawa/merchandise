@@ -1,0 +1,95 @@
+#% impex.setLocale(Locale.ENGLISH);
+
+$productCatalog=productCatalog
+$contentCatalog=contentCatalog
+$defaultCurrency=EUR
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$onlineProduct=catalogVersion(catalog(id[default=$productCatalog]),version[default='Online'])[unique=true,default='$productCatalog:Online']
+$onlineContent=catalogVersion(catalog(id[default=$contentCatalog]),version[default='Online'])[unique=true,default='$contentCatalog:Online']
+
+$storeUid=testStore
+$siteUid=testSite
+$currencies=EUR
+$net=false
+$defaultCurrency=EUR
+$languages=en,de
+$defaultLanguage=en
+$vendor=test
+
+INSERT_UPDATE Language;isocode[unique=true];active
+;de;true
+;en;true
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;€
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog
+;$productCatalog;$productCatalog;$productCatalog;true
+;$contentCatalog;$contentCatalog;$contentCatalog;true
+
+# Catalog versions for content catalogs
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode);languages(isoCode)
+;$productCatalog;Online;true;$defaultCurrency;$languages
+;$contentCatalog;Online;true;$defaultCurrency;$languages
+
+INSERT_UPDATE Product;$onlineProduct;code[unique=true]
+;;product1
+
+# Tax & Tax Groups
+INSERT_UPDATE UserTaxGroup;code[unique=true]
+;de-taxes
+
+# Base Store
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);currencies(isocode);net;taxGroup(code);storelocatorDistanceUnit(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);deliveryCountries(isocode);submitOrderProcessCode
+;$storeUid;$productCatalog,;$currencies;$net;de-taxes;km;$defaultCurrency;$languages;$defaultLanguage;;
+
+INSERT_UPDATE Vendor;code[unique=true]
+;$vendor
+
+INSERT_UPDATE Warehouse;code[unique=true];name[lang=en];;vendor(code);default
+;warehouse_1;Warehouse 1;;$vendor;true
+;warehouse_2;Warehouse 2;;$vendor;true
+;warehouse_3;Warehouse 3;;$vendor;true
+;warehouse_4;Warehouse 4;;$vendor;true
+;warehouse_5;Warehouse 5;;$vendor;true
+;warehouse_6;Warehouse 6;;$vendor;true
+;warehouse_7;Warehouse 7;;$vendor;true
+;warehouse_8;Warehouse 8;;$vendor;true
+
+INSERT_UPDATE BaseStore2WarehouseRel;source(uid)[unique=true];target(code)[unique=true]
+;$storeUid;warehouse_1
+;$storeUid;warehouse_2
+;$storeUid;warehouse_3
+;$storeUid;warehouse_4
+;$storeUid;warehouse_5
+;$storeUid;warehouse_6
+;$storeUid;warehouse_7
+;$storeUid;warehouse_8
+
+# CMS Site
+INSERT_UPDATE BaseSite;uid[unique=true];theme(code);channel(code);stores(uid);
+;$siteUid;;;$storeUid;
+
+INSERT_UPDATE PointOfService;name[unique=true];displayName;type(code);latitude;longitude;geocodeTimestamp[dateformat=dd-MM-yyyy];basestore(uid)[default=$storeUid];warehouses(code);nearbyStoreRadius[default=2000]
+;Nakano;Nakano;STORE;35.7091;139.6732;29-04-2011;;warehouse_1
+;Shinbashi;Shinbashi;STORE;35.6673;139.75429;29-04-2011;;warehouse_2
+;Koto;Koto;STORE;35.6923;139.8201;29-04-2011;;warehouse_3
+;Misato;Misato;STORE;35.8269;139.8701;29-04-2011;;warehouse_4
+;Matsudo;Matsudo;STORE;35.7982;139.93037;29-04-2011;;warehouse_5
+;Ichikawa;Ichikawa;STORE;35.7915;139.93351;29-04-2011;;warehouse_6
+;Choshi;Choshi;STORE;35.7409;140.8064;29-04-2011;;warehouse_7
+;Chiba;Chiba;STORE;35.617;140.1023;29-04-2011;;warehouse_8
+
+INSERT_UPDATE StockLevel;available;warehouse(code)[unique=true];inStockStatus(code);maxPreOrder;maxStockLevelHistoryCount;overSelling;preOrder;productCode[unique=true];reserved
+;0;warehouse_1;forceInStock;0;-1;0;0;product1;0
+;7;warehouse_2;notSpecified;1;-1;0;0;product1;0
+;12;warehouse_3;notSpecified;1;-1;0;0;product1;0
+;445;warehouse_4;notSpecified;1;-1;0;0;product1;0
+;3;warehouse_5;notSpecified;1;-1;0;0;product1;0
+;0;warehouse_6;notSpecified;1;-1;0;0;product1;0
+;6;warehouse_7;notSpecified;1;-1;0;0;product1;0
+;99;warehouse_8;notSpecified;1;-1;0;0;product1;0
+
+UPDATE Product;code[unique=true];$onlineProduct;stockLevels(productCode,warehouse(code));vendors(code)
+;product1;;product1:warehouse_1,product1:warehouse_2,product1:warehouse_3,product1:warehouse_4,product1:warehouse_5,product1:warehouse_6,product1:warehouse_7,product1:warehouse_8;$vendor
+

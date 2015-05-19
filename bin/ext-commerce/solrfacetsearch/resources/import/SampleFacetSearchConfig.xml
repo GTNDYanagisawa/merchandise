@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../config/SolrFacetConfig.xsd">
+  <solrconfig>
+    <mode>embedded</mode>
+    <clusterconfig embeddedMaster="true">
+    	<aliveCheckInterval>100</aliveCheckInterval>
+    	<connectionTimeout>200</connectionTimeout>
+    	<readTimeout>300</readTimeout>
+    	<endpointURLs>
+      		<endpointURL master="true">http://localhost/test</endpointURL>
+    	</endpointURLs>
+    </clusterconfig>
+  </solrconfig>
+  <indexconfig>
+     <batchSize>100</batchSize>
+  </indexconfig>
+  <itemTypes>
+    <itemType code="Product" variant="false" identityProvider="itemIdentityProvider" solrResultConverter="solrProductConverter">
+      <properties>
+      	<property name="code" type="string"/>
+      	<property name="name" type="string" localized="true"/>
+      	<property name="description" type="text" localized="true"/>
+        <property facet="true" name="manufacturerName" type="string" />
+        <property facet="true" name="price" type="double" valueProvider="productPriceValueProvider" rangeSet="priceRange" currency="true"/>
+      </properties>
+      <flexibleSearchUpdateQueries>
+        <fullIndexQuery user="anonymous">
+			SELECT {pk} FROM {Product}
+        </fullIndexQuery>
+        <updateIndexQuery user="anonymous" injectLastIndexTime="true">
+			SELECT {PK} FROM {Product} 
+			WHERE {modifiedtime} &gt;= ?lastIndexTime
+        </updateIndexQuery>
+      </flexibleSearchUpdateQueries>
+    </itemType>
+  </itemTypes>
+</config>

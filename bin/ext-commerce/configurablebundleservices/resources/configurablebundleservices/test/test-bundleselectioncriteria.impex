@@ -1,0 +1,25 @@
+$catalog-id=testCatalog
+$catalog-version=Online
+$catalog-version-staged=Staged
+
+$catalogversion=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+$catalogversion-staged=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version-staged])[unique=true,default=$catalog-id:$catalog-version-staged]
+
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode)
+;$catalog-id;$catalog-version-staged;true;USD
+
+INSERT_UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];$catalogversion;parentTemplate(id)
+;SmartPhonePackage;;;
+;SmartPhoneDeviceSelection;;;SmartPhonePackage
+;PAYG_NoSelections;;;SmartPhonePackage
+
+INSERT_UPDATE AutoPickBundleSelectionCriteria;id[unique=true];$catalogversion
+;SmartPhoneDeviceSelection_AutoPickBundleSelection
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];bundleSelectionCriteria(id);$catalogversion
+;SmartPhoneDeviceSelection;;SmartPhoneDeviceSelection_AutoPickBundleSelection
+
+# set all BundleTemplates in approved status
+UPDATE BundleTemplateStatus[batchmode=true];itemtype(code)[unique=true];status(code)
+;BundleTemplateStatus;approved

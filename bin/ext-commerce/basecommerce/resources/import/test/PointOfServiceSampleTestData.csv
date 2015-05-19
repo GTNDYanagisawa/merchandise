@@ -1,0 +1,24 @@
+INSERT_UPDATE Country;isocode[unique=true];name;active;
+;DE;Germany;true;
+;;
+INSERT_UPDATE PointOfService;name[unique=true];description;type(code)
+;shop_1;description_shop_1;STORE
+;shop_2;description_shop_2;STORE
+;shop_3;description_shop_3;STORE
+;shop_4;description_shop_4;STORE
+;shop_5;description_shop_5;STORE
+;;
+INSERT_UPDATE Address;owner(PointOfService.name)[unique=true];streetname;streetnumber;postalcode;town;country(isocode);
+;shop_1;Nymphenburger Strasse;32;80636;Muenchen;DE;
+;shop_2;Nyr Strasse;34;80636;exception;DE;
+;shop_3;Nymphenburger Strasse;36;80636;Muenchen;DE;
+;shop_4;Nymphenburger Strasse;38;80636;Muenchen;DE;
+;shop_5;Nymphenburger Strasse;40;80636;Muenchen;DE;
+;;
+UPDATE PointOfService;name[unique=true];description;type(code);address(owner(PointOfService.name));
+;shop_1;description_shop_1;STORE;shop_1;
+;shop_2;description_shop_2;STORE;shop_2;
+;shop_3;description_shop_3;STORE;shop_3;
+;shop_4;description_shop_4;STORE;shop_4;
+;shop_5;description_shop_5;STORE;shop_5;
+;;

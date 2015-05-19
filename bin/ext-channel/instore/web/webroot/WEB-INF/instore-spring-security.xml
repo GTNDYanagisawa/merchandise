@@ -1,0 +1,54 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                    http://www.springframework.org/schema/beans/spring-beans.xsd
+                    http://www.springframework.org/schema/security 
+                    http://www.springframework.org/schema/security/spring-security.xsd
+                    http://www.springframework.org/schema/util
+                    http://www.springframework.org/schema/util/spring-util.xsd">
+
+<!-- 		<session-management session-authentication-strategy-ref="fixation"/> -->
+    <http use-expressions="true" security="none" pattern="/zkau/**"  />
+    <http use-expressions="true" security="none" pattern="/login.zul"  />
+    <http use-expressions="true" security="none" pattern="/cng/**"  />
+    <http use-expressions="true" security="none" pattern="/css/**"  />
+    <http use-expressions="true">
+    	<intercept-url pattern="/admin.zul" access="hasRole('ROLE_ADMINGROUP')" />
+    	<intercept-url pattern="/cockpit.zul" access="hasRole('ROLE_ADMINGROUP')" />
+        <intercept-url pattern="/**" access="isAuthenticated()" />
+        <form-login
+			always-use-default-target="false"
+			login-page="/login.zul"
+			authentication-failure-url="/login.zul?login_error=1"/>
+		<logout/>
+	</http>
+    
+    <authentication-manager>
+        <authentication-provider ref="coreAuthenticationProvider"/>
+    </authentication-manager>
+    
+    <beans:bean id="fixation" class="de.hybris.platform.servicelayer.security.spring.HybrisSessionFixationProtectionStrategy"/>	
+	
+<!-- 	<bean id="rememberMeServices" class="de.hybris.platform.spring.security.CoreRememberMeService"> -->
+<!-- 		<property name="userDetailsService" ref="coreUserDetailsService" /> -->
+<!-- 		<property name="key" value="backoffice" /> -->
+<!-- 		<property name="cookieName" value="LoginToken" /> -->
+<!-- 	</bean> -->
+	
+	<beans:bean id="coreAuthenticationProvider" class="com.hybris.instore.spring.security.InstoreAuthenticationProvider">
+		<beans:property name="userService" ref="userService" />
+		<beans:property name="catalogVersionService" ref="catalogVersionService" />
+		<beans:property name="userDetailsService" ref="coreUserDetailsService"/>	
+	</beans:bean>
+	
+	<beans:bean id="coreUserDetailsService" class="de.hybris.platform.spring.security.CoreUserDetailsService" />
+	
+
+	
+	<util:map id="loginFormModel">
+		<beans:entry key="login" value='#{ T(de.hybris.platform.util.Config).getParameter("instore.login.user") }'/>
+		<beans:entry key="password" value='#{ T(de.hybris.platform.util.Config).getParameter("instore.login.password") }'/>
+	</util:map>
+</beans:beans>  

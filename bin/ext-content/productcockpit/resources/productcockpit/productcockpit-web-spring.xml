@@ -1,0 +1,797 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+	<!--
+		WARNING: This is the Spring WEB configuration file. If you want to replace items or managers you have to do this from the
+		extensions core configuration file (productcockpit/resources/productcockpit-spring.xml)
+	-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	default-autowire="byName" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc">
+
+
+
+	<bean id="UICockpitSession" class="de.hybris.platform.cockpit.session.impl.UISessionImpl" scope="session" init-method="registerAdditionalPerspectives">
+		<property name="initialSessionListeners">
+			<list></list>
+		</property>
+		<property name="availablePerspectives">
+			<list>
+				<ref bean="ProductPerspective" />
+				<ref bean="CatalogPerspective" />
+				<!-- <ref bean="AdminPerspective" /> -->
+				<!-- uncomment the following line if you want to enable external applications e.g. hMC -->
+				<!-- <ref bean="ExtAppPerspective" /> -->
+			</list>
+		</property>
+		<property name="usingTestIDs" value="false" />
+		<property name="dragOverPerspectivesEnabled" value="true" />
+		<property name="cachePerspectivesEnabled" value="true" />
+		<property name="requestHandler" ref="RequestHandler" />
+		<property name="sendEventsImmediately" value="false" />
+		<property name="pushContainers">
+			<list value-type="de.hybris.platform.cockpit.session.impl.PushCreationContainer">
+				<ref bean="WorkflowPushContainer" />
+				<ref bean="CommentPushContainer" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="themeConfig" class="de.hybris.platform.cockpit.util.CockpitThemeConfig" scope="singleton">
+		<property name="keepZKCss" value="false" />
+		<property name="uris">
+			<list>
+				<value>/cockpit/css/zk_essential.css</value>
+				<value>/cockpit/css/zk_recommended.css</value>
+				<!-- <value>/cockpit/css/zk_additional.css</value> -->
+
+				<value>/cockpit/css/cockpit_essential.css</value>
+				<value>/cockpit/css/cockpit_comments.css</value>
+				<value>/cockpit/css/cockpit_compare.css</value>
+				<value>/cockpit/css/cockpit_login.css</value>
+				<value>/cockpit/css/cockpit_navsections.css</value>
+				<value>/cockpit/css/cockpit_refeditor.css</value>
+				<value>/cockpit/css/cockpit_sectionbrowser.css</value>
+				<value>/cockpit/css/cockpit_widgets.css</value>
+				<value>/cockpit/css/cockpit_wizard.css</value>
+				<value>/cockpit/css/cockpit_workflow.css</value>
+				<value>/cockpit/css/cockpit_fileupload.css</value>
+
+				<value>/productcockpit/css/productcockpit.css</value>
+				<value>/productcockpit/css/defaultstyles.css</value>
+			</list>
+		</property>
+		<property name="ieCssUris">
+			<list>
+				<value>/cockpit/css/cockpit_essential_ie.css</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<bean id="WorkflowPushContainer" class="de.hybris.platform.cockpit.session.impl.PushCreationContainer" scope="session">
+		<constructor-arg value="de.hybris.platform.cockpit.session.impl.WorkflowPushController" index="0" />
+		<constructor-arg index="1">
+			<map>
+				<entry key="updateInterval" value="30000" />
+				<entry key="attClassNames" value-ref="WorkflowAttachmentData" />
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="CommentPushContainer" class="de.hybris.platform.cockpit.session.impl.PushCreationContainer" scope="session">
+		<constructor-arg value="de.hybris.platform.cockpit.session.impl.CommentPushController" index="0" />
+		<constructor-arg index="1">
+			<map>
+				<entry key="updateInterval" value="30000" />
+				<entry key="cockpitTypeService">
+					<ref bean="cockpitTypeService" />
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="RequestHandler" class="de.hybris.platform.cockpit.session.impl.DefaultRequestHandler" scope="session">
+		<property name="requestEventHandlers">
+			<map>
+				<entry key="activation">
+					<bean class="de.hybris.platform.cockpit.session.impl.ActivationEventHandler">
+						<property name="prefix" value="act" />
+					</bean>
+				</entry>
+				<entry key="search">
+					<bean class="de.hybris.platform.cockpit.session.impl.SearchEventHandler">
+						<property name="prefix" value="srch" />
+					</bean>
+				</entry>
+				<entry key="celum">
+					<bean class="de.hybris.platform.cockpit.session.impl.CelumEventHandler" />
+				</entry>
+				<entry key="wf">
+					<bean class="de.hybris.platform.cockpit.session.impl.TaskEventHandler">
+						<property name="attachmentTypes" ref="WorkflowAttachmentData" />
+						<property name="prefix" value="wf" />
+					</bean>
+				</entry>
+				<entry key="msg">
+					<bean class="de.hybris.platform.cockpit.session.impl.NotificationEventHandler">
+						<property name="prefix" value="msg" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	<bean id="PopupEditorAreaController" class="de.hybris.platform.productcockpit.session.impl.PopupEditorAreaControllerImpl"
+		scope="prototype">
+		<property name="sectionRowRenderer">
+			<bean id="PopupEditorSectionRowRenderer" parent="EditorSectionRowRenderer" />
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory" />
+		</property>
+	</bean>
+
+	<!-- Product perspective start -->
+	<alias name="defaultProductPerspective" alias="ProductPerspective"/>
+	<bean id="defaultProductPerspective" class="de.hybris.platform.productcockpit.session.impl.ProductPerspective" scope="session"
+		parent="BasePerspective">
+		<property name="uid" value="productcockpit.perspective.product" />
+		<property name="label" value="perspective.product" />
+		<property name="customCsaURI" value="/productcockpit/productCSA.zul" />
+		<property name="infoBoxTimeout" value="2000" />
+
+		<property name="navigationArea">
+			<ref bean="ProductNavigationArea" />
+		</property>
+		<property name="browserArea">
+			<bean class="de.hybris.platform.productcockpit.session.impl.BrowserArea">
+				<property name="viewURI" value="/productcockpit/productBrowser.zul" />
+				<property name="multiSelectActions">
+					<ref bean="ContentBrowserMultiSelectActionColumn" />
+				</property>
+				<property name="multiSelectContextActionsRegistry">
+					<ref bean="ContextAreaActionColumnConfigurationRegistry" />
+				</property>
+				<property name="additionalToolbarActions">
+					<ref bean="ProductBrowserAdditionalToolbarActionColumn" />
+				</property>
+				<property name="defaultBrowserViewMapping">
+					<map>
+						<entry key="cockpitgroup" value="GRID" />
+						<entry key="productmanagergroup" value="GRID" />
+					</map>
+				</property>
+				<property name="inspectorRenderer" ref="coverageInspectorRenderer" />
+				<property name="openInspectorOnSelect" value="true" />
+			</bean>
+		</property>
+		<property name="editorArea">
+			<bean id="ProductEditorAreaModel" parent="BaseEditorAreaModel">
+				<property name="editorAreaController">
+					<ref bean="ProductEditorAreaController" />
+				</property>
+				<!-- <property name="width" value="300px"/> -->
+			</bean>
+		</property>
+		<property name="popupEditorArea">
+			<bean id="ProductPopupEditor" parent="BasePopupEditor">
+				<property name="editorAreaController">
+					<ref bean="PopupEditorAreaController" />
+				</property>
+			</bean>
+		</property>
+		<property name="editorAreaTypes">
+			<set>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="Product" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+				<!-- <bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule"> -->
+				<!-- <property name="typeCode" value="Hats"/> -->
+				<!-- <property name="recursive" value="false"/> -->
+				<!-- <property name="allowed" value="false"/> -->
+				<!-- </bean> -->
+			</set>
+		</property>
+	</bean>
+
+	<bean id="coverageInspectorRenderer" class="de.hybris.platform.cockpit.components.inspector.impl.DefaultCoverageInspectorRenderer" scope="session">
+		<property name="showOnlyVisibleRows" value="false" />
+	</bean>
+
+	<bean id="ProductEditorAreaController" class="de.hybris.platform.productcockpit.session.impl.EditorAreaControllerImpl"
+		scope="session">
+		<!-- <property name="model"> -->
+		<!-- <bean id="ProductEditorAreaModel" parent="BaseEditorAreaModel"/> -->
+		<!-- </property> -->
+		<property name="sectionRowRenderer">
+			<bean id="ProductEditorSectionRowRenderer" parent="EditorSectionRowRenderer" />
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory" />
+		</property>
+	</bean>
+
+	<!-- Product perspective: Navigation area -->
+	<bean id="ProductNavigationArea" class="de.hybris.platform.productcockpit.session.impl.NavigationArea" scope="session"
+		parent="BaseNavigationArea">
+		<!-- <property name="width" value="300px"/> -->
+		<property name="sectionModel">
+			<ref bean="ProductNavigationAreaModel" />
+		</property>
+		<property name="sections">
+			<list>
+				<ref bean="ProductSpecialCollectionsSection" />
+				<ref bean="ProductCatalogSelectorSection" />
+				<ref bean="ProductQuerySection" />
+				<ref bean="ProductUndoSection" />
+				<ref bean="ProductWorkflowSection" />
+			</list>
+		</property>
+		<property name="infoSlotAttachmentTypes">
+			<ref bean="WorkflowAttachmentData" />
+		</property>
+	</bean>
+
+	<bean id="ProductNavigationAreaModel" class="de.hybris.platform.productcockpit.components.navigationarea.NavigationAreaModel"
+		scope="session">
+		<property name="specialCollectionTypes">
+			<list>
+				<value>quickcollection</value>
+				<value>blacklist</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- navigation area sections -->
+	<bean id="ProductCatalogSelectorSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection"
+		scope="prototype">
+		<property name="localizedLabel" value="navigationarea.catalog" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean class="de.hybris.platform.productcockpit.components.navigationarea.renderer.CatalogSelectorSectionRenderer" />
+		</property>
+	</bean>
+	<bean id="ProductSpecialCollectionsSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection"
+		scope="prototype">
+		<property name="localizedLabel" value="navigationarea.shortcuts" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.SpecialCollectionSectionRenderer">
+				<property name="allItemsLabel" value="general.all_products" />
+			</bean>
+		</property>
+	</bean>
+	<bean id="ProductQuerySection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection" scope="prototype">
+		<property name="localizedLabel" value="navigationarea.queries" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.QuerySectionRenderer" />
+		</property>
+	</bean>
+	<bean id="ProductUndoSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection" scope="prototype">
+		<property name="localizedLabel" value="navigationarea.history" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.UndoSectionRenderer" />
+		</property>
+	</bean>
+	<bean id="ProductWorkflowSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection"
+		scope="prototype"> 
+		<property name="localizedLabel" value="navigationarea.workflow" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.WorkflowSectionRenderer">
+
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="workflowConverter" class="de.hybris.platform.cockpit.components.navigationarea.workflow.visualization.servlet.WorkflowGraphConverter" scope="tenant" />
+
+	<bean id="visualizationService" class="de.hybris.platform.cockpit.components.navigationarea.workflow.visualization.servlet.DefaultVisualizationService" scope="tenant">
+		<property name="converters">
+			<ref bean="workflowConverter" />
+		</property>
+		<property name="i18nService" ref="i18nService"></property>
+		<property name="sessionService" ref="sessionService"></property>
+	</bean>
+
+	<!-- Product perspective end -->
+
+	<!-- Catalog perspective start -->
+	<alias name="defaultCatalogPerspective" alias="CatalogPerspective"/>
+	<bean id="defaultCatalogPerspective" class="de.hybris.platform.productcockpit.session.impl.CatalogPerspective" scope="session"
+		parent="BasePerspective">
+		<property name="uid" value="productcockpit.perspective.catalog" />
+		<property name="customCsaURI" value="/productcockpit/catalogCSA.zul" />
+		<property name="label" value="perspective.catalog" />
+		<property name="navigationArea">
+			<ref bean="CatalogNavigationArea" />
+		</property>
+		<property name="browserArea">
+			<bean class="de.hybris.platform.productcockpit.session.impl.CatalogBrowserArea">
+				<property name="viewURI" value="/productcockpit/catalogBrowser.zul" />
+				<property name="inspectorRenderer" ref="coverageInspectorRenderer" />
+				<property name="infoAreaContainerId" value="infoAreaContainer2"></property>
+				<property name="openInspectorOnSelect" value="true" />
+			</bean>
+		</property>
+		<property name="editorArea">
+			<bean id="CatalogEditorAreaModel" parent="BaseEditorAreaModel">
+				<property name="editorAreaController">
+					<ref bean="CatalogEditorAreaController" />
+				</property>
+			</bean>
+		</property>
+		<property name="popupEditorArea">
+			<bean id="CatalogPopupEditor" parent="BasePopupEditor">
+				<property name="editorAreaController">
+					<ref bean="PopupEditorAreaController" />
+				</property>
+			</bean>
+		</property>
+		<property name="editorAreaTypes">
+			<set>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="Product" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="Category" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+				<bean class="de.hybris.platform.cockpit.session.impl.EditorAreaTypeRule">
+					<property name="typeCode" value="ClassAttributeAssignment" />
+					<property name="recursive" value="true" />
+					<property name="allowed" value="true" />
+				</bean>
+			</set>
+		</property>
+	</bean>
+
+	<bean id="CatalogEditorAreaController" class="de.hybris.platform.productcockpit.session.impl.EditorAreaControllerImpl"
+		scope="session">
+		<property name="sectionRowRenderer">
+			<bean id="CatalogEditorSectionRowRenderer" parent="EditorSectionRowRenderer" />
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory" />
+		</property>
+	</bean>
+
+	<!-- Catalog perspective: Navigation area -->
+	<bean id="CatalogNavigationArea" class="de.hybris.platform.productcockpit.session.impl.CatalogNavigationArea" scope="session"
+		parent="BaseNavigationArea">
+		<property name="sectionModel">
+			<ref bean="CatalogNavigationAreaModel" />
+		</property>
+		<property name="sections">
+			<list>
+				<ref bean="CatalogCatalogSelectorSection" />
+				<ref bean="ProductUndoSection" />
+				<ref bean="ProductWorkflowSection" />
+			</list>
+		</property>
+		<property name="infoSlotAttachmentTypes">
+			<ref bean="WorkflowAttachmentData" />
+		</property>
+	</bean>
+
+	<bean id="CatalogNavigationAreaModel" class="de.hybris.platform.productcockpit.components.navigationarea.CatalogNavigationAreaModel"
+		scope="session">
+	</bean>
+
+	<!-- navigation area sections -->
+	<bean id="CatalogCatalogSelectorSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection"
+		scope="session">
+		<property name="localizedLabel" value="navigationarea.catalog" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean class="de.hybris.platform.productcockpit.components.navigationarea.renderer.CatalogSectionRenderer" />
+		</property>
+	</bean>
+	<bean id="CatalogFavoritesSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection"
+		scope="session">
+		<property name="localizedLabel" value="navigationarea.favorites" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean class="de.hybris.platform.productcockpit.components.navigationarea.renderer.FavoritesSectionRenderer" />
+		</property>
+	</bean>
+
+	<alias alias="ProductBrowserStatusColumn" name="ProductContentBrowserStatusColumn"/>
+	<bean id="ProductContentBrowserStatusColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Status" />
+		<property name="actions">
+			<list>
+				<ref bean="CoverageInfoAction" />
+				<ref bean="ApprovalStatus" />
+				<ref bean="VariantsStatus" />
+				<ref bean="SynchronizationStatus" />
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="ContentBrowserMultiSelectActionColumn" name="ProductContentBrowserMultiSelectActionColumn"/>
+	<bean id="ProductContentBrowserMultiSelectActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="SplitterDummyAction" />
+				<ref bean="ApprovalAction" />
+				<ref bean="SynchronizationAction" />
+				<ref bean="PullSynchronizationAction" />
+				<ref bean="SynchedProductsAction" />
+				<ref bean="AddProductToExpressUdateAction" />
+				<ref bean="ExportCsvAction" />
+				<ref bean="ExportEditorArea2PdfAction" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="ContentBrowserActionColumn" name="ProductContentBrowserActionColumn"/>
+	<bean id="ProductContentBrowserActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="ApprovalAction" />
+				<ref bean="SynchronizationAction" />
+				<ref bean="PullSynchronizationAction" />
+				<ref bean="SynchedProductsAction" />
+				<ref bean="AddProductToExpressUdateAction" />
+				<ref bean="ExportCsvAction" />
+				<ref bean="ExportEditorArea2PdfAction" />
+				<ref bean="BaseProductAction" />
+				<ref bean="VariantsAction" />	
+				<ref bean="EditAction" />
+			</list>
+		</property>
+	</bean>
+	
+<!-- 	<alias alias="ProductContentBrowserActionEditorColumn" name="ProductContentBrowserActionEditorColumn"/>
+	<bean id="ProductContentBrowserActionEditorColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="ApprovalAction" />
+				<ref bean="SynchronizationAction" />
+				<ref bean="PullSynchronizationAction" />
+				<ref bean="SynchedProductsAction" />
+				<ref bean="ExportCsvAction" />
+				<ref bean="ExportEditorArea2PdfAction" />
+				<ref bean="BaseProductAction" />
+				<ref bean="VariantsAction" />	
+			</list>
+		</property>
+	</bean>
+ -->	
+	<alias alias="VariantProductBrowserActionColumn" name="VariantProductContentBrowserActionColumn"/>
+	<bean id="VariantProductContentBrowserActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="ApprovalAction" />
+				<ref bean="SynchronizationAction" />
+				<ref bean="PullSynchronizationAction" />
+				<ref bean="SynchedProductsAction" />
+				<ref bean="AddProductToExpressUdateAction" />
+				<ref bean="ExportCsvAction" />				
+				<ref bean="ExportEditorArea2PdfAction" />
+				<ref bean="BaseProductAction" />
+				<ref bean="VariantsAction" />	
+				<ref bean="EditAction" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="ProductBrowserActionColumn" name="ProductContextBrowserActionColumn"/>
+	<bean id="ProductContextBrowserActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="ApprovalAction" />
+				<!--<ref bean="SynchronizationAction" /> -->
+				<ref bean="PullSynchronizationAction" />
+				<ref bean="SynchedProductsAction" />
+				<!--<ref bean="ExportCsvAction" /> -->				
+				<ref bean="ExportEditorArea2PdfAction" />
+				<ref bean="EditAction" />
+				<!--<ref bean="RemoveContextItemAction" />-->
+				<ref bean="SplitterDummyAction" />
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="ProductBrowserAdditionalToolbarActionColumn" name="ProductContentBrowserAdditionalToolbarActionColumn"/>
+	<bean id="ProductContentBrowserAdditionalToolbarActionColumn" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="BaseProductAction" />
+				<ref bean="VariantsAction" />
+				<ref bean="EditItemAction" />
+				<ref bean="SplitterDummyAction" />
+			</list>
+		</property>
+	</bean>
+
+    <bean id="ApprovalAction" class="de.hybris.platform.productcockpit.components.listview.impl.ApprovalAction"
+          scope="prototype">
+        <property name="modelHelper" ref="cockpitModelHelper" />
+    </bean>
+
+	<bean id="EditItemAction" class="de.hybris.platform.productcockpit.components.listview.impl.EditItemAction" scope="prototype" />
+ 	<bean id="BaseProductAction" class="de.hybris.platform.productcockpit.components.listview.impl.BaseProductAction" scope="prototype" />
+	<bean id="ApprovalStatus" class="de.hybris.platform.productcockpit.components.listview.impl.ApprovalStatus" scope="prototype" />
+	<bean id="EditAction" class="de.hybris.platform.productcockpit.components.listview.impl.EditAction" scope="prototype" />
+	<bean id="RemoveContextItemAction" class="de.hybris.platform.productcockpit.components.listview.impl.RemoveContextItemAction"
+		scope="prototype" />
+	<bean id="AddProductToExpressUdateAction" class="de.hybris.platform.productcockpit.components.listview.impl.AddProductToExpressUdateAction" scope="prototype">
+		<property name="productExpressUpdateChannel" ref="productExpressUpdateChannel"/>
+	</bean>
+	<!-- <bean id="DuplicateAction" class="de.hybris.platform.productcockpit.components.listview.impl.DuplicateAction" scope="prototype"/> -->
+	<bean id="VariantsStatus" class="de.hybris.platform.productcockpit.components.listview.impl.VariantsStatus" scope="prototype" />
+
+	<bean id="VariantsAction" class="de.hybris.platform.productcockpit.components.listview.impl.VariantsAction" scope="prototype" />
+	<!-- <bean id="PendingAction" class="de.hybris.platform.productcockpit.components.listview.impl.PendingAction" scope="prototype"/> -->
+	<!-- <bean id="ClassificationAction" class="de.hybris.platform.productcockpit.components.listview.impl.ClassificationAction" scope="prototype"/> -->
+	<!-- <bean id="ClonesAction" class="de.hybris.platform.productcockpit.components.listview.impl.ClonesAction" scope="prototype"/> -->
+	<bean id="SynchronizationStatus" class="de.hybris.platform.productcockpit.components.listview.impl.ProductSynchronizationStatus"
+		scope="prototype" />
+	<bean id="SynchronizationAction" class="de.hybris.platform.productcockpit.components.listview.impl.ProductSynchronizationAction"
+		scope="prototype" />
+	<bean id="PullSynchronizationAction" class="de.hybris.platform.productcockpit.components.listview.impl.PullSynchronizationAction"
+		scope="prototype" />
+	<bean id="SynchedProductsAction" class="de.hybris.platform.productcockpit.components.listview.impl.ShowSynchProductsAction"
+		scope="prototype" />
+
+	<bean id="productNode" scope="prototype" class="de.hybris.platform.productcockpit.model.macfinder.node.ProductNode" />
+	<bean id="mediaNode" scope="prototype" class="de.hybris.platform.productcockpit.model.macfinder.node.MediaNode" />
+	<bean id="classAttributeAssignmentNode" scope="prototype"
+		class="de.hybris.platform.productcockpit.model.macfinder.node.ClassAttributeAssignmentNode" />
+
+	<bean id="additionalNodesContainer" scope="prototype" class="de.hybris.platform.productcockpit.model.macfinder.node.AdditionalNodesContainer">
+		<property name="availableConnectedItems">
+			<list>
+				<ref local="productNode" />
+				<ref local="classAttributeAssignmentNode" />
+				<!-- <ref local="mediaNode"/> -->
+			</list>
+		</property>
+	</bean>
+
+	<!-- workflow related -->
+	<bean id="WorkflowAttachmentData" class="java.util.LinkedList">
+		<constructor-arg>
+			<list value-type="java.lang.String">
+				<value>de.hybris.platform.core.model.product.ProductModel</value>
+				<value>de.hybris.platform.category.model.CategoryModel</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+
+
+
+	<!--#### External Applications Perspective start #### -->
+	<bean id="ExtAppPerspective" scope="session" parent="BasePerspective">
+		<property name="uid" value="productcockpit.perspective.extapp" />  <!-- unique ID of the perspective -->
+		<property name="label" value="productcockpit.perspective.extapp" />  <!-- localization key for the label of the perspective -->
+		<property name="customCsaURI" value="/productcockpit/urlCSA.zul" />  <!-- file with optional custom client side actions -->
+
+		<property name="navigationArea">
+			<ref bean="ExtAppNavigationArea" />
+		</property>
+		<property name="browserArea">
+			<bean class="de.hybris.platform.cockpit.session.impl.UrlBrowserArea">
+				<property name="browserUid" value="urlbrowser.hmc" />
+				<property name="viewURI" value="/productcockpit/urlBrowser.zul" />
+				<!-- <property name="wideScreen" value="true"/> -->
+				<property name="viewModes">
+					<list>
+						<ref bean="hmcMainAreaFactory" />
+						<ref bean="hybrisMainAreaFactory" />
+					</list>
+				</property>
+			</bean>
+		</property>
+		<property name="editorArea">
+			<bean id="ExtAppEditorAreaModel" parent="BaseEditorAreaModel">
+				<property name="editorAreaController">
+					<ref bean="ExtAppEditorAreaController" />
+				</property>
+			</bean>
+		</property>
+		<property name="popupEditorArea">
+			<bean id="ExtAppPopupEditor" parent="BasePopupEditor">
+				<property name="editorAreaController">
+					<ref bean="ExtAppPopupEditorAreaController" />
+				</property>
+			</bean>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService" />
+	</bean>
+
+	<bean id="ExtAppNavigationArea" class="de.hybris.platform.cockpit.session.impl.UrlNavigationArea" scope="session" parent="BaseNavigationArea">
+		<property name="sectionModel">
+			<ref bean="ExtAppNavigationAreaModel" />
+		</property>
+		<property name="infoSlotRenderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.InfoBoxRenderer" />
+		</property>
+		<property name="sections">
+			<list>
+				<!-- add section here -->
+			</list>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService" />
+	</bean>
+
+	<bean id="ExtAppNavigationAreaModel" class="de.hybris.platform.cockpit.components.navigationarea.DefaultNavigationAreaModel"
+		scope="session">
+	</bean>
+
+	<bean id="ExtAppEditorAreaController" class="de.hybris.platform.cockpit.session.impl.DefaultEditorAreaController" scope="session">
+		<property name="sectionRowRenderer">
+			<bean id="ExtAppEditorSectionRowRenderer" parent="EditorSectionRowRenderer" />
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory" />
+		</property>
+	</bean>
+
+	<bean id="ExtAppPopupEditorAreaController" class="de.hybris.platform.cockpit.session.impl.UrlPopupEditorAreaControllerImpl"
+		scope="prototype">
+		<property name="sectionRowRenderer">
+			<bean id="ExtAppPopupEditorSectionRowRenderer" parent="EditorSectionRowRenderer" />
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory" />
+		</property>
+	</bean>
+
+	<!-- view modes -->
+	<bean id="hmcMainAreaFactory" class="de.hybris.platform.cockpit.components.contentbrowser.DefaultUrlMainAreaComponentFactory"
+		scope="prototype">
+		<property name="uid" value="urlarea.hmc" />
+		<property name="urlMappingBeanId" value="productUid2UrlMap" />
+	</bean>
+	<bean id="hybrisMainAreaFactory" class="de.hybris.platform.cockpit.components.contentbrowser.DefaultUrlMainAreaComponentFactory"
+		scope="prototype">
+		<property name="uid" value="urlarea.hybris" />
+		<property name="urlMappingBeanId" value="productUid2UrlMap" />
+	</bean>
+
+	<!-- view mode url mappings -->
+	<bean id="productUid2UrlMap" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<property name="sourceMap">
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="urlarea.hmc" value="/hmc/hybris" />
+				<entry key="urlarea.hybris" value="http://www.hybris.de/" />
+			</map>
+		</property>
+	</bean>
+
+	<!--#### External Applications Perspective end #### -->
+
+	<bean id="CommentsSection" class="de.hybris.platform.cockpit.services.config.impl.CommentsSectionConfiguration" scope="session">
+		<property name="sectionRenderer">
+			<ref bean="CommentsSectionRenderer" />
+		</property>
+	</bean>
+
+	<!-- <bean id="CommentsSectionRenderer" class="de.hybris.platform.cockpit.components.editorarea.renderer.CommentsSectionRenderer" 
+		scope="session" /> -->
+
+	<!-- filter -->
+	<bean id="productCockpitFilterChain" class="de.hybris.platform.servicelayer.web.BackOfficeFilterChain">
+		<constructor-arg>
+			<list>
+				<ref bean="log4jFilter" />
+				<ref bean="dynamicTenantActivationFilter" />
+				<ref bean="sessionFilter" />
+				<ref bean="productCockpitDataSourceSwitchingFilter" />
+				<ref bean="productCockpitCatalogVersionActivationFilter" />
+				<ref bean="productCockpitSecureMediaFilter" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="productCockpitDataSourceSwitchingFilter" class="de.hybris.platform.servicelayer.web.DataSourceSwitchingFilter">
+	</bean>
+
+	<bean id="productCockpitCatalogVersionActivationFilter" class="de.hybris.platform.servicelayer.web.DynamicCatalogVersionActivationFilter"
+		scope="tenant">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="catalogService" ref="catalogService" />
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="productCockpitSecureMediaFilter" class="de.hybris.platform.servicelayer.web.SecureMediaFilter">
+		<property name="mediaPermissionService" ref="mediaPermissionService" />
+		<property name="modelService" ref="modelService" />
+		<property name="userService" ref="userService" />
+		<property name="mediaService" ref="mediaService" />
+		<!-- <property name="secureMediaToken" value="securemedias"/> securemedias is default but you may overwrite it -->
+		<aop:scoped-proxy />
+	</bean>
+
+	<alias alias="VariantProductListviewActions" name="VariantProductMultiSelectContextActions"/>
+	<bean id="ContextAreaActionColumnConfigurationRegistry"	class="de.hybris.platform.cockpit.components.listview.ContextAreaActionColumnConfigurationRegistry">
+		<property name="map">
+			<util:map id="multiSelectContextActions">
+				<entry key="VariantProduct" value-ref="VariantProductMultiSelectContextActions" />
+				<entry key="Product" value-ref="BaseProductMultiSelectContextActions" />
+				<entry key="GenericItem" value-ref="GenericItemMultiSelectContextActions" />
+			</util:map>
+		</property>
+	</bean>
+	
+	<alias alias="BaseProductListviewActions" name="BaseProductMultiSelectContextActions"/>
+	<bean id="BaseProductMultiSelectContextActions" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="EditAction" />
+				<ref bean="SplitterDummyAction" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="VariantProductListviewActions" name="VariantProductMultiSelectContextActions"/>
+	<bean id="VariantProductMultiSelectContextActions" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="EditAction" />
+				<ref bean="SplitterDummyAction" />
+				<!--<ref bean="RemoveContextItemAction" />-->
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="VariantProductListviewActions" name="VariantProductMultiSelectContextActions"/>
+	<bean id="GenericItemMultiSelectContextActions" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="EditAction" />
+				<ref bean="SplitterDummyAction" />
+				<!-- <ref bean="RemoveContextItemAction" />  -->
+			</list>
+		</property>
+	</bean>
+	
+	<import resource="classpath:/productcockpit/productcockpit-spring-uitest.xml" />
+</beans>

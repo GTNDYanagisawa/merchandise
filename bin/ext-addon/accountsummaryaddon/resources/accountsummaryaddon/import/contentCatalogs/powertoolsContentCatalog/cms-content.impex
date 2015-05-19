@@ -1,0 +1,41 @@
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(catalog(id[default=$contentCatalog]),version[default='Staged'])
+$jarResourceCms=jar:de.hybris.platform.accountsummaryaddon.setup.InitialDataSystemSetup
+$jarResourceCmsImages=jar:de.hybris.platform.accountsummaryaddon.constants.AccountsummaryaddonConstants&/accountsummaryaddon/import/cockpits/cmscockpit
+
+# CMS Link Components - My Company
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;&componentRef;target(code)[default='sameWindow']
+;;CompanySummaryLink;Company Account Summary Link;/my-company/organization-management/accountstatus/;CompanySummaryLink;CompanySummaryLink
+;;CompanySummaryViewLink;Company Account Summary Link;/my-company/organization-management/accountstatus/;CompanySummaryViewLink;CompanySummaryViewLink
+
+## CMS Navigation Nodes - My Company
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(uid,$contentCV);&nodeRef
+;CompanyLeftNavNode;;Your Company;SiteRootNode;CompanyOrganizationtLink,CompanyBudgetLink,CompanyCostCenterLink,CompanyUnitsLink,CompanyUsersLink,CompanyUserGroupsLink,CompanyPermissionsLink,CompanySummaryLink;CompanyLeftNavNode
+;CompanySummaryNavNode;;Your Company;SiteRootNode;CompanySummaryViewLink;CompanySummaryNavNode
+
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(uid,$contentCV)[mode=append];&nodeRef
+;MyCompanyLinksNavNode;;My Company Links;MyCompanyNavNode;CompanySummaryLink;MyCompanyLinksNavNode
+
+##  Navigation Bar Component - My Company
+INSERT_UPDATE AccountNavigationComponent;$contentCV[unique=true];uid[unique=true];name;navigationNode(&nodeRef);styleClass;&componentRef
+;;CompanySummaryNavigationComponent;Company Summary Navigation Component;CompanySummaryNavNode;;CompanySummaryNavigationComponent
+
+# Account Navigation Bar Component - My Company
+INSERT_UPDATE AccountNavigationCollectionComponent;$contentCV[unique=true];uid[unique=true];name;components(uid, $contentCV);&componentRef
+;;CompanyHomepageComponent;Company Homepage Component;CompanyBudgetNavigationComponent, CompanyCostCenterNavigationComponent, CompanyUnitsNavigationComponent, CompanyUsersNavigationComponent, CompanyUserGroupsNavigationComponent, CompanyPermissionsNavigationComponent, CompanySummaryNavigationComponent;CompanyHomepageComponent
+
+# CMS Cockpit Preview Image for AccountStatusPage
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true]
+;;accountStatusPagePreview;text/png;AccountStatusPage.png;$jarResourceCmsImages/preview-images/powertools/AccountStatusPage.png
+
+# Preview for AccountStatusPage
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code,$contentCV)
+;;accountstatus;accountStatusPagePreview:
+
+# CMS Cockpit Preview Image for AccountSummaryPage
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true]
+;;accountSummaryPagePreview;text/png;AccountSummaryPage.png;$jarResourceCmsImages/preview-images/powertools/AccountSummaryPage.png
+
+# Preview for AccountSummaryPage
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code,$contentCV)
+;;accountstatusdetail;accountSummaryPagePreview:

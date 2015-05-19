@@ -1,0 +1,38 @@
+#CATEGORIES
+
+# Macros / Replacement Parameter definitions
+$productCatalog=powertoolsProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$supercategories=source(code, $catalogVersion)[unique=true]
+$categories=target(code, $catalogVersion)[unique=true]
+$productCatalogName=Powertools Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$lang=en
+
+# Insert Categories
+INSERT_UPDATE Category                 ; code[unique=true] ; allowedPrincipals(uid)[default='customergroup'] ; $catalogVersion
+                                       ; 1800 			   	
+                                       ; 1801
+                                       ; 1802
+                                       ; 1803
+                                       ; 1804
+                                       ; 1805
+                                       ; 1806
+
+INSERT_UPDATE CategoryCategoryRelation ; $categories       ; $supercategories
+									   ; 1800	 		   ; 1	
+                                       ; 1801              ; 1800
+                                       ; 1802              ; 1800
+                                       ; 1803              ; 1801
+                                       ; 1804              ; 1801
+                                       ; 1805              ; 1802
+                                       ; 1806              ; 1802
+
+UPDATE Category ; $catalogVersion ; code[unique=true] ; name[lang=$lang] ; description[lang=$lang]
+                ;                 ; 1800              ; Safety           ;
+                ;                 ; 1801              ; Apparel          ;
+                ;                 ; 1802              ; Footwear         ;
+                ;                 ; 1803              ; Men's            ;
+                ;                 ; 1804              ; Women's          ;
+                ;                 ; 1805              ; Men's            ;
+                ;                 ; 1806              ; Women's          ;

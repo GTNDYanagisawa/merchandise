@@ -1,0 +1,13 @@
+INSERT PromotionPriceRow;&id;Currency(isocode);price;
+;1001;USD;100;
+;1002;USD;10;
+;2001;USD;100;
+;2002;USD;25;
+
+INSERT_UPDATE OrderThresholdDiscountPromotion;code[unique=true];enabled;PromotionGroup(Identifier);priority;thresholdTotals(&id);discountPrices(&id)
+;orderThresholdDiscountPromotion100_10;true;default;2000;1001;1002;
+;orderThresholdDiscountPromotion100_25;true;default;2000;2001;2002;
+
+INSERT_UPDATE PromotionBillingTimeRestriction;descriptionPattern[unique=true, lang=en];promotion(code);positive;billingTimes(code)
+;promotionBillingTimeRestrictionMonthlyPositive;orderThresholdDiscountPromotion100_10;true;monthly
+;promotionBillingTimeRestrictionMonthlyNegative;orderThresholdDiscountPromotion100_25;false;monthly

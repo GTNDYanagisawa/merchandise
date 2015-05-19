@@ -1,0 +1,241 @@
+*** Settings ***
+Test Setup        import commercecart sampledata
+Test Teardown     reset system
+Resource          commerce/CommerceServices_Keywords.txt
+Resource		  commerce/SubscriptionCommerce_Keywords.txt
+Resource          subscriptionservices/SubscriptionProduct_Keywords.txt
+Resource          subscriptionservices/SubscriptionPricePlan_Keywords.txt
+Resource          subscriptionservices/SubscriptionTerm_Keywords.txt
+Resource          entitlements/Product_Keywords.txt
+
+
+*** Test Cases ***
+Test_XML_Verification_Subscription_Term_AutoRenewing_Monthly
+    [Documentation]    Verifies subscription terms
+    create subscription term "T1" with renewal type "auto_renewing" and term frequency "monthly" and term number "10"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    add product "P1" to cart
+    for product "P1" verify that the XML for subscription term matches "<subscriptionTerm>
+																		 	<termOfServiceFrequency>
+																		      	<code>monthly</code>
+																		   	</termOfServiceFrequency>
+																		    <name>T1</name>
+																		    <termOfServiceRenewal>
+																		      	<code>auto_renewing</code>
+																		    </termOfServiceRenewal>
+																		    <!-- billing plan is defined in resources/impex/testCommerceCart.csv -->
+																		    <billingPlan>
+																		      	<billingCycleType>
+																		        	<code>subscription_start</code>
+																		      	</billingCycleType>
+																		      	<name>Monthly Plan</name>
+																		      	<billingTime>
+																		        	<description>Monthly</description>
+																		        	<orderNumber>5</orderNumber>
+																		        	<name>Monthly</name>
+																		        	<code>monthly</code>
+																		      	</billingTime>
+																		   	</billingPlan>
+																		   	<!-- cancellable=true is defined as the default in resources/impex-templates/subscription-term/subscriptionterm-insert.impex.vm -->
+																		    <cancellable>true</cancellable>
+																		    <termOfServiceNumber>10</termOfServiceNumber>
+																		 </subscriptionTerm>"
+
+Test_XML_Verification_Subscription_Term_AutoRenewing_Daily
+	[Documentation]    Verifies subscription terms
+	create subscription term "T1" with renewal type "auto_renewing" and term frequency "monthly" and term number "11"
+	create subscription product "P1" with subscription term "T1"
+	for product "P1" add subscription priceplan "PP1" with currency "USD"
+	add product "P1" to cart
+	for product "P1" verify that the XML for subscription term matches "<subscriptionTerm>
+																		    <termOfServiceFrequency>
+																		      <code>monthly</code>
+																		    </termOfServiceFrequency>
+																		    <name>T1</name>
+																		    <termOfServiceRenewal>
+																		      <code>auto_renewing</code>
+																		    </termOfServiceRenewal>
+																		    <billingPlan>
+																		      <billingCycleType>
+																		        <code>subscription_start</code>
+																		      </billingCycleType>
+																		      <name>Monthly Plan</name>
+																		      <billingTime>
+																		        <description>Monthly</description>
+																		        <orderNumber>5</orderNumber>
+																		        <name>Monthly</name>
+																		        <code>monthly</code>
+																		      </billingTime>
+																		    </billingPlan>
+																		    <cancellable>true</cancellable>
+																		    <termOfServiceNumber>11</termOfServiceNumber>
+																		  </subscriptionTerm>"
+	
+Test_XML_Verification_Subscription_Term_AutoRenewing_Weekly
+	[Documentation]    Verifies subscription terms
+	create subscription term "T1" with renewal type "auto_renewing" and term frequency "monthly" and term number "12"
+	create subscription product "P1" with subscription term "T1"
+	for product "P1" add subscription priceplan "PP1" with currency "USD"
+	add product "P1" to cart
+	for product "P1" verify that the XML for subscription term matches "<subscriptionTerm>
+																		    <termOfServiceFrequency>
+																		      <code>monthly</code>
+																		    </termOfServiceFrequency>
+																		    <name>T1</name>
+																		    <termOfServiceRenewal>
+																		      <code>auto_renewing</code>
+																		    </termOfServiceRenewal>
+																		    <billingPlan>
+																		      <billingCycleType>
+																		        <code>subscription_start</code>
+																		      </billingCycleType>
+																		      <name>Monthly Plan</name>
+																		      <billingTime>
+																		        <description>Monthly</description>
+																		        <orderNumber>5</orderNumber>
+																		        <name>Monthly</name>
+																		        <code>monthly</code>
+																		      </billingTime>
+																		    </billingPlan>
+																		    <cancellable>true</cancellable>
+																		    <termOfServiceNumber>12</termOfServiceNumber>
+																		  </subscriptionTerm>"	
+	
+Test_XML_Verification_Subscription_Term_NonRenewing_Daily
+	[Documentation]    Verifies subscription terms
+	create subscription term "T1" with renewal type "non_renewing" and term frequency "monthly" and term number "11"
+	create subscription product "P1" with subscription term "T1"
+	for product "P1" add subscription priceplan "PP1" with currency "USD"
+	add product "P1" to cart
+	for product "P1" verify that the XML for subscription term matches "<subscriptionTerm>
+																		    <termOfServiceFrequency>
+																		      <code>monthly</code>
+																		    </termOfServiceFrequency>
+																		    <name>T1</name>
+																		    <termOfServiceRenewal>
+																		      <code>non_renewing</code>
+																		    </termOfServiceRenewal>
+																		    <billingPlan>
+																		      <billingCycleType>
+																		        <code>subscription_start</code>
+																		      </billingCycleType>
+																		      <name>Monthly Plan</name>
+																		      <billingTime>
+																		        <description>Monthly</description>
+																		        <orderNumber>5</orderNumber>
+																		        <name>Monthly</name>
+																		        <code>monthly</code>
+																		      </billingTime>
+																		    </billingPlan>
+																		    <cancellable>true</cancellable>
+																		    <termOfServiceNumber>11</termOfServiceNumber>
+																		  </subscriptionTerm>"
+	
+Test_XML_Verification_Subscription_Term_NonRenewing_Weekly
+	[Documentation]    Verifies subscription terms
+	create subscription term "T1" with renewal type "non_renewing" and term frequency "monthly" and term number "12"
+	create subscription product "P1" with subscription term "T1"
+	for product "P1" add subscription priceplan "PP1" with currency "USD"
+	add product "P1" to cart
+	for product "P1" verify that the XML for subscription term matches "<subscriptionTerm>
+																		    <termOfServiceFrequency>
+																		      <code>monthly</code>
+																		    </termOfServiceFrequency>
+																		    <name>T1</name>
+																		    <termOfServiceRenewal>
+																		      <code>non_renewing</code>
+																		    </termOfServiceRenewal>
+																		    <billingPlan>
+																		      <billingCycleType>
+																		        <code>subscription_start</code>
+																		      </billingCycleType>
+																		      <name>Monthly Plan</name>
+																		      <billingTime>
+																		        <description>Monthly</description>
+																		        <orderNumber>5</orderNumber>
+																		        <name>Monthly</name>
+																		        <code>monthly</code>
+																		      </billingTime>
+																		    </billingPlan>
+																		    <cancellable>true</cancellable>
+																		    <termOfServiceNumber>12</termOfServiceNumber>
+																		  </subscriptionTerm>"	
+	
+Test_XML_Verification_Subscription_Term_RenewsOnce_Daily
+	[Documentation]    Verifies subscription terms
+	create subscription term "T1" with renewal type "renews_once" and term frequency "monthly" and term number "11"
+	create subscription product "P1" with subscription term "T1"
+	for product "P1" add subscription priceplan "PP1" with currency "USD"
+	add product "P1" to cart
+	for product "P1" verify that the XML for subscription term matches "<subscriptionTerm>
+																		    <termOfServiceFrequency>
+																		      <code>monthly</code>
+																		    </termOfServiceFrequency>
+																		    <name>T1</name>
+																		    <termOfServiceRenewal>
+																		      <code>renews_once</code>
+																		    </termOfServiceRenewal>
+																		    <billingPlan>
+																		      <billingCycleType>
+																		        <code>subscription_start</code>
+																		      </billingCycleType>
+																		      <name>Monthly Plan</name>
+																		      <billingTime>
+																		        <description>Monthly</description>
+																		        <orderNumber>5</orderNumber>
+																		        <name>Monthly</name>
+																		        <code>monthly</code>
+																		      </billingTime>
+																		    </billingPlan>
+																		    <cancellable>true</cancellable>
+																		    <termOfServiceNumber>11</termOfServiceNumber>
+																		  </subscriptionTerm>"
+	
+Test_XML_Verification_Subscription_Term_RenewsOnce_Weekly
+	[Documentation]    Verifies subscription terms
+	create subscription term "T1" with renewal type "renews_once" and term frequency "monthly" and term number "12"
+	create subscription product "P1" with subscription term "T1"
+	for product "P1" add subscription priceplan "PP1" with currency "USD"
+	add product "P1" to cart
+	for product "P1" verify that the XML for subscription term matches "<subscriptionTerm>
+																		    <termOfServiceFrequency>
+																		      <code>monthly</code>
+																		    </termOfServiceFrequency>
+																		    <name>T1</name>
+																		    <termOfServiceRenewal>
+																		      <code>renews_once</code>
+																		    </termOfServiceRenewal>
+																		    <billingPlan>
+																		      <billingCycleType>
+																		        <code>subscription_start</code>
+																		      </billingCycleType>
+																		      <name>Monthly Plan</name>
+																		      <billingTime>
+																		        <description>Monthly</description>
+																		        <orderNumber>5</orderNumber>
+																		        <name>Monthly</name>
+																		        <code>monthly</code>
+																		      </billingTime>
+																		    </billingPlan>
+																		    <cancellable>true</cancellable>
+																		    <termOfServiceNumber>12</termOfServiceNumber>
+																		  </subscriptionTerm>"	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

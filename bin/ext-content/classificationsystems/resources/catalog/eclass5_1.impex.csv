@@ -1,0 +1,312 @@
+# ---------------------------------------------------------
+# --- eClass 5.1
+# --- create system and version
+# ---------------------------------------------------------
+
+#% impex.info("creating classification system $systemName $systemVersion in language $systemLanguage ...");
+
+INSERT_UPDATE ClassificationSystem[cacheUnique=true]; id[unique=true]
+; $systemName ;
+
+INSERT_UPDATE ClassificationSystemversion[cacheUnique=true]; \
+								version[unique=true] ; \
+								catalog(id)[unique=true]; \
+								inclPacking[default=true]; \
+								inclDuty[default=true]; \
+								inclFreight[default=true]; \
+								inclAssurance[default=true]
+; $systemVersion ; $systemName; 
+
+# ---------------------------------------------------------
+# --- eClass 5.1
+# --- create classes 
+# --- from eClass5_1.csv
+# ---------------------------------------------------------
+$sysVer=catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$idcl=externalID
+$identifier=
+$version_number=revision
+$publication_date=
+$revision_number=
+$coded_name=code
+$preferred_name=name[lang='$systemLanguage']
+$definition=
+$iso_language_code=
+$iso_country_code=
+$note=
+$remark=
+$level=
+$mksubclass=
+$mksynonym=
+$mkbsa=
+$superClass=superCategories(code,$sysVer)[srcCell='6',cellDecorator='de.hybris.platform.catalog.jalo.classification.eclass.EClassSuperCategoryDecorator']
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion classes  ...");
+
+INSERT_UPDATE ClassificationClass[cacheUnique=true];\
+								$sysVer[virtual=true,unique=true];\
+								$idcl[unique=true];\
+								$identifier;\
+								$version_number;\
+								$publication_date;\
+								$revision_number;\
+								$coded_name;\
+								$preferred_name;\
+								$definition;\
+								$iso_language_code;\
+								$iso_country_code;\
+								$note;\
+								$remark;\
+								$level;\
+								$mksubclass;\
+								$mksynonym;\
+								$mkbsa;\
+								$superClass
+
+#% impex.includeExternalDataMedia( "eClass5_1.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion classes");
+
+
+# ---------------------------------------------------------
+# --- eClass 5.1
+# --- create and assign keywords 
+# --- from eClass5_1_sw.csv
+# ---------------------------------------------------------
+$sysVer=catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$language=language(isocode[default='$systemLanguage'])
+$identifier=externalID
+$idcl=categories(ClassificationClass.externalID,catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))[lang='$systemLanguage',mode=append]
+$class_coded_name=
+$key_word_value=keyword
+$explanation=
+$iso_language_code=
+$iso_country_code=
+$level=
+
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion keywords ...");
+
+INSERT_UPDATE ClassificationKeyword[cacheUnique=true]; \
+								$sysVer[virtual=true,unique=true];\
+								$language[virtual=true,unique=true];\
+								$identifier;\
+								$idcl;\
+								$class_coded_name;\
+								$key_word_value[unique=true];\
+								$explanation;\
+								$iso_language_code;\
+								$iso_country_code;\
+								$level
+
+#% impex.includeExternalDataMedia( "eClass5_1_sw.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion keywords");
+
+
+# ---------------------------------------------------------
+# --- eClass 5.1
+# --- create attributes 
+# --- from eClass5_1_mm.csv
+# ---------------------------------------------------------
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$idatt=externalID
+$identifier=code
+$version_number=
+$publication_date=
+$revision_number=
+$preferred_name=name[lang='$systemLanguage']
+$short_name=
+$definition=
+$note=
+$remark=
+$alias_name_1=
+$alias_name_2=
+$formular_symbol=
+$format=
+$unit_of_measure=
+$unit_of_m_code=
+$iso_language_code=
+$iso_country_code=
+$category=
+$attribute_type=
+$valency=
+$reference=
+$def_class=
+
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion attributes ...");
+
+INSERT_UPDATE ClassificationAttribute[cacheUnique=true];\
+								$sysVer[virtual=true,unique=true];\
+								$idatt[unique=true];\
+								$identifier;\
+								$version_number;\
+								$publication_date;\
+								$revision_number;\
+								$preferred_name;\
+								$short_name;\
+								$definition;\
+								$note;\
+								$remark;\
+								$alias_name_1;\
+								$alias_name_2;\
+								$formular_symbol;\
+								$format;\
+								$unit_of_measure;\
+								$unit_of_m_code;\
+								$iso_language_code;\
+								$iso_country_code;\
+								$category;\
+								$attribute_type;\
+								$valency;\
+								$reference;\
+								$def_class
+
+#% impex.includeExternalDataMedia( "eClass5_1_mm.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion attributes");
+
+
+# ---------------------------------------------------------
+# --- eClass 5.1
+# --- create values 
+# --- from eClass5_1_we.csv
+# ---------------------------------------------------------
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+$idvl=externalID
+$identifier=code
+$version_number=
+$revision_number=
+$publication_date=
+$preferred_name=name[lang='$systemLanguage']
+$short_name=
+$definition=
+$reference=
+$iso_language_code=
+$iso_country_code=
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion values ...");
+
+INSERT_UPDATE ClassificationAttributeValue[cacheUnique=true];\
+								$sysVer[virtual=true,unique=true];\
+								$idvl[unique=true];\
+								$identifier;\
+								$version_number;\
+								$revision_number;\
+								$publication_date;\
+								$preferred_name;\
+								$short_name;\
+								$definition;\
+								$reference;\
+								$iso_language_code;\
+								$iso_country_code
+
+#% impex.includeExternalDataMedia( "eClass5_1_we.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion values");
+
+
+# ---------------------------------------------------------
+# --- eClass 5.1 
+# --- assign classes to attributes 
+# --- from eClass5_1_ml.csv
+# ---------------------------------------------------------
+$idcl=classificationClass(ClassificationClass.externalID,catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$class_coded_name=
+$idatt=classificationAttribute(externalID,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+# ---------------------------------------------------------
+# simply create assignments - their data is filled later !!!
+#% impex.info("assigning $systemName $systemVersion attributes ...");
+
+INSERT_UPDATE ClassAttributeAssignment[cacheUnique=true]; \
+								$sysVer[virtual=true,unique=true];\
+								$idcl[unique=true];\
+								$class_coded_name;\
+								$idatt[unique=true]
+
+#% impex.includeExternalDataMedia( "eClass5_1_ml.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion class2atr");
+
+
+# ---------------------------------------------------------
+# --- eClass 5.1
+# --- set attribute type in class-attribute-assignments
+# --- from eClass5_1_mm.csv
+# ---------------------------------------------------------
+$idatt=classificationAttribute(externalID,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$identifier=
+$version_number=
+$publication_date=
+$revision_number=
+$preferred_name=
+$short_name=
+$definition=
+$note=
+$remark=
+$alias_name_1=
+$alias_name_2=
+$formular_symbol=
+$format=attributeType[translator='de.hybris.platform.catalog.jalo.classification.eclass.EClassAttributeTypeTranslator']
+$unit_of_measure=unit[translator='de.hybris.platform.catalog.jalo.classification.eclass.EClassUnitTranslator',systemName='$systemName',systemVersion='$systemVersion']
+$unit_of_m_code=
+$iso_language_code=
+$iso_country_code=
+$category=
+$attribute_type=
+$valency=
+$reference=
+$def_class=
+# ---------------------------------------------------------
+#% impex.info("setting $systemName $systemVersion attribute type and unit ...");
+
+UPDATE ClassAttributeAssignment[cacheUnique=true,batchmode=true];\
+								$sysVer[virtual=true,unique=true];\
+								$idatt[unique=true];\
+								$identifier;\
+								$version_number;\
+								$publication_date;\
+								$revision_number;\
+								$preferred_name;\
+								$short_name;\
+								$definition;\
+								$note;\
+								$remark;\
+								$alias_name_1;\
+								$alias_name_2;\
+								$formular_symbol;\
+								$format;\
+								$unit_of_measure;\
+								$unit_of_m_code;\
+								$iso_language_code;\
+								$iso_country_code;\
+								$category;\
+								$attribute_type;\
+								$valency;\
+								$reference;\
+								$def_class
+
+#% impex.includeExternalDataMedia( "eClass5_1_mm.csv", 1, -1 );
+
+#% impex.info("done $systemName $systemVersion attribute type and unit");
+
+
+# ---------------------------------------------------------
+# --- eClass 5.1
+# --- assign values to class-attribute-assignments
+# --- from eClass5_1_mm_we.csv
+# ---------------------------------------------------------
+$idmm=attribute(externalID,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$idwe=value(externalID,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+# ---------------------------------------------------------
+#% impex.info("assigning $systemName $systemVersion values ...");
+
+INSERT_UPDATE AttributeValueAssignment[cacheUnique=true];\
+								$sysVer[virtual=true,unique=true];\
+								$idmm[unique=true];\
+								$idwe[unique=true]
+
+#% impex.includeExternalDataMedia( "eClass5_1_mm_we.csv", 1, -1 );
+
+#% impex.info("completed $systemName - $systemVersion ");

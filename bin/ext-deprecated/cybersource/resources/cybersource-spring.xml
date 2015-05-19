@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<bean name="codeTranslator"
+		class="de.hybris.platform.cybersource.commands.CybersourceCodeTranslator" />
+
+	<!-- factory for Cybersource API objects -->
+	<bean name="dtoFactory"
+		class="de.hybris.platform.cybersource.adapter.impl.CybersourceFactoryImpl">
+		<constructor-arg>
+			<bean class="de.hybris.platform.cybersource.api.v1_49.ObjectFactory" />
+		</constructor-arg>
+	</bean>
+
+	<!--
+		factory for executor instances. An Executor is needed to perform every
+		single request to Cybersource PSP
+	-->
+	<bean name="executorFactory"
+		class="de.hybris.platform.cybersource.adapter.impl.ExecutorFactoryImpl">
+		<property name="codeTranslator">
+			<ref bean="codeTranslator" />
+		</property>
+		<property name="cybersourceFactory">
+			<ref bean="dtoFactory" />
+		</property>
+		<property name="cardRegistry">
+			<ref bean="cardRegistry" />
+		</property>
+	</bean>
+
+	<!--
+		Every Command is that performs requests to Cybersource only needs an
+		executor factory
+	-->
+	<bean name="abstractCommand" abstract="true">
+		<property name="executorFactory">
+			<ref bean="executorFactory" />
+		</property>
+	</bean>
+
+	<!--
+		Command Factory that lists all available command goes here. Commands
+		must be put into a map like this: Map<Class<CommandType>,
+		CommandInstance>
+	-->
+	<bean name="cybersourceCommandFactory"
+		class="de.hybris.platform.payment.commands.factory.impl.DefaultCommandFactoryImpl"
+		scope="tenant">
+		<property name="paymentProvider" value="Cybersource" />
+		<property name="commands">
+			<map>
+				<entry>
+					<key>
+						<value type="java.lang.Class">
+							de.hybris.platform.payment.commands.IsApplicableCommand</value>
+					</key>
+					<bean
+						class="de.hybris.platform.cybersource.commands.IsApplicableCommandImpl" />
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">
+							de.hybris.platform.payment.commands.AuthorizationCommand</value>
+					</key>
+					<bean
+						class="de.hybris.platform.cybersource.commands.AuthorizationCommandImpl"
+						parent="abstractCommand" />
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">
+							de.hybris.platform.payment.commands.SubscriptionAuthorizationCommand
+						</value>
+					</key>
+					<bean
+						class="de.hybris.platform.cybersource.commands.SubscriptionAuthorizationCommandImpl"
+						parent="abstractCommand" />
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">
+							de.hybris.platform.payment.commands.CaptureCommand</value>
+					</key>
+					<bean class="de.hybris.platform.cybersource.commands.CaptureCommandImpl"
+						parent="abstractCommand" />
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">
+							de.hybris.platform.payment.commands.PartialCaptureCommand</value>
+					</key>
+					<bean
+						class="de.hybris.platform.cybersource.commands.PartialCaptureCommandImpl"
+						parent="abstractCommand" />
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">
+							de.hybris.platform.payment.commands.EnrollmentCheckCommand
+						</value>
+					</key>
+					<bean
+						class="de.hybris.platform.cybersource.commands.EnrollmentCheckCommandImpl"
+						parent="abstractCommand" />
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">de.hybris.platform.payment.commands.VoidCommand
+						</value>
+					</key>
+					<bean class="de.hybris.platform.cybersource.commands.VoidCommandImpl"
+						parent="abstractCommand" />
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">
+							de.hybris.platform.payment.commands.FollowOnRefundCommand</value>
+					</key>
+					<bean
+						class="de.hybris.platform.cybersource.commands.FollowOnRefundCommandImpl"
+						parent="abstractCommand" />
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">
+							de.hybris.platform.payment.commands.StandaloneRefundCommand
+						</value>
+					</key>
+					<bean
+						class="de.hybris.platform.cybersource.commands.StandaloneRefundCommandImpl"
+						parent="abstractCommand" />
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">
+							de.hybris.platform.payment.commands.CreateSubscriptionCommand
+						</value>
+					</key>
+					<bean
+						class="de.hybris.platform.cybersource.commands.CreateSubscriptionCommandImpl"
+						parent="abstractCommand" />
+				</entry>
+                <entry>
+					<key>
+						<value type="java.lang.Class">
+							de.hybris.platform.payment.commands.UpdateSubscriptionCommand
+						</value>
+					</key>
+					<bean
+						class="de.hybris.platform.cybersource.commands.UpdateSubscriptionCommandImpl"
+						parent="abstractCommand" />
+				</entry>
+                <entry>
+					<key>
+                        <value type="java.lang.Class">de.hybris.platform.payment.commands.GetSubscriptionDataCommand</value>
+					</key>
+					<bean class="de.hybris.platform.cybersource.commands.GetSubscriptionDataCommandImpl"  parent="abstractCommand"/>
+				</entry>
+				<entry>
+					<key>
+						<value type="java.lang.Class">
+							de.hybris.platform.payment.commands.DeleteSubscriptionCommand
+						</value>
+					</key>
+					<bean
+						class="de.hybris.platform.cybersource.commands.DeleteSubscriptionCommandImpl"
+						parent="abstractCommand" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+
+	<!-- Card Registry -->
+	<bean name="cardRegistry" class="de.hybris.platform.cybersource.adapter.CardRegistry">
+		<constructor-arg>
+			<list>
+				<bean class="de.hybris.platform.cybersource.adapter.CybersourceCardType">
+					<constructor-arg index="0" value="cybersource_001_Visa" />
+					<constructor-arg index="1">
+						<value type="de.hybris.platform.core.enums.CreditCardType">VISA</value>
+					</constructor-arg>
+					<constructor-arg index="2" value="Visa" />
+					<constructor-arg index="3" value="001" />
+				</bean>
+				<bean class="de.hybris.platform.cybersource.adapter.CybersourceCardType">
+					<constructor-arg index="0" value="cybersource_002_MasterCard" />
+					<constructor-arg index="1">
+						<value type="de.hybris.platform.core.enums.CreditCardType">MASTER</value>
+					</constructor-arg>
+					<constructor-arg index="2" value="MasterCard" />
+					<constructor-arg index="3" value="002" />
+				</bean>
+				<bean class="de.hybris.platform.cybersource.adapter.CybersourceCardType">
+					<constructor-arg index="0" value="cybersource_003_Amex" />
+					<constructor-arg index="1">
+						<value type="de.hybris.platform.core.enums.CreditCardType">AMEX</value>
+					</constructor-arg>
+					<constructor-arg index="2" value="American Express" />
+					<constructor-arg index="3" value="003" />
+				</bean>
+				<bean class="de.hybris.platform.cybersource.adapter.CybersourceCardType">
+					<constructor-arg index="0" value="cybersource_005_Diners" />
+					<constructor-arg index="1">
+						<value type="de.hybris.platform.core.enums.CreditCardType">DINERS</value>
+					</constructor-arg>
+					<constructor-arg index="2" value="Diner's Club" />
+					<constructor-arg index="3" value="005" />
+				</bean>
+				<bean class="de.hybris.platform.cybersource.adapter.CybersourceCardType">
+					<constructor-arg index="0" value="cybersource_042_Maestro" />
+					<constructor-arg index="1">
+						<value type="de.hybris.platform.core.enums.CreditCardType">MAESTRO</value>
+					</constructor-arg>
+					<constructor-arg index="2" value="Maestro" />
+					<constructor-arg index="3" value="042" />
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+
+</beans>

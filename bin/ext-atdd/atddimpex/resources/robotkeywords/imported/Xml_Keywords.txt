@@ -1,0 +1,13 @@
+*** Settings ***
+Library          de.hybris.platform.atddengine.keywords.XmlKeywordLibrary
+
+*** Keywords ***
+verify XML "${actualXml}" equals expected XML "${expectedXml:[^"]+}"   
+    verify xml equal    ${expectedXml}    ${actualXml}
+
+    
+verify XML "${actualXml}" equals expected XML "${expectedXml}" ignore ids
+	${transformation}=    Set Variable    transformation/IgnoreIds.xsl
+	${expected}=    transform xml    ${expectedXml}    ${transformation}
+	${actual}=    transform xml    ${actualXml}    ${transformation} 
+    verify XML "${actual}" equals expected XML "${expected}"

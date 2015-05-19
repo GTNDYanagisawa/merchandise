@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+	$Id: psc_notes.xsd 31 2009-03-24 15:12:21Z thorsten $
+
+	PRiiNT server component
+	xml schema for the note interface (getNotes)
+
+	see example xml for documentation
+
+	file:		psc_notes.xsd $Rev: 31 $
+	date:		2008-07-02 (Rev 23)
+	author:		Thorsten Rock
+	known bugs:	
+	history:	2009-03-09 tr	changed to new spec (Rev 31)
+
+	(c) 2008-2009 WERK II Medien- und Informationsgesellschaft mbH, Duisburg
+
+-->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:w2base="http://comet.werk-ii.com/base" xmlns:psc="http://comet.werk-ii.com/psc_notes" targetNamespace="http://comet.werk-ii.com/psc_notes" elementFormDefault="unqualified" version="3.0">
+
+	<!-- types from base.xsd will be prefixed with w2base: -->
+	<import namespace="http://comet.werk-ii.com/base" schemaLocation="base.xsd"/>
+
+
+
+	<!-- SIMPLE TYPES -->
+	<simpleType name="noteRef">
+		<restriction base="string">
+			<whiteSpace value="collapse"/>
+			<enumeration value="document"/>
+			<enumeration value="spread"/>
+			<enumeration value="page"/>
+			<enumeration value="group"/>
+			<enumeration value="placeholder"/>
+			<enumeration value="frame"/>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="noteType">
+		<restriction base="string">
+			<whiteSpace value="collapse"/>
+			<enumeration value="hint"/>
+			<enumeration value="todo"/>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="refType">
+		<restriction base="string">
+			<whiteSpace value="collapse"/>
+			<enumeration value="page"/>
+			<enumeration value="pageindex"/>
+			<enumeration value="group"/>
+			<enumeration value="text"/>
+			<enumeration value="placeholder"/>
+			<enumeration value="frame"/>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="standardAction">
+		<restriction base="token">
+			<enumeration value="update placeholder"/>
+			<enumeration value="save placeholder"/>
+			<enumeration value="delete group"/>
+			<enumeration value="new group"/>
+			<enumeration value="delete info"/>
+			<enumeration value="new info"/>
+			<enumeration value="create snippet"/>
+		</restriction>
+	</simpleType>
+
+	<simpleType name="standardActionN">
+		<union memberTypes="psc:standardAction w2base:nullValue"/>
+	</simpleType>	
+
+
+
+	<!-- COMPLEX TYPES -->
+	<complexType name="noteParentUIDs">
+		<attribute name="frame" type="w2base:uidTypeN" use="required"/>
+		<attribute name="group" type="w2base:uidTypeN" use="required"/>
+		<attribute name="page" type="w2base:uidTypeN" use="required"/>
+		<attribute name="spread" type="w2base:uidTypeN" use="required"/>
+		<attribute name="document" type="w2base:uidTypeN" use="required"/>
+		<attribute name="layer" type="w2base:uidTypeN" use="required"/>
+		<attribute name="layer_name" type="w2base:textN" use="required"/>
+	</complexType>
+
+	<complexType name="noteParentIDs">
+		<attribute name="frame" type="w2base:idTypeN" use="required"/>
+		<attribute name="group" type="w2base:idTypeN" use="required"/>
+		<attribute name="page" type="w2base:idTypeN" use="required"/>
+		<attribute name="spread" type="w2base:idTypeN" use="required"/>
+		<attribute name="document" type="w2base:idTypeN" use="required"/>
+	</complexType>
+
+	<complexType name="created">
+		<attribute name="user" type="w2base:varchar255" use="required"/>
+		<attribute name="role" type="w2base:varchar255" use="required"/>
+		<attribute name="on" type="w2base:internalDateTime" use="required"/>
+	</complexType>
+	
+	<complexType name="changed">
+		<attribute name="state" type="w2base:varchar255" use="required"/>
+		<attribute name="user" type="w2base:varchar255" use="required"/>
+		<attribute name="role" type="w2base:varchar255" use="required"/>
+		<attribute name="on" type="w2base:internalDateTime" use="required"/>
+	</complexType>
+
+	<complexType name="stateChange">
+		<attribute name="old" type="w2base:varchar255" use="required"/>
+		<attribute name="new" type="w2base:varchar255" use="required"/>
+		<attribute name="user" type="w2base:varchar255" use="required"/>
+		<attribute name="role" type="w2base:varchar255" use="required"/>
+		<attribute name="on" type="w2base:internalDateTime" use="required"/>
+	</complexType>
+
+	<complexType name="responsible">
+		<attribute name="user" type="w2base:varchar255" use="required"/>
+		<attribute name="role" type="w2base:varchar255" use="required"/>
+		<attribute name="on" type="w2base:internalDateTime" use="required"/>
+	</complexType>
+
+	<complexType name="comment">
+		<sequence>
+			<element name="plain" type="w2base:textN"/>
+			<element name="tagged" type="w2base:textN"/>
+			<element name="image" type="psc:image"/>
+		</sequence>
+		<attribute name="num" type="w2base:sequenceNo" use="required"/>
+		<attribute name="user" type="w2base:varchar255" use="required"/>
+		<attribute name="role" type="w2base:varchar255" use="required"/>
+		<attribute name="on" type="w2base:internalDateTime" use="required"/>
+	</complexType>
+
+	<complexType name="image">
+		<sequence>
+			<element name="path" type="w2base:pathN"/>
+			<element name="content" type="w2base:textN"/>
+			<element name="x" type="w2base:float"/>
+			<element name="y" type="w2base:float"/>
+			<element name="scale_x" type="w2base:float"/>
+			<element name="scale_y" type="w2base:float"/>
+			<element name="angle" type="w2base:float"/>
+			<element name="angle_ref_x" type="w2base:float"/>
+			<element name="angle_ref_y" type="w2base:float"/>
+			<element name="skew" type="w2base:float"/>
+			<element name="skew_ref_x" type="w2base:float"/>
+			<element name="skew_ref_y" type="w2base:float"/>
+		</sequence>
+	</complexType>
+
+	<complexType name="newValue">
+		<choice>
+			<sequence>
+				<element name="plain" type="w2base:textN"/>
+				<element name="tagged" type="w2base:textN"/>
+			</sequence>
+			<element name="path" type="w2base:pathN"/>
+		</choice>
+	</complexType>
+
+	<complexType name="reference">
+		<sequence>
+			<element name="bbox" type="w2base:bbox"/>
+			<element name="area" type="w2base:area"/>
+		</sequence>
+		<attribute name="type" type="psc:refType" use="required"/>
+		<attribute name="uid" type="w2base:uidTypeN" use="required"/>
+		<attribute name="id" type="w2base:idTypeN" use="required"/>
+		<attribute name="x" type="w2base:floatN" use="required"/>
+		<attribute name="y" type="w2base:floatN" use="required"/>
+		<attribute name="start" type="w2base:unsignedIntN" use="required"/>
+		<attribute name="end" type="w2base:signedIntN" use="required"/>
+	</complexType>
+
+	<complexType name="target">
+		<sequence>
+			<element name="bbox" type="w2base:bbox"/>
+			<element name="area" type="w2base:area"/>
+		</sequence>
+		<attribute name="x" type="w2base:floatN" use="required"/>
+		<attribute name="y" type="w2base:floatN" use="required"/>
+	</complexType>
+
+	<complexType name="placeholder">
+		<sequence>
+			<element name="record" type="w2base:record"/>
+			<element name="newValue" type="psc:newValue"/>
+		</sequence>
+		<attribute name="pid" type="w2base:idType" use="required"/>
+		<attribute name="stdAction" type="psc:standardAction" use="required"/>
+		<attribute name="actionID" type="w2base:unsignedInt"/>
+	</complexType>
+
+	<complexType name="note">
+	<!-- description of a role -->
+		<sequence>
+			<element name="title" type="w2base:varchar255"/>
+			<element name="parentUIDs" type="psc:noteParentUIDs"/>
+			<element name="parentIDs" type="psc:noteParentIDs"/>
+			<element name="created" type="psc:created"/>
+			<element name="changed" type="psc:changed"/>
+			<element name="log">
+				<complexType>
+					<sequence>
+						<element name="stateChange" type="psc:stateChange" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="responsible" type="psc:responsible"/>
+			<element name="comments">
+				<complexType>
+					<sequence>
+						<element name="comment" type="psc:comment" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="reference" type="psc:reference"/>
+			<element name="target" type="psc:target"/>
+			<element name="placeholders" minOccurs="0">
+				<complexType>
+					<sequence>
+						<element name="placeholder" type="psc:placeholder" maxOccurs="unbounded"/>
+					</sequence>
+				</complexType>
+			</element>
+		</sequence>
+		<attribute name="id" type="w2base:varchar100" use="required"/>
+		<attribute name="type" type="psc:noteType" use="required"/>
+		<attribute name="customerID" type="w2base:unsignedInt"/>
+		<attribute name="customerID2" type="w2base:unsignedInt"/>
+		<attribute name="customerID3" type="w2base:unsignedInt"/>
+		<attribute name="customerStringID" type="w2base:varchar255" use="required"/>
+		<attribute name="customerData1" type="w2base:varchar255" use="required"/>
+		<attribute name="customerData2" type="w2base:varchar255" use="required"/>
+	</complexType>
+
+	<!-- SEQUENCE -->
+	
+	<element name="notes">
+		<complexType>
+		<!-- list of all roles -->
+			<sequence>
+				<element name="note" type="psc:note" maxOccurs="unbounded"/>
+			</sequence>
+			<!-- version of the comet system -->
+			<attribute name="version" type="w2base:serverVersion" use="required"/>
+			<attribute name="reference" type="psc:noteRef" use="required"/>
+			<attribute name="referenceID" type="w2base:idTypeN" use="required"/>
+			<attribute name="referenceUID" type="w2base:uidTypeN" use="required"/>
+		</complexType>
+	</element>
+
+</schema>

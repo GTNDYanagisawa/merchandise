@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+
+	<bean class="de.hybris.platform.solrfacetsearch.config.EndpointURL">
+		<property name="url" type="String"/>
+		<property name="master" type="boolean"/>
+	</bean>
+	
+	 
+	
+	<bean class="de.hybris.platform.solrfacetsearch.config.ClusterConfig">
+		<property name="aliveCheckInterval" type="Integer"/>
+		<property name="connectionTimeout" type="Integer"/>
+		<property name="readTimeout" type="Integer"/>
+		<property name="socketTimeout" type="Integer"/>
+		<property name="maxConnections" type="Integer"/>
+		<property name="maxConnectionsPerHost" type="Integer"/>
+		<property name="tcpNoDelay" type="boolean"/>
+		<property name="embeddedMaster" type="boolean"/>
+		<property name="endpointURLs" type="java.util.List&lt;de.hybris.platform.solrfacetsearch.config.EndpointURL>"></property>	
+		<property name="useMasterNodeExclusivelyForIndexing" type="boolean"/>		
+	</bean>
+	
+	<enum class="de.hybris.platform.solrfacetsearch.config.SolrServerMode">
+		<value>STANDALONE</value>
+        <value>EMBEDDED</value>
+        <value>CLOUD</value>
+		<value>XML_EXPORT</value>
+	</enum>
+	
+	
+	<bean class="de.hybris.platform.solrfacetsearch.config.SolrConfig">
+		<property name="mode" type="de.hybris.platform.solrfacetsearch.config.SolrServerMode"/>
+		<property name="clusterConfig" type="de.hybris.platform.solrfacetsearch.config.ClusterConfig"/>
+	</bean>
+	
+	
+	<bean class="de.hybris.platform.solrfacetsearch.config.SearchConfig">
+		<property name="defaultSortOrder" type="java.util.Collection&lt;String>"/>
+		<property name="pageSize" type="int"/>
+		<property name="groupingProperty" type="de.hybris.platform.solrfacetsearch.config.IndexedProperty"/>
+	</bean>
+	
+	
+	<bean class="de.hybris.platform.solrfacetsearch.config.ValueRange">
+		<property name="name" type="String"/>
+		<property name="from" type="java.lang.Comparable"/>
+		<property name="to" type="java.lang.Comparable"/>
+	</bean>	
+	
+	<bean class="de.hybris.platform.solrfacetsearch.config.ValueRangeSet">
+		<property name="qualifier" type="String"/>
+		<property name="valueRanges" type="java.util.List&lt;de.hybris.platform.solrfacetsearch.config.ValueRange>"/>
+		<property name="type" type="de.hybris.platform.solrfacetsearch.config.ValueRangeType"/>
+	</bean>
+	
+	<enum class="de.hybris.platform.solrfacetsearch.config.ValueRangeType">
+		 <value>text</value>
+		 <value>string</value>
+		 <value>double</value>
+		 <value>float</value>
+		 <value>int</value>
+		 <value>date</value>
+	</enum>
+	
+	<enum class="de.hybris.platform.solrfacetsearch.config.FacetType">
+	 <value>Refine</value>
+	 <value>MultiSelectAnd</value>
+	 <value>MultiSelectOr</value>
+	</enum>
+	
+	<bean class="de.hybris.platform.solrfacetsearch.config.IndexedProperty">
+		<property name="name" type="String"/>
+		<property name="sortableType" type="String"/>
+		<property name="type" type="String"/>
+		<property name="exportId" type="String"/>
+		<property name="valueProviderParameter" type="String"/>
+		<property name="facet" type="boolean"/>
+		<property name="localized" type="boolean"/>
+		<property name="currency" type="boolean"/>
+		<property name="multiValue" type="boolean"/>
+		<property name="spellCheck" type="boolean"/>
+		<property name="autoSuggest" type="boolean"/>
+		<property name="facetType" type="de.hybris.platform.solrfacetsearch.config.FacetType"/>
+		<property name="priority" type="int"/>
+		<property name="facetDisplayNameProvider" type="String"/>
+		<property name="fieldValueProvider" type="String"/>
+		<property name="facetSortProvider" type="String"/>
+		<property name="valueRangeSets" type="java.util.Map&lt;String,de.hybris.platform.solrfacetsearch.config.ValueRangeSet>"></property>
+	</bean>
+	<!-- 
+	-->
+	<enum class="de.hybris.platform.solrfacetsearch.config.IndexOperation">
+		<value>FULL</value>
+		<value>UPDATE</value>
+		<value>DELETE</value>
+		<value>HOT_UPDATE</value>
+	</enum>
+	
+	
+	<bean class="de.hybris.platform.solrfacetsearch.config.IndexedTypeFlexibleSearchQuery">
+	 	<property name="query" type="String"/>
+	 	<property name="userId" type="String"/>
+	 	<property name="parameters" type="java.util.Map&lt;String,java.lang.Object>"/>
+	 	<property name="injectLastIndexTime" type="boolean"/>
+		<property name="injectCurrentTime" type="boolean"/>
+		<property name="injectCurrentDate" type="boolean"/>
+		<property name="type" type="de.hybris.platform.solrfacetsearch.config.IndexOperation"/>
+		<property name="parameterProviderId" type="String"/>
+	</bean>
+	
+	
+	
+	<bean class="de.hybris.platform.solrfacetsearch.config.IndexedType">
+		<property name="indexedProperties" type="java.util.Map&lt;String,de.hybris.platform.solrfacetsearch.config.IndexedProperty>"/>
+		
+		
+		<property name="flexibleSearchQueries" type="java.util.Map&lt;de.hybris.platform.solrfacetsearch.config.IndexOperation,de.hybris.platform.solrfacetsearch.config.IndexedTypeFlexibleSearchQuery>"/>
+		<property name="composedType" type="de.hybris.platform.core.model.type.ComposedTypeModel"/>
+		<property name="variant" type="boolean"/>
+		<property name="staged" type="boolean"/>
+		<property name="identityProvider" type="String"/>
+		<property name="modelLoader" type="String"/>
+		<property name="indexName" type="String"/>
+		<property name="indexNameFromConfig" type="String"/>
+		<property name="typeFacets" type="java.util.Set&lt;String>"/>
+		<property name="fieldsValuesProvider" type="String"/>
+		<property name="solrResultConverter" type="String"/>
+		<property name="code" type="String"/>
+		<property name="uniqueIndexedTypeCode" type="String"/>
+	</bean>
+		
+	<bean class="de.hybris.platform.solrfacetsearch.config.IndexConfig">
+		<property name="indexedTypes" type="java.util.Map&lt;String,de.hybris.platform.solrfacetsearch.config.IndexedType>"/>
+		<property name="catalogVersions" type="java.util.Collection&lt;de.hybris.platform.catalog.model.CatalogVersionModel>"/>
+		<property name="languages" type="java.util.Collection&lt;de.hybris.platform.core.model.c2l.LanguageModel>"/>
+		<property name="currencies" type="java.util.Collection&lt;de.hybris.platform.core.model.c2l.CurrencyModel>"/>
+		<property name="exportPath" type="String"/>
+		<property name="batchSize" type="int"/>
+		<property name="numberOfThreads" type="int"/>
+		<property name="indexMode" type="de.hybris.platform.solrfacetsearch.enums.IndexMode"/>
+		<property name="enabledLanguageFallbackMechanism" type="boolean"/>
+	</bean>
+	
+	
+	<bean class="de.hybris.platform.solrfacetsearch.config.FacetSearchConfig">
+		<property name="name" type="String"/>
+		<property name="description" type="String"/>
+		<property name="indexConfig" type="de.hybris.platform.solrfacetsearch.config.IndexConfig"/>
+		<property name="searchConfig" type="de.hybris.platform.solrfacetsearch.config.SearchConfig"/>
+		<property name="solrConfig"  type="de.hybris.platform.solrfacetsearch.config.SolrConfig"/>
+	</bean>
+	
+</beans>

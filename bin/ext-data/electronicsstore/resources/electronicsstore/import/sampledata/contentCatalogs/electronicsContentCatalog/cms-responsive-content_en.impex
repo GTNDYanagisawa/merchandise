@@ -1,0 +1,152 @@
+$contentCatalog=electronicsContentCatalog
+$contentCatalogName=Electronics Content Catalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$productCatalog=electronicsProductCatalog
+$productCatalogName=Electronics Product Catalog
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$picture=media(code, $contentCV);
+$siteResource=jar:de.hybris.platform.electronicsstore.constants.ElectronicsstoreConstants&/electronicsstore/import/sampledata/contentCatalogs/$contentCatalog
+$medias=medias(code, $contentCV);
+$lang=en
+$mediaContainer=media(qualifier, $contentCV)[lang=$lang];
+
+
+UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];title[lang=$lang]
+;;NewElectronicsHomepageProductCarouselComponent;What's New;
+
+###  Home page splash   #######
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images];
+;mobile;Elec_480x320_HomeSpeed_EN_01_480W.jpg;$siteResource/images/banners/homepage/responsive/Elec_480x320_HomeSpeed_EN_01_480W.jpg;Elec_480x320_HomeSpeed_EN_01_480W.jpg;"Fast Precise";
+;tablet;Elec_770x350_HomeSpeed_EN_01_770W.jpg;$siteResource/images/banners/homepage/responsive/Elec_770x350_HomeSpeed_EN_01_770W.jpg;Elec_770x350_HomeSpeed_EN_01_770W.jpg;"Fast Precise";
+;desktop;Elec_960x330_HomeSpeed_EN_01_960W.jpg;$siteResource/images/banners/homepage/responsive/Elec_960x330_HomeSpeed_EN_01_960W.jpg;Elec_960x330_HomeSpeed_EN_01_960W.jpg;"Fast Precise";
+;widescreen;Elec_1400x440_HomeSpeed_EN_01_1400W.jpg;$siteResource/images/banners/homepage/responsive/Elec_1400x440_HomeSpeed_EN_01_1400W.jpg;Elec_1400x440_HomeSpeed_EN_01_1400W.jpg;"Fast Precise";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-homepage-spalsh-en;Elec_480x320_HomeSpeed_EN_01_480W.jpg,Elec_770x350_HomeSpeed_EN_01_770W.jpg,Elec_960x330_HomeSpeed_EN_01_960W.jpg,Elec_1400x440_HomeSpeed_EN_01_1400W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ElectronicsHompageSplashBannerComponent;electronics-homepage-spalsh-en
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;mobile;Elec_480x118_HomeDiscount_EN_01_480W.jpg;$siteResource/images/banners/homepage/responsive/Elec_480x118_HomeDiscount_EN_01_480W.jpg;Elec_480x118_HomeDiscount_EN_01_480W.jpg;"25 % Off ALL DIGITAL CAMERAS";
+;tablet;Elec_770x80_HomeDiscount_EN_01_770W.jpg;$siteResource/images/banners/homepage/responsive/Elec_770x80_HomeDiscount_EN_01_770W.jpg;Elec_770x80_HomeDiscount_EN_01_770W.jpg;"25 % Off ALL DIGITAL CAMERAS";
+;desktop;Elec_960x80_HomeDiscount_EN_01_960W.jpg;$siteResource/images/banners/homepage/responsive/Elec_960x80_HomeDiscount_EN_01_960W.jpg;Elec_960x80_HomeDiscount_EN_01_960W.jpg;"25 % Off ALL DIGITAL CAMERAS";
+;widescreen;Elec_1400x80_HomeDiscount_EN_01_1400W.jpg;$siteResource/images/banners/homepage/responsive/Elec_1400x80_HomeDiscount_EN_01_1400W.jpg;Elec_1400x80_HomeDiscount_EN_01_1400W.jpg;"25 % Off ALL DIGITAL CAMERAS";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-homepage-discount-en;Elec_480x118_HomeDiscount_EN_01_480W.jpg,Elec_770x80_HomeDiscount_EN_01_770W.jpg,Elec_960x80_HomeDiscount_EN_01_960W.jpg,Elec_1400x80_HomeDiscount_EN_01_1400W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ElectronicsHompageDiscountBannerComponent;electronics-homepage-discount-en;
+
+###  Home page slot 2A  ####
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Elec_200x150_HomeFam_EN_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Elec_200x150_HomeFam_EN_01_200W.jpg;Elec_200x150_HomeFam_EN_01_200W.jpg;"Sharp and brilliant images";
+;desktop;Elec_240x180_HomeFam_EN_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Elec_240x180_HomeFam_EN_01_240W.jpg;Elec_240x180_HomeFam_EN_01_240W.jpg;"Sharp and brilliant images";
+;widescreen;Elec_350x262_HomeFam_EN_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Elec_350x262_HomeFam_EN_01_350W.jpg;Elec_350x262_HomeFam_EN_01_350W.jpg;"Sharp and brilliant images";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-homepage-light-fam-en;Elec_200x150_HomeFam_EN_01_200W.jpg,Elec_240x180_HomeFam_EN_01_240W.jpg,Elec_350x262_HomeFam_EN_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ElectronicsHompageLightFamBannerComponent;electronics-homepage-light-fam-en
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Elec_200x150_HomeFamLight_EN_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Elec_200x150_HomeFamLight_EN_01_200W.jpg;Elec_200x150_HomeFamLight_EN_01_200W.jpg;"Sharp and brilliant images";
+;desktop;Elec_240x180_HomeFamLight_EN_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Elec_240x180_HomeFamLight_EN_01_240W.jpg;Elec_240x180_HomeFamLight_EN_01_240W.jpg;"Sharp and brilliant images";
+;widescreen;Elec_350x262_HomeFamLight_EN_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Elec_350x262_HomeFamLight_EN_01_350W.jpg;Elec_350x262_HomeFamLight_EN_01_350W.jpg;"Sharp and brilliant images";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-homepage-light-text-en;Elec_200x150_HomeFamLight_EN_01_200W.jpg,Elec_240x180_HomeFamLight_EN_01_240W.jpg,Elec_350x262_HomeFamLight_EN_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ElectronicsHompageLightFamTextBannerComponent;electronics-homepage-light-text-en
+
+#### Home section 2B #######
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Elec_200x150_HomeKid_EN_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Elec_200x150_HomeKid_EN_01_200W.jpg;Elec_200x150_HomeKid_EN_01_200W.jpg;"Photo fun for the little ones";
+;desktop;Elec_240x180_HomeKid_EN_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Elec_240x180_HomeKid_EN_01_240W.jpg;Elec_240x180_HomeKid_EN_01_240W.jpg;"Photo fun for the little ones";
+;widescreen;Elec_350x262_HomeKid_EN_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Elec_350x262_HomeKid_EN_01_350W.jpg;Elec_350x262_HomeKid_EN_01_350W.jpg;"Photo fun for the little ones";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-homepage-camcorders-en;Elec_200x150_HomeKid_EN_01_200W.jpg,Elec_240x180_HomeKid_EN_01_240W.jpg,Elec_350x262_HomeKid_EN_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ElectronicsHompageCamcordersBannerComponent;electronics-homepage-camcorders-en
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Elec_200x150_HomeCaptureFirst_EN_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Elec_200x150_HomeCaptureFirst_EN_01_200W.jpg;Elec_200x150_HomeCaptureFirst_EN_01_200W.jpg;"Photo fun for the little ones";
+;desktop;Elec_240x180_HomeCaptureFirst_EN_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Elec_240x180_HomeCaptureFirst_EN_01_240W.jpg;Elec_240x180_HomeCaptureFirst_EN_01_240W.jpg;"Photo fun for the little ones";
+;widescreen;Elec_350x262_HomeCaptureFirst_EN_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Elec_350x262_HomeCaptureFirst_EN_01_350W.jpg;Elec_350x262_HomeCaptureFirst_EN_01_350W.jpg;"Photo fun for the little ones";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-homepage-camcorders-02-en;Elec_200x150_HomeCaptureFirst_EN_01_200W.jpg,Elec_240x180_HomeCaptureFirst_EN_01_240W.jpg,Elec_350x262_HomeCaptureFirst_EN_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ElectronicsHompageCamcordersChildBannerComponent;electronics-homepage-camcorders-02-en
+### Section 4
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Elec_200x200_HomeSmallDiscount_EN_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Elec_200x200_HomeSmallDiscount_EN_01_200W.jpg;Elec_200x200_HomeSmallDiscount_EN_01_200W.jpg;"Low prices, great discounts !";
+;desktop;Elec_240x240_HomeSmallDiscount_EN_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Elec_240x240_HomeSmallDiscount_EN_01_240W.jpg;Elec_240x240_HomeSmallDiscount_EN_01_240W.jpg;"Low prices, great discounts !";
+;widescreen;Elec_350x350_HomeSmallDiscount_EN_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Elec_350x350_HomeSmallDiscount_EN_01_350W.jpg;Elec_350x350_HomeSmallDiscount_EN_01_350W.jpg;"Low prices, great discounts !";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-homepage-sm-discount-en;Elec_200x200_HomeSmallDiscount_EN_01_200W.jpg,Elec_240x240_HomeSmallDiscount_EN_01_240W.jpg,Elec_350x350_HomeSmallDiscount_EN_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ElectronicsHompageSmDiscountBannerComponent;electronics-homepage-sm-discount-en
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Elec_200x200_HomeShop_EN_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Elec_200x200_HomeShop_EN_01_200W.jpg;Elec_200x200_HomeShop_EN_01_200W.jpg;"30 days right of return";
+;desktop;Elec_240x240_HomeShop_EN_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Elec_240x240_HomeShop_EN_01_240W.jpg;Elec_240x240_HomeShop_EN_01_240W.jpg;"30 days right of return";
+;widescreen;Elec_350x350_HomeShop_EN_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Elec_350x350_HomeShop_EN_01_350W.jpg;Elec_350x350_HomeShop_EN_01_350W.jpg;"30 days right of return";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-homepage-shop-en;Elec_200x200_HomeShop_EN_01_200W.jpg,Elec_240x240_HomeShop_EN_01_240W.jpg,Elec_350x350_HomeShop_EN_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ElectronicsHompageShopBannerComponent;electronics-homepage-shop-en
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Elec_200x200_HomeShipment_EN_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Elec_200x200_HomeShipment_EN_01_200W.jpg;Elec_200x200_HomeShipment_EN_01_200W.jpg;"Order up to 4 o clock, Delivery within 24h";
+;desktop;Elec_240x240_HomeShipment_EN_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Elec_240x240_HomeShipment_EN_01_240W.jpg;Elec_240x240_HomeShipment_EN_01_240W.jpg;"Order up to 4 o clock, Delivery within 24h";
+;widescreen;Elec_350x350_HomeShipment_EN_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Elec_350x350_HomeShipment_EN_01_350W.jpg;Elec_350x350_HomeShipment_EN_01_350W.jpg;"Order up to 4 o clock, Delivery within 24h";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-homepage-shipment-en;Elec_200x200_HomeShipment_EN_01_200W.jpg,Elec_240x240_HomeShipment_EN_01_240W.jpg,Elec_350x350_HomeShipment_EN_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ElectronicsHompageShipmentBannerComponent;electronics-homepage-shipment-en
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;tablet;Elec_200x200_HomeService_EN_01_200W.jpg;$siteResource/images/banners/homepage/responsive/Elec_200x200_HomeService_EN_01_200W.jpg;Elec_200x200_HomeService_EN_01_200W.jpg;"Best customer service!";
+;desktop;Elec_240x240_HomeService_EN_01_240W.jpg;$siteResource/images/banners/homepage/responsive/Elec_240x240_HomeService_EN_01_240W.jpg;Elec_240x240_HomeService_EN_01_240W.jpg;"Best customer service!";
+;widescreen;Elec_350x350_HomeService_EN_01_350W.jpg;$siteResource/images/banners/homepage/responsive/Elec_350x350_HomeService_EN_01_350W.jpg;Elec_350x350_HomeService_EN_01_350W.jpg;"Best customer service!";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-homepage-service-en;Elec_200x200_HomeService_EN_01_200W.jpg,Elec_240x240_HomeService_EN_01_240W.jpg,Elec_350x350_HomeService_EN_01_350W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ElectronicsHompageServiceBannerComponent;electronics-homepage-service-en
+
+
+### Section 5
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images]
+;mobile;Elec_475x119_HomeFreeDel_EN_01_475W.jpg;$siteResource/images/banners/homepage/responsive/Elec_475x119_HomeFreeDel_EN_01_475W.jpg;Elec_475x119_HomeFreeDel_EN_01_475W.jpg;"Free shipping and returns!";
+;tablet;Elec_770x50_HomeFreeDel_EN_01_770W.jpg;$siteResource/images/banners/homepage/responsive/Elec_770x50_HomeFreeDel_EN_01_770W.jpg;Elec_770x50_HomeFreeDel_EN_01_770W.jpg;"Free shipping and returns!";
+;desktop;Elec_960x50_HomFreeDel_EN_01_960W.jpg;$siteResource/images/banners/homepage/responsive/Elec_960x50_HomFreeDel_EN_01_960W.jpg;Elec_960x50_HomFreeDel_EN_01_960W.jpg;"Free shipping and returns!";
+;widescreen;Elec_1400x50_HomeFreeDel_EN_01_1400W.jpg;$siteResource/images/banners/homepage/responsive/Elec_1400x50_HomeFreeDel_EN_01_1400W.jpg;Elec_1400x50_HomeFreeDel_EN_01_1400W.jpg;"Free shipping and returns!";	
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-homepage-free-del-en;Elec_475x119_HomeFreeDel_EN_01_475W.jpg,Elec_770x50_HomeFreeDel_EN_01_770W.jpg,Elec_960x50_HomFreeDel_EN_01_960W.jpg,Elec_1400x50_HomeFreeDel_EN_01_1400W.jpg	
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ElectronicsHompageFreeDelBannerComponent;electronics-homepage-free-del-en
+
+# CMS Paragraph Component (Contact information)
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];content[lang=$lang];
+;;faqTextParagraph;"<div class=""global-alerts""><div class=""alert alert-info"" role=""alert""><strong>Information:</strong> Page Under Construction - Not Completely Functional</div></div><a name=""00""></a><div class=""textpage textpage-faqs""><div class=""item_container"">		<h2><a name=""a00""></a>Returns and refunds</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">back to top</a>	</div>		<div class=""item_container"">		<h2><a name=""b00""></a>Delivery information</h2>		<a class=""faq-menulink"" href=""#b01"">Delivery Options</a>		<a class=""faq-menulink"" href=""#b02"">Delivery times &amp; charges</a>		<a class=""faq-menulink"" href=""#b03"">Order tracking information</a>		<a class=""faq-menulink"" href=""#b04"">Courier status information</a>			<h3><a name=""b01""></a>Delivery Options</h3>		<p>			The delivery options available to you are shown in the Checkout area under Delivery Method.<br><br>			Based on your deliver address, these options may not all be available:			</p><ul>			<li>					<b>Home Delivery</b> - Free UK standard delivery on all orders over L50 within 4 working days (*exceptions may apply)				</li>				<li>					<b>Standard delivery</b> -  1 to 2 business days				</li>				<li>					<b>Other delivery method</b>  &ndash; 3 to 5 business days				</li>				<li>				<b>International delivery</b> &ndash; 7 to 10 business days (not all countries are available)				</li>			</ul>		<p></p>		<h3><a name=""b02""></a>Delivery times &amp; charges</h3>		<p>			We deliver the majority of our orders within 4 working days* for L3.99 or FREE on orders over L50 (*exceptions apply, see table below).			</p><ul>				<li>					Deliveries to UK addresses are made Monday to Friday between 9am to 6pm, excluding Bank Holidays. 				</li>				<li>					Deliveries to the Scottish Highlands and Islands, offshore locations and Northern Ireland may take a little longer.<br>					For delivery to ROI addresses please visit our Irish website at hybris.com				</li>				<li>					Multiple items may be delivered in more than one parcel and at different times.				</li>			</ul>		<p></p>	<h3><a name=""b03""></a>Order tracking information</h3>		<p>			We will send you email updates through every stage of your order. In each email your current order's status will be shown. Each order status is explained in the table below. We deliver most parcels via our courier. You can track these parcels by clicking on the parcel reference link on your email. Once you have clicked on the link you will be directed to the courier website. For information on courier statuses please <a href=""#b04"">click here</a>.		</p>		<table width=""100%"" cellspacing=""0"" cellpadding=""0"" border=""0"">			<tbody>				<tr>					<th>Status</th>					<th>Description</th>				</tr>				<!--ROW 1-->				<tr>					<td class=""blue3"">						<strong>Processing</strong><br>					</td>					<td class=""grey3"">						Your order is being processed.<br>					</td>				</tr>				<!--ROW 2-->	<tr>					<td class=""blue3"">						<strong>Despatched</strong><br>					</td>					<td class=""grey3"">						Your order has been despatched to the courier.<br><br>    For heavy and large products your order is ready to be despatched by our carrier. The carrier will contact you to arrange a suitable date for delivery.<br><br>For Collect from store orders you will receive a further order status update when your item(s) are ready to collect (see below for more information on collect from store statuses)<br><br>					</td>				</tr>				<!--ROW 3-->				<tr>					<td class=""blue3"">						<strong>Cancelled<br>Unable to fulfill<br> payment reversal</strong><br>					</td>					<td class=""grey3"">						Your order has been cancelled due to stock availability, no payment has been taken.<br><br>					</td>				</tr>				<!--ROW 4-->				<tr>					<td class=""blue3"">						<strong>Cancelled<br>Unable to fulfil<br>Payment refunded</strong><br>				</td>					<td class=""grey3"">						Your order has been cancelled due to stock availability. We have processed a refund to your payment card.<br><br>					</td>				</tr>				<!--ROW 5-->				<tr>					<td class=""blue3"">						<strong>Return received</strong><br>					</td>					<td class=""grey3"">Your return has been received. However, due to goods being addressed to the incorrect warehouse there may be a short delay in your refund being processes while the goods are being re-directed.<br><br>					</td>				</tr>				<!--ROW 6-->				<tr>					<td class=""blue3"">						<strong>Order ready for collection</strong><br>					</td>					<td class=""grey3"">						Your order is ready for collection at your chosen store.<br><br><strong><i>Please note:</i></strong> You must collect your order within 14 days of receiving your notification email.<br><br>					</td>				</tr>				<!--ROW 7-->				<tr>					<td class=""blue3"">						<strong>Collected</strong><br>					</td>					<td class=""grey3"">					Your order has been collected.<br><br>					</td>				</tr>				<!--ROW 8-->				<tr>					<td class=""blue3"">						<strong>Return in progress</strong><br>					</td>					<td class=""grey3"">						We are processing your return.<br><br>					</td>				</tr>				<!--ROW 9-->				<tr>					<td class=""blue3"">						<strong>Return refund complete</strong><br>					</td>					<td class=""grey3"">						We have processed your return.<br><br><strong><i>Please note:</i></strong>  Some banks may take longer than others to process refunds.<br><br>					</td>				</tr>			</tbody>		</table>		<p></p>		<h3><a name=""b04""></a>Courier status information</h3>		<p></p>		<table width=""100%"" cellspacing=""0"" cellpadding=""0"" border=""0"">			<tbody>				<tr>					<th>Status</th>					<th>Description</th>				</tr>			<!--ROW 1-->				<tr>					<td class=""blue3"">						<strong>Order generated</strong><br>					</td>					<td class=""grey3"">						Your order is ready for delivery and has entered into the courier system.<br>					</td>				</tr>				<!--ROW 2-->				<tr>					<td class=""blue3"">						<strong>Receipt at depot </strong><br>					</td>					<td class=""grey3"">					Your parcel has been received at the depot. <br><br>					</td>				</tr>				<!--ROW 3-->				<tr>					<td class=""blue3"">						<strong>Processed at depot</strong><br>					</td>					<td class=""grey3"">						Your parcel has processed through the depot operation and is ready for onward despatch to the courier.<br><br>					</td>				</tr>				<!--ROW 4-->				<tr>					<td class=""blue3"">						<strong>Out for delivery to courier</strong><br>					</td>					<td class=""grey3"">						Your parcel has left the depot for delivery to courier.<br><br>					</td>				</tr>				<!--ROW 5-->				<tr>					<td class=""blue3"">						<strong>Courier to re-attempt</strong><br>					</td>					<td class=""grey3"">						The courier has attempted to deliver your parcel and will try again. You will receive a card to confirm delivery has been attempted.<br><br>					</td>				</tr>			<!--ROW 6-->				<tr>					<td class=""blue3"">						<strong>Delivered to</strong><br>					</td>					<td class=""grey3"">						Your parcel has been delivered.<br><br>					</td>				</tr>			</tbody>		</table>		<p></p>		<a class=""pagetop-link"" href=""#00"">back to top</a>	</div>		<div class=""item_container"">		<h2><a name=""c00""></a>Registration</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">back to top</a>	</div>	<div class=""item_container"">		<h2><a name=""d00""></a>Your online account</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">back to top</a>	</div>	<div class=""item_container"">		<h2><a name=""e00""></a>Orders</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">back to top</a>	</div>	<div class=""item_container"">		<h2><a name=""f00""></a>Promotions and discounts</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">back to top</a>	</div>	<div class=""item_container"">		<h2><a name=""g00""></a>Product and general informations</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">back to top</a>	</div>	<div class=""item_container"">		<h2><a name=""h00""></a>Store information</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">back to top</a>	</div>	<div class=""item_container"">		<h2><a name=""i00""></a>Business contacts</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">back to top</a>	</div>		<div class=""item_container"">		<h2><a name=""j00""></a>Buying guides</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">back to top</a>	</div>		<div class=""item_container"">		<h2><a name=""k00""></a>Size guides</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">back to top</a>	</div>		<div class=""item_container"">		<h2><a name=""l00""></a>Privacy and security</h2>		<p>Text</p>		<a class=""pagetop-link"" href=""#00"">back to top</a>	</div></div>";
+
+# Site Logo Component
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+;;SiteLogoComponent;/images/theme/logo-hybris-responsive.png

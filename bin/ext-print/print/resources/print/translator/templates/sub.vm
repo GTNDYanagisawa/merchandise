@@ -1,0 +1,22 @@
+${utility.initializeCharStyle($node)}
+#set($counter=0)
+#set($openTag=1)
+#if($class=='')<cPosition:Subscript>
+#else<cPosition:Subscript>
+#end
+#foreach($child in $node.getChildNodes())
+#set($counter=$counter+1)
+#if(($child.nodeName=="textNode" || $child.nodeName=="entity") && $openTag==0)
+#set($openTag=1)
+#if($class=='')<cPosition:Subscript>
+#else<cPosition:Subscript>
+#end
+#end
+#if($child.nodeName!="textNode" && $child.nodeName!="entity" && $openTag==1)
+#set($openTag=0)<cPosition:>
+#end$translator.renderTextFromNode($child)
+#end
+#if($counter==0)$node.nodeText
+#end
+#if($openTag==1)<cPosition:>
+#end

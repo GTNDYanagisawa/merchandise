@@ -1,0 +1,138 @@
+<!-- ********************************************************************************************************* -->
+<!-- ****           Software Feature List  START                                                          **** -->
+<!-- ********************************************************************************************************* -->
+#foreach($deployment in ${InstalledSoftwareFeatures.deployments})
+	<!--  +++ ${InstalledSoftwareFeatures.currIndex}. Software Feature  [${deployment.productVersion.technicalName}: ${deployment.instance.key}] (${deployment.productVersion.technicalRelease}) (${deployment.productVersion.ppmsId}) on [${deployment.server.caption}]-->
+#end
+<!--                         ....                                                                               -->
+
+<!-- ========================================================================================================== -->
+<!-- == Installed Software Features of the server                                                            == -->
+<!-- ========================================================================================================== -->
+#foreach( $server in $TomcatConfiguration.tomcat.servers )
+	<!-- ****************************************************************** -->
+   	<!--  Installed Software Features of server   ${server.objectIndex}. + ${server.caption} -->
+	<group name="InstalledSoftwareFeature${server.objectIndex}" group_type="GENERIC">
+	  <rootclass 
+	    name="SAP_ATCServer"
+	  	sync="FALSE" 
+	  	merge_roots="FALSE" 
+	  	merge_properties="FALSE" 
+	  	clean="NONE"
+	   >
+	    <instance>
+	      <!--  key properties   --> 
+	      <property name="CreationClassName">
+	        <value>SAP_ATCServer</value> 
+	      </property>
+	      <property name="Name">
+	       	<value>${server.technicalName}</value>
+	      </property>
+	    </instance>
+	  </rootclass>
+	  <memberclass
+	    name="SAP_InstalledSoftwareFeature"
+	    association_name="SAP_InstalledSWFeatureOnApplicationSystem"
+	    root_role="System" 
+	    member_role="Software" 
+	    sync="TRUE" 
+	    merge_properties="TRUE" 
+	    merge_members="FALSE"
+	    clean="ALL">
+	    #foreach($deployment in ${InstalledSoftwareFeatures.getDeployments($server)} )	
+	    <instance>
+	      <!-- key properties -->	     
+	      <property name="Name">
+	        <value>$deployment.productVersion.technicalName: $deployment.instance.key</value>
+	      </property>	      
+	      <property name="SoftwareElementState">
+	        <value>3</value>
+	      </property>
+	      <property name="TargetOperatingSystem">
+	       <value>0</value>
+	      </property>
+	      <property name="Version">
+	       <value>$deployment.productVersion.technicalRelease</value>
+	      </property>
+	      <!-- non-key properties -->
+	      <property name="Caption">
+	        <value>$deployment.productVersion.technicalName $deployment.softwareComponentVersion.technicalRelease ON ${deployment.server.caption}</value>
+	      </property>
+	      <property name="Description">
+    		<value>    		  				
+    			@${SLDInfo.sldTag};
+    		</value>
+    	  </property>
+	    </instance>
+	    #end
+	  </memberclass>
+	</group>	
+#end
+
+<!-- ========================================================================================================== -->
+<!-- == Installed Software Feature assignments (CoherentSoftwareUnit )                                       == -->
+<!-- ========================================================================================================== -->
+#foreach($deployment in $InstalledSoftwareFeatures.deployments)
+	<!--  +++ ${InstalledSoftwareFeatures.currIndex}. Software Feature  [$deployment.productVersion.technicalName: $deployment.instance.key] ($deployment.productVersion.technicalRelease) ($deployment.productVersion.ppmsId) on [$deployment.server.caption] -->
+	<group name="InstalledSoftwareFeature${InstalledSoftwareFeatures.currIndex}_To_SoftwareFeatureType" data_type="" data_version="" group_type="GENERIC">
+		 <rootclass name="SAP_InstalledSoftwareFeature" 
+		 	sync="FALSE" 
+		 	merge_properties="FALSE" 
+		 	clean="NONE" 
+		 	merge_roots="TRUE"
+		 >
+		 	 <instance>
+		 	 	<!-- key properties -->				
+				 <property name="Name">		
+					<value>$deployment.productVersion.technicalName: $deployment.instance.key</value>
+				</property>
+				 <property name="SoftwareElementState">
+					<value>3</value>
+				</property>
+				 <property name="TargetOperatingSystem">
+					<value>0</value>
+				</property>
+				 <property name="Version">
+					<value>$deployment.productVersion.technicalRelease</value>
+				</property>
+				<!-- non-key properties -->
+				 <property name="Caption">
+					<value>${deployment.productVersion.technicalName}: ${deployment.instance.key} ON $deployment.server.caption</value>
+				</property>
+				 <property name="IdentificationCode">
+					<value>$deployment.instance.key</value>
+				</property>
+			</instance>
+		</rootclass>		
+		<memberclass name="SAP_CoherentSoftwareUnit" sync="FALSE" 
+				association_name="SAP_SoftwareFeatureType"
+				root_role="Dependent" 
+				member_role="Antecedent" 
+				merge_properties="FALSE"				
+				clean="NONE" 				 				
+				merge_members="FALSE"   
+				optional="TRUE">
+			 <instance>
+			 	<!-- key properties -->
+				 <property name="IdentifyingNumber">
+					<value>$deployment.productVersion.ppmsId</value>
+				</property>
+				 <property name="Name">
+					<value>$deployment.instance.key</value>
+				</property>
+				 <property name="ProductName">
+					<value>$deployment.productVersion.technicalName</value>
+				</property>
+				 <property name="Vendor">
+					<value>sap.com</value>
+				</property>
+				 <property name="Version">
+					<value>$deployment.productVersion.technicalRelease</value>
+				</property>
+			</instance>
+		</memberclass>
+	</group>
+#end
+
+<!-- ****            Software Feature List  END                                                            **** -->
+<!--                         ....                                                                               -->

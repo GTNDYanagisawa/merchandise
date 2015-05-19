@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+       xmlns:p="http://www.springframework.org/schema/p">
+
+	<import resource="classpath:/META-INF/propertyregistry-rest-client-spring.xml" />
+	
+    <alias name="defaultObjectFormatterService" alias="objectFormatterService"/>
+    <bean id="defaultObjectFormatterService"
+          class="com.hybris.cockpitng.services.format.impl.DefaultObjectFormatterService">
+        <property name="strategies">
+            <list>
+                <bean class="com.hybris.cockpitng.services.format.strategy.impl.DefaultDateFormatterStrategy"
+                      p:cockpitLocaleService-ref="cockpitLocaleService"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- webapp wide ZK localization provider - can extend or override localization fields of the widgets -->
+    <bean id="propertyRegistryBackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator"
+          scope="singleton" init-method="init" lazy-init="false">
+        <property name="location" value="/META-INF/propertyregistrybackoffice/labels"/>
+        <property name="name" value="labels"/>
+    </bean>
+    
+    <bean id="omsPropertyRegistryRestClient" class="com.hybris.propertyregistry.rest.client.PropertyServiceRestClient" parent="abstractPropertyRegistryRestClient" >
+     	<property name="endpointProvider">
+        	<bean class="com.hybris.commons.client.SimpleEndpointProvider">
+				<property name="endpointURI" value="#{configurationService.configuration.getProperty('oms.propertyregistry.client.endpoint.uri')}"/>
+        		
+        	</bean>
+        </property>   
+    	<property name="module" value="oms"/>
+	</bean>
+	
+	<bean id="defaultPropertyRegistryRestClientFactory" class="com.hybris.cockpitng.propertyRegistry.restClient.factory.PropertyRegistryRestClientFactory">
+		<property name="propertyRegistryRestClientMap">
+			<map>
+				<entry key="OMS" value-ref="omsPropertyRegistryRestClient" />
+			</map>
+		</property>
+	
+	</bean>
+	
+</beans>

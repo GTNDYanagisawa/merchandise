@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	default-autowire="byName"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	<context:annotation-config />
+	
+	<alias alias="EditorFactory" name="defaultEditorFactory" />
+	<bean id="defaultEditorFactory" class="de.hybris.platform.cockpit.model.meta.DefaultEditorFactory" scope="singleton">
+		<property name="editorDescriptors">
+			<list>
+				<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="TEXT"/>
+					<property name="defaultMode" value="single"/>
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultTextUIEditor" />
+					<property name="defaultSearchMode" value="search"/>
+					<property name="editors">
+						<map>
+							<entry key="multi" value="de.hybris.platform.cockpit.model.editor.impl.GenericCollectionUIEditor"/>
+							<entry key="range" value="de.hybris.platform.cockpit.model.editor.impl.GenericRangeUIEditor"/>
+							<entry key="imageEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultImageUIEditor"/>
+							<entry key="wysiwyg" value="de.hybris.platform.cockpit.model.editor.WysiwygUIEditor"/>
+							<entry key="search" value="de.hybris.platform.cockpit.model.editor.search.impl.DefaultTextConditionUIEditor"/>
+							<entry key="mapEditor" value="de.hybris.platform.cockpit.model.editor.impl.MapUIEditor"/>
+							<entry key="productCodeEditor" value="de.hybris.platform.cockpit.model.editor.impl.ProductCodeReferenceUIEditor"/>
+						</map>
+					</property>
+					<property name="label" value="textEditor"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="INTEGER"/>
+					<property name="defaultMode" value="single"/>
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultIntegerUIEditor" />
+					<property name="defaultSearchMode" value="search"/>
+					<property name="editors">
+						<map>
+							<entry key="multi" value="de.hybris.platform.cockpit.model.editor.impl.GenericCollectionUIEditor"/>
+							<entry key="range" value="de.hybris.platform.cockpit.model.editor.impl.GenericRangeUIEditor"/>
+							<entry key="search" value="de.hybris.platform.cockpit.model.editor.search.impl.DefaultIntConditionUIEditor"/>
+						</map>
+					</property>
+					<property name="label" value="integerEditor"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="LONG"/>
+					<property name="defaultMode" value="single"/>
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultLongUIEditor" />
+					<property name="defaultSearchMode" value="search"/>
+					<property name="editors">
+						<map>
+							<entry key="multi" value="de.hybris.platform.cockpit.model.editor.impl.GenericCollectionUIEditor"/>
+							<entry key="range" value="de.hybris.platform.cockpit.model.editor.impl.GenericRangeUIEditor"/>
+							<entry key="search" value="de.hybris.platform.cockpit.model.editor.search.impl.DefaultLongConditionUIEditor"/>
+						</map>
+					</property>
+					<property name="label" value="longEditor"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="DATE"/>
+					<property name="defaultMode" value="single"/>
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultDateUIEditor" />
+					<property name="defaultSearchMode" value="search"/>
+					<property name="editors">
+						<map>
+							<entry key="multi" value="de.hybris.platform.cockpit.model.editor.impl.GenericCollectionUIEditor"/>
+							<entry key="range" value="de.hybris.platform.cockpit.model.editor.impl.GenericRangeUIEditor"/>
+							<entry key="search" value="de.hybris.platform.cockpit.model.editor.search.impl.DefaultDateConditionUIEditor"/>
+						</map>
+					</property>
+					<property name="label" value="dateEditor"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="PK"/>
+					<property name="defaultMode" value="single"/>
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultPKUIEditor" />
+					<property name="defaultSearchMode" value="search"/>
+					<property name="editors">
+						<map>
+<!--							<entry key="multi" value="de.hybris.platform.cockpit.model.editor.impl.GenericCollectionUIEditor"/>-->
+<!--							<entry key="range" value="de.hybris.platform.cockpit.model.editor.impl.GenericRangeUIEditor"/>-->
+								<entry key="search" value="de.hybris.platform.cockpit.model.editor.search.impl.DefaultLongConditionUIEditor"/>
+						</map>
+					</property>
+					<property name="label" value="pkEditor"/>
+				</bean>				
+				<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="DECIMAL"/>
+					<property name="defaultMode" value="single"/>
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultDecimalUIEditor" />
+					<property name="defaultSearchMode" value="search"/>
+					<property name="editors">
+						<map>
+							<entry key="multi" value="de.hybris.platform.cockpit.model.editor.impl.GenericCollectionUIEditor"/>
+							<entry key="range" value="de.hybris.platform.cockpit.model.editor.impl.GenericRangeUIEditor"/>
+							<entry key="search" value="de.hybris.platform.cockpit.model.editor.search.impl.DefaultDecimalConditionUIEditor"/>
+						</map>
+					</property>
+					<property name="label" value="decimalEditor"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="FLOAT"/>
+					<property name="defaultMode" value="single"/>
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultFloatUIEditor" />
+					<property name="defaultSearchMode" value="search"/>
+					<property name="editors">
+						<map>
+							<entry key="multi" value="de.hybris.platform.cockpit.model.editor.impl.GenericCollectionUIEditor"/>
+							<entry key="range" value="de.hybris.platform.cockpit.model.editor.impl.GenericRangeUIEditor"/>
+							<entry key="search" value="de.hybris.platform.cockpit.model.editor.search.impl.DefaultFloatConditionUIEditor"/>
+						</map>
+					</property>
+					<property name="label" value="floatEditor"/>
+				</bean>								
+				<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="BOOLEAN"/>
+					<property name="defaultMode" value="single"/>
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultBooleanUIEditor" />
+					<property name="editors">
+						<map>
+							<entry key="multi" value="de.hybris.platform.cockpit.model.editor.impl.GenericCollectionUIEditor"/>
+							<entry key="range" value="de.hybris.platform.cockpit.model.editor.impl.GenericRangeUIEditor"/>
+							<entry key="dropdown" value="de.hybris.platform.cockpit.model.editor.impl.DropdownBooleanUIEditor" />
+							<entry key="checkbox" value="de.hybris.platform.cockpit.model.editor.impl.CheckboxBooleanUIEditor" />
+						</map>
+					</property>
+					<property name="label" value="booleanEditor"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="ENUM"/>
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultEnumUIEditor" />
+					<property name="defaultMode" value="single"/>
+					<property name="editors">
+						<map>
+							<entry key="multi" value="de.hybris.platform.cockpit.model.editor.impl.GenericCollectionUIEditor"/>
+							<entry key="range" value="de.hybris.platform.cockpit.model.editor.impl.GenericRangeUIEditor"/>
+						</map>
+					</property>
+					<property name="label" value="enumEditor"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="DUMMY"/>
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultDummyUIEditor" />
+					<property name="defaultMode" value="single"/>
+					<property name="editors">
+						<map>
+							<entry key="multi" value="de.hybris.platform.cockpit.model.editor.impl.GenericCollectionUIEditor"/>
+							<entry key="range" value="de.hybris.platform.cockpit.model.editor.impl.GenericRangeUIEditor"/>
+						</map>
+					</property>
+					<property name="label" value="dummyEditor"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="REFERENCE"/>
+					<property name="defaultMode" value="single"/>
+					<!-- 
+						Note:
+						In 4.1.1 version as a default simple reference selector is use new Simple Reference Selector 
+					-->
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.referenceeditor.simple.impl.DefaultSimpleReferenceUIEditor" />
+					<property name="editors">
+						<map>
+							<!-- 
+								Note:
+								Version 4.5 comes with new simplistic collection reference editor which is default editor.  
+							-->
+							<entry key="multi" value="de.hybris.platform.cockpit.model.referenceeditor.collection.CollectionUIEditor"/>
+							<entry key="multiDeprecated" value="de.hybris.platform.cockpit.model.referenceeditor.impl.DefaultReferenceCollectionUIEditor"/>
+							<entry key="listViewReferenceEditor" value="de.hybris.platform.cockpit.model.referenceeditor.impl.ListViewCollectionEditor"/>
+							<entry key="browserContextEditor" value="de.hybris.platform.cockpit.model.referenceeditor.impl.ContextAreaReferenceCollectionUIEditor"/>
+							<entry key="mediaReferenceSelector" value="de.hybris.platform.cockpit.model.referenceeditor.impl.DefaultMediaReferenceUIEditor"/>
+							<!-- 
+								Note:
+								Version 4.5 comes with new simplistic media collection reference editor which is default editor.  
+							-->
+							<entry key="mediaReferenceCollectionSelector" value="de.hybris.platform.cockpit.model.referenceeditor.collection.CollectionUIEditorMedia"/> 
+							<entry key="mediaReferenceCollectionSelectorDeprecated" value="de.hybris.platform.cockpit.model.referenceeditor.impl.DefaultMediaReferenceCollectionUIEditor"/>
+							<!-- 
+								Note:
+								Version 4.5 comes with new simplistic celum media collection reference editor which is default editor.
+							 -->
+							<entry key="celumMediaReferenceCollectionSelector" value="de.hybris.platform.cockpit.model.referenceeditor.celum.impl.CelumMediaCollectionUIEditor"/>
+							<entry key="celumMediaReferenceCollectionSelectorDeprecated" value="de.hybris.platform.cockpit.model.referenceeditor.celum.impl.CelumMediaReferenceCollectionUIEditor"/>
+							
+							<entry key="simple" value="de.hybris.platform.cockpit.model.referenceeditor.impl.SimpleReferenceUIEditor"/>
+							<entry key="shortListEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultSelectUIEditor"/>
+							<!-- 
+								Note:
+								Version 4.1.1 comes with new simple reference selectors. Beside that a default reference selector was change to new type. 
+							-->
+							<entry key="simpleMediaReferenceSelector" value="de.hybris.platform.cockpit.model.referenceeditor.simple.impl.DefaultSimpleMediaReferenceUIEditor"/>
+							<entry key="simpleCelumReferenceSelector" value="de.hybris.platform.cockpit.model.referenceeditor.celum.impl.CelumSimpleMediaReferenceUIEditor"/>
+						</map>
+					</property>
+					<property name="label" value="referenceEditor"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.model.meta.DefaultPropertyEditorDescriptor">
+					<property name="editorType" value="FEATURE"/>
+					<property name="defaultEditor" value="de.hybris.platform.cockpit.model.editor.impl.DefaultFeatureUIEditor" />
+					<property name="defaultMode" value="single"/>
+					<property name="editors">
+						<map>
+							<entry key="multi" value="de.hybris.platform.cockpit.model.editor.impl.GenericCollectionUIEditor"/>
+							<entry key="range" value="de.hybris.platform.cockpit.model.editor.impl.GenericRangeUIEditor"/>
+						</map>
+					</property>
+					<property name="label" value="featureEditor"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	
+	
+<!-- SEARCH EDITOR related stuff -->
+	<bean id="editorConditionConfiguration" parent="defaultEditorConditionConfiguration" scope="tenant"
+		class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionConfiguration"/>	
+	
+	<bean id="defaultEditorConditionConfiguration" scope="tenant" abstract="true"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionConfiguration">
+		<property name="conditions">
+			<list>
+				<ref bean="searchTextStartswithCondition"/>
+				<ref bean="searchEqualsCondition"/>
+				<ref bean="searchTextContainsCondition"/>
+				<ref bean="searchBetweenCondition"/>
+				<ref bean="searchIsEmptyCondition"/>
+				<ref bean="searchTextEndswithCondition"/>
+				
+				<ref bean="searchGreaterCondition"/>
+				<ref bean="searchLessCondition"/>
+				<ref bean="searchGreaterOrEqualsCondition"/>
+				<ref bean="searchLessOrEqualsCondition"/>
+				
+				<ref bean="searchDateGreaterCondition"/>
+				<ref bean="searchDateLessCondition"/>
+				
+				<ref bean="searchDateTodayCondition"/>
+				<ref bean="searchDateTomorrowCondition"/>
+				<ref bean="searchDateYesterdayCondition"/>
+				<ref bean="searchDateThisweekCondition"/>
+				<ref bean="searchDateLastweekCondition"/>
+				<ref bean="searchDateThismonthCondition"/>
+				<ref bean="searchDateLastmonthCondition"/>
+				<ref bean="searchDateThisyearCondition"/>
+				<ref bean="searchDateLastyearCondition"/>
+			</list>
+		</property>
+		<property name="defaultConditionsMap">
+			<map merge="true">
+				<entry key="TEXT" value="startswith,contains,equals,endswith,isempty"/>
+				<entry key="INTEGER" value="equals,between,greater,less,isempty"/>
+				<entry key="LONG" value="equals,between,greater,less,isempty"/>
+				<entry key="DECIMAL" value="equals,between,greater,less,isempty"/>
+				<entry key="DATE" value="equals,between,isempty,today,tomorrow,thisweek,lastweek,thismonth,lastmonth"/>
+			</map>
+		</property>
+	</bean>
+	
+	
+	<!-- condition entries  -->
+	<bean id="searchTextContainsCondition" scope="singleton" 
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry">
+		<property name="validAttributeTypes" value="TEXT"/>
+		<property name="operator" value="contains"/>
+		<property name="i3Label" value="search.condition.contains" />
+		<property name="viewComponents" value="$TEXT"/>
+	</bean>
+	<bean id="searchBetweenCondition"  scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry">
+		<property name="validAttributeTypes" value="TEXT,DATE,INTEGER,LONG,DECIMAL"/>
+		<property name="operator" value="between"/>
+		<property name="i3Label" value="search.condition.between" />
+		<property name="viewComponents" value="$_TYPE[40px],$LABEL(search.condition.between.and)[30px],$_TYPE[40px]"/>
+	</bean>
+	<bean id="searchIsEmptyCondition"  scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry">
+		<property name="validAttributeTypes" value="TEXT,DATE,INTEGER,LONG,DECIMAL"/>
+		<property name="operator" value="isEmpty"/>
+		<property name="i3Label" value="search.condition.isEmpty" />
+	</bean>
+	<bean id="searchEqualsCondition"  scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry">
+		<property name="validAttributeTypes" value="TEXT,DATE,INTEGER,LONG,DECIMAL"/>
+		<property name="operator" value="equals"/>
+		<property name="i3Label" value="search.condition.equals" />
+		<property name="viewComponents" value="$_TYPE"/>
+	</bean>
+	<bean id="searchTextEndswithCondition"  scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry">
+		<property name="validAttributeTypes" value="TEXT"/>
+		<property name="operator" value="endsWith"/>
+		<property name="i3Label" value="search.condition.endswith" />
+		<property name="viewComponents" value="$TEXT"/>
+	</bean>
+	<bean id="searchTextStartswithCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="TEXT"/>
+		<property name="operator" value="startswith"/>
+		<property name="i3Label" value="search.condition.startswith" />
+		<property name="viewComponents" value="$TEXT"/>
+	</bean>
+	<bean id="searchGreaterCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="INTEGER,LONG,DECIMAL"/>
+		<property name="operator" value="greater"/>
+		<property name="i3Label" value="search.condition.greater" />
+		<property name="viewComponents" value="$_TYPE"/>
+	</bean>
+	<bean id="searchLessCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="INTEGER,LONG,DECIMAL"/>
+		<property name="operator" value="less"/>
+		<property name="i3Label" value="search.condition.less" />
+		<property name="viewComponents" value="$_TYPE"/>
+	</bean>
+	<bean id="searchGreaterOrEqualsCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="INTEGER,LONG,DECIMAL"/>
+		<property name="operator" value="greaterOrEquals"/>
+		<property name="i3Label" value="search.condition.greaterOrEquals" />
+		<property name="viewComponents" value="$_TYPE"/>
+	</bean>
+	<bean id="searchLessOrEqualsCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="INTEGER,LONG,DECIMAL"/>
+		<property name="operator" value="lessOrEquals"/>
+		<property name="i3Label" value="search.condition.lessOrEquals" />
+		<property name="viewComponents" value="$_TYPE"/>
+	</bean>
+	
+	<bean id="searchDateGreaterCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="DATE"/>
+		<property name="operator" value="greater"/>
+		<property name="i3Label" value="search.condition.date.greater" />
+		<property name="viewComponents" value="$_TYPE"/>
+	</bean>
+	<bean id="searchDateLessCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="DATE"/>
+		<property name="operator" value="less"/>
+		<property name="i3Label" value="search.condition.date.less" />
+		<property name="viewComponents" value="$_TYPE"/>
+	</bean>
+	
+	
+	
+	<bean id="searchDateTodayCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="DATE"/>
+		<property name="operator" value="today"/>
+		<property name="i3Label" value="search.condition.date.today" />
+	</bean>
+	<bean id="searchDateTomorrowCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="DATE"/>
+		<property name="operator" value="tomorrow"/>
+		<property name="i3Label" value="search.condition.date.tomorrow" />
+	</bean>
+	<bean id="searchDateYesterdayCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="DATE"/>
+		<property name="operator" value="yesterday"/>
+		<property name="i3Label" value="search.condition.date.yesterday" />
+	</bean>
+	<bean id="searchDateThisweekCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="DATE"/>
+		<property name="operator" value="thisweek"/>
+		<property name="i3Label" value="search.condition.date.thisweek" />
+	</bean>
+	<bean id="searchDateLastweekCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="DATE"/>
+		<property name="operator" value="lastweek"/>
+		<property name="i3Label" value="search.condition.date.lastweek" />
+	</bean>
+	<bean id="searchDateThismonthCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="DATE"/>
+		<property name="operator" value="thismonth"/>
+		<property name="i3Label" value="search.condition.date.thismonth" />
+	</bean>
+	<bean id="searchDateLastmonthCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="DATE"/>
+		<property name="operator" value="lastmonth"/>
+		<property name="i3Label" value="search.condition.date.lastmonth" />
+	</bean>
+	<bean id="searchDateThisyearCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="DATE"/>
+		<property name="operator" value="thisyear"/>
+		<property name="i3Label" value="search.condition.date.thisyear" />
+	</bean>
+	<bean id="searchDateLastyearCondition" scope="singleton"
+			class="de.hybris.platform.cockpit.model.advancedsearch.config.impl.DefaultEditorConditionEntry" >
+		<property name="validAttributeTypes" value="DATE"/>
+		<property name="operator" value="lastyear"/>
+		<property name="i3Label" value="search.condition.date.lastyear" />
+	</bean>
+	
+	<bean id="mapUIEditorRowRenderer" class="de.hybris.platform.cockpit.model.editor.impl.MapUIEditorRowRenderer" scope="prototype"/>
+</beans>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<!-- Add accelerator facades specific product options -->
+	<enum class="de.hybris.platform.commercefacades.product.ProductOption">
+		<value>PRICE_RANGE</value>
+		<value>VOLUME_PRICES</value>
+	</enum>
+
+	<bean class="de.hybris.platform.acceleratorfacades.device.data.DeviceData">
+		<property name="id" type="String"/>
+		<property name="userAgent" type="java.lang.String"/>
+		<property name="capabilities" type="java.util.Map&lt;String,String>"/>
+		<property name="desktopBrowser" type="java.lang.Boolean"/>
+		<property name="mobileBrowser" type="java.lang.Boolean"/>
+		<property name="tabletBrowser" type="java.lang.Boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.acceleratorfacades.device.data.UiExperienceData">
+		<property name="level" type="de.hybris.platform.commerceservices.enums.UiExperienceLevel"/>
+	</bean>
+
+	<bean class="de.hybris.platform.acceleratorfacades.urlencoder.data.UrlEncoderData">
+		<property name="attributeName" type="java.lang.String"/>
+		<property name="currentValue" type="java.lang.String"/>
+		<property name="defaultValue" type="java.lang.String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.acceleratorfacades.urlencoder.data.UrlEncoderPatternData">
+		<property name="pattern" type="java.lang.String"/>
+		<property name="redirectRequired" type="boolean"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.acceleratorfacades.order.data.PriceRangeData">
+		<property name="minPrice" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="maxPrice" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.ProductData">
+		<property name="priceRange" type="de.hybris.platform.acceleratorfacades.order.data.PriceRangeData" />
+	</bean>
+		
+	<bean class="de.hybris.platform.commercefacades.order.data.ConsignmentData">
+		<property name="statusDisplay" type="String" />
+	</bean>
+	
+	<bean class="de.hybris.platform.commercefacades.product.data.ImageData">
+		<property name="width" type="Integer"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.acceleratorfacades.payment.data.PaymentSubscriptionResultData" extends="de.hybris.platform.acceleratorservices.payment.data.PaymentSubscriptionResult">
+		<property name="storedCard" type="de.hybris.platform.commercefacades.order.data.CCPaymentInfoData"/>
+	</bean>
+
+</beans>

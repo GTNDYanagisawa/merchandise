@@ -1,0 +1,62 @@
+#% impex.setLocale(Locale.ENGLISH);
+
+$productCatalog=productCatalog
+$contentCatalog=contentCatalog
+$onlineProduct=catalogVersion(catalog(id[default=$productCatalog]),version[default='Online'])[unique=true,default='$productCatalog:Online']
+$onlineContent=catalogVersion(catalog(id[default=$contentCatalog]),version[default='Online'])[unique=true,default='$contentCatalog:Online']
+
+$siteUid=testSite
+$storeUid=testStore
+$net=false
+$currencies=USD
+$defaultCurrency=USD
+$languages=en
+$defaultLanguage=en
+$vendor=test
+
+INSERT_UPDATE Language;isocode[unique=true];active
+;en;true
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=en];active;base;conversion;digits;symbol
+;USD;US Dollar;true;true;1;2;$
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];defaultCatalog
+;$productCatalog;$productCatalog;true
+;$contentCatalog;$contentCatalog;true
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode);languages(isoCode)
+;$productCatalog;Online;true;$defaultCurrency;$languages
+;$contentCatalog;Online;true;$defaultCurrency;$languages
+
+INSERT_UPDATE Product;$onlineProduct;code[unique=true]
+;;1934793
+
+INSERT_UPDATE UserTaxGroup;code[unique=true]
+;us-taxes
+
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);currencies(isocode);net;taxGroup(code);storelocatorDistanceUnit(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);deliveryCountries(isocode);submitOrderProcessCode
+;$storeUid;$productCatalog,;$currencies;$net;us-taxes;km;$defaultCurrency;$languages;$defaultLanguage;;
+
+INSERT_UPDATE Vendor;code[unique=true]
+;$vendor
+
+INSERT_UPDATE Warehouse;code[unique=true];name[lang=en];;vendor(code);default
+;warehouse_s;Warehouse South;;$vendor;true
+
+INSERT_UPDATE BaseStore2WarehouseRel;source(uid)[unique=true];target(code)[unique=true]
+;$storeUid;warehouse_s
+
+INSERT_UPDATE PointOfService;name[unique=true];type(code);latitude;longitude;geocodeTimestamp[dateformat=dd-MM-yyyy];basestore(uid)[default=$storeUid];warehouses(code);nearbyStoreRadius[default=2000]
+;warehouse_s;STORE;0.0;0.0;12-12-2012;;warehouse_s
+
+INSERT_UPDATE PoS2WarehouseRel;source(name)[unique=true];target(code)[unique=true]
+;warehouse_s;warehouse_s
+
+INSERT_UPDATE BaseSite;uid[unique=true];theme(code);channel(code);stores(uid);
+;$siteUid;;;$storeUid;
+
+INSERT_UPDATE StockLevel;available;warehouse(code)[unique=true];inStockStatus(code);maxPreOrder;maxStockLevelHistoryCount;overSelling;preOrder;productCode[unique=true];reserved
+;34;warehouse_s;forceInStock;0;-1;0;0;1934793;0
+
+UPDATE Product;code[unique=true];$onlineProduct;stockLevels(productCode,warehouse(code));vendors(code)
+;1934793;;1934793:warehouse_s;$vendor

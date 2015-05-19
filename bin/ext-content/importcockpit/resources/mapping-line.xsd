@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="mapping-line">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="import-properties" type="property-list" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="custom-editors" type="editor-list" minOccurs="0" maxOccurs="1"/>
+				<xs:element name="special-translators" type="translators-list" minOccurs="0" maxOccurs="1"/>  			
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+    
+	<xs:complexType name="editor-list">
+		<xs:sequence>
+			<xs:element name="property" type="editorProperty" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="property-list">
+		<xs:sequence>
+			<xs:element name="property" type="property" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="translators-list">
+		<xs:sequence>
+			<xs:element name="special-translator" type="specialTranslator" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+    
+    <xs:complexType name="property">
+		<xs:attribute name="qualifier" type="xs:string" use="required"/>
+		<xs:attribute name="translator" type="xs:string" use="optional"/>
+		<xs:attribute name="allowNull" type="xs:boolean" use="optional"/>
+	</xs:complexType>      
+    
+	<xs:complexType name="editorProperty">
+		<xs:sequence>
+			<xs:element name="parameter" type="parameter" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="qualifier" type="xs:string" use="required"/>
+		<xs:attribute name="editorCode" type="xs:string" use="required"/>
+		<xs:attribute name="visible" type="xs:boolean" use="optional" default="true"/>
+	</xs:complexType>      
+     
+    <xs:complexType name="specialTranslator">
+		<xs:attribute name="qualifier" type="xs:string" use="required"/>
+		<xs:attribute name="translator" type="xs:string" use="required"/>
+	</xs:complexType>
+	
+	<xs:complexType name="parameter">
+		<xs:sequence>
+			<xs:element name="name" type="name"/>
+			<xs:element name="value" type="value"/>
+		</xs:sequence>
+	</xs:complexType>  
+	
+	<xs:simpleType name="name">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+    
+	<xs:simpleType name="value">
+		<xs:restriction base="xs:string"/> 
+	</xs:simpleType>
+</xs:schema>

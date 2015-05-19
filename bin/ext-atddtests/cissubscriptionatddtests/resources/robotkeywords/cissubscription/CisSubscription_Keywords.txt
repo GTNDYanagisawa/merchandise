@@ -1,0 +1,71 @@
+*** Settings ***
+Library    de.hybris.platform.cissubscriptionatddtests.keywords.CisSubscriptionKeywordLibrary
+
+*** Keywords ***
+verify that conversion result "${convertedXml}" equals "${expectedXml}"
+	[Documentation]    TODO
+	verify xml conversion result    ${convertedXml}    ${expectedXml}
+
+register and login customer "${firstName:[^"]+}" "${lastName:[^"]+}" with login "${login}"
+	[Documentation]    TODO
+	${customerId}=    register and login customer    ${firstName}    ${lastName}    ${login}
+	[Return]	${customerId}
+
+create tiered charge entry with charge price of "${chargePrice:[^"]+}" with start "${start:[^"]+}" and end "${end:[^"]+}"
+	[Documentation]    ***
+	...    Creates a new tiered entry charge given the charge price, start and end information
+	...    INPUT PARAMETERS:
+	...        ${chargePrice} - charge price of the tiered usage charge
+	...        ${start} - tier's start
+	...        ${end} - tier's end
+	...    OUTPUT PARAMETERS:
+	...        ${result} - the TierUsageChargeEntryData returned from the method call
+	...    CALL EXAMPLE:
+	...        ${result}=    create tiered charge entry with charge price of "${chargePrice}" with start "${start}" and end "${end}"
+	...    ***************
+	${result}=    create tier usage charge    ${chargePrice}    ${start}    ${end}
+	[return]    ${result}
+
+create overage charge entry with charge price of "${chargePrice:[^"]+}"
+	[Documentation]    ***
+	...    Creates a new overage entry charge given the charge price only
+	...    INPUT PARAMETERS:
+	...        ${chargePrice} - charge price of the tiered usage charge
+	...    OUTPUT PARAMETERS:
+	...        ${result} - the OverageUsageChargeEntryData returned from the method call
+	...    CALL EXAMPLE:
+	...        ${result}=    create overage charge entry with charge price of "${chargePrice}"
+	...    ***************
+	${result}=    create overage usage charge    ${chargePrice}
+	[return]    ${result}
+
+create per unit usage charge "${name:[^"]+}" with usage unit "${unit:[^"]+}" and usage charge type "${chargeType:[^"]+}" and usage charge entries "${usageCharges:[^"]+}"
+	[Documentation]    ***
+	...    Creates a new per unit usage charge with name, unit , charge type and usage charge entries
+	...    INPUT PARAMETERS:
+	...        ${name} - name of the usage charge
+	...        ${unit} -the usage unit for this usage charge
+	...        ${chargeType} - usage charge type
+	...        ${usageCharges} -usage charge entries (can be tiers or overages)
+	...    OUTPUT PARAMETERS:
+	...        ${result} - the CisUsageChargeTier returned from the method call
+	...    CALL EXAMPLE:
+	...        ${result}=   create per unit usage charge "${name}" with usage unit "${unit}" and usage charge type "${chargeType}" and usage charge entries "${usageCharges}"
+	...    ***************
+	${result}=    populate usage charge from pre unit usage with type    ${name}    ${unit}    ${chargeType}    ${usageCharges}
+	[return]    ${result}
+
+create volume usage charge "${name:[^"]+}" with usage unit "${unit:[^"]+}" and usage charge entries "${usageCharges:[^"]+}"
+	[Documentation]    ***
+	...    Creates a new volume usage charge with name, unit and usage charge entries
+	...    INPUT PARAMETERS:
+	...        ${name} - name of the usage charge
+	...        ${unit} -the usage unit for this usage charge
+	...        ${usageCharges} -usage charge entries (can be tiers or overages)
+	...    OUTPUT PARAMETERS:
+	...        ${result} - the CisUsageChargeTier returned from the method call
+	...    CALL EXAMPLE:
+	...        ${result}=   create volume usage charge "${name}" with usage unit "${unit}" and usage charge entries "${usageCharges}"
+	...    ***************
+	${result}=    populate usage charge from volume usage    ${name}    ${unit}    ${usageCharges}
+	[return]    ${result}

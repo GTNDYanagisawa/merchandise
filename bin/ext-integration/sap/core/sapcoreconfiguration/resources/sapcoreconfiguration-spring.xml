@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans            http://www.springframework.org/schema/beans/spring-beans-3.1.xsd            http://www.springframework.org/schema/aop            http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<alias alias="sapCoreConfigurationService" name="sapCoreConfigurationSAPConfigurationService" />
+	<bean class="de.hybris.platform.sap.core.configuration.impl.SAPConfigurationServiceImpl" id="sapCoreConfigurationSAPConfigurationService"
+		scope="singleton">
+		<property name="baseStoreService" ref="baseStoreService" />
+	</bean>
+
+	<alias alias="sapCoreRFCDestinationService" name="sapCoreConfigurationRFCDestinationService" />
+	<bean class="de.hybris.platform.sap.core.configuration.rfc.impl.RFCDestinationServiceImpl" id="sapCoreConfigurationRFCDestinationService"
+		scope="singleton">
+		<property name="rfcDestinationDao" ref="sapCoreRFCDestinationDao" />
+	</bean>
+
+	<alias alias="sapCoreRFCDestinationDao" name="sapCoreDefaultRFCDestinationDao" />
+	<bean class="de.hybris.platform.sap.core.configuration.rfc.dao.impl.DefaultSAPRFCDestinationDao" id="sapCoreDefaultRFCDestinationDao"
+		parent="abstractItemDao" />
+
+	<alias alias="sapCoreHTTPDestinationDao" name="sapCoreDefaultHTTPDestinationDao" />
+	<bean class="de.hybris.platform.sap.core.configuration.http.dao.impl.DefaultSAPHTTPDestinationDao" id="sapCoreDefaultHTTPDestinationDao"
+		parent="abstractItemDao" />
+
+	<alias alias="sapCoreHTTPDestinationService" name="sapCoreConfigurationHTTPDestinationService" />
+	<bean class="de.hybris.platform.sap.core.configuration.http.impl.HTTPDestinationServiceImpl" id="sapCoreConfigurationHTTPDestinationService"
+		scope="singleton">
+		<property name="httpDestinationDao" ref="sapCoreHTTPDestinationDao" />
+	</bean>
+
+	<alias alias="sapCoreGenericConfigurationDao" name="sapCoreDefaultGenericConfigurationDao" />
+	<bean class="de.hybris.platform.sap.core.configuration.dao.impl.DefaultGenericConfigurationDao" id="sapCoreDefaultGenericConfigurationDao"
+		parent="abstractItemDao" />
+
+	<!-- =========================== -->
+	<!-- Global Configuration Access -->
+	<!-- =========================== -->
+
+	<alias alias="sapCoreSAPGlobalConfigurationDAO" name="sapCoreDefaultSAPGlobalConfigurationDAO" />
+	<bean class="de.hybris.platform.sap.core.configuration.global.dao.impl.SAPGlobalConfigurationDAOImpl" id="sapCoreDefaultSAPGlobalConfigurationDAO"
+		scope="prototype">
+	</bean>
+
+	<alias alias="sapCoreSAPGlobalConfigurationService" name="sapCoreDefaultSAPGlobalConfigurationService" />
+	<bean class="de.hybris.platform.sap.core.configuration.global.impl.SAPGlobalConfigurationServiceImpl" id="sapCoreDefaultSAPGlobalConfigurationService"
+		scope="singleton">
+		<property name="sapGlobalConfigurationDAO" ref="sapCoreSAPGlobalConfigurationDAO" />
+	</bean>
+
+	<!-- ============================= -->
+	<!-- Data Hub Initial Load Handler -->
+	<!-- ============================= -->
+	<alias alias="sapCoreDataHubInitialLoadHandler" name="sapCoreDefaultDataHubInitialLoadHandler" />
+	<bean id="sapCoreDefaultDataHubInitialLoadHandler" class="de.hybris.platform.sap.core.configuration.datahub.DataHubInitialLoadHandler">
+		<property name="dataHubManager"          ref="sapCoreDataHubTransferConfigurationManager" />
+		<property name="dataHubTransferHandler"  ref="sapCoreDataHubTransferHandler" />
+		<property name="genericConfigurationDao" ref="sapCoreGenericConfigurationDao" />
+		<property name="modelService"            ref="modelService" />
+	</bean>
+
+	<!-- ========================= -->
+	<!-- Interceptors -->
+	<!-- ========================= -->
+	<bean id="rfcValidateInterceptor" class="de.hybris.platform.sap.core.configuration.rfc.validation.RFCDestinationValidateInterceptor" />
+
+	<bean id="rfcValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="rfcValidateInterceptor" />
+		<property name="typeCode" value="SAPRFCDestination" />
+	</bean>
+
+	<bean id="httpValidateInterceptor" class="de.hybris.platform.sap.core.configuration.http.validation.HTTPDestinationValidateInterceptor" />
+
+	<bean id="httpValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="httpValidateInterceptor" />
+		<property name="typeCode" value="SAPHTTPDestination" />
+	</bean>
+
+   <bean id="sapCoreDefaultRemoveModelMap" class="de.hybris.platform.sap.core.configuration.datahub.RemoveModelMap" />
+   
+	<bean id="sapCoreDefaultRemoveInterceptor" class="de.hybris.platform.sap.core.configuration.datahub.interceptor.ConfigurationItemRemoveInterceptor">
+		<property name="removeModelMap" ref="sapCoreDefaultRemoveModelMap"/>
+		<property name="genericModel2MapPopulator" ref="sapCoreGenericModel2MapPopulator" />
+		<property name="dataHubManager" ref="sapCoreDataHubTransferConfigurationManager" />
+	</bean>
+
+	<bean id="sapCoreRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="sapCoreDefaultRemoveInterceptor" />
+		<property name="typeCode" value="Item" />
+	</bean>
+
+	<bean id="sapCoreSAPGlobalConfigurationPrepareInterceptor" class="de.hybris.platform.sap.core.configuration.global.interceptor.SAPGlobalConfigurationPrepareInterceptor" />
+
+	<bean id="sapCoreSAPGlobalConfigurationPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="sapCoreSAPGlobalConfigurationPrepareInterceptor" />
+		<property name="typeCode"    value="SAPGlobalConfiguration" />
+	</bean>
+
+</beans>

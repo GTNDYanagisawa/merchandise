@@ -1,0 +1,1037 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype code="SimpleCMSComponents" elementtype="SimpleCMSComponent" autocreate="true" generate="true"
+			type="list" />
+		<collectiontype code="TemplateContentSlots" elementtype="ContentSlotForTemplate" autocreate="true" generate="true"
+			type="list" />
+		<collectiontype code="PageContentSlots" elementtype="ContentSlotForPage" autocreate="true" generate="true" type="list" />
+		<collectiontype code="CMSStringList" elementtype="java.lang.String" autocreate="true" generate="true" type="list" />
+		<collectiontype code="CatalogList" elementtype="Catalog" autocreate="true" generate="true" type="list" />
+		<collectiontype code="CMSNavigationNodeList" elementtype="CMSNavigationNode" autocreate="true" generate="true"
+			type="list" />
+	</collectiontypes>
+
+	<enumtypes>
+		<enumtype generate="true" code="ABTestScopes" autocreate="true" jaloclass="de.hybris.platform.jalo.enumeration.EnumerationValue">
+			<value code="request" />
+			<value code="session" />
+		</enumtype>
+		<enumtype generate="true" code="LinkTargets" autocreate="true" jaloclass="de.hybris.platform.jalo.enumeration.EnumerationValue">
+			<value code="sameWindow" />
+			<value code="newWindow" />
+		</enumtype>
+		<enumtype code="CmsApprovalStatus" autocreate="true" generate="true">
+			<value code="check" />
+			<value code="approved" />
+			<value code="unapproved" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+
+
+		<relation code="CatalogsForCMSSite" generate="true" localized="false" autocreate="true">
+			<deployment table="Catalogs4Site" typecode="1063" />
+			<sourceElement qualifier="cmsSites" type="CMSSite" cardinality="many" />
+			<targetElement qualifier="contentCatalogs" type="ContentCatalog" cardinality="many" collectiontype="list"
+				ordered="true" />
+		</relation>
+
+		<relation code="ElementsForSlot" generate="true" localized="false" autocreate="true">
+			<deployment table="Elements4Slots" typecode="1085" />
+			<sourceElement qualifier="slots" type="ContentSlot" cardinality="many" />
+			<targetElement qualifier="cmsComponents" type="AbstractCMSComponent" cardinality="many" collectiontype="list"
+				ordered="true" />
+		</relation>
+
+		<relation code="ElementsForContainer" generate="true" localized="false" autocreate="true">
+			<deployment table="Elements4Container" typecode="1077" />
+			<sourceElement qualifier="containers" type="AbstractCMSComponentContainer" cardinality="many" />
+			<targetElement qualifier="simpleCMSComponents" type="SimpleCMSComponent" cardinality="many" collectiontype="list"
+				ordered="true" />
+		</relation>
+
+		<relation code="AvailableSlotsForTemplate" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="template" type="PageTemplate" cardinality="one">
+				<modifiers write="false" initial="true" optional="false" />
+			</sourceElement>
+			<targetElement qualifier="availableContentSlots" type="ContentSlotName" cardinality="many" collectiontype="list"
+				ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="ApplicableRestrictionTypeForPageTypes" generate="true" localized="false" autocreate="true">
+			<deployment table="ApplRestrTyp4PgTyp" typecode="1099"/>
+			<sourceElement qualifier="restrictionTypes" type="RestrictionType" cardinality="many"/>
+			<targetElement  qualifier="pageTypes" type="CmsPageType" cardinality="many"/>
+		</relation> 
+		
+		<relation code="RestrictionsForPages" generate="true" localized="false" autocreate="true">
+			<deployment table="Restriction4Pages" typecode="1087" />
+			<sourceElement qualifier="pages" type="AbstractPage" cardinality="many" />
+			<targetElement qualifier="restrictions" type="AbstractRestriction" cardinality="many" collectiontype="list"
+				ordered="true" />
+		</relation>
+
+		<relation code="RestrictionsForComponents" generate="true" localized="false" autocreate="true">
+			<deployment table="Restrictions4Comps" typecode="1091" />
+			<sourceElement qualifier="components" type="AbstractCMSComponent" cardinality="many" />
+			<targetElement qualifier="restrictions" type="AbstractRestriction" cardinality="many" collectiontype="list"
+				ordered="true" />
+		</relation>
+
+		<relation code="CatalogsForRestriction" generate="true" localized="false" autocreate="true">
+			<deployment table="Catalogs4Restriction" typecode="1079" />
+			<sourceElement qualifier="restrictions" type="CMSCatalogRestriction" cardinality="many" />
+			<targetElement qualifier="catalogs" type="Catalog" cardinality="many" />
+		</relation>
+
+		<relation code="CategoriesForRestriction" generate="true" localized="false" autocreate="true">
+			<deployment table="Categories4Restriction" typecode="1080" />
+			<sourceElement qualifier="restrictions" type="CMSCategoryRestriction" cardinality="many" />
+			<targetElement qualifier="categories" type="Category" cardinality="many" />
+		</relation>
+
+		<relation code="ProductsForRestriction" generate="true" localized="false" autocreate="true">
+			<deployment table="Products4Restriction" typecode="1081" />
+			<sourceElement qualifier="restrictions" type="CMSProductRestriction" cardinality="many" />
+			<targetElement qualifier="products" type="Product" cardinality="many" />
+		</relation>
+
+		<relation code="UsersForRestriction" generate="true" localized="false" autocreate="true">
+			<deployment table="Users4Restriction" typecode="1082" />
+			<sourceElement qualifier="restrictions" type="CMSUserRestriction" cardinality="many" />
+			<targetElement qualifier="users" type="User" cardinality="many" />
+		</relation>
+
+		<relation code="UserGroupsForRestriction" generate="true" localized="false" autocreate="true">
+			<deployment table="Groups4Restriction" typecode="1083" />
+			<sourceElement qualifier="restrictions" type="CMSUserGroupRestriction" cardinality="many" />
+			<targetElement qualifier="userGroups" type="UserGroup" cardinality="many" />
+		</relation>
+
+		<relation code="PreviewDataToCatalogVersion" generate="true" localized="false" autocreate="true">
+			<deployment table="PreviewDataToCatVers" typecode="1101"/>
+			<sourceElement qualifier="previews" type="PreviewData" cardinality="many" />
+			<targetElement qualifier="catalogVersions" type="CatalogVersion" cardinality="many" />
+		</relation>
+
+		<relation code="CMSNavigationNodeChildren" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="parent" type="CMSNavigationNode" cardinality="one" />
+			<targetElement qualifier="children" type="CMSNavigationNode" cardinality="many" collectiontype="list" ordered="true" />
+		</relation>
+
+		<relation code="CMSLinksForNavNodes" generate="true" localized="false" autocreate="true">
+			<deployment table="CMSLinksForNavNodes" typecode="1089" />
+			<sourceElement qualifier="links" type="CMSLinkComponent" cardinality="many" collectiontype="list" ordered="true">
+				<model>
+					<getter name="links" default="true" deprecated="true" />
+					<setter name="links" default="true" deprecated="true" />
+				</model>
+			</sourceElement>
+			<targetElement qualifier="navigationNodes" type="CMSNavigationNode" cardinality="many" collectiontype="list"
+				ordered="true">
+				<model>
+					<getter name="navigationNodes" default="true" deprecated="true" />
+					<setter name="navigationNodes" default="true" deprecated="true" />
+				</model>
+			</targetElement>
+		</relation>
+
+		<relation code="CMSContentPagesForNavNodes" generate="true" localized="false" autocreate="true">
+			<deployment table="CMSPagesForNavNodes" typecode="1090" />
+			<sourceElement qualifier="pages" type="ContentPage" cardinality="many" collectiontype="list" ordered="true">
+				<model>
+					<getter name="pages" default="true" deprecated="true" />
+					<setter name="pages" default="true" deprecated="true" />
+				</model>
+			</sourceElement>
+			<targetElement qualifier="navigationNodes" type="CMSNavigationNode" cardinality="many" collectiontype="list"
+				ordered="true">
+				<model>
+					<getter name="navigationNodes" default="true" deprecated="true" />
+					<setter name="navigationNodes" default="true" deprecated="true" />
+				</model>
+			</targetElement>
+		</relation>
+
+		<relation code="CmsLinkComponentsForContentPage" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="contentPage" type="ContentPage" cardinality="one" />
+			<targetElement qualifier="linkComponents" type="CmsLinkComponent" cardinality="many" collectiontype="list"
+				ordered="true" />
+		</relation>
+
+		<relation code="CmsLinkComponentsForProduct" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="product" type="Product" cardinality="one" />
+			<targetElement qualifier="linkComponents" type="CmsLinkComponent" cardinality="many" collectiontype="list"
+				ordered="true" />
+		</relation>
+
+		<relation code="CmsLinkComponentsForCategory" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="category" type="Category" cardinality="one" />
+			<targetElement qualifier="linkComponents" type="CmsLinkComponent" cardinality="many" collectiontype="list"
+				ordered="true" />
+		</relation>
+
+
+		<relation code="ValidComponentTypesForSite" generate="true" localized="false" autocreate="true">
+			<deployment table="ComponentTypesForSite" typecode="1093" />
+			<sourceElement qualifier="cmsSites" type="CMSSite" cardinality="many" collectiontype="set" />
+			<targetElement qualifier="validComponentTypes" type="CMSComponentType" cardinality="many" collectiontype="set" />
+		</relation>
+
+		<relation code="ValidComponentTypesForContentSlots" generate="true" localized="false" autocreate="true">
+			<deployment table="ComponentTypesForSlots" typecode="1094" />
+			<sourceElement qualifier="contentSlotNames" type="ContentSlotName" cardinality="many" collectiontype="set" />
+			<targetElement qualifier="validComponentTypes" type="CMSComponentType" cardinality="many" collectiontype="set">
+				<model>
+					<getter name="validComponentTypes" default="true" deprecated="true" />
+					<setter name="validComponentTypes" default="true" deprecated="true" />
+				</model>
+			</targetElement>
+		</relation>
+
+		<relation code="ValidPageTypesForTemplates" generate="true" localized="false" autocreate="true">
+			<deployment table="PageTypesForTemplates" typecode="1095" />
+			<sourceElement qualifier="templates" type="PageTemplate" cardinality="many" collectiontype="set" />
+			<targetElement qualifier="restrictedPageTypes" type="CMSPageType" cardinality="many" collectiontype="set" />
+		</relation>
+
+		<relation code="CMSNavNodesToCMSNavEntries" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="navigationNode" type="CMSNavigationNode" cardinality="one" />
+			<targetElement qualifier="entries" type="CMSNavigationEntry" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers partof="false" />
+			</targetElement>
+		</relation>
+
+		<relation code="AbstractRestriction2CMSInverseRestriction" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="originalRestriction" type="AbstractRestriction" cardinality="one">
+				<modifiers optional="false" initial="true" />
+			</sourceElement>
+			<targetElement qualifier="inverseRestrictions" type="CMSInverseRestriction" cardinality="many">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AbstractPage2UserRelation" generate="true" autocreate="true" localized="false">
+			<sourceElement qualifier="lockedBy" type="User" cardinality="one" />
+			<targetElement qualifier="lockedPages" type="AbstractPage" cardinality="many" />
+		</relation>
+
+		<relation code="ComponentTypeGroups2ComponentType" generate="true" localized="false" autocreate="true">
+			<deployment table="CompTypeGrp2CompType" typecode="1097" />
+			<sourceElement qualifier="componentTypeGroups" type="ComponentTypeGroup" cardinality="many" collectiontype="set"/>
+			<targetElement qualifier="cmsComponentTypes" type="CMSComponentType" cardinality="many" collectiontype="set"/>
+		</relation>
+	</relations>
+
+	<itemtypes>
+
+		<itemtype code="ComponentTypeGroup" autocreate="true" generate="true" extends="GenericItem"
+			jaloclass="de.hybris.platform.cms2.jalo.ComponentTypeGroup">
+			<deployment table="ComponentTypeGrp" typecode="1098" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="code" generate="true" autocreate="true">
+					<persistence type="property" />
+					<modifiers unique="true" optional="false"/>
+				</attribute>
+				<attribute type="localized:java.lang.String" qualifier="description" generate="true" autocreate="true">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ContentCatalog" jaloclass="de.hybris.platform.cms2.jalo.contents.ContentCatalog" extends="Catalog"
+			autocreate="true" generate="true">
+		</itemtype>
+
+		<itemtype code="CMSItem" jaloclass="de.hybris.platform.cms2.jalo.contents.CMSItem" extends="GenericItem" autocreate="true"
+			generate="true" abstract="true">
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"uid"</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="uid" generate="true" autocreate="true" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" unique="true" />
+				</attribute>
+				<attribute qualifier="name" generate="true" autocreate="true" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<modifiers optional="false" unique="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSRelation" jaloclass="de.hybris.platform.cms2.jalo.relations.CMSRelation" extends="GenericItem"
+			autocreate="true" generate="true">
+			<deployment table="CMSRelations" typecode="1100"/>
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"uid"</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="uid" generate="true" autocreate="true" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" unique="true" />
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<modifiers optional="false" unique="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ContentSlotName" jaloclass="de.hybris.platform.cms2.jalo.contents.ContentSlotName" extends="GenericItem"
+			autocreate="true" generate="true">
+			<deployment table="ContentSlotName" typecode="1078" />
+			<attributes>
+				<attribute qualifier="name" generate="true" autocreate="true" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="compTypeGroup" generate="true" autocreate="true" type="ComponentTypeGroup">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ContentSlot" jaloclass="de.hybris.platform.cms2.jalo.contents.contentslot.ContentSlot" extends="CMSItem"
+			autocreate="true" generate="true">
+			<deployment table="ContentSlot" typecode="1066" />
+			<attributes>
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="activeFrom" type="java.util.Date">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="activeUntil" type="java.util.Date">
+					<persistence type="property" />
+				</attribute>
+				<!-- jalo attributes -->
+				<attribute qualifier="currentPosition" type="java.lang.String">
+					<model>
+						<getter name="currentPosition" default="true" deprecated="true" />
+						<setter name="currentPosition" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSComponentType" jaloclass="de.hybris.platform.cms2.jalo.CMSComponentType" autocreate="true" generate="true"
+			extends="ComposedType">
+		</itemtype>
+
+		<itemtype code="AbstractCMSComponent" jaloclass="de.hybris.platform.cms2.jalo.contents.components.AbstractCMSComponent"
+			extends="CMSItem" metatype="CMSComponentType" autocreate="true" generate="true" abstract="true">
+			<deployment table="CMSComponent" typecode="1084" />
+			<custom-properties>
+				<property name="container">
+					<value>Boolean.FALSE</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="visible" type="java.lang.Boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="onlyOneRestrictionMustApply" type="boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<!-- jalo attributes -->
+				<attribute qualifier="type" generate="true" autocreate="true" type="localized:java.lang.String">
+					<model>
+						<getter name="type" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+				<attribute qualifier="typeCode" generate="true" autocreate="true" type="java.lang.String">
+					<model>
+						<getter name="typeCode" deprecated="true" default="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+				<attribute qualifier="container" type="boolean">
+					<model>
+						<getter name="container" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" optional="false" />
+				</attribute>
+				<attribute qualifier="restricted" type="boolean">
+					<model>
+						<getter name="restricted" deprecated="true" default="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" search="false" optional="false" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="componentIDX" unique="false">
+					<key attribute="uid" />
+					<key attribute="catalogVersion" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AbstractCMSComponentContainer" jaloclass="de.hybris.platform.cms2.jalo.contents.containers.AbstractCMSComponentContainer"
+			extends="AbstractCMSComponent" autocreate="true" generate="true" abstract="true">
+			<custom-properties>
+				<property name="container">
+					<value>Boolean.TRUE</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<!-- jalo attributes -->
+				<attribute qualifier="currentCMSComponents" type="SimpleCMSComponents">
+					<model>
+						<getter name="currentCMSComponents" deprecated="true" default="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ABTestCMSComponentContainer" jaloclass="de.hybris.platform.cms2.jalo.contents.containers.ABTestCMSComponentContainer"
+			extends="AbstractCMSComponentContainer" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="scope" generate="true" autocreate="true" type="ABTestScopes">
+					<defaultvalue>
+						em().getEnumerationValue("ABTestScopes","request")
+					</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="SimpleCMSComponent" jaloclass="de.hybris.platform.cms2.jalo.contents.components.SimpleCMSComponent"
+			extends="AbstractCMSComponent" autocreate="true" generate="true" abstract="true">
+		</itemtype>
+
+		<itemtype code="PageTemplate" jaloclass="de.hybris.platform.cms2.jalo.pages.PageTemplate" extends="CMSItem" autocreate="true"
+			generate="true">
+			<deployment table="PageTemplate" typecode="1076" />
+			<attributes>
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="velocityTemplate">
+					<persistence type="property" />
+					<modifiers dontOptimize="true" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="frontendTemplateName">
+					<persistence type="property" />
+				</attribute>
+				<!-- jalo attributes -->
+				<attribute qualifier="contentSlots" generate="true" autocreate="true" type="TemplateContentSlots">
+					<model>
+						<getter name="contentSlots" deprecated="true" default="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers partof="true" write="false" />
+				</attribute>
+				<attribute qualifier="previewIcon" type="Media">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ContentSlotForTemplate" jaloclass="de.hybris.platform.cms2.jalo.relations.ContentSlotForTemplate"
+			extends="CMSRelation" autocreate="true" generate="true">
+			<deployment table="SlotsForTemplate" typecode="1069" />
+			<attributes>
+				<attribute qualifier="allowOverwrite" type="java.lang.Boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="position" generate="true" autocreate="true" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" unique="false" />
+				</attribute>
+				<attribute qualifier="pageTemplate" generate="true" autocreate="true" type="PageTemplate">
+					<persistence type="property" />
+					<modifiers optional="false" unique="false" />
+				</attribute>
+				<attribute qualifier="contentSlot" generate="true" autocreate="true" type="ContentSlot">
+					<persistence type="property" />
+					<modifiers optional="false" unique="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSPageType" jaloclass="de.hybris.platform.cms2.jalo.CMSPageType" autocreate="true" generate="true"
+			extends="ComposedType">
+			<attributes>
+				<attribute qualifier="previewDisabled" type="boolean">
+					<modifiers read="true" write="true" optional="false" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="RestrictionType" jaloclass="de.hybris.platform.cms2.jalo.RestrictionType" autocreate="true" generate="true" extends="ComposedType">
+		
+		</itemtype>
+		
+		<itemtype code="AbstractPage" jaloclass="de.hybris.platform.cms2.jalo.pages.AbstractPage" extends="CMSItem" autocreate="true"
+			generate="true" abstract="true" metatype="CMSPageType">
+			<deployment table="CMSPage" typecode="1072" />
+			<attributes>
+				<attribute qualifier="approvalStatus" type="CmsApprovalStatus">
+					<modifiers read="true" write="true" search="true" optional="false" />
+					<defaultvalue>em().getEnumerationValue("CmsApprovalStatus","check")</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="title" generate="true" autocreate="true" type="localized:java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="masterTemplate" generate="true" autocreate="true" type="PageTemplate">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="defaultPage" type="java.lang.Boolean">
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="onlyOneRestrictionMustApply" type="boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="previewImage" type="Media" generate="true" autocreate="true">
+					<persistence type="property" />
+					<modifiers partof="true" optional="true" />
+				</attribute>
+				<!-- jalo attributes -->
+				<attribute qualifier="contentSlots" generate="true" autocreate="true" type="PageContentSlots">
+					<model>
+						<getter name="contentSlots" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" partof="true" />
+				</attribute>
+				<attribute qualifier="type" generate="true" autocreate="true" type="localized:java.lang.String">
+					<model>
+						<getter name="type" deprecated="true" default="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+				<attribute qualifier="typeCode" generate="true" autocreate="true" type="java.lang.String">
+					<model>
+						<getter name="typeCode" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+				<attribute qualifier="missingContentSlots" generate="true" autocreate="true" type="java.lang.String">
+					<model>
+						<getter name="missingContentSlots" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+				<attribute qualifier="availableContentSlots" generate="true" autocreate="true" type="java.lang.String">
+					<model>
+						<getter name="availableContentSlots" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+				<attribute qualifier="view" generate="true" autocreate="true" type="java.lang.String">
+					<model>
+						<getter name="view" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+				<attribute type="CMSNavigationNodeList" qualifier="navigationNodeList">
+					<persistence type="dynamic" attributeHandler="abstractPageDynamicNavigationNodeList" />
+					<modifiers read="true" write="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ContentSlotForPage" jaloclass="de.hybris.platform.cms2.jalo.relations.ContentSlotForPage" extends="CMSRelation"
+			autocreate="true" generate="true">
+			<deployment table="SlotsForPage" typecode="1071" />
+			<attributes>
+				<attribute qualifier="position" generate="true" autocreate="true" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" unique="false" />
+				</attribute>
+				<attribute qualifier="page" generate="true" autocreate="true" type="AbstractPage">
+					<persistence type="property" />
+					<modifiers optional="false" unique="false" />
+				</attribute>
+				<attribute qualifier="contentSlot" generate="true" autocreate="true" type="ContentSlot">
+					<persistence type="property" />
+					<modifiers optional="false" unique="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ContentPage" jaloclass="de.hybris.platform.cms2.jalo.pages.ContentPage" extends="AbstractPage"
+			autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="label" generate="true" autocreate="true" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="homepage" generate="true" autocreate="true" type="boolean">
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<!-- jalo attributes -->
+				<attribute qualifier="labelOrId" generate="true" autocreate="true" type="java.lang.String">
+					<model>
+						<getter name="labelOrId" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CategoryPage" jaloclass="de.hybris.platform.cms2.jalo.pages.CategoryPage" extends="AbstractPage"
+			autocreate="true" generate="true">
+		</itemtype>
+
+		<itemtype code="ProductPage" jaloclass="de.hybris.platform.cms2.jalo.pages.ProductPage" extends="AbstractPage"
+			autocreate="true" generate="true">
+		</itemtype>
+
+		<itemtype code="CatalogPage" jaloclass="de.hybris.platform.cms2.jalo.pages.CatalogPage" extends="AbstractPage"
+			autocreate="true" generate="true">
+		</itemtype>
+
+		<itemtype code="AbstractRestriction" jaloclass="de.hybris.platform.cms2.jalo.restrictions.AbstractRestriction" extends="CMSItem"
+			autocreate="true" generate="true" abstract="true" metatype="RestrictionType">
+			<deployment table="Restriction" typecode="1074" />
+			<attributes>
+				<!-- jalo attributes -->
+				<attribute qualifier="type" generate="true" autocreate="true" type="localized:java.lang.String">
+					<model>
+						<getter name="type" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+				<attribute qualifier="typeCode" generate="true" autocreate="true" type="java.lang.String">
+					<model>
+						<getter name="typeCode" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+				<attribute qualifier="description" generate="true" autocreate="true" type="java.lang.String">
+					<persistence type="dynamic" />
+					<modifiers write="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSCatalogRestriction" jaloclass="de.hybris.platform.cms2.jalo.restrictions.CatalogRestriction"
+			extends="AbstractRestriction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="description" type="java.lang.String" redeclare="true">
+					<persistence type="dynamic" attributeHandler="catalogRestrictionDynamicDescription" />
+					<modifiers write="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSInverseRestriction" jaloclass="de.hybris.platform.cms2.jalo.restrictions.CMSInverseRestriction"
+			extends="AbstractRestriction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="description" redeclare="true" type="java.lang.String">
+					<persistence type="dynamic" attributeHandler="inverseRestrictionDynamicDescription" />
+					<modifiers write="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="CMSCategoryRestriction" jaloclass="de.hybris.platform.cms2.jalo.restrictions.CategoryRestriction"
+			extends="AbstractRestriction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="recursive" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="description" redeclare="true" type="java.lang.String">
+					<persistence type="dynamic" attributeHandler="categoryRestrictionDynamicDescription" />
+					<modifiers write="false" />
+				</attribute>
+				<!-- jalo attributes -->
+				<attribute qualifier="categoryCodes" type="CMSStringList">
+					<!-- since this is Collection(String) we MUST disable pre-fetching explicitly! -->
+					<custom-properties>
+						<property name="modelPrefetchMode">
+							<value>java.lang.Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+					<model>
+						<getter name="categoryCodes" deprecated="true" default="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" search="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSProductRestriction" jaloclass="de.hybris.platform.cms2.jalo.restrictions.ProductRestriction"
+			extends="AbstractRestriction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="description" redeclare="true" type="java.lang.String">
+					<persistence type="dynamic" attributeHandler="productRestrictionDynamicDescription" />
+					<modifiers write="false" />
+				</attribute>
+				<attribute qualifier="productCodes" type="CMSStringList">
+					<!-- since this is Collection(String) we MUST disable pre-fetching explicitly! -->
+					<custom-properties>
+						<property name="modelPrefetchMode">
+							<value>java.lang.Boolean.FALSE</value>
+						</property>
+					</custom-properties>
+					<model>
+						<getter name="productCodes" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" search="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSTimeRestriction" jaloclass="de.hybris.platform.cms2.jalo.restrictions.TimeRestriction" extends="AbstractRestriction"
+			autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="activeFrom" generate="true" autocreate="true" type="java.util.Date">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="activeUntil" generate="true" autocreate="true" type="java.util.Date">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="description" redeclare="true" type="java.lang.String">
+					<persistence type="dynamic" attributeHandler="timeRestrictionDynamicDescription" />
+					<modifiers write="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSUserRestriction" jaloclass="de.hybris.platform.cms2.jalo.restrictions.UserRestriction" extends="AbstractRestriction"
+			autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="description" redeclare="true" type="java.lang.String">
+					<persistence type="dynamic" attributeHandler="userRestrictionDynamicDescription" />
+					<modifiers write="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSUserGroupRestriction" jaloclass="de.hybris.platform.cms2.jalo.restrictions.GroupRestriction"
+			extends="AbstractRestriction" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="includeSubgroups" type="boolean">
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="description" redeclare="true" type="java.lang.String">
+					<persistence type="dynamic" attributeHandler="userGroupRestrictionDynamicDescription" />
+					<modifiers write="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSSite" jaloclass="de.hybris.platform.cms2.jalo.site.CMSSite" extends="BaseSite" autocreate="true"
+			generate="true">
+			<!-- deployment table="CMSSite" typecode="1064" / -->
+			<attributes>
+
+				<attribute qualifier="urlPatterns" type="StringCollection">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="activeFrom" type="java.util.Date">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="activeUntil" type="java.util.Date">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="defaultCatalog" generate="true" autocreate="true" type="Catalog">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="startingPage" generate="true" autocreate="true" type="ContentPage">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="redirectURL" generate="true" autocreate="true" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="previewURL" generate="true" autocreate="true" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<!-- jalo attributes -->
+				<attribute qualifier="classificationCatalogs" generate="true" autocreate="true" type="CatalogList">
+					<model>
+						<getter name="classificationCatalogs" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+				<attribute qualifier="productCatalogs" generate="true" autocreate="true" type="CatalogList">
+					<model>
+						<getter name="productCatalogs" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+				<attribute qualifier="startPageLabel" generate="true" autocreate="true" type="java.lang.String">
+					<model>
+						<getter name="startPageLabel" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers write="false" />
+				</attribute>
+				<!-- default preview values -->
+				<attribute qualifier="openPreviewInNewTab" type="boolean">
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="defaultPreviewCategory" generate="true" autocreate="true" type="Category">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="defaultPreviewProduct" generate="true" autocreate="true" type="Product">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="defaultPreviewCatalog" generate="true" autocreate="true" type="Catalog">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSParagraphComponent" generate="true"
+			jaloclass="de.hybris.platform.cms2.jalo.contents.components.CMSParagraphComponent" extends="SimpleCMSComponent" autocreate="true">
+			<attributes>
+				<attribute qualifier="content" generate="true" autocreate="true" type="localized:java.lang.String">
+					<persistence type="property" />
+					<modifiers dontOptimize="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSImageComponent" generate="true" jaloclass="de.hybris.platform.cms2.jalo.contents.components.CMSImageComponent"
+			extends="SimpleCMSComponent" autocreate="true">
+			<attributes>
+				<attribute qualifier="media" type="localized:Media">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSLinkComponent" generate="true" jaloclass="de.hybris.platform.cms2.jalo.contents.components.CMSLinkComponent"
+			extends="SimpleCMSComponent" autocreate="true">
+			<attributes>
+				<attribute qualifier="linkName" type="localized:java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="external" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="url" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="contentPageLabelOrId" type="java.lang.String">
+					<model>
+						<getter name="contentPageLabelOrId" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers read="true" write="false" />
+				</attribute>
+				<attribute qualifier="productCode" type="java.lang.String">
+					<model>
+						<getter name="productCode" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers read="true" write="false" />
+				</attribute>
+				<attribute qualifier="categoryCode" type="java.lang.String">
+					<model>
+						<getter name="categoryCode" default="true" deprecated="true" />
+					</model>
+					<persistence type="jalo" />
+					<modifiers read="true" write="false" />
+				</attribute>
+				<attribute qualifier="target" generate="true" autocreate="true" type="LinkTargets">
+					<defaultvalue>
+						em().getEnumerationValue("LinkTargets","sameWindow")
+					</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="PreviewData" generate="true" jaloclass="de.hybris.platform.cms2.jalo.preview.PreviewData" extends="GenericItem"
+			autocreate="true">
+			<deployment table="PreviewData" typecode="1068" />
+			<attributes>
+				<attribute qualifier="user" type="User">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="userGroup" type="UserGroup">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="country" type="Country">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="language" type="Language">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="time" type="java.util.Date">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="liveEdit" type="java.lang.Boolean">
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="editMode" type="java.lang.Boolean">
+					<persistence type="property" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="resourcePath" type="java.lang.String">
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+				<attribute qualifier="page" type="AbstractPage">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="previewCategory" type="Category">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="previewProduct" type="Product">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="previewCatalog" type="Catalog">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="activeSite" type="CMSSite">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="activeCatalogVersion" type="CatalogVersion">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSPreviewTicket" generate="true" jaloclass="de.hybris.platform.cms2.jalo.preview.CMSPreviewTicket"
+			extends="GenericItem" autocreate="true">
+			<deployment table="CMSPreviewTicket" typecode="1067" />
+			<attributes>
+				<attribute qualifier="id" type="java.lang.String">
+					<modifiers initial="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="previewData" type="PreviewData">
+					<modifiers partof="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CMSNavigationNode" jaloclass="de.hybris.platform.cms2.jalo.navigation.CMSNavigationNode" extends="CMSItem"
+			autocreate="true" generate="true">
+			<deployment table="CMSNavigationNode" typecode="1088" />
+			<attributes>
+				<attribute qualifier="title" type="localized:java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="visible" type="boolean">
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="CMSNavigationEntry" jaloclass="de.hybris.platform.cms2.jalo.navigation.CMSNavigationEntry" extends="CMSItem"
+			autocreate="true" generate="true">
+			<deployment table="CMSNavigationEntry" typecode="1096" />
+			<attributes>
+				<attribute qualifier="item" type="Item">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="cmsNavEntryItemIdx">
+					<key attribute="item" />
+				</index>
+			</indexes>
+		</itemtype>
+
+
+		<itemtype code="User" autocreate="false" generate="false">
+			<attributes>
+				<attribute type="boolean" qualifier="authorizedToUnlockPages" generate="true">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

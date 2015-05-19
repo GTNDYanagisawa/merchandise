@@ -1,0 +1,70 @@
+"INSERT_UPDATE Country";"name";"isocode[unique=true]";
+;Spain;ES;
+
+"INSERT_UPDATE Language";"name";"isocode[unique=true]";
+;Spanish;es;
+
+
+"INSERT_UPDATE MobileActionKeyword";"&keyword";"keyword[unique=true]";"type(code)";
+;hi;hi;IGNORECASE
+;he;he;IGNORECASE
+;ho;ho;IGNORECASE
+;hu;hu;IGNORECASE
+;xx;xx;IGNORECASE
+;list2;list2;IGNORECASE
+;list3;list3;IGNORECASE
+
+
+"INSERT_UPDATE PhoneNumberList";code[unique=true];name;
+;list1;list1;
+;list2;list2;
+;list3;list3;
+;list4;list4;
+;list5;list5;
+;list6;list6;
+
+
+"INSERT_UPDATE PhoneNumber";country(isocode);number[unique=true];&phone;
+;ES;647000000;phone1;
+;ES;647000001;phone2;
+
+"INSERT_UPDATE PhoneNumberList";code[unique=true];name;numbers(&phone)
+;list6;list6;phone2;
+
+"INSERT_UPDATE MobileAggregator";"engine(code)";code[unique=true];
+;"testSendSMSEngine";test13;
+;"testSendSMSEngine";removable;
+;"testSendSMSEngine";shortcodes;
+
+"INSERT_UPDATE MobileReceiveAndSendTextAction";"target[forceWrite=true]";code[unique=true];content;
+;"helloWorldText";test13;x;
+;"helloWorldText";test13_1;x;
+;"helloWorldText";test13_2;x;
+;"helloWorldText";test13_3;x;
+;"helloWorldText";test13_4;x;
+
+
+"INSERT_UPDATE MobileShortcode";"aggregator(code)[unique=true]";country(isocode)[unique=true];code[unique=true];defaultAction(code);&shortcode;keywordPrefix[unique=true];phoneNumberFilters(code);testingPhoneNumbers(code);
+;test13;"ES";"111";test13_3;test13;;list4;list5;
+;test13;"ES";"333";;test13_2;;;;
+;test13;"ES";"444";;test13_3;;;;
+
+"INSERT_UPDATE MobileShortcode";"aggregator(code)[unique=true]";country(isocode)[unique=true];code[unique=true];&shortcode;alternativeReplyRoute(&shortcode);
+;test13;"ES";"555";test13_4;;
+;test13;"ES";"666";test13_5;;
+;shortcodes;"ES";"777";test13_6;;
+;test13;"ES";"888";test13_7;test13_3;
+
+
+
+"INSERT_UPDATE MobileActionAssignment";"state(code)";"keyword(&keyword)[unique=true]";shortcode(&shortcode)[unique=true];action(code);
+;"ACTIVE";"hi";test13;test13;
+;"ACTIVE";"he";test13;test13_1;
+;"ACTIVE";"ho";test13;test13;
+;"ACTIVE";"hu";test13;test13_4;
+;"ACTIVE";"hi";test13_2;test13;
+
+
+"INSERT_UPDATE MobileActionAssignment";"state(code)";"keyword(&keyword)[unique=true]";shortcode(&shortcode)[unique=true];action(code);phoneNumberFilters(code);testingPhoneNumbers(code);
+;"ACTIVE";"list2";test13;test13;list2;;
+;"ACTIVE";"list3";test13;test13;;list3;

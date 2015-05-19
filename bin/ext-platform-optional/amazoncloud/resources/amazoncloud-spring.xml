@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="urlSignedConversionMapping" class="de.hybris.platform.media.storage.impl.ConfigValueMappingRegistrar"  p:key="url.signed"
+		p:value-ref="booleanConfigValueConverter" />
+	<bean id="urlUnsignedHttpsConversionMapping" class="de.hybris.platform.media.storage.impl.ConfigValueMappingRegistrar"  p:key="url.unsigned.https"
+		p:value-ref="booleanConfigValueConverter" />
+	<bean id="urlUnsignedVirtualHostConversionMapping" class="de.hybris.platform.media.storage.impl.ConfigValueMappingRegistrar"  p:key="url.unsigned.virtualHost"
+		p:value-ref="booleanConfigValueConverter" />
+	<bean id="urlValidForKey" class="de.hybris.platform.media.storage.impl.ConfigValueMappingRegistrar" p:key="url.validFor"
+		p:value-ref="integerConfigValueConverter" />
+
+	<bean id="s3StorageServiceFactory" class="de.hybris.platform.amazon.media.services.impl.DefaultS3StorageServiceFactory" />
+
+	<bean id="s3MediaStorageStrategy" class="de.hybris.platform.amazon.media.storage.S3MediaStorageStrategy" init-method="setTenantPrefix">
+		<property name="locationHashService" ref="mediaLocationHashService" />
+		<property name="s3StorageServiceFactory" ref="s3StorageServiceFactory" />
+		<property name="mediaHeadersRegistry" ref="mediaHeadersRegistry" />
+	</bean>
+
+	<bean id="s3MediaStorageCleaner" class="de.hybris.platform.amazon.media.storage.S3MediaStorageCleaner" init-method="setTenantPrefix">
+		<property name="cleanOnInit" value="${media.globalSettings.s3MediaStorageStrategy.cleanOnInit}" />
+		<property name="storageConfigService" ref="mediaStorageConfigService" />
+		<property name="s3StorageServiceFactory" ref="s3StorageServiceFactory" />
+	</bean>
+
+	<bean id="s3MediaURLStrategy" class="de.hybris.platform.amazon.media.url.S3MediaURLStrategy">
+		<constructor-arg ref="s3StorageServiceFactory" />
+	</bean>
+</beans>

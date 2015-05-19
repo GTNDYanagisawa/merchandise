@@ -1,0 +1,267 @@
+
+<!-- ********************************************************************************************************* -->
+<!-- ****      Tomcat Configuration Content START                                                         **** -->
+<!-- ********************************************************************************************************* -->  
+#foreach( $server in $TomcatConfiguration.tomcat.servers )	 
+  <!-- 	${server.objectIndex} . TomcatServer   $server.technicalName -->		
+#end
+<!--                         ....                                                                              -->
+    	
+#foreach( $server in $TomcatConfiguration.tomcat.servers )	 
+	<group name="ATCSystem_Host${server.objectIndex}" data_type="" data_version="" group_type="GENERIC">
+	 <!-- 	${server.objectIndex} . TomcatServer   $server.technicalName -->	
+		<rootclass 
+			name="SAP_ATCServer"
+ 			sync="TRUE" 
+  			merge_roots="TRUE" 
+  			merge_properties="TRUE" 
+  			clean="NONE">
+  			<instance>
+  				<property name="CreationClassName">
+    	 			<value>SAP_ATCServer</value>
+	    		</property>
+    			<property name="Name">
+    				<value>${server.technicalName}</value>
+    			</property>
+    			<property name="Caption">
+    				<value>$server.caption</value>
+		   		</property>    		  			    				
+    			<property name="InstallationPath">
+    				<value>$server.installationPath</value>
+		   		</property> 
+		   		<property name="ServerPort">
+					<value>${server.port}</value>
+				</property> 
+    			<property name="SystemHome">
+    				<value>$server.hostNameUQ</value>
+	    		</property>
+				<property name="Description">
+    	  			<value>   
+    	  		  		@${SLDInfo.sldTag};    	  				    	  			
+    	  			</value>
+    			</property>
+	    		<property name="NameFormat">
+    				<value>user-driven</value>
+	    		</property>
+	    		<property name="ExtSIDName">
+    		  		<value>$server.systemId</value>
+    			</property>
+  			</instance>
+  		</rootclass>
+  		<memberclass
+	  		name="SAP_ComputerSystem"  
+	  		association_name="SAP_ATCServerHost" 
+	  		root_role="Dependent"
+	  		member_role="Antecedent"
+	  		sync="TRUE" 
+	  		merge_members="FALSE" 
+	  		merge_properties="TRUE" 
+	  		clean="LONE" 
+	  		optional="FALSE">
+  			<instance>    	
+    			<property name="CreationClassName">
+      				<value>SAP_ComputerSystem</value> 
+    			</property>
+    			<property name="Name">
+    	  			<value>$server.hostNameUQ</value> 
+    			</property>    			
+    			<property name="Caption">
+    	  			<value>$server.hostNameUQ</value>
+    			</property> 
+    			<property name="FQDName">
+	    			<value>$server.hostNameFQ</value> 
+	    		</property> 
+	    		<property name="IPAddress">
+	    			<value>$server.ipAddress</value> 
+	    		</property> 
+  			</instance>
+		</memberclass>
+  	</group>
+  	
+  	#set ( $javaRuntime = $server.javaRuntime )
+  	<group name="ATCServer${server.objectIndex}_JVM" data_type="" data_version="" group_type="GENERIC">
+		<rootclass name="SAP_ATCServer" sync="FALSE" merge_roots="FALSE" merge_properties="FALSE" clean="NONE">
+			<instance>
+				<property name="CreationClassName">
+					<value>SAP_ATCServer</value>
+				</property>
+				<property name="Name">
+					<value>${server.technicalName}</value>
+				</property>
+			</instance>
+		</rootclass>
+		<memberclass name="SAP_JavaVMService" association_name="SAP_HostedJavaVMService" 
+			root_role="Antecedent" 
+			member_role="Dependent" 
+			sync="TRUE" merge_members="FALSE" 
+			merge_properties="TRUE" 
+			clean="LONE" 
+			optional="FALSE">
+			<instance>
+				<property name="CreationClassName">
+					<value>SAP_JavaVMService</value>
+				</property>
+				<property name="Caption">
+					<value>${javaRuntime.caption}</value>
+				</property>
+				<property name="Name">
+					<value>${javaRuntime.technicalName}</value>
+				</property>
+				<property name="SystemName">
+					<value>${server.technicalName}</value>
+				</property>
+				<property name="SystemCreationClassName">
+					<value>SAP_ATCServer</value>
+				</property>
+				<property name="EnabledDefault">
+					<value>2</value>
+				</property>
+				<property name="EnabledState">
+					<value>5</value>
+				</property>
+				<property name="Vendor">
+					<value>${javaRuntime.vendor}</value>
+				</property>
+				<property name="VMName">
+					<value>${javaRuntime.vMName}</value>
+				</property>
+				<property name="Version">
+					<value>${javaRuntime.version}</value>
+				</property>
+				<property name="JavaHome">
+					<value>${javaRuntime.javaHome}</value>
+				</property>
+				<property name="ClassPath">
+					<value>${javaRuntime.classPath}</value>
+				</property>
+				<property name="LibraryPath">
+					<value>${javaRuntime.LibraryPath}</value>
+				</property>
+				<property name="BootClassPath">
+					<value>${javaRuntime.BootClassPath}</value>
+				</property>
+				<property name="ExtDirs">
+					<value>${javaRuntime.ExtDirs}</value>
+				</property>
+				<property name="IOTmpDir">
+					<value>${javaRuntime.iOTmpDir}</value>
+				</property>
+				<property name="UserName">
+					<value>${javaRuntime.userName}</value>
+				</property>
+				<property name="UserDir">
+					<value>${javaRuntime.userDir}</value>
+				</property>
+				<property name="UserHome">
+					<value>${javaRuntime.userHome}</value>
+				</property>
+				<property name="GcLogFile">
+					<value>${javaRuntime.gcLogFile}</value>
+				</property>
+				<property name="JavaAgentName">
+					<value>${javaRuntime.javaAgentName}</value>
+				</property>
+				<property name="SystemPropertyNames">
+					#foreach( $property in ${javaRuntime.systemPropertyNames})
+						<value>${property}</value>
+					#end
+				</property>
+				<property name="SystemPropertyValues">
+					#foreach( $property in ${javaRuntime.systemPropertyValues})
+						<value>${property}</value>
+					#end
+				</property>
+				<property name="VMArguments">
+					#foreach( $property in ${javaRuntime.vMArguments})
+						<value>${property}</value>
+					#end
+				</property>
+			</instance>
+		</memberclass>
+	</group>
+		
+  	<group name="ATCServer${server.objectIndex}_Ports" data_type="" data_version="" group_type="GENERIC">
+		<rootclass name="SAP_ATCServer" sync="FALSE" merge_roots="FALSE" merge_properties="FALSE" clean="NONE">
+			<instance>
+				<property name="CreationClassName">
+					<value>SAP_ATCServer</value>
+				</property>
+				<property name="Name">
+					<value>${server.technicalName}</value>
+				</property>
+			</instance>
+		</rootclass>
+		<memberclass name="SAP_IPServicePort" association_name="SAP_ATCServerIPServicePort" 
+			root_role="Antecedent" 
+			member_role="Dependent" 
+			sync="TRUE" merge_members="FALSE" 
+			merge_properties="TRUE" 
+			clean="LONE" 
+			optional="FALSE">
+			<instance>
+				<property name="Name">
+					<value>SHUTDOWN_PORT</value>
+				</property>
+				<property name="Caption">
+					<value>Shutdown Port ON ${server.port}</value>
+				</property>
+				<property name="CreationClassName">
+					<value>SAP_IPServicePort</value>
+				</property>
+				<property name="SystemCreationClassName">
+					<value>SAP_ATCServer</value>
+				</property>
+				<property name="SystemName">
+					<value>${server.technicalName}</value>
+				</property>
+				<property name="EnabledDefault">
+					<value>2</value>
+				</property>
+				<property name="EnabledState">
+					<value>5</value>
+				</property>				
+				<property name="PortNumber">
+					<value>${server.port}</value>
+				</property>
+
+			</instance>
+			#foreach( $service in $server.services )	
+				#foreach( $connector in $service.connectors )
+			<instance>					
+					<property name="Name">
+						<value>${connector.technicalName}</value>
+					</property>
+					<property name="CreationClassName">
+						<value>SAP_IPServicePort</value>
+					</property>
+					<property name="Caption">
+						<value>${connector.caption}</value>
+					</property>
+					<property name="SystemCreationClassName">
+						<value>SAP_ATCServer</value>
+					</property>
+					<property name="SystemName">
+						<value>${server.technicalName}</value>
+					</property>
+					<property name="EnabledDefault">
+						<value>2</value>
+					</property>
+					<property name="EnabledState">
+						<value>5</value>
+					</property>					
+					<property name="PortNumber">
+						<value>${connector.port}</value>
+					</property>
+					<property name="Protocol">
+						<value>${connector.scheme}</value>
+					</property>
+				</instance>
+				#end
+			#end
+		</memberclass>
+	 </group>
+ #end
+  	
+<!-- ****            Tomcat Configuration Content END                                                     **** -->
+<!--                         ....                                                                               -->
+   	

@@ -1,0 +1,628 @@
+*** Settings ***
+Test Setup        import commercecart sampledata
+Test Teardown     reset system
+Resource          subscriptionservices/SubscriptionProduct_Keywords.txt
+Resource          subscriptionservices/SubscriptionPricePlan_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+Resource		  commerce/SubscriptionCommerce_Keywords.txt
+
+
+*** Test Cases ***
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Onfirstbill_CycleFrom1To_OneProduct
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    add product "P1" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "10"	
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "0.00"
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Onfirstbill_CycleFrom1To1_From2To_OneProduct
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "10"	
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00" 
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Onfirstbill_CycleFrom1To3_From4To4_From5To_OneProduct
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "5"
+    add product "P1" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "10"	
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "30.00"
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Onfirstbill_CycleFrom1To1_From2To_OneProductx2
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "10"             
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00" 
+    verify that cart total is "0"
+    add product "P1" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "20"             
+    verify that cart total for "monthly" is "41.98"
+    for billing event "monthly" verify discount price of "20.00" 
+    verify that cart total is "0"
+        
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Onfirstbill_CycleFrom1To1_From2To_OneProductx3
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "onfirstbill" is "10" 
+    verify that cart total is "0"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "20"             
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00"
+    verify that cart total is "0" 
+    add product "P1" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "30"             
+    verify that cart total for "monthly" is "41.98"
+    for billing event "monthly" verify discount price of "20.00"
+    verify that cart total is "0"  
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Onfirstbill_CycleFrom1To1_From2To_TwoProducts
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "onfirstbill" one time price of "15"
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1"
+    for subscription priceplan "PP2" add recurring charge of "32.99" with cycle start "2"
+    add product "P1" to cart
+    add product "P2" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "25"             
+    verify that cart total for "monthly" is "42.98"
+    for billing event "monthly" verify discount price of "21.00" 
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Oncancellation_CycleFrom1To_OneProduct
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "oncancellation" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "0.00"
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Oncancellation_CycleFrom1To1_From2To_OneProduct
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "oncancellation" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00" 
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Oncancellation_CycleFrom1To3_From4To4_From5To_OneProduct
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "oncancellation" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "5"
+    add product "P1" to cart
+    verify that number of child carts is "1"	
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "30.00"
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Oncancellation_CycleFrom1To1_From2To_OneProductx2
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "oncancellation" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "1"             
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00" 
+    verify that cart total is "0"
+    add product "P1" to cart
+    verify that number of child carts is "1"             
+    verify that cart total for "monthly" is "41.98"
+    for billing event "monthly" verify discount price of "20.00" 
+    verify that cart total is "0"
+        
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Oncancellation_CycleFrom1To1_From2To_OneProductx3
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "oncancellation" one time price of "10"
+    add product "P1" to cart
+    verify that number of child carts is "0" 
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "1"             
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00" 
+    verify that cart total is "0"
+    add product "P1" to cart
+    verify that number of child carts is "1"             
+    verify that cart total for "monthly" is "41.98"
+    for billing event "monthly" verify discount price of "20.00"
+    verify that cart total is "0"
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Oncancellation_CycleFrom1To1_From2To_TwoProducts
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "oncancellation" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "oncancellation" one time price of "15"
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1"
+    for subscription priceplan "PP2" add recurring charge of "32.99" with cycle start "2"
+    add product "P1" to cart
+    add product "P2" to cart
+    verify that number of child carts is "1"             
+    verify that cart total for "monthly" is "42.98"
+    for billing event "monthly" verify discount price of "21.00"  
+    verify that cart total is "0"
+
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Paynow_CycleFrom1To_OneProduct
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "paynow" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "paynow" is "10"	
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "0.00"
+    verify that cart total is "10"
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Paynow_CycleFrom1To1_From2To_OneProduct
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "paynow" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "paynow" is "10"	
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00" 
+    verify that cart total is "10"
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Paynow_CycleFrom1To3_From4To4_From5To_OneProduct
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "paynow" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1" and cycle end "3"
+    for subscription priceplan "PP1" add recurring charge of "40.99" with cycle start "4" and cycle end "4"
+    for subscription priceplan "PP1" add recurring charge of "50.99" with cycle start "5"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "paynow" is "10"	
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "30.00"
+    verify that cart total is "10"
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Paynow_CycleFrom1To1_From2To_OneProductx2
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "paynow" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "paynow" is "10"             
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00" 
+    verify that cart total is "10"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "paynow" is "20"             
+    verify that cart total for "monthly" is "41.98"
+    for billing event "monthly" verify discount price of "20.00" 
+    verify that cart total is "20"
+        
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Paynow_CycleFrom1To1_From2To_OneProductx3
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "paynow" one time price of "10"
+    add product "P1" to cart
+    verify that number of child carts is "0"
+    verify that cart total for "paynow" is "10" 
+    verify that cart total is "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "paynow" is "20"             
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00"
+    verify that cart total is "20" 
+    add product "P1" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "paynow" is "30"             
+    verify that cart total for "monthly" is "41.98"
+    for billing event "monthly" verify discount price of "20.00"
+    verify that cart total is "30" 
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Paynow_CycleFrom1To1_From2To_TwoProducts
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "paynow" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "paynow" one time price of "15"
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1"
+    for subscription priceplan "PP2" add recurring charge of "32.99" with cycle start "2"
+    add product "P1" to cart
+    add product "P2" to cart
+    verify that number of child carts is "1"
+    verify that cart total for "paynow" is "25"             
+    verify that cart total for "monthly" is "42.98"
+    for billing event "monthly" verify discount price of "21.00" 
+    verify that cart total is "25"       
+
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Onfirstbill_Oncancellation_Paynow_CycleFrom1To1_From2To_OneProduct_OnePlan
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add "oncancellation" one time price of "5"
+    for subscription priceplan "PP1" add "paynow" one time price of "7"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total for "paynow" is "7" 
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00"  
+    verify that cart total is "7"  
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Multi_Onfirstbill_Oncancellation_Paynow_CycleFrom1To1_From2To_MultipleProducts_MultiplePlans
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "1"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "1"
+    verify that cart total for "paynow" is "0" 
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00" 
+    verify that cart total is "0"
+	create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "onfirstbill" one time price of "2"
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1"
+    for subscription priceplan "PP2" add recurring charge of "32.99" with cycle start "2"
+    add product "P2" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "3"
+    verify that cart total for "paynow" is "0" 
+    verify that cart total for "monthly" is "42.98"
+    for billing event "monthly" verify discount price of "21.00" 
+    verify that cart total is "0" 
+    create subscription product "P3"
+    for product "P3" add subscription priceplan "PP3" with currency "USD"    
+    for subscription priceplan "PP3" add "onfirstbill" one time price of "2"
+    for subscription priceplan "PP3" add "oncancellation" one time price of "2"
+    for subscription priceplan "PP3" add recurring charge of "23.99" with cycle start "1"
+    for subscription priceplan "PP3" add recurring charge of "34.99" with cycle start "2"
+    add product "P3" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "5"
+    verify that cart total for "paynow" is "0" 
+    verify that cart total for "monthly" is "66.97"
+    for billing event "monthly" verify discount price of "32.00" 
+    verify that cart total is "0" 
+    create subscription product "P4"
+    for product "P4" add subscription priceplan "PP4" with currency "USD"    
+    for subscription priceplan "PP4" add "paynow" one time price of "4"
+    for subscription priceplan "PP4" add "oncancellation" one time price of "2"
+    for subscription priceplan "PP4" add recurring charge of "25.99" with cycle start "1"
+    for subscription priceplan "PP4" add recurring charge of "36.99" with cycle start "2"
+    add product "P4" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "5"
+    verify that cart total for "paynow" is "4" 
+    verify that cart total for "monthly" is "92.96"
+    for billing event "monthly" verify discount price of "43.00" 
+    verify that cart total is "4" 
+    create subscription product "P5"
+    for product "P5" add subscription priceplan "PP5" with currency "USD"    
+    for subscription priceplan "PP5" add "paynow" one time price of "6"
+    for subscription priceplan "PP5" add "onfirstbill" one time price of "8"
+    for subscription priceplan "PP5" add recurring charge of "27.99" with cycle start "1"
+    for subscription priceplan "PP5" add recurring charge of "38.99" with cycle start "2"
+    add product "P5" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "13"
+    verify that cart total for "paynow" is "10" 
+    verify that cart total for "monthly" is "120.95"
+    for billing event "monthly" verify discount price of "54.00" 
+    verify that cart total is "10" 
+    create subscription product "P6"
+    for product "P6" add subscription priceplan "PP6" with currency "USD"    
+    for subscription priceplan "PP6" add "paynow" one time price of "6"
+    for subscription priceplan "PP6" add "onfirstbill" one time price of "7"
+    for subscription priceplan "PP6" add "oncancellation" one time price of "3"
+    for subscription priceplan "PP6" add recurring charge of "29.99" with cycle start "1"
+    for subscription priceplan "PP6" add recurring charge of "49.99" with cycle start "2"
+    add product "P6" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "20"
+    verify that cart total for "paynow" is "16" 
+    verify that cart total for "monthly" is "150.94"
+    for billing event "monthly" verify discount price of "74.00" 
+    verify that cart total is "16"  
+    add product "P6" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "27"
+    verify that cart total for "paynow" is "22" 
+    verify that cart total for "monthly" is "180.93"
+    for billing event "monthly" verify discount price of "94.00" 
+    verify that cart total is "22"  
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_BillingEvent1Test_CycleFrom1To1_From2To_OneProduct
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "billingEvent1Test" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "21.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "32.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "billingEvent1Test" is "10"    
+    verify that cart total for "paynow" is "0" 
+    verify that cart total for "monthly" is "21.99"
+    for billing event "monthly" verify discount price of "11.00"   
+    verify that cart total is "0" 
+  
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Onfirstbill_BillingEvent1Test_CycleFrom1To1_From2To_OneProduct
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "10" 
+    verify that cart total for "paynow" is "0" 
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00" 
+    verify that cart total is "0" 
+    for subscription priceplan "PP1" add "billingEvent1Test" one time price of "7"    
+    add product "P1" to cart
+    verify that number of child carts is "3"
+    verify that cart total for "onfirstbill" is "20"
+    verify that cart total for "billingEvent1Test" is "7"
+    verify that cart total for "paynow" is "0" 
+    verify that cart total for "monthly" is "41.98"
+    for billing event "monthly" verify discount price of "20.00" 
+    verify that cart total is "0" 
+        
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Onfirstbill_BillingEvent1Test_CycleFrom1To1_From2To_TwoProducts
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    add product "P1" to cart
+    verify that number of child carts is "2"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total for "paynow" is "0" 
+    verify that cart total for "monthly" is "20.99"
+    for billing event "monthly" verify discount price of "10.00" 
+    verify that cart total is "0" 
+    create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "billingEvent1Test" one time price of "7"
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1"
+    for subscription priceplan "PP2" add recurring charge of "32.99" with cycle start "2"
+    add product "P2" to cart
+    verify that number of child carts is "3"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total for "billingEvent1Test" is "7"   
+    verify that cart total for "paynow" is "0" 
+    verify that cart total for "monthly" is "42.98"
+    for billing event "monthly" verify discount price of "21.00"  
+    verify that cart total is "0" 
+    
+########### removing from cart
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_Removing_Complex
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "oncancellation" one time price of "7"
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1"
+    for subscription priceplan "PP2" add recurring charge of "32.99" with cycle start "2"
+    create subscription product "P3"
+    for product "P3" add subscription priceplan "PP3" with currency "USD"    
+    for subscription priceplan "PP3" add "paynow" one time price of "7"
+    for subscription priceplan "PP3" add recurring charge of "22.99" with cycle start "1"
+    for subscription priceplan "PP3" add recurring charge of "34.99" with cycle start "2"
+    create subscription product "P4"
+    for product "P4" add subscription priceplan "PP4" with currency "USD"    
+    for subscription priceplan "PP4" add "billingEvent1Test" one time price of "17"
+    for subscription priceplan "PP4" add recurring charge of "23.99" with cycle start "1"
+    for subscription priceplan "PP4" add recurring charge of "36.99" with cycle start "2"
+    add product "P1" to cart
+    add product "P2" to cart    
+    add product "P3" to cart 
+    add product "P4" to cart
+    verify that number of child carts is "3"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total for "billingEvent1Test" is "17"   
+    verify that cart total for "paynow" is "7" 
+    verify that cart total for "monthly" is "89.96"
+    for billing event "monthly" verify discount price of "46.00"  
+    verify that cart total is "7"        
+    remove product "P2" from cart   
+    verify that number of child carts is "3"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total for "billingEvent1Test" is "17"   
+    verify that cart total for "paynow" is "7" 
+    verify that cart total for "monthly" is "67.97"
+    for billing event "monthly" verify discount price of "35.00"  
+    verify that cart total is "7"     
+    remove product "P1" from cart   
+    verify that number of child carts is "2"
+    verify that cart total for "billingEvent1Test" is "17"   
+    verify that cart total for "paynow" is "7" 
+    verify that cart total for "monthly" is "46.98"
+    for billing event "monthly" verify discount price of "25.00"  
+    verify that cart total is "7"    
+    remove product "P4" from cart   
+    verify that number of child carts is "1"  
+    verify that cart total for "paynow" is "7" 
+    verify that cart total for "monthly" is "22.99"
+    for billing event "monthly" verify discount price of "12.00"  
+    verify that cart total is "7"     
+    remove product "P3" from cart   
+    verify that number of child carts is "0"  
+    verify that cart total for "paynow" is "0" 
+    verify that cart total is "0"     
+    remove product "P1" from cart   
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P2" from cart   
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P3" from cart   
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P4" from cart   
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    
+Test_Cart_Calculation_OneTime_And_Recurring_Charge_RemovingAddingRemoving_Complex
+    create subscription product "P1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"    
+    for subscription priceplan "PP1" add "onfirstbill" one time price of "10"
+    for subscription priceplan "PP1" add recurring charge of "20.99" with cycle start "1"
+    for subscription priceplan "PP1" add recurring charge of "30.99" with cycle start "2"
+    create subscription product "P2"
+    for product "P2" add subscription priceplan "PP2" with currency "USD"    
+    for subscription priceplan "PP2" add "oncancellation" one time price of "7"
+    for subscription priceplan "PP2" add recurring charge of "21.99" with cycle start "1"
+    for subscription priceplan "PP2" add recurring charge of "32.99" with cycle start "2"
+    create subscription product "P3"
+    for product "P3" add subscription priceplan "PP3" with currency "USD"    
+    for subscription priceplan "PP3" add "paynow" one time price of "7"
+    for subscription priceplan "PP3" add recurring charge of "22.99" with cycle start "1"
+    for subscription priceplan "PP3" add recurring charge of "34.99" with cycle start "2"
+    create subscription product "P4"
+    for product "P4" add subscription priceplan "PP4" with currency "USD"    
+    for subscription priceplan "PP4" add "billingEvent1Test" one time price of "17"
+    for subscription priceplan "PP4" add recurring charge of "23.99" with cycle start "1"
+    for subscription priceplan "PP4" add recurring charge of "36.99" with cycle start "2"
+    add product "P1" to cart
+    add product "P2" to cart    
+    add product "P3" to cart 
+    add product "P4" to cart
+    verify that number of child carts is "3"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total for "billingEvent1Test" is "17"   
+    verify that cart total for "paynow" is "7" 
+    verify that cart total for "monthly" is "89.96"
+    for billing event "monthly" verify discount price of "46.00"  
+    verify that cart total is "7"        
+    remove product "P2" from cart   
+    verify that number of child carts is "3"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total for "billingEvent1Test" is "17"   
+    verify that cart total for "paynow" is "7" 
+    verify that cart total for "monthly" is "67.97"
+    for billing event "monthly" verify discount price of "35.00"  
+    verify that cart total is "7"        
+    add product "P2" to cart   
+    verify that number of child carts is "3"
+    verify that cart total for "onfirstbill" is "10"
+    verify that cart total for "billingEvent1Test" is "17"   
+    verify that cart total for "paynow" is "7" 
+    verify that cart total for "monthly" is "89.96"
+    for billing event "monthly" verify discount price of "46.00"  
+    verify that cart total is "7" 
+    remove product "P1" from cart
+    remove product "P2" from cart    
+    verify that number of child carts is "2"
+    verify that cart total for "billingEvent1Test" is "17"   
+    verify that cart total for "paynow" is "7" 
+    verify that cart total for "monthly" is "46.98"
+    for billing event "monthly" verify discount price of "25.00"  
+    verify that cart total is "7"  
+    remove product "P2" from cart   
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED  
+    remove product "P4" from cart   
+    verify that number of child carts is "1"  
+    verify that cart total for "paynow" is "7" 
+    verify that cart total for "monthly" is "22.99"
+    for billing event "monthly" verify discount price of "12.00"  
+    verify that cart total is "7" 
+    remove product "P4" from cart   
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED  
+    add product "P4" to cart
+    verify that number of child carts is "2"  
+    verify that cart total for "billingEvent1Test" is "17"  
+    verify that cart total for "paynow" is "7" 
+    verify that cart total for "monthly" is "46.98"
+    for billing event "monthly" verify discount price of "25.00"  
+    verify that cart total is "7" 
+    remove product "P4" from cart       
+    add product "P3" to cart    
+    remove product "P3" from cart   
+    verify that number of child carts is "1"  
+    verify that cart total for "paynow" is "7" 
+    verify that cart total for "monthly" is "22.99"
+    for billing event "monthly" verify discount price of "12.00" 
+    verify that cart total is "7"    
+    remove product "P3" from cart   
+    verify that number of child carts is "0"  
+    verify that cart total for "paynow" is "0" 
+    verify that cart total is "0"     
+    remove product "P1" from cart   
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P2" from cart   
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P3" from cart   
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED
+    remove product "P4" from cart   
+    #EXPECT EXCEPTION, BECAUSE CART IS EMPTY AND NO PRODUCT CAN BE REMOVED    
+    

@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<%@page import="de.hybris.platform.util.JspContext"%>
+<%@page import="java.util.*"%>
+<%@page import="java.text.*"%>
+<%@page import="java.io.*"%>
+<%@page import="java.net.*"%>
+<%@page import="java.sql.*"%>
+<%@page import="javax.sql.*"%>
+<%@page import="java.lang.reflect.*"%>
+<%@page import="javax.naming.*"%>
+<%@page import="javax.transaction.*"%>
+<%@page import="javax.servlet.http.*"%>
+<%@page import="de.hybris.platform.core.*"%>
+<%@page import="de.hybris.platform.cache.*"%>
+<%@page import="de.hybris.platform.jalo.*"%>
+<%@page import="de.hybris.platform.jalo.c2l.Currency" %>
+<%@page import="de.hybris.platform.jalo.c2l.*"%>
+<%@page import="de.hybris.platform.jalo.product.*"%>
+<%@page import="de.hybris.platform.jalo.user.*"%>
+<%@page import="de.hybris.platform.jdbcwrapper.*"%>
+<%@page import="de.hybris.platform.jalo.type.*"%>
+<%@page import="de.hybris.platform.jalo.order.*"%>
+<%@page import="de.hybris.platform.jalo.meta.*"%>
+<%@page import="de.hybris.platform.jalo.extension.*"%>
+<%@page import="de.hybris.platform.jalo.flexiblesearch.*"%>
+<%@page import="de.hybris.platform.persistence.flexiblesearch.*"%>
+<%@page import="de.hybris.platform.jalo.security.JaloSecurityException"%>
+<%@page import="de.hybris.platform.util.*"%>
+<%@page import="de.hybris.platform.licence.*"%>
+<%@page import="de.hybris.platform.util.collections.*"%>
+
+<%!
+	JaloSession jaloSession = null;
+
+	public String getWebRoot(HttpServletResponse response, String extname)
+	{
+		return response.encodeURL(Utilities.getInstalledWebModules().get(extname)+"/");
+	}
+
+
+	public boolean isInstalled(String extname)
+	{
+		return Utilities.getInstalledWebModules().containsKey(extname);
+		//return true;
+	}
+	
+	public boolean isInitialized(HttpServletRequest request)
+	{
+		JaloSession jaloSession = null;
+		
+		boolean initialzed = true;
+		final Tenant tenant = Registry.getCurrentTenant();
+		if (tenant.getJaloConnection().isSystemInitialized())
+		{
+			try
+			{
+				jaloSession = WebSessionFunctions.getSession( request );
+				if(jaloSession != null && jaloSession.getUser().getUID().equals("anonymous"))
+				{
+					jaloSession.setUser(UserManager.getInstance().getAdminEmployee());
+				}
+			}
+			catch(Exception e)
+			{
+				initialzed = false;
+			}
+		}
+		else
+		{
+			initialzed=false;
+		}
+		return initialzed;
+	}
+%>
+<%
+	Registry.activateMasterTenant();
+	response.setContentType("text/html; charset=utf-8");
+	
+	boolean initialzed = isInitialized(request);
+	
+	if( !initialzed )
+	{
+		response.sendRedirect(getWebRoot(response, "hac"));
+	}
+%>

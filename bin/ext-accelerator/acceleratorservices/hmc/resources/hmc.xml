@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+
+	<!-- Configuration for extension acceleratorservices -->
+
+	<type name="EmailAddress" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="emailAddress"/>
+				<condition attribute="displayName"/>
+			</search>
+			<result defaultview="list">
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="emailAddress" width="200"/>
+						<attribute name="displayName" width="200"/>
+					</itemlayout>
+				</listview>
+				<editview mode="delete"/>
+				<treeview mode="replace">
+					<itemlayout>
+						<attribute name="emailAddress"/>
+						<attribute name="displayName"/>
+					</itemlayout>
+					<explorable>
+						<attribute name="messagesSent"/>
+					</explorable>
+				</treeview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="emailAddress" editable="false"/>
+						<attribute name="displayName" editable="false"/>
+					</listlayout>
+				</essentials>
+				<tab name="tab.common" position="0">
+					<section name="section.common">
+						<listlayout>
+							<attribute name="toMessages" editable="false">
+								<referencecollectioneditor maxcount="20"/>
+							</attribute>
+							<attribute name="ccMessages" editable="false">
+								<referencecollectioneditor maxcount="20"/>
+							</attribute>
+							<attribute name="bccMessages" editable="false">
+								<referencecollectioneditor maxcount="20"/>
+							</attribute>
+							<attribute name="messagesSent" editable="false">
+								<referencecollectioneditor maxcount="20"/>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="emailAddress"
+		                  mode="replace" sortattribute="emailAddress">
+			<itemlayout>
+				<attribute name="emailAddress"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="EmailMessage" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="sent"/>
+				<condition attribute="toAddresses"/>
+				<condition attribute="ccAddresses"/>
+				<condition attribute="bccAddresses"/>
+				<condition attribute="fromAddress"/>
+				<condition attribute="subject"/>
+				<condition attribute="body"/>
+				<condition attribute="sentDate"/>
+				<condition attribute="sentMessageID"/>
+			</search>
+			<result defaultview="list">
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="sent" width="50"/>
+						<attribute name="toAddresses" width="200"/>
+						<attribute name="fromAddress" width="200"/>
+						<attribute name="subject" width="250"/>
+					</itemlayout>
+				</listview>
+				<editview mode="delete"/>
+				<treeview mode="replace">
+					<itemlayout>
+						<attribute name="sent"/>
+						<attribute name="toAddresses"/>
+						<attribute name="subject"/>
+					</itemlayout>
+					<explorable>
+						<attribute name="attachments"/>
+					</explorable>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="tab.common" position="0">
+					<section name="section.common">
+						<listlayout>
+							<attribute name="toAddresses" editable="false"/>
+							<attribute name="ccAddresses" editable="false"/>
+							<attribute name="bccAddresses" editable="false"/>
+							<attribute name="fromAddress" editable="false"/>
+							<attribute name="replyToAddress" editable="false"/>
+							<attribute name="subject" editable="false"/>
+							<attribute name="body" width="600" editable="false">
+								<textareaeditor cols="40" rows="3" expanded="true"/>
+							</attribute>
+							<attribute name="attachments" editable="false"/>
+						</listlayout>
+					</section>
+					<section name="section.delivery">
+						<listlayout>
+							<attribute name="sent" editable="false"/>
+							<attribute name="sentDate" editable="false"/>
+							<attribute name="sentMessageID" editable="false"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="toAddresses"/>
+				<attribute name="subject"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="EmailPageTemplate" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.emailpagetemplate.email">
+					<section name="sec.emailpagetemplate.email">
+						<listlayout>
+							<attribute name="subject"/>
+							<attribute name="htmlTemplate"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ExportDataCronJob" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.common" position="0" mode="append">
+					<section name="section.exportdata">
+						<listlayout>
+							<attribute name="baseStore"/>
+							<attribute name="cmsSite"/>
+							<attribute name="language"/>
+							<attribute name="currency"/>
+							<attribute name="user"/>
+							<attribute name="thirdPartyHost"/>
+							<attribute name="thirdPartyUsername"/>
+							<attribute name="thirdPartyPassword"/>
+							<attribute name="dataGenerationPipeline"/>
+							<attribute name="historyEntries"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="ExportDataHistoryEntry" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="exportDataCronJob"/>
+				<condition attribute="code"/>
+				<condition attribute="status"/>
+				<condition attribute="startTime"/>
+				<condition attribute="finishTime"/>
+				<condition attribute="processedResultCount"/>
+			</search>
+			<result defaultview="list">
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="exportDataCronJob" width="200"/>
+						<attribute name="code" width="150"/>
+						<attribute name="status" width="150"/>
+						<attribute name="processedResultCount" width="150"/>
+						<attribute name="failureMessage" width="500"/>
+					</itemlayout>
+				</listview>
+				<editview mode="delete"/>
+				<treeview mode="replace">
+					<itemlayout>
+						<attribute name="exportDataCronJob"/>
+						<attribute name="code"/>
+						<attribute name="status"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="code"/>
+							<attribute name="exportDataCronJob"/>
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="tab.common" position="0">
+					<section name="section.common">
+						<listlayout>
+							<attribute name="status" editable="false"/>
+							<attribute name="startTime" editable="false"/>
+							<attribute name="finishTime" editable="false"/>
+							<attribute name="processedResultCount" editable="false"/>
+							<attribute name="failureMessage" editable="false"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="code"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="SiteMapMediaCronJob" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.common" position="0" mode="append">
+					<section name="section.sitemapjob">
+						<listlayout>
+							<attribute name="cmsSite"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="BaseStore" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" position="1" mode="append">
+					<section name="section.basestore.expresscheckoutenabled"
+					         mode="append">
+						<listlayout>
+							<attribute name="expressCheckoutEnabled" width="300"/>
+						</listlayout>
+					</section>
+					<section name="section.basestore.taxestimationenabled"
+					         mode="append">
+						<listlayout>
+							<attribute name="taxestimationenabled" width="300"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+
+	<type name="Customer" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="type"/>
+			</search>
+			<result>
+				<listview>
+					<itemlayout>
+						<attribute name="type" width="50"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="originalUid" editable="false"/>
+					</listlayout>
+				</essentials>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="SolrPageRedirect" mode="append">
+		<organizer>
+			<search>
+				<condition attribute="redirectItem"/>
+			</search>
+			<result defaultview="list">
+				<listview>
+					<itemlayout>
+						<attribute name="redirectItem"/>
+					</itemlayout>
+				</listview>
+				<editview>
+					<itemlayout>
+						<attribute name="redirectItem"/>
+					</itemlayout>
+				</editview>
+				<treeview>
+					<itemlayout>
+						<attribute name="redirectItem"/>
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="SolrItemRedirect.tab">
+					<section name="SolrItemRedirect.sec">
+						<listlayout>
+							<attribute name="redirectItem"></attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference>
+			<itemlayout>
+				<attribute name="redirectItem"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="PointOfService" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="tab.address" mode="append">
+					<section name="sec.geodata" position="1" mode="append">
+						<columnlayout mode="append">
+							<row mode="append">
+								<attribute name="nearbyStoreRadius"/>
+								<void/>
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="BaseSite" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" mode="append">
+					<section name="sec.cartremoval" position="4" mode="append">
+						<listlayout>
+							<attribute name="cartRemovalCronJob"/>
+							<attribute name="cartRemovalAge"/>
+							<attribute name="anonymousCartRemovalAge"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CmsSite" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" mode="append">
+					<section name="sec.urlencodingattributes" position="5"
+					         mode="append">
+						<listlayout>
+							<attribute name="urlEncodingAttributes"/>
+						</listlayout>
+					</section>
+					<section name="sec.sitemapconfigurations" position="5"
+					         mode="append">
+						<listlayout>
+							<attribute name="siteMaps"/>
+							<attribute name="siteMapConfig"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="SiteMapPage" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code"/>
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="code"/>
+						<attribute name="frequency"/>
+						<attribute name="priority"/>
+						<attribute name="active"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="code"/>
+						<attribute name="frequency"/>
+						<attribute name="priority"/>
+						<attribute name="active"/>
+					</listlayout>
+				</essentials>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="code"/>
+				<attribute name="frequency"/>
+				<attribute name="priority"/>
+				<attribute name="active"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="SiteMapLanguageCurrency" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="currency"/>
+				<condition attribute="language"/>
+			</search>
+			<result defaultview="list">
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="currency"/>
+						<attribute name="language"/>
+					</itemlayout>
+				</listview>
+				<editview mode="replace">
+					<itemlayout>
+						<attribute name="currency"/>
+						<attribute name="language"/>
+					</itemlayout>
+				</editview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="currency"/>
+						<attribute name="language"/>
+					</listlayout>
+				</essentials>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="currency"/>
+				<attribute name="language"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+
+</configuration>

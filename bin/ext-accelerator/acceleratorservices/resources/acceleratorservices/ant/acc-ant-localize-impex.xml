@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<project name="acc.ant.localize.impex">
+
+	<macrodef name="impexGenerate">
+		<attribute name="extname"/>
+		<sequential>
+			<typedef name="impexGen" classname="de.hybris.platform.acceleratorservices.velocity.ant.GenerateLocalizedImpexesTask" onerror="report">
+				<classpath>
+					<fileset dir="${ext.acceleratorservices.path}/lib">
+						<include name="yimpexgenerator.jar"/>
+						<include name="velocity-tools-2.0.jar"/>
+					</fileset>
+
+					<fileset dir="${ext.core.path}/lib">
+						<include name="*.jar"/>
+					</fileset>
+					<fileset dir="${platformhome}/bootstrap/bin/">
+						<include name="*.jar"/>
+					</fileset>
+
+					<fileset dir="${platformhome}/lib">
+						<include name="*.jar"/>
+					</fileset>
+
+					<fileset dir="${ant.home}/lib">
+						<include name="ant*.jar"/>
+					</fileset>
+				</classpath>
+			</typedef>
+			<if>
+				<available file="${ext.@{extname}.path}/resources-lang/@{extname}"/>
+				<then>
+					<outofdate>
+						<sourcefiles>
+							<fileset dir="${ext.@{extname}.path}/resources-lang/">
+								<include name="**/*.vt"/>
+							</fileset>
+							<fileset dir="${ext.@{extname}.path}/resources-lang/">
+								<include name="**/*.properties"/>
+							</fileset>
+						</sourcefiles>
+						<targetfiles path="${ext.@{extname}.path}/resources-lang/touch_impexgen"/>
+						<sequential>
+							<echo message="Generating localized impex scripts for  @{extname}"/>
+							<impexGen>
+								<sourcePath propertyFilePath=".">
+									<fileset dir="${ext.@{extname}.path}/resources-lang/@{extname}">
+										<include name="**/*.vt"/>
+									</fileset>
+								</sourcePath>
+								<targetPath targetFilePath="${ext.@{extname}.path}/resources" relative="false"/>
+							</impexGen>
+							<touch file="${ext.@{extname}.path}/resources-lang/touch_impexgen"/>
+
+						</sequential>
+					</outofdate>
+				</then>
+				<else>
+					<echo message="No impex templates found for @{extname}"/>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+</project>

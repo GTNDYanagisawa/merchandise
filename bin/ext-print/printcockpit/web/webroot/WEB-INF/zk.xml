@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk>
+<!--uncomment the following if you want to use ID generator-->
+
+<!--	<system-config>-->
+<!--		<id-generator-class>de.hybris.platform.cockpit.util.CockpitTestIDGenerator-->
+<!--		</id-generator-class>-->
+<!--	</system-config>-->
+<!-- -->	
+
+	<session-config>
+    	<max-desktops-per-session>1</max-desktops-per-session>        	
+	</session-config>
+	
+	<desktop-config>
+		<theme-provider-class>de.hybris.platform.cockpit.util.CockpitThemeProvider</theme-provider-class>
+ 	</desktop-config>
+
+	<language-config>
+		<addon-uri>/cockpit/customcomponents/components-lang-addon.xml</addon-uri>
+		<addon-uri>/printcockpit/customcomponents/components-lang-addon.xml</addon-uri>    
+	</language-config>
+	<listener>
+		<listener-class>
+			de.hybris.platform.cockpit.util.HybrisThreadInit
+		</listener-class>
+	</listener>
+	<listener>
+		<listener-class>
+			de.hybris.platform.cockpit.util.HybrisThreadCleanup
+		</listener-class>
+	</listener>
+	<listener>
+		<listener-class>
+			de.hybris.platform.cockpit.util.HybrisDesktopCleanup
+		</listener-class>
+	</listener>
+	<listener>
+		<description>ThreadLocal variables synchronizer</description>
+		<!-- ThreadLocalListener thows NPEx so we're using our own copy by now -->
+		<!--  <listener-class>org.zkoss.zkplus.util.ThreadLocalListener</listener-class> -->
+		<listener-class>de.hybris.platform.cockpit.util.HybrisThreadLocalListener</listener-class>
+	</listener>
+
+    <system-config>
+        <engine-class>org.zkoss.zk.ui.impl.HybrisUiEngineImpl</engine-class>
+    </system-config>
+
+	<log>
+		<log-base>org.zkoss</log-base>
+	</log>
+	
+	<preference>
+		<name>ThreadLocal</name>
+		<value>
+			org.springframework.web.context.request.RequestContextHolder=requestAttributesHolder,inheritableRequestAttributesHolder;org.springframework.security.core.context.ThreadLocalSecurityContextHolderStrategy=contextHolder;
+		</value>
+	</preference>
+	<device-config>
+	    <device-type>ajax</device-type>
+	    <!-- somehow timeout is triggered even after logout so we have to disable it until this is fixed    
+	    <timeout-uri>/login.zul?timeout=true</timeout-uri>    
+	    -->
+	    <timeout-uri>/</timeout-uri>    
+	</device-config>
+	
+	<client-config>
+		<tooltip-delay>1000</tooltip-delay>
+	</client-config>
+	
+<!--	<system-config>-->
+<!--		<id-generator-class>de.hybris.platform.cockpit.util.CockpitTestIDGenerator</id-generator-class>-->
+<!--	</system-config>-->
+	
+<!--	<desktop-config>-->
+<!--		<id-to-uuid-prefix>_</id-to-uuid-prefix>-->
+<!--	</desktop-config>-->
+	<client-config>
+		<click-filter-delay>190</click-filter-delay>
+	</client-config>
+	
+	<preference>
+		<!-- if you don't use internet explorer on client side you can comment this out	-->
+		<name>de.hybris.platform.cockpit.doubleClickDelay</name>
+		<value>300</value>
+	</preference>
+	<preference>
+		<name>de.hybris.platform.cockpit.path_to_aspell</name>
+		<value>/usr/bin/aspell</value>
+<!--		WINDOWS <value>C:\\Program Files\\Aspell\\bin\\aspell.exe</value>-->
+<!--		 APPLE <value>/opt/local/bin/aspell</value> -->
+	</preference>
+	
+	
+	<preference>
+		<!-- 				
+		This preference allows you to select references - using the Cockpit reference editors - in an easier way.
+		After making your selection in the search dialog the reference will be automatically assigned to the attribute i.e. no additional confirmation is needed if this feature is enabled.
+
+		However, this feature can cause problems for users which are using Mozilla Firefox and thus can be optionally disabled.
+		This is handled automatically if the value is set to "auto".
+		
+		Allowed values:
+			auto 	- automatically enabled/disabled depending on client browser (recommended)
+			true 	- always enabled
+			false 	- always disabled   		  
+		-->
+		<name>de.hybris.platform.cockpit.fast_reference</name>
+		<value>auto</value>
+	</preference>
+	
+	<preference>
+		 <!--
+		 	allows you to set the lazyload packet size for browser views, i.e. how many items will be rendered in one rendering cycle
+		 	
+		 	Allowed values examples:
+			  -1 	- disable lazyloading
+			  20	- set the default and initial packet size to 20
+			  2,10	- set the initial packet size to 2 and the default to 20 (setting initial to a low value can improve ui feedback, e.g. when login or switching tabs)
+		  -->
+		<name>de.hybris.platform.cockpit.browserview.renderPacketSize</name>
+		<value>0,20</value>
+	</preference>
+</zk>

@@ -1,0 +1,209 @@
+/*
+	Script Name      :	
+	File             :	
+	Author           :	
+	Creation Date    :	Mon Feb 17 09:00:00 CEST 2014
+	Description      :	
+	Known Problems   :	
+	History          :	
+*/
+
+#include "internal/types.h"
+#include "internal/text.h"
+#include "[soap]/actions/601.crpt"
+
+
+int warnIfPageIsNotActive () {
+	char *pageStringID = alloc(256);
+	int pageID1 = 0, pageID2 = 0, pageID3 = 0;
+	document::getid(0,pageID1,pageID2,pageID3,pageStringID);
+	
+	if(strlen(pageStringID) == 0 )
+	{
+		showmessage ("No Document active. Please open a document via publication panel and try again. (Problem is: pageStringID not set:%s)", pageStringID );
+		return 0; 
+	}
+}
+
+int importComments ()
+{
+	int bufferSize = 1000000;
+	int errorcode = 0;
+	int state = 0;
+	char *info = alloc(bufferSize);
+	Query qu = sql::query (soap::connection());
+	
+	char * filename = alloc(4096);
+	
+	int pageID1 = 0, pageID2 = 0, pageID3 = 0;
+	char *pageStringID = alloc(256);
+	
+	int			flags	= kReplaceNotes;
+	//flags += kSuppressExternalUpdate;
+	
+	document::getid(0,pageID1,pageID2,pageID3,pageStringID);
+	document::name(filename);
+	
+	if(strlen(pageStringID) == 0 )
+	{
+		//use warnIfPageIsNotActive() to raise a warning in advance
+		return 0; 
+	}
+	wlog("", "Importing Comments for page %s, %d, %d, %d, %s \n", filename, pageID1, pageID2, pageID3, pageStringID);
+		
+	query::send( qu, "pageStringID = \"" );
+	query::send( qu, pageStringID );
+	query::send( qu, "\" \n" );
+	
+	if(qu)
+	{
+		if(query::set_method (qu, "GET_commentxml") == 0) 
+		{
+			if(query::output (qu, kString, info, bufferSize))
+			{
+				if(query::exec (qu) )
+				{
+
+					while (query::fetch (qu))
+					{
+						
+						if(strlen(info) > 2 ) {
+							errorcode = document::import_notes (0, "", info ,flags);
+						}
+						
+						if(errorcode != 0 ) {
+							wlog("", "Error during comment import:(errorcode:%d) \n", errorcode );
+							showmessage ("Error during comment import:(errorcode:%d)", errorcode );
+						}
+					}
+					
+					
+				}
+				else
+				{
+					wlog("", "There were a query::exec error in 20034.crpt, method main(). \n");
+					errorcode = 1;
+				}
+
+			}
+			else
+			{
+				wlog("", "There were a query send/input/output error in 20034.crpt, method main(). \n");
+				errorcode = 2;
+			}
+
+		}
+		else
+		{
+			wlog("", "There were a query::set_method error in 20034.crpt, method main(). \n");
+			errorcode = 3;
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful! error in method main() in 20034.crpt. \n");
+		errorcode = 4;
+	}	
+
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in script 20034.crpt, method main(). \n");
+	}
+	
+	
+	release(info);
+	release(pageID1);
+	release(pageID2);
+	release(pageID3);
+	release(pageStringID);
+	
+
+	return 0;
+}
+
+int exportComments()
+{
+	int err = 0;	
+	int uploadErr = 0;
+	int pageID = 0;
+	int pageID2 = 0;
+	int pageID3 = 0;
+	char *stringID = alloc(256);
+	char *systime = alloc(20);
+	char *timestamp = alloc(20);
+	char *workDir = alloc(100);
+	char *comment_xml_abs = alloc(100);
+	char *comment_xml = alloc(100);
+	
+	SOAP sh = soap::connection();
+	
+	//grabing document-id	
+	document::getid( 0, pageID, pageID2, pageID3, stringID );
+
+	if( strlen( stringID ) == 0 )
+	{
+		showmessage( "No document active. Please open a document via publication panel and try again." );
+		return 0; 
+	}
+
+	if(DEBUG_ENABLED)  wlog( "", "Export comments for page with stringID [%s] \n", stringID );
+	
+	system::now(systime, 98);
+	strcpy( timestamp, strsubstring(systime, 6, 4) ); //year
+	strcat( timestamp, strsubstring(systime, 3, 2) ); //month
+	strcat( timestamp, strsubstring(systime, 0, 2) ); //day
+	strcat( timestamp, strsubstring(systime, 11, 2) );//hour
+	strcat( timestamp, strsubstring(systime, 14, 2) );//minute
+	strcat( timestamp, strsubstring(systime, 17, 2) );//secound
+
+	if(DEBUG_ENABLED)  wlog( "","Export is using timestamp [%s] \n", timestamp );
+	
+	workDir = "$HOME/werk2_print/comments/";
+	
+	sprintf( comment_xml, "push_pagecomments_xml_%s_%s.xml", timestamp, stringID );
+	sprintf( comment_xml_abs, "%s%s", workDir, comment_xml );
+	
+	err = document::export_notes( 0, comment_xml_abs );
+	if( err != 0 )
+	{
+		if(DEBUG_ENABLED)  wlog( "", "Error while creating comment XML file. Errorcode [%d], message [%s], path [%s] \n", err, serror(err), comment_xml_abs );
+	}
+
+	uploadErr = soap::upload( sh, comment_xml_abs, -1, comment_xml );
+	if( uploadErr != 0 )
+	{
+		if(DEBUG_ENABLED)  wlog( "", "Error while uploading comment XML file. Errorcode [%d], message [%s]\n", err, serror(err) );
+	}
+			
+	//removing file after upload
+	if(REMOVE_TEMPORARY_FILES_AFTER_UPLOAD)
+	{
+		err = file::remove(comment_xml_abs);
+		if(err != 0)
+		{
+			if(DEBUG_ENABLED)  wlog("", "Tried to delete file '%s' after upload to PIM. The error code is: %i. Aborting! \n", comment_xml_abs, err);
+		}
+	}
+
+	release( pageID );
+	release( pageID2 );
+	release( pageID3 );
+	release( stringID );
+
+	// Cleanup
+	release( systime );
+	release( timestamp );
+	release( comment_xml );
+	release( comment_xml_abs );
+	release( workDir );
+
+
+	
+	//if not CometExeption raised, reimport notes
+	if(uploadErr == 0) {
+		if(DEBUG_ENABLED)  wlog( "", "No error occured while uploading comment XML file. Starting to import comments to receive the latest comments from hybris. \n", err, serror(err) );
+		importComments();
+	}
+
+	return 0;
+}

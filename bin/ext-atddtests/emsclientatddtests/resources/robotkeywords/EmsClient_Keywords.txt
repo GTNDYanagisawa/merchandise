@@ -1,0 +1,101 @@
+*** Settings ***
+Library	   de.hybris.platform.emsclientatddtests.keywords.emsclient.EntitlementsBuilderKeywordLibrary
+Library        	de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+
+*** Keywords ***
+
+### SIMPLE:
+build entitlement with id "${entitlementId:[^"]*}" 
+	[Documentation]    Build entitlement in memory with id
+	${result}=    build ems grant data    ${entitlementId}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}
+	[Return]    ${result}
+
+build entitlement with id "${entitlementId:[^"]*}" granted at "${dateCreatedAt:[^"]*}"
+	[Documentation]    Build entitlement in memory with id
+	${result}=    build ems grant data    ${entitlementId}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${dateCreatedAt}
+	[Return]    ${result}	
+
+### STRING:
+build entitlement with id "${entitlementId:[^"]*}" and stringCondition "${stringCondition:[^"]*}"
+	[Documentation]    Build entitlement in memory with id and stringCondition
+	${result}=    build ems grant data    ${entitlementId}    ${stringCondition}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}
+	[Return]    ${result}
+
+build entitlement with id "${entitlementId:[^"]*}" and stringCondition "${stringCondition:[^"]*}" granted at "${dateCreatedAt:[^"]*}"
+	[Documentation]    Build entitlement in memory with id and stringCondition
+	${result}=    build ems grant data    ${entitlementId}    ${stringCondition}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${dateCreatedAt}
+	[Return]    ${result}
+
+### TIMEFRAME:
+build entitlement with id "${entitlementId:[^"]*}" and timeframeCondition with timeUnit "${timeUnit:[^"]*}" and start "${timeUnitStart:[^"]*}" and duration "${timeUnitDuration:[^"]*}"
+	[Documentation]    Build entitlement in memory with id and timeCondition
+	${result}=    build ems grant data    ${entitlementId}    ${NULL}    ${NULL}    ${timeUnit}    ${timeUnitStart}    ${timeUnitDuration}    ${NULL}    ${NULL}    ${NULL}
+	[Return]    ${result}    
+
+build entitlement with id "${entitlementId:[^"]*}" and timeframeCondition with timeUnit "${timeUnit:[^"]*}" and start "${timeUnitStart:[^"]*}" and duration "${timeUnitDuration:[^"]*}" granted at "${dateCreatedAt:[^"]*}"
+	[Documentation]    Build entitlement in memory with id and timeCondition
+	${result}=    build ems grant data    ${entitlementId}    ${NULL}    ${NULL}    ${timeUnit}    ${timeUnitStart}    ${timeUnitDuration}    ${NULL}    ${NULL}    ${dateCreatedAt}
+	[Return]    ${result}
+
+### PATH:
+build entitlement with id "${entitlementId:[^"]*}" and pathCondition "${pathCondition:[^"]*}"
+	[Documentation]    Build entitlement in memory with id and pathCondition
+	${result}=    build ems grant data    ${entitlementId}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${pathCondition}    ${NULL}    ${NULL}
+	[Return]    ${result}
+	
+build entitlement with id "${entitlementId:[^"]*}" and pathCondition "${pathCondition:[^"]*}" granted at "${dateCreatedAt:[^"]*}"
+	[Documentation]    Build entitlement in memory with id and pathCondition
+	${result}=    build ems grant data    ${entitlementId}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${pathCondition}    ${NULL}    ${dateCreatedAt}
+	[Return]    ${result}	
+
+### GEO:
+build entitlement with id "${entitlementId:[^"]*}" and geoCondition "${geoCondition:[^"]*}"
+	[Documentation]    Build entitlement in memory with id and stringCondition
+	${result}=    build ems grant data    ${entitlementId}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${geoCondition}    ${NULL}
+	[Return]    ${result}
+	
+build entitlement with id "${entitlementId:[^"]*}" and geoCondition "${geoCondition:[^"]*}" granted at "${dateCreatedAt:[^"]*}"
+	[Documentation]    Build entitlement in memory with id and stringCondition
+	${result}=    build ems grant data    ${entitlementId}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${geoCondition}    ${dateCreatedAt}
+	[Return]    ${result}	
+
+### METERED:
+build entitlement with id "${entitlementId:[^"]*}" with maxQuantity "${quantity:[^"]*}"
+	[Documentation]    Build entitlement in memory with id and quantity
+	${result}=    build ems grant data    ${entitlementId}    ${NULL}    ${quantity}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}
+	[Return]    ${result}
+	
+build entitlement with id "${entitlementId:[^"]*}" with maxQuantity "${quantity:[^"]*}" granted at "${dateCreatedAt:[^"]*}"
+	[Documentation]    Build entitlement in memory with id and quantity
+	${result}=    build ems grant data    ${entitlementId}    ${NULL}    ${quantity}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${NULL}    ${dateCreatedAt}
+	[Return]    ${result}	
+
+### VERIFICATION:
+for entitlement "${entitlementData:[^"]*}" verify that "${xPath:[^"]*}" evaluates to "${expectedXml:[^"]*}"
+	[Documentation]    Verifies that the XPath evaluates to the expected XML when applied to the given product's XML 
+	verify object xml    ${entitlementData}    ${xPath}    ${expectedXml}
+
+for entitlement "${entitlementData:[^"]*}" verify that the XML for grant matches "${expectedXml:[^"]*}"
+	[Documentation]   Verifies that XML for grant matches the expected XML 
+	for entitlement "${entitlementData}" verify that "com.hybris.services.entitlements.api.GrantData" evaluates to "${expectedXml}"
+
+create subscription product "${productCode:[^"]*}"
+	[Documentation]    Creates a subscription product with the given code
+	create subscription product "${productCode}" with subscription term "monthly"
+
+### CREATE ENTITLEMENT:
+create entitlement "${entitlementData:[^"]*}" with userId="${userId:[^"]*}", code="${code:[^"]*}", createdAt="${createdAt:[^"]*}", baseStoreUid="${baseStoreUid:[^"]*}" and orderEntryNumber="${orderEntryNumber:[^"]*}"
+	[Documentation]    Create grant in entitlement and metering system.
+	${result}=    create entitlement    ${entitlementData}    ${userId}    ${code}    ${createdAt}    ${baseStoreUid}    ${orderEntryNumber}    ${NULL}    ${NULL}    ${NULL}
+	[Return]    ${result}    
+
+#CURRENTLY USED IN SUITE: Exceptions_Entitlement_TBD.txt - ToBeDone
+#create subscription product "${productCode:[^"]+}"
+#	[Documentation]    Creates a subscription product with the given code
+#	create subscription product "${productCode}" with subscription term "monthly"
+
+# This keyword repeats one from entitlements-test, but for EmsGrantData
+grant entitlement "${entitlementData:[^"]*}"
+	[Documentation]    Create grant in EMS
+	${result} =        grant ems entitlement    ${entitlementData}
+	[Return]           ${result}

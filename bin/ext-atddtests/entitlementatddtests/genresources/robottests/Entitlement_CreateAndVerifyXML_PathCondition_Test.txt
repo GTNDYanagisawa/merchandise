@@ -1,0 +1,61 @@
+*** Settings ***
+Resource    entitlements/Product_Keywords.txt
+Resource    entitlements/Entitlement_Keywords.txt
+Resource    common/EntitlementStartup_Keywords.txt
+
+Test Setup        import entitlement sampledata
+Test Teardown     reset system
+
+*** Test Cases ***
+
+Test_Entitlement_CreateAndVerifyXML_PathCondition_InvalidPath_No1_FAIL
+	[Documentation]    Verifies addition of 1 entitlement with "/" path condition
+	create product "P1"
+	Run keyword and expect error
+	...                *
+	...                for product "P1" add non metered entitlement "NME1" with pathCondition "/"
+
+Test_Entitlement_CreateAndVerifyXML_PathCondition_InvalidPath_No2_FAIL
+	[Documentation]    Verifies addition of 1 entitlement with "a/" path condition
+	create product "P1"
+	Run keyword and expect error
+	...                *
+	...                for product "P1" add non metered entitlement "NME1" with pathCondition "a/"
+
+Test_Entitlement_CreateAndVerifyXML_PathCondition_InvalidPath_No3_FAIL
+	[Documentation]    Verifies addition of 1 entitlement with "a/b/" path condition
+	create product "P1"
+	Run keyword and expect error
+	...                *
+	...                for product "P1" add non metered entitlement "NME1" with pathCondition "a/b/"
+
+Test_Entitlement_CreateAndVerifyXML_PathCondition_ValidPath_No1_PASS
+	[Documentation]    Verifies addition of 1 entitlement with "a" path condition
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with pathCondition "a"
+	for product "P1" verify that the XML for entitlements matches " <entitlements><entitlement><name>Non-Metered Entitlement 1</name><conditionPath>a</conditionPath><quantity>0</quantity></entitlement></entitlements>"
+
+Test_Entitlement_CreateAndVerifyXML_PathCondition_ValidPath_No2_PASS
+	[Documentation]    Verifies addition of 1 entitlement with "a/b" path condition
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with pathCondition "a/b"
+	for product "P1" verify that the XML for entitlements matches " <entitlements><entitlement><name>Non-Metered Entitlement 1</name><conditionPath>a/b</conditionPath><quantity>0</quantity></entitlement></entitlements>"
+
+Test_Entitlement_CreateAndVerifyXML_PathCondition_ValidPath_Long_PASS
+	[Documentation]    Verifies addition of 1 entitlement with "a/b/1@/}{%*" path condition
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with pathCondition "a/b/1@/}{%*"
+	for product "P1" verify that the XML for entitlements matches " <entitlements><entitlement><name>Non-Metered Entitlement 1</name><conditionPath>a/b/1@/}{%*</conditionPath><quantity>0</quantity></entitlement></entitlements>"	
+
+Test_Entitlement_CreateAndVerifyXML_PathCondition_ValidPath_Short_PASS
+	[Documentation]    Verifies addition of 1 entitlement with "/a" path condition
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with pathCondition "/a"
+	for product "P1" verify that the XML for entitlements matches " <entitlements><entitlement><name>Non-Metered Entitlement 1</name><conditionPath>/a</conditionPath><quantity>0</quantity></entitlement></entitlements>"
+
+Test_Entitlement_CreateAndVerifyXML_PathCondition_x2
+	[Documentation]    Verifies addition of 2 entitlements with path condition
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with pathCondition "pathCondition1"
+	for product "P1" add non metered entitlement "NME2" with pathCondition "pathCondition2"
+	for product "P1" verify that the XML for entitlements matches " <entitlements><entitlement><name>Non-Metered Entitlement 1</name><conditionPath>pathCondition1</conditionPath><quantity>0</quantity></entitlement><entitlement><name>Non-Metered Entitlement 2</name><conditionPath>pathCondition2</conditionPath><quantity>0</quantity></entitlement></entitlements>"

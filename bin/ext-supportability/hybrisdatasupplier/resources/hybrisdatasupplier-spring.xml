@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the 
+	confidential and proprietary information of hybris ("Confidential Information"). You shall not disclose 
+	such Confidential Information and shall use it only in accordance with the terms of the license agreement 
+	you entered into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<alias name="defaultHybrisCollectorService" alias="hybrisCollectorService" />
+	<bean id="defaultHybrisCollectorService" class="de.hybris.datasupplier.services.impl.DefaultHybrisCollectorService" />
+
+
+	<bean name="mySQLCollector" class="de.hybris.datasupplier.collectors.impl.MySQLCollector" />
+	<bean name="oracleCollector" class="de.hybris.datasupplier.collectors.impl.OracleCollector" />
+	<bean name="sqlserverCollector" class="de.hybris.datasupplier.collectors.impl.SqlServerCollector" />
+	<bean name="hanaCollector" class="de.hybris.datasupplier.collectors.impl.HanaCollector" />
+	<bean name="hsqlCollector" class="de.hybris.datasupplier.collectors.impl.HsqlCollector" />
+
+	<alias name="defaultDatabaseCollectorService" alias="databaseCollectorService" />
+	<bean id="defaultDatabaseCollectorService" class="de.hybris.datasupplier.services.impl.DefaultDatabaseCollectorService">
+		<property name="databaseTypes">
+			<props>
+				<prop key="oracle">ORA</prop>
+				<prop key="mysql">MYS</prop>
+				<prop key="sqlserver">MSS</prop>
+				<prop key="sap">HDB</prop>
+				<prop key="hsqldb">HSQ</prop>
+				<prop key="unspecified">NOTFOUND</prop>
+			</props>
+		</property>
+		<property name="collectors">
+			<set>
+				<ref bean="mySQLCollector" />
+				<ref bean="oracleCollector" />
+				<ref bean="sqlserverCollector" />
+				<ref bean="hanaCollector" />
+				<ref bean="hsqlCollector" />
+			</set>
+		</property>
+	</bean>
+
+	<alias name="defaultSLDConfigurationService" alias="sldConfigurationService" />
+	<bean id="defaultSLDConfigurationService" class="de.hybris.datasupplier.services.impl.DefaultDSConfigurationService"
+		init-method="initializeProperties" />
+
+	<alias name="defaultSLDContentGeneratorService" alias="sldContentGeneratorService" />
+	<bean name="defaultSLDContentGeneratorService" class="de.hybris.datasupplier.services.impl.DefaultDSContentGeneratorService">
+		<property name="configurationService" ref="sldConfigurationService" />
+	</bean>
+
+	<alias name="defaultSLDSupplierFacade" alias="sldSupplierFacade" />
+	<bean name="defaultSLDSupplierFacade" class="de.hybris.datasupplier.facades.impl.DefaultDataSupplierFacade">
+		<constructor-arg ref="sldConfigurationService" />
+		<constructor-arg ref="sldContentGeneratorService" />
+		<constructor-arg ref="sldRegService" />
+
+	</bean>
+
+	<bean id="dataSupplierJobPerformable" class="de.hybris.datasupplier.jobs.DataSupplierJobPerformable"
+		parent="abstractJobPerformable">
+		<constructor-arg ref="sldSupplierFacade" />
+		<constructor-arg ref="mediaService" />
+		<constructor-arg ref="modelService" />
+	</bean>
+
+	<!-- sldreg service -->
+
+	<bean id="sldRegService" class="de.hybris.datasupplier.services.impl.DefaultSLDRegSenderService"></bean>
+
+
+
+</beans>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ShippingMethodsReport" language="groovy" pageWidth="595" pageHeight="420" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" scriptletClass="de.hybris.platform.cockpit.reports.scriptlets.DateTimeScriptlet" resourceBundle="localization/jasperreports">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="shippingMethodsDS">
+		<parameter name="From" class="java.util.Date" isForPrompting="false"/>
+		<parameter name="To" class="java.util.Date" isForPrompting="false"/>
+		<parameter name="PreviousYearFrom" class="java.util.Date" isForPrompting="false"/>
+		<parameter name="PreviousYearTo" class="java.util.Date" isForPrompting="false"/>
+		<queryString>
+			<![CDATA[select count(DELIVERYMODE) DELIVERYMODECOUNT, DELIVERYMODE, GROUPED from (
+{{select {pm.CODE} DELIVERYMODE, 'GP1' GROUPED from {Order as o left join deliveryMode as pm on {pm.PK}={o.deliveryMode}}  where {o.DATE} < to_date($P{To}) and {o.DATE} >= to_date($P{From}) }}
+union all
+{{select {pm.CODE} DELIVERYMODE, 'GP2' GROUPED from {Order as o left join deliveryMode as pm on {pm.PK}={o.deliveryMode}}  where {o.DATE} < to_date($P{PreviousYearTo}) and {o.DATE} >= to_date($P{PreviousYearFrom}) }}) tbl group by DELIVERYMODE, GROUPED]]>
+		</queryString>
+		<field name="DELIVERYMODECOUNT" class="java.math.BigDecimal"/>
+		<field name="DELIVERYMODE" class="java.lang.String"/>
+		<field name="GROUPED" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="timerange" class="java.lang.String">
+		<property name="type" value="ReportTimeRange"/>
+		<defaultValueExpression><![CDATA["LAST7DAYS"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="REPORT_TITLE" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="specificday" class="java.util.Date"/>
+	<parameter name="From" class="java.util.Date"/>
+	<parameter name="To" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[SELECT {code} FROM {Order}]]>
+	</queryString>
+	<field name="CODE" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="595" height="80"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<summary>
+		<band height="340" splitType="Stretch">
+			<textField pattern="dd MMMM yyyy">
+				<reportElement x="459" y="282" width="114" height="20">
+					<printWhenExpression><![CDATA[$P{timerange} == 'USERDEFINED']]></printWhenExpression>
+				</reportElement>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{To}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MMMM yyyy">
+				<reportElement x="185" y="302" width="114" height="20">
+					<printWhenExpression><![CDATA[$P{timerange} == 'SPECIFICDAY']]></printWhenExpression>
+				</reportElement>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{specificday}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="10" y="282" width="175" height="20"/>
+				<textElement>
+					<font isBold="true" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString( "legend.timerange" )]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="10" y="262" width="175" height="20"/>
+				<textElement>
+					<font isBold="true" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString( "legend.created" )]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="316" y="282" width="143" height="20">
+					<printWhenExpression><![CDATA[$P{timerange} == 'USERDEFINED']]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font isBold="true" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString( "legend.to" )]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="185" y="282" width="114" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString( "series." + $P{timerange}.toLowerCase() )]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="316" y="262" width="143" height="20">
+					<printWhenExpression><![CDATA[$P{timerange} == 'USERDEFINED']]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font isBold="true" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString( "legend.from" )]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MMMM yyyy" isBlankWhenNull="false">
+				<reportElement x="459" y="262" width="114" height="20">
+					<printWhenExpression><![CDATA[$P{timerange} == 'USERDEFINED']]></printWhenExpression>
+				</reportElement>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{From}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MMMM yyyy HH:mm">
+				<reportElement x="185" y="262" width="114" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="10" y="302" width="175" height="20">
+					<printWhenExpression><![CDATA[$P{timerange} == 'SPECIFICDAY']]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font isBold="true" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString( "legend.specificday" )]]></textFieldExpression>
+			</textField>
+			<bar3DChart>
+				<chart customizerClass="de.hybris.platform.cockpit.reports.customizer.CSMBarChartCustomizer">
+					<reportElement x="0" y="0" width="595" height="248"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<dataset>
+						<datasetRun subDataset="shippingMethodsDS">
+							<datasetParameter name="From">
+								<datasetParameterExpression><![CDATA[$P{REPORT_SCRIPTLET}.getFrom($P{timerange},$P{From},$P{specificday})]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="To">
+								<datasetParameterExpression><![CDATA[$P{REPORT_SCRIPTLET}.getTo($P{timerange},$P{To},$P{specificday})]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="PreviousYearFrom">
+								<datasetParameterExpression><![CDATA[$P{REPORT_SCRIPTLET}.getFromYearAgo($P{timerange},$P{From},$P{specificday})]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="PreviousYearTo">
+								<datasetParameterExpression><![CDATA[$P{REPORT_SCRIPTLET}.getToYearAgo($P{timerange},$P{To},$P{specificday})]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+					</dataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{GROUPED} == "GP2" ? (new org.joda.time.DateMidnight($P{PreviousYearFrom}).toString("dd MMMM yyyy") + " - " + new org.joda.time.DateMidnight($P{PreviousYearTo}).toString("dd MMMM yyyy"))
+: (new org.joda.time.DateMidnight($P{From}).toString("dd MMMM yyyy") + " - " + new org.joda.time.DateMidnight($P{To}).toString("dd MMMM yyyy"))]]></seriesExpression>
+						<categoryExpression><![CDATA[(($F{DELIVERYMODE} !=null) ? $F{DELIVERYMODE} : "")]]></categoryExpression>
+						<valueExpression><![CDATA[$F{DELIVERYMODECOUNT}]]></valueExpression>
+						<labelExpression><![CDATA[$F{GROUPED} == "GP2" ? (new org.joda.time.DateMidnight($P{PreviousYearFrom}).toString("dd MMMM yyyy") + " - " + new org.joda.time.DateMidnight($P{PreviousYearTo}).toString("dd MMMM yyyy"))
+: (new org.joda.time.DateMidnight($P{From}).toString("dd MMMM yyyy") + " - " + new org.joda.time.DateMidnight($P{To}).toString("dd MMMM yyyy"))]]></labelExpression>
+					</categorySeries>
+				</categoryDataset>
+				<bar3DPlot>
+					<plot/>
+					<itemLabel color="#000000" backgroundColor="#FFFFFF"/>
+					<categoryAxisLabelExpression><![CDATA[str("axis.shippingmethod")]]></categoryAxisLabelExpression>
+					<categoryAxisFormat>
+						<axisFormat>
+							<labelFont/>
+							<tickLabelFont/>
+						</axisFormat>
+					</categoryAxisFormat>
+					<valueAxisLabelExpression><![CDATA[str("axis.orders")]]></valueAxisLabelExpression>
+					<valueAxisFormat>
+						<axisFormat>
+							<labelFont/>
+							<tickLabelFont/>
+						</axisFormat>
+					</valueAxisFormat>
+				</bar3DPlot>
+			</bar3DChart>
+		</band>
+	</summary>
+</jasperReport>

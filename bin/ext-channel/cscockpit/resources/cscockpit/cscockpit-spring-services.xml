@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+	<alias alias="loginService" name="defaultLoginService" />
+	<bean id="defaultLoginService" class="de.hybris.platform.cockpit.services.login.impl.LoginServiceImpl" scope="tenant">
+		<property name="defaultUserPropertyKey" value="cscockpit.default.login"/>
+		<property name="defaultPasswordPropertyKey" value="cscockpit.default.password"/>
+		<property name="userService" ref="userService"/>
+		<property name="i18nService" ref="i18NService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<alias alias="deliveryModeCostRetrievalStrategy" name="defaultDeliveryModeCostRetrievalStrategy" />
+	<bean id="defaultDeliveryModeCostRetrievalStrategy" class="de.hybris.platform.cscockpit.strategies.impl.DefaultDeliveryModeCostRetrievalStrategy" scope="session">
+		<property name="basketController" ref="csBasketController"/>
+		<property name="deliveryService" ref="deliveryService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="formatFactory" ref="formatFactory"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<!-- Label Providers -->
+
+	<!-- These label providers are deprecated. Please use the model label providers below. -->
+	<alias alias="addressLabelProvider" name="defaultAddressLabelProvider" />
+	<bean id="defaultAddressLabelProvider" class="de.hybris.platform.cscockpit.services.label.impl.AddressLabelProvider" scope="tenant"/>
+	<alias alias="deliveryModeLabelProvider" name="defaultDeliveryModeLabelProvider" />
+	<bean id="defaultDeliveryModeLabelProvider" class="de.hybris.platform.cscockpit.services.label.impl.DeliveryModeLabelProvider" scope="tenant"/>
+	<alias alias="paymentInfoLabelProvider" name="defaultPaymentInfoLabelProvider" />
+	<bean id="defaultPaymentInfoLabelProvider" class="de.hybris.platform.cscockpit.services.label.impl.PaymentInfoLabelProvider" scope="tenant"/>
+
+	<!-- Model label providers -->
+	<!-- baseSiteModelLabelProvider aliased to cmsSiteLabelProvider to deal with global Cockpit UI Config -->
+	<alias alias="cmsSiteLabelProvider" name="baseSiteModelLabelProvider"/>
+	<bean id="baseSiteModelLabelProvider" class="de.hybris.platform.cscockpit.services.label.impl.BaseSiteModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<alias alias="addressModelLabelProvider" name="defaultAddressModelLabelProvider" />
+	<bean id="defaultAddressModelLabelProvider" class="de.hybris.platform.cscockpit.services.label.impl.AddressModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+	<alias alias="deliveryModeModelLabelProvider" name="defaultDeliveryModeModelLabelProvider" />
+	<bean id="defaultDeliveryModeModelLabelProvider" class="de.hybris.platform.cscockpit.services.label.impl.DeliveryModeModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider">
+		<property name="deliveryModeCostRetrievalStrategy" ref="deliveryModeCostRetrievalStrategy"/>
+	</bean>
+	<alias alias="paymentInfoModelLabelProvider" name="defaultPaymentInfoModelLabelProvider" />
+	<bean id="defaultPaymentInfoModelLabelProvider" class="de.hybris.platform.cscockpit.services.label.impl.PaymentInfoModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider"/>
+
+	<alias alias="customerModelLabelProvider" name="defaultCustomerModelLabelProvider" />
+	<bean id="defaultCustomerModelLabelProvider" class="de.hybris.platform.cscockpit.services.label.impl.CustomerModelLabelProvider" scope="tenant" parent="abstractModelLabelProvider">
+		<property name="messageSource" ref="messageSource"/>
+		<property name="i18nService" ref="i18nService"/>
+	
+	</bean>
+
+
+	<!-- Search Services -->
+	<alias alias="baseCsFlexibleSearchService" name="defaultBaseCsFlexibleSearchService" />
+	<bean id="defaultBaseCsFlexibleSearchService" abstract="true" scope="session" class="de.hybris.platform.cscockpit.services.search.generic.DefaultCsFlexibleSearchService" parent="abstractBusinessService">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+	</bean>
+
+
+	<alias alias="csAgentGroupSearchService" name="defaultCsAgentGroupSearchService"/>
+	<bean id="defaultCsAgentGroupSearchService" parent="baseCsFlexibleSearchService">
+		<property name="flexibleSearchQueryBuilder" ref="csAgentGroupSearchQueryBuilder"/>
+	</bean>
+
+	<alias alias="csAgentSearchService" name="defaultCsAgentSearchService"/>
+	<bean id="defaultCsAgentSearchService" parent="baseCsFlexibleSearchService">
+		<property name="flexibleSearchQueryBuilder" ref="csAgentSearchQueryBuilder"/>
+	</bean>
+
+	<alias alias="csCustomerSearchService" name="defaultCsCustomerSearchService"/>
+	<bean id="defaultCsCustomerSearchService" parent="baseCsFlexibleSearchService">
+		<property name="flexibleSearchQueryBuilder" ref="csCustomerSearchQueryBuilder"/>
+	</bean>
+
+	<alias alias="csOrderSearchService" name="defaultCsOrderSearchService"/>
+	<bean id="defaultCsOrderSearchService" parent="baseCsFlexibleSearchService">
+		<property name="flexibleSearchQueryBuilder" ref="csOrderSearchQueryBuilder"/>
+	</bean>
+
+	<alias alias="csTicketPoolSearchService" name="defaultCsTicketPoolSearchService"/>
+	<bean id="defaultCsTicketPoolSearchService" parent="baseCsFlexibleSearchService">
+		<property name="flexibleSearchQueryBuilder" ref="csTicketPoolSearchQueryBuilder"/>
+	</bean>
+
+	<alias alias="csTicketSearchService" name="defaultCsTicketSearchService"/>
+	<bean id="defaultCsTicketSearchService" parent="baseCsFlexibleSearchService">
+		<property name="flexibleSearchQueryBuilder" ref="csTicketSearchQueryBuilder"/>
+	</bean>
+
+	<!-- Generic query builders -->
+	<alias alias="baseCsFlexibleSearchQueryBuilder" name="defaultBaseCsFlexibleSearchQueryBuilder" />
+	<bean id="defaultBaseCsFlexibleSearchQueryBuilder" abstract="true" scope="session" class="de.hybris.platform.cscockpit.services.search.generic.query.AbstractCsFlexibleSearchQueryBuilder">
+		<property name="caseInsensitive" value="#{configurationService.configuration.getProperty('cscockpit.caseinsensitivestringsearch')}"/>
+	</bean>
+
+	<alias alias="csAgentGroupSearchQueryBuilder" name="defaultCsAgentGroupSearchQueryBuilder"/>
+	<bean id="defaultCsAgentGroupSearchQueryBuilder" parent="baseCsFlexibleSearchQueryBuilder" class="de.hybris.platform.cscockpit.services.search.generic.query.DefaultAgentGroupSearchQueryBuilder">
+	</bean>
+
+	<alias alias="csAgentSearchQueryBuilder" name="defaultCsAgentSearchQueryBuilder"/>
+	<bean id="defaultCsAgentSearchQueryBuilder" parent="baseCsFlexibleSearchQueryBuilder" class="de.hybris.platform.cscockpit.services.search.generic.query.DefaultAgentSearchQueryBuilder">
+	</bean>
+
+	<alias alias="csCustomerSearchQueryBuilder" name="defaultCsCustomerSearchQueryBuilder"/>
+	<bean id="defaultCsCustomerSearchQueryBuilder" parent="baseCsFlexibleSearchQueryBuilder" class="de.hybris.platform.cscockpit.services.search.generic.query.DefaultCustomerSearchQueryBuilder">
+	</bean>
+
+	<alias alias="csOrderSearchQueryBuilder" name="defaultCsOrderSearchQueryBuilder"/>
+	<bean id="defaultCsOrderSearchQueryBuilder" parent="baseCsFlexibleSearchQueryBuilder" class="de.hybris.platform.cscockpit.services.search.generic.query.DefaultOrderSearchQueryBuilder">
+	</bean>
+
+	<alias alias="csTicketPoolSearchQueryBuilder" name="defaultCsTicketPoolSearchQueryBuilder"/>
+	<bean id="defaultCsTicketPoolSearchQueryBuilder" parent="baseCsFlexibleSearchQueryBuilder" class="de.hybris.platform.cscockpit.services.search.generic.query.DefaultTicketPoolSearchQueryBuilder">
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<alias alias="csTicketSearchQueryBuilder" name="defaultCsTicketSearchQueryBuilder"/>
+	<bean id="defaultCsTicketSearchQueryBuilder" parent="baseCsFlexibleSearchQueryBuilder" class="de.hybris.platform.cscockpit.services.search.generic.query.DefaultTicketSearchQueryBuilder">
+	</bean>
+
+	<!-- Product Search -->
+	<alias alias="baseCsSolrSearchService" name="defaultBaseCsSolrSearchService" />
+	<bean id="defaultBaseCsSolrSearchService" abstract="true" scope="tenant" class="de.hybris.platform.cscockpit.services.search.solr.DefaultCsSolrSearchService" parent="abstractBusinessService">
+		<property name="solrFacetSearchService" ref="solrFacetSearchService"/>
+	</bean>
+	
+	<alias alias="baseCsProductSolrSearchQueryBuilder" name="defaultBaseCsProductSolrSearchQueryBuilder" />
+	<bean id="defaultBaseCsProductSolrSearchQueryBuilder" abstract="true" scope="tenant" class="de.hybris.platform.cscockpit.services.search.solr.query.DefaultProductSearchQueryBuilder">
+		<property name="facetSearchConfigService" ref="facetSearchConfigService"/>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+	
+	<!-- Product Search using Commerce API -->
+	<alias alias="defaultCsCommerceSearchService" name="defaultCsCommerceSearchService" />
+	<bean id="defaultCsCommerceSearchService" scope="tenant" class="de.hybris.platform.cscockpit.services.search.impl.DefaultCsCommerceSearchService" parent="abstractBusinessService">
+		<property name="productSearchService"  ref="commerceProductSearchService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="productService" ref="productService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="impersonationService" ref="impersonationService"/>
+		<property name="postSearchMetaProcessors">
+			<list>
+				<bean class="de.hybris.platform.cscockpit.services.search.meta.processor.ProductPromotionsProcessor">
+					<property name="csPromotionService" ref="csPromotionService"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.services.search.meta.processor.ProductPriceProcessor">
+					<property name="commercePriceService" ref="commercePriceService"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.services.search.meta.processor.ProductStockLevelProcessor">
+					<property name="commerceStockService" ref="commerceStockService"/>
+					<property name="baseStoreService" ref="baseStoreService"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Product Search using Solr -->
+	<alias alias="defaultCsProductSolrSearchService" name="defaultCsProductSolrSearchService" />
+	<bean id="defaultCsProductSolrSearchService" parent="baseCsSolrSearchService">
+		<property name="solrSearchQueryBuilder" ref="csProductSolrSearchQueryBuilder"/>
+		<property name="postSearchMetaProcessors">
+			<list>
+				<bean class="de.hybris.platform.cscockpit.services.search.meta.processor.ProductPromotionsProcessor">
+					<property name="csPromotionService" ref="csPromotionService"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.services.search.meta.processor.ProductPriceProcessor">
+					<property name="commercePriceService" ref="commercePriceService"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="csProductSolrSearchQueryBuilder" name="defaultCsProductSolrSearchQueryBuilder"/>
+	<bean id="defaultCsProductSolrSearchQueryBuilder" parent="baseCsProductSolrSearchQueryBuilder">
+		<property name="availableSorts">
+			<list>
+				<bean class="de.hybris.platform.cscockpit.services.search.solr.query.DefaultCsSolrSort">
+					<constructor-arg value="score"/>
+					<constructor-arg value="false"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.services.search.solr.query.DefaultCsSolrSort">
+					<constructor-arg value="name"/>
+					<constructor-arg value="true"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.services.search.solr.query.DefaultCsSolrSort">
+					<constructor-arg value="priceValue"/>
+					<constructor-arg value="true"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.services.search.solr.query.DefaultCsSolrSort">
+					<constructor-arg value="priceValue"/>
+					<constructor-arg value="false"/>
+				</bean>
+			</list>
+		</property>
+		<property name="defaultSort" value="score-desc"/>
+	</bean>
+
+
+	<!-- Product Search using Flexible Search query (as an alternative to the Solr search above) -->
+	<alias alias="defaultCsProductFlexibleSearchService" name="defaultCsProductFlexibleSearchService" />
+	<bean id="defaultCsProductFlexibleSearchService" parent="baseCsFlexibleSearchService">
+		<property name="flexibleSearchQueryBuilder">
+			<bean class="de.hybris.platform.cscockpit.services.search.generic.query.DefaultProductSearchQueryBuilder"/>
+		</property>
+		<property name="postSearchMetaProcessors">
+			<list>
+				<bean class="de.hybris.platform.cscockpit.services.search.meta.processor.ProductPromotionsProcessor">
+					<property name="csPromotionService" ref="csPromotionService"/>
+				</bean>
+				<bean class="de.hybris.platform.cscockpit.services.search.meta.processor.ProductPriceProcessor">
+					<property name="commercePriceService" ref="commercePriceService"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<!-- Product Search Alias -->
+	<!-- Use the defaultCsCommerceSearchService by default -->
+	<alias alias="csProductSearchService" name="defaultCsCommerceSearchService"/>
+	<!-- Uncomment this alias to use the Product Solr Search instead of the Commerce search.
+	<alias alias="csProductSearchService" name="defaultCsProductSolrSearchService"/>
+	-->
+	<!-- Uncomment this alias to use the Product Flexible Search instead of the Commerce search.
+	<alias alias="csProductSearchService" name="defaultCsProductFlexibleSearchService"/>
+	-->
+
+</beans>

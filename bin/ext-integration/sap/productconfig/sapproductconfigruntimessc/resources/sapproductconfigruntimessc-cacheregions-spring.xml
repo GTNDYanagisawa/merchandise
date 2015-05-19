@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<bean name="hybrisCacheRegionsUtil" class="com.sap.custdev.projects.fbs.slc.hybris.util.HybrisCacheRegionsUtils">
+		<property name="cacheController" ref="cacheController"/>
+		<property name="cacheRegionProvider" ref="cacheRegionProvider"/>
+	</bean>
+	
+	<bean name="_AP_CFG_PricingConditionCache" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+   		<constructor-arg name="name" value="_AP_CFG_PricingConditionCache" />
+   		<constructor-arg name="maxEntries" value="1000" />
+   		<constructor-arg name="evictionPolicy" value="LRU" />
+   		<constructor-arg name="exclusiveComputation" value="false" />
+   		<constructor-arg name="statsEnabled" value="false" />
+   		<property name="handledTypes">
+			<array>
+				<value>_AP_CFG_PricingConditionCache</value>
+			</array>
+		</property>
+   </bean>
+   
+   <bean name="OMLocalRegion" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+    <constructor-arg name="name" value="OMLocalRegion" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>__OML_LOCAL_REGION__</value>    
+   </array>
+  </property>
+   </bean>
+   
+   <bean name="_AP_CFG_Knowledgebases" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_CFG_Knowledgebases" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_CFG_Knowledgebases</value>    
+   </array>
+  </property>
+   </bean>
+ 
+   <bean name="_AP_CFG_KnowledgebaseDescriptors" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_CFG_KnowledgebaseDescriptors" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_CFG_KnowledgebaseDescriptors</value>    
+   </array>
+  </property>
+   </bean>
+   
+    <bean name="_AP_CFG_CaseBaseIndices" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_CFG_CaseBaseIndices" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_CFG_CaseBaseIndices</value>    
+   </array>
+  </property>
+   </bean>
+   
+   <bean name="_AP_CFG_CaseSequence" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_CFG_CaseSequence" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_CFG_CaseSequence</value>    
+   </array>
+  </property>
+   </bean>
+   
+ <bean name="_AP_CFG_VariantTables" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_CFG_VariantTables" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_CFG_VariantTables</value>    
+   </array>
+  </property>
+   </bean>
+   
+  
+    <bean name="_AP_CFG_PricingQueryCache" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_CFG_PricingQueryCache" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_CFG_PricingQueryCache</value>    
+   </array>
+  </property>
+   </bean>
+
+
+      <bean name="Build" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="Build" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>Build</value>    
+   </array>
+  </property>
+   </bean>
+
+  <bean name="FullyLoaded" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="FullyLoaded" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>FullyLoaded</value>    
+   </array>
+  </property>
+   </bean>
+
+     <bean name="_AP_PRC_Conversion" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_PRC_Conversion" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_PRC_Conversion</value>    
+   </array>
+  </property>
+   </bean>
+
+   
+   
+        <bean name="_AP_SPC_Product_ConfigType" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_SPC_Product_ConfigType" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_SPC_Product_ConfigType</value>    
+   </array>
+  </property>
+   </bean>
+
+	
+	
+   <bean name="_AP_SPC_Product_ProductBaseData" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_SPC_Product_ProductBaseData" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_SPC_Product_ProductBaseData</value>    
+   </array>
+  </property>
+   </bean>
+   
+
+   
+      <bean name="_AP_SPC_Product_ProductCategoryAssignment" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_SPC_Product_ProductCategoryAssignment" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_SPC_Product_ProductCategoryAssignment</value>    
+   </array>
+  </property>
+   </bean>
+ 
+	
+   <bean name="_AP_SPC_Product_ProductCategoryHierarchy" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_SPC_Product_ProductCategoryHierarchy" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_SPC_Product_ProductCategoryHierarchy</value>    
+   </array>
+  </property>
+   </bean>
+  
+   
+   <bean name="_AP_SPC_Product_ProductConfigurationData" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_SPC_Product_ProductConfigurationData" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_SPC_Product_ProductConfigurationData</value>    
+   </array>
+  </property>
+   </bean>  
+
+    
+
+   
+   <bean name="_AP_SPC_Product_ProductDescription" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_SPC_Product_ProductDescription" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_SPC_Product_ProductDescription</value>    
+   </array>
+  </property>
+   </bean> 
+ 
+   
+   <bean name="_AP_SPC_Product_ProductMaterialData" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_SPC_Product_ProductMaterialData" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_SPC_Product_ProductMaterialData</value>    
+   </array>
+  </property>
+   </bean>
+   
+
+	
+	
+      <bean name="_AP_SPC_Product_ProductNumberingScheme" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_SPC_Product_ProductNumberingScheme" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_SPC_Product_ProductNumberingScheme</value>    
+   </array>
+  </property>
+   </bean>
+   
+
+   
+   <bean name="_AP_SPC_Product_ProductSetType" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_SPC_Product_ProductSetType" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_SPC_Product_ProductSetType</value>    
+   </array>
+  </property>
+   </bean>
+  
+
+ 
+   <bean name="_AP_SPC_Product_ProductSetTypeReference" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_SPC_Product_ProductSetTypeReference" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_SPC_Product_ProductSetTypeReference</value>    
+   </array>
+  </property>
+   </bean>
+          
+
+   <bean name="_AP_SPC_Product_ProductUnits" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_SPC_Product_ProductUnits" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_SPC_Product_ProductUnits</value>    
+   </array>
+  </property>
+   </bean>
+
+            
+   <bean name="_AP_SPC_Product_LogicalSystem" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_SPC_Product_LogicalSystem" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_SPC_Product_LogicalSystem</value>    
+   </array>
+  </property>
+   </bean>
+   
+ 
+            
+   <bean name="_AP_PRC_Conditions_Customizing" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_PRC_Conditions_Customizing" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_PRC_Conditions_Customizing</value>    
+   </array>
+  </property>
+   </bean>
+
+
+  
+   <bean name="_AP_PRC_Conditions_ConditionRecords" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_PRC_Conditions_ConditionRecords" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_PRC_Conditions_ConditionRecords</value>    
+   </array>
+  </property>
+   </bean>
+
+   <bean name="_AP_PRC_Pricing_Customizing" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_PRC_Pricing_Customizing" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_PRC_Pricing_Customizing</value>    
+   </array>
+  </property>
+   </bean>
+   
+
+   
+     <bean name="_AP_PRC_Pricing_Transactiondata" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_PRC_Pricing_Transactiondata" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_PRC_Pricing_Transactiondata</value>    
+   </array>
+  </property>
+   </bean>
+
+
+    <bean name="_AP_PRC_Text" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_PRC_Text" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+	     <array>
+	        <value>_AP_PRC_Text</value>    
+	  	 </array>
+  	</property>
+   </bean>
+
+
+    <bean name="_AP_CFG_Customizing" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" scope="singleton" >
+     <constructor-arg name="name" value="_AP_CFG_Customizing" />
+     <constructor-arg name="maxEntries" value="1000" />
+     <constructor-arg name="evictionPolicy" value="LRU" />
+     <constructor-arg name="exclusiveComputation" value="false" />
+     <constructor-arg name="statsEnabled" value="true" />
+     <property name="handledTypes">
+     <array>
+        <value>_AP_CFG_Customizing</value>    
+   </array>
+  </property>
+   </bean>
+  
+  
+
+   
+   <alias alias="cacheRegionsList" name="extendedCacheRegionsList" />   
+   <bean id="extendedCacheRegionsList" class="java.util.ArrayList" >
+	    <constructor-arg>
+	        <list>
+	        	<ref bean="typesystemCacheRegion"/>
+	            <ref bean="entityCacheRegion"/>
+	            <ref bean="queryCacheRegion"/>
+	            <ref bean="defaultMediaCacheRegion"/>
+                <ref bean="scriptsCacheRegion" />
+                
+                <ref bean="_AP_CFG_Knowledgebases"/>
+				<ref bean="_AP_CFG_KnowledgebaseDescriptors"/>
+				<ref bean="_AP_CFG_CaseBaseIndices"/>
+				<ref bean="_AP_CFG_CaseSequence"/>
+				<ref bean="_AP_CFG_VariantTables"/>
+				<ref bean="_AP_CFG_PricingQueryCache"/>
+				<ref bean="_AP_CFG_PricingConditionCache"/>
+				<ref bean="OMLocalRegion"/>
+				<ref bean="Build"/>
+				<ref bean="FullyLoaded"/>
+				<ref bean="_AP_PRC_Conversion"/>
+				<ref bean="_AP_SPC_Product_ConfigType"/>
+				<ref bean="_AP_SPC_Product_ProductBaseData"/>
+				<ref bean="_AP_SPC_Product_ProductCategoryAssignment"/>
+				<ref bean="_AP_SPC_Product_ProductCategoryHierarchy"/>
+				<ref bean="_AP_SPC_Product_ProductConfigurationData"/>
+				<ref bean="_AP_SPC_Product_ProductDescription"/>
+				<ref bean="_AP_SPC_Product_ProductMaterialData"/>	
+				<ref bean="_AP_SPC_Product_ProductNumberingScheme"/>
+				<ref bean="_AP_SPC_Product_ProductSetType"/>	
+				<ref bean="_AP_SPC_Product_ProductSetTypeReference"/>
+				<ref bean="_AP_SPC_Product_ProductUnits"/>
+				<ref bean="_AP_SPC_Product_LogicalSystem"/>
+				<ref bean="_AP_PRC_Conditions_Customizing"/>
+				<ref bean="_AP_PRC_Conditions_ConditionRecords"/>  
+				<ref bean="_AP_PRC_Pricing_Customizing"/>   
+				<ref bean="_AP_PRC_Pricing_Transactiondata"/> 	
+				<ref bean="_AP_PRC_Text"/> 	
+				<ref bean="_AP_CFG_Customizing"/> 	
+	        </list>
+	    </constructor-arg>
+   </bean>
+   
+      
+  
+  <alias alias="cacheController" name="extendedDefaultCacheController" />
+   <alias alias="CacheController" name="extendedDefaultCacheController" />
+   <bean name="extendedDefaultCacheController" class="de.hybris.platform.regioncache.DefaultCacheController"  lazy-init="true">
+		<constructor-arg name="configuration" ref="extendedDefaultCacheConfiguration" />
+   </bean>
+
+   <alias alias="cacheConfiguration" name="extendedDefaultCacheConfiguration"/>	
+   <bean name="extendedDefaultCacheConfiguration" class="de.hybris.platform.regioncache.DefaultCacheConfiguration" lazy-init="true">
+		<constructor-arg name="regions">
+			<ref bean="cacheRegionsList"/>
+		</constructor-arg>
+
+		<constructor-arg name="resolvers">
+			<ref bean="extendedDefaultScenarioCacheRegionResolverList"/>
+		</constructor-arg>
+
+		<constructor-arg name="invalidationFilters">
+			<ref bean="cacheInvalidationFilterList" />
+		</constructor-arg>
+   </bean>
+ 
+   
+	<alias alias="cacheRegionProvider" name="extendedDefaultCacheRegionProvider" />
+   	<alias alias="CacheRegionProvider" name="extendedDefaultCacheRegionProvider" />
+   <bean name="extendedDefaultCacheRegionProvider" class="de.hybris.platform.regioncache.region.impl.DefaultCacheRegionProvider" lazy-init="true">
+   		<constructor-arg name="cacheRegions" ref="cacheRegionsList" />
+   </bean>
+   
+<!--    <alias name="defaultCacheRegionResolver" alias="extendedDefaultCacheRegionResolver"/> -->
+    <bean name="defaultCacheRegionResolver" class="de.hybris.platform.regioncache.region.DefaultCacheRegionResolver" >
+   		<constructor-arg name="cacheRegionProvider" ref="extendedDefaultCacheRegionProvider"/>
+   	</bean>
+   	
+   	 <alias alias="cacheRegionResolverList" name="extendedDefaultScenarioCacheRegionResolverList" />
+   	<bean id="extendedDefaultScenarioCacheRegionResolverList" class="java.util.ArrayList" >
+	    <constructor-arg>
+	        <list>
+	            <ref bean="defaultCacheRegionResolver" />
+	        </list>
+	    </constructor-arg>
+   </bean>
+			
+</beans>

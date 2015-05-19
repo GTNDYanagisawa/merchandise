@@ -1,0 +1,75 @@
+*** Settings ***
+Resource          EmsClient_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+
+
+*** Test Cases ***
+
+Test_Grant_Mapping_XML_Verification_PathCondition_ValidPath_No1_PASS
+	[Documentation]    Create entitlement test with "a" path condition
+	${entitlementData} =         build entitlement with id "entitlementId" and pathCondition "a" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData>
+		<grantTime>2012-07-11T03:21:15Z</grantTime>
+		<userId/>
+		<grantSource/>
+		<grantSourceId/>
+		<entitlementType>entitlementId</entitlementType>
+		<status>ACTIVE</status>
+		<conditions>
+			<com.hybris.services.entitlements.condition.ConditionData>
+				<properties>
+					<entry>
+						<string>path</string>
+						<string>a</string>
+					</entry>
+				</properties>
+				<type>path</type>
+			</com.hybris.services.entitlements.condition.ConditionData>
+		</conditions>
+	</com.hybris.services.entitlements.api.GrantData>"
+
+Test_Grant_Mapping_XML_Verification_PathCondition_ValidPath_No2_PASS
+	[Documentation]    Create entitlement test with "a/b" path condition
+	${entitlementData} =         build entitlement with id "entitlementId" and pathCondition "a/b" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData>
+		<grantTime>2012-07-11T03:21:15Z</grantTime>
+		<userId/>
+		<grantSource/>
+		<grantSourceId/>
+		<entitlementType>entitlementId</entitlementType>
+		<status>ACTIVE</status>
+		<conditions>
+			<com.hybris.services.entitlements.condition.ConditionData>
+				<properties>
+					<entry>
+						<string>path</string>
+						<string>a/b</string>
+					</entry>
+				</properties>
+				<type>path</type>
+			</com.hybris.services.entitlements.condition.ConditionData>
+		</conditions>
+	</com.hybris.services.entitlements.api.GrantData>"
+	
+Test_Grant_Mapping_XML_Verification_PathCondition_Empty_PASS
+	[Documentation]    Create entitlement with empty path condition
+	${entitlementData} =         build entitlement with id "entitlementId" and pathCondition "" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData>
+		<grantTime>2012-07-11T03:21:15Z</grantTime>
+		<userId/>
+		<grantSource/>
+		<grantSourceId/>
+		<entitlementType>entitlementId</entitlementType>
+		<status>ACTIVE</status>
+		<conditions>
+			<com.hybris.services.entitlements.condition.ConditionData>
+				<properties>
+					<entry>
+						<string>path</string>
+						<string></string>
+					</entry>
+				</properties>
+				<type>path</type>
+			</com.hybris.services.entitlements.condition.ConditionData>
+		</conditions>
+	</com.hybris.services.entitlements.api.GrantData>"

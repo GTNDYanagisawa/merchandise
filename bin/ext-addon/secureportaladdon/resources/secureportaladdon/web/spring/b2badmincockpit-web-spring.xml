@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+
+
+<!-- WARNING: This is the Spring WEB configuration file. If you want to replace items or managers you have to do this from the extensions 
+	core configuration file (guestOrderStatusAddon/resources/guestOrderStatusAddon-spring.xml) -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:security="http://www.springframework.org/schema/security" xmlns:aop="http://www.springframework.org/schema/aop"
+
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd	
+	">
+
+	<!-- Hack the list of allowed workflow attachment data in the B2B Admin Cockpit -->
+	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetObject" ref="WorkflowAttachmentData" />
+		<property name="targetMethod" value="addAll" />
+		<property name="arguments" ref="b2bRegistrationWorkflowAttachmentData" />
+	</bean>		
+		
+	<bean id="b2bRegistrationWorkflowAttachmentData" class="java.util.LinkedList">
+		<constructor-arg>
+			<list value-type="java.lang.String">
+				<value>de.hybris.platform.secureportaladdon.model.B2BRegistrationModel</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="cmsSiteLabelProvider" class="de.hybris.platform.secureportaladdon.cockpit.label.CMSSiteLabelProvider" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<bean id="WorkflowAttachmentData" class="java.util.LinkedList">
+		<constructor-arg>
+			<list value-type="java.lang.String">
+				<value>de.hybris.platform.core.model.product.ProductModel</value>
+				<value>de.hybris.platform.category.model.CategoryModel</value>
+				<value>de.hybris.platform.core.model.order.OrderModel</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+</beans>

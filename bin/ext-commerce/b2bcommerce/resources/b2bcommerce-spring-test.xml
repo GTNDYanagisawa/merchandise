@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved.
+	This software is the confidential and proprietary information of hybris ("Confidential
+	Information"). You shall not disclose such Confidential Information and shall
+	use it only in accordance with the terms of the license agreement you entered
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+        http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.1.xsd" default-lazy-init="true">
+	<!-- Signals the current application context to apply dependency injection
+		to non-managed classes that are instantiated outside of the Spring bean factory
+		(typically classes annotated with the @Configurable annotation). -->
+	<context:spring-configured/>
+	<!-- Activates various annotations to be detected in bean classes: Spring's
+		@Required and @Autowired, as well as JSR 250's @PostConstruct, @PreDestroy
+		and @Resource (if available), JAX-WS's @WebServiceRef (if available), EJB3's
+		@EJB (if available), and JPA's @PersistenceContext and @PersistenceUnit (if
+		available). Alternatively, you may choose to activate the individual BeanPostProcessors
+		for those annotations. -->
+	<context:annotation-config/>
+	<context:component-scan base-package="de.hybris.platform.b2b.mock" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver"/>
+
+	<!-- Enable the @AspectJ support -->
+	<aop:aspectj-autoproxy proxy-target-class="true"
+	                       expose-proxy="true"/>
+
+
+	<alias name="modelService" alias="defaultModelService"/>
+	<alias name="sessionService" alias="defaultSessionService"/>
+	<alias alias="flexibleSearchService" name="mockFlexibleSearchService"/>
+
+
+	<bean id="defaultTaskExecutionStrategy"
+	      class="de.hybris.platform.task.impl.DefaultTaskExecutionStrategy">
+		<property name="modelService" ref="modelService"/>
+		<property name="runnerClass" value="de.hybris.platform.task.TaskRunner"/>
+	</bean>
+
+	<alias name="mockBaseDao" alias="baseDao"/>
+	<bean id="mockBaseDao" class="de.hybris.platform.b2b.dao.impl.BaseDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias name="mockTaskService" alias="taskService"/>
+	<bean id="mockTaskService" class="de.hybris.platform.b2b.mock.MockTaskService">
+	</bean>
+	<alias name="mockConfigurationService" alias="configurationService"/>
+	<bean id="mockConfigurationService" class="de.hybris.platform.b2b.mock.MockConfigurationService" parent="abstractService"/>
+
+	<alias alias="typeService" name="mockTypeService"/>
+	<bean id="mockTypeService"
+	      class="de.hybris.platform.servicelayer.type.impl.DefaultTypeService"
+	      parent="abstractBusinessService">
+		<property name="converterRegistry" ref="converterRegistry"/>
+	</bean>
+
+	<alias alias="converterRegistry" name="mockConverterRegistry"/>
+	<bean id="mockConverterRegistry" class="de.hybris.platform.b2b.mock.MockModelConverterRegistry">
+	</bean>
+	<bean id="mockSerializationStrategy" class="de.hybris.platform.b2b.mock.MockSerializationStrategy">
+	</bean>
+	<!-- Localization Service (data and session language/locale) -->
+	<alias alias="localizationService" name="mockLocalizationService"/>
+	<bean id="mockLocalizationService" class="de.hybris.platform.b2b.mock.MockLocalizationService"
+	      parent="abstractService"/>
+
+	<alias alias="i18nService" name="mockI18NService"/>
+	<bean id="mockI18NService" parent="abstractBusinessService"
+	      class="de.hybris.platform.b2b.mock.MockI18NService">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	<bean id="abstractItemDao"
+	      class="de.hybris.platform.servicelayer.internal.dao.AbstractItemDao"
+	      abstract="true">
+		<property name="modelService" ref="modelService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<alias alias="businessProcessService" name="mockBusinessProcessService"/>
+	<bean id="mockBusinessProcessService" class="de.hybris.platform.b2b.mock.MockBusinessProcessService"/>
+
+	<alias alias="baseDao" name="defaultBaseDao"/>
+	<alias alias="genericDao" name="defaultGenericDao"/>
+
+	<bean id="defaultGenericDao" class="de.hybris.platform.b2b.dao.impl.GenericDao"
+	      abstract="true">
+		<property name="baseDao" ref="baseDao"/>
+	</bean>
+
+	<bean id="defaultB2BBookingLineEntryDao" class="de.hybris.platform.b2b.dao.impl.DefaultB2BBookingLineEntryDao" parent="genericDao"/>
+
+	<bean id="abstractAction" class="de.hybris.platform.processengine.action.AbstractAction"
+	      abstract="true">
+		<property name="modelService" ref="modelService"/>
+		<property name="processParameterHelper" ref="processParameterHelper"/>
+	</bean>
+
+	<bean id="processParameterHelper"
+	      class="de.hybris.platform.processengine.helpers.impl.DefaultProcessParameterHelper">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	<bean name="mockFlexibleSearchService" class="de.hybris.platform.b2b.mock.MockFlexibleSearchService" parent="abstractBusinessService"/>
+
+</beans>

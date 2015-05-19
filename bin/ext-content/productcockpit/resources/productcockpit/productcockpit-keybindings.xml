@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop-3.1.xsd"
+	default-autowire="byName">
+
+	<!-- keys and focus -->
+
+	<bean id="productcockpit.GlobalInputDispatcher" class="de.hybris.platform.productcockpit.context.GlobalInputDispatcher" scope="session">
+		<!-- key bindings:
+				^o ... open
+				^s ... save
+				^r ... reload/refresh
+				^c ... copy
+				^v ... paste
+				^x ... copy for move
+				^z ... undo
+				^y ... redo
+				^d ... delete (alternatively)
+				del .. delete 
+		 -->
+		<!-- uncomment to replace default message box component
+		<property name="messageBoxURI" value="/messagebox.zul"/>
+		-->
+		<property name="keyBindings">
+			<map>
+				<entry key=".*\smac\s.*">
+					<list>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^c"/>
+							<constructor-arg value="COPY"/>
+							<constructor-arg value="67"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="C"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^x"/>
+							<constructor-arg value="MOVE"/>
+							<constructor-arg value="88"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="X"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^v"/>
+							<constructor-arg value="PASTE"/>
+							<constructor-arg value="86"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="V"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^o"/>
+							<constructor-arg value="OPEN"/>
+							<constructor-arg value="79"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="O"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^s"/>
+							<constructor-arg value="SAVE"/>
+							<constructor-arg value="83"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="S"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^r"/>
+							<constructor-arg value="RELOAD"/>
+							<constructor-arg value="82"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="R"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^d"/>
+							<constructor-arg value="DELETE"/>
+							<constructor-arg value="68"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="D"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="#del"/>
+							<constructor-arg value="DELETE"/>
+							<constructor-arg value="46"/>
+							<constructor-arg value="0"/>
+							<constructor-arg value="L_DEL"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="#left"/>
+							<constructor-arg value="LEFT"/>
+							<constructor-arg value="37"/>
+							<constructor-arg value="0"/>
+							<constructor-arg value="L_LEFT"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="#up"/>
+							<constructor-arg value="UP"/>
+							<constructor-arg value="38"/>
+							<constructor-arg value="0"/>
+							<constructor-arg value="L_UP"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="#right"/>
+							<constructor-arg value="RIGHT"/>
+							<constructor-arg value="39"/>
+							<constructor-arg value="0"/>
+							<constructor-arg value="L_RIGHT"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="#down"/>
+							<constructor-arg value="DOWN"/>
+							<constructor-arg value="40"/>
+							<constructor-arg value="0"/>
+							<constructor-arg value="L_DOWN"/>
+						</bean>
+					</list>
+				</entry>
+			
+				<entry key=".*">
+					<list>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^c"/>
+							<constructor-arg value="COPY"/>
+							<constructor-arg value="67"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="C"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^x"/>
+							<constructor-arg value="MOVE"/>
+							<constructor-arg value="88"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="X"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^v"/>
+							<constructor-arg value="PASTE"/>
+							<constructor-arg value="86"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="V"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^o"/>
+							<constructor-arg value="OPEN"/>
+							<constructor-arg value="79"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="O"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^s"/>
+							<constructor-arg value="SAVE"/>
+							<constructor-arg value="83"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="S"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^r"/>
+							<constructor-arg value="RELOAD"/>
+							<constructor-arg value="82"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="R"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="^d"/>
+							<constructor-arg value="DELETE"/>
+							<constructor-arg value="68"/>
+							<constructor-arg value="2"/>
+							<constructor-arg value="D"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="#left"/>
+							<constructor-arg value="LEFT"/>
+							<constructor-arg value="37"/>
+							<constructor-arg value="0"/>
+							<constructor-arg value="L_LEFT"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="#up"/>
+							<constructor-arg value="UP"/>
+							<constructor-arg value="38"/>
+							<constructor-arg value="0"/>
+							<constructor-arg value="L_UP"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="#right"/>
+							<constructor-arg value="RIGHT"/>
+							<constructor-arg value="39"/>
+							<constructor-arg value="0"/>
+							<constructor-arg value="L_RIGHT"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="#down"/>
+							<constructor-arg value="DOWN"/>
+							<constructor-arg value="40"/>
+							<constructor-arg value="0"/>
+							<constructor-arg value="L_DOWN"/>
+						</bean>
+						<bean class="de.hybris.platform.productcockpit.context.KeyBinding">
+							<constructor-arg value="#del"/>
+							<constructor-arg value="DELETE"/>
+							<constructor-arg value="46"/>
+							<constructor-arg value="0"/>
+							<constructor-arg value="L_DEL"/>
+						</bean>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>	
+</beans>

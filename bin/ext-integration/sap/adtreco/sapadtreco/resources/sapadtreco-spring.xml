@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<bean id="sapAdtRecoSystemSetup" class="com.sap.wec.adtreco.SAPADTRecoSetup">
+		<property name="btgConfigurationService" ref="btgConfigurationService" />
+		<property name="typeService" ref="typeService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+ 
+	<alias alias="adtUserIdProvider" name="defaultADTUserIdProvider" />
+	<bean id="defaultADTUserIdProvider" class="com.sap.wec.adtreco.bo.ADTUserIdProvider" />
+	
+	<bean id="oAdtDataClientService" class="com.sap.wec.adtreco.be.ODataClientService" />
+	
+	<alias alias="adtInitiativesBeCEI" name="defaultADTInitiativesBeCEI" />
+	<bean id="defaultADTInitiativesBeCEI" class="com.sap.wec.adtreco.be.impl.ADTInitiativesBeCEIImpl">
+		<property name="clientService" ref ="oAdtDataClientService"/>
+<!-- Enter HTTP Destination ID here -->
+<!-- The HTTP Destination has to be configured in the hMC/SAP Configuration/HTTP Destination -->		
+		<property name="httpDestinationId" value="" />
+		
+	</bean>
+	<bean id="defaultHTTPDestinationService" parent="sapCoreDefaultHTTPDestinationService" >
+		<property name="HTTPDestinations">
+			<map>
+				<entry key="adtHttpDestinationName" value-ref="adtHTTPDestination" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="adtHTTPDestination" parent="sapCoreHTTPDestination"	>
+		<property name="httpDestinationName" value="adtHttpDestinationName" />
+		<property name="targetURL"    		 value="testTargetURL" />
+		<property name="authenticationType"  value="testAuthenticationType" />
+		<property name="userid"    			 value="testUserid" />
+		<property name="password"    		 value="testPassword" />
+	</bean>
+	
+ 	<alias alias="sapInitiativeReader" name="defaultSapInitiativeReader" />
+	<bean id="defaultSapInitiativeReader" class="com.sap.wec.adtreco.bo.impl.SAPInitiativeReaderImpl" >
+		<property name="accessBE" ref ="adtInitiativesBeCEI"/>
+<!-- Enter Customer ID Origin here -->
+		<property name="idOrigin" value="" />
+<!-- Enter Initiatives Filter Category here -->
+		<property name="filterCategory" value=""/>
+		<property name="b2bCustomerService" ref="b2bCustomerService"/>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+	</bean>
+	
+	<bean id="sapInitiativeValueProvider"
+		class="com.sap.wec.adtreco.btg.SAPInitiativeValueProvider">
+		<property name="sapInitiativeReader" ref= "sapInitiativeReader"/> 
+		<property name="userIdProvider" ref= "adtUserIdProvider"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>		
+
+	<bean id="referenceSAPInitiativeOperandValueProvider" class="com.sap.wec.adtreco.btg.ReferenceSAPInitiativeOperandValueProvider" scope="tenant">
+	</bean>
+
+	<bean id="initiativesCollectionExpressionEvaluator" class="com.sap.wec.adtreco.btg.condition.impl.SAPInitiativesExpressionEvaluator" scope="tenant">
+	</bean>
+
+	<bean id="sapadtrecoExpressionEvalutorInitializingBean"
+		class="com.sap.wec.adtreco.btg.config.ExpressionEvaluatorInitializingBean">
+		<property name="registry" ref="expressionEvaluatorRegistry" />
+		<property name="expressionEvaluators">
+			<list>
+				<ref bean="initiativesCollectionExpressionEvaluator" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="assignToInitiative" class="com.sap.wec.adtreco.btg.AssignToInitiative" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<alias alias="btgReferenceSAPInitiativesOperandLabelProvider" name="defaultBtgReferenceSAPInitiativesOperandLabelProvider" />
+	<bean id="defaultBtgReferenceSAPInitiativesOperandLabelProvider" class="com.sap.wec.adtreco.btgcockpit.BTGReferencePrincipalGroupsOperandLabelProvider" />
+				
+</beans>

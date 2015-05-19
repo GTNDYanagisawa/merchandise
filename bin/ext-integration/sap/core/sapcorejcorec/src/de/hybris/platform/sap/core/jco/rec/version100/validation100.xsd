@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+	jaxb:extensionBindingPrefixes="xjc" jaxb:version="2.0">
+
+	<xsd:annotation>
+		<xsd:appinfo>
+			<jaxb:globalBindings>
+				<xjc:superClass name="de.hybris.platform.sap.core.jco.rec.version100.SuperToString" />
+			</jaxb:globalBindings>
+		</xsd:appinfo>
+	</xsd:annotation>
+
+	<xsd:element name="Repository">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="RepositoryVersion" type="RepositoryVersion"></xsd:element>
+				<xsd:element name="Functions" type="FunctionList" minOccurs="0" />
+				<xsd:element name="Records" type="Records" minOccurs="0" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="FunctionList">
+		<xsd:sequence>
+			<xsd:element name="Function" type="FunctionParameter" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="FunctionParameter">
+		<xsd:sequence>
+			<xsd:element name="Import" type="ImportParameterList" minOccurs="0" />
+			<xsd:element name="Export" type="ExportParameterList" minOccurs="0" />
+			<xsd:element name="Changing" type="ChangingParameterList" minOccurs="0" />
+			<xsd:element name="Tables" type="TableParameterList" minOccurs="0" />
+		</xsd:sequence>
+		<xsd:attribute name="functionName" type="FunctionType" use="required" />
+		<xsd:attribute name="executionOrder" type="xsd:positiveInteger" use="required" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Records">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Element" type="Element" nillable="true" />
+			<xsd:element name="Structure" type="Structure" />
+			<xsd:element name="Table" type="Table" />
+		</xsd:choice>
+	</xsd:complexType>
+
+	<xsd:complexType name="ImportParameterList">
+		<xsd:complexContent>
+			<xsd:extension base="Records" />
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="ExportParameterList">
+		<xsd:complexContent>
+			<xsd:extension base="Records" />
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="ChangingParameterList">
+		<xsd:complexContent>
+			<xsd:extension base="Records" />
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="TableParameterList">
+		<xsd:complexContent>
+			<xsd:extension base="Records" />
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="DataTable">
+		<xsd:sequence>
+			<xsd:element name="LineType" type="LineType" minOccurs="0" />
+			<xsd:element name="Row" type="Row" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attributeGroup ref="TableInfo-optional" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Table">
+		<xsd:complexContent>
+			<xsd:restriction base="DataTable">
+				<xsd:sequence>
+					<xsd:element name="LineType" type="LineType" />
+					<xsd:element name="Row" type="Row" minOccurs="0" maxOccurs="unbounded" />
+				</xsd:sequence>
+				<xsd:attributeGroup ref="TableInfo" />
+			</xsd:restriction>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="MetaTable">
+		<xsd:sequence>
+			<xsd:element name="LineType" type="LineType" />
+		</xsd:sequence>
+		<xsd:attributeGroup ref="TableInfo" />
+	</xsd:complexType>
+
+	<xsd:complexType name="LineType">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="ElementMetaData" type="MetaElement" />
+			<xsd:element name="StructureMetaData" type="MetaStructure" />
+			<xsd:element name="TableMetaData" type="MetaTable" />
+		</xsd:choice>
+		<xsd:attributeGroup ref="FieldInfo-optional" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Row">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="RowElement" type="DataElement" nillable="true" />
+			<xsd:element name="RowStructure" type="DataStructure" />
+			<xsd:element name="RowTable" type="DataTable" />
+		</xsd:choice>
+	</xsd:complexType>
+
+	<xsd:complexType name="DataStructure">
+		<xsd:choice maxOccurs="unbounded">
+			<xsd:element name="DataElement" type="DataElement" nillable="true" />
+			<xsd:element name="DataStructure" type="DataStructure" />
+			<xsd:element name="DataTable" type="DataTable" />
+		</xsd:choice>
+		<xsd:attributeGroup ref="StructureInfo-optional" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Structure">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="Element" type="Element" nillable="true" />
+			<xsd:element name="Structure" type="Structure" />
+			<xsd:element name="Table" type="Table" />
+		</xsd:choice>
+		<xsd:attributeGroup ref="StructureInfo" />
+	</xsd:complexType>
+
+	<xsd:complexType name="MetaStructure">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="ElementMetaData" type="MetaElement" />
+			<xsd:element name="StructureMetaData" type="MetaStructure" />
+			<xsd:element name="TableMetaData" type="MetaTable" />
+		</xsd:choice>
+		<xsd:attributeGroup ref="StructureInfo" />
+	</xsd:complexType>
+
+	<xsd:complexType name="DataElement">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attributeGroup ref="ElementInfo-optional" />
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="Element">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attributeGroup ref="ElementInfo" />
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="MetaElement">
+		<xsd:attributeGroup ref="ElementInfo" />
+	</xsd:complexType>
+
+	<xsd:attribute name="name" type="FunctionType" />
+	<xsd:attribute name="fieldType" type="FieldType" />
+	<xsd:attribute name="description" type="xsd:string" />
+
+	<xsd:attributeGroup name="ElementInfo">
+		<xsd:attribute ref="name" use="required" />
+		<xsd:attribute ref="description" />
+		<xsd:attribute ref="fieldType" use="required" />
+		<xsd:attribute name="maxLength" type="xsd:nonNegativeInteger" />
+		<xsd:attribute name="BCD-Decimals" type="xsd:nonNegativeInteger" />
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="ElementInfo-optional">
+		<xsd:attribute ref="name" />
+		<xsd:attribute ref="description" />
+		<xsd:attribute ref="fieldType" />
+		<xsd:attribute name="maxLength" type="xsd:nonNegativeInteger" />
+		<xsd:attribute name="BCD-Decimals" type="xsd:nonNegativeInteger" />
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="FieldInfo">
+		<xsd:attribute ref="name" use="required" />
+		<xsd:attribute ref="description" />
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="FieldInfo-optional">
+		<xsd:attribute ref="name" />
+		<xsd:attribute ref="description" />
+	</xsd:attributeGroup>
+
+	<xsd:attribute name="tableName" type="FunctionType" />
+
+	<xsd:attributeGroup name="TableInfo">
+		<xsd:attributeGroup ref="FieldInfo" />
+		<xsd:attribute ref="tableName" />
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="TableInfo-optional">
+		<xsd:attributeGroup ref="FieldInfo-optional" />
+		<xsd:attribute ref="tableName" />
+	</xsd:attributeGroup>
+
+	<xsd:attribute name="structureName" type="FunctionType" />
+
+	<xsd:attributeGroup name="StructureInfo">
+		<xsd:attributeGroup ref="FieldInfo" />
+		<xsd:attribute ref="structureName" />
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="StructureInfo-optional">
+		<xsd:attributeGroup ref="FieldInfo-optional" />
+		<xsd:attribute ref="structureName" />
+	</xsd:attributeGroup>
+
+	<xsd:simpleType name="FunctionType">
+		<xsd:restriction base="xsd:string">
+			<!-- xsd:pattern value="[A-Z][A-Z0-9_]*[A-Z0-9]+ ?|" /-->
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="FieldType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="BCD" />
+			<xsd:enumeration value="BYTE" />
+			<xsd:enumeration value="CHAR" />
+			<xsd:enumeration value="DATE" />
+			<xsd:enumeration value="DECF16" />
+			<xsd:enumeration value="DECF34" />
+			<xsd:enumeration value="FLOAT" />
+			<xsd:enumeration value="INT" />
+			<xsd:enumeration value="INT1" />
+			<xsd:enumeration value="INT2" />
+			<xsd:enumeration value="NUM" />
+			<xsd:enumeration value="STRING" />
+			<xsd:enumeration value="TIME" />
+			<xsd:enumeration value="XSTRING" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="RepositoryVersion">
+		<xsd:restriction base="xsd:string">
+		</xsd:restriction>
+	</xsd:simpleType>
+
+</xsd:schema>

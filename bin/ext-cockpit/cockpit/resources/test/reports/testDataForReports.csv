@@ -1,0 +1,21 @@
+﻿$defaultCatalog=testCatalog
+$defaultCatalogVersion=Online
+$catalogVersion=catalogVersion(catalog(id[default='$defaultCatalog']),version[default='$defaultCatalogVersion'])[unique=true,default='$defaultCatalog:$defaultCatalogVersion']
+
+INSERT_UPDATE UserGroup;uid[unique=true];
+;vjdbcReportsGroup;
+
+INSERT_UPDATE Customer;uid[unique=true];customerID[unique=true];name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password
+;demoUser;demoUser;VJDBC API Report User;VJDBC API Report user. Allowed to perform data fetch queries on platform via VJDBC.;en;EUR;vjdbcReportsGroup;1234;
+
+
+INSERT_UPDATE JasperMedia;code[unique=true];$catalogVersion;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];
+;testAverageOrderValue;;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/reports/averageOrderValue.jrxml;
+;notAReport;;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/reports/notAReport.jrxml;
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;vjdbcReportsGroup;;;;;;;;
+;;;;Item;+;-;-;-;-
+User;demoUser;vjdbcReportsGroup;1234;;;;;;
+$END_USERRIGHTS;;;;;;;;;

@@ -1,0 +1,605 @@
+<?xml version="1.0"?>
+<project name="acc.ant.addons">
+
+	<!--
+	Copies a given resource to any extension inheriting from addOnExtension.
+	The example addon resource might be :
+		addon.folder=/webroot/_ui;/webroot/WEB-INF
+	There is separate rule for _ui subfolders and for WEB-INF subfolders
+	-->
+	<macrodef name="copyAddOnToExtension">
+		<attribute name="addOnExtension"/>
+		<attribute name="addOnResource"/>
+		<attribute name="target"/>
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<and>
+							<available file="${ext.@{extname}.path}/web/webroot"/>
+							<contains string="${required.extensions.for.@{extname}}" substring="@{addOnExtension}"/>
+						</and>
+						<then>
+							<echo message="copyAddOnToExtension addOnExtension=@{addOnExtension} addOnResource=@{addOnResource} target=@{target}"/>
+
+<!--
+							<echo message="processing addon &lt;@{addOnExtension}&gt; for extension &lt;@{extname}&gt;"/>
+-->
+
+							<processAddOn addonextension="@{addOnExtension}" addonresource="@{addOnResource}">
+								<doTags>
+									<!--
+																		<echo message="Synchronizing &lt;@{addOnExtension}&gt;/acceleratoraddon@{addOnResource}/${mainDirVar} with &lt;@{extname}&gt;/web@{addOnResource}/${mainDirVar}/addons/@{addOnExtension}/"/>
+									-->
+
+									<touchFutureTimestamp distDir="${ext.@{extname}.path}/@{addOnResource}/${mainDirVar}/addons/@{addOnExtension}/"/>
+									<sync todir="${ext.@{extname}.path}/@{addOnResource}/${mainDirVar}/addons/@{addOnExtension}/">
+										<fileset dir="${ext.@{addOnExtension}.path}/acceleratoraddon/@{addOnResource}/${mainDirVar}" erroronmissingdir="false"/>
+									</sync>
+								</doTags>
+								<doOthers>
+									<!--
+																		<echo message="Synchronizing &lt;@{addOnExtension}&gt;/acceleratoraddon@{addOnResource}/${mainDirVar} with &lt;@{extname}&gt;/web@{addOnResource}/addons/@{addOnExtension}/${mainDirVar}"/>
+									-->
+									<touchFutureTimestamp distDir="${ext.@{extname}.path}/@{addOnResource}/addons/@{addOnExtension}/${mainDirVar}"/>
+									<sync todir="${ext.@{extname}.path}/@{addOnResource}/addons/@{addOnExtension}/${mainDirVar}">
+										<fileset dir="${ext.@{addOnExtension}.path}/acceleratoraddon/@{addOnResource}/${mainDirVar}" erroronmissingdir="false"/>
+									</sync>
+								</doOthers>
+								<doSrc>
+									<sequential>
+										<!--
+																				<echo message="Copying &lt;@{addOnExtension}&gt;/acceleratoraddon/web/webroot/WEB-INF/lib/ to &lt;@{extname}&gt;/web/webroot/WEB-INF/lib/"/>
+										-->
+										<copy todir="${ext.@{extname}.path}/web/webroot/WEB-INF/lib/">
+											<fileset dir="${ext.@{addOnExtension}.path}/acceleratoraddon/web/webroot/WEB-INF/lib/" includes="**/*.jar" erroronmissingdir="false"/>
+											<globmapper from="*" to="addon-@{addOnExtension}-*"/>
+										</copy>
+
+										<!--
+																				<echo message="Synchronizing &lt;@{addOnExtension}&gt;/acceleratoraddon with &lt;@{extname}&gt;/web/addonsrc/"/>
+										-->
+										<touchFutureTimestamp distDir="${ext.@{extname}.path}/web/addonsrc/@{addOnExtension}/"/>
+										<sync todir="${ext.@{extname}.path}/web/addonsrc/@{addOnExtension}/">
+											<fileset dir="${ext.@{addOnExtension}.path}/acceleratoraddon/web/src" includes="**/*.java" erroronmissingdir="false"/>
+										</sync>
+										<sequential>
+											<compileAddOn extname="@{target}" addOnExtension="@{addOnExtension}"/>
+											<mkdir dir="${HYBRIS_TEMP_DIR}/touch"/>
+											<touch file="${HYBRIS_TEMP_DIR}/touch/@{target}_addon_@{addOnExtension}srctouch"/>
+										</sequential>
+									</sequential>
+								</doSrc>
+							</processAddOn>
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<!--
+	Compiles addon src from predefined source to /WEB-INF/classes
+	-->
+	<macrodef name="compileAddOn">
+		<attribute name="extname"/>
+		<attribute name="addOnExtension"/>
+		<sequential>
+			<if>
+				<and>
+					<available file="${ext.@{addOnExtension}.path}/acceleratoraddon"/>
+					<available file="${ext.@{extname}.path}/web/addonsrc/@{addOnExtension}"/>
+				</and>
+				<then>
+					<echo message="Compile addonsrc @{extname} - @{addOnExtension}"/>
+
+					<mkdir dir="${ext.@{extname}.path}/web/webroot/WEB-INF/classes"/>
+					<javacompile destdir="${ext.@{extname}.path}/web/webroot/WEB-INF/classes">
+						<source>
+							<pathelement path="${ext.@{extname}.path}/web/addonsrc/@{addOnExtension}"/>
+						</source>
+						<additionalclasspath>
+							<fileset dir="${ext.@{extname}.path}/web/webroot">
+								<include name="WEB-INF/lib/**.jar"/>
+							</fileset>
+							<fileset dir="${ext.@{extname}.path}">
+								<include name="bin/*.jar"/>
+							</fileset>
+							<pathelement path="${ext.@{extname}.classpath}"/>
+						</additionalclasspath>
+					</javacompile>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<!--
+	Deleting the given resource to any extension not inheriting from addOnExtension, but having its addons copied.
+	The example addon resource might be :
+		addon.folder=/webroot/_ui;/webroot/WEB-INF
+	There is separate rule for _ui subfolders and for WEB-INF subfolders
+	-->
+	<macrodef name="deleteAddOnFromExtension">
+		<attribute name="addOnExtension"/>
+		<attribute name="addOnResource"/>
+		<sequential>
+			<foreachext>
+				<do>
+					<containsExact string="${required.extensions.for.@{extname}}" substring="@{addOnExtension}">
+						<do>
+							<if>
+								<available file="${ext.@{extname}.path}/web/webroot"/>
+								<then>
+									<echo message="Clearing add-on resource(@{addOnResource}) for the extension &lt;@{extname}&gt;"/>
+
+									<processAddOn addonextension="@{addOnExtension}" addonresource="@{addOnResource}">
+										<doTags>
+											<delete dir="${ext.@{extname}.path}/@{addOnResource}/${mainDirVar}/addons/@{addOnExtension}/" failonerror="false"/>
+										</doTags>
+										<doOthers>
+											<delete dir="${ext.@{extname}.path}/@{addOnResource}/addons/@{addOnExtension}" failonerror="false"/>
+										</doOthers>
+										<doSrc>
+											<delete dir="${ext.@{extname}.path}/web/addonsrc/@{addOnExtension}" failonerror="false"/>
+											<delete failonerror="false">
+												<fileset dir="${ext.@{extname}.path}/web/webroot/WEB-INF/lib" includes="addon-**.jar"/>
+											</delete>
+										</doSrc>
+									</processAddOn>
+								</then>
+							</if>
+						</do>
+					</containsExact>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<!--
+	Process addon extension dir as tags folder or static resource folder basing on the addOnResource path
+	-->
+	<macrodef name="processAddOn">
+		<element name="doTags" optional="false"/>
+		<element name="doSrc" optional="false"/>
+		<element name="doOthers" optional="false"/>
+		<attribute name="addOnExtension"/>
+		<attribute name="addOnResource"/>
+		<sequential>
+			<if>
+				<contains string="@{addOnResource}" substring="/web/webroot"/>
+				<then>
+					<!-- for each dir in <addonextension>/acceleratoraddon/webroot/WEB-INF/ excluding /lib-->
+					<for param="dir">
+						<dirset dir="${ext.@{addOnExtension}.path}/acceleratoraddon/@{addOnResource}/">
+							<exclude name="**/lib"/>
+							<include name="*"/>
+						</dirset>
+						<sequential>
+							<basename property="@{dir}addOnDir" file="@{dir}"/>
+							<var name="mainDirVar" value="${@{dir}addOnDir}"/>
+							<if>
+								<contains string="@{dir}" substring="WEB-INF"/>
+								<then>
+									<doTags/>
+								</then>
+								<else>
+									<doOthers/>
+								</else>
+							</if>
+						</sequential>
+					</for>
+				</then>
+			</if>
+			<if>
+				<contains string="@{addOnResource}" substring="/web/src"/>
+				<then>
+					<doSrc/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="syncaddons">
+		<attribute name="addonlist"/>
+		<sequential>
+			<if>
+				<or>
+					<equals arg1="@{addonlist}" arg2=""/>
+					<contains string="@{addonlist}" substring="$"/>
+				</or>
+				<then>
+					<foreachext>
+						<do>
+							<sequential>
+								<if>
+									<available file="${ext.@{extname}.path}/acceleratoraddon"/>
+									<then>
+										<extension_build extname="@{extname}"/>
+									</then>
+								</if>
+							</sequential>
+						</do>
+					</foreachext>
+				</then>
+				<else>
+					<for list="@{addonlist}" delimiter="," param="addon">
+						<sequential>
+							<extension_build extname="@{addon}"/>
+						</sequential>
+					</for>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<!--Generation of project.properties file for addon base on project.properties.template file-->
+	<macrodef name="generate_addon_properties_file">
+		<attribute name="addonname"/>
+		<attribute name="storefrontTemplateNames"/>
+		<sequential>
+			<echo message="Generate project.properties file from template ${ext.@{addonname}.path}/project.properties.template"/>
+			<!--echo message="storefrontTemplateNames : @{storefrontTemplateNames}"/>
+			<echo message="properties template : ${ext.@{addonname}.path}/project.properties.template"/-->
+
+			<if>
+				<available file="${ext.@{addonname}.path}/project.properties.template"/>
+				<then>
+					<sequential>
+
+						<!-- delete project.properties file -->
+						<delete file="${ext.@{addonname}.path}/project.properties"/>
+
+						<!-- copy properties template file -->
+						<copy file="${ext.@{addonname}.path}/project.properties.template" tofile="${ext.@{addonname}.path}/project.properties"/>
+
+						<!--Replace storefrontTemplate lines -->
+						<for list="@{storefrontTemplateNames}" param="storefrontTemplateName">
+							<sequential>
+								<!--echo message="storefrontTemplateName : @{storefrontTemplateName}"/-->
+								<if>
+									<length string="@{storefrontTemplateName}" trim="true" when="greater" length="0"/>
+									<then>
+										<sequential>
+											<var name="storefrontNames" value="${addonStorefront.@{storefrontTemplateName}}"/>
+											<!--echo message="storefrontNames : ${storefrontNames}"/-->
+											<if>
+												<equals arg1="${storefrontNames}" arg2="blank"/>
+												<then>
+													<replaceregexp file="${ext.@{addonname}.path}/project.properties" match="@{storefrontTemplateName}.additionalWebSpringConfigs(.*)${line.separator}" replace=""/>
+												</then>
+												<else>
+													<add_additionalWebSpringConfigs_line addonname="@{addonname}" storefrontTemplateName="@{storefrontTemplateName}" storefrontNames="${storefrontNames}"/>
+												</else>
+											</if>
+										</sequential>
+									</then>
+								</if>
+							</sequential>
+						</for>
+					</sequential>
+				</then>
+				<else>
+					<fail message="project.properties.template file doesn't exist : ${ext.@{addonname}.path}/project.properties.template"/>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<!--Duplicates templateLine for all storefront (storefrontNames parameter) i project.properties file
+	templateLine will be something like <storefrontTemplateName>.additionalWebSpringConfigs.<addonname>=...
+	 -->
+	<macrodef name="add_additionalWebSpringConfigs_line">
+		<attribute name="addonname"/>
+		<attribute name="storefrontTemplateName"/>
+		<attribute name="storefrontNames"/>
+		<sequential>
+			<echo message="Add additionalWebSpringConfigs line for storefrontTemplate '@{storefrontTemplateName}' and storefronts '@{storefrontNames}'"/>
+			<var name="pattern" value="@{storefrontTemplateName}.additionalWebSpringConfigs"/>
+			<var name="filePath" value="${ext.@{addonname}.path}/project.properties"/>
+			<!--echo message="pattern = ${pattern}"/>
+			<echo message="filePath = ${filePath}"/-->
+			<var unset="true" name="templateLine"/>
+			<loadfile property="templateLine" srcfile="${filePath}">
+				<filterchain>
+					<linecontainsregexp>
+						<regexp pattern="${pattern}"/>
+					</linecontainsregexp>
+				</filterchain>
+			</loadfile>
+			<!--echo message="templateLine = ${templateLine}"/-->
+			<if>
+				<isset property="templateLine"/>
+				<then>
+					<echo file="${filePath}" message="${line.separator}" append="true"/>
+					<for param="storefrontName" list="@{storefrontNames}">
+						<sequential>
+							<propertyregex property="replacedLine" input="${templateLine}" regexp="${pattern}" replace="@{storefrontName}.additionalWebSpringConfigs" global="true"/>
+							<!--echo message="replacedLine = ${replacedLine}"/-->
+							<echo file="${filePath}" message="${replacedLine}" append="true"/>
+							<var unset="true" name="replacedLine"/>
+						</sequential>
+					</for>
+					<replaceregexp file="${filePath}" match="${pattern}(.*)${line.separator}" replace=""/>
+				</then>
+				<else>
+					<echo message="-----------WARNING----------- : Could not find line = ${pattern}... in project.properties.template. It can be caused by lack of configuration line in project.properties.template or wrong storefrontTemplateName in command line (addonStorefront.'storefrontTemplateName'). "/>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<!--Check if all parameters neede to install addOn was set  -->
+	<macrodef name="check_addoninstall_parameters">
+		<sequential>
+			<var name="command" value="ant addoninstall -Daddonnames=&quot;AddOnName1,AddOnName2&quot; -DaddonStorefront.yacceleratorstorefront=&quot;B2CStorefront1,B2CStorefront2&quot; -DaddonStorefront.yb2bacceleratorstorefront=&quot;B2BStorefront1,B2BStorefront2&quot;"/>
+
+			<!-- check storefront extensions-->
+			<if>
+				<isset property="storefrontTemplates"/>
+				<then>
+					<for list="${storefrontTemplates}" param="storefrontTemplateName">
+						<sequential>
+							<var name="storefrontNames" value="${addonStorefront.@{storefrontTemplateName}}"/>
+							<for list="${storefrontNames}" param="storefrontName">
+								<sequential>
+									<check_extension extensionName="@{storefrontName}"/>
+								</sequential>
+							</for>
+						</sequential>
+					</for>
+				</then>
+				<else>
+					<fail message="Storefront template parameters are missing. Set at least one storefront parameter (addonStorefront...) in command line : ${command}"/>
+				</else>
+			</if>
+
+			<!-- check if addonnames is set -->
+			<if>
+				<not>
+					<isset property="addonnames"/>
+				</not>
+				<then>
+					<input addproperty="addonnames">Please enter the addOn name or names (comma separated) :</input>
+				</then>
+			</if>
+
+			<!-- check if addonnames is not empty -->
+			<if>
+				<and>
+					<equals arg1="${addonnames}" arg2=""/>
+				</and>
+				<then>
+					<fail message="AddOn name cannot be empty. Enter correct name or set 'addonnames' in command line : ${command}"/>
+				</then>
+			</if>
+
+			<!-- check if addons are available -->
+			<for list="${addonnames}" param="addon">
+				<sequential>
+					<if>
+						<not>
+							<isset property="ext.@{addon}.path"/>
+						</not>
+						<then>
+							<fail message="Addon extension '@{addon}' is not added to localextensions.xml. Please include the @{addon} extension in your localextensions.xml"/>
+						</then>
+					</if>
+				</sequential>
+			</for>
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="check_extension">
+		<attribute name="extensionName"/>
+		<sequential>
+			<!-- check if not empty -->
+			<if>
+				<equals arg1="@{extensionName}" arg2=""/>
+				<then>
+					<fail message="Storefront name cannot be empty"/>
+				</then>
+			</if>
+
+			<!-- check if is available -->
+			<if>
+				<not>
+					<isset property="ext.@{extensionName}.path"/>
+				</not>
+				<then>
+					<fail message="storefront extension '@{extensionName}' is not added to localextensions.xml. Please include the @{extensionName} extension in your localextensions.xml"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<!--Adding addon extension as required to extensioninfo.xml file for all storefronts-->
+	<macrodef name="add_addon_to_all_storefront_extensioninfo">
+		<attribute name="addonname"/>
+		<attribute name="storefrontTemplateNames"/>
+		<sequential>
+			<!--add addon as required extension to storefronts-->
+			<for list="@{storefrontTemplateNames}" param="storefrontTemplateName">
+				<sequential>
+					<var name="storefrontNames" value="${addonStorefront.@{storefrontTemplateName}}"/>
+					<for list="${storefrontNames}" param="storefrontName">
+						<sequential>
+							<add_addon_to_storefront_extensioninfo addonname="@{addonname}" storefront="@{storefrontName}"/>
+						</sequential>
+					</for>
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+	<!--Adding addon extension as required to extensioninfo.xml file for selected storefront-->
+	<macrodef name="add_addon_to_storefront_extensioninfo">
+		<attribute name="addonname"/>
+		<attribute name="storefront"/>
+		<sequential>
+			<echo message="Adding addon '@{addonname}' to extensioninfo.xml for '@{storefront}'"/>
+			<!--add addon as required extension to storefront-->
+			<xmltask source="${ext.@{storefront}.path}/extensioninfo.xml" dest="${ext.@{storefront}.path}/extensioninfo.xml">
+				<remove path="/extensioninfo/extension/requires-extension[@name='@{addonname}']"/>
+				<!-- remove to make sure that we will not have duplication" -->
+				<insert path="/extensioninfo/extension/*[position() = 1]" position="before">
+					<![CDATA[ <requires-extension name="@{addonname}" /> ]]>
+				</insert>
+			</xmltask>
+		</sequential>
+	</macrodef>
+
+	<!--Method write list of properties starting with 'addonStorefront.' to temporary file.
+	And filter this file to get list of storefront template names.
+	 -->
+	<macrodef name="set_storefront_template_list">
+		<sequential>
+			<tempfile property="temp.file"/>
+			<echoproperties destFile="${temp.file}">
+				<propertyset>
+					<propertyref prefix="addonStorefront."/>
+				</propertyset>
+			</echoproperties>
+			<replaceregexp flags="g" file="${temp.file}" match="#(.*)${line.separator}" replace=""/>
+			<replaceregexp flags="g" file="${temp.file}" match="addonStorefront." replace=""/>
+			<replaceregexp flags="g" file="${temp.file}" match="=(.*)${line.separator}" replace=","/>
+			<loadfile property="storefrontTemplates" srcfile="${temp.file}"/>
+			<echo message="Storefront templates found in command line : ${storefrontTemplates}"/>
+			<delete file="${temp.file}"/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="remove_addon_from_all_storefront_extensioninfo">
+			<attribute name="addonname"/>
+			<attribute name="storefrontTemplateNames"/>
+			<sequential>
+				<!--add addon as required extension to storefronts-->
+				<for list="@{storefrontTemplateNames}" param="storefrontTemplateName">
+					<sequential>
+						<var name="storefrontNames" value="${addonStorefront.@{storefrontTemplateName}}"/>
+						<for list="${storefrontNames}" param="storefrontName">
+							<sequential>
+								<remove_addon_from_storefront_extensioninfo addonname="@{addonname}" storefront="@{storefrontName}"/>
+							</sequential>
+						</for>
+					</sequential>
+				</for>
+			</sequential>
+		</macrodef>
+
+
+	<macrodef name="remove_addon_from_storefront_extensioninfo">
+		<attribute name="addonname"/>
+		<attribute name="storefront"/>
+		<sequential>
+			<echo message="Removing addon '@{addonname}' from extensioninfo.xml for '@{storefront}'"/>
+			<!--add addon as required extension to storefront-->
+			<xmltask source="${ext.@{storefront}.path}/extensioninfo.xml" dest="${ext.@{storefront}.path}/extensioninfo.xml">
+				<remove path="/extensioninfo/extension/requires-extension[@name='@{addonname}']"/>
+			</xmltask>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="addoninstall">
+		<sequential>
+			<set_storefront_template_list/>
+			<check_addoninstall_parameters/>
+			<echo message="AddOn name list: ${addonnames}"/>
+			<for list="${addonnames}" param="addon">
+				<sequential>
+					<echo message="------------------Instaling addon : @{addon}---------------"/>
+					<generate_addon_properties_file addonname="@{addon}" storefrontTemplateNames="${storefrontTemplates}"/>
+					<add_addon_to_all_storefront_extensioninfo addonname="@{addon}" storefrontTemplateNames="${storefrontTemplates}"/>
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="addonuninstall">
+		<sequential>
+			<set_storefront_template_list/>
+			<check_addoninstall_parameters/>
+			<echo message="AddOn name list: ${addonnames}"/>
+			<for list="${addonnames}" param="addon">
+				<sequential>
+					<echo message="------------------Uninstaling addon : @{addon}---------------"/>
+					<delete includeEmptyDirs="true" failonerror="false">
+						<fileset dir="${ext.@{addon}.path}/" includes="project.properties"/>
+					</delete>
+					<remove_addon_from_all_storefront_extensioninfo addonname="@{addon}" storefrontTemplateNames="${storefrontTemplates}"/>
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="addoninstallbundle">
+		<sequential>
+			<if>
+				<isset property="bundle.id"/>
+				<then>
+					<echo level="info" message="installing bundle : ${bundle.id}"/>
+					<property file="${ext.addonsupport.path}/resources/${bundle.id}_bundle.properties"/>
+				</then>
+			</if>
+			<if>
+				<isset property="addonStorefront.yacceleratorstorefront"/>
+				<then>
+					<echo level="info" message="Storefronts : ${addonStorefront.yacceleratorstorefront}"/>
+					<property name="storefrontnames" value="${addonStorefront.yacceleratorstorefront}"/>
+				</then>
+				<else>
+					<echo level="info" message="Storefronts : yacceleratorstorefront"/>
+					<property name="storefrontnames" value="yacceleratorstorefront"/>
+				</else>
+			</if>
+			<if>
+				<isset property="addonStorefront.yacceleratorstorefront"/>
+				<then>
+					<echo level="info" message="installing AddOns : ${bundle.addons}"/>
+					<antcall target="addoninstall">
+						<param name="addonnames" value="${bundle.addons}"/>
+						<param name="addonStorefront.yacceleratorstorefront" value="yacceleratorstorefront"/>
+					</antcall>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="touchFutureTimestamp">
+		<attribute name="distDir"/>
+		<sequential>
+			<property name="tstamp.pattern" value="MM/dd/yyyy HH:mm a"/>
+			<tstamp>
+				<format property="tstamp.now" pattern="${tstamp.pattern}"/>
+			</tstamp>
+<!--
+			<echo message="touching addon resources with future timestamp in @{distDir}"/>
+-->
+			<touch>
+				<fileset dir="@{distDir}" erroronmissingdir="false">
+					<date datetime="${tstamp.now}" when="after" pattern="${tstamp.pattern}"/>
+					<type type="file"/>
+				</fileset>
+			</touch>
+		</sequential>
+	</macrodef>
+
+	<target name="addoninstall" description="Install addon">
+		<addoninstall/>
+	</target>
+
+	<target name="addonuninstall" description="Uninstall addon">
+		<addonuninstall/>
+	</target>
+
+	<target name="installbundle" description="Install bundle">
+		<addoninstallbundle/>
+	</target>
+
+	<!--
+	<target name="initializebundle" depends="clean,installbundle,all,initialize" description="Install and initialize with addon bundle">
+	</target>
+	-->
+</project>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+	
+	<alias alias="logoutSuccessHandler" name="sapOrdermgmtDefaultLogoutSuccessHandler"/>	
+	<bean id="sapOrdermgmtDefaultLogoutSuccessHandler"
+		  class="de.hybris.platform.sap.ysapordermgmtb2baddon.security.DefaultLogoutSuccessHandler">
+		<property name="cartService" ref="sapOrdermgmtCartService"/>		  
+		<property name="defaultTargetUrl" value="/?logout=true"/>
+		<property name="guidCookieStrategy" ref="guidCookieStrategy"/>
+		<property name="useReferer" value="true"/>
+		<property name="restrictedPages">
+			<list>
+				<value>/my-account</value>
+				<value>/checkout</value>
+			</list>
+		</property>
+		<aop:scoped-proxy/>
+	</bean>	
+
+</beans>

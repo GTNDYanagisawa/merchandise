@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd"
+    default-autowire="byName">
+    
+   <alias alias="btgSegmentRestrictionActionWizard" name="defaultBtgSegmentRestrictionActionWizard" /> 
+	<bean id="defaultBtgSegmentRestrictionActionWizard" scope="prototype" class="de.hybris.platform.btgcockpit.wizard.BTGSegmentRestrictionActionWizard">
+		<property name="title" value="btgcockpit.wizard.segmentRestrictionAction.title"/>
+		<property name="defaultController" ref="btgSegmentRestrictionActionWizardController"/>
+		<property name="pages">
+			<list>
+				<ref bean="btgSegmentRestrictionActionWizard_chooseRestrictionTypePage"/>
+				<ref bean="btgSegmentRestrictionActionWizard_chooseCmsPagePage"/>
+				<ref bean="btgSegmentRestrictionActionWizard_pageInverseHandlingPage"/>
+				<ref bean="btgSegmentRestrictionActionWizard_pageDefaultHandlingPage"/>
+				<ref bean="btgSegmentRestrictionActionWizard_chooseCmsComponentPage"/>
+				<ref bean="btgSegmentRestrictionActionWizard_componentInverseHandlingPage"/>
+				<ref bean="btgSegmentRestrictionActionWizard_otherUserComponentHandlingPage"/>
+				<ref bean="btgSegmentRestrictionActionWizard_summaryPage"/>
+			</list>
+		</property>
+		<property name="typeService" ref="cockpitTypeService"/>
+		<property name="cmsPageService" ref="cmsPageService"/>
+		<property name="pageRoot" value="/btgcockpit/wizards/segmentrestrictionaction"/>
+	</bean>
+	
+	<alias alias="btgSegmentRestrictionActionWizardController" name="defaultBtgSegmentRestrictionActionWizardController" />
+	<bean id="defaultBtgSegmentRestrictionActionWizardController" class="de.hybris.platform.btgcockpit.wizard.controller.RestrictionOutputActionController" scope="prototype">
+		<property name="btgCockpitService" ref="btgCockpitService"/>
+		<property name="typeService" ref="cockpitTypeService"/>
+		<property name="transitions">
+			<list>
+				<bean class="de.hybris.platform.cockpit.wizards.Transition">
+					<property name="source" value="pageInverseHandlingPage"/>
+					<property name="ifAttributesTrue" value="defaultPageSelected"/>
+					<property name="destination" value="pageDefaultPage"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.wizards.Transition">
+					<property name="source" value="pageInverseHandlingPage"/>
+					<property name="ifAttributesTrue" value="selectedPageRestricted"/>
+					<property name="destination" value="pageDefaultPage"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.wizards.Transition">
+					<property name="source" value="pageInverseHandlingPage"/>
+					<property name="destination" value="summaryPage"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.wizards.Transition">
+					<property name="source" value="pageDefaultPage"/>
+					<property name="destination" value="summaryPage"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.wizards.Transition">
+					<property name="source" value="componentInverseHandlingPage"/>
+					<property name="ifAttributesFalse" value="restrictionInverted"/>
+					<property name="ifAttributesTrue" value="extInverseHandling"/>
+					<property name="destination" value="otherUserComponentPage"/>
+				</bean>
+				<bean class="de.hybris.platform.cockpit.wizards.Transition">
+					<property name="source" value="componentInverseHandlingPage"/>
+					<property name="destination" value="summaryPage"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="btgSegmentRestrictionActionWizard_chooseRestrictionTypePage" name="defaultBtgSegmentRestrictionActionWizard_chooseRestrictionTypePage" />
+	<bean id="defaultBtgSegmentRestrictionActionWizard_chooseRestrictionTypePage" class="de.hybris.platform.cockpit.wizards.impl.DefaultPage" scope="prototype">
+		<property name="id" value="chooseRestrictionTypePage"/>
+		<property name="title" value="btgcockpit.wizard.segmentRestrictionAction.restrictionTypePage.title" />
+		<property name="componentURI" value="chooseRestrictionType.zul"/>
+	</bean>
+	
+	<alias alias="btgSegmentRestrictionActionWizard_chooseCmsComponentPage" name="defaultBtgSegmentRestrictionActionWizard_chooseCmsComponentPage" />
+	<bean id="defaultBtgSegmentRestrictionActionWizard_chooseCmsComponentPage" class="de.hybris.platform.cockpit.wizards.impl.DefaultPage" scope="prototype">
+		<property name="id" value="chooseCMSComponentPage"/>
+		<property name="componentURI" value="chooseCmsComponent.zul"/>
+	</bean>
+	
+	<alias alias="btgSegmentRestrictionActionWizard_componentInverseHandlingPage" name="defaultBtgSegmentRestrictionActionWizard_componentInverseHandlingPage" />
+	<bean id="defaultBtgSegmentRestrictionActionWizard_componentInverseHandlingPage" class="de.hybris.platform.cockpit.wizards.impl.DefaultPage" scope="prototype">
+		<property name="id" value="componentInverseHandlingPage"/>
+		<property name="componentURI" value="componentInverseHandling.zul"/>
+	</bean>
+	
+	<alias alias="btgSegmentRestrictionActionWizard_otherUserComponentHandlingPage" name="defaultBtgSegmentRestrictionActionWizard_otherUserComponentHandlingPage" />
+	<bean id="defaultBtgSegmentRestrictionActionWizard_otherUserComponentHandlingPage" class="de.hybris.platform.cockpit.wizards.impl.DefaultPage" scope="prototype">
+		<property name="id" value="otherUserComponentPage"/>
+		<property name="componentURI" value="otherUserComponent.zul"/>
+	</bean>
+	
+	<alias alias="btgSegmentRestrictionActionWizard_chooseCmsPagePage" name="defaultBtgSegmentRestrictionActionWizard_chooseCmsPagePage" />
+	<bean id="defaultBtgSegmentRestrictionActionWizard_chooseCmsPagePage" class="de.hybris.platform.cockpit.wizards.impl.DefaultPage" scope="prototype">
+		<property name="id" value="chooseCMSPagePage"/>
+		<property name="componentURI" value="chooseCmsPage.zul"/>
+	</bean>
+	
+	<alias alias="btgSegmentRestrictionActionWizard_pageInverseHandlingPage" name="defaultBtgSegmentRestrictionActionWizard_pageInverseHandlingPage" />
+	<bean id="defaultBtgSegmentRestrictionActionWizard_pageInverseHandlingPage" class="de.hybris.platform.cockpit.wizards.impl.DefaultPage" scope="prototype">
+		<property name="id" value="pageInverseHandlingPage"/>
+		<property name="componentURI" value="pageInverseHandling.zul"/>
+	</bean>
+
+	<alias alias="btgSegmentRestrictionActionWizard_pageNotDefaultHandlingPage" name="defaultBtgSegmentRestrictionActionWizard_pageNotDefaultHandlingPage" />
+	<bean id="defaultBtgSegmentRestrictionActionWizard_pageNotDefaultHandlingPage" class="de.hybris.platform.cockpit.wizards.impl.DefaultPage" scope="prototype">
+		<property name="id" value="pageNotDefaultPage"/>
+		<property name="componentURI" value="pageNotDefault.zul"/>
+	</bean>
+	
+	<alias alias="btgSegmentRestrictionActionWizard_pageDefaultHandlingPage" name="defaultBtgSegmentRestrictionActionWizard_pageDefaultHandlingPage" />
+	<bean id="defaultBtgSegmentRestrictionActionWizard_pageDefaultHandlingPage" class="de.hybris.platform.cockpit.wizards.impl.DefaultPage" scope="prototype">
+		<property name="id" value="pageDefaultPage"/>
+		<property name="componentURI" value="pageDefault.zul"/>
+	</bean>
+	
+	<alias alias="btgSegmentRestrictionActionWizard_summaryPage" name="defaultBtgSegmentRestrictionActionWizard_summaryPage" />
+	<bean id="defaultBtgSegmentRestrictionActionWizard_summaryPage" class="de.hybris.platform.cockpit.wizards.impl.DefaultPage" scope="prototype">
+		<property name="id" value="summaryPage"/>
+		<property name="componentURI" value="summary.zul"/>
+	</bean>
+</beans>

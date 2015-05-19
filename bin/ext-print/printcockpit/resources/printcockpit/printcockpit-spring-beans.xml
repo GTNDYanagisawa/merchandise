@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+				http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+				http://www.springframework.org/schema/aop 
+				http://www.springframework.org/schema/aop/spring-aop-3.1.xsd 
+				http://www.springframework.org/schema/util 
+				http://www.springframework.org/schema/util/spring-util-3.1.xsd"
+	default-autowire="byName">
+	<alias alias="pageAbstractModel" name="defaultPageAbstractModel" />
+	<bean id="defaultPageAbstractModel" class="de.hybris.platform.printcockpit.view.layouts.grid.AbstractPreviewModel" scope="prototype" abstract="true">
+		<property name="modelHelper" ref="cockpitModelHelper"/>
+	</bean>
+	<alias alias="pageFixedModel" name="defaultPageFixedModel" />
+	<bean id="defaultPageFixedModel" class="de.hybris.platform.printcockpit.model.layout.impl.FixedModel" scope="prototype" parent="pageAbstractModel">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	<alias alias="pageDynamicModel" name="defaultPageDynamicModel" />
+	<bean id="defaultPageDynamicModel" class="de.hybris.platform.printcockpit.model.layout.impl.DynamicModel" scope="prototype" parent="pageAbstractModel"/>
+	
+	<alias alias="abstractPagePreviewModel" name="defaultAbstractPagePreviewModel" /> 
+	<bean id="defaultAbstractPagePreviewModel" class="de.hybris.platform.printcockpit.model.layout.impl.AbstractPagePreviewModel" scope="tenant" abstract="true">
+		<property name="cockpitModelHelper" ref="cockpitModelHelper"/>
+		<property name="layoutService" ref="layoutService"/>
+		<property name="printcockpitService" ref="printcockpitService"/>
+		<property name="placementsHandlerRegistry" ref="placementsHandlerRegistry"/>
+		<property name="pagePlannerRegistry" ref="pagePlannerRegistry"/>
+		<property name="publicationService" ref="publicationService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>	
+
+	<alias alias="pageDoubleModel" name="defaultPageDoubleModel"/>	
+	<bean id="defaultPageDoubleModel" class="de.hybris.platform.printcockpit.model.layout.impl.DoublePageModel" scope="prototype">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<alias alias="pageSingleModel" name="defaultPageSingleModel"/>	
+	<bean id="defaultPageSingleModel" class="de.hybris.platform.printcockpit.model.layout.impl.SinglePageModel" scope="prototype">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<alias alias="SEQUENCE_EmptyPageHandler" name="defaultSequenceModeEmptyPageHandler"/>
+	<bean id="defaultSequenceModeEmptyPageHandler" class="de.hybris.platform.printcockpit.pagemanagment.impl.DefaultSequenceModeEmptyPageHandler" scope="tenant">
+		<property name="printcockpitService" ref="printcockpitService"/>
+	</bean>
+	
+	<alias alias="abstractPlacementHandler" name="defaultAbstractPlacementHandler" />
+	<bean id="defaultAbstractPlacementHandler" class="de.hybris.platform.printcockpit.pagemanagment.impl.AbstractPlacementHandler" abstract="true" scope="tenant">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+	</bean>	
+	
+	<alias alias="dynamicPlacementHandler" name="defaultDynamicPlacementHandler"/>
+	<bean id="defaultDynamicPlacementHandler" class="de.hybris.platform.printcockpit.pagemanagment.impl.DynamicPlacementHandler" scope="tenant" parent="abstractPlacementHandler"/>
+	
+	<alias alias="fixedPlacementHandler" name="defaultFixedPlacementHandler"/>
+	<bean id="defaultFixedPlacementHandler" class="de.hybris.platform.printcockpit.pagemanagment.impl.FixedPlacementHandler" scope="tenant" parent="abstractPlacementHandler"/>
+	
+	<alias alias="placementsHandlerRegistry" name="defaultPlacementsHandlerRegistry"/>
+	
+	<util:map id="defaultPlacementsHandlerRegistry" scope="tenant">
+		<entry> 
+			<key>
+				<util:constant static-field="de.hybris.platform.print.enums.GridMode.FIXED"/>
+			</key>
+			<ref bean="fixedPlacementHandler"/>
+		</entry>
+		<entry> 
+			<key>
+				<util:constant static-field="de.hybris.platform.print.enums.GridMode.DYNAMIC"/>
+			</key>
+			<ref bean="dynamicPlacementHandler"/>
+		</entry>
+	</util:map>
+	
+</beans>
+	

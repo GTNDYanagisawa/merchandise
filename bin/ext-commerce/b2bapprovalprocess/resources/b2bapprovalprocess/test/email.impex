@@ -1,0 +1,26 @@
+#% impex.setLocale( Locale.ENGLISH )
+$defaultCatalog=testCatalog
+$defaultCatalogVersion=Online
+$catalogVersion=catalogVersion(catalog(id[default='$defaultCatalog']),version[default='$defaultCatalogVersion'])[unique=true,default='$defaultCatalog:$defaultCatalogVersion']
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog
+;$defaultCatalog;$defaultCatalog;$defaultCatalog;true
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode)
+;$defaultCatalog;$defaultCatalogVersion;true;EUR;de,en
+
+REMOVE Media;code[unique=true];$catalogVersion;
+;order_confirmation_media;;
+;order_rejection_media;;
+
+REMOVE RendererTemplate;code[unique=true];
+;order_confirmation;
+;order_rejection;
+
+INSERT Media;code[unique=true];$catalogVersion;mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];
+;order_confirmation_media;;text/html;order_confirmation.vm;jar:/email_template/order_confirmation.vm;
+;order_rejection_media;;text/html;order_rejection.vm;jar:/email_template/order_rejection.vm;
+
+INSERT RendererTemplate;code[unique=true];description[lang=en];content(code, $catalogVersion)[lang=en];content(code, $catalogVersion)[lang=de];contextClass;outputMimeType;rendererType(code)
+;order_confirmation;Velocity template for the order confirmation email;order_confirmation_media;order_confirmation_media;de.hybris.platform.b2b.mail.impl.OrderInfoContextDto;text/html;velocity
+;order_rejection;Velocity template for the order rejection email;order_rejection_media;order_rejection_media;de.hybris.platform.b2b.mail.impl.OrderInfoContextDto;text/html;velocity

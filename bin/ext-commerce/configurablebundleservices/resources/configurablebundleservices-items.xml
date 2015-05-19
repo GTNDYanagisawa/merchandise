@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+
+-->
+
+<items  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="items.xsd">
+     
+    <enumtypes>
+        
+        <enumtype code="BundleRuleTypeEnum" autocreate="true" generate="true" dynamic="true">
+            <value code="ANY" />
+            <value code="ALL" />
+        </enumtype>
+
+        <enumtype code="BundleTemplateStatusEnum" autocreate="true" generate="true" dynamic="false">
+            <value code="check"/>
+            <value code="unapproved"/>
+            <value code="approved"/>
+            <value code="archived"/>
+        </enumtype>
+
+    </enumtypes>
+     
+    
+    <relations> 	
+        
+        <!-- The many-to-many relationship between AbstractBundleRule and Product for conditional products -->
+        <relation
+            generate="true"             
+            localized="false"           
+            code="AbstractBundleRulesConditionalProductsRelation"
+            autocreate="true"> 
+            <deployment table="BundleRule2CondProdRel" typecode="6301" />            
+            <sourceElement type="AbstractBundleRule" qualifier="conditionalBundleRules" cardinality="many"/>
+            <targetElement type="Product" qualifier="conditionalProducts" cardinality="many"/>
+        </relation>
+
+        <!-- The many-to-many relationship between AbstractBundleRule and Product for target products-->
+        <relation
+            generate="true"             
+            localized="false"           
+            code="AbstractBundleRulesTargetProductsRelation"  
+            autocreate="true">   
+            <deployment table="BundleRule2TargProdRel" typecode="6302" />          
+            <sourceElement type="AbstractBundleRule" qualifier="targetBundleRules" cardinality="many"/>
+            <targetElement type="Product" qualifier="targetProducts" cardinality="many"/>
+        </relation>
+        
+        <!-- The 1-to-many relationship between BundleTemplate and associated BundleTemplates -->
+        <relation
+            generate="true"             
+            localized="false"           
+            code="BundleTemplateRelation"  
+            autocreate="true">         
+            <sourceElement type="BundleTemplate" qualifier="parentTemplate" cardinality="one">
+                 <modifiers read="true" write="false" search="true" initial="true"/>
+            </sourceElement>
+            <targetElement type="BundleTemplate" qualifier="childTemplates" cardinality="many" collectiontype="list" ordered="true">
+                 <modifiers read="true" write="true" search="true" initial="false"/>
+            </targetElement>
+        </relation>
+
+        <!-- The many-to-many relationship between Product and BundleTemplate -->
+        <relation
+            generate="true"             
+            localized="false"           
+            code="ProductsBundleTemplatesRelation"  
+            autocreate="true">   
+            <deployment table="Prod2BundleTemplRel" typecode="6303" />          
+            <sourceElement type="Product" qualifier="products" cardinality="many"  collectiontype="list" ordered="true"/>
+            <targetElement type="BundleTemplate" qualifier="bundleTemplates" cardinality="many"/>
+        </relation>
+
+        <!-- The 1-to-many relationship between BundleTemplate and ChangeProductPriceBundleRule -->
+        <relation
+            generate="true"             
+            localized="false"           
+            code="BundleTemplatePriceRulesRelation"  
+            autocreate="true">        
+            <sourceElement type="BundleTemplate" qualifier="bundleTemplate" cardinality="one"/>
+            <targetElement type="ChangeProductPriceBundleRule" qualifier="changeProductPriceBundleRules" cardinality="many">
+                <modifiers partof="true"></modifiers>
+            </targetElement>
+        </relation>
+
+        <!-- The 1-to-many relationship between BundleTemplate and DisableProductBundleRule -->
+        <relation
+            generate="true"             
+            localized="false"           
+            code="BundleTemplateDisableRulesRelation"  
+            autocreate="true">        
+            <sourceElement type="BundleTemplate" qualifier="bundleTemplate" cardinality="one"/>
+            <targetElement type="DisableProductBundleRule" qualifier="disableProductBundleRules" cardinality="many">
+                <modifiers partof="true"></modifiers>
+            </targetElement>
+        </relation>
+
+        <!-- The many-to-many relationship between required BundleTemplates and dependent BundleTemplates -->
+        <relation
+            generate="true"             
+            localized="false"           
+            code="RequiredBundleTemplatesDependentBundleTemplatesRelation"  
+            autocreate="true">    
+            <deployment table="Req2DependBundleTemplRel" typecode="6312" />       
+            <sourceElement type="BundleTemplate" qualifier="requiredBundleTemplates" cardinality="many"/>
+            <targetElement type="BundleTemplate" qualifier="dependentBundleTemplates" cardinality="many"/>
+        </relation>
+
+        <!-- The 1-to-many relationship between BundleTemplateStatus and BundleTemplates -->
+        <relation
+            generate="true"             
+            localized="false"           
+            code="BundleTemplateStatusRelation"  
+            autocreate="true">         
+            <sourceElement type="BundleTemplateStatus" qualifier="status" cardinality="one"/>
+            <targetElement type="BundleTemplate" qualifier="bundleTemplates" cardinality="many"/>
+        </relation>
+
+        <!-- The 1-to-many relationship between master Cart and CartEntries for latest cart modifications -->
+        <relation
+            generate="true"             
+            localized="false"           
+            code="LastModifiedEntriesRelation"  
+            autocreate="true">         
+            <sourceElement type="Cart" qualifier="lastModifiedMasterCart" cardinality="one"/>
+            <targetElement type="CartEntry" qualifier="lastModifiedEntries" cardinality="many"/>
+        </relation>
+        
+        <!--  1:n relation between BillingEvent and ChangeProductPriceBundleRule -->
+        <relation
+            generate="true"
+            localized="false"
+            code="BillingEvent2ChangeProductPriceBundleRule"
+            autocreate="true">
+            <sourceElement type="BillingEvent" qualifier="billingEvent" cardinality="one"/>
+             <targetElement type="ChangeProductPriceBundleRule" qualifier="changeProductPriceBundleRules" cardinality="many"/>               
+        </relation>
+
+    </relations>
+
+    <itemtypes>
+        
+        <itemtype code="AbstractOrderEntry"  autocreate="false"  generate="false" jaloclass="de.hybris.platform.configurablebundleservices.jalo.order.AbstractOrderEntry">
+            <attributes>               
+                <attribute qualifier="bundleNo" type="java.lang.Integer" generate="true">
+                    <description>Bundle number, greater than 0 if product is part of a bundle</description>
+                    <persistence type="property" />
+                    <defaultvalue>new Integer(0)</defaultvalue>
+                </attribute>
+                <attribute type="BundleTemplate" qualifier="bundleTemplate">
+                    <description>Component, the product is assigned to within a bundle. Null, if product is standalone</description>
+                    <persistence type="property" />
+                </attribute>  
+            </attributes>
+            
+            <indexes>
+                <index name="orderBundleNoTemplateIdx" unique="false">
+                    <key attribute="bundleNo"/>
+                    <key attribute="bundleTemplate"/>
+                </index>
+            </indexes>
+        </itemtype>
+        
+        <itemtype code="AbstractBundleRule" generate="true" jaloclass="de.hybris.platform.configurablebundleservices.jalo.AbstractBundleRule"
+            extends="GenericItem" 
+            abstract="true" 
+            autocreate="true">
+            <deployment table="AbstractBundleRules" typecode="6307"/>
+            <attributes>
+                <attribute type="java.lang.String" qualifier="id">
+                    <description>Identifier</description>
+                    <persistence type="property"/>
+                    <modifiers initial="true" optional="true" write="false"/>
+                </attribute>
+                <attribute qualifier="catalogVersion" type="CatalogVersion">
+                    <description>Catalog Version</description>
+                    <modifiers initial="true" optional="false" write="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.String" qualifier="name">
+                    <description>Name of the bundle rule</description>
+                    <persistence type="property"/>
+                    <modifiers optional="true" unique="false"/>
+                </attribute> 
+                <attribute type="BundleRuleTypeEnum" qualifier="ruleType">
+                    <persistence type="property"/>
+                    <defaultvalue>em().getEnumerationValue("BundleRuleTypeEnum","ANY")</defaultvalue>
+                </attribute>
+            </attributes>
+             <indexes>
+	            <index name="versionIdx" unique="false">
+	         		<key attribute="catalogVersion"/>
+	         	</index>
+	         	<index name="idVersionIdx" unique="false">
+							<key attribute="id"/>
+							<key attribute="catalogVersion"/>
+					</index>
+				</indexes>
+        </itemtype>
+
+        <itemtype code="ChangeProductPriceBundleRule" generate="true" jaloclass="de.hybris.platform.configurablebundleservices.jalo.ChangeProductPriceBundleRule"
+            extends="AbstractBundleRule"
+            autocreate="true">
+            <custom-properties>
+                <property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+                <property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+                <property name="uniqueKeyAttributeQualifier"><value>"bundleTemplate,id,currency"</value></property>
+            </custom-properties>
+            <attributes>   
+                <attribute qualifier="price" type="java.math.BigDecimal">
+                    <description>price set by bundle rule</description>
+                    <modifiers optional="false"/>
+                    <persistence type="property"/>
+                </attribute>    
+                <attribute qualifier="currency" type="Currency">
+                    <description>Currency</description>
+                    <modifiers optional="false"/>
+                    <persistence type="property" />
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+        <itemtype code="DisableProductBundleRule" generate="true" jaloclass="de.hybris.platform.configurablebundleservices.jalo.DisableProductBundleRule"
+        	extends="AbstractBundleRule" autocreate="true">
+            <custom-properties>
+                <property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+                <property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+                <property name="uniqueKeyAttributeQualifier"><value>"bundleTemplate,id"</value></property>
+            </custom-properties>
+        	<attributes></attributes>
+        </itemtype>
+        
+        <itemtype code="BundleTemplate" generate="true" jaloclass="de.hybris.platform.configurablebundleservices.jalo.BundleTemplate"
+            extends="GenericItem"
+            autocreate="true">
+            <deployment table="BundleTemplates" typecode="6309"/>
+            <custom-properties>
+                <property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+                <property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+                <property name="uniqueKeyAttributeQualifier"><value>"id,version"</value></property>
+            </custom-properties>
+            <attributes>
+                <attribute type="java.lang.String" qualifier="id">
+                    <description>Identifier</description>
+                    <persistence type="property"/>
+                    <modifiers initial="true" optional="false" write="false"/>
+                </attribute>                                             
+                <attribute type="java.lang.String" qualifier="version">
+                    <description>The version of the bundle template. Each clone of a BundleTemplate needs to have a different version.</description>
+                    <persistence type="property"/>
+                    <modifiers optional="false"/>
+                </attribute>    
+                <attribute qualifier="catalogVersion" type="CatalogVersion">
+                    <description>Catalog Version</description>
+                    <modifiers initial="false" optional="false" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="localized:java.lang.String" qualifier="name">
+                    <description>Name of the bundle template</description>
+                    <persistence type="property"/>
+                    <modifiers optional="true" unique="false"/>
+                </attribute>    
+                <attribute qualifier="description" type="localized:java.lang.String">
+                    <description>Description of the bundle template</description>
+                    <persistence type="property" />
+                </attribute>
+                <attribute qualifier="bundleSelectionCriteria" type="BundleSelectionCriteria">
+                    <description>Criteria how many of the bundle's assigned products must/can be selected'</description>
+                    <modifiers partof="true"/>
+                    <persistence type="property" />
+                </attribute>
+            </attributes>
+             <indexes>
+	            <index name="versionIdx" unique="false">
+	         		<key attribute="catalogVersion"/>
+	         	</index>
+                <index name="idVersionIdx" unique="false">
+                    <key attribute="id"/>
+                    <key attribute="version"/>
+                    <key attribute="catalogVersion"/>
+                </index>
+				</indexes>
+        </itemtype>
+
+        <itemtype code="BundleSelectionCriteria" generate="true" jaloclass="de.hybris.platform.configurablebundleservices.jalo.BundleSelectionCriteria"
+            extends="GenericItem" 
+            abstract="true"
+            autocreate="true">
+            <deployment table="BundleSelectionCriteria" typecode="6310"/>
+            <custom-properties>
+                <property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+                <property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+                <property name="uniqueKeyAttributeQualifier"><value>"id"</value></property>
+            </custom-properties>
+            <attributes>
+                <attribute type="java.lang.String" qualifier="id">
+                    <description>Identifier</description>
+                    <persistence type="property"/>
+                    <modifiers initial="true" optional="true" write="false"/>
+                </attribute>
+                <attribute qualifier="catalogVersion" type="CatalogVersion">
+                    <description>Catalog Version</description>
+                    <modifiers initial="true" optional="false" write="false"/>
+                    <persistence type="property"/>
+                </attribute> 
+            </attributes>
+             <indexes>
+	            <index name="versionIdx" unique="false">
+	         		<key attribute="catalogVersion"/>
+	         	</index>
+	         	<index name="idVersionIdx" unique="false">
+							<key attribute="id"/>
+							<key attribute="catalogVersion"/>
+					</index>
+				</indexes>
+        </itemtype>
+
+        <itemtype code="AutoPickBundleSelectionCriteria" generate="true" jaloclass="de.hybris.platform.configurablebundleservices.jalo.AutoPickBundleSelectionCriteria"
+            extends="BundleSelectionCriteria"
+            autocreate="true">
+        </itemtype>
+
+        <itemtype code="PickExactlyNBundleSelectionCriteria" generate="true" jaloclass="de.hybris.platform.configurablebundleservices.jalo.PickExactlyNBundleSelectionCriteria"
+            extends="BundleSelectionCriteria"
+            autocreate="true">
+            <attributes>   
+                <attribute qualifier="n" type="java.lang.Integer">
+                    <description>pick exactly n options</description>
+                    <modifiers optional="false"/>
+                    <persistence type="property" />
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="PickNToMBundleSelectionCriteria" generate="true" jaloclass="de.hybris.platform.configurablebundleservices.jalo.PickNToMBundleSelectionCriteria"
+            extends="PickExactlyNBundleSelectionCriteria"
+            autocreate="true">
+            <attributes>   
+                <attribute qualifier="m" type="java.lang.Integer">
+                    <description>pick n to m options</description>
+                    <modifiers optional="false"/>
+                    <persistence type="property" />
+                </attribute>
+            </attributes>
+        </itemtype>
+
+        <itemtype code="BundleTemplateStatus" generate="true" jaloclass="de.hybris.platform.configurablebundleservices.jalo.BundleTemplateStatus"
+            extends="GenericItem"
+            autocreate="true">
+            <deployment table="BundleTemplateStatus" typecode="6311"/>
+            <custom-properties>
+                <property name="catalogItemType"><value>java.lang.Boolean.TRUE</value></property>
+                <property name="catalogVersionAttributeQualifier"><value>"catalogVersion"</value></property>
+                <property name="uniqueKeyAttributeQualifier"><value>"id"</value></property>
+            </custom-properties>
+            <attributes>
+                <attribute qualifier="id" type="java.lang.String">
+                    <description>Identifier</description>
+                    <persistence type="property"/>
+                    <modifiers initial="true" optional="true" write="false"/>
+                </attribute>                                                
+                <attribute qualifier="catalogVersion" type="CatalogVersion">
+                    <description>Catalog Version</description>
+                    <modifiers initial="true" optional="false" write="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="status" type="BundleTemplateStatusEnum">
+                    <persistence type="property"/>
+                    <defaultvalue>em().getEnumerationValue("BundleTemplateStatusEnum","unapproved")</defaultvalue>
+                </attribute>
+            </attributes>
+             <indexes>
+	            <index name="versionIdx" unique="false">
+	         		<key attribute="catalogVersion"/>
+	         	</index>
+	         	<index name="idVersionIdx" unique="false">
+							<key attribute="id"/>
+							<key attribute="catalogVersion"/>
+					</index>
+				</indexes>
+        </itemtype>
+
+        <itemtype code="Product" autocreate="false" generate="false">
+            <attributes>
+                 <attribute qualifier="soldIndividually" type="java.lang.Boolean">
+                        <modifiers read="true" write="true" search="true" />
+                        <persistence type="property" />
+                        <defaultvalue>Boolean.valueOf(true)</defaultvalue>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+		<itemtype code="BundleTemplateProductsAssignedConstraint" autocreate="true" generate="true" extends="TypeConstraint"
+             jaloclass="de.hybris.platform.configurablebundleservices.jalo.BundleTemplateProductsAssignedConstraint">
+            <description>Custom constraint which checks if products are assigned to a bundle template.</description>
+            <attributes>
+                <attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+                    <modifiers write="false" initial="true" optional="false"/>
+                    <defaultvalue>
+                        de.hybris.platform.configurablebundleservices.constraints.BundleTemplateProductsAssigned.class
+                    </defaultvalue>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+		<itemtype code="BundleTemplateRulesTargetProductsAssignedConstraint" autocreate="true" generate="true" extends="TypeConstraint"
+             jaloclass="de.hybris.platform.configurablebundleservices.jalo.BundleTemplateRulesTargetProductsAssignedConstraint">
+            <description>Custom constraint which checks if target products are assigned to a bundle template's rules.</description>
+            <attributes>
+                <attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+                    <modifiers write="false" initial="true" optional="false"/>
+                    <defaultvalue>
+                        de.hybris.platform.configurablebundleservices.constraints.BundleTemplateRulesTargetProductsAssigned.class
+                    </defaultvalue>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+		<itemtype code="AbstractBundleRuleTargetProductsAssignedConstraint" autocreate="true" generate="true" extends="TypeConstraint"
+             jaloclass="de.hybris.platform.configurablebundleservices.jalo.AbstractBundleRuleTargetProductsAssignedConstraint">
+            <description>Custom constraint which checks that at least 1 target product is assigned to a bundle rule.</description>
+            <attributes>
+                <attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+                    <modifiers write="false" initial="true" optional="false"/>
+                    <defaultvalue>
+                        de.hybris.platform.configurablebundleservices.constraints.AbstractBundleRuleTargetProductsAssigned.class
+                    </defaultvalue>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+		<itemtype code="AbstractBundleRuleComponentProductsAssignedConstraint" autocreate="true" generate="true" extends="TypeConstraint"
+             jaloclass="de.hybris.platform.configurablebundleservices.jalo.AbstractBundleRuleComponentProductsAssignedConstraint">
+            <description>Custom constraint which checks that at least 1 product is assigned to a bundle rule's component.</description>
+            <attributes>
+                <attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+                    <modifiers write="false" initial="true" optional="false"/>
+                    <defaultvalue>
+                        de.hybris.platform.configurablebundleservices.constraints.AbstractBundleRuleComponentProductsAssigned.class
+                    </defaultvalue>
+                </attribute>
+            </attributes>
+        </itemtype>
+
+    </itemtypes>
+</items>

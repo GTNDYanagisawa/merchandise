@@ -1,0 +1,30 @@
+*** Settings ***
+Resource          EmsClient_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+
+*** Test Cases ***
+
+Test_Grant_Mapping_XML_Verification_SimpleCondition_NoGrantTime
+	[Documentation]    Create entitlement test and verify XML - mapping testing
+	${entitlementData} =         build entitlement with id "entitlementId"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData>
+		<userId/>
+		<grantSource/>
+		<grantSourceId/>
+		<entitlementType>entitlementId</entitlementType>
+		<status>ACTIVE</status>
+		<conditions/>
+	</com.hybris.services.entitlements.api.GrantData>"
+
+Test_Grant_Mapping_XML_Verification_SimpleCondition_WithGrantTime
+	[Documentation]    Create entitlement test and verify XML - mapping testing
+	${entitlementData} =         build entitlement with id "entitlementId" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData>
+		<grantTime>2012-07-11T03:21:15Z</grantTime>
+		<userId/>
+		<grantSource/>
+		<grantSourceId/>
+		<entitlementType>entitlementId</entitlementType>
+		<status>ACTIVE</status>
+		<conditions/>
+	</com.hybris.services.entitlements.api.GrantData>"

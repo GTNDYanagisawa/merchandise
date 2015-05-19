@@ -1,0 +1,64 @@
+$solrValueRanges=solrValueRanges(name);
+$defaultSortOrder=defaultSortOrder;
+$document=document(code);
+$solrSearchConfig=solrSearchConfig(pageSize);
+$catalogVersions=catalogVersions(catalog(id[default='hwcatalog']),version[default='Online'])[unique=true,default='hwcatalog:Online']
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$catalogVersions=catalogVersions(catalog(id),version)[unique=true,default=testCatalog1:Winter]
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=testCatalog1:Winter]
+$solrValueRangeSets = solrValueRangeSets(name)
+$solrValueRangeSet = solrValueRangeSet(name)
+;;
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;CHF;Schweizer Franken;Swiss franc;true;false;0,6447;2;SFr.
+;EUR;Euro;Euro;true;true;1;2;Û
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$
+;GBP;Pfund Sterling;Pound Sterling;true;false;0,68;2;£
+;;
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en]
+;testCatalog1;testCatalog1;testCatalog1
+;testCatalog2;testCatalog2;testCatalog2
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode)
+;testCatalog1;Winter;true;EUR;de,en
+;testCatalog1;Summer;true;EUR;de,en;
+;testCatalog2;Winter;true;EUR;de,en
+;testCatalog2;Summer;true;EUR;de,en;;;;;
+INSERT_UPDATE Category;code[unique=true];$catalogversion;name[lang=de];name[lang=en];supercategories;;
+;testCategory0;;testCategory0;testCategory0;
+INSERT_UPDATE Product;code[unique=true];$catalogversion;name[lang=de];name[lang=en];unit(code);$prices;approvalStatus(code);owner(Principal.uid);startLineNumber;supercategories;description[lang=de];description[lang=en];onlineDate[dateformat=dd-MM-yyyy]
+;testProduct0;;testProduct0-de;testProduct0-en;pieces;3,95 EUR;approved;admin;0;;de-description;en-description;02-05-2008
+;testProduct1;;testProduct1-de;testProduct1-en;pieces;87,95 EUR, 145,99 USD, 1003 CHF;approved;admin;0;;de-description;en-description;06-02-2009
+;testProduct2;;Deutche Name;English name;pieces;1,92 EUR, 3,99 USD;approved;admin;0;;de-description;en-description;22-12-2009
+;;
+INSERT_UPDATE  Media;code[unique=true];catalogVersion(catalog(id),version)[allowNull=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];
+;SampleFacetSearchConfig;;text/plain;SampleFacetSearchConfig.xml;jar:/import/SampleFacetSearchConfig.xml;
+;;
+INSERT_UPDATE  SolrValueRangeSet;name[unique=true];type;
+;priceRange;double;
+;stringRange;string;
+;dateRange;date;
+INSERT_UPDATE  SolrValueRange;name[unique=true];from;to;$solrValueRangeSet;
+;1-100;1;100;priceRange;
+;101-200;101;200;priceRange;
+;201-300;201;300;priceRange;
+;301-400;301;400;priceRange;
+;401-500;401;500;priceRange;
+;501-600;501;600;priceRange;
+;601-700;601;700;priceRange;
+;701-800;701;800;priceRange;
+;801-900;801;900;priceRange;
+;901-1000;901;1000;priceRange;
+;1001-INF;1001;;priceRange;
+;A-D;A;D;stringRange;
+;E-K;E;K;stringRange;
+;L-R;L;R;stringRange;;
+;S-Z;S;Z;stringRange;
+;2009_02;2009-02-01;2009-02-28;dateRange;
+;2009_12;2009-12-01;2009-12-31;dateRange;
+;2008_05;2008-05-01;2008-05-31;dateRange;
+;;
+INSERT_UPDATE  SolrSearchConfig;pageSize[unique=true];$defaultSortOrder;
+;20;score;
+;;
+INSERT_UPDATE  SolrFacetSearchConfig;name[unique=true];description;$document;$solrSearchConfig;currencies(isocode);languages(isocode);$catalogVersions;$solrValueRangeSets;
+;sample SOLR configuration;sample SOLR configuration;SampleFacetSearchConfig;20;EUR,USD,GBP,CHF;de,en;testCatalog1:Winter,testCatalog1:Summer;priceRange,stringRange,dateRange;

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans            http://www.springframework.org/schema/beans/spring-beans-3.1.xsd            http://www.springframework.org/schema/context            http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+
+	<bean class="de.hybris.platform.sap.core.jco.connection.impl.JCoConnectionParameterImpl" id="testConnectionParameterParent"
+		abstract="true" init-method="init" scope="singleton">
+		<property name="connectionParameters" ref="sapCoreConnectionParametersJCo" />
+	</bean>
+
+
+	<!-- JCo Connection Parameter Configurer for sflight -->
+	<bean id="testConnectionParameter1" parent="testConnectionParameterParent">
+		<property name="functionModule" value="CMR_ISA_SCARR_GETLIST" />
+		<property name="cacheType" value="default" />
+		<property name="traceBefore" value="true" />
+		<property name="traceAfter" value="true" />
+		<property name="functionModuleToBeReplaced" value="STFC_CONNECTION" />
+	</bean>
+
+	<!-- JCo Connection Parameter Configurer for sflight -->
+	<bean id="testConnectionParameter2" parent="testConnectionParameterParent">
+		<property name="functionModule" value="STFC_CONNECTION" />
+		<property name="eventListener" ref="sapTestJCoListenerSTFC_CONNECTION" />
+		<property name="traceBefore" value="true" />
+		<property name="traceAfter" value="true" />
+	</bean>
+
+	<!-- JCo Connection Parameter Configurer for sflight -->
+	<bean id="testConnectionParameter3" parent="testConnectionParameterParent">
+		<property name="functionModule" value="STFC_CONNECTION_CACHED" />
+		<property name="cacheType" value="Default" />
+		<property name="functionModuleToBeReplaced" value="STFC_CONNECTION" />
+	</bean>
+
+	<!-- JCo Connection Parameter Configurer for sflight -->
+	<bean id="testConnectionParameter4" parent="testConnectionParameterParent">
+		<property name="functionModule" value="STFC_CONNECTION_CACHED2" />
+		<property name="cacheType" value="Default" />
+		<property name="functionModuleToBeReplaced" value="STFC_CONNECTION" />
+	</bean>
+
+	<!-- JCo Connection Parameter Configurer for sflight -->
+	<bean id="testConnectionParameter5" parent="testConnectionParameterParent">
+		<property name="functionModule" value="STFC_CONNECTION_CACHED3" />
+		<property name="traceAfter" value="true" />
+		<property name="traceExcludeTableParameters" value="CARRID,CURRCODE,URL" />
+		<property name="functionModuleToBeReplaced" value="CMR_ISA_SCARR_GETLIST" />
+	</bean>
+
+	<!-- JCo Connection Parameter Configurer for sflight -->
+	<bean id="testConnectionParameter6" parent="testConnectionParameterParent">
+		<property name="functionModule" value="CRM_ISA_FLIGHT_GETLIST" />
+		<property name="traceBefore" value="true" />
+		<property name="traceExcludeImportParameters" value="DESTINATION_FROM" />
+	</bean>
+
+	<!-- JCo Connection Parameter Configurer for sflight -->
+	<bean id="testConnectionParameter7" parent="testConnectionParameterParent">
+		<property name="functionModule" value="CMR_ISA_SCARR_GETDETAIL" />
+		<property name="traceAfter" value="true" />
+		<property name="traceExcludeExportParameters" value="ES_AIRLINE" />
+	</bean>
+
+	<alias alias="sapTestJCoListenerSTFC_CONNECTION" name="sapDefaultTestJCoListenerSTFC_CONNECTION" />
+	<bean id="sapDefaultTestJCoListenerSTFC_CONNECTION" class="de.hybris.platform.sap.core.jco.connection.impl.JCoListenerSTFC_CONNECTION"
+		scope="singleton">
+	</bean>
+
+	<!-- Cache Region for JCo test-->
+	<alias alias="sapCoreConnectionCacheRegion" name="sapDefaultCoreConnectionCacheRegion" />
+	<bean name="sapDefaultCoreConnectionCacheRegion"
+		class="de.hybris.platform.regioncache.region.impl.EHCacheRegion">
+		<constructor-arg name="name" value="JCoCacheRegion" />
+		<constructor-arg name="maxEntries" value="50000" />
+		<constructor-arg name="evictionPolicy" value="LFU" />
+		<property name="handledTypes">
+			<array>
+				<value></value>
+			</array>
+		</property>
+	</bean>
+
+</beans>

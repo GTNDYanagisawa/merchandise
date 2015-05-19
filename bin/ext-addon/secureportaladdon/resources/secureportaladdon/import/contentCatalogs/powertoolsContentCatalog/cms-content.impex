@@ -1,0 +1,131 @@
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(catalog(id[default=$contentCatalog]),version[default='Staged'])
+$jarResourceCms=jar:de.hybris.platform.secureportaladdon.setup.InitialDataSystemSetup
+$jarResourceCmsImages=jar:de.hybris.platform.secureportaladdon.constants.SecureportaladdonConstants&/secureportaladdon/import/contentCatalogs/cockpits/cmscockpit
+
+
+# Create PageTemplates
+# These define the layout for pages
+# "FrontendTemplateName" is used to define the JSP that should be used to render the page for pages with multiple possible layouts.
+# "RestrictedPageTypes" is used to restrict templates to page types
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true];velocityTemplate
+;;SecureCustomerPortalTemplate;Secure Customer Portal Page Template Template;;ContentPage;;"
+<div>
+	<table width='100%' cellspacing='0' style='margin:0;padding:0;table-layout:fixed;border:1px solid #1E4EBF;'>
+		<col style='width: 25%;'/>
+        <col style='width: 25%;'/>
+        <col style='width: 25%;'/>
+		<col style='width: 25%;'/>
+		<tbody>
+			<tr>
+				<td height='125px'  colspan='1' rowspan='2' class='structureViewSection'>
+					<cockpit code='SiteLogo' />
+				</td>
+			</tr>
+			<tr>
+				<td height='125px' colspan='3' class='structureViewSection'>
+					<div>Header</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td rowspan='2'  colspan='2' class='structureViewSection' style='vertical-align:top;'>
+					<cockpit code='SideContent' />
+				</td>
+				<td colspan='2' class='structureViewSection' height='100px' style='vertical-align:top;'>
+					<cockpit code='TopContent' />
+				</td>
+			</tr>
+			<tr>
+				<td colspan='2' height='343px' class='structureViewSection'>
+					<div>Login data</div>
+				</td>
+			</tr>
+			<tr>
+				<td height='170px' colspan='4' class='structureViewSection'>
+					<cockpit code='Footer' />
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<div style='width:100%; border-top: 2px solid #bbb' class='cmsContentEditor'>
+		<cockpit code='editor' />
+	</div>
+</div>
+"
+
+
+# Create ContentSlotNames
+# Each PageTemplate has a number of ContentSlotNames, with a list of valid components for the slot.
+# There are a standard set of slots and a number of specific slots for each template.
+# Standard slots are SiteLogo, HeaderLinks, MiniCart and NavigationBar (that all appear in the Header), and the Footer. 
+
+# Main Page Template
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='SecureCustomerPortalTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;TopContent;;;wide
+;SideContent;;;wide
+;Footer;;;footer
+
+# Bind Content Slots to Page Template
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='SecureCustomerPortalTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-SecureCustomerPortal;SiteLogo;;SiteLogoSlot;true
+;;Footer-SecureCustomerPortal;Footer;;FooterSlot;true
+;;SideContent-SecureCustomerPortal;SideContent;;SideContentSlot;true
+
+
+# Functional Content Pages
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code,$contentCV)
+;;SecureCustomerPortalSecuredLoginPage;Secure Customer Portal Secured Login Page;SecureCustomerPortalTemplate;SecureCustomerPortalSecuredLoginPage;;;;securedLoginPagePreview:
+;;SecureCustomerPortalSecuredResetPasswordPage;Secure Customer Portal Secured Reset Password Page;SecureCustomerPortalTemplate;SecureCustomerPortalSecuredResetPasswordPage;;;;securedResetPasswordPagePreview:
+;;SecureCustomerPortalSecuredRegisterPage;Secure Customer Portal Secured Register Page;SecureCustomerPortalTemplate;SecureCustomerPortalSecuredRegisterPage;;;;securedRegisterPagePreview:
+;;SecureCustomerPortalRegisterPage;Secure Customer Portal Register Page;LoginPageTemplate;SecureCustomerPortalRegisterPage;;;;registerPagePreview:
+
+# Preview Image for use in the CMS Cockpit for special ContentPages
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true]
+;;securedLoginPagePreview;text/png;SecuredLogin.png;$jarResourceCmsImages/preview-images/powertools/SecuredLogin.png
+;;securedResetPasswordPagePreview;text/png;SecuredResetPassword.png;$jarResourceCmsImages/preview-images/powertools/SecuredResetPassword.png
+;;securedRegisterPagePreview;text/png;SecuredRegistration.png;$jarResourceCmsImages/preview-images/powertools/SecuredRegistration.png
+;;registerPagePreview;text/png;Registration.png;$jarResourceCmsImages/preview-images/powertools/Registration.png
+
+
+# New content slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;SideContent-SecureCustomerPortalSecuredLoginPage;SideContent Slot for SecureCustomerPortalSecuredLoginPage;true;
+;;TopContent-SecureCustomerPortalSecuredLoginPage;TopContent Slot for SecureCustomerPortalSecuredLoginPage;true;
+;;SideContent-SecureCustomerPortalSecuredResetPasswordPage;SideContent Slot for SecureCustomerPortalSecuredResetPasswordPage;true;
+;;TopContent-SecureCustomerPortalSecuredResetPasswordPage;TopContent Slot for SecureCustomerPortalSecuredResetPasswordPage;true;
+;;SideContent-SecureCustomerPortalSecuredRegisterPage;SideContent Slot for SecureCustomerPortalSecuredRegisterPage;true;
+;;TopContent-SecureCustomerPortalSecuredRegisterPage;TopContent Slot for SecureCustomerPortalSecuredRegisterPage;true;
+;;SideContent-SecureCustomerPortalRegisterPage;SideContent Slot for SecureCustomerPortalRegisterPage;true;
+;;TopContent-SecureCustomerPortalRegisterPage;TopContent Slot for SecureCustomerPortalRegisterPage;true;
+
+
+
+# Bind Content Slots to Pages
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true];contentSlot(uid,$contentCV)[unique=true]
+;;SideContent-SecureCustomerPortalSecuredLoginPage;SideContent;SecureCustomerPortalSecuredLoginPage;SideContent-SecureCustomerPortalSecuredLoginPage
+;;TopContent-SecureCustomerPortalSecuredLoginPage;TopContent;SecureCustomerPortalSecuredLoginPage;TopContent-SecureCustomerPortalSecuredLoginPage
+;;SideContent-SecureCustomerPortalSecuredResetPasswordPage;SideContent;SecureCustomerPortalSecuredResetPasswordPage;SideContent-SecureCustomerPortalSecuredResetPasswordPage
+;;TopContent-SecureCustomerPortalSecuredResetPasswordPage;TopContent;SecureCustomerPortalSecuredResetPasswordPage;TopContent-SecureCustomerPortalSecuredResetPasswordPage
+;;SideContent-SecureCustomerPortalSecuredRegisterPage;SideContent;SecureCustomerPortalSecuredRegisterPage;SideContent-SecureCustomerPortalSecuredRegisterPage
+;;TopContent-SecureCustomerPortalSecuredRegisterPage;TopContent;SecureCustomerPortalSecuredRegisterPage;TopContent-SecureCustomerPortalSecuredRegisterPage
+;;SideContent-SecureCustomerPortalRegisterPage;SideContent;SecureCustomerPortalRegisterPage;SideContent-SecureCustomerPortalRegisterPage
+;;TopContent-SecureCustomerPortalRegisterPage;TopContent;SecureCustomerPortalRegisterPage;TopContent-SecureCustomerPortalRegisterPage
+;;NavigationBar-SecureCustomerPortalRegisterPage;NavigationBar;SecureCustomerPortalRegisterPage;NavigationBarSlot
+
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;&componentRef;target(code)[default='sameWindow'];linkName[lang=en];onlyOneRestrictionMustApply[default='false']
+;;RegisterLink;Register Link;/register;RegisterLink;RegisterLink;;Register;
+
+# CMS User Restrictions
+UPDATE CMSUserRestriction;$contentCV[unique=true];uid[unique=true];components(&componentRef)[mode=append]
+;;AnonymousUserRestriction;RegisterLink
+
+# CMS User Restrictions
+INSERT_UPDATE CMSSecurePortalRestriction;$contentCV[unique=true];uid[unique=true];components(&componentRef)[mode=append]
+;;SecurePortalRestriction;RegisterLink
+
+
+# CMS Navigation Nodes - Header
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];links(&linkRef)[mode=append]
+;HeaderLinksNode;;RegisterLink

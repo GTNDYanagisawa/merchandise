@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<project name="productcockpit_buildcallbacks" >
+	
+	<property name="productcockpit.base.extension.name" value="productcockpit"/>
+
+	<!-- 
+	    called whenever 'ant ear' is used. this callback can be used to modify the content of the ear file
+			you can for example put a custom ear.properties into the ear file (just use the <copy>-task to copy it 
+			to the ${ear.resources.path}
+	
+	     ${ear.path}: 					path to ear
+	     ${ear.libs.path}: 			path to libs inside ear (as default this comes to ear.path/libs)
+	     ${ear.resources.path}:	path to resources inside ear (as default this comes to ear.path/resources)
+	 -->
+	<macrodef name="productcockpit_before_build">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<and>
+							<equals arg1="${ext.@{extname}.webmodule.available}" arg2="available" />
+							<contains string="${required.extensions.for.@{extname}}" substring="${productcockpit.base.extension.name}"/>
+							<not>
+								<uptodate>
+					            <srcfiles dir="${ext.productcockpit.path}/web/webroot">
+										<include name="productcockpit/**/**.*" />
+									</srcfiles>
+									<globmapper from="*" to="${ext.@{extname}.path}/web/webroot/*"/>
+					        	</uptodate>
+							</not>
+						</and>
+						<then>
+							<echo level="info" message="Start copying product cockpit files for extension @{extname}..."/>
+							<copy todir="${ext.@{extname}.path}/web/webroot">
+								<fileset dir="${ext.productcockpit.path}/web/webroot">
+									<include name="productcockpit/**/**.*" />
+								</fileset>
+							</copy>
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="productcockpit_after_clean">
+		<sequential>
+			<foreachext>
+				<do>
+					<if>
+						<and>
+							<equals arg1="${ext.@{extname}.webmodule.available}" arg2="available" />
+							<contains string="${required.extensions.for.@{extname}}" substring="${productcockpit.base.extension.name}"/>
+						</and>
+						<then>
+							<echo level="info" message="Start cleaning up product cockpit files for extension @{extname}"/>
+							<delete quiet="true" dir="${ext.@{extname}.path}/web/webroot/productcockpit"/>
+						</then>
+					</if>
+				</do>
+			</foreachext>
+		</sequential>
+	</macrodef>
+	
+</project>

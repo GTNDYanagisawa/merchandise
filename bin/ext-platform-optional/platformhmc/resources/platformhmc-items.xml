@@ -1,0 +1,1192 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<itemtypes>
+<!--WizardBusinessitem specific items	-->
+
+<!-- from catalog-items.xml -->
+<itemtype code="CompareCatalogVersionWizard"
+      extends="WizardBusinessItem"
+      jaloonly="true"
+      jaloclass="de.hybris.platform.catalog.hmc.CompareCatalogVersionWizard"
+      generate="true" autocreate="true" >
+   <attributes>
+
+    <!-- essential infos -->
+    <attribute qualifier="infoAboutComparedCatalogVersions" type="java.lang.String">
+     <modifiers read="true" write="false" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+
+    <!-- tab 1: catalog settings -->
+
+    <attribute qualifier="sourceVersion" type="CatalogVersion">
+     <modifiers read="true" write="true" optional="false"/>
+     <persistence type="property"/>
+    </attribute>
+           <attribute qualifier="targetVersion" type="CatalogVersion">
+     <modifiers read="true" write="true" optional="false"/>
+     <persistence type="property"/>
+    </attribute>
+    <attribute qualifier="overwriteApprovalStatus" type="java.lang.Boolean">
+     <modifiers read="true" write="true" optional="false"/>
+     <persistence type="property"/>
+     <defaultvalue>Boolean.TRUE</defaultvalue>
+    </attribute>
+    <attribute qualifier="keepCronJob" type="java.lang.Boolean">
+     <modifiers read="true" write="true" optional="false"/>
+     <defaultvalue>Boolean.TRUE</defaultvalue>
+     <persistence type="property"/>
+    </attribute>
+    <attribute qualifier="priceTolerance" type="java.lang.Double">
+     <modifiers read="true" write="true" optional="false"/>
+     <persistence type="property"/>
+     <defaultvalue>new Double( 5 )</defaultvalue>
+    </attribute>
+    <attribute qualifier="priceCustomer" type="Customer">
+     <modifiers read="true" write="true" optional="true"/>
+     <persistence type="property"/>
+    </attribute>
+
+    <!-- tab 3: summary: new and missing products, price differences -->
+    <attribute qualifier="missingProducts" type="java.lang.Integer">
+     <modifiers read="true" write="false" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="newProducts" type="java.lang.Integer">
+     <modifiers read="true" write="false" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="overviewOutOfToleranceProducts" type="java.lang.Integer">
+     <modifiers read="true" write="true" optional="true"/>
+     <persistence type="property"/>
+    </attribute>
+
+    <!-- n/a -->
+
+    <!-- fill in pre-settings for <shortcut name="find.differences.product.NEW> -->
+    <attribute qualifier="mode1" type="ProductDifferenceMode">
+              <modifiers read="true" write="true" search="true" optional="true" initial="false"/>
+            <persistence type="property"/>
+    </attribute>
+    <!-- fill in pre-settings for <shortcut name="find.differences.product.PRICE_DIFFERENCES> -->
+    <attribute qualifier="mode2" type="ProductDifferenceMode">
+              <modifiers read="true" write="true" search="true" optional="true" initial="false"/>
+            <persistence type="property"/>
+    </attribute>
+    <!-- fill in pre-settings for <shortcut name="find.differences.product.REMOVED> -->
+    <attribute qualifier="mode3" type="ProductDifferenceMode">
+              <modifiers read="true" write="true" search="true" optional="true" initial="false"/>
+            <persistence type="property"/>
+    </attribute>
+    <attribute qualifier="cronJob" type="CompareCatalogVersionsCronJob">
+            <modifiers read="true" write="true" search="true" optional="true" initial="false"/>
+            <persistence type="property"/>
+    </attribute>
+   </attributes>
+  </itemtype>
+
+
+  <itemtype code="RemoveCatalogWizard"
+      extends="WizardBusinessItem"
+      jaloonly="true"
+      jaloclass="de.hybris.platform.catalog.hmc.RemoveCatalogWizard"
+      generate="true" autocreate="true" >
+   <attributes>
+
+    <!-- tab 1: catalog selection -->
+    <attribute qualifier="catalog" type="Catalog">
+     <modifiers write="true" optional="false"/>
+     <persistence type="jalo"/><!-- delegated to cronjob -->
+    </attribute>
+
+    <!-- tab 2: catalog version selection -->
+    <attribute qualifier="catalogVersion" type="CatalogVersion">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/><!-- delegated to cronjob -->
+    </attribute>
+    <attribute qualifier="dontRemoveObjects" type="java.lang.Boolean">
+     <modifiers write="true" optional="false"/>
+     <persistence type="jalo"/><!-- delegated to cronjob -->
+    </attribute>
+
+    <!-- helper attributes -->
+    <attribute qualifier="selectedCatalog" type="Catalog">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="availableCatalogVersions" type="CatalogVersionCollection">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="cronJob" type="RemoveCatalogVersionCronJob">
+     <modifiers write="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="notRemovedItemsMedia" type="ImpexMedia">
+     <modifiers write="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+
+   </attributes>
+  </itemtype>
+  
+  <itemtype code="SynchronizeCatalogVersionWizard"
+      extends="WizardBusinessItem"
+      jaloonly="true"
+      jaloclass="de.hybris.platform.catalog.hmc.SynchronizeCatalogVersionWizard"
+      generate="true" autocreate="true" >
+   <attributes>
+
+    <attribute qualifier="presetItems" type="ItemCollection">
+     <modifiers read="true" write="true" optional="true" initial="false" private="true"/>
+     <persistence type="property"/>
+    </attribute>
+
+    <!-- tab 1: source version -->
+
+    <attribute qualifier="sourceVersions" type="CatalogVersionCollection">
+     <modifiers read="true" write="true" optional="true"/>
+     <persistence type="property"/>
+    </attribute>
+
+    <!-- tab 2: select categories -->
+    <attribute qualifier="categories" type="SyncCategoryList">
+     <modifiers read="true" write="true" optional="true"/>
+     <persistence type="property"/>
+    </attribute>
+    <attribute qualifier="includingSubcategories" type="java.lang.Boolean">
+     <modifiers read="true" write="true" optional="false"/>
+     <defaultvalue>Boolean.TRUE</defaultvalue>
+     <persistence type="property"/>
+    </attribute>
+    <attribute qualifier="includingProducts" type="java.lang.Boolean">
+     <modifiers read="true" write="true" optional="false"/>
+     <defaultvalue>Boolean.FALSE</defaultvalue>
+     <persistence type="property"/>
+    </attribute>
+
+    <!-- tab 3: select products -->
+
+    <attribute qualifier="products" type="SyncProductList">
+     <modifiers read="true" write="true" optional="true"/>
+     <persistence type="property"/>
+    </attribute>
+
+    <!-- tab 4: select medias -->
+
+    <attribute qualifier="medias" type="SyncMediaList">
+     <modifiers read="true" write="true" optional="true"/>
+     <persistence type="property"/>
+    </attribute>
+
+    <!-- tab 5: select keywords -->
+
+    <attribute qualifier="keywords" type="SyncKeywordList">
+     <modifiers read="true" write="true" optional="true"/>
+     <persistence type="property"/>
+    </attribute>
+
+    <!-- tab 7: select others -->
+
+    <attribute qualifier="others" type="SyncOthersList">
+     <modifiers read="true" write="true" optional="true"/>
+     <persistence type="property"/>
+    </attribute>
+
+    <!-- tab 6: target versions -->
+    <attribute qualifier="ignoreErrors" type="java.lang.Boolean">
+     <modifiers read="true" write="true" optional="false"/>
+     <persistence type="property"/>
+     <defaultvalue>Boolean.TRUE</defaultvalue>
+    </attribute>
+    <attribute qualifier="forceUpdate" type="java.lang.Boolean">
+     <modifiers read="true" write="true" optional="false"/>
+     <persistence type="property"/>
+     <defaultvalue>Boolean.FALSE</defaultvalue>
+    </attribute>
+    <attribute qualifier="keepCronJob" type="java.lang.Boolean">
+     <modifiers read="true" write="true" optional="false"/>
+     <defaultvalue>Boolean.TRUE</defaultvalue>
+     <persistence type="property"/>
+    </attribute>
+          <attribute qualifier="executableJobs" type="SyncItemJobCollection">
+     <modifiers read="true" write="false" optional="true"/>
+     <persistence type="property"/>
+    </attribute>
+    <attribute qualifier="logToFile" type="java.lang.Boolean">
+     <modifiers read="true" write="true" initial="false" optional="false"/>
+     <persistence type="property"/>
+     <defaultvalue>Boolean.TRUE</defaultvalue>
+    </attribute>
+    <attribute qualifier="logToDatabase" type="java.lang.Boolean">
+     <modifiers read="true" write="true" initial="false" optional="false"/>
+     <persistence type="property"/>
+     <defaultvalue>Boolean.FALSE</defaultvalue>
+    </attribute>
+    <attribute qualifier="logLevelFile" type="JobLogLevel">
+     <modifiers read="true" write="true" initial="false" optional="false"/>
+     <persistence type="property"/>
+     <defaultvalue>em().getEnumerationValue("JobLogLevel", "INFO")</defaultvalue>
+    </attribute>
+    <attribute qualifier="logLevelDatabase" type="JobLogLevel">
+     <modifiers read="true" write="true" initial="false" optional="false"/>
+     <persistence type="property"/>
+     <defaultvalue>em().getEnumerationValue("JobLogLevel", "WARNING")</defaultvalue>
+    </attribute>
+    <attribute qualifier="createSavedValues" type="java.lang.Boolean">
+     <modifiers read="true" write="true" initial="false" optional="false"/>
+     <persistence type="property"/>
+     <defaultvalue>Boolean.FALSE</defaultvalue>
+    </attribute>
+    <attribute qualifier="cronJobs" type="SyncItemCronJobCollection">
+     <modifiers write="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+   </attributes>
+  </itemtype>
+  
+  <!-- from impex-items.xml -->
+  
+  <itemtype code="ImpExImportWizard" 
+      extends="WizardBusinessItem"
+      jaloonly="true"
+      jaloclass="de.hybris.platform.impex.jalo.cronjob.ImpExImportWizard"
+      generate="true" autocreate="true" >
+   <attributes>
+    <attribute qualifier="jobMedia" type="ImpExMedia">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="mediasZip" type="Media">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="externalDataCollection" type="ImpExMediaCollection">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="mediasTarget" type="java.lang.String">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="locale" type="java.lang.String">
+     <modifiers read="true" write="true" initial="true" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="enableCodeExecution" type="java.lang.Boolean">
+     <modifiers read="true" write="true" initial="true" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="enableExternalCodeExecution" type="java.lang.Boolean">
+     <modifiers read="true" write="true" initial="true" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="enableExternalSyntaxParsing" type="java.lang.Boolean">
+     <modifiers read="true" write="true" initial="true" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="enableHmcSavedValues" type="java.lang.Boolean">
+     <modifiers read="true" write="true" initial="true" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="resultCronJobList" type="CronJobList">
+     <modifiers read="true" write="false" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="zipentry" type="java.lang.String">
+     <modifiers read="true" write="true" initial="false" optional="true" />
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="mode" type="ImpExValidationModeEnum">
+     <modifiers read="true" write="true" initial="true" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="unzipMediasMedia" type="java.lang.Boolean">
+     <modifiers read="true" write="true" initial="true" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="logText" type="java.lang.String">
+     <modifiers read="true" write="false" initial="false" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="unresolvedDataStore" type="ImpExMedia">
+     <modifiers read="true" write="true" initial="false" optional="true" partof="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="errorMode" type="ErrorMode">
+     <modifiers read="true" write="true" initial="false" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="maxThreads" type="java.lang.Integer">
+     <persistence type="jalo"/>
+     <modifiers read="true" write="true" optional="true" search="true"/>
+    </attribute>
+   </attributes>
+  </itemtype>
+  
+  <itemtype code="ImpExExportWizard" 
+    extends="WizardBusinessItem"
+    jaloonly="true"
+    jaloclass="de.hybris.platform.impex.jalo.cronjob.ImpExExportWizard"
+    generate="true" autocreate="true" >
+   <attributes>
+    <attribute qualifier="exportTemplate" type="HeaderLibrary">
+     <modifiers read="true" write="true" initial="false" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="pkMode" type="java.lang.Boolean">
+     <modifiers read="true" write="true" initial="true" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="encoding" type="EncodingEnum">
+     <modifiers read="true" write="true" initial="false" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="mode" type="ImpExValidationModeEnum">
+     <modifiers read="true" write="true" initial="true" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="items" type="ItemCollection">
+     <modifiers read="true" write="true" optional="true" />
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="resultCronJobList" type="CronJobList">
+     <modifiers read="true" write="false" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="dataExportTarget" type="ImpExExportMedia">
+     <modifiers read="true" write="false" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="mediasExportTarget" type="ImpExExportMedia">
+     <modifiers read="true" write="false" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="impExScript" type="java.lang.String">
+     <modifiers read="true" write="true" initial="false" optional="true"/>
+     <persistence type="jalo"/>
+     <description>ImpexScript content</description>
+    </attribute>
+    <attribute qualifier="pklist" type="java.lang.String">
+     <modifiers read="true" write="false" initial="false" optional="true"/>
+     <persistence type="jalo"/>
+     <description>pk list</description>
+    </attribute>
+    <attribute qualifier="jobMedia" type="ImpExMedia">
+     <modifiers read="true" write="true" initial="false" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <!-- destination media settings -->
+    <attribute qualifier="fieldSeparator" type="java.lang.Character">
+     <modifiers read="true" write="true" initial="false" optional="true"/>
+     <persistence type="jalo"/>
+     <description>Character used for separating columns in CSV-lines</description>
+    </attribute>
+    <attribute qualifier="quoteCharacter" type="java.lang.Character">
+     <modifiers read="true" write="true" initial="false" optional="true"/>
+     <persistence type="jalo"/>
+     <description>Character used for escaping columns in CSV-lines</description>
+    </attribute>
+    <attribute qualifier="commentCharacter" type="java.lang.Character">
+     <modifiers read="true" write="true" initial="false" optional="true"/>
+     <persistence type="jalo"/>
+     <description>Character used for indicating a comment</description>
+    </attribute>
+    <attribute qualifier="dataExportMediaCode" type="java.lang.String">
+     <modifiers read="true" write="true" initial="false" optional="true"/>
+     <persistence type="jalo"/>
+     <description>Code of the generated export media, containing the exported data</description>
+    </attribute>
+    <attribute qualifier="mediasExportMediaCode" type="java.lang.String">
+     <modifiers read="true" write="true" initial="false" optional="true"/>
+     <persistence type="jalo"/>
+     <description>Code of the generated export media, containing the exported medias</description>
+    </attribute>
+    <attribute qualifier="converterClass" type="ExportConverterEnum">
+     <modifiers read="true" write="true" initial="false" optional="true"/>
+     <persistence type="jalo"/>
+     <description>class, which will be used for report generation</description>
+    </attribute>
+    <attribute qualifier="export" type="Export">
+     <modifiers read="true" write="false" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="report" type="Report">
+     <modifiers read="true" write="false" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="singleFile" type="java.lang.Boolean" >
+     <modifiers read="true" write="true" optional="false"/>
+     <persistence type="jalo"/>
+     <description>Export as a single file or as a zip</description>
+    </attribute>
+    <attribute qualifier="logText" type="java.lang.String">
+     <modifiers read="true" write="false" initial="false" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+   </attributes>
+  </itemtype>
+
+  <itemtype code="ScriptGeneratorWizard" 
+    extends="WizardBusinessItem"
+    jaloonly="true"
+    jaloclass="de.hybris.platform.impex.jalo.cronjob.ScriptGeneratorWizard"
+    generate="true" autocreate="true" >
+   <attributes>
+    <attribute qualifier="script" type="ImpExMedia">
+     <modifiers read="true" write="true" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="mode" type="ScriptTypeEnum">
+     <modifiers read="true" write="true" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="modifier" type="ScriptModifierEnum">
+     <modifiers read="true" write="true" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="impExScript" type="java.lang.String">
+     <modifiers read="true" write="true" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="useDocumentID" type="java.lang.Boolean">
+     <modifiers read="true" write="true" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="includeSystemTypes" type="java.lang.Boolean">
+     <modifiers read="true" write="true" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="languages" type="LanguageSet">
+     <modifiers read="true" write="true" optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+   </attributes>
+  </itemtype>
+  
+  <!-- from ldap-items.xml -->
+  <itemtype code="LDIFImportWizard" 
+     extends="WizardBusinessItem"
+     jaloonly="true"
+     jaloclass="de.hybris.platform.ldap.jalo.cronjob.LDIFImportWizard"
+     generate="true" autocreate="true" >
+  <attributes>
+   <attribute qualifier="searchbase" type="java.lang.String">
+    <modifiers read="true" write="true" initial="true" optional="true"/>
+    <defaultvalue>"cn=development,ou=hybris groups,ou=hybris,dc=hybris,dc=de"</defaultvalue>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="ldapquery" type="java.lang.String">
+    <modifiers read="true" write="true" initial="true" optional="true"/>
+    <defaultvalue><![CDATA["(&(objectclass=*)(cn=*))"]]></defaultvalue>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="resultfilter" type="java.lang.String">
+    <modifiers read="true" write="true" initial="true" optional="true"/>
+    <defaultvalue>"distinguishedName, objectClass, displayName, member, cn, sAMAccountName"</defaultvalue>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="ldifFile" type="LDIFMedia">
+    <modifiers write="true" optional="true"/>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="configFile" type="ConfigurationMedia">
+    <modifiers write="true" optional="true"/>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="configFile2" type="ConfigurationMedia">
+    <modifiers write="true" optional="true"/>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="cronJob" type="ImpExImportCronJob">
+    <modifiers read="true" write="true" initial="true" optional="true"/>
+    <persistence type="property"/>
+   </attribute>
+   <!-- Tab3: ResultTab shows performed CronJob (as Collection) -->
+   <attribute qualifier="resultCronJobList" type="CronJobList">
+      <modifiers read="true" write="false" optional="false"/>
+      <persistence type="jalo"/>
+     </attribute>
+     <attribute qualifier="destMedia" type="ImpExMedia">
+      <modifiers read="true" write="false"/>
+      <persistence type="jalo"/>
+     </attribute>
+     <attribute qualifier="dumpMedia" type="ImpExMedia">
+      <modifiers read="true" write="false"/>
+      <persistence type="jalo"/>
+     </attribute>
+   </attributes>
+  </itemtype>
+ 
+  <itemtype code="LDIFGroupImportWizard" 
+     extends="WizardBusinessItem"
+     jaloonly="true"
+     jaloclass="de.hybris.platform.ldap.jalo.cronjob.LDIFGroupImportWizard"
+     generate="true" autocreate="true" >
+   <attributes>
+   <attribute qualifier="searchbase" type="java.lang.String">
+    <modifiers read="true" write="true" initial="true" optional="true"/>
+    <defaultvalue>"cn=development,ou=hybris groups,ou=hybris,dc=hybris,dc=de"</defaultvalue>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="ldapquery" type="java.lang.String">
+    <modifiers read="true" write="true" initial="true" optional="true"/>
+   <defaultvalue><![CDATA["(&(objectclass=*)(cn=*))"]]></defaultvalue>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="resultfilter" type="java.lang.String">
+    <modifiers read="true" write="true" initial="true" optional="true"/>
+    <defaultvalue>"distinguishedName, objectClass, displayName, member, cn, sAMAccountName"</defaultvalue>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="userSearchFieldQualifier" type="java.lang.String">
+    <modifiers read="true" write="true" initial="true" optional="true"/>
+    <defaultvalue>"distinguishedName"</defaultvalue>
+    <persistence type="jalo"/>
+    </attribute>
+   <attribute qualifier="userRootDN" type="java.lang.String">
+    <modifiers read="true" write="true" initial="true" optional="true"/>
+    <defaultvalue>"DC=hybris,DC=de"</defaultvalue>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="userResultfilter" type="java.lang.String">
+    <modifiers read="true" write="true" initial="true" optional="true"/>
+    <!-- Active Directory -->
+    <defaultvalue>"distinguishedName, objectClass, displayName, memberOf,sn, cn,sAMAccountName"</defaultvalue>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="ldifFile" type="LDIFMedia">
+    <modifiers write="true" optional="true"/>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="configFile" type="ConfigurationMedia">
+    <modifiers write="true" optional="true"/>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="importUsers" type="java.lang.Boolean">
+    <modifiers write="true" optional="false"/>
+    <defaultvalue>Boolean.TRUE</defaultvalue>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="codeExecution" type="java.lang.Boolean">
+    <modifiers write="true" optional="false"/>
+    <defaultvalue>Boolean.TRUE</defaultvalue>
+    <persistence type="jalo"/>
+   </attribute>
+   <attribute qualifier="cronJob" type="ImpExImportCronJob">
+    <modifiers read="true" write="true" initial="true" optional="true"/>
+    <persistence type="property"/>
+   </attribute>
+   <!-- Tab1: ResultTab shows performed CronJob (as Collection) -->
+   <attribute qualifier="resultCronJobList" type="CronJobList">
+      <modifiers read="true" write="false" optional="false"/>
+      <persistence type="jalo"/>
+     </attribute>
+     <attribute qualifier="destMedia" type="ImpExMedia">
+      <modifiers read="true" write="false"/>
+      <persistence type="jalo"/>
+     </attribute>
+     <attribute qualifier="dumpMedia" type="ImpExMedia">
+      <modifiers read="true" write="false"/>
+      <persistence type="jalo"/>
+     </attribute>
+   </attributes>
+  </itemtype>
+  
+  <!-- from processing-items.xml -->
+  <itemtype code="RemoveItemsWizard" extends="WizardBusinessItem" jaloonly="true"
+   jaloclass="de.hybris.platform.cronjob.jalo.RemoveItemsWizard" autocreate="true" generate="true">
+   <attributes>
+    <attribute qualifier="cronjob" type="RemoveItemsCronJob">
+     <modifiers read="true" write="true" initial="true" optional="false" />
+     <persistence type="jalo" />
+    </attribute>
+    <attribute qualifier="cronJobHistory" type="CronJobList">
+     <persistence type="jalo" />
+    </attribute>
+    <attribute qualifier="summary" type="java.lang.String">
+     <modifiers write="false" />
+     <persistence type="jalo" />
+    </attribute>
+    <attribute qualifier="createSavedValues" type="java.lang.Boolean">
+     <modifiers read="true" write="true" optional="false" />
+     <persistence type="jalo" />
+    </attribute>
+   </attributes>
+  </itemtype>
+    
+    <itemtype code="MoveMediaWizard" autocreate="true" generate="true" extends="WizardBusinessItem"
+   jaloclass="de.hybris.platform.cronjob.jalo.MoveMediaWizard" jaloonly="true">
+   <attributes>
+    <attribute type="MediaCollection" qualifier="medias">
+     <persistence type="jalo" />
+     <modifiers />
+     <description>Folder where selected medias will be moved to</description>
+    </attribute>
+    <attribute type="MediaFolder" qualifier="targetFolder">
+     <persistence type="jalo" />
+     <modifiers optional="false" />
+     <description>Folder where selected medias will be moved to</description>
+    </attribute>
+   </attributes>
+  </itemtype>
+  
+  <itemtype code="RepairProcessWizard"
+      extends="WizardBusinessItem"
+      jaloonly="true"
+      jaloclass="de.hybris.platform.processengine.hmc.RepairProcessWizard"
+      generate="true" autocreate="true" >
+   <attributes>
+    <attribute qualifier="selectedProcess" type="BusinessProcess">
+     <modifiers write="false" initial="true" optional="false"/>
+     <persistence type="property"/>
+    </attribute>
+    <attribute qualifier="availableProcessStates" type="WizardProcessStatesCollection">
+     <persistence type="property"/>
+    </attribute>
+   </attributes>
+  </itemtype>
+  
+  <!-- from workflow-items.xml -->
+  <itemtype code="CreateWorkflowWizard"
+   jaloclass="de.hybris.platform.workflow.hmc.CreateWorkflowWizard"
+   extends="WizardBusinessItem" jaloonly="true" generate="true"
+   autocreate="true">
+   <attributes>
+    <attribute qualifier="workflow" type="Workflow">
+     <modifiers read="true" write="false" optional="false"
+      initial="true" />
+     <persistence type="jalo" />
+    </attribute>
+    <attribute qualifier="job" type="WorkflowTemplate">
+     <modifiers read="true" write="false" optional="false"
+      initial="false" />
+     <persistence type="jalo" />
+    </attribute>
+    <attribute qualifier="actions" type="WorkflowActionList">
+     <modifiers read="true" write="true" optional="false" />
+     <persistence type="jalo" />
+    </attribute>
+    <attribute qualifier="code" type="java.lang.String">
+     <modifiers read="true" write="false" optional="false" />
+     <persistence type="jalo" />
+    </attribute>
+    <attribute qualifier="name" type="localized:java.lang.String">
+     <modifiers read="true" write="true" optional="true" />
+     <persistence type="jalo" />
+    </attribute>
+    <attribute qualifier="description" type="localized:java.lang.String">
+     <modifiers read="true" write="true" optional="true" />
+     <persistence type="jalo" />
+    </attribute>
+    <attribute qualifier="attachments" type="WorkflowItemAttachmentList">
+     <modifiers initial="true" />
+     <persistence type="jalo" />
+    </attribute>
+    <attribute qualifier="workflowOwner" type="User">
+     <modifiers initial="true" />
+     <persistence type="jalo" />
+    </attribute>
+   </attributes>
+  </itemtype>
+  
+  <!-- 
+    <itemtype code="ImportCometConfigurationWizard" 
+     extends="WizardBusinessItem"
+     jaloclass="de.hybris.platform.print.hmc.jalo.ImportCometConfigurationWizard"
+     autocreate="true"
+     generate="true">
+   <attributes>
+    <attribute qualifier="cometConfiguration" type="CometConfiguration" >
+     <persistence type="jalo" />
+    </attribute>
+    <attribute qualifier="code" type="java.lang.String" >
+     <persistence type="jalo" />
+    </attribute>
+    <attribute qualifier="name" type="java.lang.String" >
+     <persistence type="jalo" />
+    </attribute>
+    <attribute qualifier="defaultConfiguration" type="java.lang.Boolean" >
+     <persistence type="jalo" />
+     <defaultvalue>Boolean.FALSE</defaultvalue>
+    </attribute>
+    <attribute qualifier="publicationController" type="java.lang.String" >
+     <persistence type="jalo" />
+     <defaultvalue>"DefaultPublicationController"</defaultvalue>
+    </attribute>
+    <attribute qualifier="defaultDeleteAutoCometJob" type="DeleteAutoCometJob">
+     <persistence type="jalo"/>
+     <defaultvalue>em().getEnumerationValue( de.hybris.platform.print.constants.PrintConstants.TC.DELETEAUTOCOMETJOB, de.hybris.platform.print.constants.PrintConstants.Enumerations.DeleteAutoCometJob.NEVER )</defaultvalue>
+    </attribute>
+    <attribute qualifier="importFile" type="Media" >
+     <persistence type="jalo" />
+    </attribute>
+   </attributes>   
+  </itemtype> 
+ 
+  <itemtype code="CreatePagePreviewWizard" 
+     extends="WizardBusinessItem"
+     jaloclass="de.hybris.platform.print.hmc.jalo.CreatePagePreviewWizard"
+     autocreate="true"
+     generate="true">
+   <attributes>
+    <attribute type="java.lang.Integer" qualifier="previewSize">
+     <modifiers optional="true" read="true" write="true" search="false" />
+     <persistence type="jalo" />
+    </attribute>
+    <attribute type="PDFPresetEnum" qualifier="pdfPreset">
+     <modifiers optional="false" read="true" write="true" search="false" />
+     <persistence type="jalo"/>
+     <defaultvalue>
+      em().getEnumerationValue(de.hybris.platform.print.constants.PrintConstants.TC.PDFPRESETENUM,de.hybris.platform.print.constants.PrintConstants.Enumerations.PDFPresetEnum.SMALLESTFILESIZE)
+     </defaultvalue>
+    </attribute>
+   </attributes>   
+  </itemtype>
+  
+  <itemtype code="CreateChapterPreviewWizard" 
+     extends="WizardBusinessItem"
+     jaloclass="de.hybris.platform.print.hmc.jalo.CreateChapterPreviewWizard"
+     autocreate="true"
+     generate="true">
+   <attributes>
+    <attribute type="java.lang.Integer" qualifier="previewSize">
+     <modifiers optional="true" read="true" write="true" search="false" />
+     <persistence type="jalo" />
+    </attribute>
+    <attribute type="PDFPresetEnum" qualifier="pdfPreset">
+     <modifiers optional="false" read="true" write="true" search="false" />
+     <persistence type="jalo"/>
+    </attribute>
+   </attributes>   
+  </itemtype>  
+
+  <itemtype code="CreatePublicationPreviewWizard" 
+     extends="WizardBusinessItem"
+     jaloclass="de.hybris.platform.print.hmc.jalo.CreatePublicationPreviewWizard"
+     autocreate="true"
+     generate="true">
+   <attributes>
+    <attribute type="java.lang.Integer" qualifier="previewSize">
+     <modifiers optional="true" read="true" write="true" search="false" />
+     <persistence type="jalo" />
+    </attribute>
+    <attribute type="PDFPresetEnum" qualifier="pdfPreset">
+     <modifiers optional="false" read="true" write="true" search="false" />
+     <persistence type="jalo"/>
+    </attribute>
+   </attributes>   
+  </itemtype>
+   -->
+ <!--  <itemtype code="BMECatImportWizard" 
+      extends="WizardBusinessItem"
+      jaloonly="true"
+      jaloclass="de.hybris.platform.bmecat.hmc.BMECatImportWizard"
+      generate="true" autocreate="true" >
+   <attributes>
+
+    tab 1: Upload / Media Selection
+    <attribute qualifier="file" type="BMECatJobMedia">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="mediaFile" type="BMECatJobMedia">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="mediasNotIncluded" type="java.lang.Boolean">
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    
+    <attribute qualifier="importJob" type="BMECatImportBatchJob">
+     <modifiers optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>    
+
+    tab 2: Catalog Basic Data
+    <attribute qualifier="transactionMode" type="TransactionModeEnum">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="catalogName" type="java.lang.String">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="catalog" type="Catalog">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="catalogDate" type="java.util.Date">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="catalogVersionName" type="java.lang.String">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="catalogVersion" type="CatalogVersion">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="catalogLanguageISO" type="java.lang.String">
+     <modifiers write="false" optional="false"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="catalogLanguage" type="Language">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="defaultCurrencyISO" type="java.lang.String">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="defaultCurrency" type="Currency">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    
+    <attribute qualifier="territories" type="StringCollection">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    
+    <attribute qualifier="articleCount" type="java.lang.Integer">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="categoryCount" type="java.lang.Integer">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="mediaCount" type="java.lang.Integer">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="keywordCount" type="java.lang.Integer">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="categoryAssignmentsCount" type="java.lang.Integer">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    tab 3: import settings
+    <attribute qualifier="enableUndo" type="java.lang.Boolean">
+     <modifiers write="true" optional="false"/>
+     <persistence type="jalo"/>delegated to cronjob
+     <defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+    </attribute>
+
+    <attribute qualifier="keepLogs" type="java.lang.Boolean">
+     <modifiers write="true" optional="false"/>
+     <persistence type="property"/>
+     <defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+    </attribute>
+
+    <attribute qualifier="sendEmail" type="java.lang.Boolean">
+     <modifiers write="true" optional="false"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="emailAddress" type="java.lang.String">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="currencyMappings" type="Iso2CurrencyMap">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="classificationMappings" type="Classification2QualifierMap">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="unitMappings" type="Code2UnitMap">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    <attribute qualifier="priceTypeMappings" type="BMECatPriceType2UserPriceGroupMapType">
+     <persistence type="jalo"/>
+    </attribute>    
+    <attribute qualifier="taxTypeMappings" type="BMECatTax2TaxGroupMapType">
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="localizationUpdate" type="java.lang.Boolean">
+     <modifiers optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+
+    <attribute qualifier="bmeCatImportCronJob" type="BMECatImportCronJob">
+     <modifiers write="false"/>
+     <persistence type="jalo"/>
+    </attribute>      
+   </attributes>
+  </itemtype>
+
+  bmecat import wizard with csv
+  <itemtype  code="BMECatImportWithCsvWizard" 
+     extends="WizardBusinessItem"
+     jaloonly="true"
+     jaloclass="de.hybris.platform.bmecat.hmc.BMECatImportWithCsvWizard"
+     generate="true" autocreate="true" >
+   <attributes>
+    tab 0 and 1: Upload / Media Selection
+    <attribute qualifier="importJob" type="BMECatImportWithCsvJob">
+     <modifiers optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="file" type="BMECatJobMedia">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="mediaFile" type="BMECatJobMedia">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="mediasNotIncluded" type="java.lang.Boolean">
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    tab 2 and 3: Catalog Basic Data
+    <attribute qualifier="transactionMode" type="TransactionModeEnum">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="catalogName" type="java.lang.String">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="catalog" type="Catalog">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="catalogDate" type="java.util.Date">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="catalogVersionName" type="java.lang.String">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="catalogVersion" type="CatalogVersion">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="catalogLanguageISO" type="java.lang.String">
+     <modifiers write="false" optional="false"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="catalogLanguage" type="Language">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="defaultCurrencyISO" type="java.lang.String">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="defaultCurrency" type="Currency">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="territories" type="StringCollection">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="articleCount" type="java.lang.Integer">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="categoryCount" type="java.lang.Integer">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="mediaCount" type="java.lang.Integer">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="keywordCount" type="java.lang.Integer">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="categoryAssignmentsCount" type="java.lang.Integer">
+     <modifiers write="false" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    tab 4: import settings
+    <attribute qualifier="currencyMappings" type="Iso2CurrencyMap">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="classificationMappings" type="Classification2QualifierMap">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="unitMappings" type="Code2UnitMap">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="priceTypeMappings" type="PriceType2BMECatPriceMapType">
+     <persistence type="jalo"/>
+    </attribute>    
+    <attribute qualifier="taxTypeMappings" type="BMECatTax2TaxGroupMapType">
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="localizationUpdate" type="java.lang.Boolean">
+     <modifiers optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+
+    TODO Q: is a media also compatible for an ImpExImportCronJob???
+    tab 5: impex script file
+    <attribute qualifier="impexScriptFile" type="BMECatImpExScriptMedia">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+
+    tab 6: other settings
+    <attribute qualifier="enableUndo" type="java.lang.Boolean">
+     <modifiers write="true" optional="false"/>
+     <persistence type="jalo"/>delegated to cronjob
+     <defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+    </attribute>
+    <attribute qualifier="keepLogs" type="java.lang.Boolean">
+     <modifiers write="true" optional="false"/>
+     <persistence type="property"/>
+     <defaultvalue>java.lang.Boolean.TRUE</defaultvalue>
+    </attribute>
+    <attribute qualifier="sendEmail" type="java.lang.Boolean">
+     <modifiers write="true" optional="false"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+    <attribute qualifier="emailAddress" type="java.lang.String">
+     <modifiers write="true" optional="true"/>
+     <persistence type="jalo"/>delegated to cronjob
+    </attribute>
+
+    2 cronjobs, one for transforming bmecat.xml to csv files,
+      and the other for the whole wizard
+    
+    <attribute qualifier="bmecatImportWithCsvCronJob" type="BMECatImportWithCsvCronJob">
+     <modifiers write="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="bmecatImportWithCsvTransformCronJob" type="BMECatImportWithCsvTransformCronJob">
+     <modifiers write="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+   </attributes>
+  </itemtype>
+
+  <itemtype code="BMECatExportWizard"
+      extends="WizardBusinessItem"
+      jaloonly="true"
+      jaloclass="de.hybris.platform.bmecat.hmc.BMECatExportWizard"
+      generate="true" autocreate="true" >
+   <attributes>
+    <attribute qualifier="exportCatalogVersion" type="CatalogVersion">
+     <description>CatalogVersion to export</description>
+     <modifiers optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="exportLanguages" type="LanguageCollection">
+     <modifiers read="true" write="true" optional="true" initial="true"/>
+     <persistence type="property"/>
+    </attribute>
+    <attribute qualifier="exportCurrency" type="Currency">
+     <modifiers read="true" write="true" optional="true"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="exportedProductSize" type="java.lang.Integer" >
+     <modifiers read="true" write="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="existedProductSize" type="java.lang.Integer" >
+     <modifiers read="true" write="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="classificationSystemVersions" type="ClassificationSystemVersionCollection" >
+     <persistence type="jalo"/>      
+    </attribute>
+    <attribute qualifier="ClassificationSystemNumberFormat" type="java.lang.String" >
+     <persistence type="jalo"/>      
+    </attribute> 
+    <attribute qualifier="Hybris2BMECatMimePurposeMapping" type="Hybris2BMECatMimePurposeMappingType">
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="priceTypeMapping" type="BMECatPriceType2UserPriceGroupMapType">
+     <persistence type="jalo"/>      
+    </attribute>     
+    <attribute qualifier="exportedMedias" type="BMECatJobMedia">
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="bmeCatExportCronJob" type="BMECatExportCronJob">
+     <modifiers write="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="jobMedia" type="JobMedia">
+     <modifiers write="false"/>
+     <persistence type="jalo"/>     
+    </attribute>
+    <attribute qualifier="udpNet" type="java.lang.Boolean">
+     <modifiers optional="false"/>
+     <persistence type="jalo"/>    
+    </attribute>
+    <attribute qualifier="referenceDate" type="java.util.Date">
+     <modifiers optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>         
+    <attribute qualifier="referenceCustomer" type="Customer">
+     <modifiers optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>         
+    <attribute qualifier="suppressEmptyCategories" type="java.lang.Boolean">
+     <modifiers optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+    <attribute qualifier="suppressProductsWithoutPrice" type="java.lang.Boolean">
+     <modifiers optional="false"/>
+     <persistence type="jalo"/>
+    </attribute>
+   </attributes>
+  </itemtype> -->
+    
+	</itemtypes>
+</items>

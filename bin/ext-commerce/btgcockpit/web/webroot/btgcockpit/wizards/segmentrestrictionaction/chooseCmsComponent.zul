@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:h="http://www.w3.org/1999/xhtml" 
+		xmlns:zk="http://www.zkoss.org/2005/zk"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd ">
+		
+		<zscript>
+			Object[] typeNameAsArray = new Object[] {wizardBean.getSelectedTypeName()};
+		</zscript>
+		
+		<div style="text-align: left;">
+		
+			<div sclass="wizardPageDescription">
+				<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.chooseComponentPage.description')}"/>
+			</div>
+		
+			<div id="compEditorCnt"	action="onshow:anima.appear(#{self});" style="margin: 30px;" visible="true">
+				<div width="80%">
+					<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.chooseComponentPage.optionalpage')}"/>
+				</div>
+				<div height="4px"/>
+				
+				<h:div id="Wizard_Create_Output_Action_WCMS_Page_Input">
+				
+				<div 	use="de.hybris.platform.cockpit.components.editor.CockpitEditorContainer" 
+						valueTypeCode="AbstractPage" editorCode="single" editorValue='${wizardBean.pageForComponent}'
+						onValueChange='wizardBean.setPageForComponent(self.getEditorValue()); wizardBean.setRestrictedComponent(null);
+											componentListEditor.setEditorValue(wizardBean.restrictedComponent); componentListEditor.update();
+											componentEditor.setEditorValue(wizardBean.restrictedComponent); componentEditor.update();
+											componentListEditor.setVisible(wizardBean.pageForComponent!=null);
+											componentEditor.setVisible(wizardBean.pageForComponent==null)'>
+					<custom-attributes allowCreate="false" displaySubtypes="true" allowActivate="false"
+							predefinedPropertyValues="${wizardBean.predefinedValuesForPage}"/>
+				</div>
+				
+				</h:div>
+			
+				<div height="20px"/>
+				<div width="80%">
+					<label value="${c:l2('btgcockpit.wizard.segmentRestrictionAction.chooseComponentPage.choose', typeNameAsArray)}"/>
+				</div>
+				
+				<h:div id="Wizard_Create_Output_Action_WCMS_Component_Input">
+				
+				<div height="4px"/>	
+				<div 	id="componentListEditor" use="de.hybris.platform.cockpit.components.editor.CockpitEditorContainer" 
+						valueTypeCode="AbstractCMSComponent" editorCode="shortListEditor" editorValue='${wizardBean.restrictedComponent}'
+						onValueChange='wizardBean.setRestrictedComponent(self.getEditorValue())'
+						visible="${wizardBean.pageForComponent!=null}">
+					<custom-attributes allowedValuesList="${wizardBean.componentsForSelectedPageProvider}"/>
+				</div>
+					
+				<div id="componentEditor" use="de.hybris.platform.cockpit.components.editor.CockpitEditorContainer" 
+						valueTypeCode="AbstractCMSComponent" editorCode="single" editorValue='${wizardBean.restrictedComponent}'
+						onValueChange='wizardBean.setRestrictedComponent(self.getEditorValue())'
+						visible="${wizardBean.pageForComponent==null}">
+					<custom-attributes allowCreate="false" displaySubtypes="true" allowActivate="false"
+							predefinedPropertyValues="${wizardBean.predefinedValuesForComponent}"/>
+				</div>
+				
+				</h:div>
+				
+			</div>	
+		</div>
+</zk>

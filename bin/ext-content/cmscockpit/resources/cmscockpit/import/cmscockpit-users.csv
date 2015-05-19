@@ -1,0 +1,43 @@
+$lang=en
+$passwordEncoding=md5
+$defaultPassword=1234
+$setPassword=@password[translator=de.hybris.platform.impex.jalo.translators.ConvertPlaintextToEncodedUserPasswordTranslator][default='$passwordEncoding:$defaultPassword']
+
+UPDATE Language;isocode[unique=true];;name[lang=$lang];
+;de;;German;
+;en;;English;
+
+INSERT_UPDATE Currency;isocode[unique=true];symbol;name[lang=$lang]
+;USD;$;US Dollar
+
+INSERT_UPDATE Employee;UID[unique=true];$setPassword;description;name;groups(uid)[mode=append];sessionLanguage(isocode);sessionCurrency(isocode)
+;cmsmanager;;CMS manager;CMS Manager;cmsmanagergroup;en;USD
+
+# Set hMC configurations for user groups (see also CORE-4072);
+INSERT_UPDATE UserGroup;UID[unique=true];hmcXML;locname[lang=de];locname[lang=en];description
+;cmsmanagergroup;"<?xml version=""1.0"" encoding=""ISO-8859-1""?>
+<configuration xmlns=""hybris.de/schemas/hmc/generic""
+   xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance""
+   xsi:schemaLocation=""hybris.de/schemas/hmc/generic hmc.xsd""> 
+
+ <explorertree>
+  
+    <group name=""user"" mode=""delete""/>
+    <group name=""recommendation"" mode=""delete""/>
+    <group name=""marketing"" mode=""delete""/> 
+    <group name=""pricesettings"">
+     <group name=""taxes"" mode=""delete""/>
+    </group>
+    <group name=""cmsgroup"" mode=""delete""/>
+  </explorertree>
+  <type name=""VariantType"" mode=""append"">
+   <organizer>
+    <editor>
+      <tab name=""XML"" mode=""delete"" />
+      <tab name=""extended"" mode=""delete"" />
+      <tab name=""security"" mode=""delete"" />
+     </editor> 
+    </organizer>
+  </type>
+  
+</configuration>";CMS Manager-Gruppe;CMS Manager Group;Can edit cms data.

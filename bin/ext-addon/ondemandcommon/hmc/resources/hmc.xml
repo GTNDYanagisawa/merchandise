@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2013 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+
+	<explorertree>
+		<group name="group.ondemandcommon.producttaxcode" description="group.ondemandcommon.producttaxcode.description">
+			<typeref type="ProductTaxCode" description="producttaxcode.description"/>
+		</group>
+	</explorertree>
+
+	<!-- *** Extend BaseStore *** -->
+	<type name="BaseStore" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="properties" mode="append">
+					<section name="section.ondemandbasestorepreferences">
+						<listlayout>
+							<attribute name="ondemandBaseStorePreferences" width="500"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<!-- *** Extend Order *** -->
+	<type name="Order" mode="append">
+		<organizer>
+			<editor>
+				<tab name="positions_and_prices" mode="append">
+					<section name="section.order.ondemandprices" position="2">
+						<listlayout>
+							<customchip classname="de.hybris.platform.ondemandcommon.hmc.editors.OrderOnDemandPricesEditorChip"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<!-- *** Extend OrderEntry *** -->
+	<type name="OrderEntry" mode="append">
+		<organizer>
+			<editor>
+				<tab name="common" mode="append">
+					<section name="section.orderentry.ondemandprices" position="2">
+						<listlayout>
+							<customchip classname="de.hybris.platform.ondemandcommon.hmc.editors.OrderEntryOnDemandPricesEditorChip"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="OndemandBaseStorePreference" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="atsFormula"/>
+			</search>
+			<result defaultview="list">
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="atsFormula" width="200"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials mode="append">
+					<listlayout>
+						<attribute name="atsFormula"/>
+					</listlayout>
+				</essentials>
+			</editor>
+		</organizer>
+		<defaultreference>
+			<itemlayout>
+				<attribute name="atsFormula"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="ProductTaxCode" mode="append">
+		<organizer>
+			<search mode="append">
+				<condition attribute="taxCode"/>
+				<condition attribute="productCode"/>
+				<condition attribute="taxArea"/>
+			</search>
+			<result defaultview="list">
+				<listview mode="append">
+					<itemlayout>
+						<attribute name="taxCode" width="200"/>
+						<attribute name="productCode" width="100"/>
+						<attribute name="taxArea" width="100"/>
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials mode="append">
+					<listlayout>
+						<attribute name="taxCode"/>
+						<attribute name="productCode"/>
+						<attribute name="taxArea"/>
+					</listlayout>
+				</essentials>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="taxCode"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+</configuration>

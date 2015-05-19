@@ -1,0 +1,744 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+
+	<!-- Configuration for extension b2bcommerce -->
+
+	<explorertree>
+		<group name="b2bcommercegroup" description="group.b2b.description">
+			<typeref type="B2BUnit" description="b2bcommercegroup.units.description" />
+			<typeref type="B2BCustomer" description="b2bcommercegroup.customers.description" />
+			<typeref type="B2BCostCenter" description="b2bcommercegroup.costcenters.description" />
+			<typeref type="B2BBudget" description="b2bcommercegroup.budgets.description" />
+			<typeref type="B2BUserGroup" description="b2bcommercegroup.usergroups.description" />
+			<typeref type="B2BReportingSet" description="b2bcommmercegroup.reportingset.description" />
+			<typeref type="B2BMerchantCheck" description="b2bcommmercegroup.merchantcheck.description" />
+		</group>
+		<group name="order" mode="append">
+			<typeref type="B2BBookingLineEntry"
+				description="b2bcommercegroup.b2bbookinglineentry.description" />
+		</group>
+	</explorertree>
+
+	<!-- BEGIN B2B B2BUnit -->
+	<type name="B2BUnit" mode="append">
+		<organizer>
+			<result defaultview="tree">
+				<treeview mode="replace">
+					<itemlayout>
+						<attribute name="uid" width="100" />
+						<attribute name="locname" />
+					</itemlayout>
+					<explorable>
+						<attribute name="members" suppressroot="true" />
+					</explorable>
+				</treeview>
+			</result>
+			<editor>
+				<tab name="tab.groups" position="1" mode="append">
+					<section name="section.b2bunit.hierarchy.descendents"
+						position="2">
+						<listlayout>
+							<attribute name="usergroups" width="500">
+								<referencecollectioneditor editable="true"
+									externalcreate="true" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="uid" width="100" />
+										<attribute name="unit" width="100" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+
+				<tab name="administration" mode="append">
+					<section name="unbound" position="4" mode="append">
+						<listlayout>
+							<attribute name="active" width="500" editable="false" />
+						</listlayout>
+					</section>
+				</tab>
+
+
+
+				<tab name="tab.b2bunit.merchantcheck" mode="append" position="4">
+					<section name="section.b2bunit.merchantcheck.accountmanagers"
+						mode="append">
+						<listlayout>
+							<attribute name="accountManager" />
+							<attribute name="accountmanagergroups">
+								<referencecollectioneditor editable="true"
+									externalcreate="false" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="uid" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+					<section name="section.b2bunit.merchantcheck.creditlimit"
+						mode="append">
+						<listlayout>
+							<attribute name="creditlimit" />
+						</listlayout>
+					</section>
+				</tab>
+
+				<tab name="tab.b2bunit.approver" position="1" mode="append">
+					<section name="section.b2bunit.approver" position="1">
+						<listlayout>
+							<attribute name="approvergroups">
+								<referencecollectioneditor editable="true"
+									externalcreate="false" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="uid" />
+										<attribute name="Unit" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="approvers">
+								<referencecollectioneditor editable="true"
+									externalcreate="true" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="uid" />
+										<attribute name="active" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+
+
+					</section>
+				</tab>
+				<tab name="tab.b2bunit.costcenter" position="2">
+					<section name="section.b2bunit.costcenter" position="1">
+						<listlayout>
+							<attribute name="budgets">
+								<referencecollectioneditor editable="true"
+									externalcreate="false" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="code" />
+										<attribute name="name" />
+										<attribute name="budget" />
+										<attribute name="currency" />
+										<attribute name="Unit" />
+										<attribute name="active" />
+										<attribute name="dateRange" />
+
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="costcenters">
+								<referencecollectioneditor editable="true"
+									externalcreate="true" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="code" />
+										<attribute name="name" />
+										<attribute name="currency" />
+										<attribute name="Unit" />
+										<attribute name="active" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+
+							<attribute name="orders" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.hmclayout" position="6">
+					<section name="section.hmclayout">
+						<listlayout>
+							<text name="text.classificationclass.hmclayout" />
+							<attribute name="hmcXML" width="595">
+								<textareaeditor expanded="true" wrap="false"
+									cols="80" rows="30" />
+							</attribute>
+						</listlayout>
+
+						<table>
+							<tr>
+								<td width="16px"></td>
+								<td>
+									<action type="item"
+										classname="de.hybris.platform.b2b.hmc.util.DisableB2BUnit"
+										name="action.b2bunitdisable" toolbaricon="header_clear_all_main"
+										icon="images/icons/header_clear_all_main.gif" autosave="true"
+										showtoolbarlabel="true" hidebutton="true" />
+
+									<action type="item"
+										classname="de.hybris.platform.b2b.hmc.util.EnableB2BUnit"
+										name="action.b2bunitenable" toolbaricon="header_refresh"
+										icon="images/icons/header_refresh.gif" autosave="true"
+										showtoolbarlabel="true" hidebutton="true" />
+								</td>
+								<td>
+									<action type="item"
+										classname="de.hybris.platform.b2b.hmc.util.GenerateReportingSet"
+										name="action.reportSet" toolbaricon="header_refresh"
+										icon="images/icons/header_refresh.gif" autosave="true"
+										showtoolbarlabel="true" hidebutton="true" />
+								</td>
+							</tr>
+						</table>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	<!-- END B2B B2BUnit -->
+
+	<!-- BEGIN B2B B2BCustomer -->
+	<type name="B2BCustomer" mode="append">
+		<organizer>
+			<editor>
+				<tab name="tab.b2bcustomer.approver" position="1" mode="append">
+					<section name="section.b2bcustomer.approver" position="1">
+						<listlayout>
+							<attribute name="approvergroups">
+								<referencecollectioneditor editable="true"
+									externalcreate="true" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="uid" />
+										<attribute name="Unit" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="approvers">
+								<referencecollectioneditor editable="true"
+									externalcreate="true" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="uid" />
+										<attribute name="active" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+						<table>
+							<tr>
+								<td width="16px"></td>
+								<td>
+									<action type="item"
+										classname="de.hybris.platform.b2b.hmc.util.DisableB2BCustomer"
+										name="action.b2bunitdisable" toolbaricon="header_clear_all_main"
+										icon="images/icons/header_clear_all_main.gif" autosave="true"
+										showtoolbarlabel="true" hidebutton="true" />
+
+									<action type="item"
+										classname="de.hybris.platform.b2b.hmc.util.EnableB2BCustomer"
+										name="action.b2bunitenable" toolbaricon="header_refresh"
+										icon="images/icons/header_refresh.gif" autosave="true"
+										showtoolbarlabel="true" hidebutton="true" />
+								</td>
+							</tr>
+						</table>
+					</section>
+				</tab>
+				<tab name="addresses" id="tab_addresses" position="1" mode="append">
+					<section name="addresses" mode="append">
+						<listlayout>
+							<attribute name="email" width="595" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.b2bcustomer.permissions" position="1" mode="append">
+					<section name="section.b2bcustomer.permissions" position="1">
+						<listlayout>
+							<attribute name="permissionGroups">
+								<referencecollectioneditor editable="true"
+									externalcreate="true" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="uid" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+
+							<attribute name="permissions">
+								<referencecollectioneditor editable="true"
+									externalcreate="true" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="code" />
+										<attribute name="active" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+	<!-- END B2B B2BCustomer -->
+
+
+
+	<!-- BEGIN B2B BUDGET -->
+	<type name="B2BBudget" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" operator="contains" />
+				<condition attribute="name" operator="contains" />
+				<condition attribute="Unit" operator="contains" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code" />
+						<attribute name="Unit" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="Unit" />
+					</listlayout>
+				</essentials>
+				<tab name="tab.b2bbudget.general" position="1">
+					<section name="section.b2bbudget.general.properties"
+						position="0">
+						<listlayout>
+							<attribute name="code" />
+							<attribute name="name" />
+							<attribute name="budget" />
+							<attribute name="dateRange" />
+							<attribute name="currency" />
+							<attribute name="active" />
+
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.b2bbudget.hierarchy" position="2">
+					<section name="section.b2bbudget.hierarchy.descendants"
+						position="0">
+						<listlayout>
+
+							<attribute name="costcenters">
+								<referencecollectioneditor editable="true"
+									externalcreate="true" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="code" />
+										<attribute name="name" />
+										<attribute name="currency" />
+										<attribute name="Unit" />
+										<attribute name="active" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+				<attribute name="Unit" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<!-- END B2B BUDGET -->
+
+
+	<!-- BEGIN B2B B2BCostCenter -->
+	<type name="B2BCostCenter" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" operator="contains" />
+				<condition attribute="name" operator="contains" />
+				<condition attribute="Unit" operator="contains" />
+				<condition attribute="Budgets" operator="contains" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code" />
+						<attribute name="Unit" />
+						<attribute name="Budgets" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="Unit" />
+					</listlayout>
+				</essentials>
+				<tab name="tab.b2bcostcenter.general" position="1">
+					<section name="section.b2bcostcenter.general.properties"
+						position="1">
+						<listlayout>
+							<attribute name="code" />
+							<attribute name="name" />
+							<attribute name="active" />
+							<attribute name="currency" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.b2bcostcenter.hierarchy" position="2">
+					<section name="section.b2bcostcenter.hierarchy.parent"
+						position="1">
+						<listlayout>
+							<attribute name="budgets">
+								<referencecollectioneditor editable="true"
+									externalcreate="true" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="code" />
+										<attribute name="name" />
+										<attribute name="budget" />
+										<attribute name="currency" />
+										<attribute name="Unit" />
+										<attribute name="active" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+
+			</editor>
+		</organizer>
+
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+				<attribute name="Unit" />
+				<attribute name="Budgets" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	<!-- END B2B B2BCostCenter -->
+
+
+	<!-- BEGIN B2B ReportingSet -->
+	<type name="B2BReportingSet" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" operator="contains" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="code" />
+					</listlayout>
+				</essentials>
+				<tab name="tab.b2breportingset.main" position="2">
+					<section name="section.b2breportingset.main.entries"
+						position="1">
+						<listlayout>
+							<attribute name="reportingentries">
+								<referencecollectioneditor editable="true"
+									externalcreate="true" resortable="false" presetattribute="owner"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="pk" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+
+		</organizer>
+
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	<!-- END B2B ReportingSet -->
+
+	<!-- BEGIN B2B User Groups -->
+	<type name="B2BUserGroup" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="uid" operator="contains" />
+				<condition attribute="name" operator="contains" />
+				<condition attribute="Unit" operator="contains" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="uid" />
+						<attribute name="Unit" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="Unit" />
+					</listlayout>
+				</essentials>
+				<tab name="tab.common" position="0" mode="append">
+					<section name="properties" mode="append" position="1">
+						<listlayout>
+							<attribute name="name" />
+							<attribute name="permissions">
+								<referencecollectioneditor editable="false"
+									presetattribute="owner" externalcreate="true" resortable="false"
+									remove="true" create="true" autosave="false">
+									<itemlayout>
+										<attribute name="code" />
+										<attribute name="active" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+
+		<defaultreference searchattribute="uid" mode="replace">
+			<itemlayout>
+				<attribute name="uid" />
+				<attribute name="Unit" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	<!-- END B2B B2B User Groups -->
+
+
+	<type name="B2BBookingLineEntry" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="costCenter" operator="contains" />
+				<condition attribute="orderID" operator="contains" />
+				<condition attribute="product" operator="contains" />
+				<condition attribute="bookingStatus" operator="contains" />
+				<condition attribute="bookingDate" operator="contains" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="bookingStatus" />
+						<attribute name="costCenter" />
+						<attribute name="amount" />
+						<attribute name="product" />
+						<attribute name="quantity" />
+						<attribute name="orderID" />
+						<attribute name="orderEntryNr" />
+						<attribute name="bookingDate" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+
+				<tab name="tab.common" position="1" mode="append">
+					<section name="section.bookinglineentry.general" position="1">
+						<listlayout>
+							<attribute name="bookingStatus" />
+							<attribute name="costCenter" />
+							<attribute name="amount" />
+							<attribute name="product" />
+							<attribute name="quantity" />
+							<attribute name="orderID" />
+							<attribute name="orderEntryNr" />
+							<attribute name="bookingDate" />
+						</listlayout>
+
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<!-- BEGIN B2B Merchant Check -->
+	<type name="B2BMerchantCheck" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" operator="contains" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="code" />
+					</listlayout>
+				</essentials>
+				<tab name="tab.b2bmerchantcheck.general" position="1">
+					<section name="section.b2bmerchantcheck.general.properties"
+						position="1">
+						<listlayout>
+							<attribute name="active" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	<!-- END B2B Merchant Check -->
+
+	<!-- BEGIN B2B Credit Limit -->
+	<type name="B2BCreditLimit" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="code" operator="contains" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="code" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<listlayout>
+						<attribute name="code" />
+					</listlayout>
+				</essentials>
+				<tab name="tab.b2bmerchantcheck.general" position="1" mode="append">
+					<section name="section.b2bmerchantcheck.general.properties"
+						position="1">
+						<listlayout>
+							<attribute name="datePeriod" />
+							<attribute name="dateRange" />
+							<attribute name="currency" />
+							<attribute name="amount" />
+							<attribute name="active" />
+							<attribute name="Unit" />
+						</listlayout>
+						<table>
+							<tr>
+								<td width="16px"></td>
+								<td>
+									<action type="item"
+										classname="de.hybris.platform.b2b.hmc.util.CalculateCreditExtended"
+										name="action.b2bcalculatecreditextended" toolbaricon="header_refresh"
+										icon="images/icons/header_refresh.gif" autosave="true"
+										showtoolbarlabel="true" hidebutton="true" />
+								</td>
+							</tr>
+						</table>
+					</section>
+
+					<section name="section.b2bmerchantcheck.general.properties"
+						position="1">
+						<listlayout>
+							<attribute name="alertThreshold" />
+							<attribute name="alertRateType" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	<!-- END B2B Credit Limit -->
+
+
+	<type name="AbstractOrder" icon="images/icons/e_order.gif" mode="append">
+		<organizer>
+			<editor>
+				<tab name="positions_and_prices" id="tab_order_positions_and_prices"
+					position="0">
+
+					<section name="section.b2bcomment">
+						<listlayout>
+							<attribute name="b2bcomments">
+								<referencecollectioneditor editable="true"
+									externalcreate="false" remove="true" create="true" autosave="true">
+									<itemeditorlayout>
+										<attribute name="code" />
+										<attribute name="comment" width="350" />
+										<attribute name="modifiedDate" width="175" />
+									</itemeditorlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+
+					<section name="section.b2bquoteExpirationDate">
+						<listlayout>
+							<attribute name="quoteExpirationDate" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="VariantCategory" mode="append">
+		<organizer>
+			<editor>
+				<tab name="tab.category.variant">
+					<section name="section.category.variant">
+						<listlayout>
+							<attribute name="supercategories">
+								<referencecollectioneditor autoperform="true" resortable="true" add="true" remove="true">
+									<itemlayout>
+										<attribute name="code" width="274"/>
+										<attribute name="name" width="274"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="hasImage"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="VariantValueCategory" mode="append">
+		<organizer>
+			<editor>
+				<tab name="tab.valuecategory.variant">
+					<section name="section.valuecategory.variant">
+						<listlayout>
+							<attribute name="sequence"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+</configuration>

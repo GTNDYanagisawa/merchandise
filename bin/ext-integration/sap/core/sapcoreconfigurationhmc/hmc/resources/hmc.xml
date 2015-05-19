@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+<configuration xmlns="hybris.de/schemas/hmc/generic" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+	<explorertree>
+		<group description="group.sapintegration.description" expand="false" name="group.sapintegration.name">
+			<typeref description="node.sapconfiguration.description" type="SAPConfiguration" />
+			<typeref description="node.sapRFCDestination.description" type="SAPRFCDestination" />
+			<typeref description="node.sapHTTPDestination.description" type="SAPHTTPDestination" />
+			<typeref description="node.sapglobalconfiguration.description" type="SAPGlobalConfiguration" />
+			<typeref description="node.sapAdministration.description" type="SAPAdministration" />
+		</group>
+	</explorertree>
+
+	<!-- Base Store Configuration -->
+	<type mode="append" name="SAPConfiguration">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="core_name" />
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="core_name" />
+					</itemlayout>
+				</listview>
+			</result>
+
+			<editor>
+				<essentials>
+					<columnlayout mode="replace">
+						<row>
+							<text name="txt.sapconfiguration.moreinformation" />
+						</row>
+						<row>
+							<attribute name="core_name" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab mode="append" name="tab.sapconfiguration">
+					<section name="section.sapconfiguration">
+						<columnlayout mode="append">
+							<row>
+								<attribute mode="append" name="sapRFCDestination" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="core_name">
+			<itemlayout>
+				<attribute name="core_name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<!-- Global Configuration -->
+	<type mode="append" name="SAPGlobalConfiguration">
+		<organizer>
+			<editor>
+				<essentials>
+						<columnlayout>
+							<row>
+								<text name="txt.sapglobalconfiguration.moreinformation" />
+							</row>
+						</columnlayout>
+				</essentials>
+			</editor>
+		</organizer>
+	</type>
+
+	<!-- RFC Destination -->
+	<type name="SAPRFCDestination" mode="append">
+		<organizer>
+			<search autoperform="true" mode="replace">
+				<condition attribute="rfcDestinationName" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="rfcDestinationName" width="155" />
+						<attribute name="sid" width="100" />
+						<attribute name="client" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<essentials>
+					<table width="75%">
+						<tr>
+							<td colspan="2">
+								<text name="txt.saprfcdestination.changed" />
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<attribute name="rfcDestinationName" labelwidth="185" />
+							</td>
+							<td>
+								<attribute name="offlineMode" labelwidth="130"/>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<action type="item" showtoolbarlabel="true" name="button.pingaction" align="right" hidebutton="true" tooltip="button.pingaction"
+									toolbaricon="header_open_alt.gif" classname="de.hybris.platform.sap.core.configuration.hmc.extension.action.PingForRFCDestinationAction" />
+							</td>
+						</tr>
+					</table>
+				</essentials>
+				<tab name="tab.saprfcdestination.server">
+					<section name="section.saprfcdestination.serverdata.default">
+						<listlayout>
+							<attribute name="jcoMsServ" labelwidth="185" />
+							<attribute name="jcoSAPRouter" labelwidth="185" />
+							<attribute name="backendType" labelwidth="185" />
+							<attribute name="connectionType" labelwidth="185">
+								<advancedbooleaneditor truename="radio.saprfcdestination.serverconnection" falsename="radio.saprfcdestination.groupconnection" />
+							</attribute>
+						</listlayout>
+					</section>
+					<section name="section.saprfcdest.server" mode="append">
+						<listlayout>
+							<attribute name="targetHost" labelwidth="185" />
+							<attribute name="instance" labelwidth="185" />
+						</listlayout>
+					</section>
+					<section name="section.saprfcdest.group" mode="append">
+						<listlayout>
+							<attribute name="sid" labelwidth="185" />
+							<attribute name="messageServer" labelwidth="185">
+								<stringeditor />
+							</attribute>
+							<attribute name="group" labelwidth="185" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.saprfcdestination.user">
+					<section name="section.saprfcdestination.userdata">
+						<listlayout>
+							<attribute name="client" labelwidth="185" />
+							<attribute name="userid" labelwidth="185" />
+							<attribute name="password" labelwidth="185">
+								<stringeditor encrypted="true" />
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.saprfcdestination.specific">
+					<section name="section.saprfcdestination.pooling">
+						<listlayout>
+							<attribute name="pooledConnectionMode" labelwidth="185" />
+							<attribute name="maxConnections" labelwidth="185" />
+							<attribute name="poolSize" labelwidth="185" />
+							<attribute name="maxWaitTime" labelwidth="185" />
+						</listlayout>
+					</section>
+					<section name="section.saprfcdestination.performance">
+						<listlayout>
+							<attribute name="jcoClientDelta" labelwidth="185" />
+						</listlayout>
+					</section>
+					<section name="section.saprfcdestination.addAttrs">
+						<listlayout>	
+							<attribute name="AdditionalAttributes" labelwidth="185">
+								<referencecollectioneditor add="false" remove="true"
+									autosave="true" prohibitopening="true" resortable="true"
+									externalcreate="false" editable="true">
+									<itemlayout>
+										<attribute name="jcoattr_name" title="Name" />
+										<attribute name="jcoattr_value" title="Value" />
+									</itemlayout>
+								</referencecollectioneditor> 
+							</attribute>
+						</listlayout>							
+						<columnlayout mode="append">
+							<row>
+								<attribute mode="append" name="AdditionalAttribute" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="tab.saprfcdestination.trace" >
+					<section name="section.saprfcdestination.tracedata">
+						<listlayout>
+							<attribute name="jcoTraceLevel" labelwidth="185" />
+							<attribute name="jcoTracePath" labelwidth="185" />
+							<attribute name="jcoCPICTrace" labelwidth="185" />
+							<attribute name="jcoRFCTrace" labelwidth="185" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="tab.saprfcdestination.snc">
+					<section name="section.rfcdestination.snc">
+						<listlayout>
+							<attribute name="sncMode" labelwidth="185" />
+							<attribute name="sncQoP" labelwidth="185" />
+							<attribute name="sncPartnerName" labelwidth="185" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="rfcDestinationName">
+			<itemlayout>
+				<attribute name="rfcDestinationName" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<!-- Base Store Enhancement -->
+	<type mode="append" name="BaseStore">
+		<organizer>
+			<editor>
+				<tab name="properties" position="0">
+					<section mode="append" name="section.sapconfiguration.reference" position="0">
+						<listlayout>
+							<attribute name="SAPConfiguration" width="500" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<!-- HTTP Destination -->
+	<type name="SAPHTTPDestination" mode="append">
+		<organizer>
+			<search autoperform="true" mode="replace">
+				<condition attribute="httpDestinationName" />
+			</search>
+			<result mode="replace">
+				<listview>
+					<itemlayout>
+						<attribute name="httpDestinationName" width="155" />
+						<attribute name="targetUrl" width="100" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor>
+				<tab name="tab.sapcorehttp.connection">
+					<section name="section.sapcorehttp.default">
+						<listlayout>
+							<attribute name="httpDestinationName" labelwidth="185" />
+							<attribute name="targetURL" labelwidth="185" />
+						</listlayout>
+					</section>
+					<section name="section.sapcorehttp.logondata">
+						<listlayout>
+							<attribute name="authenticationType" labelwidth="185" />
+							<attribute name="userid" labelwidth="185" />
+							<attribute name="password" labelwidth="185">
+								<stringeditor encrypted="true" />
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="httpDestinationName">
+			<itemlayout>
+				<attribute name="httpDestinationName" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<!-- Administration -->
+	<type mode="append" name="SAPAdministration">
+		<organizer>
+			<editor>
+				<tab mode="append" name="tab.sapadmin.datahub">
+					<section name="section.sapadmin.datahub.transfer">
+						<columnlayout mode="append">
+							<row>
+								<text name="txt.datahub.transfer.info" />
+							</row>
+							<row>
+								<attribute name="core_lastDataHubInitialLoad" labelwidth="185" editable="false" />
+							</row>
+							<row>
+								<action type="item" name="button.sapadmin.datahub.initialloadaction" align="left"
+									tooltip="button.sapadmin.datahub.initialloadaction" classname="de.hybris.platform.sap.core.configuration.hmc.extension.action.DataHubTransferAction" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+</configuration>

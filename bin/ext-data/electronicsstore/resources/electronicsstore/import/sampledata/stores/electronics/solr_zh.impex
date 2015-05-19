@@ -1,0 +1,67 @@
+# ImpEx for Solr for Electronics Store
+$indexedType=electronicsProductType
+$solrIndexedType=solrIndexedType(identifier[default=$indexedType])[unique=true]
+$facetSearchConfigName=electronicsIndex
+$contentCatalogName=electronicsContentCatalog
+$contentCatalogVersion=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalogName]),CatalogVersion.version[default=Staged])[default=$contentCatalogName:Staged]
+$productCatalog=electronicsProductCatalog
+$productCatalogVersion=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$productCatalog]),CatalogVersion.version[default=Staged])[default=$productCatalog:Staged]
+
+# Language
+$lang=zh
+
+UPDATE SolrIndexedProperty;name[unique=true];$solrIndexedType;displayName[lang=$lang]
+ ;Colour of product, 1766;;"颜色";
+ ;Lens type, 472   ;;"镜头类型";
+ ;Megapixel, 63          ;;"百万像素";
+ ;Mounting, 1867         ;;"安装支架";
+ ;Resolution, 80         ;;"分辨率";
+
+# Redirect page URL (Must use INSERT_UPDATE here)
+UPDATE SolrURIRedirect;url[unique=true];&redirectRefID
+;"/cart";$contentCatalogName-redirectRefID-cart
+;"/cart";$contentCatalogName-redirectRefID-basket
+;"http://www.hybris.com/multichannel-accelerator";$contentCatalogName-redirectRefID-accelerator
+;"http://www.hybris.com/multichannel-accelerator";$contentCatalogName-redirectRefID-hymacc
+
+UPDATE SolrPageRedirect;redirectItem(uid,$contentCatalogVersion)[unique=true];&redirectRefID
+;faq;$contentCatalogName-redirectRefID-help
+;faq;$contentCatalogName-redirectRefID-shipping
+
+UPDATE SolrProductRedirect;redirectItem(code,$productCatalogVersion)[unique=true];&redirectRefID
+;1382080;$contentCatalogName-redirectRefID-1382080
+;2053266;$contentCatalogName-redirectRefID-2053266
+;816780;$contentCatalogName-redirectRefID-816780
+
+# Category Redirect (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrCategoryRedirect;redirectItem(code,$productCatalogVersion)[unique=true];&redirectRefID
+;brand_5;$productCatalog-redirectRefID-sony
+;brand_10;$productCatalog-redirectRefID-canon
+;902;$productCatalog-redirectRefID-memory
+
+# Synonyms (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrSynonymConfig;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];synonymFrom[unique=true];synonymTo
+ ;;;"af";"自动定焦"
+ ;;;"摄像机";"摄像机"
+ ;;;"小巧、迷你";"紧凑型"
+ ;;;"促销";"优惠"
+ 
+# Keyword Redirects (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrFacetSearchKeywordRedirect;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];keyword[unique=true];matchType(code)[unique=true];redirect(&redirectRefID);ignoreCase[default=true]
+ ;;;"加速器";EXACT;$contentCatalogName-redirectRefID-accelerator;
+ ;;;"购物车";EXACT;$contentCatalogName-redirectRefID-basket;
+ ;;;"购物车";EXACT;$contentCatalogName-redirectRefID-cart;
+ ;;;"帮助";EXACT;$contentCatalogName-redirectRefID-help;
+ ;;;"hymacc";EXACT;$contentCatalogName-redirectRefID-hymacc;
+
+# Keyword Redirects (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrFacetSearchKeywordRedirect;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];keyword[unique=true];matchType(code)[unique=true];redirect(&redirectRefID);ignoreCase[default=true]
+
+INSERT_UPDATE SolrFacetSearchKeywordRedirect;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];keyword[unique=true];matchType(code)[unique=true];redirect(&redirectRefID);ignoreCase[default=true]
+ ;;;"450d";CONTAINS;$contentCatalogName-redirectRefID-1382080;
+ ;;;"500d";CONTAINS;$contentCatalogName-redirectRefID-2053266;
+ ;;;"a100";CONTAINS;$contentCatalogName-redirectRefID-816780;
+
+# Starts With Keyword Redirects (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrFacetSearchKeywordRedirect;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];keyword[unique=true];matchType(code)[unique=true];redirect(&redirectRefID);ignoreCase[default=true]
+ ;;;"发货";STARTS_WITH;$contentCatalogName-redirectRefID-shipping;

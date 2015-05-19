@@ -1,0 +1,78 @@
+$catalog-id=testCatalog
+$catalog-version=Online
+$testCategory0-id=testCategory0
+$testCategory1-id=testCategory1
+$catalogVersion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$baseProduct=baseProduct(code, catalogVersion(catalog(id[default='$catalog-id']),version[default='$catalog-version']))
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;
+;de;true;;;;;;
+;en;true;;;;;;
+
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];;;;;
+;de;Deutsch;German;;;;;
+;en;Englisch;English;;;;;
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=de];name[lang=en];conversion;;;
+;pieces;pieces;pieces;pieces;1
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;E
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$
+
+INSERT_UPDATE Title;code[unique=true];name[lang=de];name[lang=en];;
+;dr;Dr.;dr.;;
+;prof;Prof.;prof.;;
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=de];name[lang=en];active;
+;DE;Deutschland;Germany;true;
+;US;Vereinigte Staaten von Amerika;United States of America;true;
+
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid);
+;cockpitgroup;;
+;customergroup;cockpitgroup;
+
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password
+;ahertz;K2006-C0005;Anja Hertz;;en;USD;customergroup;1234
+;abrode;K2006-C0006;Arin Brode;;en;USD;customergroup;1234
+;dejol;K2006-C0007;Max de Jol;;en;USD;customergroup;1234
+;promoted;K2006-C0007;Max promo;;en;EUR;customergroup;1234
+
+INSERT_UPDATE Address;owner(Customer.uid)[unique=true];streetname[unique=true];streetnumber[unique=true];postalcode[unique=true];duplicate[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;gender(code);middlename;phone1;title(code);url;company;fax;department
+;ahertz;Zennerstrasse;45;28277;false;Bremen;DE;false;false;false;true;Anja;Hertz;ahertz@na-du.de;FEMALE;;;;;hybris GmbH
+;ahertz;Schiller Allee;8;28277;false;Bremen;DE;true;true;true;false;Anja;Hertz;ahertz@na-du.de;FEMALE;;;;;hybris GmbH
+;abrode;Feldweg;7;18551;false;Sagard;DE;true;false;true;true;Arin;Brode;arin@wow-europe.com;MALE;;;;;hybris GmbH
+
+INSERT_UPDATE Customer;uid[unique=true];defaultPaymentaddress(owner(Customer.uid), streetname, streetnumber, postalcode,duplicate);defaultShipmentAddress(owner(Customer.uid), streetname, streetnumber, postalcode, duplicate)
+;ahertz;ahertz:Schiller Allee:8:28277:false;ahertz:Zennerstrasse:45:28277:false
+;abrode;abrode:Feldweg:7:18551:false;abrode:Feldweg:7:18551:false
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog
+;$catalog-id;$catalog-id;$catalog-id;true
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode)
+;$catalog-id;$catalog-version;true;EUR;de,en
+
+INSERT_UPDATE Category;code[unique=true];$catalogVersion;name[lang=de];name[lang=en];$supercategories
+;$testCategory0-id;;$testCategory0-id;$testCategory0-id;
+;$testCategory1-id;;$testCategory1-id;$testCategory1-id;$testCategory0-id
+
+INSERT_UPDATE Tax;code[unique=true];name[lang=de];name[lang=en];value;currency(isocode)
+;VAT_FULL;MwSt voll;VAT full;19;
+;VAT_HALF;MwSt halb;VAT half;7;
+
+INSERT_UPDATE ProductTaxGroup;code[unique=true];name[lang=de];name[lang=en];
+;Tax_Full;voller Steuersatz;full tax rate;
+;Tax_Half;halber Steuersatz;half tax rate;
+
+INSERT_UPDATE TaxRow;pg(code)[unique=true];tax(code)[unique=true];value;currency(isocode);
+;Tax_Full;VAT_FULL;20;
+;Tax_Half;VAT_HALF;10;
+
+INSERT_UPDATE Product;code[unique=true];$catalogVersion;name[lang=de];name[lang=en];unit(code);$prices;approvalStatus(code);startLineNumber;$supercategories;Europe1PriceFactory_PTG(code);varianttype(code)
+;HW1210-3422;;baseDE;baseEN;pieces;1 EUR;approved;0;$testCategory0-id;Tax_Full;
+;HW1210-3423;;var1DE;var1EN;pieces;4 EUR;approved;0;$testCategory1-id;Tax_Half;
+;HW1210-3424;;varDepth2DE;varDepth2EN;pieces;1 EUR;approved;0;$testCategory1-id;Tax_Half;
+;HW1210-3425;;varMissingPrice0DE;varMissingPrice0EN;pieces;2 EUR;approved;0;$testCategory1-id;Tax_Half;

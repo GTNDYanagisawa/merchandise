@@ -1,0 +1,158 @@
+*** Settings ***
+Resource    entitlements/Product_Keywords.txt
+Resource    entitlements/Entitlement_Keywords.txt
+Resource    common/EntitlementStartup_Keywords.txt
+
+Test Setup        import entitlement sampledata
+Test Teardown     reset system
+
+*** Test Cases ***
+
+Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_x1
+	[Documentation]    Verifies addition of non metered entitlement with timeframe conditions
+	...                All entitlement details(name/usageUnit) are defined in impex file: testEntitlements.csv
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "day", start "1" and duration "1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>1</timeUnitStart>
+			<timeUnitDuration>1</timeUnitDuration>
+		</entitlement>
+	</entitlements>"
+
+Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_x2
+	[Documentation]    Verifies addition of 2 entitlement with timeframe conditions
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "day", start "1" and duration "1"
+	for product "P1" add non metered entitlement "NME2" with conditionTimeframe having timeUnit "month", start "1" and duration "0"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>1</timeUnitStart>
+			<timeUnitDuration>1</timeUnitDuration>
+		</entitlement>
+		<entitlement>
+			<name>Non-Metered Entitlement 2</name>
+			<quantity>0</quantity>
+			<timeUnit>MONTH</timeUnit>
+			<timeUnitStart>1</timeUnitStart>
+			<timeUnitDuration>0</timeUnitDuration>
+		</entitlement>
+	</entitlements>"
+
+# Next test do not work because validation was limited by NON-470
+#Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_TimeUnit_UnknownValue_FAIL
+#	[Documentation]    Verifies if creating entitlement with timeframe condition fails for unknown time unit value
+#	create product "P1"
+#	Run keyword and expect error
+#	...                Import of resource impex-templates/entitlement-insert.impex.vm failed: [de.hybris.platform.entitlementservices.interceptor.impl.ProductEntitlementValidateInterceptor*
+#	...                for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "unknownTimeUnitValue", start "1" and duration "1"
+	
+#Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_Without_TimeUnit_FAIL
+#	[Documentation]    Verifies if creating entitlement with timeframe condition fails for no time unit value
+#	create product "P1"
+#	Run keyword and expect error
+#	...                Import of resource impex-templates/entitlement-insert.impex.vm failed: [de.hybris.platform.entitlementservices.interceptor.impl.ProductEntitlementValidateInterceptor*
+#	...                for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "", start "1" and duration "1"
+
+#Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_StartTime_Only_FAIL
+#	[Documentation]    Verifies if creating entitlement with timeframe condition fails for no time unit and duration value
+#	create product "P1"
+#	Run keyword and expect error
+#	...                Import of resource impex-templates/entitlement-insert.impex.vm failed: [de.hybris.platform.entitlementservices.interceptor.impl.ProductEntitlementValidateInterceptor*
+#	...                for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "", start "1" and duration ""
+
+#Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_TimeUnit_Only_FAIL
+#	[Documentation]    Verifies if creating entitlement with timeframe condition fails for no start and duration value
+#	create product "P1"
+#	Run keyword and expect error
+#	...                Import of resource impex-templates/entitlement-insert.impex.vm failed: [de.hybris.platform.entitlementservices.interceptor.impl.ProductEntitlementValidateInterceptor*
+#	...                for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "day", start "" and duration ""
+
+Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_TimeUnit_Without_StartTime_FAIL
+	[Documentation]    Verifies if creating entitlement with timeframe condition fails for no start value
+	create product "P1"
+	Run keyword and expect error
+	...                Import of resource impex-templates/entitlement-insert.impex.vm failed: [de.hybris.platform.entitlementservices.interceptor.impl.ProductEntitlementValidateInterceptor*
+	...                for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "day", start "" and duration "1"
+
+Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_Duration_only_FAIL
+	[Documentation]    Verifies if creating entitlement with timeframe condition fails for no time unit and start value
+	create product "P1"
+	Run keyword and expect error
+	...                Import of resource impex-templates/entitlement-insert.impex.vm failed: [de.hybris.platform.entitlementservices.interceptor.impl.ProductEntitlementValidateInterceptor*
+	...                for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "", start "" and duration "1"
+
+Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_Negative_StartTime_FAIL
+	[Documentation]    Verifies if creating entitlement with timeframe condition fails for negative start time
+	create product "P1"
+	Run keyword and expect error
+	...                Import of resource impex-templates/entitlement-insert.impex.vm failed: [de.hybris.platform.entitlementservices.interceptor.impl.ProductEntitlementValidateInterceptor*
+	...                for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "day", start "-1" and duration ""
+
+Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_Negative_Duration_FAIL
+	[Documentation]    Verifies if creating entitlement with timeframe condition fails for negative duration
+	create product "P1"
+	Run keyword and expect error
+	...                Import of resource impex-templates/entitlement-insert.impex.vm failed: [de.hybris.platform.entitlementservices.interceptor.impl.ProductEntitlementValidateInterceptor*
+	...                for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "day", start "10" and duration "-10"
+
+Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_Duration_NoValue_PASS
+	[Documentation]    Verifies if creating entitlement with timeframe condition passes if duration value is empty
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "day", start "1" and duration ""
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>1</timeUnitStart>
+		</entitlement>
+	</entitlements>"
+
+Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_Duration_ZeroValue_PASS
+	[Documentation]    Verifies if creating entitlement with timeframe condition fails for duration value =0
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "day", start "1" and duration "0"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<timeUnit>DAY</timeUnit>
+			<timeUnitStart>1</timeUnitStart>
+			<timeUnitDuration>0</timeUnitDuration>
+		</entitlement>
+	</entitlements>"
+
+Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_Duration_UnlimitedValue_PASS
+	[Documentation]    Verifies if creating entitlement with timeframe condition fails for negative duration value
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "day", start "1" and duration "0"
+	for product "P1" verify that the XML for entitlements matches "<entitlements>
+		<entitlement>
+			<timeUnitDuration>0</timeUnitDuration>
+			<timeUnitStart>1</timeUnitStart>
+			<name>Non-Metered Entitlement 1</name>
+			<quantity>0</quantity>
+			<timeUnit>DAY</timeUnit>
+		</entitlement>
+	</entitlements>"
+
+Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_Start_NonNumericValue_FAIL
+	[Documentation]    Verifies if creating entitlement with timeframe condition fails for string start value
+	create product "P1"
+	Run keyword and expect error
+	...                Import of resource impex-templates/entitlement-insert.impex.vm failed: cannot parse number 'a' with format specified pattern '#,##0' due to Unparseable number: "a"
+	...                for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "day", start "a" and duration "1"
+	
+Test_Entitlement_CreateAndVerifyXML_TimeframeCondition_Duration_NonNumericValue_FAIL
+	[Documentation]    Verifies if creating entitlement with timeframe condition fails for string duration value
+	create product "P1"
+	Run keyword and expect error
+	...                Import of resource impex-templates/entitlement-insert.impex.vm failed: cannot parse number 'a' with format specified pattern '#,##0' due to Unparseable number: "a"
+	...                for product "P1" add non metered entitlement "NME1" with conditionTimeframe having timeUnit "day", start "1" and duration "a"	

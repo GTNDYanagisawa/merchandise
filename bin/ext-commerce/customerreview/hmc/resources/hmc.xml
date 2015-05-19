@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+	[y] hybris Platform
+	
+	Copyright (c) 2000-2014 hybris AG
+	All rights reserved.
+	
+	This software is the confidential and proprietary information of hybris
+	("Confidential Information"). You shall not disclose such Confidential
+	Information and shall use it only in accordance with the terms of the
+	license agreement you entered into with hybris.
+	
+	
+-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+	<!-- Configuration for extension customerreview -->
+	<explorertree mode="append">
+		<group name="marketing" mode="append">
+			<typeref type="CustomerReview"
+				description="typeref.customerreview.description" />
+		</group>
+	</explorertree>
+
+	<type name="CustomerReview" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tab name="administration" mode="append">
+					<section name="section.metadata" mode="append">
+						<listlayout>
+							<attribute name="creationtime"
+								mode="delete" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="CustomerReview" mode="append"
+		icon="ext/customerreview/images/customer_review.gif">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="rating"></condition>
+				<condition attribute="product"></condition>
+				<condition attribute="user"></condition>
+				<condition attribute="headline" operator="contains"></condition>
+				<condition attribute="blocked"></condition>
+				<condition attribute="creationtime"></condition>
+				<condition attribute="approvalStatus"/>
+				<condition attribute="language"/>
+			</search>
+
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+						<attribute name="rating" width="80" />
+						<attribute name="product" width="200" />
+						<attribute name="user" width="150" />
+						<attribute name="headline" width="200" />
+						<attribute name="blocked" width="60" />
+						<attribute name="creationtime" width="200" />
+						<attribute name="approvalStatus"/>
+					  	<attribute name="language"/>						
+					</itemlayout>
+				</listview>
+			</result>
+
+			<editor mode="append">
+				<essentials>
+					<listlayout>
+						<attribute name="product" />
+						<attribute name="rating"></attribute>
+						<attribute name="user" />
+						<attribute name="blocked" />
+						<attribute name="creationtime" editable="false"
+							mode="replace">
+						</attribute>
+					</listlayout>
+				</essentials>
+				<tab name="customerreview.tabs.commons" mode="append">
+					<section name="customerreview.sections.commons">
+						<listlayout>
+							<attribute name="headline" />
+							<attribute name="comment" width="400">
+								<textareaeditor rows="10" cols="50"
+									expanded="true">
+								</textareaeditor>
+							</attribute>
+							<attribute name="alias" />
+							<attribute name="approvalStatus" />
+							<attribute name="language" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="rating" />
+				<attribute name="headline" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+
+	<type name="User" mode="append">
+		<organizer>
+			<editor>
+				<tab name="tab.community" mode="append" position="11">
+					<section name="user.sections.customerreviews">
+						<listlayout>
+							<text name="text.customerreviews.description" />
+							<attribute name="customerReviews">
+								<referencecollectioneditor
+									presetattribute="user" add="false">
+									<itemlayout>
+										<attribute name="product"
+											width="200" />
+										<attribute name="headline"
+											width="200" />
+										<attribute name="rating" />
+										<attribute name="blocked" />
+										<attribute name="creationtime" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+
+	<type name="Product" mode="append">
+		<organizer>
+			<editor>
+				<tab name="tab.community" mode="append" position="11">
+					<section name="product.sections.customerreviews">
+						<listlayout>
+							<text name="text.customerreviews.description" />
+							<attribute name="productReviews">
+								<referencecollectioneditor
+									presetattribute="product">
+									<itemlayout>
+										<attribute name="user"
+											width="200" />
+										<attribute name="headline"
+											width="200" />
+										<attribute name="rating" />
+										<attribute name="blocked" />
+										<attribute name="creationtime" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="averageRating" width="50" />
+							<attribute name="numberOfReviews" width="50" />
+						</listlayout>
+
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+</configuration>

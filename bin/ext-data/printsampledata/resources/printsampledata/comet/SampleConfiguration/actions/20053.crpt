@@ -1,0 +1,140 @@
+
+#include "internal/types.h"
+
+float absf (float a)
+{
+	if (a < 0.0)	return -1.0*a;
+	return a;
+}
+
+int getBoolParam (char * p, int defaultValue)
+{
+	if (!p || !*p)				return defaultValue;
+	
+	if (strcmp (p, "1") == 0)		return 1;
+	if (strcmp (p, "yes") == 0)		return 1;
+	if (strcmp (p, "Yes") == 0)		return 1;
+	if (strcmp (p, "YES") == 0)	return 1;
+	if (strcmp (p, "ja") == 0)		return 1;
+	if (strcmp (p, "Ja") == 0)		return 1;
+	if (strcmp (p, "JA") == 0)		return 1;
+	
+	if (strcmp (p, "0") == 0)		return 0;
+	if (strcmp (p, "no") == 0)		return 0;
+	if (strcmp (p, "No") == 0)		return 0;
+	if (strcmp (p, "NO") == 0)		return 0;
+	if (strcmp (p, "nein") == 0)	return 0;
+	if (strcmp (p, "Nein") == 0)	return 0;
+	if (strcmp (p, "NEIN") == 0)	return 0;
+	
+	return defaultValue;
+}
+
+float getFloatParam (char * p, float defaultValue)
+{
+	if (!p || !*p)				return defaultValue;
+	return fval (p);
+}
+
+int fit_scaling (float scale, int what, float * imageScaleX, float * imageScaleY)
+{	
+	if (scale > 0.0)
+	{
+		if ((what > 0 && *imageScaleX > scale) || (what < 0 && *imageScaleX < scale))
+		{
+			*imageScaleY	= *imageScaleY * scale / *imageScaleX;
+			*imageScaleX	= scale;
+		}
+		if ((what > 0 && *imageScaleY > scale) || (what < 0 && *imageScaleY < scale))
+		{
+			*imageScaleX	= *imageScaleX * scale / *imageScaleY;
+			*imageScaleY	= scale;
+		}
+	}
+	return 0;
+}
+
+int main ()
+{
+	int 		useMinScale			= getBoolParam (gParam4, 0);
+	int		refPoint				= kRefPointTopLeft;
+	float		minScale				= 1.0;
+	float		maxScale				= 100000.0;
+	float		imageScaleOldX, imageScaleOldY, imageScaleX, imageScaleY, newScale;
+	int          	err;
+	
+	if (strcmp (gParam2, "oben") == 0)
+	{
+		if (strcmp (gParam1, "links") == 0)	refPoint	= kRefPointTopLeft;
+		if (strcmp (gParam1, "mitte") == 0)	refPoint	= kRefPointTopCenter;
+		if (strcmp (gParam1, "rechts") == 0)	refPoint	= kRefPointTopRight;
+	}
+	if (strcmp (gParam2, "mitte") == 0)
+	{
+		if (strcmp (gParam1, "links") == 0)	refPoint	= kRefPointLeftCenter;
+		if (strcmp (gParam1, "mitte") == 0)	refPoint	= kRefPointCenter;
+		if (strcmp (gParam1, "rechts") == 0)	refPoint	= kRefPointRightCenter;
+	}
+	if (strcmp (gParam2, "unten") == 0)
+	{
+		if (strcmp (gParam1, "links") == 0)	refPoint	= kRefPointBottomLeft;
+		if (strcmp (gParam1, "mitte") == 0)	refPoint	= kRefPointBottomCenter;
+		if (strcmp (gParam1, "rechts") == 0)	refPoint	= kRefPointBottomRight;
+	}
+	
+	if (strlen (gParam3) > 0)
+	{
+		minScale = getFloatParam (strtoken (gParam3, "-", 0), 1.0) / 100.0;
+		maxScale = getFloatParam (strtoken (gParam3, "-", 1), 10000.0) / 100.0;
+	}
+	
+	// Welche Skalierung soll verwendet werden
+	// !!Haben die Skalierungen unterschiedliche Vorzeichen, klappt das so nicht!!
+	if (absf (gResizeX) < absf (gResizeY))
+	{
+		if (useMinScale)				newScale = gResizeX;
+		else						newScale = gResizeY;
+	}
+	else
+	{
+		if (useMinScale)				newScale = gResizeY;
+		else						newScale = gResizeX;
+	}
+	
+	// Ermitteln der aktuellen Bildskalierung
+	err = frame::image_getscale(gFrame, &imageScaleOldX, &imageScaleOldY);
+	if (err != 0)
+	{
+		wlog("", "Error [%i], message: [%s], while getting image scale (1) in script 20053.crpt, method main().", err, serror(err));
+	}
+	else
+	{
+		imageScaleX 			= imageScaleOldX * newScale;
+		imageScaleY 			= imageScaleOldY * newScale;
+
+		err = frame::image_getscale(gFrame,&imageScaleOldX,&imageScaleOldY);
+		if (err != 0)
+		{
+			wlog("", "Error [%i], message: [%s], while getting image scale (2) in script 20053.crpt, method main().", err, serror(err));
+		}
+		else
+		{
+			imageScaleX 			= imageScaleOldX * newScale;
+			imageScaleY 			= imageScaleOldY * newScale;
+		
+			fit_scaling (minScale, -1, &imageScaleX, &imageScaleY);
+			fit_scaling (maxScale, 1, &imageScaleX, &imageScaleY);
+			
+			// Bild skalieren
+			err = frame::image_scale(gFrame, imageScaleX, imageScaleY, refPoint);
+			{
+				wlog("", "Error [%i], message: [%s], while scaling image in script 20053.crpt, method main().", err, serror(err));
+			}
+		}
+	}
+
+	return 0;
+}
+
+
+

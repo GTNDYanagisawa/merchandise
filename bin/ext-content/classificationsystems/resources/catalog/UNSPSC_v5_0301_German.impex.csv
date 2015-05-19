@@ -1,0 +1,54 @@
+# ---------------------------------------------------------
+# --- UNSPSC 5.0301 
+# --- create system and version
+# ---------------------------------------------------------
+
+#% impex.info("creating system $systemName $systemVersion ...");
+
+INSERT ClassificationSystem; id[unique=true]
+; $systemName ;
+
+INSERT ClassificationSystemversion; version[unique=true] ; catalog(id)[unique=true]; inclPacking[default=true]; inclDuty[default=true]; inclFreight[default=true]; inclAssurance[default=true];
+; $systemVersion ; $systemName;
+
+#% impex.info("done creating system $systemName $systemVersion.");
+
+# ---------------------------------------------------------
+# --- UNSPSC 5.0301
+# --- create classes 
+# ---------------------------------------------------------
+#% impex.info("creating $systemName $systemVersion classes...");
+
+$sysVer=catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion'])
+
+INSERT ClassificationClass[cacheUnique=true]; $sysVer[virtual=true,unique=true]; code[unique=true]; name[lang='de']; name[lang='en'];
+
+"#% 
+impex.includeExternalData( 
+	new de.hybris.platform.catalog.jalo.classification.unspsc.UNSPSCReader( 
+	   impex.findExternalDataMedia(""UNSPSC_v5_0301_German.csv""), ""Windows-1252"", false 
+	), 1, -1 
+);"
+
+#% impex.info("done creating $systemName $systemVersion classes.");
+
+
+# ---------------------------------------------------------
+# --- UNSPSC 5.0301
+# --- assign classes to superclasses 
+# ---------------------------------------------------------
+#% impex.info("assigning $systemName $systemVersion classes to superclasses...");
+
+$superClass=source(Category.code,Category.catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+$class=target(Category.code,Category.catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']))
+
+INSERT CategoryCategoryRelation[cacheUnique=true]; $class[unique=true]; ; ; $superClass[unique=true]
+
+"#% 
+impex.includeExternalData( 
+	new de.hybris.platform.catalog.jalo.classification.unspsc.UNSPSCReader( 
+	   impex.findExternalDataMedia(""UNSPSC_v5_0301_German.csv""), ""Windows-1252"", true 
+	), 1, -1 
+);"
+
+#% impex.info("completed $systemName $systemVersion.");

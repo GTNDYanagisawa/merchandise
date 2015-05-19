@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  [y] hybris Platform
+ 
+  Copyright (c) 2000-2014 hybris AG
+  All rights reserved.
+ 
+  This software is the confidential and proprietary information of hybris
+  ("Confidential Information"). You shall not disclose such Confidential
+  Information and shall use it only in accordance with the terms of the
+  license agreement you entered into with hybris.
+ 
+  
+--><beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans            http://www.springframework.org/schema/beans/spring-beans-3.1.xsd            http://www.springframework.org/schema/context            http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+	<!-- From servicelayer-mock-base-test.xml -->
+	<bean abstract="true" class="de.hybris.platform.servicelayer.internal.service.AbstractService" id="abstractService">
+		<property name="currentTenant" ref="tenantFactory"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.servicelayer.tenant.TestTenantFactory" id="tenantFactory"/>
+
+	<bean class="de.hybris.platform.sap.core.test.session.SAPMockSessionService" id="sessionService" parent="abstractService">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias alias="modelService" name="defaultModelService"/>
+	<bean class="de.hybris.platform.servicelayer.model.MockModelService" id="defaultModelService" parent="abstractService"/>
+
+	<bean class="de.hybris.platform.servicelayer.cluster.MockClusterService" id="clusterService" parent="abstractService">
+		<property name="clusterId" value="0"/>
+		<property name="clusterIslandId" value="0"/>
+	</bean>
+
+	<bean class="de.hybris.platform.servicelayer.tenant.impl.TestTenantService" id="tenantService" parent="abstractService">
+		<property name="currentTenant" ref="tenantFactory"/>
+	</bean>
+	
+	<bean id="eventService" class="de.hybris.platform.servicelayer.event.impl.DefaultEventService" parent="abstractService">
+		<property name="tenantService" ref="tenantService"/>
+		<property name="clusterService" ref="clusterService"/>
+		<property name="applicationEventMulticaster" ref="applicationEventMulticaster"/>
+		<property name="eventSender" ref="springEventSender"/>
+	</bean>	
+
+	<!-- Register a new multicaster to replace Spring's default one. The id of the bean *must* be "applicationEventMulticaster".-->
+	<bean id="applicationEventMulticaster" class="de.hybris.platform.servicelayer.event.impl.HybrisApplicationEventMulticaster" />
+
+	<bean id="springEventSender" class="de.hybris.platform.servicelayer.event.impl.SpringEventSender"/>		
+
+	<!-- Property support -->
+	<bean id="hybrisProperties" class="de.hybris.platform.servicelayer.config.impl.HybrisPropertiesFactory" scope="singleton"/>
+	
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" scope="singleton">
+  		<property name="properties" ref="hybrisProperties"/>
+	</bean>
+
+	<!-- For test support -->
+	<alias alias="sapCoreApplicationContextProvider" name="sapCoreDefaultApplicationContextProvider"/>
+	<bean class="de.hybris.platform.sap.core.test.beans.ApplicationContextProvider" id="sapCoreDefaultApplicationContextProvider"/>
+
+</beans>

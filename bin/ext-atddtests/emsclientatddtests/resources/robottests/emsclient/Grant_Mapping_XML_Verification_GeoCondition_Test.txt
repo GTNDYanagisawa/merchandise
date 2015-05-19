@@ -1,0 +1,121 @@
+*** Settings ***
+Resource          EmsClient_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+
+
+*** Test Cases ***
+
+Test_Grant_Mapping_XML_Verification_GeoCondition_ValidPath_No1_PASS
+	[Documentation]    Create entitlement test.
+	${entitlementData} =         build entitlement with id "entitlementId" and geoCondition "A" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData>
+		<grantTime>2012-07-11T03:21:15Z</grantTime>
+		<userId/>
+		<grantSource/>
+		<grantSourceId/>
+		<entitlementType>entitlementId</entitlementType>
+		<status>ACTIVE</status>
+		<conditions>
+			<com.hybris.services.entitlements.condition.ConditionData>
+				<properties>
+					<entry>
+						<string>geoPath</string>
+						<string>A</string>
+					</entry>
+				</properties>
+				<type>geo</type>
+			</com.hybris.services.entitlements.condition.ConditionData>
+		</conditions>
+	</com.hybris.services.entitlements.api.GrantData>"
+	
+Test_Grant_Mapping_XML_Verification_GeoCondition_ValidPath_No2_PASS
+	[Documentation]    Create entitlement test.
+	${entitlementData} =         build entitlement with id "entitlementId" and geoCondition "A/B" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData>
+		<grantTime>2012-07-11T03:21:15Z</grantTime>
+		<userId/>
+		<grantSource/>
+		<grantSourceId/>
+		<entitlementType>entitlementId</entitlementType>
+		<status>ACTIVE</status>
+		<conditions>
+			<com.hybris.services.entitlements.condition.ConditionData>
+				<properties>
+					<entry>
+						<string>geoPath</string>
+						<string>A/B</string>
+					</entry>
+				</properties>
+				<type>geo</type>
+			</com.hybris.services.entitlements.condition.ConditionData>
+		</conditions>
+	</com.hybris.services.entitlements.api.GrantData>"
+	
+Test_Grant_Mapping_XML_Verification_GeoCondition_ValidPath_No3_PASS
+	[Documentation]    Create entitlement test.
+	${entitlementData} =         build entitlement with id "entitlementId" and geoCondition "A/B/C" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData>
+		<grantTime>2012-07-11T03:21:15Z</grantTime>
+		<userId/>
+		<grantSource/>
+		<grantSourceId/>
+		<entitlementType>entitlementId</entitlementType>
+		<status>ACTIVE</status>
+		<conditions>
+			<com.hybris.services.entitlements.condition.ConditionData>
+				<properties>
+					<entry>
+						<string>geoPath</string>
+						<string>A/B/C</string>
+					</entry>
+				</properties>
+				<type>geo</type>
+			</com.hybris.services.entitlements.condition.ConditionData>
+		</conditions>
+	</com.hybris.services.entitlements.api.GrantData>"
+
+Test_Grant_Mapping_XML_Verification_GeoCondition_MultipleConditionEntries
+	[Documentation]    Create entitlement test.
+	${entitlementData} =         build entitlement with id "entitlementId" and geoCondition "A/B/Omsk, Z, X/C, 1/2/3" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData>
+		<grantTime>2012-07-11T03:21:15Z</grantTime>
+		<userId/>
+		<grantSource/>
+		<grantSourceId/>
+		<entitlementType>entitlementId</entitlementType>
+		<status>ACTIVE</status>
+		<conditions>
+			<com.hybris.services.entitlements.condition.ConditionData>
+				<properties>
+					<entry>
+						<string>geoPath</string>
+						<string>A/B/Omsk, Z, X/C, 1/2/3</string>
+					</entry>
+				</properties>
+				<type>geo</type>
+			</com.hybris.services.entitlements.condition.ConditionData>
+		</conditions>
+	</com.hybris.services.entitlements.api.GrantData>"		
+
+Test_Grant_Mapping_XML_Verification_GeoCondition_Empty_PASS
+	[Documentation]    Validates creation entitlement with empty geo condition.
+	${entitlementData} =         build entitlement with id "entitlementId" and geoCondition "" granted at "2012-07-11T03:21:15Z"
+	for entitlement "${entitlementData}" verify that the XML for grant matches "<com.hybris.services.entitlements.api.GrantData>
+		<grantTime>2012-07-11T03:21:15Z</grantTime>
+		<userId/>
+		<grantSource/>
+		<grantSourceId/>
+		<entitlementType>entitlementId</entitlementType>
+		<status>ACTIVE</status>
+		<conditions>
+			<com.hybris.services.entitlements.condition.ConditionData>
+				<properties>
+					<entry>
+						<string>geoPath</string>
+						<string></string>
+					</entry>
+				</properties>
+				<type>geo</type>
+			</com.hybris.services.entitlements.condition.ConditionData>
+		</conditions>
+	</com.hybris.services.entitlements.api.GrantData>"

@@ -1,0 +1,33 @@
+$solrValueRanges=solrValueRanges(name);
+$defaultSortOrder=defaultSortOrder;
+$document=document(code);
+$solrSearchConfig=solrSearchConfig(pageSize);
+$catalogVersions=catalogVersions(catalog(id[default='hwcatalog']),version[default='Online'])[unique=true,default='hwcatalog:Online']
+$solrValueRangeSets = solrValueRangeSets(name)
+$solrValueRangeSet = solrValueRangeSet(name)
+$solrIndexerQueries = solrIndexerQueries(identifier)
+$solrIndexedProperties = solrIndexedProperties(name)
+$solrIndexedTypes = solrIndexedTypes(identifier)
+;;
+;;
+INSERT_UPDATE  SolrSearchConfig;pageSize[unique=true];$defaultSortOrder;description;
+;20;score;page size: 20, sort order:score;
+;;
+INSERT_UPDATE SolrIndexedProperty;name[unique=true];type(code);sortableType(code);facet;exportId;
+;code;string;;true;code_id;
+;name;text;sortabletext;true;;
+;;
+INSERT_UPDATE SolrIndexerQuery;identifier[unique=true];type(code);query;injectLastIndexTime;injectCurrentTime;injectCurrentDate;user(uid);solrIndexerQueryParameters(name);
+;productFull;full;SELECT {pk} FROM {Product};FALSE;FALSE;FALSE;anonymous;;
+;;
+INSERT_UPDATE SolrIndexedType;identifier[unique=true];type(code);$solrIndexerQueries;$solrIndexedProperties;variant;identityProvider;modelLoader;
+;product;Product;productFull;code,name;false;;;
+;;
+INSERT_UPDATE SolrIndexConfig;name[unique=true];batchSize;exportPath;
+;batch size 100;100;;
+;;
+INSERT_UPDATE SolrServerConfig;name[unique=true];mode(code);embeddedMaster;
+;embeddedTest;embedded;true;
+;;
+INSERT_UPDATE  SolrFacetSearchConfig;name[unique=true];description;$document;$solrSearchConfig;currencies(isocode);languages(isocode);$catalogVersions;$solrValueRangeSets;$solrIndexedTypes;solrServerConfig(name);solrIndexConfig(name);
+;ConfigWithExportIds;test;;20;;;testCatalog:Online;;product;embeddedTest;batch size 100;

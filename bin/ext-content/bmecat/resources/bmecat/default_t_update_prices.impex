@@ -1,0 +1,70 @@
+## default impex script for T_UPDATE_PRICES
+## the user can also upload his impex script himself
+
+#% impex.setLocale( Locale.GERMAN );
+
+##****************HEADER starts****************
+
+#% if: impex.findExternalDataMedia("customers.csv") != null;
+INSERT_UPDATE COMPANY; locname[lang=$lang_iso]; uid[unique=true]; dunsID; ilnID; buyerSpecificID; supplierSpecificID;
+#% impex.includeExternalDataMedia("customers.csv");
+#% endif:
+
+INSERT_UPDATE Language; isocode[unique=true]; active;
+;$lang_iso;true
+
+##% impex.includeExternalDataMedia("catalog.csv");
+## not necessary to import the catalog.csv, the catalog attributes are saved as constants
+INSERT_UPDATE CATALOG; id[unique=true]; name[lang=$lang_iso]; buyer(uid); supplier(uid);
+;$catalog_id;$catalog_name;;
+
+#% if: impex.findExternalDataMedia("catalogversion.csv") != null
+INSERT_UPDATE CATALOGVERSION; catalog(id)[default=$catalog_id, unique=true]; version[unique=true, default=$catalog_version]; languages(isocode)[mode=append, default=$lang_iso]; inclAssurance; inclDuty; inclFreight; inclPacking; defaultCurrency(isocode); generationDate;
+#% impex.includeExternalDataMedia("catalogversion.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("countries.csv")!=null
+INSERT_UPDATE COUNTRY; isocode[unique=true]; ; active[virtual=true, default=true];
+#% impex.includeExternalDataMedia("countries.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("regions.csv")!=null
+INSERT_UPDATE REGION; country(isocode); isocode[unique=true]; active[virtual=true, default=true];
+#% impex.includeExternalDataMedia("regions.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("agreements.csv") !=null
+INSERT_UPDATE AGREEMENT; Catalog(id); id[unique=true]; startdate; enddate; buyer(uid); supplier(uid); currency(isocode); 
+#% impex.includeExternalDataMedia("agreements.csv");
+#% endif:
+
+## zip of pobox is just included in the csv file, but cannot be imported
+## the street can be separated as streetname and streetnumber
+#% if: impex.findExternalDataMedia("addresses.csv")!=null
+INSERT_UPDATE ADDRESS; owner(Principal.uid)[unique=true]; building; department; company; lastname; streetname; postalcode; pobox; ; town; region(isocode); country(isocode); phone1; fax; email; publicKey; url; remarks; 
+#% impex.includeExternalDataMedia("addresses.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("medias.csv")!=null
+INSERT_UPDATE MEDIA; code[unique=true]; catalogVersion(catalog(id),version)[default=$catalog_id:$catalog_version,virtual=true, unique=true]; realfilename; @media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator]; mime; description; alttext; 
+#% impex.includeExternalDataMedia("medias.csv");
+#% endif:
+
+##****************HEADER ends****************
+
+#% if: impex.findExternalDataMedia("keywords.csv")!=null
+INSERT_UPDATE Keyword; keyword[unique=true]; catalogVersion(catalog(id),version)[default=$catalog_id:$catalog_version, virtual=true, unique=true]; language(isocode)[default=$lang_iso];
+#% impex.includeExternalDataMedia("keywords.csv");
+#% endif:
+
+## delete all prices of the product first
+#% if: impex.findExternalDataMedia("productsupdateprices.csv") != null
+UPDATE PRODUCT; catalogVersion(catalog(id), version)[default=$catalog_id:$catalog_version, virtual=true, unique=true]; code[unique=true]; ; europe1Prices[];
+#% impex.includeExternalDataMedia("productsupdateprices.csv");
+#% endif:
+
+## add new prices
+#% if: impex.findExternalDataMedia("productsupdateprices.csv") != null
+INSERT_UPDATE PRODUCT; catalogVersion(catalog(id),version)[default=$catalog_id:$catalog_version, virtual=true, unique=true]; code[unique=true]; europe1Prices[mode=append, translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator];
+#% impex.includeExternalDataMedia("productsupdateprices.csv");
+#% endif:

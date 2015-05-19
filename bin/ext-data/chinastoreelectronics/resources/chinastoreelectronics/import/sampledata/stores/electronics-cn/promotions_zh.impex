@@ -1,0 +1,34 @@
+# ImpEx for Promotions for Electronics CN Store
+
+# Language
+$lang=zh
+
+# Import config properties into impex macros
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+
+# Load the storefront context root config param
+$storefrontContextRoot=$config-storefrontContextRoot
+
+UPDATE OrderThresholdDiscountPromotion;code[unique=true];messageFired[lang=$lang];
+ ;OrderThreshold15Discount;这一份订单超过了 {1} ，您节省了 {3}。;
+
+
+UPDATE ProductPercentageDiscountPromotion;code[unique=true];enabled[default=true][unique=true];messageFired[lang=$lang];name[lang=$lang];title;description;
+ ;10DiscountCanonEOS450D;;在这件商品上您可享有10％的折扣，节省了 {2}。;九折;九折;九折;
+
+
+
+UPDATE AcceleratorProductMultiBuyPromotion;code[unique=true];enabled[default=true][unique=true];messageCouldHaveFired[lang=$lang];messageFired[lang=$lang];name[lang=$lang];
+ ;MultiBuyElectronics;;购买 {0,number,integer} 卷胶卷只需 {2} - 添加 {3,number,integer} 卷即可享受优惠;同時购买 {0,number,integer} 卷只需支付 {2} - 您节省了 {4};多重优惠;
+
+
+UPDATE AcceleratorProductBOGOFPromotion;code[unique=true];enabled[default=true][unique=true];messageCouldHaveFired[lang=$lang];messageFired[lang=$lang];name[lang=$lang];
+;BOGOFElectronics;;再购买 {0,choice,1#一|1< {0,number,integer}个产品} 即可参加买{1,number,integer}赠{2,number,integer} 的活动;这些卡可用于买{0,number,integer}赠{1,number,integer}的活动 - 您已节省了{3};买一赠一;
+
+
+UPDATE ProductPerfectPartnerPromotion;code[unique=true];enabled[default=true][unique=true];messageCouldHaveFired[lang=$lang];messageFired[lang=$lang];name[lang=$lang];
+ ;PerfectPartnerElectronics;;购买 DSLR-A100H，即可用优惠价 {1} 赚买索尼电池。;同時购买 DSLR-A100H 和索尼电池 - 您节省了 {3};DSLR-A100H电池优惠;
+
+
+UPDATE ProductBundlePromotion;code[unique=true];enabled[default=true][unique=true];messageCouldHaveFired[lang=$lang];messageFired[lang=$lang];name[lang=$lang];
+ ;ProductBundleElectronics;;从我们的<a href='$storefrontContextRoot/Cameras/Hand-held-Camcorders/HDR-CX105E-Red/p/1934406' class='promotion_link'><b>索尼红色高清摄像机</b></a>套餐中购买 {0,choice,1#多个项目|1<另外 {0,number,integer} 个项目}，包括<a href='$storefrontContextRoot/Components/Power-Supplies/Battery-Chargers/AC-VQP10-CHARGER/p/278688' class='promotion_link'><b>充电器</b></a>和<a href='$storefrontContextRoot/Cameras/Camera-Accessories-Supplies/Tripods/Remote-Control-Tripod-VCT-80AV/p/1687508' class='promotion_link'><b>三脚架</b></a>，只需 {2}！;您购买的便携式摄像机套餐只需 {1}，节省了 {3};摄像机打包优惠;

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+
+
+	<!--
+		WARNING: This is the Spring WEB configuration file. If you want to
+		replace items or managers you have to do this from the extensions core
+		configuration file (mobile/resources/mobile-spring.xml)
+	-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+
+	<!--
+		Registering the hybris "tenant" scope This is the custom hybris scope
+		that manages the lifetime of a "tenant". If you do not deal with
+		tenants ("multimandantenfähigkeit"), then there is no need to
+		understand what this is for.
+	-->
+
+	<bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<props>
+				<prop key="/view/test/**">sampleConnectorController</prop>
+				<prop key="/view/page/**">viewController</prop>
+				<prop key="/gateway/bulksms">bulkSMSConnector</prop>
+			</props>
+		</property>
+		<property name="alwaysUseFullPath">
+			<value>true</value>
+		</property>
+	</bean>
+
+
+
+	<bean id="defaultParamResolver"
+		class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodNameResolver">
+		<property name="paramName">
+			<value>action</value>
+		</property>
+	</bean>
+
+	<bean id="sampleConnectorController"
+		class="de.hybris.platform.mobileservices.text.web.DemoController">
+		<property name="methodNameResolver" ref="defaultParamResolver" />
+		<property name="textService" ref="textService" />
+		<property name="modelService" ref="modelService" />
+		<property name="messageGateway" ref="incomingSMSMessageGateway" />
+		<property name="engineId" value="demoEngine" />
+	</bean>
+	
+	<bean id="bulkSMSConnector"
+		class="de.hybris.platform.mobileservices.text.web.adaptors.BulkSms">
+		<property name="messageGateway" ref="incomingSMSMessageGateway"/>
+		<property name="countryIsoCode" value="UK"/>	
+		<property name="secret" value="ad7jd8.b2d"/>
+		<property name="engineId" value="bulkSMSEngine"/>
+	</bean>
+	
+	<bean id="viewController"
+		class="org.springframework.web.servlet.mvc.UrlFilenameViewController">
+	</bean>
+
+	<bean id="genericViewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+		<property name="contentType" value="application/xhtml+xml; charset=utf-8" />
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+</beans>

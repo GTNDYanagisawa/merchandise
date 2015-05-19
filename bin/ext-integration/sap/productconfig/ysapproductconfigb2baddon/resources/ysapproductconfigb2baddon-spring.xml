@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		   http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+           
+    <!-- SystemSetup for the ysapproductconfigb2baddon -->
+    <bean id="sapProductConfigSystemSetup" class="de.hybris.platform.sap.productconfig.frontend.setup.ProductConfigSetup"  parent="abstractCoreSystemSetup">
+    </bean>
+
+    <alias name="sapProductConfigDefaultValidator" alias="sapProductConfigValidator" />
+	<bean id="sapProductConfigDefaultValidator" class="de.hybris.platform.sap.productconfig.frontend.validator.ProductConfigurationValidator">
+		<property name="numericChecker" ref="sapProductConfigNumericChecker" />
+	</bean>
+
+    <alias name="sapProductConfigDefaultNumericChecker" alias="sapProductConfigNumericChecker" />
+	<bean id="sapProductConfigDefaultNumericChecker" class="de.hybris.platform.sap.productconfig.frontend.validator.NumericCheckerImpl">
+	</bean>
+	
+	<alias name="sapProductConfigDefaultConflictChecker" alias="sapProductConfigConflictChecker" />
+	<bean id="sapProductConfigDefaultConflictChecker" class="de.hybris.platform.sap.productconfig.frontend.validator.ConflictCheckerImpl">
+	</bean>
+</beans>

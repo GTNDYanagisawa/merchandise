@@ -1,0 +1,36 @@
+$catalogVersion=catalogVersion(catalog(id[default='hwcatalog']),version[default='Online'])[unique=true,default='hwcatalog:Online'];
+
+INSERT_UPDATE PromotionGroup;Identifier[unique=true];
+;prGroup1;
+;prGroup2;
+;prGroup3;
+;prGroup4;
+;prGroup5;
+
+INSERT PromotionPriceRow;&id;Currency(isocode);price;
+;1001;EUR;200;
+
+INSERT_UPDATE ProductFixedPricePromotion;code[unique=true];enabled;products(code,$catalogVersion);PromotionGroup(Identifier);priority;productFixedUnitPrice(&id);
+;productFixedPricePromotion1;true;HW1210-3411;prGroup1;2000;1001;
+;productFixedPricePromotion2;true;HW1210-3411;prGroup2;2000;1001;
+;productFixedPricePromotion3;true;HW1210-3411;prGroup3;2000;1001;
+;productFixedPricePromotion4;true;HW1210-3411;prGroup4;2000;1001;
+;productFixedPricePromotion5;true;HW1210-3411;prGroup5;2000;1001;
+
+INSERT_UPDATE UserGroup;UID[unique=true];groups(uid)[mode=append];
+;group01;;
+;group02;;
+;group05;;
+;group11;group01;
+;group12;group05;
+
+INSERT_UPDATE Employee;UID[unique=true];password;groups(uid);
+;employee01;employee01;group11,group12;
+;employee02;employee02;group02;
+
+INSERT_UPDATE PromotionUserRestriction;descriptionPattern[unique=true, lang=en];users(uid);positive;promotion(code);
+;promotionUserRestriction1;customergroup;true;productFixedPricePromotion1;
+;promotionUserRestriction2;group01;true;productFixedPricePromotion2;
+;promotionUserRestriction3;demo;true;productFixedPricePromotion3;
+;promotionUserRestriction4;group02;true;productFixedPricePromotion4;
+;promotionUserRestriction5;group05;true;productFixedPricePromotion5;

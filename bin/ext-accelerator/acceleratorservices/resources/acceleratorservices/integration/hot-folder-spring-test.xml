@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="batchTransformerTask" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.task.ImpexTransformerTask" 
+		  init-method="initConvertersMap">
+		<property name="fieldSeparator" value="," />
+		<property name="encoding" value="UTF-8" />
+		<property name="linesToSkip" value="0"/>
+		<property name="cleanupHelper">
+			<null/><!-- not needed for tests -->
+		</property>
+	</bean>
+	
+	<!-- Transformer converters mappings -->
+	<bean id="product1Mapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="base_product" 
+		  p:converter-ref="batchProductConverter"/>
+		  
+	<bean id="product2Mapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="base_product" 
+		  p:converter-ref="batchTaxConverter"/>
+		  		  
+	<bean id="taxMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="tax" 
+		  p:converter-ref="batchTaxConverter"/>
+
+	<bean id="priceMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="price" 
+		  p:converter-ref="batchPriceConverter"/>
+		  
+	<bean id="stock1Mapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="stock" 
+		  p:converter-ref="batchStockConverter"/>	  
+	
+	<bean id="stock2Mapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="inc-stock" 
+		  p:converter-ref="batchStockIncrementalConverter"/>
+	
+	<bean id="merchandiseMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="merchandise" 
+		  p:converter-ref="batchMerchandiseConverter"/>
+
+	<!-- Converters -->
+	<bean id="batchProductConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>
+				# Insert Products
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0}</value>
+		</property>
+		<property name="type" value="Product"/>
+	</bean>
+	<bean id="batchPriceConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value># ImpEx for Importing Prices</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0}</value>
+		</property>
+	</bean>
+	<bean id="batchTaxConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>
+				# Insert tax
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0}</value>
+		</property>
+	</bean>
+	<bean id="batchStockConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>
+				# Insert stock
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0}</value>
+		</property>
+	</bean>
+	<bean id="batchStockIncrementalConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>
+				# Insert stock
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0}</value>
+		</property>
+	</bean>
+	<bean id="batchMerchandiseConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>
+				# Insert references
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0}</value>
+		</property>
+	</bean>
+</beans>

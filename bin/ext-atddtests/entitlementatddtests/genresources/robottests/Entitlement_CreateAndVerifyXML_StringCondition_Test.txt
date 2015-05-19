@@ -1,0 +1,24 @@
+*** Settings ***
+Resource    entitlements/Product_Keywords.txt
+Resource    entitlements/Entitlement_Keywords.txt
+Resource    common/EntitlementStartup_Keywords.txt
+
+Test Setup        import entitlement sampledata
+Test Teardown     reset system
+
+
+*** Test Cases ***
+
+Test_Entitlement_CreateAndVerifyXML_StringCondition_x1
+	[Documentation]    Verifies addition of 1 entitlement with string condition (non metered)
+	...                All entitlement details(name/usageUnit) are defined in impex file: testEntitlements.csv
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with stringCondition "stringCondition1"
+	for product "P1" verify that the XML for entitlements matches "<entitlements><entitlement><name>Non-Metered Entitlement 1</name><conditionString>stringCondition1</conditionString><quantity>0</quantity></entitlement></entitlements>"
+
+Test_Entitlement_CreateAndVerifyXML_StringCondition_x2
+	[Documentation]    Verifies addition of 2 entitlements with string conditions (non metered)
+	create product "P1"
+	for product "P1" add non metered entitlement "NME1" with stringCondition "stringCondition1"
+	for product "P1" add non metered entitlement "NME2" with stringCondition "stringCondition2"
+	for product "P1" verify that the XML for entitlements matches " <entitlements><entitlement><name>Non-Metered Entitlement 1</name><conditionString>stringCondition1</conditionString><quantity>0</quantity></entitlement><entitlement><name>Non-Metered Entitlement 2</name><conditionString>stringCondition2</conditionString><quantity>0</quantity></entitlement></entitlements>"

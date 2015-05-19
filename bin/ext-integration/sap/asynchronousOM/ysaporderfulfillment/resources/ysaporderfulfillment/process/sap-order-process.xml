@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+<process xmlns="http://www.hybris.de/xsd/processdefinition" start="checkSAPOrder" name="sap-order-process"
+	processClass="de.hybris.platform.orderprocessing.model.OrderProcessModel">
+
+	<action id="checkSAPOrder" bean="sapOrderexchangeCheckOrderAction">
+		<transition name="OK" to="checkSAPCustomerReplication" />
+		<transition name="NOK" to="error" />
+	</action>
+
+
+	<action id="checkSAPCustomerReplication" bean="sapCustomerexchangeCheckOrderAction">
+		<transition name="NOK" to="waitForERPCustomerReplication" />
+		<transition name="OK" to="sendOrderToErp" />
+	</action>
+
+	
+	<wait id="waitForERPCustomerReplication" then="sendOrderToErp" prependProcessCode="false">
+		<event>ERPCustomerReplicationEvent_${process.order.user.customerID}_${process.order.code}</event>
+	</wait>
+
+
+	<action id="sendOrderToErp" bean="sapOrderexchangeSendOrderToDataHubAction">
+		<transition name="OK" to="waitForERPConfirmation" />
+		<transition name="NOK" to="erpsendingerror" />
+	</action>
+
+	<wait id="waitForERPConfirmation" then="setConfirmationStatus" prependProcessCode="false">
+		<event>ERPOrderConfirmationEvent_${process.order.code}</event>
+	</wait>
+
+	<action id="setConfirmationStatus" bean="sapOrderexchangeSetConfirmationStatusAction">
+		<transition name="OK" to="waitForConsignmentCreation" />
+		<transition name="NOK" to="error" />
+	</action>
+
+	<wait id="waitForConsignmentCreation" then="waitForGoodsIssue" prependProcessCode="false">
+		<event>ConsignmentCreationEvent_${process.order.code}</event>
+	</wait>
+
+	<wait id="waitForGoodsIssue" then="setCompletionStatus" prependProcessCode="false">
+		<event>GoodsIssueEvent_${process.order.code}</event>
+	</wait>
+
+	<action id="setCompletionStatus" bean="sapOrderexchangeSetCompletionStatusAction">
+		<transition name="OK" to="success" />
+		<transition name="NOK" to="error" />
+	</action>
+
+	<action id="setCancelStatus" bean="sapOrderexchangeSetCancelAction">
+		<transition name="OK" to="canceled" />
+		<transition name="NOK" to="error" />
+	</action>
+
+
+	<end id="erpsendingerror" state="ERROR">Sending to ERP went wrong.</end>
+	<end id="error" state="ERROR">Order check failed.</end>
+	<end id="failed" state="FAILED">Order failed.</end>
+	<end id="canceled" state="SUCCEEDED">Order cancelled.</end>
+	<end id="success" state="SUCCEEDED">Order placed. Consignment created.</end>
+
+</process>

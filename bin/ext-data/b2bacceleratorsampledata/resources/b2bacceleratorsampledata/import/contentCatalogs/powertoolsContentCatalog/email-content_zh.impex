@@ -1,0 +1,20 @@
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$picture=media(code, $contentCV);
+$wideContent=CMSImageComponent,BannerComponent
+$jarResource=jar:de.hybris.platform.b2bacceleratorsampledata.constants.B2BAcceleratorSampleDataConstants&/b2bacceleratorsampledata/import
+$siteResource=jar:de.hybris.platform.b2bacceleratorsampledata.constants.B2BAcceleratorSampleDataConstants&/b2bacceleratorsampledata/import/contentCatalogs/$contentCatalog
+
+# Language
+$lang=zh
+
+# Media
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg']
+ ;;/images/theme/banner-free-delivery.jpg;banner-free-delivery.jpg;$siteResource/images/theme/banner-free-delivery.jpg;;
+ ;;images/theme/banner-sale-now-on.jpg;banner-sale-now-on.jpg;$siteResource/images/theme/banner-sale-now-on.jpg;;
+
+
+# CMS Image Components
+UPDATE CMSImageComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+ ;;EmailBannerFreeDeliveryImage;/images/theme/banner-free-delivery.jpg;
+ ;;EmailBannerSaleNowOnImage;/images/theme/banner-sale-now-on.jpg;

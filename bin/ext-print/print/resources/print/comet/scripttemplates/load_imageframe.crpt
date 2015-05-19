@@ -1,0 +1,172 @@
+/*
+ * [y] hybris Platform
+ * Script: %SCRIPT_ID%
+ * LOAD script to read the attribute value of a hybris item
+ */
+
+#include "internal/types.h"
+int kBufferSize = 50000;
+
+int main ()
+{
+	int errorcode = 0;
+	char * result = alloc( kBufferSize );
+	Query qu = sql::query( soap::connection() );
+	char * layer = alloc( 8000 );
+	char * path = alloc( 8000 );
+	float x, y, width, height, scaleX, scaleY, rotat, skew;
+
+	// Getting parameter values
+	frame::get_layer( gItem, layer );
+
+	if(qu)
+	{
+		// Creating query
+		if(query::set_method( qu, "GET_attribute" ) == 0)
+		{
+			if(	query::send( qu, "qualifier = %QUALIFIER%\n" ) &&
+				query::send( qu, "id = ?\n" ) &&
+				query::send( qu, "language = ?\n" ) &&
+				query::input( qu, kString, gRecordStringID ) &&
+				query::input( qu, kString, layer ) &&
+				query::output( qu, kString, result, kBufferSize ))
+			{
+				// Executing query
+				if(query::exec( qu ))
+				{
+					query::fetch( qu );
+				}
+				else
+				{
+					wlog("", "There was a query::exec error in template loadimageframe.crpt, method main(). \n");
+					errorcode = 1;
+				}
+			}
+			else
+			{
+				wlog("", "There was a query send/input/output error intemplate loadimageframe.crpt, method main(). \n");
+				errorcode = 2;
+			}
+		}
+		else
+		{
+			wlog("", "There was a query::set_method error in template loadimageframe.crpt, method main(). \n");
+			errorcode = 3;
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful! error in template loadimageframe.crpt, method main(). \n");
+		errorcode = 4;
+	}
+
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in template loadimageframe.crpt, method main(). \n");
+	}
+
+	if(errorcode == 0)
+	{
+		if( gNewValue != 0 )
+		{
+			// the script is called via todo list panel
+			// dont change the document, but write the database value to the variable gNewValue which is displayed in the todo list panel as comparison value
+			strcpy( gNewValue, result );
+		}
+		else
+		{
+			// Check if we got a new image path
+			if( strlen(result) <= 1 )
+			{
+				// got no new image path, so delete existing image
+				// if( frame::image_getpath(gFrame, path) )
+				if( strlen(frame::image_getpath(gFrame, path)) > 1 )
+				{
+					// there is an existing image in this frame, remove it
+					errorcode = frame::remove_image( gFrame );
+					if( errorcode != 0 )
+					{
+						wlog( "", "Error while removing old image: [%d], message: [%s]\n", errorcode, serror(errorcode) );
+					}
+				}
+			}
+			else
+			{
+				// We got a new image path, so load the new image
+				// Check if there is already an existing image
+				if( strlen(frame::image_getpath(gFrame, path)) > 1 )
+				{
+					// Found an existing image, so backup its settings, place the new image and reassign the stored settings
+					// Backup image settings of existing image
+					frame::image_getpos (gFrame, &x, &y);
+					frame::image_getrotation (gFrame, &rotat);
+					if( rotat != 0 ){
+						frame::image_rotate (gFrame, 0);//turn around image to it's original position so we can measure it
+					}
+					frame::image_getsize (gFrame, &width, &height);
+					frame::image_getscale (gFrame, &scaleX, &scaleY);
+					frame::image_getskew (gFrame, &skew);
+
+					// Now place the new image
+					errorcode = frame::image( gFrame, result, kMiddle, kFitBigContentProp);
+					// Which corner of the frame should be pinned? Inline frames are always pinned at their right-bottom corner. Text frames with more an one line of text can change their height only.
+					// kRefPointDefault
+					// kRefPointTopLeftNew
+					// kRefPointTopCenter
+					// kRefPointTopRight
+					// kRefPointLeftCenter
+					// kRefPointCenter
+					// kRefPointRightCenter
+					// kRefPointBottomLeft
+					// kRefPointBottomCenter
+					// kRefPointBottomRight
+
+					if( errorcode != 0 )
+					{
+						wlog( "", "Error while loading image: [%d], message: [%s]\n", errorcode, serror(errorcode) );
+					}
+
+					// Restore the image settings
+					//frame::image_scale (gFrame, scaleX, scaleY);
+					frame::image_size (gFrame, width, height);
+					frame::image_rotate (gFrame, rotat);
+					//frame::image_skew (gFrame, skew);
+					frame::image_pos (gFrame, x, y);
+				}
+				else
+				{
+					// Did not find an existing image, so simply place the new image
+					errorcode = frame::image( gFrame, result, kPlaceCentered, kFitBigContentProp );
+					// Which corner of the frame should be pinned? Inline frames are always pinned at their right-bottom corner. Text frames with more an one line of text can change their height only.
+					// kRefPointDefault
+					// kRefPointTopLeftNew
+					// kRefPointTopCenter
+					// kRefPointTopRight
+					// kRefPointLeftCenter
+					// kRefPointCenter
+					// kRefPointRightCenter
+					// kRefPointBottomLeft
+					// kRefPointBottomCenter
+					// kRefPointBottomRight
+					if( errorcode != 0 )
+					{
+						wlog( "", "Error while loading image: [%d], message: [%s]\n", errorcode, serror(errorcode) );
+					}
+
+					errorcode = frame::fit( gFrame, kRefPointCenter );
+					if( errorcode != 0 )
+					{
+					   wlog( "", "Error while fitting image: [%d], message: [%s]\n", errorcode, serror(errorcode) );
+					}
+				}
+			}
+		}
+	}
+
+	// Cleanup
+	release( result );
+	release( layer );
+	release( path );
+
+	return 0;
+}

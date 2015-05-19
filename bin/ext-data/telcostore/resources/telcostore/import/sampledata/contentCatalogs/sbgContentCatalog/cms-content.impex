@@ -1,0 +1,13 @@
+$contentCatalog=telcoContentCatalog
+$contentCV=catalogversion(catalog(id[default=$contentCatalog]),version[default=Staged])[default=$contentCatalog:Staged]
+
+$productCatalog=sbgProductCatalog
+$productCV=catalogversion(catalog(id[default=$productCatalog]),version[default=Staged])[unique=true,default=$productCatalog:Staged]
+
+# Category Page Restrictions
+INSERT_UPDATE CMSCategoryRestriction;$contentCV[unique=true];uid[unique=true];name;categories(code, $productCV);pages(uid, $contentCV)[unique=true]
+;;SBGProductsCategory-LandingPageRestriction;Restriction for TV Channels;sbgproducts;SBGProductsCategoryPage
+
+
+INSERT_UPDATE ProductReferencesComponent;$contentCV[unique=true];uid[unique=true];name;productReferenceTypes(code);maximumNumberProducts;
+;;Upselling;Upselling;UPSELLING;5;

@@ -1,0 +1,40 @@
+$facetSearchConfigName=powertoolsIndex
+$contentCatalogName=powertoolsContentCatalog
+$indexedType=powertoolsProductType
+$productCatalog=powertoolsProductCatalog
+$productCatalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+
+#
+# Localization en
+#
+$lang=en
+
+UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true,default=$indexedType];name[unique=true];displayName[lang=$lang]
+ ;;Colour of product, 1766;"Colour"
+
+# Redirect page URL (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrURIRedirect;url[unique=true];&redirectRefID
+;"/cart";$contentCatalogName-redirectRefID-cart
+;"/cart";$contentCatalogName-redirectRefID-basket
+;"http://www.hybris.com/multichannel-accelerator";$contentCatalogName-redirectRefID-accelerator
+;"http://www.hybris.com/multichannel-accelerator";$contentCatalogName-redirectRefID-hymacc
+
+# Category Redirect (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrCategoryRedirect;redirectItem(code,$productCatalogVersion)[unique=true];&redirectRefID
+;1360;$productCatalog-redirectRefID-drill
+;1595;$productCatalog-redirectRefID-grinder
+
+# Synonyms (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrSynonymConfig;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];synonymFrom[unique=true];synonymTo
+ ;;;"bosch hammer";"PSB"
+ ;;;"battery";"coordless"
+
+# Keyword Redirects (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrFacetSearchKeywordRedirect;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];keyword[unique=true];matchType(code)[unique=true];redirect(&redirectRefID);ignoreCase[default=true]
+
+# Keyword Redirects (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrFacetSearchKeywordRedirect;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];keyword[unique=true];matchType(code)[unique=true];redirect(&redirectRefID);ignoreCase[default=true]
+ ;;;"accelerator";EXACT;$contentCatalogName-redirectRefID-accelerator;
+ ;;;"basket";EXACT;$contentCatalogName-redirectRefID-basket;
+ ;;;"cart";EXACT;$contentCatalogName-redirectRefID-cart;
+ ;;;"hymacc";EXACT;$contentCatalogName-redirectRefID-hymacc;

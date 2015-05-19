@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+		   
+   <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    +++++++++++ process execution environment +++++++++++++++++++++++++++++++++++++++++++++++
+    ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+	
+	<!-- The RMI registry service. This bean is intentionally on global scope. -->
+	<alias name="defaultRmiRegistryService" alias="rmiRegistryService"/>
+	<bean id="defaultRmiRegistryService" class="de.hybris.platform.mediaconversion.os.process.impl.DefaultRMIRegistryService" 
+	       scope="singleton"
+	       init-method="init" 
+	       destroy-method="destroy"
+           lazy-init="false">
+	   <property name="port" value="${os.rmiregistry.port}"/>
+       <property name="loopback" value="${os.rmi.loopback.address}"/>
+	</bean>
+	
+	<!-- This bean is intentionally on global scope. -->
+	<bean id="os.remoteDrain" class="de.hybris.platform.mediaconversion.os.process.impl.DefaultRemoteDrain" 
+	       scope="singleton"
+           init-method="init" 
+           destroy-method="destroy"
+           lazy-init="false">
+       <property name="rmiRegistryService" ref="rmiRegistryService"/>
+       <property name="processContextRegistry" ref="processContextRegistry"/>
+	</bean>
+	
+	<!-- This bean is intentionally on global scope. -->
+	<alias name="os.processContextRegistry" alias="processContextRegistry"/>
+	<bean id="os.processContextRegistry" class="de.hybris.platform.mediaconversion.os.process.impl.DefaultProcessContextRegistry" 
+           scope="singleton">
+    </bean>
+</beans>

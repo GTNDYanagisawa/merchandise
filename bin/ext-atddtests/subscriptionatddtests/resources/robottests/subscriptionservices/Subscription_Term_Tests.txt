@@ -1,0 +1,110 @@
+*** Settings ***
+Test Setup        import commercecart sampledata
+Test Teardown     reset system
+Resource          commerce/CommerceServices_Keywords.txt
+Resource		  commerce/SubscriptionCommerce_Keywords.txt
+Resource          subscriptionservices/SubscriptionBillingPlan_Keywords.txt
+Resource          subscriptionservices/SubscriptionProduct_Keywords.txt
+Resource          subscriptionservices/SubscriptionPricePlan_Keywords.txt
+Resource          subscriptionservices/SubscriptionTerm_Keywords.txt
+Resource          entitlements/Product_Keywords.txt
+
+
+*** Test Cases ***
+Test_Subscription_Terms_Default_For_Cancellable
+    [Documentation]    Verifies subscription terms
+    create subscription term "T1" with renewal type "auto_renewing" and term frequency "monthly" and term number "10"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    add product "P1" to cart
+    for product "P1" verify that the XML for subscription term matches "<subscriptionTerm>
+																		 	<termOfServiceFrequency>
+																		      	<code>monthly</code>
+																		   	</termOfServiceFrequency>
+																		    <name>T1</name>
+																		    <termOfServiceRenewal>
+																		      	<code>auto_renewing</code>
+																		    </termOfServiceRenewal>
+																		    <!-- billing plan is defined in resources/impex/testCommerceCart.csv -->
+																		    <billingPlan>
+																		      	<billingCycleType>
+																		        	<code>subscription_start</code>
+																		      	</billingCycleType>
+																		      	<name>Monthly Plan</name>
+																		      	<billingTime>
+																		        	<description>Monthly</description>
+																		        	<orderNumber>5</orderNumber>
+																		        	<name>Monthly</name>
+																		        	<code>monthly</code>
+																		      	</billingTime>
+																		   	</billingPlan>
+																		   	<!-- cancellable=true is defined as the default in resources/impex-templates/subscription-term/subscriptionterm-insert.impex.vm -->
+																		    <cancellable>true</cancellable>
+																		    <termOfServiceNumber>10</termOfServiceNumber>
+																		 </subscriptionTerm>"
+									
+Test_Subscription_Terms_Not_Cancellable
+    [Documentation]    Verifies subscription terms
+    create subscription term "T1" with renewal type "auto_renewing" and term frequency "monthly" and term number "10" and cancellable "false"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    add product "P1" to cart
+    for product "P1" verify that the XML for subscription term matches "<subscriptionTerm>
+																		 	<termOfServiceFrequency>
+																		      	<code>monthly</code>
+																		   	</termOfServiceFrequency>
+																		    <name>T1</name>
+																		    <termOfServiceRenewal>
+																		      	<code>auto_renewing</code>
+																		    </termOfServiceRenewal>
+																		    <!-- billing plan is defined in resources/impex/testCommerceCart.csv -->
+																		    <billingPlan>
+																		      	<billingCycleType>
+																		        	<code>subscription_start</code>
+																		      	</billingCycleType>
+																		      	<name>Monthly Plan</name>
+																		      	<billingTime>
+																		        	<description>Monthly</description>
+																		        	<orderNumber>5</orderNumber>
+																		        	<name>Monthly</name>
+																		        	<code>monthly</code>
+																		      	</billingTime>
+																		   	</billingPlan>
+																		   	<!-- cancellable=true is defined as the default in resources/impex-templates/subscription-term/subscriptionterm-insert.impex.vm -->
+																		    <cancellable>false</cancellable>
+																		    <termOfServiceNumber>10</termOfServiceNumber>
+																		 </subscriptionTerm>"
+
+Test_Subscription_Terms_Custom_BillingPlan
+    [Documentation]    Verifies subscription terms
+    create billing plan "BP1_MONTHLY" with billing frequency "monthly" and billing cycle type "day_of_month" and billing cycle day "3"
+    create subscription term "T1" with billing plan "BP1_MONTHLY" and renewal type "auto_renewing" and term frequency "monthly" and term number "10" and cancellable "false"
+	create subscription product "P1" with subscription term "T1"
+    for product "P1" add subscription priceplan "PP1" with currency "USD"
+    add product "P1" to cart
+    for product "P1" verify that the XML for subscription term matches "<subscriptionTerm>
+																		 	<termOfServiceFrequency>
+																		      	<code>monthly</code>
+																		   	</termOfServiceFrequency>
+																		    <name>T1</name>
+																		    <termOfServiceRenewal>
+																		      	<code>auto_renewing</code>
+																		    </termOfServiceRenewal>
+																		    <!-- billing plan is defined in resources/impex/testCommerceCart.csv -->
+																		    <billingPlan>
+      																			<billingCycleDay>3</billingCycleDay>
+																		      	<billingCycleType>
+																		        	<code>day_of_month</code>
+																		      	</billingCycleType>
+																		      	<name>BP1_MONTHLY</name>
+																		      	<billingTime>
+																		        	<description>Monthly</description>
+																		        	<orderNumber>5</orderNumber>
+																		        	<name>Monthly</name>
+																		        	<code>monthly</code>
+																		      	</billingTime>
+																		   	</billingPlan>
+																		   	<!-- cancellable=true is defined as the default in resources/impex-templates/subscription-term/subscriptionterm-insert.impex.vm -->
+																		    <cancellable>false</cancellable>
+																		    <termOfServiceNumber>10</termOfServiceNumber>
+																		 </subscriptionTerm>"

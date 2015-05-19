@@ -1,0 +1,626 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<relations>
+
+		<relation code="OrderEntry2SapPricingCondition" autocreate="true" localized="false">
+
+			<description>Relationship between order entries and SAP pricing conditions
+				filled when reading synchronous prices from SAP ERP
+			</description>
+
+			<sourceElement type="AbstractOrderEntry" qualifier="orderEntry" cardinality="one">
+				<description>Order entry</description>
+				<modifiers read="true" write="false" initial="true" search="true" optional="true" unique="true" />
+			</sourceElement>
+
+			<targetElement type="SAPPricingCondition" qualifier="sapPricingConditions" cardinality="many" collectiontype="set"
+				ordered="false">
+				<description>SAP pricing conditions</description>
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+
+		</relation>
+
+
+		<relation autocreate="true" code="SapErpHttpDestinationForGlobalConfiguration" generate="true" localized="false">
+			<sourceElement cardinality="many" qualifier="sapcommon_globalConfigurations" type="SAPGlobalConfiguration" />
+			<targetElement cardinality="one" qualifier="sapcommon_erpHttpDestination" type="SAPHTTPDestination" />
+		</relation>
+
+
+		<relation code="SAPConfigDeliveryRelation" autocreate="true" localized="false">
+
+			<sourceElement type="SAPConfiguration" qualifier="sapConfiguration" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+
+			<targetElement type="SAPDeliveryMode" qualifier="sapDeliveryModes" cardinality="many" collectiontype="set"
+				ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+
+		</relation>
+
+		<relation code="SapConfigPaymentRelation" autocreate="true" localized="false">
+
+			<sourceElement type="SAPConfiguration" qualifier="sapConfiguration" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+
+			<targetElement type="SAPPaymentMode" qualifier="sapPaymentModes" cardinality="many" collectiontype="set" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+
+		</relation>
+
+		<relation code="SAPGlobalConfigSAPProductSalesAreaToCatalogMappingRelation" autocreate="true" localized="false">
+			<sourceElement type="SAPGlobalConfiguration" qualifier="sapGlobalConfiguration" cardinality="one"></sourceElement>
+			<targetElement type="SAPProductSalesAreaToCatalogMapping" qualifier="sapProductSalesAreaToCatalogMapping"
+				cardinality="many" collectiontype="set"></targetElement>
+		</relation>
+
+		<relation code="SAPGlobalConfigurationPricingSalesArea" autocreate="true" localized="false">
+			<sourceElement type="SAPGlobalConfiguration" qualifier="sapcommon_sapGlobalConfiguration" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement type="SAPPricingSalesAreaToCatalog" qualifier="sapcommon_sapPricingSalesArea" cardinality="many"
+				collectiontype="set">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="SAPConfigBonusBuySite" autocreate="true" localized="false">
+			<sourceElement type="SAPGlobalConfiguration" qualifier="sapcommon_sapGlobalConfiguration" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement type="SAPBonusBuySiteToCatalog" qualifier="sapcommon_sapSiteToCatalog" cardinality="many"
+				collectiontype="set" ordered="false">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+
+	</relations>
+
+	<itemtypes>
+
+		<itemtype code="AbstractOrderEntry" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="externalConfiguration" type="java.lang.String">
+					<description>XML Representation of a Product Configuration</description>
+					<modifiers read="true" write="true" search="false" optional="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>TEXT</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Language" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="sapCode" type="java.lang.String">
+					<description>SAP Code (ERP Table T002 field SPRAS)</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Currency" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="sapCode" type="java.lang.String">
+					<description>SAP Code (ERP Table TCURC field WAERS)</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Unit" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="sapCode" type="java.lang.String">
+					<description>SAP Code (ERP Table T006 field MSEHI)</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ClassificationAttributeUnit" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="sapCode" type="java.lang.String">
+					<description>SAP Code (ERP Table T006 field MSEHI)</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Country" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="sapCode" type="java.lang.String">
+					<description>SAP Code (ERP Table T005 field LAND1)</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Product" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="sapBlocked" type="java.lang.Boolean">
+					<description>Indicator if item is blocked for sale</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapBlockedDate" type="java.util.Date">
+					<description>Indicates the date the product is blocked from</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapConfigurable" type="java.lang.Boolean">
+					<description>Is the product configurable?</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapEAN" type="java.lang.String">
+					<description>Product EAN</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapBaseUnitConversion" type="java.lang.Double">
+					<description>Factor for converting Sales Unit quantity to Base Unit quantity</description>
+					<modifiers read="true" write="true" search="false" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Address" generate="false" autocreate="false">
+			<attributes>
+				<attribute qualifier="sapCustomerID" type="java.lang.String">
+					<description>Unique identifier of SAP customer</description>
+					<modifiers initial="true" read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapAddressUsage" type="java.lang.String">
+					<description>SAP address usage</description>
+					<modifiers initial="true" read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapAddressUsageCounter" type="java.lang.String">
+					<description>SAP address usage counter</description>
+					<modifiers initial="true" read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Customer" generate="false" autocreate="false">
+			<attributes>
+				<attribute qualifier="sapConsumerID" type="java.lang.String">
+					<description>Unique identifier of SAP consumer</description>
+					<modifiers initial="true" read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapContactID" type="java.lang.String">
+					<description>Unique identifier of SAP contact</description>
+					<modifiers initial="true" read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapIsReplicated" type="java.lang.Boolean">
+					<description>Indicates if the customer has been replicated to the SAP system</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapReplicationInfo" type="java.lang.String">
+					<description>Information related to the replication to the SAP system</description>
+					<modifiers initial="true" read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ReferenceDistributionChannelMapping" generate="true" autocreate="true">
+			<description>Distribution Channel per Sales Organization - Assign Master Data. Filled from ERP view V_TVKOV_ST</description>
+			<attributes>
+				<attribute autocreate="true" qualifier="salesOrganization" type="java.lang.String">
+					<description>Sales Organization</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" initial="true" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="distChannel" type="java.lang.String">
+					<description>Distribution Channel</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" initial="true" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="distChannelName" type="localized:java.lang.String">
+					<description>Distribution Channel Name</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute autocreate="true" qualifier="refDistChannelConditions" type="java.lang.String">
+					<description>Reference distribution channel for conditions</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" initial="true" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="refDistChannelConditionsName" type="localized:java.lang.String">
+					<description>Reference distribution channel name for conditions</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute autocreate="true" qualifier="refDistChannelCustMat" type="java.lang.String">
+					<description>Reference distribution channel for customer and material masters</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" initial="true" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="refDistChannelCustMatName" type="localized:java.lang.String">
+					<description>Reference distribution channel name for customer and material masters</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ReferenceDivisionMapping" generate="true" autocreate="true">
+			<description>Divisions per Sales Organization - Assign Master Data. Filled from ERP view V_TVKOS_ST</description>
+			<attributes>
+				<attribute autocreate="true" qualifier="salesOrganization" type="java.lang.String">
+					<description>Sales Organization</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" initial="true" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="division" type="java.lang.String">
+					<description>Division</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" initial="true" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="divisionName" type="localized:java.lang.String">
+					<description>Division Name</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute autocreate="true" qualifier="refDivisionConditions" type="java.lang.String">
+					<description>Reference division for conditions</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" initial="true" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="refDivisionConditionsName" type="localized:java.lang.String">
+					<description>Reference division name for conditions</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute autocreate="true" qualifier="refDivisionCustomer" type="java.lang.String">
+					<description>Reference division for customer</description>
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" initial="true" optional="false" />
+				</attribute>
+				<attribute autocreate="true" qualifier="refDivisionCustomerName" type="localized:java.lang.String">
+					<description>Reference division name for customer</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="SAPConfiguration" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="sapcommon_referenceCustomer" autocreate="true" type="java.lang.String" generate="true">
+					<persistence type="property" />
+					<modifiers optional="true" />
+					<description>reference customer used in rfc call</description>
+				</attribute>
+				<attribute qualifier="sapcommon_transactionType" generate="true" autocreate="true" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapcommon_salesOrganization" generate="true" autocreate="true" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="sapcommon_distributionChannel" generate="true" autocreate="true" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="sapcommon_division" generate="true" autocreate="true" type="java.lang.String">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+
+			</attributes>
+		</itemtype>
+		<!-- PriceRow/DiscountRow Extensions - Needed in data import scenario -->
+		<itemtype code="PriceRow" autocreate="false" generate="false">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="sapConditionId">
+					<persistence type="property" />
+					<description>Unique identifier of Price Condition.</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="DiscountRow" autocreate="false" generate="false">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="sapConditionId">
+					<persistence type="property" />
+					<description>Unique identifier of Price Condition.</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="SAPPricingCondition" extends="GenericItem" jaloclass="de.hybris.platform.sap.sapmodel.jalo.SAPPricingCondition"
+			autocreate="true" generate="true">
+
+			<deployment table="SAPPricingConditions" typecode="9310" />
+
+			<attributes>
+				<attribute qualifier="order" type="java.lang.String">
+					<description>Order number</description>
+					<modifiers read="true" write="false" initial="true" search="true" optional="true" unique="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="conditionType" type="java.lang.String">
+					<description>KSCHL - Condition type</description>
+					<modifiers read="true" write="false" initial="true" search="true" optional="true" unique="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="stepNumber" type="java.lang.String">
+					<description>STUNR - Step number</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="conditionCounter" type="java.lang.String">
+					<description>ZAEHK - Condition counter</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="currencyKey" type="java.lang.String">
+					<description>WAERS - Currency key</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="conditionPricingUnit" type="java.lang.String">
+					<description>KPEIN - Condition pricing unit</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="conditionUnit" type="java.lang.String">
+					<description>KMEIN - Condition unit in the document</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="conditionCalculationType" type="java.lang.String">
+					<description>KRECH - Calculation type for condition</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="conditionRate" type="java.lang.String">
+					<description>KBETR - Rate (condition amount or percentage)</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="conditionValue" type="java.lang.String">
+					<description>KWERT - Condition value</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="SAPDeliveryMode" extends="GenericItem" jaloclass="de.hybris.platform.sap.sapmodel.jalo.SAPDeliveryMode"
+			autocreate="true" generate="true">
+
+			<deployment table="SAPDeliveryModes" typecode="9311" />
+
+			<attributes>
+
+				<attribute qualifier="sapConfiguration" type="SAPConfiguration">
+					<persistence type="property" />
+					<modifiers unique="true" optional="true" read="true" write="false" initial="true" search="true" />
+				</attribute>
+
+				<attribute qualifier="deliveryMode" type="DeliveryMode">
+					<persistence type="property" />
+					<modifiers unique="true" optional="false" read="true" write="true" initial="false" search="true" />
+				</attribute>
+
+				<attribute qualifier="deliveryValue" type="java.lang.String" autocreate="true">
+					<persistence type="property" />
+					<modifiers unique="false" optional="false" read="true" write="true" initial="false" search="true" />
+				</attribute>
+
+			</attributes>
+
+		</itemtype>
+
+		<itemtype code="SAPPaymentMode" extends="GenericItem" jaloclass="de.hybris.platform.sap.sapmodel.jalo.SAPPaymentMode"
+			autocreate="true" generate="true">
+
+			<deployment table="SAPPaymentModes" typecode="9312" />
+
+			<attributes>
+
+				<attribute qualifier="sapConfiguration" type="SAPConfiguration">
+					<persistence type="property" />
+					<modifiers unique="true" optional="true" read="true" write="false" initial="true" search="true" />
+				</attribute>
+
+				<attribute qualifier="paymentMode" type="PaymentMode">
+					<persistence type="property" />
+					<modifiers unique="true" optional="false" read="true" write="true" initial="false" search="true" />
+				</attribute>
+
+				<attribute qualifier="paymentName" type="java.lang.String" autocreate="true">
+					<persistence type="property" />
+					<modifiers unique="false" optional="false" read="true" write="true" initial="false" search="true" />
+				</attribute>
+
+				<attribute qualifier="paymentValue" type="java.lang.String" autocreate="true">
+					<persistence type="property" />
+					<modifiers unique="false" optional="false" read="true" write="true" initial="false" search="true" />
+				</attribute>
+
+			</attributes>
+
+		</itemtype>
+
+		<itemtype autocreate="false" code="SAPGlobalConfiguration" generate="false" singleton="true">
+			<attributes>
+				<attribute qualifier="replicateregistereduser" type="boolean" autocreate="true">
+					<description>Replicate Registered User</description>
+					<persistence type="property" />
+					<modifiers unique="false" optional="false" read="true" write="true" initial="true" search="true" />
+				</attribute>
+				<attribute qualifier="sapcommon_erpLogicalSystem" type="java.lang.String" autocreate="true">
+					<persistence type="property" />
+					<modifiers unique="false" optional="false" read="true" write="true" initial="true" search="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="SAPProductSalesAreaToCatalogMapping" extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="SAPProductSales2Catalog" typecode="9313" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="salesOrganization">
+					<modifiers unique="true" />
+					<persistence type="property" />
+					<description>Sales Organization</description>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="distributionChannel">
+					<modifiers unique="true" />
+					<persistence type="property" />
+					<description>Distribution Channel</description>
+				</attribute>
+				<attribute type="CatalogVersion" qualifier="catalogVersion">
+					<modifiers unique="false" search="true" />
+					<persistence type="property" />
+					<description>Catalog Version</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="SAPPricingSalesAreaToCatalog" extends="GenericItem" autocreate="true" generate="true"
+			jaloclass="de.hybris.platform.sap.sapmodel.jalo.SAPPricingSalesAreaToCatalog">
+			<deployment table="SAPPricingSalesArea" typecode="9314" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="salesOrganization">
+					<modifiers unique="true" />
+					<persistence type="property" />
+					<description>Sales Organization</description>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="distributionChannel">
+					<modifiers unique="true" />
+					<persistence type="property" />
+					<description>Distribution Channel</description>
+				</attribute>
+				<attribute type="CatalogVersion" qualifier="catalogVersion">
+					<modifiers unique="false" search="true" />
+					<persistence type="property" />
+					<description>Catalog Version</description>
+				</attribute>
+				<attribute type="boolean" qualifier="net">
+					<modifiers unique="false" search="true" read="true" write="false" />
+					<persistence type="dynamic" attributeHandler="sapNetAttributeHandler" />
+					<description>Net Flag</description>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="SAPBonusBuySiteToCatalog" extends="GenericItem" jaloclass="de.hybris.platform.sap.sapmodel.jalo.SAPBonusBuySiteToCatalog"
+			autocreate="true" generate="true">
+			<deployment table="SAPBonusBuySiteToCatalog" typecode="9315" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="site">
+					<modifiers unique="true" />
+					<persistence type="property" />
+					<description>Bonus Buy Site</description>
+				</attribute>
+				<attribute type="CatalogVersion" qualifier="catalogVersion">
+					<modifiers unique="false" search="true" />
+					<persistence type="property" />
+					<description>Catalog Version</description>
+				</attribute>
+				<attribute type="PromotionGroup" qualifier="promotionGroup">
+					<modifiers unique="false" search="true" />
+					<persistence type="property" />
+					<description>Promotion Group</description>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ERPVariantProduct" extends="VariantProduct" jaloclass="de.hybris.platform.sap.sapmodel.jalo.ERPVariantProduct"
+			autocreate="true" generate="true" metatype="VariantType">
+		</itemtype>
+
+		<itemtype code="ClassificationAttribute" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="sapERPCharacteristicLongText" type="localized:java.lang.String">
+					<description>Original Characteristic Long Text in SAP ERP</description>
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>TEXT</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+
+				</attribute>
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<description>Enhanced Description</description>
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>TEXT</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

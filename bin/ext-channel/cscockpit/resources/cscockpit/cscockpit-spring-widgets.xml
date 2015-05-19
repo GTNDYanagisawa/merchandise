@@ -1,0 +1,1904 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean id="abstractWidgetRenderer" scope="prototype" abstract="true" class="de.hybris.platform.cscockpit.widgets.renderers.impl.AbstractCsWidgetRenderer">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="systemService" ref="systemService"/>
+		<property name="propertyEditorHelper" ref="propertyEditorHelper"/>
+		<property name="propertyRendererHelper" ref="propertyRendererHelper"/>
+		<property name="labelService" ref="labelService"/>
+	</bean>
+
+	<bean id="abstractWidgetDetailRenderer" scope="prototype" abstract="true" class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.AbstractWidgetDetailRenderer">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="systemService" ref="systemService"/>
+		<property name="propertyEditorHelper" ref="propertyEditorHelper"/>
+		<property name="propertyRendererHelper" ref="propertyRendererHelper"/>
+	</bean>
+
+	<!-- WIDGETS -->
+
+	<!-- spring csBaseWidgetConfig template for all widget configs -->
+	<alias alias="csBaseWidgetConfig" name="defaultCsBaseWidgetConfig" />
+	<bean id="defaultCsBaseWidgetConfig" scope="session" abstract="true" class="de.hybris.platform.cockpit.widgets.impl.DefaultWidgetConfig">
+		<property name="controllerCtx" value="csCtx"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame"/>
+		<property name="lazyLoadingEnabled" value="true"/>
+		<property name="focusable" value="true"/>
+	</bean>
+
+	<!-- csBaseAppender template for all appender configs -->
+	<alias alias="csBaseAppender" name="defaultCsBaseAppender" />
+	<bean id="defaultCsBaseAppender" scope="prototype" abstract="true" class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.AbstractItemAppenderEventDispatcher">
+		<property name="widgetController" ref="csCallContextController"/>
+	</bean>
+
+	<!-- Global Widgets -->
+
+	<!-- help widget -->
+	<alias alias="csHelpWidgetConfig" name="defaultCsHelpWidgetConfig"/>
+	<bean id="defaultCsHelpWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.help"/>
+		<property name="widgetRenderer" ref="csHelpWidgetRenderer"/>
+		<property name="widgetClass" value="de.hybris.platform.cscockpit.widgets.impl.HelpWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame defaultNavWidgetFrame csNavHelpWidgetFrame"/>
+		<property name="lazyLoadingEnabled" value="false"/>
+		<property name="focusable" value="false"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cockpit.widgets.models.impl.DefaultMapWidgetModel"/>
+		</property>
+	</bean>
+
+	<alias alias="csHelpWidgetRenderer" name="defaultCsHelpWidgetRenderer"/>
+	<bean id="defaultCsHelpWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.HelpWidgetRenderer"/>
+
+	<!-- call context widget -->
+	<alias alias="csCallContextWidgetConfig" name="defaultCsCallContextWidgetConfig"/>
+	<bean id="defaultCsCallContextWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.call.context"/>
+		<property name="widgetRenderer" ref="csCallContextWidgetRenderer"/>
+		<property name="widgetController" ref="csCallContextController"/>
+		<property name="widgetSclass" value="defaultWidgetFrame defaultNavWidgetFrame csNavCallContextWidgetFrame"/>
+		<property name="lazyLoadingEnabled" value="false"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CallContextWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.CallContextAdapter">
+				<lookup-method name="lookupCustomerBrowserModel" bean="csCustomerBrowser"/>
+				<lookup-method name="lookupOrderBrowserModel" bean="csOrderBrowser"/>
+				<lookup-method name="lookupCheckoutBrowserModel" bean="csCheckoutBrowser"/>
+				<lookup-method name="lookupTicketBrowserModel" bean="csTicketBrowser"/>
+				<property name="widgetHelper" ref="widgetHelper"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csCallContextWidgetRenderer" name="defaultCsCallContextWidgetRenderer"/>
+	<bean id="defaultCsCallContextWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.CallContextWidgetRenderer">
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+		<property name="endCallBrowser" value="cscockpit.browser.endCall"/>
+		<property name="endCallWidgetName" value="endCallWidget"/>
+		<property name="widgetHelper" ref="widgetHelper"/>
+		<property name="messageSource" ref="messageSource"/>
+		<property name="i18nService" ref="i18nService"/>
+		<property name="customerModelLabelProvider" ref="customerModelLabelProvider"/>
+	</bean>
+
+	<!-- customer search widget -->
+	<alias alias="csCustomerSearchWidgetConfig" name="defaultCsCustomerSearchWidgetConfig"/>
+	<bean id="defaultCsCustomerSearchWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.customer.search"/>
+		<property name="widgetRenderer" ref="csCustomerSearchWidgetRenderer"/>
+		<property name="widgetController" ref="csCustomerSearchController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csCustomerSearchWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.TextSearchWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.TextSearchResultAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csCustomerSearchWidgetRenderer" name="defaultCsCustomerSearchWidgetRenderer"/>
+	<bean id="defaultCsCustomerSearchWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.CustomerSearchWidgetRenderer">
+		<property name="listConfigurationCode" value="customerBrowseList"/>
+		<property name="listConfigurationType" value="Customer"/>
+		<property name="itemAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.PopupCloseAppender">
+				<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+				<property name="itemAppender">
+					<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.CustomerAppender" parent="csBaseAppender"/>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- order search widget -->
+	<alias alias="csOrderSearchWidgetConfig" name="defaultCsOrderSearchWidgetConfig"/>
+	<bean id="defaultCsOrderSearchWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.search"/>
+		<property name="widgetRenderer" ref="csOrderSearchWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderSearchController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csOrderSearchWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.TextSearchWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.TextSearchResultAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csOrderSearchWidgetRenderer" name="defaultCsOrderSearchWidgetRenderer"/>
+	<bean id="defaultCsOrderSearchWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.OrderSearchWidgetRenderer">
+		<property name="listConfigurationCode" value="orderSearchResult"/>
+		<property name="listConfigurationType" value="Order"/>
+		<property name="itemAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.PopupCloseAppender">
+				<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+				<property name="itemAppender">
+					<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.OrderAppender" parent="csBaseAppender"/>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- ticket search widget -->
+	<alias alias="csTicketSearchWidgetConfig" name="defaultCsTicketSearchWidgetConfig"/>
+	<bean id="defaultCsTicketSearchWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.ticket.search"/>
+		<property name="widgetRenderer" ref="csTicketSearchWidgetRenderer"/>
+		<property name="widgetController" ref="csTicketSearchController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csTicketSearchWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.TextSearchWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.TextSearchResultAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csTicketSearchWidgetRenderer" name="defaultCsTicketSearchWidgetRenderer"/>
+	<bean id="defaultCsTicketSearchWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.TicketSearchWidgetRenderer">
+		<property name="listConfigurationCode" value="ticketSearchResult"/>
+		<property name="listConfigurationType" value="CsTicket"/>
+		<property name="itemAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.PopupCloseAppender">
+				<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+				<property name="itemAppender">
+					<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.TicketAppender" parent="csBaseAppender"/>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- agent search widget -->
+	<alias alias="csAgentSearchWidgetConfig" name="defaultCsAgentSearchWidgetConfig"/>
+	<bean id="defaultCsAgentSearchWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.agent.search"/>
+		<property name="widgetRenderer" ref="csAgentSearchWidgetRenderer"/>
+		<property name="widgetController" ref="csAgentSearchController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csAgentSearchWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.TextSearchWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.TextSearchResultAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csAgentSearchWidgetRenderer" name="defaultCsAgentSearchWidgetRenderer"/>
+	<bean id="defaultCsAgentSearchWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.AgentSearchWidgetRenderer">
+		<property name="listConfigurationCode" value="agentSearchResult"/>
+		<property name="listConfigurationType" value="Employee"/>
+		<property name="itemAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.PopupCloseAppender">
+				<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- agent group search widget -->
+	<alias alias="csAgentGroupSearchWidgetConfig" name="defaultCsAgentGroupSearchWidgetConfig"/>
+	<bean id="defaultCsAgentGroupSearchWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.agentgroup.search"/>
+		<property name="widgetRenderer" ref="csAgentGroupSearchWidgetRenderer"/>
+		<property name="widgetController" ref="csAgentGroupSearchController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csAgentGroupSearchWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.TextSearchWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.TextSearchResultAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csAgentGroupSearchWidgetRenderer" name="defaultCsAgentGroupSearchWidgetRenderer"/>
+	<bean id="defaultCsAgentGroupSearchWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.AgentGroupSearchWidgetRenderer">
+		<property name="listConfigurationCode" value="agentGroupSearchResult"/>
+		<property name="listConfigurationType" value="CsAgentGroup"/>
+		<property name="itemAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.PopupCloseAppender">
+				<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- modify state widget -->
+	<alias alias="csTicketStateChangeWidgetConfig" name="defaultCsTicketStateChangeWidgetConfig"/>
+	<bean id="defaultCsTicketStateChangeWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.ticket.statechange"/>
+		<property name="widgetRenderer" ref="csTicketStateChangeWidgetRenderer"/>
+		<property name="widgetController" ref="csTicketController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultInputWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csTicketStateChangeWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cockpit.widgets.models.impl.DefaultItemWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.UpdateWidgetAdapter"/>
+		</property>
+	</bean>
+	
+	<alias alias="csTicketStateChangeWidgetRenderer" name="defaultCsTicketStateChangeWidgetRenderer"/>
+	<bean id="defaultCsTicketStateChangeWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.TicketStateChangeWidgetRenderer">
+		<property name="ticketBusinessService" ref="ticketBusinessService"/>
+	</bean>
+
+	<!-- modify priority widget -->
+	<alias alias="csTicketPriorityChangeWidgetConfig" name="defaultCsTicketPriorityChangeWidgetConfig"/>
+	<bean id="defaultCsTicketPriorityChangeWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.ticket.prioritychange"/>
+		<property name="widgetRenderer" ref="csTicketPriorityChangeWidgetRenderer"/>
+		<property name="widgetController" ref="csTicketController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultInputWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csTicketStateChangeWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cockpit.widgets.models.impl.DefaultItemWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.UpdateWidgetAdapter"/>
+		</property>
+	</bean>
+	
+	<alias alias="csTicketPriorityChangeWidgetRenderer" name="defaultCsTicketPriorityChangeWidgetRenderer"/>
+	<bean id="defaultCsTicketPriorityChangeWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.TicketPriorityChangeWidgetRenderer">
+		<property name="ticketService" ref="ticketService"/>
+		<property name="ticketBusinessService" ref="ticketBusinessService"/>
+	</bean>
+
+	<!-- close ticket widget -->
+	<alias alias="csTicketCloseWidgetConfig" name="defaultCsTicketCloseWidgetConfig"/>
+	<bean id="defaultCsTicketCloseWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.ticket.close"/>
+		<property name="widgetRenderer" ref="csTicketCloseWidgetRenderer"/>
+		<property name="widgetController" ref="csTicketController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultInputWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csTicketCloseWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cockpit.widgets.models.impl.DefaultItemWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.UpdateWidgetAdapter"/>
+		</property>
+	</bean>
+
+	<alias alias="csTicketCloseWidgetRenderer" name="defaultCsTicketCloseWidgetRenderer"/>
+	<bean id="defaultCsTicketCloseWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.TicketCloseWidgetRenderer">
+		<property name="ticketService" ref="ticketService"/>
+		<property name="ticketBusinessService" ref="ticketBusinessService"/>
+	</bean>
+
+	<!-- Ticket Pool Browser Widgets -->
+
+	<!-- ticket pool widget -->
+	<alias alias="csTicketPoolWidgetConfig" name="defaultCsTicketPoolWidgetConfig"/>
+	<bean id="defaultCsTicketPoolWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.ticketpool"/>
+		<property name="widgetRenderer" ref="csTicketPoolWidgetRenderer"/>
+		<property name="widgetController" ref="csTicketPoolSearchController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csTicketPoolWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.TextSearchWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.TextSearchResultAdapter">
+				<property name="runSearchOnInit" value="true"/>
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csTicketPoolWidgetRenderer" name="defaultCsTicketPoolWidgetRenderer"/>
+	<bean id="defaultCsTicketPoolWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.TicketPoolWidgetRenderer">
+		<property name="listConfigurationCode" value="ticketPoolList"/>
+		<property name="listConfigurationType" value="CsTicket"/>
+		<property name="itemAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.TicketAppender" parent="csBaseAppender"/>
+		</property>
+	</bean>
+
+	<!-- Basket Browser Widgets -->
+
+	<!-- basket search widget -->
+	<alias alias="csBasketSearchWidgetConfig" name="defaultCsBasketSearchWidgetConfig"/>
+	<bean id="defaultCsBasketSearchWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.basket.search"/>
+		<property name="widgetRenderer" ref="csBasketSearchWidgetRenderer"/>
+		<property name="widgetController" ref="csProductSearchController"/>
+		<property name="widgetClass" value="de.hybris.platform.cscockpit.widgets.impl.AutoFocusInputWidget"/>
+		<property name="lazyLoadingEnabled" value="false"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.BasketSearchWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.BasketSearchAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csBasketSearchWidgetRenderer" name="defaultCsBasketSearchWidgetRenderer"/>
+	<bean id="defaultCsBasketSearchWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.BasketSearchWidgetRenderer"/>
+
+	<!-- basket result widget -->
+	<alias alias="csBasketResultWidgetConfig" name="defaultCsBasketResultWidgetConfig"/>
+	<bean id="defaultCsBasketResultWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.basket.result"/>
+		<property name="widgetRenderer" ref="csBasketResultWidgetRenderer"/>
+		<property name="widgetController" ref="csProductSearchController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.SearchResultWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.BasketResultAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csBasketResultWidgetRenderer" name="defaultCsBasketResultWidgetRenderer"/>
+	<bean id="defaultCsBasketResultWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.BasketResultWidgetRenderer">
+		<property name="listConfigurationCode" value="productSearchResult"/>
+		<property name="listConfigurationType" value="Product"/>
+		<property name="itemAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.BasketAppender" parent="csBaseAppender">
+				<property name="widgetController" ref="csBasketController"/>
+			</bean>
+		</property>
+		<property name="callContextController" ref="csCallContextController"/>
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ProductSearchProductDetailRenderer">
+				<property name="urlStrategy" ref="csProductUrlStrategy"/>
+				<property name="configurationCode" value="productDetails"/>
+			</bean>
+		</property>
+		<property name="lazyLoadingEnabled" value="false"/>
+		<property name="csPromotionService" ref="csPromotionService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="formatFactory" ref="formatFactory"/>
+	</bean>
+
+	<!-- basket cart widget -->
+	<alias alias="csBasketCartWidgetConfig" name="defaultCsBasketCartWidgetConfig"/>
+	<bean id="defaultCsBasketCartWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.basket.cart"/>
+		<property name="widgetRenderer" ref="csBasketCartWidgetRenderer"/>
+		<property name="widgetController" ref="csBasketController"/>
+		<property name="widgetClass" value="de.hybris.platform.cscockpit.widgets.impl.CaptionUpdateListboxWidget"/>
+		<property name="widgetModel" ref="csBasketCartWidgetModel"/>
+		<property name="widgetAdapter" ref="csBasketCartWidgetAdapter"/>
+	</bean>
+
+	<alias alias="csBasketCartWidgetRenderer" name="defaultCsBasketCartWidgetRenderer"/>
+	<bean id="defaultCsBasketCartWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.BasketCartWidgetRenderer">
+		<property name="listConfigurationCode" value="cartList"/>
+		<property name="listConfigurationType" value="AbstractOrderEntry"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="customerModelLabelProvider" ref="customerModelLabelProvider"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="lazyLoadingEnabled" value="false"/>
+		<property name="callContextController" ref="csCallContextController"/>
+		<property name="csPromotionService" ref="csPromotionService"/>
+		<property name="popupWindowCreator" ref="popupWindowCreator"/>
+		<property name="detailRenderers">
+			<map key-type="java.lang.String">
+				<entry key="defaultRenderer">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ProductSearchProductDetailRenderer">
+						<property name="urlStrategy" ref="csProductUrlStrategy"/>
+						<property name="configurationCode" value="productDetails"/>
+					</bean>
+				</entry>
+				<entry key="PromotionResult">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.PromotionResultDetailRenderer">
+						<property name="configurationCode" value="promotionDetails"/>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="formatFactory" ref="formatFactory"/>
+	</bean>
+
+	<!-- basket cart widget -->
+	<alias alias="csBasketTotalsWidgetConfig" name="defaultCsBasketTotalsWidgetConfig"/>
+	<bean id="defaultCsBasketTotalsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.basket.totals"/>
+		<property name="widgetRenderer" ref="csBasketTotalsWidgetRenderer"/>
+		<property name="widgetController" ref="csBasketController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultInputWidget"/>
+		<property name="widgetModel" ref="csBasketCartWidgetModel"/>
+		<property name="widgetAdapter" ref="csBasketCartWidgetAdapter"/>
+	</bean>
+
+	<alias alias="csBasketTotalsWidgetRenderer" name="defaultCsBasketTotalsWidgetRenderer"/>
+	<bean id="defaultCsBasketTotalsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.BasketTotalsWidgetRenderer">
+		<property name="formatFactory" ref="formatFactory"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<!-- Checkout Browser Widgets -->
+
+	<!-- checkout cart widget -->
+	<alias alias="csCheckoutCartWidgetConfig" name="defaultCsCheckoutCartWidgetConfig"/>
+	<bean id="defaultCsCheckoutCartWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.checkout.cart"/>
+		<property name="widgetRenderer" ref="csCheckoutCartWidgetRenderer"/>
+		<property name="widgetController" ref="csCheckoutController"/>
+		<property name="widgetClass" value="de.hybris.platform.cscockpit.widgets.impl.CaptionUpdateListboxWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CheckoutCartWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.CheckoutCartAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csCheckoutCartWidgetRenderer" name="defaultCsCheckoutCartWidgetRenderer"/>
+	<bean id="defaultCsCheckoutCartWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.CheckoutCartWidgetRenderer">
+		<property name="listConfigurationCode" value="checkoutCartList"/>
+		<property name="listConfigurationType" value="AbstractOrderEntry"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="namedDeliveryDateConfigurationCode" value="checkoutCartEntryNamedDeliveryDateEditor"/>
+		<property name="namedDeliveryDateTypeCode" value="AbstractOrderEntry"/>
+		<property name="lazyLoadingEnabled" value="false"/>
+		<property name="displayActionsPerLineItem" value="true"/>
+		<property name="displayPerLineDeliveryModeSelector" value="true"/>
+		<property name="displayPerLineDeliveryDateSelector" value="true"/>
+		<property name="displayPerLineDeliveryAddressSelector" value="true"/>
+		<property name="formatFactory" ref="formatFactory"/>
+	</bean>
+
+	<!-- checkout cart applied promotions widget -->
+	<alias alias="csCheckoutCartAppliedPromotionsWidgetConfig" name="defaultCsCheckoutCartAppliedPromotionsWidgetConfig"/>
+	<bean id="defaultCsCheckoutCartAppliedPromotionsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.checkout.cart.appliedPromotions"/>
+		<property name="widgetRenderer" ref="csCheckoutCartAppliedPromotionsWidgetRenderer"/>
+		<property name="widgetController" ref="csCheckoutController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.DefaultMasterDetailListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.CheckoutCartPromotionsWidgetAdapter">
+				<property name="csPromotionService" ref="csPromotionService"/>
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csCheckoutCartAppliedPromotionsWidgetRenderer" name="defaultCsCheckoutCartAppliedPromotionsWidgetRenderer"/>
+	<bean id="defaultCsCheckoutCartAppliedPromotionsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.OrderAppliedPromotionsWidgetRenderer">
+		<property name="listConfigurationCode" value="appliedPromotionResultList"/>
+		<property name="listConfigurationType" value="PromotionResult"/>
+		<property name="lazyLoadingEnabled" value="false"/>
+		<property name="detailRenderers">
+			<map key-type="java.lang.String">
+				<entry key="defaultRenderer">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.AppliedPromotionDetailRenderer" parent="abstractWidgetDetailRenderer">
+						<property name="listConfigurationCode" value="promotionOrderEntryConsumedList"/>
+						<property name="listConfigurationType" value="PromotionOrderEntryConsumed"/>
+						<property name="csPromotionService" ref="csPromotionService"/>
+					</bean>
+				</entry>
+				<entry key="OrderPromotion">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ConfigurableItemWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+						<property name="configurationCode" value="appliedPromotionDetails"/>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="csPromotionService" ref="csPromotionService"/>
+	</bean>
+
+	<!-- cart payment transactions widget -->
+	<alias alias="csCartPaymentTransactionsWidgetConfig" name="defaultCsCartPaymentTransactionsWidgetConfig"/>
+	<bean id="defaultCsCartPaymentTransactionsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.checkout.cart.paymentTransactions"/>
+		<property name="widgetRenderer" ref="csCartPaymentTransactionsWidgetRenderer"/>
+		<property name="widgetController" ref="csCheckoutController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.DefaultMasterDetailListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.CartPaymentTransactionsListWidgetAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csCartPaymentTransactionsWidgetRenderer" name="defaultCsCartPaymentTransactionsWidgetRenderer"/>
+	<bean id="defaultCsCartPaymentTransactionsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.ConfigurableCsMasterDetailListboxWidgetRenderer">
+		<property name="listConfigurationCode" value="paymentTransactionList"/>
+		<property name="listConfigurationType" value="PaymentTransactionEntry"/>
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.OrderPaymentTransactionEntryDetailRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="configurationCode" value="paymentTransactionListDetail"/>
+				<property name="paymentInfoRenderer">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ConfigurableItemWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+						<property name="configurationCode" value="paymentInfo"/>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- shipping address widget -->
+	<alias alias="csShippingAddressWidgetConfig" name="defaultCsShippingAddressWidgetConfig"/>
+	<bean id="defaultCsShippingAddressWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.checkout.shippingAddress"/>
+		<property name="widgetRenderer" ref="csShippingAddressWidgetRenderer"/>
+		<property name="widgetController" ref="csBasketController"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csShippingAddressWidgetConfig"/>
+		<property name="widgetModel" ref="csShippingCartAddressWidgetModel"/>
+		<property name="widgetAdapter" ref="csShippingCartAddressWidgetAdapter" />
+	</bean>
+
+	<alias alias="csShippingAddressWidgetRenderer" name="defaultCsShippingAddressWidgetRenderer"/>
+	<bean id="defaultCsShippingAddressWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.ShippingAddressWidgetRenderer">
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+	</bean>
+
+	<!-- payment address widget -->
+	<alias alias="csPaymentAddressWidgetConfig" name="defaultCsPaymentAddressWidgetConfig"/>
+	<bean id="defaultCsPaymentAddressWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.checkout.paymentAddress"/>
+		<property name="widgetRenderer" ref="csPaymentAddressWidgetRenderer"/>
+		<property name="widgetController" ref="csBasketController"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csPaymentAddressWidgetConfig"/>
+		<property name="widgetModel" ref="csCartAddressWidgetModel"/>
+		<property name="widgetAdapter" ref="csCartPaymentAddressWidgetAdapter"/>
+	</bean>
+
+	<alias alias="csPaymentAddressWidgetRenderer" name="defaultCsPaymentAddressWidgetRenderer"/>
+	<bean id="defaultCsPaymentAddressWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.PaymentAddressWidgetRenderer">
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+	</bean>
+
+	<!-- Order Browser Widgets -->
+
+	<!-- order details widget -->
+	<alias alias="csOrderDetailsWidgetConfig" name="defaultCsOrderDetailsWidgetConfig"/>
+	<bean id="defaultCsOrderDetailsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.details"/>
+		<property name="widgetRenderer" ref="csOrderDetailsWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderController"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csOrderDetailsWidgetConfig"/>
+		<property name="widgetModel" ref="csOrderItemWidgetModel"/>
+		<property name="widgetAdapter" ref="csOrderDetailsWidgetAdapter"/>
+	</bean>
+
+	<alias alias="csOrderDetailsWidgetRenderer" name="defaultCsOrderDetailsWidgetRenderer"/>
+	<bean id="defaultCsOrderDetailsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.OrderDetailsWidgetRenderer">
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.OrderDetailsListRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="enumerationService" ref="enumerationService"/>
+				<property name="customerModelLabelProvider" ref="customerModelLabelProvider"/>
+				<property name="configurationCode" value="orderDetailsList"/>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- order billing address widget -->
+	<alias alias="csOrderDetailsBillingAddressWidgetConfig" name="defaultCsOrderDetailsBillingAddressWidgetConfig"/>
+	<bean id="defaultCsOrderDetailsBillingAddressWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.billingAddress"/>
+		<property name="widgetRenderer" ref="csOrderDetailsBillingAddressWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderController"/>
+		<property name="widgetModel" ref="csOrderItemWidgetModel"/>
+		<property name="widgetAdapter" ref="csOrderDetailsWidgetAdapter"/>
+	</bean>
+
+	<alias alias="csOrderDetailsBillingAddressWidgetRenderer" name="defaultCsOrderDetailsBillingAddressWidgetRenderer"/>
+	<bean id="defaultCsOrderDetailsBillingAddressWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.OrderDetailsAddressWidgetRenderer">
+		<property name="billing" value="true"/>
+		<property name="configurationCode" value="orderDetailsBillingAddress"/>
+	</bean>
+
+	<!-- order delivery address widget -->
+	<alias alias="csOrderDetailsDeliveryAddressWidgetConfig" name="defaultCsOrderDetailsDeliveryAddressWidgetConfig"/>
+	<bean id="defaultCsOrderDetailsDeliveryAddressWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.deliveryAddress"/>
+		<property name="widgetRenderer" ref="csOrderDetailsDeliveryAddressWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderController"/>
+		<property name="widgetModel" ref="csOrderItemWidgetModel"/>
+		<property name="widgetAdapter" ref="csOrderDetailsWidgetAdapter"/>
+	</bean>
+
+	<alias alias="csOrderDetailsDeliveryAddressWidgetRenderer" name="defaultCsOrderDetailsDeliveryAddressWidgetRenderer"/>
+	<bean id="defaultCsOrderDetailsDeliveryAddressWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.OrderDetailsAddressWidgetRenderer">
+		<property name="billing" value="false"/>
+		<property name="configurationCode" value="orderDetailsDeliveryAddress"/>
+	</bean>
+
+	<!-- order items details widget -->
+	<alias alias="csOrderDetailOrderItemsWidgetConfig" name="defaultCsOrderDetailOrderItemsWidgetConfig"/>
+	<bean id="defaultCsOrderDetailOrderItemsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.detailsItems"/>
+		<property name="widgetRenderer" ref="csOrderDetailOrderItemsWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetModel" ref="csOrderItemWidgetModel"/>
+		<property name="widgetAdapter" ref="csOrderDetailsWidgetAdapter"/>
+	</bean>
+
+	<alias alias="csOrderDetailOrderItemsWidgetRenderer" name="defaultCsOrderDetailOrderItemsWidgetRenderer"/>
+	<bean id="defaultCsOrderDetailOrderItemsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.OrderDetailsOrderItemsWidgetRenderer">
+		<property name="listConfigurationCode" value="cartList"/>
+		<property name="listConfigurationType" value="AbstractOrderEntry"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="lazyLoadingEnabled" value="false"/>
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ProductSearchProductDetailRenderer">
+				<property name="urlStrategy" ref="csProductUrlStrategy"/>
+				<property name="configurationCode" value="productDetails"/>
+			</bean>
+		</property>
+		<property name="formatFactory" ref="formatFactory"/>
+	</bean>
+
+	<!-- order totals widget -->
+	<alias alias="csOrderDetailOrderTotalsWidgetConfig" name="defaultCsOrderDetailOrderTotalsWidgetConfig"/>
+	<bean id="defaultCsOrderDetailOrderTotalsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.totals"/>
+		<property name="widgetRenderer" ref="csOrderDetailOrderTotalsWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderController"/>
+		<property name="widgetModel" ref="csOrderItemWidgetModel"/>
+		<property name="widgetAdapter" ref="csOrderDetailsWidgetAdapter"/>
+	</bean>
+
+	<alias alias="csOrderDetailOrderTotalsWidgetRenderer" name="defaultCsOrderDetailOrderTotalsWidgetRenderer"/>
+	<bean id="defaultCsOrderDetailOrderTotalsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.OrderDetailsOrderTotalsWidgetRenderer">
+		<property name="formatFactory" ref="formatFactory"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<!-- order payments widget -->
+	<alias alias="csOrderDetailsOrderPaymentWidgetConfig" name="defaultCsOrderDetailsOrderPaymentWidgetConfig"/>
+	<bean id="defaultCsOrderDetailsOrderPaymentWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.payment"/>
+		<property name="widgetRenderer" ref="csOrderDetailsOrderPaymentWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderController"/>
+		<property name="widgetModel" ref="csOrderItemWidgetModel"/>
+		<property name="widgetAdapter" ref="csOrderDetailsWidgetAdapter"/>
+	</bean>
+
+	<alias alias="csOrderDetailsOrderPaymentWidgetRenderer" name="defaultCsOrderDetailsOrderPaymentWidgetRenderer"/>
+	<bean id="defaultCsOrderDetailsOrderPaymentWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.OrderDetailsOrderPaymentWidgetRenderer">
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ConfigurableItemWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="configurationCode" value="paymentInfo"/>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- order promotions widget -->
+	<alias alias="csOrderDetailAppliedPromotionsWidgetConfig" name="defaultCsOrderDetailAppliedPromotionsWidgetConfig"/>
+	<bean id="defaultCsOrderDetailAppliedPromotionsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.appliedPromotions"/>
+		<property name="widgetRenderer" ref="csOrderDetailAppliedPromotionsWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.DefaultMasterDetailListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.OrderAppliedPromotionsListWidgetAdapter">
+				<property name="csPromotionService" ref="csPromotionService"/>
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csOrderDetailAppliedPromotionsWidgetRenderer" name="defaultCsOrderDetailAppliedPromotionsWidgetRenderer"/>
+	<bean id="defaultCsOrderDetailAppliedPromotionsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.OrderAppliedPromotionsWidgetRenderer">
+		<property name="listConfigurationCode" value="appliedPromotionResultList"/>
+		<property name="listConfigurationType" value="PromotionResult"/>
+		<property name="lazyLoadingEnabled" value="false"/>
+		<property name="detailRenderers">
+			<map key-type="java.lang.String">
+				<entry key="defaultRenderer">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.AppliedPromotionDetailRenderer" parent="abstractWidgetDetailRenderer">
+						<property name="listConfigurationCode" value="promotionOrderEntryConsumedList"/>
+						<property name="listConfigurationType" value="PromotionOrderEntryConsumed"/>
+						<property name="csPromotionService" ref="csPromotionService"/>
+					</bean>
+				</entry>
+				<entry key="OrderPromotion">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ConfigurableItemWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+						<property name="configurationCode" value="appliedPromotionDetails"/>
+					</bean>
+				</entry>
+			</map>
+		</property>
+		<property name="csPromotionService" ref="csPromotionService"/>
+	</bean>
+
+	<!-- order consignments widget -->
+	<alias alias="csOrderConsignmentsWidgetConfig" name="defaultCsOrderConsignmentsWidgetConfig"/>
+	<bean id="defaultCsOrderConsignmentsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.consignments"/>
+		<property name="widgetRenderer" ref="csOrderConsignmentsWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csOrderConsignmentsWidgetConfig"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.DefaultMasterDetailListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.OrderConsignmentsListWidgetAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+	
+	<alias alias="csOrderConsignmentsWidgetRenderer" name="defaultCsOrderConsignmentsWidgetRenderer"/>
+	<bean id="defaultCsOrderConsignmentsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.ConfigurableCsMasterDetailListboxWidgetRenderer">
+		<property name="listConfigurationCode" value="consignmentList"/>
+		<property name="listConfigurationType" value="Consignment"/>
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.OrderConsignmentsWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="listConfigurationCode" value="consignmentList"/>
+				<property name="listConfigurationType" value="ConsignmentEntry"/>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- order tickets widget -->
+	<alias alias="csOrderTicketListWidgetConfig" name="defaultCsOrderTicketListWidgetConfig"/>
+	<bean id="defaultCsOrderTicketListWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.tickets"/>
+		<property name="widgetRenderer" ref="csOrderTicketListWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.TicketMasterDetailListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.OrderTicketListWidgetAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csOrderTicketListWidgetRenderer" name="defaultCsOrderTicketListWidgetRenderer"/>
+	<bean id="defaultCsOrderTicketListWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.TicketListMasterDetailWidgetRenderer">
+		<property name="listConfigurationCode" value="orderTicketList"/>
+		<property name="listConfigurationType" value="CsTicket"/>
+		<property name="ticketAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.TicketAppender" parent="csBaseAppender"/>
+		</property>
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.TicketDetailRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="ticketHeaderRenderer">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ConfigurableItemWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+						<property name="configurationCode" value="ticketHeaderDetails"/>
+					</bean>
+				</property>
+				<property name="ticketEventRenderer" ref="csTicketEventDetailRenderer"/>
+				<property name="ticketService" ref="ticketService"/>
+			</bean>
+		</property>
+		<property name="widgetHelper" ref="widgetHelper"/>
+	</bean>
+
+	<!-- order actions widget -->
+	<alias alias="csOrderActionsWidgetConfig" name="defaultCsOrderActionsWidgetConfig"/>
+	<bean id="defaultCsOrderActionsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.ordermanagement"/>
+		<property name="widgetRenderer" ref="csOrderActionsWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderManagementActionsWidgetController"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cockpit.widgets.models.impl.DefaultItemWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.UpdateWidgetAdapter"/>
+		</property>
+	</bean>
+
+	<alias alias="csOrderActionsWidgetRenderer" name="defaultCsOrderActionsWidgetRenderer"/>
+	<bean id="defaultCsOrderActionsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.OrderManagementActionsWidgetRenderer">
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+	</bean>
+
+	<!-- partial order cancellation widget -->
+	<alias alias="csPartialOrderCancellationWidgetConfig" name="defaultCsPartialOrderCancellationWidgetConfig"/>
+	<bean id="defaultCsPartialOrderCancellationWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.partialcancellation"/>
+		<property name="widgetRenderer" ref="csPartialOrderCancellationWidgetRenderer"/>
+		<property name="widgetController" ref="csCancellationController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultInputWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cockpit.widgets.models.impl.DefaultListWidgetModel"/>
+		</property>
+	</bean>
+
+	<alias alias="csPartialOrderCancellationWidgetRenderer" name="defaultCsPartialOrderCancellationWidgetRenderer"/>
+	<bean id="defaultCsPartialOrderCancellationWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.PartialOrderCancellationWidgetRenderer">
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+		<property name="enumerationService" ref="enumerationService"/>
+		<property name="productInfoConfigurationCode" value="cancellableOrderEntryProductList"/>
+	</bean>
+
+	<!-- full order cancellation widget -->
+	<alias alias="csFullOrderCancellationWidgetConfig" name="defaultCsFullOrderCancellationWidgetConfig"/>
+	<bean id="defaultCsFullOrderCancellationWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.fullcancellation"/>
+		<property name="widgetRenderer" ref="csFullOrderCancellationWidgetRenderer"/>
+		<property name="widgetController" ref="csCancellationController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultInputWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cockpit.widgets.models.impl.DefaultListWidgetModel"/>
+		</property>
+	</bean>
+
+	<alias alias="csFullOrderCancellationWidgetRenderer" name="defaultCsFullOrderCancellationWidgetRenderer"/>
+	<bean id="defaultCsFullOrderCancellationWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.FullOrderCancellationWidgetRenderer">
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+		<property name="enumerationService" ref="enumerationService"/>
+	</bean>
+
+	<!-- place order widget -->
+	<alias alias="csPlaceOrderWidgetConfig" name="defaultCsPlaceOrderWidgetConfig"/>
+	<bean id="defaultCsPlaceOrderWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.checkout.placeorder"/>
+		<property name="widgetRenderer" ref="csPlaceOrderWidgetRenderer"/>
+		<property name="widgetController" ref="csCheckoutController"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cockpit.widgets.models.impl.DefaultItemWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.UpdateWidgetAdapter"/>
+		</property>
+	</bean>
+
+	<alias alias="csPlaceOrderWidgetRenderer" name="defaultCsPlaceOrderWidgetRenderer"/>
+	<bean id="defaultCsPlaceOrderWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.PlaceOrderWidgetRenderer">
+		<lookup-method name="lookupCheckoutBrowser" bean="csCheckoutBrowser"/>
+		<property name="callContextController" ref="csCallContextController"/>
+		<property name="widgetHelper" ref="widgetHelper"/>
+	</bean>
+
+	<!-- Payment Options widget -->
+	<alias alias="csCheckoutPaymentWidgetConfig" name="defaultCsCheckoutPaymentWidgetConfig"/>
+	<bean id="defaultCsCheckoutPaymentWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.checkout.payment"/>
+		<property name="widgetRenderer" ref="csCheckoutPaymentWidgetRenderer"/>
+		<property name="widgetController" ref="csCheckoutController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csCheckoutPaymentWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CheckoutPaymentWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.CheckoutPaymentWidgetAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csCheckoutPaymentWidgetRenderer" name="defaultCsCheckoutPaymentWidgetRenderer"/>
+	<bean id="defaultCsCheckoutPaymentWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.CheckoutPaymentWidgetRenderer">
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="listConfigurationCode" value="creditCardsList"/>
+		<property name="listConfigurationType" value="CreditCardPaymentInfo"/>
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ConfigurableItemWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="configurationCode" value="paymentInfo"/>
+			</bean>
+		</property>
+		<property name="formatFactory" ref="formatFactory"/>
+	</bean>
+
+	<!-- new payment option widget -->
+	<alias alias="csCheckoutCardPaymentWidgetConfig" name="defaultCsCheckoutCardPaymentWidgetConfig"/>
+	<bean id="defaultCsCheckoutCardPaymentWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.card.payment"/>
+		<property name="widgetRenderer" ref="csCardPaymentWidgetRenderer"/>
+		<property name="widgetController" ref="csCheckoutCardPaymentController"/>
+		<property name="widgetClass" value="de.hybris.platform.cscockpit.widgets.impl.CardPaymentWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csCardPaymentWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cockpit.widgets.models.impl.DefaultItemWidgetModel"/>
+		</property>
+	</bean>
+
+	<alias alias="csCardPaymentWidgetRenderer" name="defaultCsCardPaymentWidgetRenderer"/>
+	<bean id="defaultCsCardPaymentWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.CardPaymentWidgetRenderer">
+		<property name="showPreviousPaymentInfos" value="true"/>
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+		<property name="paymentInfoModelLabelProvider" ref="paymentInfoModelLabelProvider"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+
+		<property name="defaultPropertyValuesMap">
+			<map>
+			</map>
+		</property>
+	</bean>
+
+	<!-- order history widget -->
+	<alias alias="csOrderHistoryWidgetConfig" name="defaultCsOrderHistoryWidgetConfig"/>
+	<bean id="defaultCsOrderHistoryWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.history"/>
+		<property name="widgetRenderer" ref="csOrderHistoryWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.OrderHistoryListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.OrderHistoryWidgetAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+				<property name="orderHistoryService" ref="orderHistoryService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csOrderHistoryWidgetRenderer" name="defaultCsOrderHistoryWidgetRenderer"/>
+	<bean id="defaultCsOrderHistoryWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.OrderHistoryWidgetRenderer">
+		<property name="listConfigurationCode" value="orderHistoryList"/>
+		<property name="listConfigurationType" value="OrderHistoryEntry"/>
+	</bean>
+
+	<!-- order payment transactions widget -->
+	<alias alias="csOrderPaymentTransactionsWidgetConfig" name="defaultCsOrderPaymentTransactionsWidgetConfig"/>
+	<bean id="defaultCsOrderPaymentTransactionsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.paymentTransactions"/>
+		<property name="widgetRenderer" ref="csOrderPaymentTransactionsWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.DefaultMasterDetailListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.OrderPaymentTransactionsListWidgetAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csOrderPaymentTransactionsWidgetRenderer" name="defaultCsOrderPaymentTransactionsWidgetRenderer"/>
+	<bean id="defaultCsOrderPaymentTransactionsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.ConfigurableCsMasterDetailListboxWidgetRenderer">
+		<property name="listConfigurationCode" value="paymentTransactionList"/>
+		<property name="listConfigurationType" value="PaymentTransactionEntry"/>
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.OrderPaymentTransactionEntryDetailRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="configurationCode" value="paymentTransactionListDetail"/>
+				<property name="paymentInfoRenderer">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ConfigurableItemWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+						<property name="configurationCode" value="paymentInfo"/>
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- order return requests widget -->
+	<alias alias="csOrderReturnRequestsWidgetConfig" name="defaultCsOrderReturnRequestsWidgetConfig"/>
+	<bean id="defaultCsOrderReturnRequestsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.returnRequests"/>
+		<property name="widgetRenderer" ref="csOrderReturnRequestsWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.DefaultMasterDetailListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.OrderReturnRequestListWidgetAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csOrderReturnRequestsWidgetRenderer" name="defaultCsOrderReturnRequestsWidgetRenderer"/>
+	<bean id="defaultCsOrderReturnRequestsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.ConfigurableCsMasterDetailListboxWidgetRenderer">
+		<property name="listConfigurationCode" value="returnRequestList"/>
+		<property name="listConfigurationType" value="ReturnRequest"/>
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.OrderReturnRequestListWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="listConfigurationCode" value="returnRequestListDetail"/>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- new refund request widget -->
+	<alias alias="csRefundRequestCreateWidgetConfig" name="defaultCsRefundRequestCreateWidgetConfig"/>
+	<bean id="defaultCsRefundRequestCreateWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.returnRefund.create"/>
+		<property name="widgetRenderer" ref="csRefundRequestCreateWidgetRenderer"/>
+		<property name="widgetController" ref="csReturnsController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultInputWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csReturnsCreateWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cockpit.widgets.models.impl.DefaultListWidgetModel"/>
+		</property>
+	</bean>
+
+	<alias alias="csRefundRequestCreateWidgetRenderer" name="defaultCsRefundRequestCreateWidgetRenderer"/>
+	<bean id="defaultCsRefundRequestCreateWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.ReturnRequestCreateWidgetRenderer">
+		<property name="productInfoConfigurationCode" value="returnsOrderEntryList"/>
+		<property name="listConfigurationCode" value="refundEntryList"/>
+		<property name="listEditorConfigurationCode" value="refundEntryEdit"/>
+		<property name="listConfigurationType" value="RefundEntry"/>
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+	</bean>
+
+	<!-- new replacement request widget -->
+	<alias alias="csReplacementRequestCreateWidgetConfig" name="defaultCsReplacementRequestCreateWidgetConfig"/>
+	<bean id="defaultCsReplacementRequestCreateWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.returnReplacement.create"/>
+		<property name="widgetRenderer" ref="csReplacementRequestCreateWidgetRenderer"/>
+		<property name="widgetController" ref="csReturnsController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultInputWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csReturnsCreateWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cockpit.widgets.models.impl.DefaultListWidgetModel"/>
+		</property>
+	</bean>
+
+	<alias alias="csReplacementRequestCreateWidgetRenderer" name="defaultCsReplacementRequestCreateWidgetRenderer"/>
+	<bean id="defaultCsReplacementRequestCreateWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.ReturnRequestCreateWidgetRenderer">
+		<property name="productInfoConfigurationCode" value="returnsOrderEntryList"/>
+		<property name="listConfigurationCode" value="replacementEntryList"/>
+		<property name="listEditorConfigurationCode" value="replacementEntryEdit"/>
+		<property name="listConfigurationType" value="ReplacementEntry"/>
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+	</bean>
+
+	<!-- order modifications widget -->
+	<alias alias="csOrderModificationsHistoryWidgetConfig" name="defaultCsOrderModificationsHistoryWidgetConfig"/>
+	<bean id="defaultCsOrderModificationsHistoryWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.order.modificationsHistory"/>
+		<property name="widgetRenderer" ref="csOrderModificationsHistoryWidgetRenderer"/>
+		<property name="widgetController" ref="csOrderController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.DefaultMasterDetailListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.OrderModificationsHistoryListWidgetAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csOrderModificationsHistoryWidgetRenderer" name="defaultCsOrderModificationsHistoryWidgetRenderer"/>
+	<bean id="defaultCsOrderModificationsHistoryWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.ConfigurableCsMasterDetailListboxWidgetRenderer">
+		<property name="listConfigurationCode" value="orderModificationRecordList"/>
+		<property name="listConfigurationType" value="OrderModificationRecord"/>
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.OrderModificationRecordEntryListWidgetMultiLevelDetailRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="listConfigurationCode" value="orderModificationRecordListDetail"/>
+				<property name="listConfigurationType" value="OrderModificationRecordEntry"/>
+				<property name="detailRenderer">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.OrderEntryModificationRecordEntryListWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+						<property name="listConfigurationCode" value="orderEntryModificationRecordEntryListDetail"/>
+						<property name="productInfoConfigurationCode" value="modificationRecordOrderEntryList"/>
+					</bean>
+				</property>
+				<property name="labelService" ref="labelService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- refund confirm widget -->
+	<alias alias="csRefundConfirmationWidgetConfig" name="defaultCsRefundConfirmationWidgetConfig"/>
+	<bean id="defaultCsRefundConfirmationWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.returns.refund.confirm"/>
+		<property name="widgetRenderer" ref="csRefundConfirmationWidgetRenderer"/>
+		<property name="widgetController" ref="csReturnsController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csReturnsConfirmWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cockpit.widgets.models.impl.DefaultListWidgetModel"/>
+		</property>
+	</bean>
+
+	<alias alias="csRefundConfirmationWidgetRenderer" name="defaultCsRefundConfirmationWidgetRenderer"/>
+	<bean id="defaultCsRefundConfirmationWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.RefundConfirmationWidgetRenderer">
+		<property name="listConfigurationCode" value="returnsOrderEntryList"/>
+		<property name="listConfigurationType" value="AbstractOrderEntry"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+		<property name="formatFactory" ref="formatFactory"/>
+	</bean>
+
+	<!-- Customer Browser Widgets -->
+
+	<!-- new customer widget -->
+	<alias alias="csCustomerCreateWidgetConfig" name="defaultCsCustomerCreateWidgetConfig"/>
+	<bean id="defaultCsCustomerCreateWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.customer.create"/>
+		<property name="widgetRenderer" ref="csCustomerCreateWidgetRenderer"/>
+		<property name="widgetController" ref="csCustomerCreateController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultInputWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csCustomerCreateWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.DefaultMasterDetailListWidgetModel"/>
+		</property>
+	</bean>
+
+	<alias alias="csCustomerCreateWidgetRenderer" name="defaultCsCustomerCreateWidgetRenderer"/>
+	<bean id="defaultCsCustomerCreateWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.CustomerCreateWidgetRenderer">
+		<property name="itemAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.CustomerAppender" parent="csBaseAppender"/>
+		</property>
+		<property name="editorConfigurationCode" value="newCustomerDetails"/>
+		<property name="editorConfigurationType" value="Customer"/>
+		<property name="defaultPropertyValuesMap">
+			<map>
+				<entry key="User.loginDisabled">
+					<value type="java.lang.Boolean">false</value>
+				</entry>
+				<entry key="User.ldapaccount">
+					<value type="java.lang.Boolean">false</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<!-- new address widget -->
+	<alias alias="csAddressCreateWidgetConfig" name="defaultCsAddressCreateWidgetConfig"/>
+	<bean id="defaultCsAddressCreateWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.address.create"/>
+		<property name="widgetRenderer" ref="csAddressCreateWidgetRenderer"/>
+		<property name="widgetController" ref="csCallContextController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultInputWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csAddressCreateWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.DefaultMasterDetailListWidgetModel"/>
+		</property>
+	</bean>
+
+	<alias alias="csAddressCreateWidgetRenderer" name="defaultCsAddressCreateWidgetRenderer"/>
+	<bean id="defaultCsAddressCreateWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.AddressCreateWidgetRenderer">
+		<property name="editorConfigurationCode" value="customerAddressListEditor"/>
+		<property name="editorConfigurationType" value="Address"/>
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+		<property name="defaultPropertyValuesMap">
+			<map>
+				<entry key="Address.unloadingAddress">
+					<value type="java.lang.Boolean">false</value>
+				</entry>
+				<entry key="Address.billingAddress">
+					<value type="java.lang.Boolean">false</value>
+				</entry>
+				<entry key="Address.shippingAddress">
+					<value type="java.lang.Boolean">false</value>
+				</entry>
+				<entry key="Address.contactAddress">
+					<value type="java.lang.Boolean">false</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<alias alias="csShippingAddressCreateWidgetConfig" name="defaultCsShippingAddressCreateWidgetConfig"/>
+	<bean id="defaultCsShippingAddressCreateWidgetConfig" parent="defaultCsAddressCreateWidgetConfig">
+		<property name="widgetRenderer" ref="csShippingAddressCreateWidgetRenderer"/>
+	</bean>
+
+	<alias alias="csShippingAddressCreateWidgetRenderer" name="defaultCsShippingAddressCreateWidgetRenderer"/>
+	<bean id="defaultCsShippingAddressCreateWidgetRenderer" parent="defaultCsAddressCreateWidgetRenderer">
+		<property name="defaultPropertyValuesMap">
+			<map>
+				<entry key="Address.unloadingAddress">
+					<value type="java.lang.Boolean">false</value>
+				</entry>
+				<entry key="Address.billingAddress">
+					<value type="java.lang.Boolean">false</value>
+				</entry>
+				<entry key="Address.shippingAddress">
+					<value type="java.lang.Boolean">true</value>
+				</entry>
+				<entry key="Address.contactAddress">
+					<value type="java.lang.Boolean">false</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<alias alias="csPaymentAddressCreateWidgetConfig" name="defaultCsPaymentAddressCreateWidgetConfig"/>
+	<bean id="defaultCsPaymentAddressCreateWidgetConfig" parent="defaultCsAddressCreateWidgetConfig">
+		<property name="widgetRenderer" ref="csPaymentAddressCreateWidgetRenderer"/>
+	</bean>
+
+	<alias alias="csPaymentAddressCreateWidgetRenderer" name="defaultCsPaymentAddressCreateWidgetRenderer"/>
+	<bean id="defaultCsPaymentAddressCreateWidgetRenderer" parent="defaultCsAddressCreateWidgetRenderer">
+		<property name="defaultPropertyValuesMap">
+			<map>
+				<entry key="Address.unloadingAddress">
+					<value type="java.lang.Boolean">false</value>
+				</entry>
+				<entry key="Address.billingAddress">
+					<value type="java.lang.Boolean">true</value>
+				</entry>
+				<entry key="Address.shippingAddress">
+					<value type="java.lang.Boolean">false</value>
+				</entry>
+				<entry key="Address.contactAddress">
+					<value type="java.lang.Boolean">false</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<!-- edit customer details widget -->
+	<alias alias="csCustomerEditWidgetConfig" name="defaultCsCustomerEditWidgetConfig"/>
+	<bean id="defaultCsCustomerEditWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.customer.edit"/>
+		<property name="widgetRenderer" ref="csCustomerEditWidgetRenderer"/>
+		<property name="widgetController" ref="csCustomerController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultInputWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csCustomerEditWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CustomerItemWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.CustomerEditAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csCustomerEditWidgetRenderer" name="defaultCsCustomerEditWidgetRenderer"/>
+	<bean id="defaultCsCustomerEditWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.CustomerDetailsEditWidgetRenderer">
+		<property name="editorConfigurationCode" value="editCustomerDetails"/>
+		<property name="footerRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ConfigurableItemWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="configurationCode" value="customerReadonlyDetails"/>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- customer addresses widget -->
+	<alias alias="csCustomerEditAddressWidgetConfig" name="defaultCsCustomerEditAddressWidgetConfig"/>
+	<bean id="defaultCsCustomerEditAddressWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.customer.addresses"/>
+		<property name="widgetRenderer" ref="csCustomerEditAddressWidgetRenderer"/>
+		<property name="widgetController" ref="csCustomerController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csCustomerEditAddressesWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.CustomerAddressesListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.CustomerEditAddressesAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csCustomerEditAddressWidgetRenderer" name="defaultCsCustomerEditAddressWidgetRenderer"/>
+	<bean id="defaultCsCustomerEditAddressWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.CustomerAddressesWidgetRenderer">
+		<property name="listConfigurationCode" value="customerAddressList"/>
+		<property name="listEditorConfigurationCode" value="customerAddressListEditor"/>
+		<property name="listConfigurationType" value="Address"/>
+		<property name="lazyLoadingEnabled" value="false"/>
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+		<property name="addressModelLabelProvider" ref="addressModelLabelProvider"/>
+		<property name="itemRemovalAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.RemoveAddressAppender" parent="csBaseAppender"/>
+		</property>
+	</bean>
+
+	<!-- customer orders widget -->
+	<alias alias="csCustomerOrdersWidgetConfig" name="defaultCsCustomerOrdersWidgetConfig"/>
+	<bean id="defaultCsCustomerOrdersWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.customer.orders"/>
+		<property name="widgetRenderer" ref="csCustomerOrdersWidgetRenderer"/>
+		<property name="widgetController" ref="csCustomerController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csCustomerOrdersWidgetFrame"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.DefaultMasterDetailListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.CustomerOrdersAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csCustomerOrdersWidgetRenderer" name="defaultCsCustomerOrdersWidgetRenderer"/>
+	<bean id="defaultCsCustomerOrdersWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.CustomerOrdersWidgetRenderer">
+		<property name="listConfigurationCode" value="customerOrderList"/>
+		<property name="listConfigurationType" value="AbstractOrder"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="lazyLoadingEnabled" value="false"/>
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.OrderEntriesWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="listConfigurationCode" value="customerOrderEntryList"/>
+				<property name="listConfigurationType" value="AbstractOrderEntry"/>
+			</bean>
+		</property>
+		<property name="orderAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.OrderAppender" parent="csBaseAppender"/>
+		</property>
+		<property name="widgetHelper" ref="widgetHelper"/>
+		<property name="formatFactory" ref="formatFactory"/>
+	</bean>
+
+	<!-- customer tokenised credit cards (stored cards) -->
+	<alias alias="csCustomerTokenisedCreditCardsWidgetConfig" name="defaultCsCustomerTokenisedCreditCardsWidgetConfig"/>
+	<bean id="defaultCsCustomerTokenisedCreditCardsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.customer.tokenisedCreditCards"/>
+		<property name="widgetRenderer" ref="csCustomerTokenisedCreditCardsWidgetRenderer"/>
+		<property name="widgetController" ref="csCustomerController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.DefaultMasterDetailListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.TokenisedCreditCardsListWidgetAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csCustomerTokenisedCreditCardsWidgetRenderer" name="defaultCsCustomerTokenisedCreditCardsWidgetRenderer"/>
+	<bean id="defaultCsCustomerTokenisedCreditCardsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.ConfigurableCsMasterDetailListboxWidgetRenderer">
+		<property name="listConfigurationCode" value="creditCardsList"/>
+		<property name="listConfigurationType" value="CreditCardPaymentInfo"/>
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ConfigurableItemWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="configurationCode" value="paymentInfo"/>
+			</bean>
+		</property>
+	</bean>
+
+
+	<!-- order tickets widget -->
+	<alias alias="csCustomerTicketListWidgetConfig" name="defaultCsCustomerTicketListWidgetConfig"/>
+	<bean id="defaultCsCustomerTicketListWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.customer.tickets"/>
+		<property name="widgetRenderer" ref="csCustomerTicketListWidgetRenderer"/>
+		<property name="widgetController" ref="csCustomerController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.TicketMasterDetailListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.CustomerTicketListWidgetAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csCustomerTicketListWidgetRenderer" name="defaultCsCustomerTicketListWidgetRenderer"/>
+	<bean id="defaultCsCustomerTicketListWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.TicketListMasterDetailWidgetRenderer">
+		<property name="listConfigurationCode" value="customerTicketList"/>
+		<property name="listConfigurationType" value="CsTicket"/>
+		<property name="ticketAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.TicketAppender" parent="csBaseAppender"/>
+		</property>
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.TicketDetailRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="ticketHeaderRenderer">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ConfigurableItemWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+						<property name="configurationCode" value="ticketHeaderDetails"/>
+					</bean>
+				</property>
+				<property name="ticketEventRenderer" ref="csTicketEventDetailRenderer"/>
+				<property name="ticketService" ref="ticketService"/>
+			</bean>
+		</property>
+		<property name="widgetHelper" ref="widgetHelper"/>
+	</bean>
+
+	<!-- Ticket Browser Widgets -->
+
+	<!-- ticket header details widget -->
+	<alias alias="csTicketHeaderWidgetConfig" name="defaultCsTicketHeaderWidgetConfig"/>
+	<bean id="defaultCsTicketHeaderWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.ticket.header"/>
+		<property name="widgetRenderer" ref="csTicketHeaderWidgetRenderer"/>
+		<property name="widgetController" ref="csTicketController"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cockpit.widgets.models.impl.DefaultItemWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.TicketWidgetAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csTicketHeaderWidgetRenderer" name="defaultCsTicketHeaderWidgetRenderer"/>
+	<bean id="defaultCsTicketHeaderWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.TicketHeaderWidgetRenderer">
+		<property name="configurationCode" value="ticketHeaderDetails"/>
+		<property name="popupWidgetHelper" ref="popupWidgetHelper"/>
+	</bean>
+
+	<!-- ticket events widget -->
+	<alias alias="csTicketEventsWidgetConfig" name="defaultCsTicketEventsWidgetConfig"/>
+	<bean id="defaultCsTicketEventsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.ticket.events"/>
+		<property name="widgetRenderer" ref="csTicketEventsWidgetRenderer"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetController" ref="csTicketController"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.TicketEventsWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.TicketEventsWidgetAdapter">
+				<property name="ticketService" ref="ticketService"/>
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csTicketEventsWidgetRenderer" name="defaultCsTicketEventsWidgetRenderer"/>
+	<bean id="defaultCsTicketEventsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.TicketEventsWidgetRenderer">
+		<property name="listConfigurationCode" value="ticketEventsList"/>
+		<property name="listConfigurationType" value="CsTicketEvent"/>
+		<property name="ticketEventRenderer" ref="csTicketEventDetailRenderer"/>
+		<property name="lazyLoadingEnabled" value="false"/>
+	</bean>
+
+	<!-- End Call Browser Widgets -->
+
+	<!-- end call widget -->
+	<alias alias="csEndCallWidgetConfig" name="defaultCsEndCallWidgetConfig"/>
+	<bean id="defaultCsEndCallWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.endCall.endCall"/>
+		<property name="widgetRenderer" ref="csEndCallWidgetRenderer"/>
+		<property name="widgetController" ref="csCallContextController"/>
+		<property name="widgetSclass" value="defaultWidgetFrame csEndCallWidgetConfig"/>
+	</bean>
+
+	<alias alias="csEndCallWidgetRenderer" name="defaultCsEndCallWidgetRenderer"/>
+	<bean id="defaultCsEndCallWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.EndCallWidgetRenderer"/>
+
+	<!-- Fraud Report Browser widget -->
+	<alias alias="csFraudReportWidgetConfig" name="defaultCsFraudReportWidgetConfig" />
+	<bean id="defaultCsFraudReportWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.fraudReport.list" />
+		<property name="widgetRenderer" ref="csFraudReportWidgetRenderer" />
+		<property name="widgetController" ref="csOrderFraudController" />
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget" />
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.DefaultMasterDetailListWidgetModel" />
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.cscockpit.widgets.adapters.FraudReportWidgetAdapter" >
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+			</bean>
+		</property>
+	</bean>
+	
+	
+	<alias alias="csFraudReportWidgetRenderer" name="defaultCsFraudReportWidgetRenderer"/>
+	<bean id="defaultCsFraudReportWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.impl.FraudReportWidgetRenderer"/>
+	
+
+
+	<!-- WIDGET DETAIL RENDERERS -->
+
+	<!-- Detail renderer for ticket events that is shared between the customer tickets, order tickets and ticket renderers -->
+	<alias alias="csTicketEventDetailRenderer" name="defaultCsTicketEventDetailRenderer"/>
+	<bean id="defaultCsTicketEventDetailRenderer" class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.TicketEventDetailRenderer" scope="session">
+		<property name="detailRenderers" >
+			<map key-type="java.lang.String">
+				<entry key="ticketCreationEvent">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.TicketEventDescriptionRenderer">
+						<property name="configurationCode" value="ticketEventsListCreation"/>
+						<property name="propertyEditorHelper" ref="propertyEditorHelper"/>
+						<property name="systemService" ref="systemService"/>
+						<property name="propertyRendererHelper" ref="propertyRendererHelper"/>
+						<property name="cockpitTypeService" ref="cockpitTypeService"/>
+					</bean>
+				</entry>
+				<entry key="ticketChangeEvent">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.TicketEventDescriptionRenderer">
+						<property name="configurationCode" value="ticketEventsListChange"/>
+						<property name="propertyEditorHelper" ref="propertyEditorHelper"/>
+						<property name="systemService" ref="systemService"/>
+						<property name="propertyRendererHelper" ref="propertyRendererHelper"/>
+						<property name="cockpitTypeService" ref="cockpitTypeService"/>
+					</bean>
+				</entry>
+				<entry key="customerNote">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.TicketEventDescriptionRenderer">
+						<property name="configurationCode" value="ticketEventsListNote"/>
+						<property name="propertyEditorHelper" ref="propertyEditorHelper"/>
+						<property name="systemService" ref="systemService"/>
+						<property name="propertyRendererHelper" ref="propertyRendererHelper"/>
+						<property name="cockpitTypeService" ref="cockpitTypeService"/>
+					</bean>
+				</entry>
+				<entry key="customerEmail">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.TicketEventDescriptionRenderer">
+						<property name="configurationCode" value="ticketEventsListEmail"/>
+						<property name="propertyEditorHelper" ref="propertyEditorHelper"/>
+						<property name="systemService" ref="systemService"/>
+						<property name="propertyRendererHelper" ref="propertyRendererHelper"/>
+						<property name="cockpitTypeService" ref="cockpitTypeService"/>
+					</bean>
+				</entry>
+				<entry key="ticketResolutionEvent">
+					<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.TicketEventDescriptionRenderer">
+						<property name="configurationCode" value="ticketEventsListResolution"/>
+						<property name="propertyEditorHelper" ref="propertyEditorHelper"/>
+						<property name="systemService" ref="systemService"/>
+						<property name="propertyRendererHelper" ref="propertyRendererHelper"/>
+						<property name="cockpitTypeService" ref="cockpitTypeService"/>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+
+	<!-- WIDGET MODELS -->
+
+
+	<alias alias="csBasketCartWidgetModel" name="defaultCsBasketCartWidgetModel" />
+	<bean id="defaultCsBasketCartWidgetModel" class="de.hybris.platform.cscockpit.widgets.models.impl.BasketCartWidgetModel" scope="session"/>
+
+	<alias alias="csOrderItemWidgetModel" name="defaultCsOrderItemWidgetModel" />
+	<bean id="defaultCsOrderItemWidgetModel" class="de.hybris.platform.cscockpit.widgets.models.impl.OrderItemWidgetModel" scope="session"/>
+
+	<alias alias="csCartAddressWidgetModel" name="defaultCsCartAddressWidgetModel" />
+	<bean id="defaultCsCartAddressWidgetModel" class="de.hybris.platform.cscockpit.widgets.models.impl.CartAddressWidgetModel" scope="session"/>
+
+	<alias alias="csShippingCartAddressWidgetModel" name="defaultCsShippingCartAddressWidgetModel" />
+	<bean id="defaultCsShippingCartAddressWidgetModel" class="de.hybris.platform.cscockpit.widgets.models.impl.ShippingCartAddressWidgetModel" parent="csCartAddressWidgetModel" scope="session">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+	</bean>
+
+
+	<!-- WIDGET ADAPTERS -->
+
+
+	<alias alias="csBasketCartWidgetAdapter" name="defaultCsBasketCartWidgetAdapter" />
+	<bean id="defaultCsBasketCartWidgetAdapter" class="de.hybris.platform.cscockpit.widgets.adapters.BasketCartAdapter" scope="session">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+	</bean>
+
+	<alias alias="csOrderDetailsWidgetAdapter" name="defaultCsOrderDetailsWidgetAdapter" />
+	<bean id="defaultCsOrderDetailsWidgetAdapter" class="de.hybris.platform.cscockpit.widgets.adapters.OrderDetailsAdapter" scope="session">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+	</bean>
+
+	<alias alias="csCartAddressWidgetAdapter" name="defaultCsCartAddressWidgetAdapter" />
+	<bean id="defaultCsCartAddressWidgetAdapter" abstract="true" class="de.hybris.platform.cscockpit.widgets.adapters.CartAddressAdapter" scope="session">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+	</bean>
+
+	<alias alias="csShippingCartAddressWidgetAdapter" name="defaultCsShippingCartAddressWidgetAdapter" />
+	<bean id="defaultCsShippingCartAddressWidgetAdapter" class="de.hybris.platform.cscockpit.widgets.adapters.CartShippingAddressAdapter" scope="session" parent="csCartAddressWidgetAdapter">
+		<property name="deliveryService" ref="deliveryService"/>
+	</bean>
+
+	<alias alias="csCartPaymentAddressWidgetAdapter" name="defaultCsCartPaymentAddressWidgetAdapter" />
+	<bean id="defaultCsCartPaymentAddressWidgetAdapter" class="de.hybris.platform.cscockpit.widgets.adapters.CartPaymentAddressAdapter" scope="session" parent="csCartAddressWidgetAdapter">
+		<property name="customerAccountService" ref="customerAccountService"/>
+	</bean>
+
+
+	<!-- WIDGET CONTROLLERS -->
+	<alias alias="csBaseWidgetController" name="defaultCsBaseWidgetController" />
+	<bean id="defaultCsBaseWidgetController" abstract="true" scope="session" class="de.hybris.platform.cscockpit.widgets.controllers.impl.AbstractCsWidgetController">
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+
+	<!-- Search controllers -->
+	<alias alias="csBaseDefaultSearchController" name="defaultCsBaseDefaultSearchController" />
+	<bean id="defaultCsBaseDefaultSearchController" abstract="true" scope="session" parent="csBaseWidgetController" class="de.hybris.platform.cscockpit.widgets.controllers.search.impl.DefaultSearchCommandController">
+		<property name="pageable.pageSize" value="8"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+	</bean>
+
+	<alias alias="csAgentGroupSearchController" name="defaultCsAgentGroupSearchController"/>
+	<bean id="defaultCsAgentGroupSearchController" parent="csBaseDefaultSearchController">
+		<property name="searchService" ref="csAgentGroupSearchService"/>
+	</bean>
+
+	<alias alias="csAgentSearchController" name="defaultCsAgentSearchController"/>
+	<bean id="defaultCsAgentSearchController" parent="csBaseDefaultSearchController">
+		<property name="searchService" ref="csAgentSearchService"/>
+	</bean>
+
+	<alias alias="csCustomerSearchController" name="defaultCsCustomerSearchController"/>
+	<bean id="defaultCsCustomerSearchController" parent="csBaseDefaultSearchController">
+		<property name="searchService" ref="csCustomerSearchService"/>
+	</bean>
+
+	<alias alias="csOrderSearchController" name="defaultCsOrderSearchController"/>
+	<bean id="defaultCsOrderSearchController" parent="csBaseDefaultSearchController">
+		<property name="searchService" ref="csOrderSearchService"/>
+	</bean>
+
+	<alias alias="csTicketSearchController" name="defaultCsTicketSearchController"/>
+	<bean id="defaultCsTicketSearchController" parent="csBaseDefaultSearchController">
+		<property name="searchService" ref="csTicketSearchService"/>
+	</bean>
+
+	<alias alias="csTicketPoolSearchController" name="defaultCsTicketPoolSearchController"/>
+	<bean id="defaultCsTicketPoolSearchController" parent="csBaseDefaultSearchController">
+		<property name="searchService" ref="csTicketPoolSearchService"/>
+		<property name="pageable.pageSize" value="15"/>
+		<property name="defaultSearchCommand">
+			<bean class="de.hybris.platform.cscockpit.services.search.impl.DefaultCsTextSearchCommand">
+				<property name="flags">
+					<list>
+						<util:constant static-field="de.hybris.platform.cscockpit.services.search.generic.query.DefaultTicketPoolSearchQueryBuilder$SearchAgent.CurrentUserOrUnassigned"/>
+						<util:constant static-field="de.hybris.platform.cscockpit.services.search.generic.query.DefaultTicketPoolSearchQueryBuilder$SearchGroup.MyGroup"/>
+						<util:constant static-field="de.hybris.platform.cscockpit.services.search.generic.query.DefaultTicketPoolSearchQueryBuilder$SearchStatus.NewOrOpen"/>
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csProductSearchController" name="defaultCsProductSearchController"/>
+	<bean id="defaultCsProductSearchController" parent="csBaseDefaultSearchController">
+		<property name="searchService" ref="csProductSearchService"/>
+		<property name="impersonateCustomer" value="true"/>
+		<property name="pageable.pageSize" value="15"/>
+	</bean>
+
+
+	<!-- Order details controller -->
+	<alias alias="csOrderController" name="defaultCsOrderController"/>
+	<bean id="defaultCsOrderController" scope="session" parent="csAbstractCallContextDependantController" class="de.hybris.platform.cscockpit.widgets.controllers.impl.DefaultOrderController">
+	    <property name="ticketStrategy" ref="csTicketStrategy"/>
+	</bean>
+	
+	<!-- Order fraud controller -->
+	<alias alias="csOrderFraudController" name="defaultCsOrderFraudController"/>
+	<bean id="defaultCsOrderFraudController" scope="session" parent="defaultCsOrderController" class="de.hybris.platform.cscockpit.widgets.controllers.impl.DefaultOrderFraudController">
+		<lookup-method name="lookupBussinessService" bean="businessProcessService"/>
+		<property name="processName" value="placeorder"/>
+		<property name="orderVerifiedEventName" value="CSAOrderVerified"/>
+		<property name="orderUnsuspendedEventName" value="CleanUpEvent"/>
+	</bean>
+
+
+	<!-- Ticket controller -->
+	<alias alias="csTicketController" name="defaultCsTicketController"/>
+	<bean id="defaultCsTicketController" scope="session" parent="csAbstractCallContextDependantController" class="de.hybris.platform.cscockpit.widgets.controllers.impl.DefaultTicketController">
+		<property name="ticketBusinessService" ref="ticketBusinessService"/>
+		<property name="csCustomerService" ref="csCustomerService"/>
+	</bean>
+
+	<!-- basket controller -->
+	<alias alias="csBasketController" name="defaultCsBasketController"/>
+	<bean id="defaultCsBasketController"  scope="session" parent="csAbstractCallContextDependantController" class="de.hybris.platform.cscockpit.widgets.controllers.impl.DefaultBasketController">
+		<property name="basketStrategy" ref="csBasketStrategy"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="userService" ref="userService"/>
+		<property name="commerceCartService" ref="commerceCartService"/>
+		<property name="csPromotionService" ref="csPromotionService"/>
+		<lookup-method name="lookupCheckoutBrowser" bean="csCheckoutBrowser"/>
+		<property name="checkoutBrowserDefaultWidgetCode" value="checkoutCartWidget"/>
+		<property name="csCheckoutService" ref="csCheckoutService"/>
+		<property name="widgetHelper" ref="widgetHelper"/>
+		<property name="deliveryService" ref="deliveryService"/>
+		<property name="commerceCheckoutService" ref="commerceCheckoutService"/>
+		<property name="impersonationService" ref="impersonationService"/>
+		<property name="formatFactory" ref="formatFactory"/>
+		<property name="customerAccountService" ref="customerAccountService"/>
+		<lookup-method name="lookupCheckoutController" bean="csCheckoutController"/>
+	</bean>
+
+	<!-- create customer controller -->
+	<alias alias="csCustomerCreateController" name="defaultCsCustomerCreateController"/>
+	<bean id="defaultCsCustomerCreateController" parent="csBaseWidgetController" class="de.hybris.platform.cscockpit.widgets.controllers.impl.DefaultCustomerCreateController" scope="session">
+		<property name="uidKeyGenerator" ref="csCustomerUidGenerator"/>
+		<property name="customerAccountService" ref="customerAccountService"/>
+		<property name="i18NService" ref="i18NService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<!-- These should be aliased to the correct customer id generators -->
+	<alias alias="csCustomerUidGenerator" name="orderCodeGenerator"/>
+
+	<!-- call context controller -->
+	<alias alias="csCustomerController" name="defaultCsCallContextController"/>
+	<alias alias="csCallContextController" name="defaultCsCallContextController"/>
+	<bean id="defaultCsCallContextController" parent="csBaseWidgetController" class="de.hybris.platform.cscockpit.widgets.controllers.impl.DefaultCallContextController" scope="session">
+		<property name="basketController" ref="csBasketController"/>
+		<property name="customerOrdersStrategy" ref="csCustomerOrdersStrategy"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="userService" ref="userService"/>
+		<property name="ticketStrategy" ref="csTicketStrategy"/>
+		<lookup-method name="lookupBrowserToSwitchOnEndCall" bean="csBasketBrowser"/>
+		<property name="widgetToFocusOnEndCall" value="basketCartWidget"/>
+		<property name="impersonationService" ref="impersonationService"/>
+		<property name="widgetHelper" ref="widgetHelper"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService"/>
+		<property name="newItemService" ref="newItemService"/>
+		<property name="customerAccountService" ref="customerAccountService"/>
+	</bean>
+
+	<alias alias="csAbstractCallContextDependantController" name="defaultCsAbstractCallContextDependantController" />
+	<bean id="defaultCsAbstractCallContextDependantController" scope="session" abstract="true" parent="csBaseWidgetController" class="de.hybris.platform.cscockpit.widgets.controllers.impl.AbstractCallContextDependantController"/>
+
+	<!-- Strategies -->
+	<alias alias="csBasketStrategy" name="defaultCsBasketStrategy"/>
+	<bean id="defaultCsBasketStrategy" class="de.hybris.platform.cscockpit.widgets.controllers.strategies.impl.DefaultBasketStrategy" scope="session">
+		<lookup-method name="lookupCallContextController" bean="csCallContextController"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="keyGenerator" ref="orderCodeGenerator"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="cartFactory" ref="cartFactory"/>
+	</bean>
+
+	<!-- checkout controller -->
+	<alias alias="csCheckoutCardPaymentController" name="defaultCsCheckoutController"/>
+	<alias alias="csCheckoutController" name="defaultCsCheckoutController"/>
+	<bean id="defaultCsCheckoutController" class="de.hybris.platform.cscockpit.widgets.controllers.impl.DefaultCheckoutController" scope="session" parent="csAbstractCallContextDependantController">
+		<property name="basketController" ref="csBasketController"/>
+		<property name="csCheckoutService" ref="csCheckoutService"/>
+		<property name="csCardPaymentService" ref="csCardPaymentService"/>
+		<property name="commerceCartService" ref="commerceCartService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="impersonationService" ref="impersonationService"/>
+		<property name="namedDeliveryDateStrategy" ref="namedDeliveryDateStrategy"/>
+	</bean>
+
+	<alias alias="csOrderManagementActionsWidgetController" name="defaultCsOrderManagementActionsWidgetController"/>
+	<bean id="defaultCsOrderManagementActionsWidgetController" parent="csBaseWidgetController" class="de.hybris.platform.cscockpit.widgets.controllers.impl.DefaultOrderManagementActionsWidgetController" scope="session">
+		<property name="callContextController" ref="csCallContextController"/>
+		<property name="orderCancelService" ref="orderCancelService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<alias alias="csCancellationController" name="defaultCsCancellationController"/>
+	<bean id="defaultCsCancellationController" parent="csBaseWidgetController" class="de.hybris.platform.cscockpit.widgets.controllers.impl.DefaultCancellationController" scope="session">
+		<property name="orderManagementActionsWidgetController" ref="csOrderManagementActionsWidgetController"/>
+		<property name="orderCancelService" ref="orderCancelService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<alias alias="csReturnsController" name="defaultCsReturnsController"/>
+	<bean id="defaultCsReturnsController" parent="csBaseWidgetController" class="de.hybris.platform.cscockpit.widgets.controllers.impl.DefaultReturnsController" scope="session">
+		<property name="orderManagementActionsWidgetController" ref="csOrderManagementActionsWidgetController"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="impersonationService" ref="impersonationService"/>
+		<property name="refundService" ref="refundService"/>
+		<property name="returnService" ref="returnService"/>
+	</bean>
+
+	<alias alias="csCustomerOrdersStrategy" name="defaultCsCustomerOrdersStrategy"/>
+	<bean id="defaultCsCustomerOrdersStrategy" class="de.hybris.platform.cscockpit.widgets.controllers.strategies.impl.DefaultCustomerOrdersStrategy" scope="session"/>
+
+	<alias alias="csTicketStrategy" name="defaultCsTicketStrategy"/>
+	<bean id="defaultCsTicketStrategy" class="de.hybris.platform.cscockpit.widgets.controllers.strategies.impl.DefaultTicketStrategy" scope="session">
+		<property name="ticketService" ref="ticketService"/>	      
+	</bean>
+
+	<alias alias="baseCsProductUrlStrategy" name="defaultBaseCsProductUrlStrategy" />
+	<bean id="defaultBaseCsProductUrlStrategy" class="de.hybris.platform.cscockpit.widgets.controllers.strategies.impl.AbstractProductUrlStrategy" abstract="true" scope="session">
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="productModelUrlResolver" ref="productModelUrlResolver"/>
+		<lookup-method name="lookupCallContextController" bean="csCallContextController"/>
+	</bean>
+
+	<!-- The default product strategy builds product URL links based on a static baseUrl -->
+	<alias alias="defaultCsProductUrlStrategy" name="defaultCsProductUrlStrategy" />
+	<bean id="defaultCsProductUrlStrategy" class="de.hybris.platform.cscockpit.widgets.controllers.strategies.impl.DefaultProductUrlStrategy" parent="baseCsProductUrlStrategy">
+		<property name="baseUrl" value="http://localhost.com"/>
+	</bean>
+	<!-- The null product strategy can be used to disable product URL links -->
+	<bean id="nullCsProductUrlStrategy" class="de.hybris.platform.cscockpit.widgets.controllers.strategies.impl.NullProductUrlStrategy" scope="session"/>
+
+	<!-- The default is to use the nullCsProductUrlStrategy which will disable product links -->
+	<alias alias="csProductUrlStrategy" name="nullCsProductUrlStrategy"/>
+
+	<alias alias="namedDeliveryDateStrategy" name="defaultNamedDeliveryDateStrategy"/>
+	<bean name="defaultNamedDeliveryDateStrategy" scope="session" class="de.hybris.platform.cscockpit.strategies.impl.DefaultNamedDeliveryDateStrategy">
+		<property name="i18nService" ref="i18nService"/>
+	</bean>
+
+	<alias alias="csProductThumbnailResolutionStrategy" name="defaultCsProductThumbnailResolutionStrategy"/>
+	<bean id="defaultCsProductThumbnailResolutionStrategy" class="de.hybris.platform.cscockpit.services.config.strategy.impl.DefaultProductThumbnailResolutionStrategy" scope="session"/>
+
+	<!-- HELPERS -->
+
+
+
+	<alias alias="popupWidgetHelper" name="defaultCsPopupWidgetHelper"/>
+	<bean id="defaultCsPopupWidgetHelper" class="de.hybris.platform.cscockpit.widgets.renderers.utils.PopupWidgetHelper" scope="session">
+		<property name="popupWindowCreator" ref="popupWindowCreator"/>
+	</bean>
+
+	<alias alias="popupWindowCreator" name="defaultCsPopupWindowCreator"/>
+	<bean id="defaultCsPopupWindowCreator" class="de.hybris.platform.cscockpit.widgets.popup.impl.DefaultPopupWindowCreator" scope="session">
+		<property name="closePopupCtrlKeys" value="@x"/> <!-- Alt-X -->
+	</bean>
+
+	<alias alias="globalPopupWidgetManager" name="defaultCsGlobalPopupWidgetManager"/>
+	<bean id="defaultCsGlobalPopupWidgetManager" class="de.hybris.platform.cscockpit.widgets.popup.impl.DefaultGlobalPopupWidgetManager" scope="session">
+		<property name="callContextWidgetConfig" ref="csCallContextWidgetConfig"/>
+	</bean>
+
+	<alias alias="widgetHelper" name="defaultCsWidgetHelper"/>
+	<bean id="defaultCsWidgetHelper" class="de.hybris.platform.cscockpit.utils.WidgetHelper" scope="session"/>
+
+	<alias alias="propertyEditorHelper" name="defaultCsPropertyEditorHelper"/>
+	<bean id="defaultCsPropertyEditorHelper" class="de.hybris.platform.cscockpit.utils.PropertyEditorHelper" scope="session">
+		<property name="cockpitPropertyService" ref="cockpitPropertyService"/>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>
+		<property name="systemService" ref="systemService"/>
+		<property name="propertyRendererHelper" ref="propertyRendererHelper"/>
+	</bean>
+
+	<alias alias="propertyRendererHelper" name="defaultCsPropertyRendererHelper"/>
+	<bean id="defaultCsPropertyRendererHelper" class="de.hybris.platform.cscockpit.utils.PropertyRendererHelper" scope="session"/>
+
+</beans>

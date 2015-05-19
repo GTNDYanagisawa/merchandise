@@ -1,0 +1,182 @@
+*** Settings ***
+Test Setup        import bundlecartdata sampledata
+Test Teardown     reset system
+
+Resource          bundleservices/Add_To_Cart_Keywords.txt
+Resource          bundleservices/Common_Keywords.txt
+Resource          bundleservices/Remove_From _Cart_Keywords.txt
+Resource          bundleservices/Verify_Keywords.txt
+Resource          commerce/CommerceServices_Keywords.txt
+Resource		  commerce/SubscriptionCommerce_Keywords.txt
+Resource          subscriptionservices/SubscriptionPricePlan_Keywords.txt
+
+*** Test Cases ***
+
+### Add bundle to cart and verify price:
+
+Test_Add_To_Cart_SingleBundleNew_SingleProduct
+	[Documentation]    Adding a single product to a new bundle.
+	verify that cart total is "0"
+	add to cart product "PRODUCT01" for component "ProductComponent1" 	
+    verify that number of child carts is "0" 
+	verify that cart total for "paynow" is "600"
+	verify that cart total is "600"	    
+  
+Test_Add_To_Cart_SingleBundleExisting_SingleProduct  
+	[Documentation]    Adding a single product to a existing bundle.
+	verify that cart total is "0"
+	add to cart product "PRODUCT01" for component "ProductComponent1"
+	verify that cart total is "600"
+	add to cart product "PREMIUM01" for component "PremiumComponent2" to bundle with index "1"
+	verify that cart total is "1310"
+
+Test_Add_To_Cart_SingleBundleNew_TwoProducts
+	[Documentation]    Adding a two products (for example one as Device and other as service Plan) to a new bundle.
+	add to cart product "PRODUCT01" for component "ProductComponent1" and product "PREMIUM01" for component "PremiumComponent2" 
+	verify that cart total is "1310"
+        
+Test_Add_To_Cart_SingleBundleExisting_TwoProducts
+	[Documentation]    Adding a two products (for example one as Device and other as service Plan) to a new bundle.
+	add to cart product "PRODUCT01" for component "ProductComponent1"
+	verify that cart total is "600"
+	add to cart product "PRODUCT02" for component "ProductComponent1" and product "PREMIUM02" for component "PremiumComponent2" to bundle with index "1"
+	verify that cart total is "1970"    
+
+Test_BundleRule_With_BillingEvent
+    [Documentation]    Adding two products to the bundle with billing event. (SUBSCRIPTIONPRODUCT01 with pay now price 100 and one time price 10, SUBSCRIPTIONPREMIUM01 with pay now price 0, one time charge 0 and price rule to reduce SUBSCRIPTIONPRODUCT01 one time charge to 7) 
+    verify that cart total is "0"
+    add to cart product "SUBSCRIPTIONPRODUCT01" for component "ProductComponent1"
+    verify that cart total is "100"
+    verify that cart total for "onetimeprice" is "10"
+    add to cart product "SUBSCRIPTIONPREMIUM01" for component "PremiumComponent2" to bundle with index "1"
+    verify that cart total is "100"
+    verify that cart total for "onetimeprice" is "7"
+    for billing event "onetimeprice" verify discount price of "3"
+
+Test_BundleRule_With_BillingEvent_TwoProducts
+    [Documentation]    Adding two products to the bundle with billing event. (SUBSCRIPTIONPRODUCT01 with pay now price 100 and one time price 10, SUBSCRIPTIONPREMIUM03 with pay now price 210, one time charge 0 and price rule to reduce SUBSCRIPTIONPRODUCT01 one time charge to 4)  
+    verify that cart total is "0"
+    add to cart product "SUBSCRIPTIONPRODUCT01" for component "ProductComponent1"
+    verify that cart total is "100"
+    verify that cart total for "onetimeprice" is "10"
+    add to cart product "SUBSCRIPTIONPREMIUM03" for component "PremiumComponent2" to bundle with index "1"
+    verify that cart total is "310"
+    verify that cart total for "onetimeprice" is "4"
+    for billing event "onetimeprice" verify discount price of "6"
+
+Test_BundleRule_With_BillingEvent_TwoProducts_For_Apply_PriceRule_To_One_Product
+    [Documentation]    Adding two products to the bundle with billing event. (SUBSCRIPTIONPRODUCT01 with pay now price 100 and one time price 10, SUBSCRIPTIONPRODUCT02 with pay now price 150 and one time price 15, SUBSCRIPTIONPREMIUM01 with pay now price 0, one time charge 0 and price rule to reduce SUBSCRIPTIONPRODUCT01 one time charge to 7)
+    verify that cart total is "0"
+    add to cart product "SUBSCRIPTIONPRODUCT01" for component "ProductComponent1"
+    verify that cart total is "100"
+    verify that cart total for "onetimeprice" is "10"
+    add to cart product "SUBSCRIPTIONPRODUCT02" for component "ProductComponent1"
+    verify that cart total is "250"
+    verify that cart total for "onetimeprice" is "25"
+    add to cart product "SUBSCRIPTIONPREMIUM01" for component "PremiumComponent2" to bundle with index "1"
+    verify that cart total is "250"
+    verify that cart total for "onetimeprice" is "22"
+    for billing event "onetimeprice" verify discount price of "3"
+    
+Test_BundleRule_With_BillingEvent_TwoProducts_For_Apply_PriceRule_To_Two_Product
+    [Documentation]    Adding two products to the bundle with billing event. (SUBSCRIPTIONPRODUCT01 with pay now price 100 and one time price 10, SUBSCRIPTIONPRODUCT02 with pay now price 150 and one time price 15, SUBSCRIPTIONPREMIUM02 with pay now price 0, one time charge 0 and price rule to reduce SUBSCRIPTIONPRODUCT01 and SUBSCRIPTIONPRODUCT02 one time charge to 9) 
+    verify that cart total is "0"
+    add to cart product "SUBSCRIPTIONPRODUCT01" for component "ProductComponent1"
+    verify that cart total is "100"
+    verify that cart total for "onetimeprice" is "10"
+    add to cart product "SUBSCRIPTIONPRODUCT02" for component "ProductComponent1"
+    verify that cart total is "250"
+    verify that cart total for "onetimeprice" is "25"
+    add to cart product "SUBSCRIPTIONPREMIUM02" for component "PremiumComponent2" to bundle with index "1"
+    add to cart product "SUBSCRIPTIONPREMIUM02" for component "PremiumComponent2" to bundle with index "2"
+    verify that cart total is "250"
+    verify that cart total for "onetimeprice" is "18"
+    for billing event "onetimeprice" verify discount price of "7"
+    
+Test_BundleRule_For_Recurring_Rule_Win_Without_BillingEvent
+    [Documentation]    Adding two products to the bundle without billing event.
+    verify that cart total is "0"
+    add to cart product "SUBSCRIPTIONPRODUCT03" for component "ProductComponent1"
+    verify that cart total is "170"
+    verify that cart total for "monthly" is "17"
+    add to cart product "SUBSCRIPTIONPREMIUM04" for component "PremiumComponent2" to bundle with index "1"
+    verify that cart total is "170"
+    verify that cart total for "monthly" is "7"
+    for billing event "monthly" verify discount price of "10"
+    for billing event "paynow" verify discount price of "0"
+    
+Test_BundleRule_For_Recurring_Plan_Win_Without_BillingEvent
+    [Documentation]    Adding two products to the bundle without billing event.
+    verify that cart total is "0"
+    add to cart product "SUBSCRIPTIONPRODUCT03" for component "ProductComponent1"
+    verify that cart total is "170"
+    verify that cart total for "monthly" is "17"
+    add to cart product "SUBSCRIPTIONPREMIUM05" for component "PremiumComponent2" to bundle with index "1"
+    verify that cart total is "360"
+    verify that cart total for "monthly" is "17"
+    for billing event "monthly" verify discount price of "0"
+    for billing event "paynow" verify discount price of "0"
+
+Test_Mixed_BundleRule_For_OneTimePrice_And_Recurring
+    verify that cart total is "0"
+    add to cart product "SUBSCRIPTIONPRODUCT01" for component "ProductComponent1"
+    verify that cart total is "100"
+    verify that cart total for "onetimeprice" is "10"
+    add to cart product "SUBSCRIPTIONPREMIUM03" for component "PremiumComponent2" to bundle with index "1"
+    verify that cart total is "310"
+    verify that cart total for "onetimeprice" is "4"
+    for billing event "onetimeprice" verify discount price of "6"
+    add to cart product "SUBSCRIPTIONPRODUCT03" for component "ProductComponent1"
+    verify that cart total is "480"
+    verify that cart total for "monthly" is "17"
+    add to cart product "SUBSCRIPTIONPREMIUM04" for component "PremiumComponent2" to bundle with index "2"
+    verify that cart total is "480"
+    verify that cart total for "monthly" is "7"
+    for billing event "monthly" verify discount price of "10"
+    for billing event "paynow" verify discount price of "0"
+
+Test_Add_To_Cart_SingleBundleExisting_TwoProducts_With_Rule_But_Empty_BillingEvent
+	[Documentation]    Adding two products (for example one as Device and other as service Plan) to a new bundle, which is empty billing event.
+	add to cart product "PRODUCT06" for component "ProductComponent1"
+	verify that cart total is "600"
+	add to cart product "PRODUCT05" for component "ProductComponent1" 
+	verify that cart total is "1250"
+	add to cart product "PREMIUM06" for component "PremiumComponent2" to bundle with index "1"
+	verify that cart total is "1510"
+    for billing event "paynow" verify discount price of "500"
+    
+Test_Add_To_Cart_SingleBundleExisting_OneProduct_With_Rule_Empty_BillingEvent
+	[Documentation]    Adding one product (for example one as Device and other as service Plan) to a new bundle, which is empty billing event.
+	add to cart product "PRODUCT06" for component "ProductComponent1"
+	verify that cart total is "600"
+	add to cart product "PREMIUM06" for component "PremiumComponent2" to bundle with index "1"
+	verify that cart total is "860"
+    for billing event "paynow" verify discount price of "500"
+
+Test_BundleRule_With_BillingEvent_Misconfiguration_Plan_No_OneTimePrice
+    [Documentation]    Adding two products to the bundle with billing event. 
+    verify that cart total is "0"
+    add to cart product "SUBSCRIPTIONPRODUCT04" for component "ProductComponent1"
+    verify that cart total is "125"
+    verify that number of child carts is "0"
+    add to cart product "SUBSCRIPTIONPREMIUM06" for component "PremiumComponent2" to bundle with index "1"
+    verify that cart total is "125"
+    verify that number of child carts is "0"
+
+Test_BundleRule_With_BillingEvent_Misconfiguration_Rule_No_OneTimePrice
+    [Documentation]    Adding two products to the bundle with billing event.
+    verify that cart total is "0"
+    add to cart product "SUBSCRIPTIONPRODUCT01" for component "ProductComponent1"
+    verify that cart total is "100"
+    verify that cart total for "onetimeprice" is "10"
+    add to cart product "SUBSCRIPTIONPREMIUM07" for component "PremiumComponent2" to bundle with index "1"
+    verify that cart total is "100"
+    verify that cart total for "onetimeprice" is "10"
+    verify that number of child carts is "1"
+    
+### Add bundle to cart and verify if all bundles are valid:
+
+Test_Add_To_Cart_SingleBundleNew_SingleProduct_VerifyCart
+	[Documentation]    Checks cart is complete - no bundle product is missing (no invalid components are in cart)
+	add to cart product "PRODUCT01" for component "ProductComponent1"
+	verify that bundles in cart are complete

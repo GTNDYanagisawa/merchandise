@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:h="http://www.w3.org/1999/xhtml" 
+		xmlns:zk="http://www.zkoss.org/2005/zk"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd ">
+
+		<zscript>
+			Object[] typeNameAsArray = new Object[] { controllerBean.getParentItemName(wizardBean)};
+		</zscript>
+		
+		<div style="text-align: left;" onCreate='setAttr("createNewSegment",false)'>
+			<div sclass="wizardPageDescription">
+				<label value="${c:l('btgcockpit.wizard.segmentRestriction.chooseSegmentPage.description')}"/>
+			</div>
+			<div style="margin: 30px; margin-top: 10px;" >
+				
+				
+					<label value="${c:l('btgcockpit.wizard.segmentRestriction.chooseSegmentPage.segmentEditorLabel')}"/>
+					<div height="5px"/>	
+					<div 	id="segmentEditor" use="de.hybris.platform.cockpit.components.editor.CockpitEditorContainer"
+							valueTypeCode="BTGSegment" editorCode="single" 
+							onValueChange='setAttr("existingSegment",self.getEditorValue())'>
+						<custom-attributes allowCreate="false" displaySubtypes="true" allowActivate="false"/>
+					</div>
+					<div height="30px"/>	
+					<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.componentInverseHandling.decisionLabel')}"/>
+					<div style="margin: 15px;">
+						<radiogroup orient="vertical">
+							<hbox>
+								<radio onCheck='setAttr("restrictionInverted",false);'
+										onCreate='self.setChecked(!Boolean.TRUE.equals(getAttr("restrictionInverted")))' />
+								<label value="${c:l2('btgcockpit.wizard.segmentRestrictionAction.componentInverseHandling.decisionSee', typeNameAsArray)}"/>
+							</hbox>
+							<div height="10px;"/>
+							<hbox>
+								<radio onCheck='setAttr("restrictionInverted",true);'
+										onCreate='self.setChecked(Boolean.TRUE.equals(getAttr("restrictionInverted")))' />
+								<div>
+									<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.componentInverseHandling.decisionHide1')} "/>
+									<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.inverseHandling.notfulfilled.bold')}" style="font-weight: bold;"/>
+									<label value="${c:l2('btgcockpit.wizard.segmentRestrictionAction.componentInverseHandling.decisionHide2', typeNameAsArray)}"/>
+								</div>
+							</hbox>
+						</radiogroup>
+					</div>
+			</div>
+		</div>
+</zk>

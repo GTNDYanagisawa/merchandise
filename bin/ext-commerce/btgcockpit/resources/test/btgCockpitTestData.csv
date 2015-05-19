@@ -1,0 +1,49 @@
+$catalogVersion=catalogVersion(catalog(id),version)[unique=true]
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;
+;de;true;;;;;;
+;en;true;;;;;;
+
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];;;;;
+;de;Deutsch;German;;;;;
+;en;Englisch;English;;;;;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;€
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$
+INSERT_UPDATE Country;isocode[unique=true];name[lang=de];name[lang=en];active;
+;DE;Deutschland;Germany;true;
+;US;Vereinigte Staaten von Amerika;United States of America;true;
+
+
+INSERT_UPDATE UserGroup;UID[unique=true];locname[lang=de];locname[lang=en];
+;userAGroup;User A Group;User A Group;
+;userBGroup;User B Group;User B Group;
+
+INSERT_UPDATE User;uid[unique=true];name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password
+;userA;A;userA;de;EUR;userAGroup;1234
+;userB;B;userB;de;EUR;userBGroup;1234
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en]
+;sampleCatalog;Sample Catalog;Sample Catalog
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode)
+;sampleCatalog;Staged;true;EUR;de,en
+
+#Page Templates
+INSERT_UPDATE PageTemplate;$catalogVersion;uid[unique=true];name;active;
+;sampleCatalog:Staged;test_template;Test Template;true
+
+#Content Page
+INSERT_UPDATE ContentPage;$catalogVersion;uid[unique=true];name;label;masterTemplate(uid,$catalogVersion);defaultPage;approvalStatus(code);
+;sampleCatalog:Staged;test_homepage_default;Homepage;homepage;test_template:sampleCatalog:Staged;true;approved;
+
+#Create Banners
+INSERT_UPDATE CMSLinkComponent;$catalogVersion;uid[unique=true];name;visible;linkName[lang=de];linkName[lang=en];external
+;sampleCatalog:Staged;test_component1;Link We like;true;"Unsere Empfehlung";"We like";false;
+;sampleCatalog:Staged;test_component2;Link How To;true;"Hilfe?";"How To?";false;
+
+
+
+
+

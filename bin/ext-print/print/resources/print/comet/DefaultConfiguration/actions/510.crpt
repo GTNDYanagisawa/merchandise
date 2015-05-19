@@ -1,0 +1,59 @@
+#include "internal/types.h"
+#include "internal/text.h"
+
+
+
+int main ()
+{
+	int bufferSize = 8000;
+	int errorcode = 0;
+	int state = 0;
+	char *info = alloc(bufferSize);
+	Query qu = sql::query (soap::connection());
+	
+	if(qu)
+	{
+		if(query::set_method (qu, "GET_environment") == 0)
+		{
+			if(query::output (qu, kString, info, bufferSize))
+			{
+				if(query::exec (qu) )
+				{
+					state = query::fetch (qu);	
+				}
+				else
+				{
+					wlog("", "There were a query::exec error in 510.crpt, method main(). \n");
+					errorcode = 1;
+				}
+
+			}
+			else
+			{
+				wlog("", "There were a query send/input/output error in 510.crpt, method main(). \n");
+				errorcode = 2;
+			}
+
+		}
+		else
+		{
+			wlog("", "There were a query::set_method error in 510.crpt, method main(). \n");
+			errorcode = 3;
+		}
+	}
+	else
+	{
+		wlog("", "Establishing sql query / soap connection was not successful! error in method main() in 510.crpt. \n");
+		errorcode = 4;
+	}	
+
+	if( query::close(qu) != 0)
+	{
+		wlog("", "There was an error during SOAP connection close in script 510.crpt, method main(). \n");
+	}
+	
+	showmessage(info);
+	release(info);
+
+	return 0;
+}

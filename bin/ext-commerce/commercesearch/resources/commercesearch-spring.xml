@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns:util="http://www.springframework.org/schema/util"
+		 xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+
+
+           http://www.springframework.org/schema/util
+		     http://www.springframework.org/schema/util/spring-util.xsd"
+		>
+
+	<bean id="rootProductCodeValueProvider" class="de.hybris.platform.commercesearch.search.solrfacetsearch.providers.RootProductCodeValueProvider"  parent="abstractPropertyFieldValueProvider">
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+	</bean>
+
+	<!-- Converters -->
+	<alias name="defaultVisibilityFilteringSolrSearchResponseConverter" alias="visibilityFilteringSolrSearchResponseConverter"/>
+	<bean id="defaultVisibilityFilteringSolrSearchResponseConverter" parent="defaultCommerceSolrSearchResponseConverter">
+		<lookup-method name="createTarget" bean="productCategorySearchPageData"/>
+		<property name="populators">
+			<list merge="true">
+				<ref bean="facetVisibilityRulePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="serchandizingIndexedPropertyConverter" alias="indexedPropertyConverter"/>
+	<bean id="serchandizingIndexedPropertyConverter" parent="commerceIndexedPropertyConverter">
+		<property name="populators">
+			<list merge="true">
+				<ref bean="indexedPropertyFacetVisibilityRulesPopulator"/>
+				<ref bean="indexedPropertyBoostRulesPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultfacetValueCountSolrFacetVisibilityRuleConverter" alias="facetValueCountSolrFacetVisibilityRuleConverter"/>
+	<bean id="defaultfacetValueCountSolrFacetVisibilityRuleConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="facetValueCountSolrFacetVisibilityRule"/>
+		<property name="populators">
+			<list>
+				<ref bean="facetValueCountSolrFacetVisibilityRulePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCategorySelectedSolrFacetVisibilityRuleConverter" alias="categorySelectedSolrFacetVisibilityRuleConverter"/>
+	<bean id="defaultCategorySelectedSolrFacetVisibilityRuleConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="categorySelectedSolrFacetVisibilityRule"/>
+		<property name="populators">
+			<list>
+				<ref bean="categorySelectedSolrFacetVisibilityRulePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultValueCoverageSolrFacetVisibilityRuleConverter" alias="valueCoverageSolrFacetVisibilityRuleConverter"/>
+	<bean id="defaultValueCoverageSolrFacetVisibilityRuleConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="valueCoverageSolrFacetVisibilityRule"/>
+		<property name="populators">
+			<list>
+				<ref bean="valueCoverageSolrFacetVisibilityRulePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultOtherFacetValueCountSolrFacetVisibilityRuleConverter" alias="otherFacetValueCountSolrFacetVisibilityRuleConverter"/>
+	<bean id="defaultOtherFacetValueCountSolrFacetVisibilityRuleConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="otherFacetValueCountSolrFacetVisibilityRule"/>
+		<property name="populators">
+			<list>
+				<ref bean="otherFacetValueCountSolrFacetVisibilityRulePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultBoostRuleConverter" alias="boostRuleConverter"/>
+	<bean id="defaultBoostRuleConverter" class="de.hybris.platform.commercesearch.searchandizing.boost.converters.BoostRuleConverter">
+		<property name="enumerationService" ref="enumerationService"/>
+	</bean>
+
+	<!-- The following alias enables facet rules filtering -->
+	<alias name="visibilityFilteringSolrSearchResponseConverter" alias="commerceSolrSearchResponseConverter"/>
+
+	<!-- Plugins -->
+	<bean id="categorySelectedFacetVisibilityRulePlugin" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.plugin.CategorySelectedFacetVisibilityRulePlugin">
+		<property name="evaluator" ref="categorySelectedFacetVisibilityRuleEvaluator" />
+	</bean>
+
+	<bean id="facetValueCountFacetVisibilityRulePlugin" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.plugin.FacetValueCountFacetVisibilityRulePlugin">
+		<property name="evaluator" ref="facetValueCountFacetVisibilityRuleEvaluator" />
+	</bean>
+
+	<bean id="otherFacetValueCountFacetVisibilityRulePlugin" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.plugin.OtherFacetValueCountFacetVisibilityRulePlugin" >
+		<property name="evaluator" ref="otherFacetValueCountFacetVisibilityRuleEvaluator" />
+	</bean>
+
+	<bean id="valueCoverageFacetVisibilityRulePlugin" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.plugin.ValueCoverageSolrFacetVisibilityRulePlugin"  >
+		<property name="evaluator" ref="valueCoverageFacetVisibilityRuleEvaluator" />
+	</bean>
+
+	<!-- Populators -->
+	<alias name="defaultIndexedPropertyFacetVisibilityRulesPopulator" alias="indexedPropertyFacetVisibilityRulesPopulator"/>
+	<bean id="defaultIndexedPropertyFacetVisibilityRulesPopulator" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.populators.IndexedPropertyRulesPopulator">
+		<property name="converters">
+			<map>
+				<entry key="FacetValueCountSolrFacetVisibilityRule" value-ref="facetValueCountSolrFacetVisibilityRuleConverter"/>
+				<entry key="CategorySelectedSolrFacetVisibilityRule" value-ref="categorySelectedSolrFacetVisibilityRuleConverter"/>
+				<entry key="ValueCoverageSolrFacetVisibilityRule" value-ref="valueCoverageSolrFacetVisibilityRuleConverter"/>
+				<entry key="OtherFacetValueCounsearch.solrfacetsearch.populatorstSolrFacetVisibilityRule" value-ref="otherFacetValueCountSolrFacetVisibilityRuleConverter"/>
+			</map>
+		</property>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<alias name="defaultIndexedPropertyBoostRulesPopulator" alias="indexedPropertyBoostRulesPopulator"/>
+	<bean id="defaultIndexedPropertyBoostRulesPopulator" class="de.hybris.platform.commercesearch.searchandizing.boost.populators.IndexedPropertyBoostRulesPopulator" />
+
+	<alias name="defaultFacetVisibilityRulePopulator" alias="facetVisibilityRulePopulator" />
+	<bean id="defaultFacetVisibilityRulePopulator" class="de.hybris.platform.commercesearch.search.solrfacetsearch.populators.FacetVisibilityRulePopulator">
+		<property name="facetVisibilityRulesService" ref="facetVisibilityRulesService"/>
+	</bean>
+
+	<bean id="abstractVisibilityRulePopulator" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.populators.AbstractVisibilityRulePopulator" abstract="true">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<alias name="defaultFacetValueCountRulePopulator" alias="facetValueCountSolrFacetVisibilityRulePopulator"/>
+	<bean id="defaultFacetValueCountRulePopulator" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.populators.FacetValueCountRulePopulator" parent="abstractVisibilityRulePopulator"/>
+
+	<alias name="defaultCategorySelectedRulePopulator" alias="categorySelectedSolrFacetVisibilityRulePopulator"/>
+	<bean id="defaultCategorySelectedRulePopulator" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.populators.CategorySelectedRulePopulator" parent="abstractVisibilityRulePopulator"/>
+
+	<alias name="defaultOtherFacetValueCountRulePopulator" alias="otherFacetValueCountSolrFacetVisibilityRulePopulator"/>
+	<bean id="defaultOtherFacetValueCountRulePopulator" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.populators.OtherFacetValueCountRulePopulator" parent="abstractVisibilityRulePopulator"/>
+
+	<alias name="defaultValueCoverageRulePopulator" alias="valueCoverageSolrFacetVisibilityRulePopulator"/>
+	<bean id="defaultValueCoverageRulePopulator" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.populators.ValueCoverageRulePopulator" parent="abstractVisibilityRulePopulator"/>
+
+	<alias name="defaultBoostSearchQueryPopulator" alias="boostSearchQueryPopulator"/>
+	<bean id="defaultBoostSearchQueryPopulator" class="de.hybris.platform.commercesearch.search.solrfacetsearch.populators.BoostSearchQueryPopulator">
+		<property name="categoryFilterTermKey" value="category"/>
+		<property name="heroProductFacade" ref="heroProductFacade"/>
+		<property name="categoryService" ref="categoryService"/>
+		<property name="boostService" ref="boostService"/>
+		<property name="solrQueryOperatorTranslator" ref="defaultSolrQueryOperatorTranslator"/>
+	</bean>
+
+	<alias name="defaultSolrQueryOperatorTranslator" alias="solrQueryOperatorTranslator"/>
+	<bean id="defaultSolrQueryOperatorTranslator" class="de.hybris.platform.commercesearch.searchandizing.boost.operators.DefaultSolrQueryOperatorTranslator">
+		<property name="solrBoostConditionOperatorToSolrOperatorMap">
+			<util:map  map-class="java.util.HashMap">
+				<entry key="#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).GREATER_THAN_OR_EQUAL_TO}" value="[%s TO *]"/>
+				<entry key="#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).LESS_THAN_OR_EQUAL_TO}" value="[* TO %s]"/>
+				<entry key="#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).GREATER_THAN}" value="{%s TO *]"/>
+				<entry key="#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).LESS_THAN}" value="[* TO %s}"/>
+				<entry key="#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).EQUAL_TO}" value="%s"/>
+				<entry key="#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).CONTAINS}" value="*%s*"/>
+			</util:map>
+		</property>
+	</bean>
+
+	<bean id="boostOperatorsRegistry" class="de.hybris.platform.commercesearch.searchandizing.boost.operators.BoostOperatorsRegistry"
+			init-method="initOperatorsMap" />
+
+	<bean id="NumericBoostOperators" class="de.hybris.platform.commercesearch.searchandizing.boost.operators.BoostOperatorsRegistry.IndexPropertyTypeOperatorsMapping">
+		<property name="solrPropertyTypes">
+			<util:set set-class="java.util.HashSet">
+				<value>#{T(de.hybris.platform.solrfacetsearch.enums.SolrPropertiesTypes).DOUBLE}</value>
+				<value>#{T(de.hybris.platform.solrfacetsearch.enums.SolrPropertiesTypes).INT}</value>
+				<value>#{T(de.hybris.platform.solrfacetsearch.enums.SolrPropertiesTypes).FLOAT}</value>
+				<value>#{T(de.hybris.platform.solrfacetsearch.enums.SolrPropertiesTypes).DATE}</value>
+			</util:set>
+		</property>
+
+		<property name="operators">
+			<util:set set-class="java.util.HashSet">
+				<value>#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).GREATER_THAN_OR_EQUAL_TO}</value>
+				<value>#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).LESS_THAN_OR_EQUAL_TO}</value>
+				<value>#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).GREATER_THAN}</value>
+				<value>#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).LESS_THAN}</value>
+				<value>#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).EQUAL_TO}</value>
+			</util:set>
+		</property>
+	</bean>
+
+
+	<bean id="StringBoostOperators" class="de.hybris.platform.commercesearch.searchandizing.boost.operators.BoostOperatorsRegistry.IndexPropertyTypeOperatorsMapping">
+		<property name="solrPropertyType" value="#{T(de.hybris.platform.solrfacetsearch.enums.SolrPropertiesTypes).STRING}" />
+		<property name="operators">
+			<util:set set-class="java.util.HashSet">
+				<value>#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).CONTAINS}</value>
+				<value>#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).EQUAL_TO}</value>
+			</util:set>
+		</property>
+	</bean>
+
+
+	<bean id="BooleanBoostOperators" class="de.hybris.platform.commercesearch.searchandizing.boost.operators.BoostOperatorsRegistry.IndexPropertyTypeOperatorsMapping">
+		<property name="solrPropertyType" value="#{T(de.hybris.platform.solrfacetsearch.enums.SolrPropertiesTypes).BOOLEAN}" />
+		<property name="operators">
+			<util:set set-class="java.util.HashSet">
+				<value>#{T(de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator).EQUAL_TO}</value>
+			</util:set>
+		</property>
+	</bean>
+
+
+
+	<alias name="defaultCommerceSearchResponseConditionalFacetFilterPopulator" alias="commerceSearchResponseFacetFilterPopulator"/>
+	<bean id="defaultCommerceSearchResponseConditionalFacetFilterPopulator"
+			class="de.hybris.platform.commercesearch.search.solrfacetsearch.populators.SearchResponseConditionalFacetFilterPopulator"
+			>
+		<property name="originalFilterPopulator" ref="defaultCommerceSearchResponseFacetFilterPopulator"/>
+		<property name="facetFeaturesConfigurationService" ref="facetFeaturesConfigurationService"/>
+	</bean>
+
+
+	<bean id="dateValueProvider" class="de.hybris.platform.commercesearch.search.solrfacetsearch.providers.DateValueProvider" parent="abstractPropertyFieldValueProvider">
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+	</bean>
+
+	<alias name="defaultSearchProfileDao" alias="searchProfileDao" />
+	<bean id="defaultSearchProfileDao" parent="abstractItemDao" class="de.hybris.platform.commercesearch.searchandizing.searchprofile.dao.impl.DefaultSearchProfileDao" />
+	<alias name="defaultCategorySolrSearchProfileMatchStrategy" alias="categorySolrSearchProfileMatchStrategy" />
+	<bean id="defaultCategorySolrSearchProfileMatchStrategy"  class="de.hybris.platform.commercesearch.searchandizing.searchprofile.strategy.impl.DefaultCategorySolrSearchProfileMatchStrategy" />
+
+	<!-- globalSolrSearchProfileValidator and mapping -->
+	<bean id="globalSolrSearchProfileValidator" class="de.hybris.platform.commercesearch.searchandizing.searchprofile.interceptors.GlobalSolrSearchProfileValidator">
+		<property name="searchProfileDao" ref="searchProfileDao" />
+	</bean>
+
+	<bean id="globalSolrSearchProfileValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="globalSolrSearchProfileValidator" />
+		<property name="typeCode" value="GlobalSolrSearchProfile" />
+	</bean>
+
+	<!-- categorySolrSearchProfileValidator and mapping -->
+	<bean id="categorySolrSearchProfileValidator" class="de.hybris.platform.commercesearch.searchandizing.searchprofile.interceptors.CategorySolrSearchProfileValidator">
+		<property name="searchProfileDao" ref="searchProfileDao" />
+	</bean>
+
+	<bean id="categorySolrSearchProfileValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="categorySolrSearchProfileValidator" />
+		<property name="typeCode" value="CategorySolrSearchProfile" />
+	</bean>
+
+	<bean id="boostRuleValidator" class="de.hybris.platform.commercesearch.searchandizing.boost.interceptors.BoostRuleValidator">
+		<property name="boostOperatorsRegistry" ref="boostOperatorsRegistry"/>
+		<property name="l10nService" ref="l10nService"/>
+		<property name="validators">
+			<util:set set-class="java.util.HashSet">
+				<ref bean="numberBoostValueValidator" />
+				<ref bean="commonBoostValueValidator" />
+				<ref bean="booleanBoostValueValidator" />
+				<ref bean="dateBoostValueValidator" />
+				<ref bean="doubleBoostValueValidator" />
+				<ref bean="floatBoostValueValidator" />
+				<ref bean="integerBoostValueValidator" />
+			</util:set>
+		</property>
+	</bean>
+
+	<bean id="localizedBoostValueValidator" class="de.hybris.platform.commercesearch.searchandizing.boost.validators.impl.LocalizedBoostValueValidator" abstract="true">
+		<property name="l10nService" ref="l10nService"/>
+	</bean>
+	<bean id="commonBoostValueValidator" parent="localizedBoostValueValidator" class="de.hybris.platform.commercesearch.searchandizing.boost.validators.impl.CommonBoostValueValidator" />
+	<bean id="booleanBoostValueValidator" parent="localizedBoostValueValidator" class="de.hybris.platform.commercesearch.searchandizing.boost.validators.impl.BooleanBoostValueValidator" />
+	<bean id="dateBoostValueValidator" parent="localizedBoostValueValidator" class="de.hybris.platform.commercesearch.searchandizing.boost.validators.impl.DateBoostValueValidator" />
+	<bean id="doubleBoostValueValidator" parent="localizedBoostValueValidator" class="de.hybris.platform.commercesearch.searchandizing.boost.validators.impl.DoubleBoostValueValidator" />
+	<bean id="floatBoostValueValidator" parent="localizedBoostValueValidator" class="de.hybris.platform.commercesearch.searchandizing.boost.validators.impl.FloatBoostValueValidator" />
+	<bean id="integerBoostValueValidator" parent="localizedBoostValueValidator" class="de.hybris.platform.commercesearch.searchandizing.boost.validators.impl.IntegerBoostValueValidator" />
+	<bean id="numberBoostValueValidator" parent="localizedBoostValueValidator" class="de.hybris.platform.commercesearch.searchandizing.boost.validators.impl.NumberBoostValueValidator" />
+
+	<bean id="boostRuleValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="boostRuleValidator" />
+		<property name="typeCode" value="SolrBoostRule" />
+	</bean>
+
+	<alias name="defaultFacetVisibilityRulesService" alias="facetVisibilityRulesService"/>
+	<bean id="defaultFacetVisibilityRulesService" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.impl.DefaultFacetVisibilityRulesService">
+	</bean>
+
+	<alias name="defaultSortEvaluatorService" alias="sortEvaluatorService"/>
+	<bean id="defaultSortEvaluatorService" class="de.hybris.platform.commercesearch.searchandizing.sorting.impl.DefaultSortEvaluatorService">
+	</bean>
+
+	<!-- Evaluators -->
+	<bean id="abstractCategorySelectedFacetVisibilityRuleEvaluator" abstract="true" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.evaluators.impl.AbstractCategorySelectedFacetVisibilityRuleEvaluator" >
+		<property name="commerceCategoryService" ref="commerceCategoryService"/>
+	</bean>
+
+	<alias name="solrCategorySelectedFacetVisibilityRuleEvaluator" alias="categorySelectedFacetVisibilityRuleEvaluator" />
+	<bean id="solrCategorySelectedFacetVisibilityRuleEvaluator" parent="abstractCategorySelectedFacetVisibilityRuleEvaluator" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.evaluators.impl.SolrCategorySelectedRuleEvaluator" />
+
+	<alias name="defaultFacetValueCountFacetVisibilityRuleEvaluator" alias="facetValueCountFacetVisibilityRuleEvaluator" />
+	<bean id="defaultFacetValueCountFacetVisibilityRuleEvaluator" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.evaluators.impl.FacetValueCountFacetVisibilityRuleEvaluator" />
+
+	<alias name="solrOtherFacetValueCountFacetVisibilityRuleEvaluator" alias="otherFacetValueCountFacetVisibilityRuleEvaluator" />
+	<bean id="solrOtherFacetValueCountFacetVisibilityRuleEvaluator" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.evaluators.impl.SolrOtherFacetValueCountRuleEvaluator" />
+
+	<alias name="defaultValueCoverageFacetVisibilityRuleEvaluator" alias="valueCoverageFacetVisibilityRuleEvaluator" />
+	<bean id="defaultValueCoverageFacetVisibilityRuleEvaluator" class="de.hybris.platform.commercesearch.searchandizing.facet.visibilityrules.evaluators.impl.ValueCoverageFacetVisibilityRuleEvaluator" />
+
+	<!-- Rule -->
+	<bean id="facetValueCountSolrFacetVisibilityRule" class="de.hybris.platform.solrfacetsearch.config.FacetValueCountSolrFacetVisibilityRuleData" scope="prototype"/>
+	<bean id="categorySelectedSolrFacetVisibilityRule" class="de.hybris.platform.solrfacetsearch.config.CategorySelectedFacetVisibilityRuleData" scope="prototype"/>
+	<bean id="valueCoverageSolrFacetVisibilityRule" class="de.hybris.platform.solrfacetsearch.config.ValueCoverageFacetVisibilityRuleData" scope="prototype"/>
+	<bean id="otherFacetValueCountSolrFacetVisibilityRule" class="de.hybris.platform.solrfacetsearch.config.OtherFacetValueCountSolrFacetVisibilityRuleData" scope="prototype"/>
+
+
+	<!-- conditional search -->
+
+	<bean id="selectedCategoryHierarchySolrSortConditionDynamicDescription" class="de.hybris.platform.commercesearch.searchandizing.sorting.SelectedCategoryHierarchySolrSortConditionDynamicDescription" />
+	<bean id="categorySolrSearchProfileDynamicDescription"  class="de.hybris.platform.commercesearch.searchandizing.model.CategorySolrSearchProfileDynamicDescription" />
+	<bean id="globalSolrSearchProfileDynamicDescription"  class="de.hybris.platform.commercesearch.searchandizing.model.GlobalSolrSearchProfileDynamicDescription" />
+
+	<bean id="solrFacetReconfigurationDynamicDescription"  class="de.hybris.platform.commercesearch.searchandizing.model.SolrFacetReconfigurationDynamicDescription" >
+		<property name="typeService" ref="typeService" />
+	</bean>
+	<bean id="selectedCategoryHierarchyConditionalSortPlugin" class="de.hybris.platform.commercesearch.searchandizing.sorting.DefaultSolrConditionalSortPlugin">
+		<property name="typeCode" value="SelectedCategoryHierarchySolrSortCondition" />
+		<property name="evaluator" ref="selectedCategoryHierarchyIndexedTypeSortEvaluator" />
+	</bean>
+
+	<alias name="defaultSelectedCategoryHierarchyIndexedTypeSortEvaluator" alias="selectedCategoryHierarchyIndexedTypeSortEvaluator" />
+	<bean id="defaultSelectedCategoryHierarchyIndexedTypeSortEvaluator" class="de.hybris.platform.commercesearch.searchandizing.sorting.evaluators.impl.SelectedCategoryHierarchyIndexedTypeSortEvaluator">
+		<property name="navigationalStateService" ref="solrNavigationalStateService" />
+	</bean>
+
+	<alias name="solrNavigationalStateService" alias="navigationalStateService" />
+	<alias name="defaultSolrNavigationalStateService" alias="solrNavigationalStateService" />
+	<bean id="defaultSolrNavigationalStateService" class="de.hybris.platform.commercesearch.searchandizing.navigationalstate.impl.DefaultNavigationalStateService">
+		<property name="commerceCategoryService" ref="commerceCategoryService" />
+	</bean>
+
+	<alias name="defaultConditionalSortFilteringIndexedTypePopulator" alias="conditionalSortFilteringIndexedTypePopulator" />
+  	<bean id="defaultConditionalSortFilteringIndexedTypePopulator" class="de.hybris.platform.commercesearch.search.solrfacetsearch.populators.ConditionalSortFilteringIndexedTypePopulator">
+  		<property name="sortEvaluatorService" ref="sortEvaluatorService"/>
+  	</bean>
+
+
+	<alias name="defaultFacetReconfigurationPopulator"  alias="facetReconfigurationPopulator"/>
+	<bean id="defaultFacetReconfigurationPopulator"  class="de.hybris.platform.commercesearch.search.solrfacetsearch.populators.SolrFacetReconfigurationPopulator">
+		<property name="facetReconfigurationService" ref="facetReconfigurationService"/>
+		<property name="navigationalStateService" ref="solrNavigationalStateService" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="commerceSearchQueryPageableConverter"/>
+		<property name="add" ref="boostSearchQueryPopulator"/>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="commerceSearchQueryPageableConverter"/>
+		<property name="add" ref="conditionalSortFilteringIndexedTypePopulator"/>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="commerceSearchQueryPageableConverter"/>
+		<property name="add" ref="facetReconfigurationPopulator"/>
+	</bean>
+
+	<!-- solrHeroProductValidator and mapping -->
+	<bean id="solrHeroProductValidator" class="de.hybris.platform.commercesearch.searchandizing.heroproduct.interceptors.SolrHeroProductValidator">
+		<property name="heroProductDefinitionDao" ref="heroProductDefinitionDao" />
+	</bean>
+
+	<bean id="solrHeroProductValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="solrHeroProductValidator" />
+		<property name="typeCode" value="SolrHeroProductDefinition" />
+	</bean>
+
+	<bean id="solrHeroProductPrepareInterceptor" class="de.hybris.platform.commercesearch.searchandizing.heroproduct.interceptors.HeroProductPrepareInterceptor"/>
+
+	<bean id="solrHeroProductPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="solrHeroProductPrepareInterceptor"/>
+		<property name="typeCode" value="SolrHeroProductDefinition"/>
+	</bean>
+
+	<alias alias="heroProductDefinitionDao" name="defaultHeroProductDefinitionDao" />
+	<bean id="defaultHeroProductDefinitionDao" class="de.hybris.platform.commercesearch.searchandizing.heroproduct.dao.impl.DefaultHeroProductDefinitionDao">
+		<constructor-arg value="SolrHeroProductDefinition"/>
+	</bean>
+
+	<alias alias="facetDao" name="defaultFacetDao" />
+	<bean id="defaultFacetDao" class="de.hybris.platform.commercesearch.searchandizing.facet.dao.impl.DefaultFacetDao">
+		<property name="solrFacetSearchConfigSelectionStrategy" ref="solrFacetSearchConfigSelectionStrategy" />
+	</bean>
+
+	<alias alias="heroProductDefinitionService" name="defaultHeroProductDefinitionService" />
+	<bean id="defaultHeroProductDefinitionService" class="de.hybris.platform.commercesearch.searchandizing.heroproduct.impl.DefaultHeroProductDefinitionService">
+		<property name="modelService" ref="modelService" />
+		<property name="categoryService" ref="categoryService"/>
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="heroProductDefinitionDao" ref="heroProductDefinitionDao"/>
+		<property name="solrFacetSearchConfigSelectionStrategy" ref="solrFacetSearchConfigSelectionStrategy" />
+	</bean>
+
+	<alias name="defaultHeroProductFacade" alias="heroProductFacade" />
+	<bean id="defaultHeroProductFacade" class="de.hybris.platform.commercesearch.searchandizing.heroproduct.impl.DefaultHeroProductFacade">
+		<property name="modelService" ref="modelService" />
+		<property name="productService" ref="productService" />
+		<property name="heroProductDefinitionService" ref="heroProductDefinitionService" />
+	</bean>
+
+	<alias alias="facetFeaturesConfigurationService" name="defaultFacetFeaturesConfigurationService"/>
+	<bean id="defaultFacetFeaturesConfigurationService"
+			class="de.hybris.platform.commercesearch.searchandizing.facet.featuresconfig.impl.DefaultFacetFeaturesConfigurationService">
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+	<alias alias="facetAdminService" name="defaultFacetAdminService"/>
+	<bean id="defaultFacetAdminService"
+	class="de.hybris.platform.commercesearch.searchandizing.facet.reconfiguration.impl.DefaultFacetAdminService">
+		<property name="fallbackFacetAdminService" ref="globalFacetAdminService"/>
+		<property name="searchStateApplicableFacetAdminServices">
+			<list>
+				<ref bean="categoryFacetAdminService" />
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="globalFacetAdminService" name="defaultGlobalFacetAdminService"/>
+	<bean id="defaultGlobalFacetAdminService"
+			class="de.hybris.platform.commercesearch.searchandizing.facet.reconfiguration.impl.GlobalFacetAdminService">
+		<property name="facetDao" ref="facetDao" />
+		<property name="searchProfileDao" ref="searchProfileDao" />
+		<property name="modelService" ref="modelService" />
+		<property name="facetReconfigurationService" ref="facetReconfigurationService" />
+		<property name="facetAdminHelper" ref="facetAdminHelper"/>
+	</bean>
+
+	<alias alias="categoryFacetAdminService" name="defaultCategoryFacetAdminService"/>
+	<bean id="defaultCategoryFacetAdminService"
+			class="de.hybris.platform.commercesearch.searchandizing.facet.reconfiguration.impl.CategoryFacetAdminService">
+		<property name="modelService" ref="modelService"/>
+		<property name="facetDao" ref="facetDao" />
+		<property name="categorySearchProfileFacade" ref="categorySolrSearchProfileFacade" />
+		<property name="facetReconfigurationService" ref="facetReconfigurationService" />
+		<property name="facetAdminHelper" ref="facetAdminHelper"/>
+	</bean>
+
+	<alias alias="facetAdminHelper" name="defaultFacetAdminHelper"/>
+	<bean id="defaultFacetAdminHelper" class="de.hybris.platform.commercesearch.searchandizing.facet.reconfiguration.utils.impl.DefaultFacetAdminHelper">
+		<property name="facetDao" ref="facetDao" />
+		<property name="facetReconfigurationService" ref="facetReconfigurationService" />
+		<property name="solrFacetReconfigurationComparator" ref="solrFacetReconfigurationComparator" />
+	</bean>
+
+	<alias alias="facetReconfigurationService" name="defaultFacetReconfigurationService"/>
+	<bean id="defaultFacetReconfigurationService" class="de.hybris.platform.commercesearch.searchandizing.facet.reconfiguration.impl.DefaultFacetReconfigurationService">
+		<property name="modelService" ref="modelService" />
+		<property name="solrFacetReconfigurationModelPopulator" ref="solrFacetReconfigurationModelPopulator"/>
+		<property name="solrIndexedPropertyModelPopulator" ref="solrIndexPropertyModelPopulator" />
+		<property name="facetSearchConfigDao" ref="facetSearchConfigDao"/>
+		<property name="searchProfileDao" ref="searchProfileDao"/>
+		<property name="categorySearchProfileService" ref="categorySearchProfileService"/>
+	</bean>
+
+	<alias alias="solrFacetReconfigurationModelPopulator" name="defaultSolrFacetReconfigurationModelPopulator"/>
+	<bean id="defaultSolrFacetReconfigurationModelPopulator" class="de.hybris.platform.commercesearch.searchandizing.facet.reconfiguration.populators.SolrFacetReconfigurationModelPopulator">
+	</bean>
+
+	<alias alias="solrIndexPropertyModelPopulator" name="defaultSolrIndexPropertyModelPopulator"/>
+	<bean id="defaultSolrIndexPropertyModelPopulator" class="de.hybris.platform.commercesearch.searchandizing.facet.reconfiguration.populators.SolrIndexedPropertyModelPopulator">
+	</bean>
+
+	<alias alias="categorySolrSearchProfileFacade" name="defaultCategorySolrSearchProfileFacade"/>
+	<bean id="defaultCategorySolrSearchProfileFacade"
+			class="de.hybris.platform.commercesearch.searchandizing.searchprofile.impl.DefaultCategorySearchProfileFacade">
+		<property name="categoryService" ref="categoryService" />
+		<property name="categorySearchProfileService" ref="categorySearchProfileService" />
+		<property name="solrFacetSearchConfigSelectionStrategy" ref="solrFacetSearchConfigSelectionStrategy" />
+		<property name="facetReconfigurationService" ref="facetReconfigurationService" />
+	</bean>
+
+	<alias alias="categorySearchProfileService" name="defaultCategorySearchProfileService"/>
+	<bean id="defaultCategorySearchProfileService"
+			class="de.hybris.platform.commercesearch.searchandizing.searchprofile.impl.DefaultCategorySearchProfileService">
+		<property name="categorySearchProfileMatchStrategy" ref="categorySolrSearchProfileMatchStrategy" />
+		<property name="commerceCategoryService" ref="commerceCategoryService" />
+		<property name="modelService" ref="modelService" />
+		<property name="searchProfileDao" ref="searchProfileDao" />
+		<property name="facetSearchConfigDao" ref="facetSearchConfigDao"/>
+	</bean>
+
+	<alias alias="globalSearchProfileService" name="defaultGlobalSearchProfileService"/>
+	<bean id="defaultGlobalSearchProfileService"
+			class="de.hybris.platform.commercesearch.searchandizing.searchprofile.impl.DefaultGlobalSearchProfileService">
+		<property name="modelService" ref="modelService"/>
+		<property name="searchProfileDao" ref="searchProfileDao"/>
+		<property name="facetSearchConfigDao" ref="facetSearchConfigDao"/>
+	</bean>
+
+	<alias alias="solrFacetReconfigurationComparator" name="defaultSolrFacetReconfigurationComparator"/>
+	<bean id="defaultSolrFacetReconfigurationComparator" class="de.hybris.platform.commercesearch.searchandizing.searchprofile.comparator.SolrFacetReconfigurationComparator">
+	</bean>
+
+	<alias alias="boostService" name="defaultBoostService"/>
+	<bean id="defaultBoostService"
+			class="de.hybris.platform.commercesearch.searchandizing.boost.impl.DefaultBoostService">
+		<property name="facetSearchConfigDao" ref="facetSearchConfigDao"/>
+		<property name="categorySearchProfileMatchStrategy" ref="categorySolrSearchProfileMatchStrategy"/>
+		<property name="searchProfileDao" ref="searchProfileDao"/>
+		<property name="commerceCategoryService" ref="commerceCategoryService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="globalSearchProfileService" ref="globalSearchProfileService"/>
+		<property name="categorySearchProfileService" ref="categorySearchProfileService"/>
+		<property name="facetSearchConfigService" ref="facetSearchConfigService"/>
+	</bean>
+
+	<alias alias="boostFacade" name="defaultBoostFacade"/>
+	<bean id="defaultBoostFacade"
+			class="de.hybris.platform.commercesearch.searchandizing.boost.impl.DefaultBoostFacade">
+		<property name="boostService" ref="boostService" />
+		<property name="solrFacetSearchConfigSelectionStrategy" ref="solrFacetSearchConfigSelectionStrategy"/>
+		<property name="facetSearchConfigService" ref="facetSearchConfigService"/>
+		<property name="categoryService" ref="categoryService" />
+		<property name="boostConverter" ref="boostRuleConverter"/>
+	</bean>
+
+</beans>

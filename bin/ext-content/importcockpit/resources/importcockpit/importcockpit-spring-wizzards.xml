@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+					http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd"
+	default-autowire="byName">
+
+	<!-- Mapping Wizard -->
+	<alias alias="mappingWizard" name="defaultMappingWizard"/>
+	<bean id="defaultMappingWizard" parent="genericWizard" scope="prototype" class="de.hybris.platform.importcockpit.wizzard.mapping.MappingWizard">
+		<property name="typeService" ref="typeService" />
+		<property name="componentURI" value="/cockpit/wizards/defaultWizardFrame.zul"/>
+		<property name="pages">
+			<list>
+				<ref bean="mappingDecisionPage"/>
+				<ref bean="mappingTargetPage"/> 
+				<ref bean="mappingLoadPage"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="mappingDecisionPage" name="defaultMappingDecisionPage"/>
+	<bean id="defaultMappingDecisionPage" class="de.hybris.platform.importcockpit.wizzard.mapping.page.MappingDecisionPage" scope="prototype">
+		<property name="id" value="mappingDecisionPage"/>
+		<property name="title" value="importcockpit.mappingwizard.decisionpage.title" />	
+	</bean>	
+
+	<alias alias="mappingTargetPage" name="defaultMappingTargetPage"/>
+	<bean id="defaultMappingTargetPage" class="de.hybris.platform.importcockpit.wizzard.mapping.page.MappingTargetPage" scope="prototype">
+		<property name="id" value="mappingTargetPage"/>
+		<property name="title" value="importcockpit.mappingwizard.targetpage.title" />	
+		<property name="showManualCatalogVersionOption" value="true"/>
+		<property name="mappingLineConfigService" ref="mappingLineConfigService" />	
+		<property name="typeService" ref="typeService" />	
+		<property name="catalogVersionService" ref="catalogVersionService" />	
+		<property name="catalogTypeService" ref="catalogTypeService" />	
+	</bean>	
+	
+	<alias alias="mappingLoadPage" name="defaultMappingLoadPage"/>
+	<bean id="defaultMappingLoadPage" class="de.hybris.platform.importcockpit.wizzard.mapping.page.MappingLoadPage" scope="prototype">
+		<property name="id" value="mappingLoad"/>
+		<property name="title" value="importcockpit.mappingwizard.loadpage.title" />
+		<property name="mappingService" ref="importCockpitMappingService" />	
+		<property name="mediaService" ref="mediaService" />	
+	</bean>	
+</beans>

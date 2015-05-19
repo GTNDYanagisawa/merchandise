@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype generate="true" code="CheckoutPaymentType" autocreate="true" dynamic="true">
+			<description>This enum type will be used for selecting checkout Payment Type</description>
+			<value code="CARD"/>
+			<value code="ACCOUNT"/>
+		</enumtype>
+		<enumtype generate="true" code="B2BPermissionTypeEnum" autocreate="true" dynamic="true">
+			<description>This enum type will be used for selecting B2B Permission type</description>
+			<value code="B2BOrderThresholdPermission"/>
+			<value code="B2BOrderThresholdTimespanPermission"/>
+			<value code="B2BBudgetExceededPermission"/>
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		<relation generate="true" localized="false" code="Order2CartToOrderCronJob" autocreate="true">
+			<sourceElement type="CartToOrderCronJob" cardinality="one" qualifier="schedulingCronJob">
+				<modifiers read="true" write="true" initial="true" search="true" optional="true"/>
+			</sourceElement>
+			<targetElement type="Order" cardinality="many" qualifier="orders">
+				<modifiers read="true" write="true" initial="true" search="true" optional="true"/>
+			</targetElement>
+		</relation>
+
+	</relations>
+
+	<itemtypes>
+
+		<typegroup name="Order">
+
+			<itemtype code="AbstractOrder" autocreate="false" generate="false">
+				<description>Extending AbstractOrder type with additional attributes.</description>
+				<attributes>
+					<attribute qualifier="purchaseOrderNumber" type="java.lang.String">
+						<description>PO number is a string up to 255 chars.</description>
+						<persistence type="property"/>
+					</attribute>
+					<attribute qualifier="paymentType" type="CheckoutPaymentType">
+						<description>Payment type for Checkout summary</description>
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="Processes">
+
+			<itemtype code="ReplenishmentProcess" extends="StoreFrontCustomerProcess"
+				autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.b2bacceleratorservices.jalo.process.ReplenishmentProcess">
+				<description>It represents Replenishment  business process.</description>
+				<attributes>
+					<attribute qualifier="cartToOrderCronJob" type="CartToOrderCronJob">
+						<persistence type="property" />
+						<description>Attribute contains cronjob that knows how to create an order from cart.</description>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>
+
+		<typegroup name="Promotions">
+
+			<itemtype code="OrderThresholdDiscountPercentagePromotion" extends="OrderPromotion" autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.b2bacceleratorservices.jalo.promotions.OrderThresholdDiscountPercentagePromotion">
+				<attributes>
+					<attribute
+							qualifier="thresholdTotals"
+							autocreate="true"
+							type="PromotionPriceRowCollectionType">
+						<description>The cart total value threshold in specific currencies.</description>
+						<persistence type="property"/>
+						<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+					</attribute>
+
+					<attribute
+							qualifier="percentageDiscount"
+							autocreate="true"
+							type="java.lang.Double">
+						<defaultvalue>Double.valueOf(10.0D)</defaultvalue>
+						<description>Percentage discount.</description>
+						<modifiers read="true" write="true" search="true" optional="true"/>
+						<persistence type="property"/>
+					</attribute>
+
+					<attribute qualifier="messageFired" type="localized:java.lang.String">
+						<description>The message to show when the promotion has fired.</description>
+						<modifiers read="true" write="true" optional="true"/>
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+					</attribute>
+
+					<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+						<description>The message to show when the promotion could have potentially fire.</description>
+						<modifiers read="true" write="true" optional="true"/>
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+					</attribute>
+
+				</attributes>
+			</itemtype>
+
+			<itemtype code="ProductPriceDiscountPromotionByPaymentType" extends="ProductPromotion" autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.b2bacceleratorservices.jalo.promotions.ProductPriceDiscountPromotionByPaymentType">
+
+				<attributes>
+
+					<attribute
+							qualifier="productDiscountPrice"
+							autocreate="true"
+							type="PromotionPriceRowCollectionType">
+						<description>Fixed price for discount in specific currencies.</description>
+						<persistence type="property"/>
+						<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+					</attribute>
+
+					<attribute qualifier="messageFired" type="localized:java.lang.String">
+						<description>The message to show when the promotion has fired.</description>
+						<modifiers read="true" write="true" optional="true"/>
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+					</attribute>
+
+					<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+						<description>The message to show when the promotion could have potentially fire.</description>
+						<modifiers read="true" write="true" optional="true"/>
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+					</attribute>
+
+					<attribute qualifier="paymentType" type="CheckoutPaymentType">
+						<description>Payment type for Checkout summary</description>
+						<persistence type="property"/>
+					</attribute>
+
+				</attributes>
+			</itemtype>
+
+
+			<itemtype code="ProductThresholdPriceDiscountPromotion" extends="ProductPromotion" autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.b2bacceleratorservices.jalo.promotions.ProductThresholdPriceDiscountPromotion">
+
+				<attributes>
+
+					<attribute
+							qualifier="productThresholdPrice"
+							autocreate="true"
+							type="PromotionPriceRowCollectionType">
+						<description>The cart total value threshold in specific currencies.</description>
+						<persistence type="property"/>
+						<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+					</attribute>
+
+
+					<attribute
+							qualifier="productPriceDiscount"
+							autocreate="true"
+							type="PromotionPriceRowCollectionType">
+						<description>Fixed price for discount in specific currencies.</description>
+						<persistence type="property"/>
+						<modifiers read="true" write="true" search="false" initial="false" optional="true" partof="true"/>
+					</attribute>
+
+					<attribute qualifier="messageFired" type="localized:java.lang.String">
+						<description>The message to show when the promotion has fired.</description>
+						<modifiers read="true" write="true" optional="true"/>
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+					</attribute>
+
+					<attribute qualifier="messageCouldHaveFired" type="localized:java.lang.String">
+						<description>The message to show when the promotion could have potentially fire.</description>
+						<modifiers read="true" write="true" optional="true"/>
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+					</attribute>
+
+				</attributes>
+
+			</itemtype>
+		</typegroup>
+
+		<typegroup name="btg">
+
+			<itemtype code="BTGAssignOrganizationToGroupDefinition" autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.b2bacceleratorservices.jalo.btg.BTGAssignOrganizationToGroupDefinition"
+				extends="BTGAssignToGroupDefinition">
+				<attributes>
+					<attribute qualifier="target" type="java.lang.String" autocreate="true" generate="true" redeclare="true">
+						<modifiers read="true" write="false" optional="false" initial="true"/>
+						<persistence type="property"/>
+						<defaultvalue>"assignOrganizationToGroup"</defaultvalue>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="BTGNumberOfOrdersAboveAmountRelativeDateOperand"
+				extends="BTGNumberOfOrdersRelativeDateOperand" autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.b2bacceleratorservices.jalo.btg.BTGNumberOfOrdersAboveAmountRelativeDateOperand">
+				<attributes>
+					<attribute type="java.lang.Double" qualifier="amount">
+						<modifiers optional="false"/>
+						<persistence type="property"/>
+						<defaultvalue>Double.valueOf(0)</defaultvalue>
+					</attribute>
+					<attribute type="Currency" qualifier="currency">
+						<persistence type="property"/>
+					</attribute>
+					<attribute type="OrderStatus" qualifier="orderStatus">
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="BTGOrganizationUIDOfUserOperand" extends="BTGAbstractOrderOperand" autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.b2bacceleratorservices.jalo.btg.BTGOrganizationUIDOfUserOperand">
+			</itemtype>
+
+			<itemtype code="BTGOrganizationUIDsOperand" extends="BTGAbstractOrderOperand" autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.b2bacceleratorservices.jalo.btg.BTGOrganizationUIDsOperand">
+				<attributes>
+					<attribute type="StringCollection" qualifier="organizationUids">
+						<persistence type="property"/>
+						<modifiers optional="false"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+
+		</typegroup>
+
+	</itemtypes>
+</items>

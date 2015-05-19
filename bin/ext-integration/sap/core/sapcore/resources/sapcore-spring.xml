@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  [y] hybris Platform
+ 
+  Copyright (c) 2000-2014 hybris AG
+  All rights reserved.
+ 
+  This software is the confidential and proprietary information of hybris
+  ("Confidential Information"). You shall not disclose such Confidential
+  Information and shall use it only in accordance with the terms of the
+  license agreement you entered into with hybris.
+ 
+  
+--><beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans            http://www.springframework.org/schema/beans/spring-beans-3.1.xsd            http://www.springframework.org/schema/aop            http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<!-- =============== -->
+	<!-- Generic Factory -->
+	<!-- =============== -->
+	<alias alias="sapCoreGenericFactory" name="sapCoreDefaultGenericFactory"/>
+	<bean class="de.hybris.platform.sap.core.common.util.DefaultGenericFactory" id="sapCoreDefaultGenericFactory" scope="singleton"/>
+
+	<!-- ==================== -->
+	<!-- Populator Configurer -->
+	<!-- ==================== -->
+	<alias alias="sapCoreGenericPopulatorConfigurer" name="sapCoreDefaultGenericPopulatorConfigurer" />
+	<bean class="de.hybris.platform.sap.core.spring.GenericPopulatorConfigurer" id="sapCoreDefaultGenericPopulatorConfigurer"
+		abstract="true" init-method="addPopulatorsToConverter" scope="singleton">
+	</bean>
+
+	<!-- ====================== -->
+	<!-- Module Resource Access -->
+	<!-- ====================== -->
+	<alias alias="sapCoreModuleResourceAccess" name="sapCoreDefaultModuleResourceAccess"/>
+	<bean class="de.hybris.platform.sap.core.module.impl.ModuleResourceAccessImpl" id="sapCoreDefaultModuleResourceAccess" scope="singleton">
+		<property name="l10nService" ref="l10nService" />
+	</bean>
+
+	<!-- ================ -->
+	<!-- Session Handling -->
+	<!-- ================ -->
+	<alias alias="sapCoreSAPSession" name="sapCoreDefaultSAPSession"/>
+	<bean class="de.hybris.platform.sap.core.spring.SAPSessionScopeHandler" id="sapCoreDefaultSAPSession">
+		<property name="sapHybrisSessionProvider" ref="sapCoreHybrisSessionProvider"/>
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer" id="sapCoreScopeConfigurer">
+		<property name="scopes">
+			<map>
+				<entry key="sapSession" value-ref="sapCoreSAPSession"/>
+			</map>
+		</property>
+	</bean>
+
+	<alias alias="sapCoreHybrisSessionProvider" name="sapCoreDefaultHybrisSessionProvider"/>
+	<bean class="de.hybris.platform.sap.core.runtime.SAPHybrisSessionProvider" id="sapCoreDefaultHybrisSessionProvider" scope="singleton">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="tenantService" ref="tenantService"/>
+		<property name="clusterService" ref="clusterService"/>
+		<property name="genericFactory" ref="sapCoreGenericFactory"/>
+	</bean>
+
+	<alias alias="sapCoreHybrisSession" name="sapCoreDefaultHybrisSession"/>
+	<bean class="de.hybris.platform.sap.core.runtime.SAPHybrisSession" id="sapCoreDefaultHybrisSession" scope="prototype">
+		<property name="sessionObjectFactory" ref="sapCoreSessionObjectFactory"/>
+	</bean>
+
+	<alias alias="sapCoreSessionObjectFactory" name="sapCoreDefaultSessionObjectFactory"/>
+	<bean class="de.hybris.platform.sap.core.runtime.SessionObjectFactory" id="sapCoreDefaultSessionObjectFactory" scope="prototype">
+	</bean>
+	
+	<!-- ================================= -->
+	<!-- Request Sequencer-->
+	<!-- ================================= -->
+	<alias alias="sapCoreRequestSequencer" name="sapCoreDefaultRequestSequencer"/>
+	<bean class="de.hybris.platform.sap.core.requestsequencer.RequestSequencerFilter" id="sapCoreDefaultRequestSequencer" >
+		<property name="urlIncludePatternList" ref="sapCoreIncludeUrlPatternListForRequestSequencer" />
+		<property name="urlExcludePatternList" ref="sapCoreExcludeUrlPatternListForRequestSequencer" />
+	</bean>	
+	
+	<!-- ================================= -->
+	<!-- Url Patterns for Request Sequencer-->
+	<!-- ================================= -->
+	
+	<!-- Include URL Patterns -->
+	<alias alias="sapCoreIncludeUrlPatternListForRequestSequencer" name="sapCoreDefaultIncludeUrlPatternListForRequestSequencer" />
+	<bean class="de.hybris.platform.sap.core.common.configurer.impl.ConfigurerEntitiesListImpl" id="sapCoreDefaultIncludeUrlPatternListForRequestSequencer"
+		scope="singleton">
+	</bean>
+	
+	<!-- Exclude URL Patterns -->
+	<alias alias="sapCoreExcludeUrlPatternListForRequestSequencer" name="sapCoreDefaultExcludeUrlPatternListForRequestSequencer" />
+	<bean class="de.hybris.platform.sap.core.common.configurer.impl.ConfigurerEntitiesListImpl" id="sapCoreDefaultExcludeUrlPatternListForRequestSequencer"
+		scope="singleton">
+	</bean>
+
+	<alias alias="sapCoreUrlPatternConfigurerForRequestSequencer" name="sapCoreDefaultUrlPatternConfigurerForRequestSequencer" />
+	<bean class="de.hybris.platform.sap.core.requestsequencer.configurer.impl.UrlPatternImpl" id="sapCoreDefaultUrlPatternConfigurerForRequestSequencer"
+		abstract="true" init-method="init" scope="singleton">
+		<property name="includeUrlPatternList" ref="sapCoreIncludeUrlPatternListForRequestSequencer" />
+		<property name="excludeUrlPatternList" ref="sapCoreExcludeUrlPatternListForRequestSequencer" />
+	</bean>
+	
+</beans>

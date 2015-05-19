@@ -1,0 +1,104 @@
+###################################################################################################
+##
+## Base data required by the comment system
+##
+#Base Store
+INSERT_UPDATE BaseStore;uid[unique=true];name;
+;csTicketTestStore;Test Store for CS Ticketing;
+;csOtherTicketTestStore;Other Test Store for CS Ticketing;
+
+INSERT_UPDATE UserGroup;uid[unique=true]
+;testTicketGroup
+
+INSERT_UPDATE Domain;code[unique=true];name;
+;ticketSystemDomain;Ticket System Domain;
+
+INSERT_UPDATE Component;code[unique=true];name;domain[unique=true](code);readPermitted(uid);writePermitted(uid);createPermitted(uid);removePermitted(uid);
+;ticketSystem;Ticket System;ticketSystemDomain;testTicketGroup;testTicketGroup;testTicketGroup;testTicketGroup;
+
+INSERT_UPDATE CommentType;code[unique=true];name;domain[unique=true](code);metaType(code)
+;customerNote;Customer Note;ticketSystemDomain;CsCustomerEvent
+;customerEmail;Customer Email;ticketSystemDomain;CsCustomerEvent
+;ticketCreationEvent;Ticket Created Event;ticketSystemDomain;CsCustomerEvent
+;ticketResolutionEvent;Ticket Resolved Event;ticketSystemDomain;CsTicketResolutionEvent
+;ticketChangeEvent;Ticket Changed Event;ticketSystemDomain;CsTicketEvent;
+
+###################################################################################################
+##
+## Sample order data
+##
+INSERT_UPDATE StandardPaymentMode;code[unique=true];name[lang=de];name[lang=en];description[lang=de];description[lang=en];active;paymentinfotype(code)
+;invoice;Rechnung;Invoice;per Rechnung bezahlen;payment with invoice;true;InvoicePaymentInfo
+;advance;Vorkasse;Advance;per Vorkasse bezahlen;payment in advance;true;AdvancePaymentInfo
+
+#INSERT_UPDATE PromotionVoucher;code[unique=true];name[lang=de];name[lang=en];description[lang=de];description[lang=en];freeShipping;value;currency(isoCode);voucherCode;redemptionQuantityLimit;redemptionQuantityLimitPerUser
+#;A02;Treuerabatt;Loyalty rebate;Ihr Treuerabatt;This is your loyalty rebate;false;10;;vo2;5;5
+
+INSERT_UPDATE Order;code[unique=true];user(uid);date[dateformat=dd.MM.yyyy HH:mm];currency(isocode);net;deliveryMode(code);paymentMode(code);Discounts(code);calculated
+;ticketTestOrder1;hweaving;01.01.2006 07:56;EUR;false;;advance;;false
+"#%   impex.getLastImportedItem().setDeliveryAddress(impex.getLastImportedItem().getUser().getDefaultDeliveryAddress());impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getDefaultPaymentAddress());";
+;ticketTestOrder2;sbrueck;02.01.2006 17:00;EUR;false;;invoice;;false
+"#%   impex.getLastImportedItem().setDeliveryAddress(impex.getLastImportedItem().getUser().getDefaultDeliveryAddress());impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getDefaultPaymentAddress());";
+;ticketTestOrder3;ariel;02.01.2006 17:00;EUR;false;;invoice;;false
+"#%   impex.getLastImportedItem().setDeliveryAddress(impex.getLastImportedItem().getUser().getDefaultDeliveryAddress());impex.getLastImportedItem().setPaymentAddress(impex.getLastImportedItem().getUser().getDefaultPaymentAddress());";
+
+INSERT_UPDATE OrderEntry;order(code)[unique=true];product(code,catalogVersion(catalog(id),version))[unique=true];quantity;calculated;unit(code);entryNumber;
+;ticketTestOrder1;HW2110-0019:hwcatalog:Online;4;false;pieces;0
+;ticketTestOrder1;HW2110-0027:hwcatalog:Online;4;false;pieces;1
+;ticketTestOrder1;HW2200-0623:hwcatalog:Online;4;false;pieces;2
+;ticketTestOrder1;HW2200-0521:hwcatalog:Online;4;false;pieces;3
+
+;ticketTestOrder2;HW1100-0023:hwcatalog:Online;2;false;pieces;0
+;ticketTestOrder2;HW1100-0024:hwcatalog:Online;3;false;pieces;1
+;ticketTestOrder2;HW1100-0025:hwcatalog:Online;3;false;pieces;2
+
+;ticketTestOrder3;HW1100-0023:hwcatalog:Online;2;false;pieces;0
+;ticketTestOrder3;HW1100-0024:hwcatalog:Online;3;false;pieces;1
+;ticketTestOrder3;HW1100-0025:hwcatalog:Online;3;false;pieces;2
+
+###################################################################################################
+##
+## Sample ticket data
+##
+INSERT_UPDATE CsAgentGroup;uid[unique=true];ticketstores(uid);defaultAssignee(uid)
+;testTicketGroup1;csTicketTestStore;
+;testTicketGroup2;csTicketTestStore;
+;testTicketGroup3;csOtherTicketTestStore;agent3;
+
+INSERT_UPDATE Employee;uid[unique=true];name;description;sessionLanguage(isocode);groups(uid);password;ticketstores(uid)
+;agent1;Ticket Agent 1;Ticket Agent 1;en;testTicketGroup1;1234;csTicketTestStore
+;agent2;Ticket Agent 2;Ticket Agent 2;en;testTicketGroup2;1234;csTicketTestStore
+;agent3;Ticket Agent 3;Ticket Agent 3;en;testTicketGroup3;1234;csOtherTicketTestStore
+;agent4;Ticket Agent 4;Ticket Agent 4;en;testTicketGroup1,testTicketGroup2;1234;csTicketTestStore
+
+#INSERT_UPDATE CsAgentGroup;uid[unique=true]
+#;testTicketGroup
+
+INSERT_UPDATE Employee;uid[unique=true];name;groups(uid)
+;csagent;Agent for Unit Test;testTicketGroup
+
+INSERT_UPDATE CsCustomerEvent;code[unique=true];author[unique=true](uid);component[unique=true](code);commentType[unique=true](code);subject;text
+;test-ticket-1-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
+;test-ticket-2-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
+;test-ticket-3-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
+;test-ticket-4-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created problem';
+;test-ticket-5-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created problem';
+;test-ticket-6-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created incident';
+;test-ticket-7-create;admin;ticketSystem;ticketCreationEvent;'';'Ticket Created note';
+
+INSERT_UPDATE CsCustomerEvent;code[unique=true];author[unique=true](uid);component[unique=true](code);commentType[unique=true](code);text;interventionType(code);reason(code)
+;test-ticket-7-customer;admin;ticketSystem;customerNote;'customer call events';Email;Complaint
+
+INSERT_UPDATE CsTicketResolutionEvent;code[unique=true];resolutionType[unique=true](code);author[unique=true](uid);component[unique=true](code);commentType[unique=true](code);text
+;test-ticket-7-closed;Closed;admin;ticketSystem;ticketResolutionEvent;'Ticket Closed';
+
+INSERT_UPDATE CsTicket;state[default='New'](code);ticketID[unique=true];customer(uid);order(code);category(code);priority(code);assignedAgent(uid);assignedGroup(uid);headline;comments(code);resolution(code);
+;;test-ticket-1;ariel;;Note;Low;csagent;testTicketGroup1;'Test Headline 1';test-ticket-1-create;;
+;;test-ticket-2;ariel;;Note;Medium;csagent;;'Test Headline 2';test-ticket-2-create;;
+;;test-ticket-3;ariel;;Note;High;;testTicketGroup1;'Test Headline 3';test-ticket-3-create;;
+;;test-ticket-4;ppetersonson;;Problem;High;csagent;testTicketGroup1;'Test Problem for customer';test-ticket-4-create;;
+;;test-ticket-5;hweaving;ticketTestOrder1;Problem;High;csagent;testTicketGroup1;'Test Problem for order';test-ticket-5-create;;
+;Open;test-ticket-6;sbrueck;ticketTestOrder2;Incident;High;csagent;testTicketGroup1;'Test Incident for order';test-ticket-6-create;;
+
+;Closed;test-ticket-7;sbrueck;ticketTestOrder2;Note;Low;csagent;testTicketGroup1;'Test Note for order';test-ticket-7-create,test-ticket-7-customer,test-ticket-7-closed;test-ticket-7-closed
+

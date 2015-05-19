@@ -1,0 +1,29 @@
+# Test data to perform active/inactive aggregator & shortcode testing
+
+"INSERT_UPDATE Country";"name";"isocode[unique=true]";
+;Spain;ES;
+
+
+"INSERT_UPDATE MobileActionKeyword";"&keyword";"keyword[unique=true]";"type(code)";
+;hi;hi;REGEX
+
+
+"INSERT_UPDATE MobileAggregator";"engine(code)";code[unique=true];state(code);
+;"testSendSMSEngine";test14_1;ACTIVE;
+;"testSendSMSEngine";test14_2;OFF;
+
+"INSERT_UPDATE MobileShortcode";"aggregator(code)[unique=true]";country(isocode)[unique=true];code[unique=true];defaultAction(code);&shortcode;state(code);
+;test14_1;"ES";"111";test14;test14_1;ACTIVE;
+;test14_1;"ES";"222";test14;test14_2;OFF;
+;test14_2;"ES";"333";test14;test14_3;ACTIVE;
+;test14_2;"ES";"444";test14;test14_4;OFF;
+
+"INSERT_UPDATE MobileReceiveAndSendTextAction";"target[forceWrite=true]";code[unique=true];content;
+;"helloWorldText";test14;x;
+
+"INSERT_UPDATE MobileActionAssignment";"state(code)";"keyword(&keyword)[unique=true]";shortcode(&shortcode)[unique=true];action(code);
+;"ACTIVE";"hi";test14_1;test14;
+;"ACTIVE";"hi";test14_2;test14;
+;"ACTIVE";"hi";test14_3;test14;
+;"ACTIVE";"hi";test14_4;test14;
+

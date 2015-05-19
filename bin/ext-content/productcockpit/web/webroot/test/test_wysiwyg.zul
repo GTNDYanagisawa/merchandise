@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?init 				class="org.zkoss.zkplus.databind.AnnotateDataBinderInit" ?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+<?taglib 			uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+
+<?page title="[y] hybris Product Cockpit : Test page for WYSIWYG Editor component [y]"?>
+
+<window xmlns="http://www.zkoss.org/2005/zul"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:zk="http://www.zkoss.org/2005/zk"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd "
+	width="100%" height="100%" style="background-color: white" shadow="false">
+
+	<!--  custom styles in here -->
+	<style src="/css/productcockpit.css" />
+	<style src="/css/defaultstyles.css" />
+	<vbox>
+		<zscript>
+			<![CDATA[
+			class TextHolder
+			{
+			   	String s = "<h1>Foo</h1>";
+			   
+		   		public String getText()
+		   		{
+		      		System.out.println("get");
+			   	  	return this.s;
+		   		}
+		   		public void setText( String s)
+		   		{
+		      		System.out.println("set");
+		   	  		this.s = s;
+		   		}
+			}
+			TextHolder th1 = new TextHolder();
+			TextHolder th2 = new TextHolder();
+			]]>
+		</zscript>
+		<separator height="24px"/>
+		<label value="WYSIWYG editor with a registered event listener (see console for output)"/>
+		<wysiwyg>
+			<attribute name="onContentChanged">
+				<![CDATA[
+					import de.hybris.platform.productcockpit.components.texteditor.WysiwygChangeEvent;
+					System.out.println("Wysiwyg editor test listener > Content changed\n\tContent: " + ((WysiwygChangeEvent)event).getContent() );
+				]]>
+			</attribute>
+		</wysiwyg>
+		
+		<separator height="24px"/>
+		
+		<label value="WYSIWYG editor with databinding"/>
+		<wysiwyg value="@{th1.text}" onContentChanged='System.out.println("wysiwyg content changed!")'/>
+							
+		<separator height="24px"/>
+			
+		<label value="Another WYSIWYG which is bound to the same data as the one above"/>
+		<wysiwyg value="@{th2.text}" onContentChanged='System.out.println("wysiwyg 2 content changed!")'/>
+		
+		<separator height="24px"/>
+		
+		<label value="A label which is bound to the same data as the two editors above:"/>
+		<label value="@{th2.text}" style="font-weight: bold"/>
+		
+		<separator height="24px"/>
+	</vbox>	
+</window>

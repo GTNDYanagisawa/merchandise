@@ -1,0 +1,103 @@
+*** Settings ***
+Library         com.hybris.services.entitlements.atdd.keywords.EntitlementsBuilderKeywordLibrary
+Library         com.hybris.services.entitlements.atdd.keywords.EntitlementsExecuteKeywordLibrary
+Library         com.hybris.services.entitlements.atdd.keywords.EntitlementsDetailsKeywordLibrary
+Library         com.hybris.services.entitlements.atdd.keywords.EntitlementsRevokeKeywordLibrary
+
+
+*** Keywords ***
+### GRANT ENTITLEMENT:
+grant entitlement with entitlementType "${entitlementType:[^"]+}" for user "${user:[^"]+}"
+    [Documentation]    Grants entitlement (with given entitlement type) for user
+    ${id} =    generate id
+    ${entitlement}=    grant entitlement with params    ${entitlementType}    ${user}
+    [Return]    ${entitlement}
+
+grant entitlement with entitlementType "${entitlementType:[^"]+}" and conditions "${conditions:[^"]+}" for user "${user:[^"]+}"
+    [Documentation]    Grants entitlement (with given entitlement type) with conditions
+    ${id} =    generate id
+    ${entitlement}=    grant entitlement with params and conditions    ${entitlementType}    ${user}    ${conditions}
+    [Return]    ${entitlement}
+
+### REVOKE ENTITLEMENT(S):
+revoke entitlement for user "${user:[^"]+}" and entitlementType "${entitlementType:[^"]+}" and grantSource "${grantSource:[^"]+}" and grantSourceId "${grantSourceId:[^"]+}"
+    [Documentation]    Revoke entitlements by filter
+    ${result}=    revoke entitlement     ${user}     ${entitlementType}    ${grantSource}    ${grantSourceId}
+    [Return]    ${result}
+
+revoke entitlements for user "${user:[^"]+}" and entitlementType "${entitlementType:[^"]+}" and grantSource "${grantSource:[^"]+}"
+    [Documentation]    Revoke entitlements by filter
+    ${result}=    revoke entitlement     ${user}     ${entitlementType}    ${grantSource}    ${null}
+    [Return]    ${result}
+
+revoke entitlements for user "${user:[^"]+}" and entitlementType "${entitlementType:[^"]+}"
+    [Documentation]    Revoke entitlements by filter
+    ${result}=    revoke entitlement     ${user}     ${entitlementType}    ${null}    ${null}
+    [Return]    ${result}
+
+revoke entitlements for user "${user:[^"]+}" and entitlementType "${entitlementType:[^"]+}" and grantSourceId "${grantSourceId:[^"]+}"
+    [Documentation]    Revoke entitlements by filter
+    ${result}=    revoke entitlement     ${user}     ${entitlementType}    ${null}    ${grantSourceId}
+    [Return]    ${result}
+
+revoke entitlements for user "${user:[^"]+}" and grantSource "${grantSource:[^"]+}"
+    [Documentation]    Revoke entitlements by filter
+    ${result}=    revoke entitlement     ${user}     ${null}    ${grantSource}    ${null}
+    [Return]    ${result}
+
+revoke entitlements for user "${user:[^"]+}" and grantSourceId "${grantSourceId:[^"]+}"
+    [Documentation]    Revoke entitlements by filter
+    ${result}=    revoke entitlement     ${user}     ${null}    ${null}    ${grantSourceId}
+    [Return]    ${result}
+
+revoke entitlements for user "${user:[^"]+}" and grantSource "${grantSource:[^"]+}" and grantSourceId "${grantSourceId:[^"]+}"
+    [Documentation]    Revoke entitlements by filter
+    ${result}=    revoke entitlement     ${user}     ${null}    ${grantSource}    ${grantSourceId}
+    [Return]    ${result}
+
+revoke entitlements for user "${user:[^"]+}"
+    [Documentation]    Revoke entitlements by filter
+    ${result}=    revoke entitlement     ${user}     ${null}    ${null}    ${null}
+    [Return]    ${result}
+
+revoke entitlement with grantId "${grantId:[^"]+}"
+    [Documentation]    Revoke entitlements by grantId (in meaning of internal id, not the grantSourceId)
+    ${result}=    revoke entitlement by grantId    ${grantId}
+    [Return]    ${result}
+
+### GET ENTITLEMENT:
+get entitlement with grantId "${grantId:[^"]+}" is "${exists_boolean:[^"]+}"
+    [Documentation]    Gets entitlement with given grantId (in meaning of internal id, not the grantSourceId)
+    ${result}=    get entitlement    ${grantId}     ${exists_boolean}
+    [Return]    ${result}
+
+### DELETE CONDITION(S)/PROPERTY:
+delete conditions of grant "${grantId:[^"]+}"
+    [Documentation]    Delete all conditions of given grant
+    ${result}=    delete all conditions    ${grantId}
+    [Return]      ${result}
+
+delete condition "${conditionType:[^"]+}" of grant "${grantId:[^"]+}"
+    [Documentation]    Delete condition by type
+    ${result}=    delete condition    ${grantId}    ${conditionType}
+    [Return]      ${result}
+
+delete property "${propertyName:[^"]+}" of entitlement with id "${entitlementId:[^"]+}"
+    [Documentation]     Delete property by name
+    ${result} =         delete entitlement property    ${entitlementId}    ${propertyName}
+
+### SET STATUS/PROPERTY:
+set status "${status:[^"]+}" for entitlement with id "${entitlementId:[^"]+}"
+    [Documentation]    Sets new entitlement status
+    update status of entitlement    ${entitlementId}    ${status}
+
+set property name "${propertyName:[^"]+}" and value "${propertyValue:[^"]+}" for entitlement with id "${entitlementId:[^"]+}"
+    [Documentation]     Set property to entitlement
+    ${result}=    create entitlement property    ${entitlementId}    ${propertyName}    ${propertyValue}
+    [Return]    ${result}
+
+### CHANGE PROPERTY:
+change property "${propertyName:[^"]+}" of entitlement with id "${entitlementId:[^"]+}" to "${propertyValue:[^"]+}"
+    [Documentation]     Change value of existing property
+    ${result} =         update entitlement property    ${entitlementId}    ${propertyName}    ${propertyValue}
+    [Return]            ${result}

@@ -1,0 +1,150 @@
+## default impex script for T_NEW_CATALOG
+## the user can also upload his impex script
+
+#% impex.setLocale( Locale.GERMAN );
+
+##****************HEADER starts****************
+
+"#% impex.info(""Processing informations from HEADER tag"")"
+
+"#% impex.info(""  Creating companies"")"
+INSERT_UPDATE COMPANY; locname[lang=$lang_iso]; uid[unique=true]; dunsID; ilnID; buyerSpecificID; supplierSpecificID;
+#% impex.includeExternalDataMedia("customers.csv");
+
+"#% impex.info(""  Creating languages"")"
+INSERT_UPDATE Language; isocode[unique=true]; active;
+;$lang_iso;true
+
+##% impex.includeExternalDataMedia("catalog.csv");
+## not necessary to import the catalog.csv, the catalog attributes are saved as constants
+"#% impex.info(""  Creating catalogs"")"
+INSERT_UPDATE CATALOG; id[unique=true]; name[lang=$lang_iso]; buyer(uid); supplier(uid);
+;$catalog_id;$catalog_name;;
+
+"#% impex.info(""  Creating catalog version"")"
+INSERT_UPDATE CATALOGVERSION; catalog(id)[default=$catalog_id, unique=true]; version[unique=true, default=$catalog_version]; languages(isocode)[mode=append, default=$lang_iso]; inclAssurance; inclDuty; inclFreight; inclPacking; defaultCurrency(isocode); generationDate;
+#% impex.includeExternalDataMedia("catalogversion.csv");
+
+#% if: impex.findExternalDataMedia("countries.csv")!=null
+"#% impex.info(""  Creating countries"")"
+INSERT_UPDATE COUNTRY; isocode[unique=true]; ; active[virtual=true, default=true];
+#% impex.includeExternalDataMedia("countries.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("regions.csv")!=null
+"#% impex.info(""  Creating regions"")"
+INSERT_UPDATE REGION; country(isocode); isocode[unique=true]; active[virtual=true, default=true];
+#% impex.includeExternalDataMedia("regions.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("agreements.csv") !=null
+"#% impex.info(""  Creating agreements"")"
+INSERT_UPDATE AGREEMENT; Catalog(id); id[unique=true]; startdate; enddate; buyer(uid); supplier(uid); currency(isocode); 
+#% impex.includeExternalDataMedia("agreements.csv");
+#% endif:
+
+## zip of pobox is just included in the csv file, but cannot be imported
+## the street can be separated as streetname and streetnumber
+#% if: impex.findExternalDataMedia("addresses.csv")!=null
+"#% impex.info(""  Creating addresses"")"
+INSERT_UPDATE ADDRESS; owner(Principal.uid)[unique=true]; building; department; company; lastname; streetname; postalcode; pobox; ; town; region(isocode); country(isocode); phone1; fax; email; publicKey; url; remarks; 
+#% impex.includeExternalDataMedia("addresses.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("medias.csv")!=null
+"#% impex.info(""  Creating medias"")"
+INSERT_UPDATE MEDIA; code[unique=true]; catalogVersion(catalog(id),version)[default=$catalog_id:$catalog_version,virtual=true, unique=true]; realfilename; @media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator]; mime; description; alttext; 
+#% impex.includeExternalDataMedia("medias.csv");
+#% endif:
+
+"#% impex.info(""Finished processing informations from HEADER tag"")"
+
+##****************HEADER ends****************
+
+##****************CLASS SYSTEM starts********
+#% if: $class_system_create
+"#% impex.info(""Creating new class system: $class_system_versions"")"
+
+#% if: impex.findExternalDataMedia("classificationsystem.csv")!=null
+"#% impex.info(""  Creating classification systems"")"
+INSERT_UPDATE CLASSIFICATIONSYSTEM; id[unique=true]; name[lang=$lang_iso];
+#% impex.includeExternalDataMedia("classificationsystem.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("classificationsystemversion.csv")!=null
+"#% impex.info(""  Creating classifications system versions"")"
+INSERT_UPDATE CLASSIFICATIONSYSTEMVERSION; catalog(id)[unique=true]; version[unique=true]; languages(isocode)[mode=append, default=$lang_iso]
+#% impex.includeExternalDataMedia("classificationsystemversion.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("classificationclass.csv")!=null
+"#% impex.info(""  Creating classification classes"")"
+INSERT_UPDATE CLASSIFICATIONCLASS; code[unique=true]; name[lang=$lang_iso]; description; supercategories(code, catalogVersion(catalog(id),version)); catalogVersion(catalog(id),version)[unique=true];
+#% impex.includeExternalDataMedia("classificationclass.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("classificationattribute.csv")!=null
+"#% impex.info(""  Creating classification attributes"")"
+INSERT_UPDATE ClassificationAttribute;code[unique=true];name[lang=$lang_iso]; systemVersion(catalog(id))[unique=true]
+#% impex.includeExternalDataMedia("classificationattribute.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("classificationattributeassignment.csv")!=null
+"#% impex.info(""  Creating classification attribute assignments"")"
+INSERT_UPDATE ClassAttributeAssignment; classificationClass(ClassificationClass.code,catalogVersion(catalog(id)))[unique=true]; classificationAttribute(code,systemVersion(catalog(id)))[unique=true] ; systemVersion(catalog(id))[unique=true];attributeType(code[default=string,virtual=true])
+#% impex.includeExternalDataMedia("classificationattributeassignment.csv");
+#% endif:
+
+"#% impex.info(""Finished creating new class system: $class_system_versions"")"
+#% endif:
+##****************CLASS SYSTEM ends**********
+
+#% if: impex.findExternalDataMedia("keywords.csv")!=null
+"#% impex.info(""Creating keywords"")"
+INSERT_UPDATE Keyword; keyword[unique=true]; catalogVersion(catalog(id),version)[default=$catalog_id:$catalog_version, virtual=true, unique=true]; language(isocode)[default=$lang_iso];
+#% impex.includeExternalDataMedia("keywords.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("categories.csv")!=null
+"#% impex.info(""Creating categories"")"
+INSERT_UPDATE CATEGORY; code[unique=true]; name[lang=$lang_iso]; description; supercategories(code, catalogVersion(catalog(id[default=$catalog_id]),version[default=$catalog_version])); order; medias(code); keywords(keyword, catalogVersion(catalog(id[default=$catalog_id]),version[default=$catalog_version]))[lang=$lang_iso]; ; catalogVersion(catalog(id),version)[default=$catalog_id:$catalog_version, virtual=true, unique=true];
+#% impex.includeExternalDataMedia("categories.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("groupsystem.csv")!=null
+"#% impex.info(""Creating group systems"")"
+UPDATE CATALOGVERSION; categorySystemID; categorySystemName; categorySystemDescription; catalog(id)[default=$catalog_id, virtual=true, unique=true]; version[default=$catalog_version, virtual=true, unique=true]; 
+#% impex.includeExternalDataMedia("groupsystem.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("products.csv")!=null;
+"#% impex.info(""Creating products"")"
+INSERT_UPDATE PRODUCT; catalog(id)[default=$catalog_id, virtual=true, unique=true]; catalogVersion(catalog(id),version)[default=$catalog_id:$catalog_version, virtual=true, unique=true]; ; code[unique=true]; name[lang=$lang_iso]; description[lang=$lang_iso]; ean; supplierAlternativeAID; manufacturerAID; manufacturerName; manufacturerTypeDescription[lang=$lang_iso]; erpGroupBuyer; erpGroupSupplier; deliveryTime; keywords(keyword, catalogVersion(catalog(id[default=$catalog_id]),version[default=$catalog_version]))[lang=$lang_iso]; remarks[lang=$lang_iso]; segment[lang=$lang_iso]; order; unit(code); contentUnit(code)[cellDecorator=de.hybris.platform.bmecat.jalo.bmecat2csv.ContentUnitCellDecorator]; numberContentUnits; priceQuantity; minOrderQuantity; orderQuantityInterval; normal(code); thumbnails(code); data_sheet(code); detail(code); logo(code); others(code); ; buyerIDS(key(code), value); specialTreatmentClasses(key, value); articleStatus(key(code), value); europe1Prices[mode=append, translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator];
+"#% beforeEach: String key = importMapping.get(line.get(new Integer(17))); if(key!=null){ line.put(new Integer(17),key); }"
+#% impex.includeExternalDataMedia("products.csv");
+#% endif:
+
+## order in productnew2category.csv file is not defined in hybris system, so it it ignored
+#% if: impex.findExternalDataMedia("productnew2category.csv")!=null;
+"#% impex.info(""Creating product to category relations"")"
+UPDATE CATEGORY; products(code)[mode=append]; code[unique=true]; ;
+#% impex.includeExternalDataMedia("productnew2category.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("productreferences.csv")!=null;
+"#% impex.info(""Creating product references"")"
+INSERT_UPDATE ProductReference; source(code)[unique=true]; target(code); referenceType(code); quantity; ; ; preselected[default=false]; active[default=true];
+#% impex.includeExternalDataMedia("productreferences.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("productfeatures.csv") != null;
+"#% impex.info(""Creating product features"")"
+UPDATE PRODUCT; catalogVersion(catalog(id),version)[default=$catalog_id:$catalog_version, virtual=true, unique=true]; code[unique=true]; ; supercategories(code,catalogVersion(catalog(id)))[mode=append, cellDecorator=de.hybris.platform.bmecat.jalo.bmecat2csv.ClassificationGroupIDCellDecorator]; ;
+"#% beforeEach: String key = importMapping.get(line.get(new Integer(2))); if(key!=null) {line.put(new Integer(3), (line.get(new Integer(3)) + "":"" + key));}"
+#% impex.includeExternalDataMedia("productfeatures.csv");
+#% endif:
+
+#% if: impex.findExternalDataMedia("productfeaturevaluemappings.csv") != null;
+"#% impex.info(""Creating product feature value mappings"")"
+#% impex.includeExternalDataMedia("productfeaturevaluemappings.csv", 0, 0);
+#% endif:

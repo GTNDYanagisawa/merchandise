@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<bean class="de.hybris.platform.solrfacetsearch.config.AbstractSolrFacetVisibilityRuleData">
+		<property name="name" type="String"/>
+		<property name="code" type="String"/>
+		<property name="ruleTypeCode" type="String"/>
+		<property name="condition" type="de.hybris.platform.commercesearch.enums.FacetVisibilityRuleCondition"/>
+	</bean>
+
+	<bean class="de.hybris.platform.solrfacetsearch.config.FacetValueCountSolrFacetVisibilityRuleData" extends="de.hybris.platform.solrfacetsearch.config.AbstractSolrFacetVisibilityRuleData">
+		<property name="count" type="java.lang.Integer"/>
+		<property name="selectedStates" type="java.util.Set&lt;de.hybris.platform.commercesearch.enums.FacetSelectedState>"/>
+		<property name="operator" type="de.hybris.platform.commercesearch.enums.FacetValueCountOperator"/>
+	</bean>
+
+	<bean class="de.hybris.platform.solrfacetsearch.config.CategorySelectedFacetVisibilityRuleData" extends="de.hybris.platform.solrfacetsearch.config.AbstractSolrFacetVisibilityRuleData">
+		<property name="categories" type="java.util.Collection&lt;de.hybris.platform.category.model.CategoryModel>"/>
+	</bean>
+
+	<bean class="de.hybris.platform.solrfacetsearch.config.ValueCoverageFacetVisibilityRuleData" extends="de.hybris.platform.solrfacetsearch.config.AbstractSolrFacetVisibilityRuleData">
+		<property name="coveragePercentage" type="java.lang.Integer"/>
+	</bean>
+
+	<bean class="de.hybris.platform.solrfacetsearch.config.OtherFacetValueCountSolrFacetVisibilityRuleData" extends="de.hybris.platform.solrfacetsearch.config.FacetValueCountSolrFacetVisibilityRuleData">
+		<property name="otherFacet" type="de.hybris.platform.solrfacetsearch.model.config.SolrIndexedPropertyModel"/>
+	</bean>
+
+	<bean class="de.hybris.platform.solrfacetsearch.config.IndexedProperty">
+		<property name="facetVisibilityRules" type="java.util.List&lt;? extends AbstractSolrFacetVisibilityRuleData>"/>
+		<property name="boostRules" type="java.util.Collection&lt;de.hybris.platform.commercesearch.model.SolrBoostRuleModel>"></property>
+	</bean>
+
+	<bean class="de.hybris.platform.commercesearch.facet.config.FacetSearchStateData">
+		<property name="selectedCategoryCode" type="java.lang.String"/>
+		<property name="selectedKeyword" type="java.lang.String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercesearch.data.BoostRuleData">
+		<property name="propertyName" type="String"/>
+		<property name="propertyValue" type="String"/>
+		<!-- @Deprecated use boostFactor instead of boost -->
+		<property name="boost" type="String"/>
+		<property name="boostFactor" type="java.lang.Integer"/>
+		<property name="operator" type="String"/>
+		<property name="operatorType" type="de.hybris.platform.commercesearch.enums.SolrBoostConditionOperator"/>
+		<property name="pk" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercesearch.data.SearchProfileData">
+		<property name="hasOwnSearchProfile" type="java.lang.Boolean"/>
+		<property name="categoryName" type="java.lang.String"/>
+		<property name="searchProfileId" type="java.lang.String"/>
+		<property name="boostProfileId" type="java.lang.String"/>
+		<property name="boostProfileCategoryName" type="java.lang.String"/>
+	</bean>
+
+</beans>

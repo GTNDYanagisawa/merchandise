@@ -1,0 +1,726 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd"
+	default-autowire="byName">
+
+	<bean
+		class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor" />
+
+	<!--
+		Simple java bean which holds all additional parameters which are used
+		in some implementations of LayoutService
+	-->
+
+	<bean id="UICockpitSession" class="de.hybris.platform.cockpit.session.impl.UISessionImpl"
+		scope="session">
+		<property name="initialSessionListeners">
+			<list></list>
+		</property>
+		<property name="availablePerspectives">
+			<list>
+				<ref bean="PrintPerspective" />
+			</list>
+		</property>
+		<property name="usingTestIDs" value="false" />
+		<property name="dragOverPerspectivesEnabled" value="true" />
+		<property name="cachePerspectivesEnabled" value="true" />
+		<property name="requestHandler" ref="RequestHandler" />
+		<property name="pushContainers">
+			<list value-type="de.hybris.platform.cockpit.session.impl.PushCreationContainer">
+				<ref bean="WorkflowPushContainer" />
+				<ref bean="CommentPushContainer" />
+			</list>
+		</property>
+		<!--
+		 <property
+			name="sendEventsImmediately" value="false" />
+		-->
+	</bean>
+
+	<bean id="printcockpitSessionAddon"
+		class="de.hybris.platform.printcockpit.session.impl.PrintcockpitSessionAddon"
+		scope="session">
+		<property name="UICockpitSession" ref="UICockpitSession" />
+		<property name="modelService" ref="modelService" />
+		<property name="publicationService" ref="publicationService" />
+		<property name="initialSessionListeners">
+			<list>
+				<!--
+					<bean
+					class="de.hybris.platform.printcockpit.session.impl.UILuceneSessionListenerImpl"
+					>
+				-->
+				<!--
+					<property name="luceneSearcher"
+					ref="publicationSearcher"></property>
+				-->
+				<!--				</bean>-->
+			</list>
+		</property>
+	</bean>
+
+	<!--
+		Will be used by
+		de.hybris.platform.printcockpit.security.HybrisUserDetailsService for
+		setting the current session user
+	-->
+	<bean id="printcockpitSessionProxy" class="de.hybris.platform.printcockpit.tools.SessionProxy"
+		scope="session">
+		<aop:scoped-proxy />
+		<property name="session" ref="UICockpitSession" />
+	</bean>
+
+	<bean id="printcockpitConfigurationBean"
+		class="de.hybris.platform.printcockpit.session.impl.PrintcockpitConfigurationBean"
+		scope="session">
+		<property name="productSearchBrowserAvailableViewModes">
+			<list value-type="java.lang.String">
+				<value><![CDATA[Product]]></value>
+				<value><![CDATA[ContentBlock]]></value>
+				<value><![CDATA[Category]]></value>
+			</list>
+		</property>	
+	</bean>
+	
+	<bean id="WorkflowPushContainer" class="de.hybris.platform.cockpit.session.impl.PushCreationContainer" scope="session">
+		<constructor-arg value="de.hybris.platform.cockpit.session.impl.WorkflowPushController" index="0" />
+		<constructor-arg index="1">
+			<map>
+				<entry key="updateInterval" value="30000" />
+				<entry key="attClassNames" value-ref="WorkflowAttachmentData"/>
+			</map>
+		</constructor-arg>
+	</bean>
+		
+	<bean id="CommentPushContainer" class="de.hybris.platform.cockpit.session.impl.PushCreationContainer" scope="session">
+		<constructor-arg value="de.hybris.platform.cockpit.session.impl.CommentPushController" index="0" />
+		<constructor-arg index="1">
+			<map>
+				<entry key="updateInterval" value="30000" />
+				<entry key="cockpitTypeService">
+					<ref bean="cockpitTypeService"/>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PrintPerspective"
+		class="de.hybris.platform.printcockpit.session.impl.PrintPerspective"
+		scope="session" parent="BasePerspective">
+		<property name="uid" value="printcockpit.perspective.print" />
+		<property name="label" value="perspective.print" />
+		<property name="customCsaURI" value="/cockpit/commonCSA.zul" />
+		<property name="infoBoxTimeout" value="2000" />
+
+		<property name="navigationArea">
+			<ref bean="PrintNavigationArea" />
+		</property>
+		<property name="browserArea">
+			<bean class="de.hybris.platform.printcockpit.session.impl.PrintBrowserArea">
+				<property name="rootSearchTypeCode" value="Publication" />
+				<property name="welcomeBrowserModel" ref="PrintcockpitWelcomeBrowserModel"/>
+				<property name="viewURI" value="/cockpit/baseSearchBrowserArea.zul" />
+			</bean>
+		</property>
+		<property name="editorArea">
+			<bean id="PrintEditorAreaModel" parent="BaseEditorAreaModel" class="de.hybris.platform.printcockpit.session.impl.PrintEditorArea">
+				<property name="editorAreaController">
+					<ref bean="PrintViewEditorAreaController" />
+				</property>
+			</bean>
+		</property>
+		<property name="popupEditorArea">
+			<bean id="PrintCatalogPopupEditor" parent="BasePopupEditor">
+				<property name="editorAreaController">
+					<ref bean="PrintPopupEditorAreaController" />
+				</property>
+			</bean>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService" />
+	</bean>
+
+
+	<!--#### Welcome page ####-->
+	<bean id="PrintcockpitWelcomeBrowserModel" class="de.hybris.platform.printcockpit.session.impl.PrintcockpitWelcomeBrowserModel" scope="prototype">
+		<property name="welcomeTemplate" value="printcockpit/welcome/welcome.zul" />
+	</bean>
+
+
+	<bean id="PrintNavigationArea"
+		class="de.hybris.platform.printcockpit.session.impl.PrintNavigationArea"
+		scope="session" parent="BaseNavigationArea">
+		<property name="sectionModel">
+			<ref bean="PrintNavigationAreaModel" />
+		</property>
+		<property name="infoSlotRenderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.InfoBoxRenderer"/>
+		</property>
+		<property name="infoSlotAttachmentTypes">
+			<ref bean="WorkflowAttachmentData"/>
+		</property>
+		<property name="sections">
+			<list>
+				<ref bean="PrintSpecialCollectionsSection"/>
+				<ref bean="PublicationSelectorSection" />
+				<ref bean="PrintQuerySection" />
+				<ref bean="PrintUndoSection" />
+			</list>
+		</property>
+		<property name="cockpitTypeService" ref="cockpitTypeService" />
+	</bean>
+
+	<bean id="PrintQuerySection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection" scope="prototype">
+		<property name="localizedLabel" value="navigationarea.queries" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean class="de.hybris.platform.cockpit.components.navigationarea.renderer.QuerySectionRenderer" />
+		</property>
+	</bean>
+
+	<bean id="PrintNavigationAreaModel"
+		class="de.hybris.platform.printcockpit.components.navigationarea.PrintNavigationAreaModel"
+		scope="session">
+		<property name="specialCollectionTypes">
+			<list>
+				<value>clipboard</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="PrintSpecialCollectionsSection" class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection"
+		scope="prototype">
+		<property name="localizedLabel" value="navigationarea.shortcuts" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean class="de.hybris.platform.printcockpit.components.navigationarea.renderer.PrintcockpitSpecialCollectionSectionRenderer" >
+				<property name="allItemsLabel" value="general.all_publications"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="WorkflowAttachmentData" class="java.util.LinkedList" scope="tenant">
+		<constructor-arg>
+			<list value-type="java.lang.String">
+				<value>de.hybris.platform.print.model.PageModel</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="PublicationSelectorSection"
+		class="de.hybris.platform.printcockpit.components.navigationarea.PublicationSelectorSection"
+		scope="prototype">
+		<property name="localizedLabel" value="navigationarea.publicationselector" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean
+				class="de.hybris.platform.printcockpit.components.navigationarea.renderer.PublicationSelectorSectionRenderer">
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="PrintUndoSection"
+		class="de.hybris.platform.cockpit.components.navigationarea.NavigationPanelSection"
+		scope="prototype">
+		<property name="localizedLabel" value="navigationarea.history" />
+		<property name="visible" value="true" />
+		<property name="renderer">
+			<bean
+				class="de.hybris.platform.cockpit.components.navigationarea.renderer.UndoSectionRenderer" />
+		</property>
+	</bean>
+
+	<bean id="PrintViewEditorAreaController"
+		class="de.hybris.platform.printcockpit.session.impl.PrintEditorAreaControllerImpl"
+		scope="session">
+		<property name="sectionRowRenderer">
+			<bean id="CatalogViewEditorSectionRowRenderer" parent="EditorSectionRowRenderer" />
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory" />
+		</property>
+	</bean>
+
+	<bean id="PrintPopupEditorAreaController"
+		class="de.hybris.platform.printcockpit.session.impl.PrintPopupEditorAreaControllerImpl"
+		scope="prototype">
+		<property name="sectionRowRenderer">
+			<bean id="PrintPopupEditorSectionRowRenderer" parent="EditorSectionRowRenderer" />
+		</property>
+		<property name="editorFactory">
+			<ref bean="EditorFactory" />
+		</property>
+	</bean>
+
+	<bean id="RequestHandler"
+		class="de.hybris.platform.cockpit.session.impl.DefaultRequestHandler" scope="session">
+		<property name="requestEventHandlers">
+			<map>
+				<entry key="activation">
+					<bean
+						class="de.hybris.platform.cockpit.session.impl.ActivationEventHandler">
+						<property name="prefix" value="act" />
+					</bean>
+				</entry>
+				<entry key="search">
+					<bean class="de.hybris.platform.cockpit.session.impl.SearchEventHandler">
+						<property name="prefix" value="srch" />
+					</bean>
+				</entry>
+				<entry key="celum">
+					<bean class="de.hybris.platform.cockpit.session.impl.CelumEventHandler" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="clipboard"
+		class="de.hybris.platform.printcockpit.view.misc.impl.ClipboardImpl"
+		scope="session" />
+
+
+	<!-- view beans -->
+	<bean id="previewController"
+		class="de.hybris.platform.printcockpit.view.browser.publication.PublicationPreviewController"
+		scope="session">
+		<property name="selectionModel">
+			<bean
+				class="de.hybris.platform.printcockpit.view.misc.impl.DefaultListSelectionModel" />
+		</property>
+		<property name="printcockpitService" ref="printcockpitService" />
+		<property name="doublePageImagePath" value="/printcockpit/images/toolbar_doublepage.gif" />
+		<property name="singlePageImagePath" value="/printcockpit/images/toolbar_singlepage.gif" />
+		<property name="showPerformanceInfo" value="true" />
+		<property name="modelService" ref="modelService" />
+		<property name="cockpitTypeService" ref="cockpitTypeService" />
+		<property name="accessRightService" ref="PrintcockpitUIAccessRightService"/>
+	</bean>
+
+	<bean id="flowController"
+		class="de.hybris.platform.printcockpit.view.browser.publication.PublicationFlowBoxController"
+		scope="session">
+		<property name="selectionModel">
+			<bean
+				class="de.hybris.platform.printcockpit.view.misc.impl.DefaultListSelectionModel" />
+		</property>
+		<property name="showPerformanceInfo" value="true" />
+		<property name="modelService" ref="modelService" />
+		<property name="cockpitTypeService" ref="cockpitTypeService" />
+	</bean>
+	
+	<bean id="organizerController"
+		class="de.hybris.platform.printcockpit.view.center.RevisedOrganizerController"
+		scope="session">
+		<property name="flowBoxCtrl">
+			<ref bean="flowController"/>
+		</property>
+		<property name="previewCtrl">
+			<ref bean="previewController" />
+		</property>
+		<property name="listBoxCtrl">
+			<bean
+				class="de.hybris.platform.printcockpit.view.browser.publication.PublicationFlowBoxController">
+				<property name="selectionModel">
+					<bean
+						class="de.hybris.platform.printcockpit.view.misc.impl.DefaultListSelectionModel" />
+				</property>
+				<property name="modelService" ref="modelService" />
+				<property name="cockpitTypeService" ref="cockpitTypeService" />
+			</bean>
+		</property>
+		<property name="printPerspective" ref="PrintPerspective" />
+		<property name="printcockpitService" ref="printcockpitService" />
+		<property name="publicationService" ref="publicationService" />
+	</bean>
+
+	<bean id="printPreviewOrganizerController"
+		class="de.hybris.platform.printcockpit.view.center.PrintPreviewOrganizerController"
+		scope="session">
+		<property name="flowBoxCtrl">
+			<bean
+				class="de.hybris.platform.printcockpit.view.browser.publication.PublicationFlowBoxController">
+				<property name="selectionModel">
+					<bean
+						class="de.hybris.platform.printcockpit.view.misc.impl.DefaultListSelectionModel" />
+				</property>
+				<property name="modelService" ref="modelService" />
+				<property name="cockpitTypeService" ref="cockpitTypeService" />
+			</bean>
+		</property>
+		<property name="previewCtrl">
+			<bean
+				class="de.hybris.platform.printcockpit.view.browser.publication.PublicationPreviewController">
+				<property name="selectionModel">
+					<bean
+						class="de.hybris.platform.printcockpit.view.misc.impl.DefaultListSelectionModel" />
+				</property>
+				<property name="doublePageImagePath" value="/printcockpit/images/toolbar_doublepage.gif" />
+				<property name="singlePageImagePath" value="/printcockpit/images/toolbar_singlepage.gif" />
+				<property name="modelService" ref="modelService" />
+				<property name="cockpitTypeService" ref="cockpitTypeService" />
+			</bean>
+		</property>
+		<property name="listBoxCtrl">
+			<bean
+				class="de.hybris.platform.printcockpit.view.browser.publication.PublicationFlowBoxController">
+				<property name="selectionModel">
+					<bean
+						class="de.hybris.platform.printcockpit.view.misc.impl.DefaultListSelectionModel" />
+				</property>
+				<property name="modelService" ref="modelService" />
+				<property name="cockpitTypeService" ref="cockpitTypeService" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="printLoginForm" class="de.hybris.platform.printcockpit.view.login.LoginForm"
+		scope="session">
+		<property name="viewComponentURI" value="/printcockpit/dialog/loginDialog.zul" />
+	</bean>
+
+	<bean id="printTableController"
+		class="de.hybris.platform.printcockpit.view.table.PrintTableController" scope="session">
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="typeService" ref="cockpitTypeService"/>
+	</bean>
+
+
+	<alias alias="catalogNavigationDao" name="defaultCatalogNavigationDao" />
+	<bean id="defaultCatalogNavigationDao"
+		class="de.hybris.platform.printcockpitnew.services.impl.DefaultCatalogNavigationDao"
+		parent="abstractItemDao" scope="session">
+	</bean>
+
+
+	<alias alias="catalogNavigationService" name="defaultCatalogNavigationService" />
+	<bean id="defaultCatalogNavigationService"
+		class="de.hybris.platform.printcockpitnew.services.impl.DefaultCatalogNavigationService"
+		scope="session">
+		<property name="catalogNavigationDao" ref="catalogNavigationDao" />
+		<property name="typeService" ref="cockpitTypeService" />
+	</bean>
+
+	<bean id="catalogTreeModel"
+		class="de.hybris.platform.printcockpitnew.view.browser.navigation.models.CatalogTreeModel"
+		scope="session">
+		<property name="catalogNavigationService" ref="catalogNavigationService" />
+		<property name="catalogService" ref="catalogService" />
+		<property name="typeService" ref="cockpitTypeService" />
+	</bean>
+
+	<bean id="catalogListModel"
+		class="de.hybris.platform.printcockpitnew.view.browser.navigation.models.CatalogListModel"
+		scope="session">
+		<property name="catalogNavigationService" ref="catalogNavigationService" />
+	</bean>
+
+	<bean id="attributeListModel"
+		class="de.hybris.platform.printcockpitnew.view.browser.navigation.models.AttributeListModel"
+		scope="session">
+		<property name="typeService" ref="cockpitTypeService" />
+	</bean>
+
+	<bean id="classAttributeListModel"
+		class="de.hybris.platform.printcockpitnew.view.browser.navigation.models.ClassAttributeListModel"
+		scope="session">
+		<property name="typeService" ref="cockpitTypeService" />
+	</bean>
+
+	<bean id="catalogTreeItemRenderer"
+		class="de.hybris.platform.printcockpitnew.view.browser.navigation.renderers.CatalogTreeItemRenderer"
+		scope="session">
+		<property name="sourceBrowseController" ref="sourceBrowseController" />
+	</bean>
+
+	<bean id="catalogListitemRenderer"
+		class="de.hybris.platform.printcockpitnew.view.browser.navigation.renderers.CatalogListitemRenderer"
+		scope="session">
+		<property name="sourceBrowseController" ref="sourceBrowseController" />
+	</bean>
+	
+	<bean id="attributeListitemRenderer" class="de.hybris.platform.printcockpitnew.view.browser.navigation.renderers.AttributeListitemRenderer" 
+		scope="session"/>
+
+	<bean id="sourceBrowseController"
+		class="de.hybris.platform.printcockpitnew.view.browser.controllers.SourceBrowseController"
+		scope="session">
+		<property name="layoutService" ref="layoutService" />
+		<property name="clipboard" ref="clipboard" />
+		<property name="typeService" ref="cockpitTypeService" />
+		<property name="navigatorClasses">
+			<list value-type="java.lang.Class">
+				<value>de.hybris.platform.printcockpitnew.view.browser.navigation.navigators.CatalogTreeNavigator
+				</value>
+				<value>de.hybris.platform.printcockpitnew.view.browser.navigation.navigators.CatalogListNavigator
+				</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<bean id="tableSourceBrowseController"
+		class="de.hybris.platform.printcockpitnew.view.browser.controllers.TableSourceBrowseController"
+		scope="session" parent="sourceBrowseController">
+		<property name="tableAttributeBrowseController" ref="tableAttributeBrowseController" />
+	</bean>
+
+	<!-- ListView menu popup builder -->
+	<!--	<bean id="listViewMenuPopupBuilder"-->
+	<!--
+		class="de.hybris.platform.cockpit.model.listview.impl.DefaultListViewHeaderColumnMenuPopupBuilder"
+	-->
+	<!--		scope="prototype" />-->
+
+	<bean id="tableAttributeBrowseController"
+		class="de.hybris.platform.printcockpitnew.view.browser.controllers.TableAttributeBrowseController"
+		scope="session">
+		<property name="layoutService" ref="layoutService" />
+		<property name="clipboard" ref="clipboard" />
+		<property name="typeService" ref="cockpitTypeService" />
+		<property name="navigatorClasses">
+			<list value-type="java.lang.Class">
+				<value>de.hybris.platform.printcockpitnew.view.browser.navigation.navigators.AttributeListNavigator
+				</value>
+				<value>de.hybris.platform.printcockpitnew.view.browser.navigation.navigators.ClassAttributeListNavigator
+				</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="printContentBlockListActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="EditTableBlockAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="printPageListActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="EditItemAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="printPublicationListActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="EditItemAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="printChapterListActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="EditItemAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="printPlacementListActionColumn"
+		class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+		scope="prototype">
+		<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="EditItemAction" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="EditItemAction"
+		class="de.hybris.platform.printcockpit.components.listview.impl.EditItemAction"
+		scope="prototype" />
+		
+	<bean id="EditTableBlockAction"
+		class="de.hybris.platform.printcockpit.components.listview.impl.EditTableBlockAction"
+		scope="prototype" />	
+		
+	
+	<!-- Comment Layer  -->
+	<alias alias="commentLayerComponentController" name="printCockpitCommentLayerComponentController"/>
+	<bean id="printCockpitCommentLayerComponentController" class="de.hybris.platform.printcockpit.components.mvc.commentlayer.impl.PrintCockpitCommentLayerComponentController" parent="defaultCommentLayerComponentController" scope="session">
+		<property name="cockpitCommentUtils" ref="cockpitCommentUtils" />
+		<property name="printCollaborationFacade" ref="printCollaborationFacade" />
+	</bean>
+
+	<alias alias="contextAreaCommentTreeController" name="printContextAreaCommentTreeController"/>
+	<bean id="printContextAreaCommentTreeController" parent="defaultContextAreaCommentTreeController" scope="session">
+		<property name="commentLayerComponentController" ref="printCockpitCommentLayerComponentController"/>
+	</bean>
+
+	<alias name="defaultPrintCanvasController" alias="printCanvasController"/>
+	<bean id="defaultPrintCanvasController" class="de.hybris.platform.printcockpit.components.mvc.commentlayer.canvas.PrintCanvasController" scope="session">
+	</bean>
+	
+	<!-- Comment Layer  END-->
+	
+	<!-- filter -->	
+	<bean id="printCockpitFilterChain" class="de.hybris.platform.servicelayer.web.BackOfficeFilterChain">
+		<constructor-arg>
+			<list>
+				<ref bean="log4jFilter"/>
+				<ref bean="dynamicTenantActivationFilter"/>				
+				<ref bean="sessionFilter"/>
+				<ref bean="printCockpitDataSourceSwitchingFilter"/>
+				<ref bean="printCockpitCatalogVersionActivationFilter"/>
+            <ref bean="printCockpitSecureMediaFilter"/>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="printCockpitDataSourceSwitchingFilter" class="de.hybris.platform.servicelayer.web.DataSourceSwitchingFilter">
+	</bean>
+	
+	<alias alias="printCockpitCatalogVersionActivationFilter" name="defaultPrintCockpitCatalogVersionActivationFilter" />
+	<bean id="defaultPrintCockpitCatalogVersionActivationFilter" class="de.hybris.platform.servicelayer.web.DynamicCatalogVersionActivationFilter" scope="tenant">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="catalogService" ref="catalogService"/>
+		<aop:scoped-proxy/>
+	</bean>
+ 
+   <bean id="printCockpitSecureMediaFilter" class="de.hybris.platform.servicelayer.web.SecureMediaFilter">
+       <property name="mediaPermissionService" ref="mediaPermissionService"/>
+       <property name="modelService" ref="modelService"/>
+       <property name="userService" ref="userService"/>
+       <property name="mediaService" ref="mediaService"/>
+      <!-- <property name="secureMediaToken" value="securemedias"/>  securemedias is default but you may overwrite it -->
+       <aop:scoped-proxy/>
+    </bean>
+	
+	<alias alias="page.pagemodeToolbarEditorHandler" name="default.page.pagemodeToolbarEditorHandler" />
+	<bean name="default.page.pagemodeToolbarEditorHandler" class="de.hybris.platform.printcockpit.model.editor.impl.PageModelPlannerEditorHandler" scope="tenant">
+		<property name="pagePlannerRegistry" ref="pagePlannerRegistry" />
+	</bean>
+	
+	<alias alias="page.gridToolbarEditorHandler" name="default.page.gridToolbarEditorHandler" />
+	<bean name="default.page.gridToolbarEditorHandler" class="de.hybris.platform.printcockpit.model.editor.impl.GridPlannerEditorHandler" scope="tenant">
+		<property name="pagePlannerRegistry" ref="pagePlannerRegistry" />
+	</bean>
+	
+	<alias alias="page.alternativegridToolbarEditorHandler" name="default.page.alternativegridToolbarEditorHandler" />
+	<bean name="default.page.alternativegridToolbarEditorHandler" class="de.hybris.platform.printcockpit.model.editor.impl.AlternativeGridPlannerEditorHandler" scope="tenant">
+		<property name="pagePlannerRegistry" ref="pagePlannerRegistry" />
+	</bean>
+	
+	<alias alias="page.gridmodeEditorValidator" name="default.page.gridmodeEditorValidator" />
+	<bean name="default.page.gridmodeEditorValidator" class="de.hybris.platform.printcockpit.model.editor.impl.GridModePlannerEditorHandler" scope="tenant">
+		<property name="pagePlannerRegistry" ref="pagePlannerRegistry" />
+	</bean>
+	
+	<bean id="PrintPlannerSection" class="de.hybris.platform.printcockpit.model.editor.PrintPlannerSectionConfiguration" scope="session">
+		<property name="sectionRenderer">
+			<ref bean="printPlannerSectionRenderer"/>
+		</property>
+		<property name="pagePlannerProperties">
+			<map>
+				<entry key="Page.pageMode" value=""/>
+				<entry key="Page.gridMode" value=""/>
+				<entry key="Page.grid" value="shortListEditor"/>
+				<entry key="Page.alternativeGrid" value="shortListEditor"/>
+			</map>
+		</property>
+		<property name="typeService" ref="cockpitTypeService"/>
+	</bean>
+	
+	<bean id="printPlannerSectionRenderer" class="de.hybris.platform.printcockpit.model.editor.PrintPlannerSectionRenderer" scope="prototype">
+		<property name="pagePlannerEditorController" ref="pagePlannerEditorController"/>
+		<property name="typeService" ref="cockpitTypeService"/>
+	</bean>
+	
+	<bean id="pagePlannerEditorController" class="de.hybris.platform.printcockpit.components.contentbrowser.PagePlannerEditorController" scope="prototype">
+		<property name="i18nService" ref="i18nService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="validationUIHelper" ref="validationUIHelper"/>
+		<property name="cockpitValidationService" ref="cockpitValidationService"/>
+		<property name="modelHelper" ref="cockpitModelHelper"/>
+		<property name="typeService" ref="cockpitTypeService" />
+		
+	</bean>
+	
+	<bean id="themeConfig" class="de.hybris.platform.cockpit.util.CockpitThemeConfig" scope="singleton">
+		<property name="keepZKCss" value="true"/>
+		<property name="uris">
+			<list>
+				<value>/cockpit/css/cockpit_fileupload.css</value>
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="printWorkflowDecisionHelper" name="defaultPrintWorkflowDecisionHelper" />
+	<bean id="defaultPrintWorkflowDecisionHelper" class="de.hybris.platform.printcockpit.components.workflow.PrintWorkflowDecisionHelper" scope="session">
+		<property name="workflowProcessingService" ref="workflowProcessingService"/>
+	</bean>
+	
+	<!-- Comment filter -->
+	
+	<bean id="abstractCommentFilterComponent" class="de.hybris.platform.printcockpit.components.contextarea.filters.AbstractCommentFilterComponent" abstract="true">
+		<property name="componentController" ref="printCockpitCommentLayerComponentController"/>
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<bean id="typeFilterComponent" class="de.hybris.platform.printcockpit.components.contextarea.filters.TypeFilterComponent" parent="abstractCommentFilterComponent" scope="session"/>
+	<bean id="commentGroupFilterComponent" class="de.hybris.platform.printcockpit.components.contextarea.filters.CommentGroupFilterComponent" parent="abstractCommentFilterComponent" scope="session">
+		<property name="cockpitCommentService" ref="cockpitCommentService"/>
+		<property name="commentService" ref="commentService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	<bean id="statusFilterComponent" class="de.hybris.platform.printcockpit.components.contextarea.filters.StatusFilterComponent" parent="abstractCommentFilterComponent" scope="session">
+		<property name="workflowTemplateService" ref="workflowTemplateService"/>
+	</bean>
+	
+	<!-- Comment listview cell renderer -->
+	
+	<alias alias="commentContextAreaRenderer" name="defaultCommentContextAreaRenderer" />
+	<bean id="defaultCommentContextAreaRenderer" class="de.hybris.platform.printcockpit.renderer.impl.DefaultCommentContextAreaRenderer" scope="singleton">
+		<property name="cellRenderer">
+			<list>
+				<value>de.hybris.platform.printcockpit.renderer.impl.CommentToggleVisibilityCellRenderer</value>
+				<value>de.hybris.platform.printcockpit.renderer.impl.CommentTypeIconCellRenderer</value>
+				<value>de.hybris.platform.printcockpit.renderer.impl.CommentTypeCellRenderer</value>
+				<value>de.hybris.platform.printcockpit.renderer.impl.CommentAuthorCellRenderer</value>
+				<value>de.hybris.platform.printcockpit.renderer.impl.CommentDateCellRenderer</value>
+				<value>de.hybris.platform.printcockpit.renderer.impl.CommentDescriptionCellRenderer</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="CommentLayerActionColumnsCommunicationBrowser" class="de.hybris.platform.cockpit.components.listview.impl.DefaultActionColumnConfiguration"
+	scope="prototype">
+	<constructor-arg value="Actions" />
+		<property name="actions">
+			<list>
+				<ref bean="AnswerCommentFromCommenLayerAction" />
+				<ref bean="EditCommentFromCommentLayerAction" />
+				<ref bean="deleteJobOrCommentFromCommentLayerAction" />
+			</list>
+		</property>
+	</bean>
+	
+	<!-- can be comment or job now -->
+	<bean id="deleteJobOrCommentFromCommentLayerAction" class="de.hybris.platform.printcockpit.components.listview.impl.DeleteJobOrCommentFromCommentLayerAction" scope="prototype">
+		<property name="commentLayerService" ref="commentLayerService" />
+		<property name="deleteCommentFromCommentLayerAction" ref="DeleteCommentFromCommentLayerAction" />
+		<property name="printCollaborationFacade" ref="printCollaborationFacade"/>
+	</bean>
+
+	<bean id="printWorkflowStatusDropdownRenderer" class="de.hybris.platform.printcockpit.components.workflow.PrintWorkflowStatusDropdownRenderer" scope="prototype" />
+	
+</beans>

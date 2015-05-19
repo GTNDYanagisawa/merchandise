@@ -1,0 +1,4111 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+   <explorertree width="185" columns="2">
+      <group name="system" expand="false" description="group.system.description">
+         <group name="systemconfig" expand="false" description="group.systemconfig.description">
+         </group>
+         <group name="systemtools" expand="false" description="group.systemtools.description">
+            <externalnode classname="de.hybris.platform.hmc.administration.TypeExportTreeNodeChip" description="typeref.typeexport.description"/>
+<!--
+            <typeref type="ImportUserRightsWizard" description="typeref.importuserrights.description"/>
+            <typeref type="ExportUserRightsWizard" description="typeref.exportuserrights.description"/>
+-->
+            <typeref type="Link" description="typeref.link.description"/>
+            <typeref type="RelationTypeUsageView" description="typeref.relationtypeusageview.description"/>            
+            <typeref type="SavedValues" description="typeref.savedvalues.description"/>                     
+         </group>
+         <typeref type="Type" description="typeref.type.description"/>
+         <typeref type="SavedQuery" description="typeref.savedquery.description"/>
+         <typeref type="ViewType" description="typeref.viewtype.description"/>
+         <typeref type="SearchRestriction" description="typeref.searchrestriction.description"/>
+         <externalnode classname="de.hybris.platform.hmc.administration.StructureTreeNodeChip" description="hmc.configuration.description"/>
+      </group>
+
+      <group name="catalog" expand="false" description="group.catalog.description">
+         <typeref type="Product" description="typeref.product.description"/>
+         <typeref type="Unit" description="typeref.unit.description"/>
+      </group>
+
+      <group name="medias" expand="false" description="group.media.description">
+         <typeref type="Media" description="typeref.media.description"/>
+         <typeref type="MediaFolder" description="typeref.mediafolder.description"/>
+         <typeref type="MediaContainer" description="typeref.mediacontainer.description"/>
+         <typeref type="MediaFormat" description="typeref.mediaformat.description"/>
+         <typeref type="MediaContext" description="typeref.mediacontext.description"/>
+      </group>
+
+      <group name="user" expand="false" description="group.user.description">
+         <typeref type="UserGroup" description="typeref.usergroup.description"/>
+         <typeref type="Employee" description="typeref.employee.description"/>
+         <typeref type="Customer" description="typeref.customer.description"/>
+         <typeref type="Address" description="typeref.address.description"/>
+         <typeref type="Title" description="typeref.title.description"/>
+      </group>
+
+      <group name="order" description="group.order.description">
+         <typeref type="Order" description="typeref.order.description"/>
+         <typeref type="OrderEntry" description="typeref.orderentry.description"/>
+      </group>
+
+      <group name="pricesettings" description="group.pricesettings.description">
+         <group name="prices" description="typeref.prices.description"/>
+         <group name="taxes" description="typeref.taxes.description"/>
+         <group name="discounts" description="typeref.discounts.description"/>
+         <group name="deliverycosts" description="typeref.deliverycosts.description"/>
+         <group name="paymentcosts" description="typeref.paymentcosts.description"/>
+      </group>
+
+      <group name="c2l" description="group.c2l.description">
+         <!--
+         <group name="c2lviews">
+            <typeref type="UnlocalizedAttributeDescriptors"/>
+         </group>-->
+         <typeref type="Language" description="typeref.language.description"/>
+         <typeref type="Currency" description="typeref.currency.description"/>
+         <typeref type="Country" description="typeref.country.description"/>
+         <typeref type="Region" description="typeref.region.description"/>
+      </group>
+
+      <group name="marketing" description="group.marketing.description">
+         <group name="orderstatistics" description="group.orderstatistics.description">
+	         <typeref type="CustomerOrderOverview" description="typeref.customerorderoverview.description"/>
+	         <typeref type="Cart" description="typeref.cart.description"/>
+	         <typeref type="CartEntry" description="typeref.cartentry.description"/>
+	      </group>
+      </group>
+
+      <group name="scripting" expand="false" description="group.scripting.description">
+         <typeref type="Script" description="typeref.script.description"/>
+         <typeref type="ScriptingJob" description="typeref.scriptingJob.description"/>
+         <typeref type="ScriptingTask" description="typeref.scriptingTask.description"/>
+         <typeref type="DynamicProcessDefinition" description="typeref.dynamicProcessDefinition.description"/>
+      </group>
+
+      <!-- view type definitions and view example types -->
+      <!--
+      <group name="views" expand="false">
+         <typeref type="ViewType"/>
+         <typeref type="CustomerOrderOverview"/>
+      </group>
+      -->
+
+   </explorertree>
+
+   <action type="toolbar" classname="de.hybris.platform.hmc.util.action.OpenSessionUserEditor" name="opensessionusereditor"
+            icon="header_employee" align="left"/>
+
+	<!-- replaced with the actions from servicelayer below
+   <action type="save" classname="de.hybris.platform.hmc.util.action.GenericItemSaveAction"/>
+   <action type="create" classname="de.hybris.platform.hmc.util.action.GenericItemCreateAction"/>
+   <action type="remove" classname="de.hybris.platform.hmc.util.action.GenericItemRemoveAction"/>
+   <action type="load" classname="de.hybris.platform.hmc.util.action.LoadAction"/>
+    -->
+
+    <!-- activates servicelayer based load action -->
+   <action type="load" classname="de.hybris.platform.servicelayer.hmc.ServicelayerHMCLoadAction"/>
+   <action type="save" classname="de.hybris.platform.servicelayer.hmc.ServicelayerHMCSaveAction"/>
+   <action type="create" classname="de.hybris.platform.servicelayer.hmc.ServicelayerHMCCreateAction"/>
+   <action type="remove" classname="de.hybris.platform.servicelayer.hmc.ServicelayerHMCRemoveAction"/>
+
+   <defaultmappings>
+		<!--  
+				comment this in to use an alternative version of the localized attribute chip which 
+				allows you to select one language to edit at a time (useful if you have a lot of system languages, see PLA-5446)
+				
+	   	<defaultmapping source="de.hybris.platform.hmc.attribute.LocalizableAttributeChip" target="de.hybris.platform.hmc.attribute.LocalizableAttributeSelectChip"/>
+		-->
+   </defaultmappings>
+
+   <defaultattributechips>
+
+      <attributetype classname="java.lang.Object">
+         <display classname="de.hybris.platform.hmc.attribute.ObjectDisplayChip"/>
+         <editor classname="de.hybris.platform.hmc.attribute.ObjectEditorChip"/>
+      </attributetype>
+
+      <attributetype classname="java.lang.Class">
+         <editor classname="de.hybris.platform.hmc.attribute.JavaClassEditorChip"/>
+      </attributetype>
+
+      <attributetype classname="java.lang.String">
+         <display classname="de.hybris.platform.hmc.attribute.StringDisplayChip">
+            <parameter key="width" value="200px"/>
+         </display>
+         <editor classname="de.hybris.platform.hmc.attribute.StringEditorChip">
+            <parameter key="width" value="200px"/>
+         </editor>
+      </attributetype>
+      
+      <attributetype classname="java.lang.Character">
+         <display classname="de.hybris.platform.hmc.attribute.StringDisplayChip"/>
+         <editor classname="de.hybris.platform.hmc.attribute.CharacterEditorChip"/>
+      </attributetype>
+
+      <attributetype classname="de.hybris.platform.core.PK">
+         <display classname="de.hybris.platform.hmc.attribute.PKDisplayChip">
+            <parameter key="width" value="200px"/>
+         </display>
+         <editor classname="de.hybris.platform.hmc.attribute.PKEditorChip">
+            <parameter key="width" value="200px"/>
+         </editor>
+      </attributetype>
+
+
+      <attributetype classname="java.lang.Double">
+         <display classname="de.hybris.platform.hmc.attribute.DoubleDisplayChip">
+            <parameter key="numberpattern" value="#,##0.00"/>
+         </display>
+         <editor classname="de.hybris.platform.hmc.attribute.DoubleEditorChip">
+            <parameter key="numberpattern" value="#,##0.00"/>
+         </editor>
+      </attributetype>
+
+      <attributetype classname="java.lang.Float">
+         <editor classname="de.hybris.platform.hmc.attribute.FloatEditorChip">
+            <parameter key="numberpattern" value="#,##0.00"/>
+         </editor>
+         <display classname="de.hybris.platform.hmc.attribute.FloatDisplayChip">
+            <parameter key="numberpattern" value="#,##0.00"/>
+         </display>
+      </attributetype>
+
+      <attributetype classname="java.lang.Long">
+         <display classname="de.hybris.platform.hmc.attribute.LongDisplayChip"/>
+         <editor classname="de.hybris.platform.hmc.attribute.LongEditorChip"/>
+      </attributetype>
+      
+      <attributetype classname="java.math.BigDecimal">
+         <display classname="de.hybris.platform.hmc.attribute.BigDecimalDisplayChip">
+            <parameter key="numberpattern" value="#,##0.00"/>
+         </display>
+         <editor classname="de.hybris.platform.hmc.attribute.BigDecimalEditorChip">
+            <parameter key="numberpattern" value="#,##0.00"/>
+         </editor>
+      </attributetype>
+
+      <attributetype classname="java.lang.Short">
+         <display classname="de.hybris.platform.hmc.attribute.ShortDisplayChip"/>
+         <editor classname="de.hybris.platform.hmc.attribute.ShortEditorChip"/>
+      </attributetype>
+
+      <attributetype classname="java.lang.Byte">
+         <display classname="de.hybris.platform.hmc.attribute.ByteDisplayChip"/>
+         <editor classname="de.hybris.platform.hmc.attribute.ByteEditorChip"/>
+      </attributetype>
+
+      <attributetype classname="java.lang.Integer">
+         <display classname="de.hybris.platform.hmc.attribute.IntegerDisplayChip"/>
+         <editor classname="de.hybris.platform.hmc.attribute.IntegerEditorChip"/>
+      </attributetype>
+
+      <attributetype classname="java.util.Date">
+         <display classname="de.hybris.platform.hmc.attribute.DateTimeDisplayChip"/>
+         <editor classname="de.hybris.platform.hmc.attribute.DateTimeEditorChip"/>
+      </attributetype>
+
+      <attributetype classname="de.hybris.platform.util.StandardDateRange">
+         <display classname="de.hybris.platform.hmc.attribute.DateRangeDisplayChip"/>
+         <editor classname="de.hybris.platform.hmc.attribute.DateRangeEditorChip"/>
+      </attributetype>
+
+      <attributetype classname="java.lang.Boolean">
+         <display classname="de.hybris.platform.hmc.attribute.BooleanDisplayChip"/>
+         <editor classname="de.hybris.platform.hmc.attribute.BooleanEditorChip"/>
+      </attributetype>
+
+      <attributetype classname="de.hybris.platform.jalo.Item">
+         <display classname="de.hybris.platform.hmc.attribute.ItemDisplayChip"/>
+         <editor classname="de.hybris.platform.hmc.attribute.AutocompleteReferenceEditorChip"/>
+      </attributetype>
+
+      <attributetype classname="de.hybris.platform.jalo.media.Media">
+         <editor classname="de.hybris.platform.hmc.attribute.MediaEditorChip"/>
+      </attributetype>
+
+      <attributetype classname="de.hybris.platform.jalo.type.ComposedType">
+         <display classname="de.hybris.platform.hmc.attribute.ItemDisplayChip"/>
+         <editor classname="de.hybris.platform.hmc.attribute.AutocompleteReferenceEditorChip"/>
+      </attributetype>
+
+      <attributetype classname="de.hybris.platform.jalo.type.CollectionType">
+         <display classname="de.hybris.platform.hmc.attribute.CollectionDisplayChip"/>
+<!--          <editor classname="de.hybris.platform.hmc.attribute.ObjectEditorChip"/>	-->
+      </attributetype>
+
+      <attributetype classname="de.hybris.platform.util.TaxValue">
+         <display classname="de.hybris.platform.hmc.attribute.TaxValueDisplayChip"/>
+      </attributetype>
+
+      <attributetype classname="de.hybris.platform.util.DiscountValue">
+         <display classname="de.hybris.platform.hmc.attribute.DiscountValueDisplayChip"/>
+      </attributetype>
+
+      <attributetype classname="de.hybris.platform.jalo.enumeration.EnumerationType">
+         <display classname="de.hybris.platform.hmc.attribute.EnumerationValueDisplayChip"/>
+         <editor classname="de.hybris.platform.hmc.attribute.EnumerationValueSelectEditorChip"/>
+      </attributetype>
+
+   </defaultattributechips>
+
+
+<!-- ################ Type declarations ################ -->
+
+   <type name="Item">
+      <organizer>
+         <search>
+            <condition attribute="pk"/>
+         </search>
+         <result>
+            <listview>
+               <itemlayout>
+                  <attribute name="pk" width="170"/>
+                  <item/>
+               </itemlayout>
+            </listview>
+            <editview>
+               <itemlayout>
+                  <attribute name="pk" width="150"/>
+               </itemlayout>
+            </editview>
+            <treeview>
+               <itemlayout>
+                  <attribute name="pk"/>
+               </itemlayout>
+            </treeview>
+            <!--  <action type="searchresult" 
+            		  classname="de.hybris.platform.hmc.util.action.GenericGetItemDataSearchResultAction" 
+            		  name="show.item.text"/>-->
+            <action type="searchresult"
+            		  classname="de.hybris.platform.cronjob.hmc.ExtendedRemoveAction"
+            		  name="delete"/>
+           	<action type="searchresult" 
+					classname="de.hybris.platform.hmc.util.action.CSVExportAction" 
+					name="action.searchresult.exportcsv"/>
+         </result>
+         <editor>
+            <exclude>
+               <exclusion attribute="allDocuments"/>
+            </exclude>
+            <essentials>
+            </essentials>
+            <tab name="administration" id="tab_administration">
+               <section name="section.metadata">
+                  <listlayout>
+                     <attribute name="pk"/>
+                     <attribute name="itemtype"/>
+                     <attribute name="creationtime" editable="false" />
+                     <attribute name="modifiedtime"/>
+                     <attribute name="owner">
+                     	<referenceeditor>
+									<parameter key="creatable" value="false"/>
+                     	</referenceeditor>
+                     </attribute>
+                  </listlayout>
+               </section>
+<!--           <section name="links">
+                  <columnlayout>
+                     <row>
+                        <shortcut name="createlinksforitem" type="Link" usage="creator">
+                           <preset targetattribute="source"/>
+                        </shortcut>
+                        <shortcut name="findlinksforitemassource" type="Link" usage="finder" autoperform="true">
+                           <preset targetattribute="source"/>
+                        </shortcut>
+                     </row>
+                     <row>
+                        <shortcut name="createlinksforitemastarget" type="Link" usage="creator">
+                           <preset targetattribute="target"/>
+                        </shortcut>
+                        <shortcut name="findlinksforitemastarget" type="Link" usage="finder" autoperform="true">
+                           <preset targetattribute="target"/>
+                        </shortcut>
+                     </row>
+                  </columnlayout>
+               </section>          -->
+               <section name="section.saved.values">
+                  <listlayout>
+                    <attribute name="savedValues" width="595">
+                       <referencecollectioneditor create="false" add="false" remove="false">
+                          <itemlayout>
+                          <attribute name="timestamp" width="120"/>
+                            <attribute name="user" width="120"/>
+                            <attribute name="modificationtype" width="120"/>
+                            <attribute name="changedAttributes" width="160"/>
+                     </itemlayout>
+                       </referencecollectioneditor>
+                    </attribute>
+                  </listlayout>
+               </section>
+               <defaultsection name="unbound" preferred="false"/>
+            </tab> 
+         </editor>
+      </organizer>
+      <defaultreference>
+         <itemlayout>
+            <attribute name="pk"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="Product" icon="images/icons/e_product.gif" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="code" operator="contains"/>
+            <condition attribute="name" operator="contains"/>
+
+            <!-- demo: add following tags to add other default search conditions -->
+            <!--
+            <condition attribute="modifiedTime" operator=">"/>
+            <condition attribute="pk" operator="contains"/>
+            -->
+
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="120"/>
+                  <attribute name="name" width="180"/>
+                  <!-- demo: add following tags to provide additional columns in the result list -->
+                  <!--
+                  <attribute name="pk" width="200"/>
+                  <attribute name="modifiedTime" width="130"/>
+                  -->
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="120"/>
+                  <attribute name="name" width="180"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="120"/>
+               </itemlayout>
+            </treeview>
+            <!-- 
+               search result action demo: include your searchresult actions this way. SampleSearchResultAction class is a part of the tutorial extension, therefore the tutorial extension 
+               must be configured in the <platform_dir>/extensions.xml, in order for the action to be displayed
+            -->
+            <!--
+            <action type="searchresult" classname="de.hybris.jakarta.hmc.ext.tutorial.SampleSearchResultAction" name="samplesearchresultaction"/>
+            -->
+         </result>
+         <editor>
+            <essentials>
+               <columnlayout>
+                  <row>
+                     <attribute name="code"/>
+                     <attribute name="name"/>
+                  </row>
+               </columnlayout>
+            </essentials>
+            
+            <tab name="tab.product.properties" position="1">
+               <section name="product.descriptions">
+                  <listlayout>
+                     <attribute name="description">
+                        <wysiwygeditor/>
+                     </attribute>
+                     <attribute name="unit"/>
+                  </listlayout>
+               </section>
+            </tab>
+            
+            <tab name="tab.product.categorysystem" position="3">
+               <section name="section.product.productincategory">
+                  <listlayout>
+                     <attribute name="supercategories"/>
+                  </listlayout>
+               </section>
+            </tab>
+            
+            <tab name="tab.product.multimedia" position="5">
+               <section name="section.product.pictures">
+                  <listlayout>
+                     <attribute name="picture">
+                        <mediaeditor/>
+                     </attribute>
+                     <attribute name="thumbnail">
+                        <mediaeditor/>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+      <labels>
+         <label name="create"/>
+      </labels>
+   </type>
+
+   <type name="Unit" icon="images/icons/unit_container.gif" useselector="true" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="code" operator="contains"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="unitType" width="100"/>
+                  <attribute name="code" width="50"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="unitType" width="100"/>
+                  <attribute name="code" width="50"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="unitType"/>
+                  <attribute name="code"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <listlayout>
+                  <attribute name="code"/>
+               </listlayout>
+            </essentials>
+            <tab name="properties" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="name"/>
+                     <attribute name="conversion"/>
+                     <attribute name="unitType"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+<!--            <attribute name="unitType"/> -->
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="Type" icon="images/icons/type.gif" mode="append">
+      <organizer>
+         <search mode="replace" autoperform="true">
+            <condition attribute="code" operator="contains"/>
+            <condition attribute="name" operator="contains"/>
+            <condition attribute="extensionname" operator="contains"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="200"/>
+                  <attribute name="name" width="200"/>
+                  <attribute name="extensionName" width="200"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="200"/>
+                  <attribute name="name" width="200"/>
+                  <attribute name="extensionName" width="200"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="200"/>
+                  <attribute name="name" width="200"/>
+                  <attribute name="extensionName" width="200"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <listlayout>
+                  <attribute name="code"/>
+                  <attribute name="extensionName"/>
+               </listlayout>
+            </essentials>
+            <tab name="properties" position="0">
+               <defaultsection name="properties"/>
+            </tab>
+            <tab name="XML" id="tab_xmldef" position="1">
+               <section name="definition">
+                  <listlayout>
+                     <attribute name="xmldefinition" width="595">
+                        <textareaeditor expanded="true" wrap="false" rows="25"/>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="name" fallback="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+<!-- end type by core -->
+
+   <type name="AtomicType" icon="images/icons/type.gif" mode="append">
+      <organizer>
+         <search>
+            <condition attribute="extensionName" operator="contains"/>
+         </search>
+         <result>
+            <treeview>
+               <explorable>
+                  <attribute name="subtypes" suppressroot="true"/>
+               </explorable>
+            </treeview>
+         </result>
+         <editor>
+            <tab name="properties" mode="replace" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="name"/>
+                     <attribute name="description"/>
+                     <attribute name="javaClass"/>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="super_sub_types" position="1">
+               <section name="super_sub_types">
+                  <listlayout>
+                     <attribute name="superType"/>
+                     <attribute name="subtypes"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+
+   <type name="ComposedType" icon="images/icons/type.gif" mode="append">
+      <organizer>
+         <result>
+            <listview>
+               <itemlayout>
+                  <attribute name="name" width="250" position="1"/>
+               </itemlayout>
+            </listview>
+            <editview>
+               <itemlayout>
+                  <attribute name="name" width="250" position="1"/>
+               </itemlayout>
+            </editview>
+            <treeview scrollbar="false">
+               <explorable>
+                  <attribute name="subtypes" suppressroot="true"/>
+                  <attribute name="declaredattributedescriptors"/>
+               </explorable>
+            </treeview>
+         </result>
+         <editor>
+         	<exclude> 
+         		<exclusion attribute="allSubTypes"/>
+         		<exclusion attribute="allSuperTypes"/>
+         	</exclude>
+            <essentials mode="replace">
+               <columnlayout leftwidth="590" rightwidth="150">
+                  <row>
+                     <attribute name="code" width="430"/>
+                     <shortcut name="CreateSubtype" type="ComposedType" usage="creator">
+                        <preset targetattribute="superType"/>
+                        <preset targetattribute="itemtype" sourceattribute="itemtype"/>
+                     </shortcut>
+                  </row>
+                  <row>
+                     <attribute name="extensionName"/>
+                     <shortcut name="CreateInstance" usage="creator"/>
+                  </row>
+               </columnlayout>
+            </essentials>
+            <tab name="common" position="0">
+               <section name="common">
+                  <listlayout>
+                     <attribute name="name" width="595"/>
+                     <attribute name="description" width="595"/>
+                     <attribute name="superType" width="595"/>
+                     <attribute name="subtypes" width="595">
+                        <referencecollectioneditor>
+                           <itemlayout>
+                              <attribute name="code" width="255"/>
+                              <attribute name="name" width="287"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                     <inlineshortcut name="relation.usage.view" type="RelationTypeUsageView">
+                        <preset targetattribute="composedtype"/>
+                        <itemlayout>
+                           <attribute name="relationType" width="547"/>
+                        </itemlayout>
+                     </inlineshortcut>
+                  </listlayout>
+               </section>      
+            </tab>
+            <tab name="properties" mode="replace" position="1">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="declaredattributedescriptors" width="595">
+                        <referencecollectioneditor editable="true" resortable="false" presetattribute="enclosingType" add="true" remove="true" create="true">
+                           <itemlayout>
+                              <attribute name="qualifier" width="121"/>
+                              <attribute name="attributeType" width="200"/>
+                              <attribute name="readable" width="50"/>
+                              <attribute name="writable" width="50"/>
+                              <attribute name="optional" width="50"/>
+                              <attribute name="search" width="50"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                     <attribute name="inheritedattributedescriptors" width="595">
+                        <referencecollectioneditor resortable="false" presetattribute="enclosingType">
+                           <itemlayout>
+                              <attribute name="qualifier" width="121"/>
+                              <attribute name="attributeType" width="200"/>
+                              <attribute name="readable" width="50"/>
+                              <attribute name="writable" width="50"/>
+                              <attribute name="optional" width="50"/>
+                              <attribute name="search" width="50"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="extended" position="2">
+               <section name="extended">
+                  <columnlayout leftwidth="300" rightwidth="440">
+                     <row>
+                        <attribute name="jaloclass"/>
+                     </row>
+                     <row>
+ 						<attribute name="abstract" width="154">
+                           <advancedbooleaneditor truename="true" falsename="false" nullname="notdefined"/>
+                        </attribute>
+                        <attribute name="deprecated" labelwidth="130" width="264">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                     <row>
+                        <attribute name="jaloonly" width="154">
+                           <advancedbooleaneditor truename="true" falsename="false" nullname="notdefined"/>
+                        </attribute>
+                        <attribute name="generate" labelwidth="130" width="264">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                     <row>
+                        <attribute name="singleton" width="154">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                        <attribute name="autocreate" labelwidth="130" width="264">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>                     
+                  	</row>
+                  	<row>
+                  		<attribute name="dynamic" width="154">
+                           <advancedbooleaneditor truename="true" falsename="false" nullname="notdefined"/>
+                        </attribute>
+                    </row>
+                  </columnlayout>
+               </section>
+               <section name="persistence">
+                  <columnlayout leftwidth="300" rightwidth="440">
+                  	<row>
+                     	<attribute name="jndiName" width="430"/>
+                     	<void/>
+                    </row>
+                    <row>
+                     	<attribute name="table" width="154"/>
+                     	<attribute name="dumpPropertyTable" labelwidth="130" width="264"/>
+                    </row>
+                  </columnlayout>
+               </section>               
+               <section name="section.hmc.settings">
+                  <columnlayout leftwidth="300" rightwidth="440">
+                  	<row>
+                    	<attribute name="hmcIcon" width="154"><mediaeditor/></attribute>
+                    	<attribute name="logHMCChanges" labelwidth="130" width="264"/>
+                  	</row>
+                  </columnlayout>
+               </section>               
+            </tab>
+            <customtab name="security" classname="de.hybris.platform.hmc.security.TypeAccessRightsEditorChip"/>
+         </editor>
+      </organizer>
+   </type>
+
+   <type name="CollectionType" icon="images/icons/type.gif" mode="append">
+      <organizer>
+         <search>
+            <condition attribute="extensionName" operator="contains"/>
+         </search>
+         <editor>
+            <tab name="properties" mode="replace">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="name"/>
+                     <attribute name="description"/>
+                     <attribute name="elementType"/>
+                     <attribute name="typeOfCollection"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+
+   <type name="RelationMetaType" icon="images/icons/e_relationmetatype.gif" mode="append">
+      <organizer>
+         <search>
+            <condition attribute="extensionName" operator="contains"/>
+         </search>
+         <editor>
+            <essentials mode="replace">
+               <listlayout>
+                  <attribute name="code"/>
+               </listlayout>
+            </essentials>
+            <tab name="common" mode="delete"/>
+            <tab name="properties" position="0" mode="replace">
+               <section name="definition">
+                  <columnlayout>
+                     <row>
+                        <attribute name="name"/>
+                     </row>
+                     <row>
+                        <attribute name="description"/>
+                     </row>
+                     <row>
+                        <attribute name="sourceType"/>
+                        <attribute name="sourceTypeRole"/>
+                     </row>
+                     <row>
+                        <attribute name="targetType"/>
+                        <attribute name="targetTypeRole"/>
+                     </row>
+                     <row>
+                        <attribute name="localized">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                  </columnlayout>
+               </section>
+            </tab>
+            <tab name="extended" position="1" mode="replace">
+               <section name="alternativeDefinition">
+                  <listlayout>
+                     <attribute name="sourceAttribute"/>
+                     <attribute name="targetAttribute"/>
+                  </listlayout>
+               </section>
+               <section name="extended">
+               	<listlayout>
+	                  <attribute name="extensionName"/>
+	               </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference>
+         <itemlayout>
+            <attribute name="sourceType"/>
+            <attribute name="targetType"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="EnumerationMetaType" icon="images/icons/e_enumerationmetatype.gif" mode="append">
+      <organizer>
+         <search>
+            <condition attribute="extensionName" operator="contains"/>
+         </search>
+         <result>
+            <treeview>
+               <explorable mode="replace">
+                  <attribute name="values" suppressroot="true"/>
+               </explorable>
+            </treeview>
+         </result>
+         <editor>
+            <essentials mode="replace">
+               <listlayout>
+                  <attribute name="code"/>
+               </listlayout>
+            </essentials>
+            <tab name="common">
+               <section name="common" mode="delete"/>
+               <section name="definition">
+                  <listlayout>
+                     <attribute name="name"/>
+                     <attribute name="description"/>
+                     <attribute name="valueType"/>
+                  </listlayout>
+               </section>
+               <section name="enum.section.sorting">
+                  <listlayout>
+                     <attribute name="comparationAttribute"/>
+                  </listlayout>
+                  <columnlayout>
+                     <row>
+                        <attribute name="isSorted" width="20"/>
+                        <text name="enum.issorted.description"/>
+                     </row>
+                     <row>
+                        <attribute name="isResortable" width="20"/>
+                        <text name="enum.isresortable.description"/>
+                     </row>
+                  </columnlayout>
+               </section>
+               <section name="section.enumerationvalues">
+                  <listlayout>
+                     <attribute name="values" width="595">
+                        <referencecollectioneditor editable="true" externalcreate="false"/>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="properties" mode="replace">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="declaredattributedescriptors" width="595">
+                        <referencecollectioneditor resortable="false" presetattribute="enclosingType" add="true" remove="true" create="true">
+                           <itemlayout>
+                              <attribute name="qualifier" width="150"/>
+                              <attribute name="attributeType"/>
+                              
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                     <attribute name="inheritedattributedescriptors" width="595">
+                        <referencecollectioneditor resortable="false" presetattribute="enclosingType">
+                           <itemlayout>
+                              <attribute name="qualifier" width="150"/>
+                              <attribute name="attributeType"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="extended" mode="replace">
+               <section name="extended">
+                  <columnlayout leftwidth="300" rightwidth="440">
+                     <row>
+                        <attribute name="jaloclass"/>
+                     </row>
+                     <row>
+                        <attribute name="abstract" width="154">
+                           <advancedbooleaneditor truename="true" falsename="false" nullname="notdefined"/>
+                        </attribute>
+                        <attribute name="deprecated" labelwidth="130" width="264">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                     <row>
+                        <attribute name="jaloonly" width="154">
+                           <advancedbooleaneditor truename="true" falsename="false" nullname="notdefined"/>
+                        </attribute>
+                        <attribute name="generate" labelwidth="130" width="264">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                     <row>
+                        <attribute name="singleton" width="154">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                        <attribute name="autocreate" labelwidth="130" width="264">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                     <row>
+                     	<attribute name="dynamic" labelwidth="130" width="264">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                  </columnlayout>
+	               <listlayout>
+	                  <attribute name="extensionName"/>
+	               </listlayout>
+               </section>
+               <section name="persistence">
+                  <listlayout>
+                     <attribute name="jndiName"/>
+                     <attribute name="table"/>
+                     <attribute name="dumpPropertyTable"/>
+                  </listlayout>
+               </section>
+
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+
+   <type name="MapType" icon="images/icons/type.gif" mode="append">
+      <organizer>
+         <search>
+            <condition attribute="extensionName" operator="contains"/>
+         </search>
+         <result>
+            <listview>
+               <itemlayout>
+                  <attribute name="name" width="200" position="1"/> 
+               </itemlayout>
+            </listview>
+            <editview>
+               <itemlayout>
+                  <attribute name="name" width="200" position="1"/>
+               </itemlayout>
+            </editview>
+         </result>
+         <editor>
+            <tab name="properties" mode="replace">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="name"/>
+                     <attribute name="description"/>
+                     <attribute name="argumentType"/>
+                     <attribute name="returntype"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+
+   <type name="AttributeDescriptor" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="qualifier"/>
+            <condition attribute="name"/>
+            <condition attribute="enclosingType"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="enclosingType" width="150"/>
+                  <attribute name="qualifier" width="150"/>
+                  <attribute name="attributeType"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="qualifier" width="100"/>
+                  <attribute name="attributeType"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="qualifier" width="100"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+         	<exclude>
+         		<exclusion attribute="modifiers"/>
+         	</exclude>
+            <essentials>
+               <listlayout>
+                  <attribute name="qualifier"/>
+                  <attribute name="enclosingType"/>
+                  <attribute name="attributeType"/>
+                  <attribute name="extensionName"/>
+               </listlayout>
+            </essentials>
+            <tab name="tab.common" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <text name="text.attributedescriptor.description"/>
+                     <text name="text.empty"/>
+                     <attribute name="name"/>
+                     <attribute name="description"/>
+                     <attribute name="defaultValue">
+                        <customeditor classname="de.hybris.platform.hmc.attribute.DefaultValueEditorChip"/>
+                     </attribute>
+                     <attribute name="declaringEnclosingType"/>
+                  </listlayout>
+               </section>
+               <section name="modifiers">
+                  <listlayout>
+                     <attribute name="readable"/>
+                     <attribute name="writable"/>
+                     <attribute name="search"/>
+                     <attribute name="removable"/>
+                     <attribute name="partOf"/>
+                     <attribute name="initial"/>
+                     <attribute name="optional"/>
+                     <attribute name="private"/>
+                     <attribute name="unique"/>
+                  </listlayout>
+               </section>
+               <section name="properties.advanced">
+                  <listlayout>
+                  	 <attribute name="generate"/>
+                  	 <attribute name="encrypted"/>
+                     <attribute name="deprecated"/>
+                     <attribute name="dontcopy"/>
+                     <attribute name="primitive"/>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="persistence" position="1">
+               <section name="persistence">
+                  <listlayout>
+                     <attribute name="persistenceClass"/>
+                     <attribute name="databaseColumn"/>
+                     <attribute name="proposedDatabaseColumn"/>
+                     <attribute name="property"/>
+                     <attribute name="localized"/>
+                     <attribute name="autocreate"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="qualifier"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="ConfigAttributeDescriptor" mode="append">
+      <organizer>
+         <search>
+            <condition attribute="enclosingType"/>
+         </search>
+         <result>
+            <listview>
+               <itemlayout>
+                  <attribute name="externalQualifier" width="150" position="2"/>
+                  <attribute name="storeInDatabase" width="50" position="3"/>
+                  <attribute name="needRestart" width="50" position="4"/>
+                </itemlayout>
+            </listview>
+            <editview>
+               <itemlayout>
+                  <attribute name="externalQualifier" width="150" position="2"/>
+                  <attribute name="storeInDatabase" width="50" position="3"/>
+                  <attribute name="needRestart" width="50" position="4"/>
+               </itemlayout>
+            </editview>
+         </result>
+         <editor>
+            <tab name="tab.common">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="externalQualifier" position="0"/>
+                     <attribute name="storeInDatabase" position="1"/>
+                     <attribute name="needRestart" width="50" position="2"/>
+                  </listlayout>
+               </section>
+               <section name="modifiers">
+                  <listlayout>
+                     <attribute name="search" mode="delete"/>
+                     <attribute name="removable" mode="delete"/>
+                     <attribute name="partOf" mode="delete"/>
+                     <attribute name="initial" mode="delete"/>
+                     <attribute name="private" mode="delete"/>
+                     <attribute name="unique" mode="delete"/>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="persistence" mode="delete"/>
+         </editor>
+      </organizer>
+      <defaultreference>
+         <itemlayout>
+            <attribute name="qualifier"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="EnumerationValue" icon="images/icons/type.gif" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="code" operator="contains"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="150"/>
+                  <attribute name="name" width="150"/>
+                  <attribute name="icon"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="150"/>
+                  <attribute name="name" width="150"/>
+                  <attribute name="icon"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <listlayout>
+                  <attribute name="code"/>
+               </listlayout>
+            </essentials>
+            <tab name="properties" position="0">
+            	<section name="section.common">
+						<listlayout>
+							<attribute name="name"/>
+							<attribute name="icon"/>
+						</listlayout>
+					</section>
+            	<!-- <defaultsection name="defaultsection"/> -->
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="code" mode="replace" sortattribute="sequenceNumber">
+         <itemlayout>
+            <attribute name="name" fallback="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="EncodingEnum" mode="append">
+      <organizer/>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="Link" icon="images/icons/e_link.gif" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="qualifier"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="qualifier" width="150"/>
+                  <attribute name="source" width="150"/>
+                  <attribute name="target" width="150"/>
+                  <attribute name="language"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="qualifier" width="150"/>
+                  <attribute name="source" width="150"/>
+                  <attribute name="target" width="150"/>
+                  <attribute name="language"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="qualifier"/>
+               </itemlayout>
+               <explorable>
+                  <attribute name="source"/>
+                  <attribute name="target"/>
+               </explorable>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <listlayout>
+                  <attribute name="qualifier"/>
+               </listlayout>
+            </essentials>
+            <tab name="properties" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="source"/>
+                     <attribute name="target"/>
+                     <attribute name="language"/>
+                     <attribute name="sequenceNumber"/>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="administration">
+               <section name="link" mode="delete"/>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="qualifier"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="Principal" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="uid"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="uid" width="150"/>
+                  <attribute name="displayname" width="200"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="uid"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="uid"/>
+               </itemlayout>
+            </treeview>            
+         </result>
+         <editor>
+            <exclude>
+               <exclusion attribute="accessibleCategories"/>
+               <exclusion attribute="searchrestrictions"/>
+               <exclusion attribute="displayname"/>               
+            </exclude>
+            <tab name="tab.personalization" position="5">
+               <section name="section.personalization.rules">
+                  <listlayout>
+                     <text name="text.principal.personalization" width="720"/>
+                     <attribute name="allsearchrestrictions" width="595">
+                     	<referencecollectioneditor presetattribute="SearchRestriction" add="false" remove="false" create="false">
+                     		<itemlayout>
+				                  <attribute name="code" width="180"/>
+				                  <attribute name="name" width="100"/>
+				                  <attribute name="restrictedType" width="138"/>
+				                  <attribute name="principal" width="130"/>
+                     		</itemlayout>
+                     	</referencecollectioneditor>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+            <customtab name="principal.security.tab" classname="de.hybris.platform.hmc.security.PrincipalAccessRightsEditorChip" position="6"/>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="uid" mode="replace">
+         <itemlayout>
+            <attribute name="uid"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="Address" icon="images/icons/e_address.gif" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="lastname"/>
+            <condition attribute="streetname"/>
+            <condition attribute="town"/>
+            <condition attribute="owner">
+               <editor classname="de.hybris.platform.hmc.generic.GenericReferenceEditorChip">
+                  <parameter key="presetsearchtype" value="User"/>
+               </editor>
+            </condition>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="lastname" width="150"/>
+                  <attribute name="firstname" width="100"/>
+                  <attribute name="town" width="150"/>
+                  <attribute name="email"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="lastname" width="150"/>
+                  <attribute name="firstname" width="100"/>
+                  <attribute name="town" width="150"/>
+                  <attribute name="email" width="150"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="lastname"/>
+                  <attribute name="firstname"/>
+                  <attribute name="town"/>
+                  <attribute name="postalcode"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor mode="replace">
+            <essentials>
+               <listlayout>
+                  <attribute name="owner">
+                     <referenceeditor presetsearchtype="User"/>
+                  </attribute>
+               </listlayout>
+            </essentials>
+            <tab name="tab.common" position="0">
+               <section name="section.address.address">
+                  <columnlayout>
+                     <row>
+                        <attribute name="streetname"/>
+                        <attribute name="streetnumber"/>
+                     </row>
+                     <row>
+                        <attribute name="postalcode"/>
+                        <attribute name="town"/>
+                     </row>
+                     <row>
+                        <attribute name="country"/>
+                     </row>
+                  </columnlayout>
+               </section>
+               <section name="section.address.additional">
+                  <columnlayout>
+                  	<row>
+                  		<attribute name="gender"/>
+                  		<attribute name="dateofbirth" />
+                  	</row>
+                     <row>
+                        <attribute name="company"/>
+                        <attribute name="pobox"/>
+                     </row>
+                     <row>
+                        <attribute name="phone1"/>
+                        <attribute name="phone2"/>
+                     </row>
+                     <row>
+                        <attribute name="cellphone"/>
+                        <attribute name="fax"/>
+                     </row>
+                     <row>
+                        <attribute name="email"/>
+                     </row>
+                  </columnlayout>
+               </section>
+               <section name="section.address.contact">
+                  <columnlayout>
+                     <row>
+                        <attribute name="title"/>
+                        <attribute name="lastname"/>
+                     </row>
+                     <row>
+                        <attribute name="firstname"/>
+                        <attribute name="middlename"/>
+                     </row>
+                     <row>
+                        <attribute name="department"/>
+                        <attribute name="middlename2"/>
+                     </row>
+                     <row>
+                        <attribute name="building"/>
+                        <attribute name="appartment"/>
+                     </row>
+                     <row>
+                        <attribute name="region"/>
+                        <attribute name="district"/>
+                     </row>
+                  </columnlayout>
+               </section>
+            </tab>
+            <tab name="administration">
+               <section name="common">
+                  <listlayout>
+                     <attribute name="pk"/>
+                     <attribute name="itemtype"/>
+                     <attribute name="creationtime"/>
+                     <attribute name="modifiedtime"/>               
+                  </listlayout>
+               </section>
+<!--           <section name="links">
+                  <columnlayout>
+                     <row>
+                        <shortcut name="createlinksforitem" type="Link" usage="creator">
+                           <preset targetattribute="source"/>
+                        </shortcut>
+                        <shortcut name="findlinksforitemassource" type="Link" usage="finder" autoperform="true">
+                           <preset targetattribute="source"/>
+                        </shortcut>
+                     </row>
+                     <row>
+                        <shortcut name="createlinksforitemastarget" type="Link" usage="creator">
+                           <preset targetattribute="target"/>
+                        </shortcut>
+                        <shortcut name="findlinksforitemastarget" type="Link" usage="finder" autoperform="true">
+                           <preset targetattribute="target"/>
+                        </shortcut>
+                     </row>
+                  </columnlayout>
+               </section>               -->
+               <defaultsection name="unbound" preferred="false"/>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="streetname"/>
+            <attribute name="streetnumber"/>
+            <attribute name="postalcode"/>
+            <attribute name="town"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="Log" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="timestamp"/>
+            <condition attribute="topic"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="timestamp" width="150"/>
+                  <attribute name="clusterid" width="150"/>
+                  <attribute name="priority" width="200"/>
+                  <attribute name="topic" width="200"/>
+                  <attribute name="message"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="timestamp" width="150"/>
+                  <attribute name="clusterid" width="150"/>
+                  <attribute name="priority" width="200"/>
+                  <attribute name="topic" width="200"/>
+                  <attribute name="message"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="timestamp" width="150"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <listlayout>
+                  <attribute name="topic"/>
+               </listlayout>
+            </essentials>
+            <tab name="properties" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="timestamp"/>
+                     <attribute name="clusterid"/>
+                     <attribute name="priority"/>
+                     <attribute name="message"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="timestamp"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+
+<!--
+##############################################################################################
+## C2L                                                                                      ##
+##############################################################################################
+-->   
+
+   <type name="Language" icon="images/icons/language_container.gif" useselector="true" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="isocode" operator="equal"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="active" width="50"/>
+                  <attribute name="isocode" width="100"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="active" width="50"/>
+                  <attribute name="isocode" width="100"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="isocode"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <listlayout>
+                  <attribute name="isocode"/>
+                  <attribute name="name"/>
+               </listlayout>
+            </essentials>
+            <tab name="attributes" position="0">
+               <section name="common">
+                  <listlayout>
+                     <attribute name="active">
+                        <advancedbooleaneditor truename="true" falsename="false"/>
+                     </attribute>
+                  </listlayout>
+               </section>
+               <section name="section.fallbackLanguages">
+                  <listlayout>
+                     <text name="text.language.description"/>
+                     <attribute name="fallbackLanguages" width="595">
+<!--
+								<customeditor classname="de.hybris.platform.hmc.generic.MyDraggableReferenceListEditorChip" >
+									<parameter key="itemlayout" value="
+										name=isocode, width=122;
+	                           name=active, width=50
+									"/>																
+								</customeditor>
+-->
+                        <referencecollectioneditor resortable="true" remove="true" add="true" create="true">
+                           <itemlayout>
+                           <attribute name="isocode" width="122"/>
+                           <attribute name="active" width="50"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="isocode" mode="replace">
+         <itemlayout>
+            <attribute name="name" fallback="isocode"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="Currency" icon="images/icons/e_currency.gif" useselector="true" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="isocode" operator="equal"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="active" width="50"/>
+                  <attribute name="base" width="80"/>
+                  <attribute name="isocode" width="100"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="active" width="50"/>
+                  <attribute name="base" width="80"/>
+                  <attribute name="isocode" width="100"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="isocode"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <listlayout>
+                  <attribute name="isocode" maxlength="5"/>
+                  <attribute name="name"/>
+               </listlayout>
+            </essentials>
+            <tab name="attributes" position="0">
+               <section name="common">
+                  <listlayout>
+                     <attribute name="active">
+                     	<advancedbooleaneditor truename="true" falsename="false"/>
+                     </attribute>
+                     <attribute name="base">
+                     	<advancedbooleaneditor truename="true" falsename="false"/>
+                     </attribute>
+                     <attribute name="conversion"/>
+                     <attribute name="digits"/>
+                     <attribute name="symbol"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="isocode" mode="replace">
+         <itemlayout>
+            <attribute name="isocode"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="Country" icon="images/icons/country_container.gif" useselector="true" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="isocode" operator="equal"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="active" width="50"/>
+                  <attribute name="isocode" width="100"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="active" width="50"/>
+                  <attribute name="isocode" width="100"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="name"/>
+               </itemlayout>
+               <explorable>
+                  <attribute name="regions" suppressroot="true"/>
+               </explorable>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <listlayout>
+                  <attribute name="isocode"/>
+                  <attribute name="name"/>
+               </listlayout>
+            </essentials>
+            <tab name="properties" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="active">
+                     	<advancedbooleaneditor truename="true" falsename="false"/>
+                     </attribute>
+                     <attribute name="regions" width="595">
+                        <referencecollectioneditor editable="true" externalcreate="false" autosave="true" presetattribute="country" add="true" remove="true" create="true"/>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="name" mode="replace">
+         <itemlayout>
+            <attribute name="name"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="Region" icon="images/icons/region_container.gif" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="isocode" operator="equal"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="active" width="50"/>
+                  <attribute name="isocode" width="100"/>
+                  <attribute name="name" width="150"/>
+                  <attribute name="country"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="active" width="50"/>
+                  <attribute name="isocode" width="100"/>
+                  <attribute name="name" width="150"/>
+                  <attribute name="country"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="name"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <listlayout>
+                  <attribute name="isocode"/>
+                  <attribute name="name"/>
+               </listlayout>
+            </essentials>
+            <tab name="properties" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="active">
+                     	<advancedbooleaneditor truename="true" falsename="false"/>
+                     </attribute>
+                     <attribute name="country"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="name" mode="replace">
+         <itemlayout>
+            <attribute name="name"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+
+<!--
+##############################################################################################
+## Users                                                                                    ##
+##############################################################################################
+-->
+
+   <type name="User" mode="append">
+      <organizer>
+         <search> 
+            <condition attribute="name"/>
+         </search>
+         <result>
+            <listview>
+               <itemlayout mode="replace">
+                  <attribute name="uid" width="150"/>
+                  <attribute name="name" width="200"/>
+               </itemlayout>
+            </listview>
+            <editview>
+               <itemlayout mode="replace">
+                  <attribute name="uid" width="150"/>
+                  <attribute name="name" width="200"/>
+               </itemlayout>
+            </editview>
+            <treeview>
+               <itemlayout mode="replace">
+                  <attribute name="uid"/>
+                  <attribute name="name"/>
+               </itemlayout>
+               <explorable>
+               	<attribute name="addresses" suppressroot="true"/>
+               	<attribute name="orders" suppressroot="true"/>               	
+               </explorable>
+            </treeview>
+         </result>
+         <editor>
+            <exclude>
+               <exclusion attribute="currentDate"/>
+               <exclusion attribute="currentTime"/>
+            </exclude>
+            <essentials>
+               <columnlayout>
+                  <row>
+                     <attribute name="uid"/>
+                     <attribute name="name"/>
+                  </row>
+               </columnlayout>
+            </essentials>
+            <tab name="tab.common" id="tab_user_properties" mode="replace" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="description">
+                        <textareaeditor expanded="true" rows="3"/>
+                     </attribute>
+                     <attribute name="sessionLanguage"/>
+                     <attribute name="sessionCurrency"/>
+                     <attribute name="groups">
+                        <referencecollectioneditor showsearcheditor="true">
+                           <itemlayout>
+                              <attribute name="uid" width="150"/>
+                              <attribute name="locname" width="150"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                     
+<!-- use this button if groups attribute is not adequate
+                     <text name="text.empty"/>
+                     <shortcut name="findusergroupsforuser" type="PrincipalGroup" usage="finder" autoperform="true">
+                        <preset targetattribute="members"/>
+                     </shortcut>
+-->
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="addresses" id="tab_addresses" position="1">
+               <section name="addresses">
+                  <listlayout>
+                     <attribute name="addresses" width="595">
+                        <referencecollectioneditor resortable="false" presetattribute="owner" create="true" remove="true" autosave="true">
+                           <itemlayout>
+                              <attribute name="postalcode" width="120"/>
+                              <attribute name="town" width="180"/>
+                              <attribute name="streetname" width="180"/>
+                              <attribute name="streetnumber" title="number.abbr" width="63"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                     <attribute name="defaultPaymentAddress"/>
+                     <attribute name="defaultShipmentAddress"/>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="password" id="tab_password" position="2">
+               <section name="password">
+                  <listlayout>
+                     <attribute name="password">
+                        <specialeditor classname="de.hybris.platform.hmc.security.EncryptedPasswordEditorChip">
+                        	<!-- Here you can specify the minimum allowed password length -->
+                       		<parameter key="minPasswordLength" value="0"/>                      		
+                        </specialeditor>
+                     </attribute>
+                     <attribute name="passwordQuestion"/>
+                     <attribute name="passwordAnswer"/>
+                     <attribute name="loginDisabled"/>
+                     <attribute name="hmcLoginDisabled">
+                        <advancedbooleaneditor 
+                           wrapvalues="true"
+                           truename="login.disabled"
+                           falsename="login.enabled"
+                           nullname="login.inherited.group"/>   
+                     </attribute>
+                  <attribute name="lastLogin"/>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="orders" id="tab_user_orders" position="3">
+               <section name="section.orders">
+                  <listlayout>
+                     <attribute name="orders" width="595">
+                        <referencecollectioneditor resortable="false" presetattribute="user" autosave="true">
+                           <itemlayout>
+                              <attribute name="code" width="180"/>
+                              <attribute name="date" width="180"/>
+                              <attribute name="totalPrice" width="182"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                     <attribute name="carts" width="595">
+                        <referencecollectioneditor resortable="false" presetattribute="user" autosave="true">
+                           <itemlayout>
+                              <attribute name="code" width="180"/>
+                              <attribute name="date" width="180"/>
+                              <attribute name="totalPrice" width="90"/>
+                              <attribute name="currency" width="92"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                     <attribute name="paymentInfos" width="595">
+                        <referencecollectioneditor resortable="false" presetattribute="user" autosave="true">
+                           <itemlayout>
+                              <attribute name="code" width="540"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="administration" mode="append">
+              <section name="common" mode="append">
+                <listlayout>
+                  <attribute name="userprofile">
+                  	<referenceeditor>
+                  		<preset targetattribute="owner"/>
+                  	</referenceeditor>
+                  </attribute>
+                </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+
+	<type name="UserProfile" icon="images/icons/header_userprofile_main.gif"  mode="append">
+      <organizer>
+      	<editor>
+         	<tab name="administration" mode="append">
+              <section name="section.metadata" mode="append">
+                <listlayout>
+                  <attribute name="owner" mode="delete"/>
+                </listlayout>
+               </section>
+            </tab>
+         </editor> 
+      </organizer>
+   </type>
+   
+   <type name="UserProfile" icon="images/icons/header_userprofile_main.gif"  mode="append">
+      <organizer>
+         <search mode="append" autoperform="true">
+            <condition attribute="owner" operator="equal"/>
+         </search>
+         <result>
+            <listview mode="append">
+               <itemlayout>
+                  <attribute name="owner"/>
+                  <attribute name="readableLanguages"/>
+                  <attribute name="writableLanguages"/>
+               </itemlayout>
+            </listview>
+         </result>
+         <editor>
+            <exclude>
+               <exclusion attribute="allReadableLanguages"/>        
+               <exclusion attribute="allWritableLanguages"/>
+            </exclude>
+			<essentials>
+			  <listlayout>
+               <attribute name="owner" editable="false"/>
+			  </listlayout>
+			</essentials>
+			<tab name="administration" mode="append">
+              <section name="section.metadata" mode="append">
+                <listlayout>
+                  <attribute name="owner" mode="delete"/>
+                </listlayout>
+               </section>
+            </tab>
+			<tab name="tab.userprofile.settings" mode="append">
+              <section name="section.userprofile.language" mode="append">
+                <listlayout>
+                	<text name="text.userprofile.description"/>
+                	<text name="text.userprofile.readablelanguages"/>
+                  	<attribute name="readableLanguages" hidelabel="true"/>
+                  	<text name="text.userprofile.writablelanguages"/>
+                 	<attribute name="writableLanguages" hidelabel="true"/>
+                 	<attribute name="expandInitial">
+                 		<advancedbooleaneditor truename="yes" falsename="no" />
+                 	</attribute>
+                </listlayout>
+               </section>
+            </tab>
+         </editor> 
+      </organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="owner"/>
+			</itemlayout>
+		</defaultreference>
+   </type>
+   
+   <type name="Customer" icon="images/icons/customer_container.gif" mode="append">
+      <organizer>
+         <search> 
+            <condition attribute="customerID"/>
+         </search>
+         <result>
+            <listview>
+               <itemlayout>
+                  <attribute name="customerID" width="100"/>
+               </itemlayout>
+            </listview>
+            <editview>
+               <itemlayout>
+                  <attribute name="customerID" width="100"/>
+               </itemlayout>
+            </editview>
+         </result>
+         <editor>
+            <essentials>
+                 <listlayout>
+                    <attribute name="customerID"/>
+               </listlayout>
+            </essentials>
+         </editor>
+      </organizer>
+      <labels>
+         <label name="create"/>
+      </labels>
+   </type>
+
+   <type name="PaymentInfo" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="code" operator="contains"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="user" width="150"/>
+                  <attribute name="code"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="user" width="150"/>
+                  <attribute name="code"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <columnlayout>
+                  <row>
+                     <attribute name="code"/>
+                     <attribute name="user"/>
+                  </row>
+               </columnlayout>
+            </essentials>
+            <tab name="common" position="0">
+               <section name="common">
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+
+      <defaultreference>
+         <itemlayout mode="replace">
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>      
+   </type>
+
+   <type name="CreditCardPaymentInfo" mode="append">
+      <organizer>
+         <search>
+            <condition attribute="user" position="0"/>
+            <condition attribute="ccOwner" position="1"/>
+         </search>
+         <result>
+            <listview>
+               <itemlayout>
+                  <attribute name="code" width="100" mode="replace"/>
+                  <attribute name="type" width="150"/>
+                  <attribute name="ccOwner" width="150"/>
+                  <attribute name="number">
+                  	<display classname="de.hybris.platform.hmc.attribute.CreditCardNumberDisplayChip"/>
+                  </attribute>
+               </itemlayout>
+            </listview>
+            <editview>
+               <itemlayout>
+                  <attribute name="user" width="150" position="0"/>
+                  <attribute name="code" width="100" mode="replace"/>
+                  <attribute name="type" width="150"/>
+                  <attribute name="ccOwner" width="150"/>
+                  <attribute name="number" width="100">
+                  	<editor classname="de.hybris.platform.hmc.attribute.CreditCardNumberEditorChip"/>
+                  </attribute>
+               </itemlayout>
+            </editview>
+            <treeview>
+               <itemlayout>
+                  <attribute name="code"/>
+                  <attribute name="type"/>
+                  <attribute name="ccOwner"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <tab name="common" position="0" mode="append">
+               <section name="common" mode="append">
+                  <columnlayout>
+                     <row>
+                        <!-- credit cardnumer 'masking' feature -->
+                        <attribute name="number" width="100">
+                  			<customeditor classname="de.hybris.platform.hmc.attribute.CreditCardNumberEditorChip" />
+				  		</attribute>
+				  		<attribute name="type"/>
+                     </row>
+                     <row>
+                        <attribute name="ccOwner"/>
+                     </row>
+                     <row>
+                        <attribute name="validToYear"/>
+                        <attribute name="validToMonth"/>
+                     </row>
+                     <row>
+                        <attribute name="validFromYear"/>
+                        <attribute name="validFromMonth"/>
+                     </row>
+                  </columnlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      
+      <defaultreference>
+         <itemlayout mode="replace">
+            <attribute name="type"/>
+            <attribute name="number"/>
+            <attribute name="validToMonth"/>         
+            <attribute name="validToYear"/>   
+            <attribute name="ccOwner"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="DebitPaymentInfo" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="user"/>
+            <condition attribute="baOwner"/>
+            <condition attribute="accountNumber"/>
+            <condition attribute="bank"/>
+         </search>
+         <result>
+            <listview>
+               <itemlayout>
+                  <attribute name="code" width="100" mode="replace"/>
+                  <attribute name="baOwner" width="150"/>
+                  <attribute name="accountNumber" width="150"/>
+                  <attribute name="bank" width="200"/>
+                  <attribute name="bankIDNumber" width="200"/>
+               </itemlayout>
+            </listview>
+            <editview>
+               <itemlayout>
+                  <attribute name="code" width="100" mode="replace"/>
+                  <attribute name="baOwner" width="150"/>
+                  <attribute name="accountNumber" width="150"/>
+                  <attribute name="bank" width="200"/>
+                  <attribute name="bankIDNumber" width="200"/>
+               </itemlayout>
+            </editview>
+            <treeview>
+               <itemlayout mode="replace">
+                  <attribute name="bank"/>
+                  <attribute name="accountNumber"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <tab name="common" position="0" mode="append">
+               <section name="common" mode="append">
+                  <columnlayout>
+                     <row>
+                        <attribute name="baOwner"/>
+                        <attribute name="accountNumber"/>
+                     </row>
+                     <row>
+                        <attribute name="bankIDNumber"/>
+                        <attribute name="bank"/>
+                     </row>
+                  </columnlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+
+      <defaultreference>
+         <itemlayout mode="replace">
+            <attribute name="baOwner"/>
+            <attribute name="accountNumber"/>
+            <attribute name="bank"/>
+            <attribute name="bankIDNumber"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="PrincipalGroup" icon="images/icons/usergroup_container.gif" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="uid"/>
+            <condition attribute="locname"/>
+         </search>
+         <result>
+            <listview>
+               <itemlayout mode="replace">
+                  <attribute name="uid" width="150"/>
+                  <attribute name="locname"/>
+               </itemlayout>
+            </listview>
+            <editview>
+               <itemlayout mode="replace">
+                  <attribute name="uid" width="150"/>
+                  <attribute name="locname" width="150"/>
+               </itemlayout>
+            </editview>
+         </result>
+         <editor>
+            <exclude>
+               <exclusion attribute="name"/>
+            </exclude>
+         
+            <essentials>
+               <columnlayout>
+                  <row>
+                     <attribute name="uid"/>
+                     <attribute name="locname"/>
+                  </row>
+               </columnlayout>
+            </essentials>
+         </editor>
+      </organizer>
+   </type>
+   
+   <type name="UserGroup" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="uid"/>
+            <condition attribute="locname"/>
+         </search>
+         <editor>
+			<exclude>
+	        	<exclusion attribute="members" />
+			</exclude>
+            <tab name="tab.common" id="tab_ug_properties" mode="replace" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="description">
+                        <textareaeditor expanded="true" rows="3"/>
+                     </attribute>
+                     <attribute name="hmcLoginDisabled">
+                        <advancedbooleaneditor 
+                           wrapvalues="true"
+                           truename="login.disabled"
+                           falsename="login.enabled"
+                           nullname="login.inherited"/>   
+                     </attribute>
+                     <attribute name="groups">
+                     	<referencecollectioneditor showsearcheditor="true">
+                     		<itemlayout>
+						            <attribute name="uid" width="150"/>
+						            <attribute name="locname" width="150"/>
+                     		</itemlayout>
+					         </referencecollectioneditor>
+                     </attribute>
+                  </listlayout>
+				<table>
+					<tr>
+						<td width="16" />
+						<td width="200" >
+							<shortcut name="findusersforgroup" type="Principal" usage="finder" autoperform="true">
+								<preset targetattribute="groups" />
+							</shortcut>
+						</td>
+					</tr>
+				</table>
+               </section>
+            </tab>
+            <tab name="tab.languages" position="3">
+               <section name="section.languages">
+                  <listlayout>
+                     <text name="text.principal.languages" width="480"/>
+                     <attribute name="readablelanguages" width="595">
+                        <referencecollectioneditor remove="true" create="false" add="true" autoperform="true">
+                        </referencecollectioneditor>                  
+                     </attribute>
+                     <attribute name="writeablelanguages" width="595">
+                        <referencecollectioneditor remove="true" create="false" add="true" autoperform="true">
+                        </referencecollectioneditor>                  
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+				<tab name="tab.hmclayout">
+					<section name="section.hmclayout">
+						<listlayout>
+							<text name="text.usergroup.hmclayout"/>
+							<attribute name="hmcXML" width="700">
+								<textareaeditor expanded="true" wrap="false" cols="90" rows="30"/>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+         </editor>
+      </organizer>
+   </type>
+
+   <type name="Title" icon="images/icons/e_title.gif" mode="append" useselector="true">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="code" operator="contains"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="50"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="50"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+            </essentials>
+            <tab name="properties" position="0">
+               <section name="common">
+                  <listlayout>
+                     <attribute name="code"/>
+                     <attribute name="name"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="name" mode="replace">
+         <itemlayout>
+            <attribute name="name"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+
+<!--
+##############################################################################################
+## Order                                                                                    ##
+##############################################################################################
+-->
+
+   <type name="AbstractOrder" icon="images/icons/e_order.gif" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="code" operator="contains"/>
+            <condition attribute="date" operator="&gt;">
+               <editor classname="de.hybris.platform.hmc.attribute.DateEditorChip"/>
+            </condition>
+            <condition attribute="user"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="200"/>
+                  <attribute name="date" width="200"/>
+                  <attribute name="totalPrice" width="100">
+							<display classname="de.hybris.platform.hmc.attribute.DoubleDisplayChip">
+								<parameter key="align" value="right"/>
+							</display>
+						</attribute>
+                  <attribute name="user" width="200"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="200"/>
+                  <attribute name="date" width="300"/>
+                  <attribute name="user" width="200"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+                  <attribute name="user"/>
+               </itemlayout>
+               <explorable>
+                  <attribute name="entries" suppressroot="true"/>
+               </explorable>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <columnlayout>
+                  <row>
+                     <attribute name="user"/>
+                     <attribute name="code" labelwidth="60" width="264"/>
+                  </row>
+               </columnlayout>
+            </essentials>
+            <tab name="positions_and_prices" id="tab_order_positions_and_prices" position="0">
+               <section name="common">
+                  <columnlayout>
+                     <row>
+                        <attribute name="currency"/>
+                        <attribute name="date" labelwidth="60" width="264"/>
+                     </row>
+                     <row>
+                        <attribute name="net" labelwidth="110">
+                           <advancedbooleaneditor truename="order.net.true" falsename="order.net.false"/>
+                        </attribute>
+                     </row>
+                     <row>
+                        <attribute name="calculated" labelwidth="110">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                  </columnlayout>
+               </section>
+               <section name="positions">
+                  <listlayout>
+                        <attribute name="entries" width="595">
+                           <referencecollectioneditor editable="true" externalcreate="false" presetattribute="order" remove="true" create="true" autosave="true">
+                              <itemeditorlayout>
+                                 <attribute name="product" width="230"/>
+                                 <attribute name="quantity" width="50"/>
+                                 <attribute name="unit" width="90"/>
+                                 <attribute name="basePrice" width="77">
+									<editor classname="de.hybris.platform.hmc.attribute.DoubleEditorChip">
+										<parameter key="align" value="right"/>
+									</editor>
+								</attribute>
+		                  		<attribute name="totalPrice" width="80">
+									<editor classname="de.hybris.platform.hmc.attribute.DoubleEditorChip">
+										<parameter key="align" value="right"/>
+									</editor>
+								</attribute>
+                              </itemeditorlayout>
+                           </referencecollectioneditor>
+                        </attribute>
+                        <attribute name="globalDiscountValues" labelwidth="441" width="250">
+									<collectioneditor resortable="false" addremove="true" title="globaldiscountvalues"/>
+								</attribute>
+                        <attribute name="totalTaxValues" labelwidth="441" width="250">
+									<collectioneditor resortable="false" editable="false" addremove="true" title="totaltaxvalues"/>
+								</attribute>
+                        <attribute name="paymentCost" descriptionattribute="currency" labelwidth="530" width="124">
+                        	<doubleeditor>
+										<parameter key="align" value="right"/>
+                        	</doubleeditor>
+                        </attribute>
+                        <attribute name="deliveryCost" descriptionattribute="currency" labelwidth="530" width="124">
+                        	<doubleeditor>
+										<parameter key="align" value="right"/>
+                        	</doubleeditor>
+                        </attribute>
+                        <attribute name="totalPrice" descriptionattribute="currency" labelwidth="530" width="124">
+                        	<doubleeditor>
+										<parameter key="align" value="right"/>
+                        	</doubleeditor>
+                        </attribute>
+                        <attribute name="totalTax" descriptionattribute="currency" labelwidth="530" width="124">
+                        	<doubleeditor>
+										<parameter key="align" value="right"/>
+                        	</doubleeditor>
+                        </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="payment_and_delivery" position="2">
+               <section name="status">
+                  <listlayout>
+                     <attribute name="status"/>
+                     <attribute name="exportStatus"/>
+                     <attribute name="statusInfo"/>
+                  </listlayout>
+               </section>
+               <section name="payment">
+                  <listlayout>
+                     <attribute name="paymentAddress">
+                     	<referenceeditor autoperform="true">
+	                     	<preset targetattribute="owner" sourceattribute="user"/>
+	                     	<restriction attribute="owner" sourceattribute="user"/>
+                     	</referenceeditor>
+                     </attribute>
+                     <attribute name="paymentMode"/>
+                     <attribute name="paymentStatus"/>
+                     <attribute name="paymentInfo"/>
+                  </listlayout>
+               </section>
+               <section name="deliveryadministration">
+                  <listlayout>
+                     <attribute name="deliveryAddress">
+                     	<referenceeditor autoperform="true">
+	                     	<preset targetattribute="owner" sourceattribute="user"/>
+	                     	<restriction attribute="owner" sourceattribute="user"/>
+	                     </referenceeditor>
+                     </attribute>
+                     <attribute name="deliveryMode"/>
+                     <attribute name="deliveryStatus"/>
+                  </listlayout>
+                  <table>
+                     <tr>
+                        <td width="16px">
+                        </td>
+                        <td>
+                           <action type="item"
+                                   classname="de.hybris.platform.hmc.util.action.OrderCalculationAction" 
+                                   name="action.ordercalculation"
+                                   toolbaricon="order_calculate"
+                                   icon="images/icons/order_calculate_main.gif"
+                                   autosave="true"
+                                   showtoolbarlabel="true"
+                                   hidebutton="true"
+                                 />
+                        </td>
+                        <td>
+                           <action type="item" 
+                                   classname="de.hybris.platform.hmc.util.action.OrderTotalsCalculationAction" 
+                                   name="action.ordertotalscalculation"
+                                   toolbaricon="order_totals"
+                                   icon="images/icons/order_totals_main.gif"
+                                   autosave="true"
+                                   showtoolbarlabel="true"
+                                   hidebutton="true"
+                                 />
+                        </td>
+                     </tr>
+                  </table>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+            <attribute name="user"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="Cart" icon="images/icons/e_cart.gif" mode="append">
+		<organizer>
+			<editor>
+				<tab name="administration" mode="append">
+					<section name="common" mode="append">
+						<listlayout>
+							<attribute name="sessionId"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+   </type>
+   
+   <type name="AbstractOrderEntry" icon="images/icons/e_orderentry.gif" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="product"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="product" width="200"/>
+                  <attribute name="quantity" width="70"/>
+                  <attribute name="basePrice" width="70">
+							<display classname="de.hybris.platform.hmc.attribute.DoubleDisplayChip">
+								<parameter key="align" value="right"/>
+							</display>
+						</attribute>
+                  <attribute name="totalPrice" width="70">
+							<display classname="de.hybris.platform.hmc.attribute.DoubleDisplayChip">
+								<parameter key="align" value="right"/>
+							</display>
+						</attribute>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="product" width="100"/>
+                  <attribute name="quantity" width="70"/>
+                  <attribute name="basePrice" width="100"/>
+                  <attribute name="totalPrice"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="product"/>
+                  <attribute name="quantity"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <columnlayout>
+                  <row>
+                     <attribute name="product"/>
+                     <attribute name="order"/>
+                  </row>
+               </columnlayout>
+            </essentials>
+            <tab name="common" position="0">
+               <section name="orderentries">
+                  <columnlayout>
+                     <row>
+                        <attribute name="quantity"/>
+                        <attribute name="unit"/>
+                     </row>
+                  </columnlayout>
+               </section>
+               <section name="orderentries.subtotal">
+                  <columnlayout>
+                     <row>
+                        <attribute name="calculated">
+                           <advancedbooleaneditor truename="true" falsename="false"/>
+                        </attribute>
+                     </row>
+                     <row>
+                        <attribute name="basePrice"/>
+                        <attribute name="totalPrice"/>
+                     </row>
+                  </columnlayout>
+                  <listlayout>
+                     <attribute name="discountValues">
+                        <collectioneditor resortable="false" addremove="true" title="discountvalues"/>
+                     </attribute>
+                     <attribute name="taxValues">
+                        <collectioneditor resortable="false" addremove="true" title="taxvalues"/>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="info" position="1">
+               <section name="info">
+                  <listlayout>
+                     <attribute name="info">
+                        <textareaeditor expanded="true"/>
+                     </attribute>
+                     <attribute name="entryNumber"/>
+                  </listlayout>
+                  <table>
+                     <tr>
+                        <td width="16px">
+                        </td>
+                        <td>
+                           <action type="item"
+                                   classname="de.hybris.platform.hmc.util.action.OrderEntryCalculationAction" 
+                                   name="action.orderentrycalculation"
+                                   toolbaricon="order_calculate"
+                                   icon="images/icons/order_calculate_main.gif"
+                                   showtoolbarlabel="true"
+                                   hidebutton="true"
+                                 />
+                        </td>
+                        <td>
+                           <action type="item" 
+                                   classname="de.hybris.platform.hmc.util.action.OrderEntryTotalsCalculationAction" 
+                                   name="action.orderentrytotalscalculation"
+                                   toolbaricon="order_totals"
+                                   icon="images/icons/order_totals_main.gif"
+                                   showtoolbarlabel="true"
+                                   hidebutton="true"
+                                 />
+                        </td>
+                     </tr>
+                  </table>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="product"/>
+            <attribute name="quantity"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="CartEntry" icon="images/icons/e_cartentry.gif" mode="append"/>
+
+   <type name="Media" icon="images/icons/multimedia_container.gif" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="code" operator="contains"/>
+            <condition attribute="mime"/>
+            <condition attribute="folder"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="url" title="title.image" width="50">
+                     <display classname="de.hybris.platform.hmc.attribute.UrlAsImageDisplayChip">
+                        <parameter key="height" value="30"/>
+                     </display>
+                  </attribute>
+                  <attribute name="code" width="200"/>
+                  <attribute name="mime" width="100"/>   
+                  <attribute name="url2" title="title.download" width="50">
+                     <display classname="de.hybris.platform.hmc.attribute.MediaDownloadUrlChip"/>
+                  </attribute>
+                  <attribute name="folder" width="100"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="200"/>
+                  <attribute name="mime"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <exclude>
+               <exclusion attribute="mime"/>
+               <exclusion attribute="realfilename"/>
+               <!--<exclusion attribute="url2"/>-->
+            </exclude>
+            <essentials>
+               <listlayout>
+                  <attribute name="code"/>
+               </listlayout>
+            </essentials>
+            <tab name="tab.common" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="url">
+                        <specialeditor 
+                           classname="de.hybris.platform.hmc.media.MediaFileUploadEditorChip"
+                           parameter="showpreview"
+                       />
+                     </attribute>
+	           		<attribute name="mediaformat" />
+              		<attribute name="mediacontainer" />
+              		<attribute name="folder" editable="false" />
+                  </listlayout>
+               </section>
+            </tab>
+				<tab name="tab.media.metadata">
+					<section name="section.media.metadata">
+                  <listlayout>
+                     <attribute name="alttext"/>
+                     <attribute name="downloadurl"/>
+                  </listlayout>
+					</section>
+				</tab>
+            <tab name="tab.media.security">
+             <section name="section.media.security">
+                  <listlayout>
+                     <attribute name="permittedPrincipals"/>
+                     <attribute name="deniedPrincipals"/>
+                  </listlayout>
+           </section>
+          </tab>        
+				<tab name="administration">
+               		<section name="common">
+                  		<listlayout>
+                     		<attribute name="dataPK"/>
+                     		<attribute name="foreignDataOwners"/>
+                  		</listlayout>
+               		</section>
+               </tab>
+            <!--
+            <tab name="links" position="1">
+               <section name="search">
+                  <table>
+                     <tr>
+                        <td>
+                           <shortcut name="findproductsforthumbnail" type="Product" usage="finder" autoperform="true">
+                              <preset targetattribute="thumbnail"/>
+                           </shortcut>
+                        </td>
+                        <td>
+                           <shortcut name="findproductsforpicture" type="Product" usage="finder" autoperform="true">
+                              <preset targetattribute="picture"/>
+                           </shortcut>
+                        </td>
+                     </tr>
+                     <tr>
+                        <td>
+                           <shortcut name="findcategorynodesforthumbnail" type="Category" usage="finder" autoperform="true">
+                              <preset targetattribute="thumbnail"/>
+                           </shortcut>
+                        </td>
+                        <td>
+                           <shortcut name="findcategorynodesforpicture" type="Category" usage="finder" autoperform="true">
+                              <preset targetattribute="picture"/>
+                           </shortcut>
+                        </td>
+                     </tr>
+                  </table>
+               </section>
+            </tab>
+            -->
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="MediaFolder" icon="images/icons/mediafolder.gif" mode="append" useselector="true">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="qualifier"/>
+				<condition attribute="path"/>
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+		                <attribute name="qualifier" width="160"/>
+		                <attribute name="path" width="160"/>
+		            </itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials mode="replace">
+					<listlayout>
+						<attribute name="qualifier"/>
+					</listlayout>
+				</essentials>
+				<tab name="tab.mediafolder.commons">
+					<section name="tab.mediafolder.properties">
+						<listlayout>
+							<attribute name="path"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="qualifier">
+			<itemlayout>
+				<attribute name="qualifier" fallback="path"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+   <type name="MediaContainer" icon="images/icons/mediacontainer.gif" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="qualifier"/>
+				<condition attribute="name"/>
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+		                <attribute name="qualifier" width="160"/>
+		                <attribute name="name" width="160"/>
+		            </itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials mode="replace">
+					<listlayout>
+						<attribute name="qualifier"/>
+					</listlayout>
+				</essentials>
+				<tab name="tab.mediacontainer.commons">
+					<section name="tab.mediacontainer.properties">
+						<listlayout>
+							<attribute name="name"/>
+							<attribute name="medias">
+								<referencecollectioneditor>
+									<itemlayout>
+										<attribute name="url" title="title.image" width="50">
+										   <display classname="de.hybris.platform.hmc.attribute.UrlAsImageDisplayChip">
+										      <parameter key="height" value="30"/>
+										   </display>
+										</attribute>
+										<attribute name="code"/>
+										<attribute name="catalogVersion"/>
+										<attribute name="mediaFormat"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace" searchattribute="qualifier">
+			<itemlayout>
+				<attribute name="name" fallback="qualifier"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="MediaFormat" useselector="true" icon="images/icons/mediaformat.gif" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="qualifier"/>
+				<condition attribute="name"/>
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+		                <attribute name="qualifier" width="160"/>
+		                <attribute name="name" width="160"/>
+		            </itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials mode="replace">
+					<listlayout>
+						<attribute name="qualifier"/>
+					</listlayout>
+				</essentials>
+				<tab name="tab.mediaformat.commons">
+					<section name="tab.mediaformat.properties">
+						<listlayout>
+							<attribute name="name"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="name" fallback="qualifier"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="MediaContext" icon="images/icons/mediacontext.gif" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="qualifier"/>
+				<condition attribute="name"/>
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+		                <attribute name="qualifier" width="160"/>
+		                <attribute name="name" width="160"/>
+		            </itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials mode="replace">
+					<listlayout>
+						<attribute name="qualifier"/>
+					</listlayout>
+				</essentials>
+				<tab name="tab.mediacontext.commons">
+					<section name="tab.mediacontext.properties">
+						<listlayout>
+							<attribute name="name"/>
+							<attribute name="mappings">
+								<referencecollectioneditor presetattribute="mediaContext">
+									<itemlayout>
+										<attribute name="source"/>
+										<attribute name="target"/>
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="name" fallback="qualifier"/>
+			</itemlayout>
+		</defaultreference>
+	</type>
+	
+	<type name="MediaFormatMapping" mode="append">
+		<organizer>
+			<search mode="replace">
+				<condition attribute="mediaContext"/>
+				<condition attribute="source"/>
+				<condition attribute="target"/>
+			</search>
+			<result>
+				<listview mode="replace">
+					<itemlayout>
+		                <attribute name="mediaContext" width="160"/>
+		                <attribute name="source" width="160"/>
+		                <attribute name="target" width="160"/>
+		            </itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials mode="replace">
+					<listlayout>
+						<attribute name="mediaContext"/>
+					</listlayout>
+				</essentials>
+				<tab name="tab.mediaformatmapping.commons">
+					<section name="tab.mediaformatmapping.properties">
+						<listlayout>
+							<attribute name="source"/>
+							<attribute name="target"/>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="source" />
+				<attribute name="target" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+   <type name="Tax" icon="images/icons/e_tax.gif" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="code" operator="contains"/>
+            <condition attribute="name" operator="contains"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="150"/>
+                  <attribute name="name" width="150"/>
+                  <attribute name="value"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="150"/>
+                  <attribute name="name" width="150"/>
+                  <attribute name="value"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <columnlayout>
+                  <row>
+                     <attribute name="code"/>
+                     <attribute name="name"/>
+                  </row>
+               </columnlayout>
+            </essentials>
+            <tab name="section.tax.standardvalues" position="0">
+               <section name="properties">
+                  <columnlayout>
+                     <row>
+                        <attribute name="value"/>
+                        <attribute name="absolute">
+                           <advancedbooleaneditor truename="tax.absolute.true" falsename="tax.absolute.false"/>
+                        </attribute>
+                     </row>
+                  </columnlayout>
+               </section>
+               <section name="taxrows">
+                  <listlayout>
+                     <text name="text.tax.taxrow" width="694"/>
+                  </listlayout>
+                  <table>
+                     <tr>
+                        <td width="16px">
+                        </td>
+                        <td>
+	                        <shortcut name="findTaxRows" type="TaxRow" usage="finder" autoperform="true">
+	                           <preset targetattribute="tax"/>
+	                        </shortcut>
+	                     </td>
+	                     <td>   
+	                        <shortcut name="createTaxRow" type="TaxRow" usage="creator" autoperform="true">
+	                           <preset targetattribute="tax"/>
+	                        </shortcut>
+	                     </td>
+	                  </tr>
+	               </table>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   <type name="Discount" icon="images/icons/e_discount.gif" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="code" operator="contains"/>
+            <condition attribute="name" operator="contains"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="100"/>
+                  <attribute name="name" width="150"/>
+                  <attribute name="discountstring" width="100"/>                    
+                  <attribute name="global" width="150">
+							<display classname="de.hybris.platform.hmc.attribute.AdvancedBooleanDisplayChip">
+								<parameter key="truename" value="discount.global.true"/>
+								<parameter key="falsename" value="discount.global.false"/>
+							</display>
+                  </attribute>
+                  <attribute name="priority" width="50"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="100"/>
+                  <attribute name="name" width="150"/>
+                  <attribute name="discountstring" width="100"/>                    
+                  <attribute name="global" width="170">
+							<editor classname="de.hybris.platform.hmc.attribute.AdvanceBooleanEditorChip">
+								<parameter key="truename" value="discount.global.true"/>
+								<parameter key="falsename" value="discount.global.false"/>
+								<parameter key="useselectbox" value="true"/>
+							</editor>
+						</attribute>
+                  <attribute name="priority" width="50"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <columnlayout>
+                  <row>
+                     <attribute name="code"/>
+                     <attribute name="name"/>
+                  </row>
+               </columnlayout>
+            </essentials>
+            <tab name="common" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="priority"/>
+                     <attribute name="global">
+                        <advancedbooleaneditor truename="discount.global.true" falsename="discount.global.false"/>
+                     </attribute>
+                  </listlayout>
+               </section>
+               <section name="section.discount.standardvalues">
+                  <columnlayout>
+                     <row>
+                        <attribute name="value"/>
+                        <attribute name="currency"/>
+                     </row>
+                     <row>
+                        <attribute name="absolute">
+                           <advancedbooleaneditor truename="discount.absolute.true" falsename="discount.absolute.false"/>
+                        </attribute>
+                     </row>
+                  </columnlayout>
+               </section>
+               <section name="discountrows">
+                  <listlayout>
+                     <text name="discount.discountrow"/>
+                     <inlineshortcut name="discountrows" type="DiscountRow" maxcount="10">
+                        <preset targetattribute="discount"/>
+                        <itemlayout>
+                           <attribute name="user" width="100"/>
+                           <attribute name="ug" width="140"/>
+                           <attribute name="discountstring" width="80"/>
+                           <attribute name="discount" width="50"/>
+                           <attribute name="daterange" width="173"/>
+                        </itemlayout>
+                     </inlineshortcut>
+                  </listlayout>
+                  <table>
+                     <tr>
+                        <td width="146px"></td>
+                        <td>
+                           <shortcut name="FindDiscountRows" type="DiscountRow" usage="finder" autoperform="true">
+                              <preset targetattribute="discount"/>
+                           </shortcut>
+                        </td>
+                        <td>
+                           <shortcut name="CreateDiscountRow" type="DiscountRow" usage="creator">
+                              <preset targetattribute="discount"/>
+                              <preset sourceattribute="absolute" targetattribute="absolute"/>
+                           </shortcut>
+                        </td>
+                     </tr>
+                  </table>
+               </section>
+            </tab>
+            <tab name="discountorders" position="1">
+               <section name="orders">
+                  <listlayout>
+                     <shortcut name="findOrdersForDiscount" type="AbstractOrder" usage="finder" autoperform="true">
+                        <preset targetattribute="discounts"/>
+                     </shortcut>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="DeliveryMode" useselector="true" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="code" operator="contains"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="150"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="150"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+               </itemlayout>
+               <explorable>
+                  <attribute name="supportedpaymentmodes" suppressroot="true"/>
+               </explorable>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <listlayout>
+                  <attribute name="code"/>
+               </listlayout>
+            </essentials>
+
+            <tab name="properties" id="tab_deliverymodes" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="name"/>
+                     <attribute name="description"/>
+                     <attribute name="active">
+                        <advancedbooleaneditor truename="true" falsename="false"/>
+                     </attribute>
+                     <attribute name="supportedpaymentmodes" width="595">
+                        <referencecollectioneditor>
+                           <itemlayout>
+                              <attribute name="code" width="90"/>
+                              <attribute name="name" width="80"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="PaymentMode" useselector="true" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="code" operator="contains"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="100"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="100"/>
+                  <attribute name="name"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <columnlayout>
+                  <row>
+                     <attribute name="code"/>
+                     <attribute name="name"/>
+                  </row>
+               </columnlayout>
+            </essentials>
+            <tab name="properties" id="tab_paymentmode" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="paymentinfotype"/>
+                     <attribute name="active">
+                        <advancedbooleaneditor truename="true" falsename="false"/>
+                     </attribute>
+                     <attribute name="description"/>
+                     <attribute name="supporteddeliverymodes" width="595">
+                        <referencecollectioneditor>
+                           <itemlayout>
+                              <attribute name="code" width="90"/>
+                              <attribute name="name" width="80"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="SavedQuery" icon="images/search.gif" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="code"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="200"/>
+                  <attribute name="name" width="300"/>
+                  <attribute name="resulttype" width="150"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="200"/>
+                  <attribute name="name" width="300"/>
+                  <attribute name="resulttype" width="150"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <listlayout>
+                  <text name="text.savedquery" width="480"/>
+                  <attribute name="code"/>
+               </listlayout>
+            </essentials>
+            <tab name="properties" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="name"/>
+                     <attribute name="description" width="595">
+                        <textareaeditor expanded="false"/>
+                     </attribute>
+                     <text name="text.savedquery.search"/>
+                     <attribute name="query" width="595">
+                        <textareaeditor expanded="true" rows="10"/>
+                     </attribute>
+                     <text name="text.savedquery.resulttype"/>
+                     <attribute name="resulttype"/>
+                     <text name="text.savedquery.parameter"/>
+                     <attribute name="params"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="SearchRestriction" icon="images/search_filter.gif" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="code"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="250"/>
+                  <attribute name="active" width="50"/>
+                  <!--<attribute name="name" width="120"/>-->
+                  <attribute name="restrictedType" width="130"/>
+                  <attribute name="principal"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="code" width="250"/>
+                  <attribute name="active" width="50"/>
+                  <!--<attribute name="name" width="120"/>-->
+                  <attribute name="restrictedtype" width="130"/>
+                  <attribute name="principal"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+               </itemlayout>
+            </treeview>
+         </result>
+         <editor>
+            <essentials>
+               <listlayout>
+                  <text name="text.restriction" width="480"/>
+                  <attribute name="active"/>
+                  <attribute name="code"/>
+               </listlayout>
+            </essentials>
+            <tab name="properties" position="0">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="name"/>
+                     <text name="text.restriction.query"/>
+                     <attribute name="query" width="595">
+                        <textareaeditor expanded="true" rows="15"/>
+                     </attribute>
+                     <attribute name="restrictedType"/>
+                     <attribute name="principal"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+            <attribute name="restrictedtype"/>
+            <attribute name="active"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <!-- view types -->
+   
+   <type name="ViewType" icon="images/search.gif" mode="append">
+      <organizer>
+         <search autoperform="true" mode="replace">
+            <condition attribute="code" operator="contains"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="name" width="150"/>
+                  <attribute name="code" width="200"/>
+               </itemlayout>
+            </listview>
+            <editview mode="replace">
+               <itemlayout>
+                  <attribute name="name" width="150"/>
+                  <attribute name="code" width="200"/>
+               </itemlayout>
+            </editview>
+            <treeview mode="replace">
+               <itemlayout>
+                  <attribute name="code"/>
+               </itemlayout>
+               <explorable>
+                  <attribute name="subtypes" suppressroot="true"/>
+               </explorable>
+            </treeview>
+         </result>
+         <editor mode="replace">
+            <essentials>
+               <listlayout>
+                  <text name="text.views" width="480"/>
+                  <attribute name="code"/>
+               </listlayout>
+            </essentials>
+            <tab name="properties">
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="name"/>
+                     <attribute name="description" width="595">
+                     	<textareaeditor expanded="true"/>
+                     </attribute>
+                     <text name="text.views.query" width="480"/>
+                     <attribute name="query" width="595">
+                        <textareaeditor expanded="true" wrap="false" rows="15"/>
+                     </attribute>
+                     <text name="text.views.columns" width="480"/>
+                     <attribute name="columns" width="595">
+                        <referencecollectioneditor editable="true" externalcreate="false" resortable="true" presetattribute="enclosingType" add="true" remove="true" create="true">
+                           <itemlayout>
+                              <attribute name="qualifier" width="100"/>
+                              <attribute name="attributeType" width="150"/>
+                              <attribute name="optional"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                     <text name="text.views.params" width="480"/>
+                     <attribute name="params" width="595">
+                        <referencecollectioneditor editable="true" externalcreate="false" resortable="false" presetattribute="enclosingType" add="true" remove="true" create="true">
+                           <itemlayout>
+                              <attribute name="qualifier" width="100"/>
+                              <attribute name="attributeType"/>
+                           </itemlayout>
+                        </referencecollectioneditor>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+            <tabref idref="tab_xmldef"/>
+            <tabref idref="tab_administration"/>
+            <customtab name="security" classname="de.hybris.platform.hmc.security.TypeAccessRightsEditorChip"/>
+         </editor>
+      </organizer>
+      <defaultreference searchattribute="code" mode="replace">
+         <itemlayout>
+            <attribute name="code"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="ViewAttributeDescriptor" mode="append">
+      <organizer>
+         <result>
+            <listview>
+               <itemlayout>
+                  <attribute name="attributeType" width="150" mode="replace"/>
+                  <attribute name="optional"/>
+               </itemlayout>
+            </listview>
+            <editview>
+               <itemlayout>
+                  <attribute name="attributeType" width="150" mode="replace"/>
+                  <attribute name="optional" width="50"/>
+               </itemlayout>
+            </editview>
+         </result>
+         <editor>
+            <tab name="properties">
+               <section name="modifiers" mode="delete"/>
+               <section name="properties">
+                  <listlayout>
+                     <attribute name="defaultValue" mode="delete"/>
+<!--
+                     <attribute name="optional"/>
+                     <attribute name="unique"/>
+-->
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="persistence" mode="delete"/>
+         </editor>
+      </organizer>
+      <defaultreference>
+         <itemlayout>
+            <attribute name="qualifier"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+
+   <!-- view example -->
+
+   <type name="CustomerOrderOverview" icon="images/search.gif" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="currency" operator="equal"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="customer" width="150"/>
+                  <attribute name="orderCount" width="130"/>
+                  <attribute name="orderTotals"/>
+               </itemlayout>
+            </listview>
+         </result>
+         <editor>
+            <exclude>
+               <exclusion attribute="owner"/>
+            </exclude>
+            <essentials>
+               <listlayout>
+                  <attribute name="customer"/>
+                  <attribute name="orderCount"/>
+                  <attribute name="orderTotals"/>
+               </listlayout>
+            </essentials>
+            <tab name="properties"/>
+            <tab name="administration" mode="delete"/>
+         </editor>
+      </organizer>
+      <defaultreference mode="replace">
+         <itemlayout>
+            <attribute name="customer"/>
+            <attribute name="orderCount"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+
+   <type name="RelationTypeUsageView" icon="images/search.gif" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="composedType" operator="equal"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="relationType"/>
+               </itemlayout>
+            </listview>
+         </result>
+         <editor>
+            <exclude>
+               <exclusion attribute="owner"/>
+            </exclude>
+            <essentials>
+               <listlayout>
+                  <attribute name="relationType"/>
+               </listlayout>
+            </essentials>
+            <tab name="properties"/>
+            <tab name="administration" mode="delete"/>
+         </editor>
+      </organizer>
+      <defaultreference>
+         <itemlayout>
+            <attribute name="relationType"/>
+         </itemlayout>
+      </defaultreference>
+   </type>
+   
+   
+   <type name="UnlocalizedAttributeDescriptors" mode="append">
+      <organizer>
+         <search mode="replace">
+            <condition attribute="code" operator="contains" defaultvalue="%"/>
+            <condition attribute="qualifier" operator="contains" defaultvalue="%"/>
+            <condition attribute="extension" operator="contains" defaultvalue="%"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="extName" width="100"/>
+                  <attribute name="type" width="150"/>
+                  <attribute name="attribute"/>
+               </itemlayout>
+            </listview>
+         </result>
+         <editor>
+            <exclude>
+               <exclusion attribute="owner"/>
+            </exclude>
+            <essentials>
+               <listlayout>
+                  <attribute name="type"/>
+                  <attribute name="attribute"/>
+               </listlayout>
+            </essentials>
+            <tab name="administration" mode="delete"/>
+         </editor>
+      </organizer>
+   </type>
+
+   <type name="WizardBusinessItem" mode="append">
+   	  <organizer>
+   	  	  <editor>
+   	  	  	  <exclude>
+   	  	  	  	  <exclusion attribute="owner" />
+   	  	  	  	  
+   	  	  	  </exclude>
+   	  	  	  <tab name="administration" mode="delete" />
+   	  	  </editor>
+   	  </organizer>
+   </type>
+   
+   <type name="SampleWizard" useselector="true" mode="append">
+      <organizer>
+         <editor>
+            <exclude>
+               <exclusion attribute="owner"/>
+            </exclude>
+            <tab name="tab1" position="0">
+               <section name="section1">
+                  <listlayout>
+                     <attribute name="seconds"/>
+                     <attribute name="pk"/>
+                     <attribute name="stringList"/>
+                     <attribute name="unitList"/>
+                  </listlayout>
+               </section>
+            </tab>
+            <tab name="tab2" position="1">
+               <section name="section2">
+                  <listlayout>
+                     <attribute name="creationtime"/>
+                  </listlayout>
+               </section>
+            </tab>
+         </editor>
+      </organizer>
+   </type>
+
+   <type name="SavedValues" icon="images/icons/e_last_changes.gif"  mode="append">
+      <organizer>
+         <search mode="replace" autoperform="true">
+            <condition attribute="modifiedItemType" operator="contains" />            
+            <condition attribute="modificationType" operator="contains" />
+            <condition attribute="user" operator="contains" />            
+            <condition attribute="timestamp" operator="contains" />
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="timestamp" width="100"/>
+                  <attribute name="modificationType" width="80"/>
+                  <attribute name="modifiedItemType" width="100"/>
+                  <attribute name="user" width="80"/>
+                  <attribute name="modifiedItemDisplayString"/>  
+               </itemlayout>
+            </listview>
+         </result>
+         <editor>
+            <exclude>
+               <exclusion attribute="savedValues"/>        
+               <exclusion attribute="owner"/>
+            </exclude>
+				<essentials>
+				  <listlayout>
+                <attribute name="modifiedItem"/>
+				  </listlayout>
+				</essentials>
+            <tab name="tab.saved.values">
+               <section name="section.saved.values">
+                   <listlayout>
+                        <attribute name="modificationType"/>
+                        <attribute name="user"/>
+                        <attribute name="timestamp"/>
+                        <attribute name="savedValuesEntries"/>  
+                   </listlayout>
+               </section>
+            </tab>
+            <tab name="administration" mode="append">
+              <section name="common" mode="append">
+                <listlayout>
+                  <attribute name="modifiedItemType"/>
+                  <attribute name="modifiedItemDisplayString" width="595">
+                     <textareaeditor expanded="true" wrap="false" rows="5"/>
+                  </attribute>
+                   </listlayout>
+               </section>
+            </tab>
+         </editor> 
+      </organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="modificationType"/>
+				<attribute name="user"/>
+			</itemlayout>
+		</defaultreference>
+   </type>
+	
+   <type name="SavedValueEntry" mode="append">
+      <organizer>
+         <search mode="append">
+            <condition attribute="modifiedAttribute" operator="contains" defaultvalue="%"/>
+         </search>
+         <result>
+            <listview mode="replace">
+               <itemlayout>
+                  <attribute name="modifiedAttribute"/>
+               </itemlayout>
+            </listview>
+         </result>
+         <editor>
+            <exclude>
+               <exclusion attribute="savedValues"/>
+               <exclusion attribute="newValue"/>
+               <exclusion attribute="parent"/>
+               <exclusion attribute="OldValueAttributeDescriptor"/>
+               <exclusion attribute="owner"/>
+            </exclude>
+            <essentials>
+              <listlayout>
+                <attribute name="modifiedAttribute"/>
+              </listlayout>
+            </essentials>
+            <tab name="tab.saved.valuesentry">
+               <section name="section.saved.values">
+                   <listlayout>
+                     <attribute name="oldValue" mode="replace">
+                        <specialeditor classname="de.hybris.platform.hmc.attribute.SavedValueEntryEditorChip"/>
+                     </attribute>
+                  </listlayout>
+               </section>
+            </tab>
+         <tab name="administration" mode="delete"/>
+           </editor>
+      </organizer>
+   </type> 
+   
+   <type name="ImportUserRightsWizard" icon="images/icons/userrights_import.gif" mode="append">
+   	<organizer>
+   		<editor>
+   			<exclude>
+   				<exclusion attribute="fieldseperatorchar"/>
+   				<exclusion attribute="textseperatorchar"/>
+   				<exclusion attribute="dataseperatorchar"/>	
+   				<exclusion attribute="exportAllPrincipals"/>	
+   				<exclusion attribute="owner"/>	
+   			</exclude>
+   			<tab name="importuserrightswizard.tab1.settings" position="0">
+  					<section name="importuserrightswizard.tab1.section.settings">
+  					 	<listlayout>
+  					 	   <text name="importuserrightswizard.tab1.section.description" width="450"/> 
+  					 		<attribute name="importmedia">  					 		
+  					 		<uploadtomediaeditor/>
+  					 		</attribute>
+  					 	</listlayout>
+  					</section>
+  				</tab>
+   		</editor>
+   	</organizer>
+   </type>
+   
+   <type name="ExportUserRightsWizard" icon="images/icons/userrights_export.gif" mode="append">
+   	<organizer>
+   		<editor>
+   			<exclude>
+   				<exclusion attribute="fieldseperatorchar"/>
+   				<exclusion attribute="textseperatorchar"/>
+   				<exclusion attribute="dataseperatorchar"/>	
+   				<exclusion attribute="owner"/>			
+   				<exclusion attribute="importmedia"/>
+   			</exclude>
+  				<tab name="exportuserrightswizard.tab1.settings" position="0">
+  					<section name="exportuserrightswizard.tab1.section.settings">
+  					 	<listlayout>
+  					 		<text name="exportuserrightswizard.tab1.section.description" width="450"/> 					 		 
+  					 		<attribute name="exportAllPrincipals" labelwidth="280"/>  					 		
+  					 	</listlayout>
+  					</section>
+  				</tab>
+  				<tab name="exportuserrightswizard.tab2.end" position="1">
+  					<section name="exportuserrightswizard.tab2.section.end">
+  					 	<listlayout>
+  					 		<text name="exportuserrightswizard.tab2.section.description" width="450"/>
+  					 		<attribute name="exportmedia"/>  					 		
+  					 	</listlayout>
+  					</section>
+  				</tab>
+  				
+   		</editor>
+   	</organizer>
+   </type>
+
+   <type name="Script" mode="append">
+   	<organizer>
+   		<search mode="replace">
+   			<condition attribute="code" operator="contains"/>
+   			<condition attribute="scriptType"/>
+   			<condition attribute="description"/>
+   			<condition attribute="active" operator="yes"/>
+   			<condition attribute="version" />   	
+			<condition attribute="autodisabling"/>	
+		</search>
+   		<result defaultview="list">
+   			<listview mode="replace">
+   				<itemlayout>
+   					<attribute name="code" width="120"/>
+   					<attribute name="scriptType"  width="120"/>
+   					<attribute name="description" width="120"/>
+   					<attribute name="active" width="120"/>
+   					<attribute name="version" width="120"/>   
+					<attribute name="autodisabling" width="120"/>
+				</itemlayout>
+   			</listview>
+   			<editview mode="replace">
+   				<itemlayout>
+   					<attribute name="code" width="120"/>
+   					<attribute name="scriptType"  width="120"/>
+   					<attribute name="description" width="120"/>
+   					<attribute name="active" width="120"/>
+   					<attribute name="version" width="120"/>
+					<attribute name="autodisabling" width="120"/>
+   				</itemlayout>
+   			</editview>
+   			<treeview mode="replace">
+   				<itemlayout>
+   					<attribute name="code" width="120"/>
+   					<attribute name="scriptType"  width="120"/>
+   					<attribute name="description" width="120"/>
+   					<attribute name="active" width="120"/>
+   					<attribute name="version" width="120"/> 
+					<attribute name="autodisabling" width="120"/>
+  				</itemlayout>
+   			</treeview>
+   		</result>
+   		<editor mode="append">
+   			<essentials>
+   				<columnlayout>
+   					<row>
+   						<attribute name="code"/>
+   						<attribute name="scriptType"/>
+   					</row>
+   					<row>
+   						<attribute name="active" editable="false"/>
+   						<attribute name="version"  editable="false"/>
+   					</row>
+   				</columnlayout>
+   			</essentials>
+   			<tab name="Properties">
+   				<section name="Properties">
+   					<listlayout>
+   						<attribute name="description"/>
+   						<attribute name="content"><textareaeditor cols="120" rows="20" expanded="true"/></attribute>
+						<attribute name="checksum" editable="false"/>
+						<attribute name="autodisabling" />
+		                <attribute name="disabled" />
+   					</listlayout>
+   				</section>
+   			</tab>
+   		</editor>
+   	</organizer>
+   </type>
+
+   <type name="ScriptingJob" mode="append">
+   	<organizer>
+   		<search mode="replace">
+   			<condition attribute="code" operator="contains"/>
+   			<condition attribute="scriptURI"/>
+   		</search>
+   		<result defaultview="list">
+   			<listview mode="replace">
+   				<itemlayout>
+   					<attribute name="code" width="120"/>
+   					<attribute name="scriptURI" width="120"/>
+   				</itemlayout>
+   			</listview>
+   			<editview mode="replace">
+   				<itemlayout>
+   					<attribute name="code" width="120"/>
+   					<attribute name="scriptURI" width="120"/>
+   				</itemlayout>
+   			</editview>
+   			<treeview mode="replace">
+   				<itemlayout>
+   					<attribute name="code" width="120"/>
+   					<attribute name="scriptURI" width="120"/>
+   				</itemlayout>
+   			</treeview>
+   		</result>
+   		<editor mode="append">
+   			<essentials mode="replace">
+   				<listlayout>
+   					<attribute name="code" />
+   					<attribute name="springId" editable="false" />
+   				</listlayout>
+   			</essentials>
+   			<tab name="Properties">
+   				<section name="Properties">
+   					<listlayout>
+   						<attribute name="scriptURI" />
+   					</listlayout>
+   				</section>
+   			</tab>
+   		</editor>
+   	</organizer>
+   </type>
+
+   <type name="ScriptingTask" mode="append">
+   	<organizer>
+   		<search mode="replace">
+   			<condition attribute="scriptURI"/>
+   		</search>
+   		<result defaultview="list">
+   			<listview mode="replace">
+   				<itemlayout>
+   					<attribute name="scriptURI" width="120"/>
+   				</itemlayout>
+   			</listview>
+   			<editview mode="replace">
+   				<itemlayout>
+   					<attribute name="scriptURI" width="120"/>
+   				</itemlayout>
+   			</editview>
+   			<treeview mode="replace">
+   				<itemlayout>
+   					<attribute name="scriptURI" width="120"/>
+   				</itemlayout>
+   			</treeview>
+   		</result>
+   		<editor mode="append">
+   			<tab name="Properties">
+   				<section name="Properties">
+   					<columnlayout>
+   						<row>
+   							<attribute name="scriptURI" />
+   							<attribute name="runnerBean" editable="false"/>
+   						</row>
+   					</columnlayout>
+   				</section>
+   			</tab>
+   		</editor>
+   	</organizer>
+   </type>
+
+   <type name="DynamicProcessDefinition" mode="append">
+   	<organizer>
+   		<search mode="replace">
+   			<condition attribute="code" operator="contains"/>
+   			<condition attribute="active" operator="yes"/>
+   			<condition attribute="version" />
+   		</search>
+   		<result defaultview="list">
+   			<listview mode="replace">
+   				<itemlayout>
+   					<attribute name="code" width="120"/>
+   					<attribute name="active" width="120"/>
+   					<attribute name="version" width="120"/>
+   				</itemlayout>
+   			</listview>
+   			<editview mode="replace">
+   				<itemlayout>
+   					<attribute name="code" width="120"/>
+   					<attribute name="active" width="120"/>
+   					<attribute name="version" width="120"/>
+   				</itemlayout>
+   			</editview>
+   			<treeview mode="replace">
+   				<itemlayout>
+   					<attribute name="code" width="120"/>
+   					<attribute name="active" width="120"/>
+   					<attribute name="version" width="120"/>
+   				</itemlayout>
+   			</treeview>
+   		</result>
+   		<editor mode="append">
+   			<essentials>
+   				<columnlayout>
+   					<row>
+   						<attribute name="code" editable="false"/>
+   						<attribute name="active" editable="false"/>
+   					</row>
+   					<row>
+   						<attribute name="content" ><textareaeditor cols="120" rows="20" expanded="true" base64="true"/></attribute>
+   					</row>
+   					<row>
+   						<attribute name="checksum" editable="false"/>
+   						<attribute name="version" editable="false"/>
+   					</row>
+   				</columnlayout>
+   			</essentials>
+   		</editor>
+   	</organizer>
+   </type>
+
+</configuration>

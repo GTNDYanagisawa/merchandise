@@ -1,0 +1,52 @@
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$catalogversion=catalogversion(catalog(id[default='testCatalog1']),version[default='Staged'])[unique=true,default='testCatalog1:Staged']
+$supercategories=supercategories(code,catalogversion(catalog(id[default='testCatalog1']),version[default='Staged']))
+;;;;;;;;;;;;
+INSERT_UPDATE Language;isocode[unique=true];active;
+;de;true;
+;en;true;
+;;;;;;;;;;;;
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=de];name[lang=en];conversion;
+;test;testUnit1;testUnit1;testUnit1;1
+;;;;;;;;;;;;
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];
+;de;Deutsch;German;
+;en;Englisch;English;
+;;;;;;;;;;;;
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;€
+;;;;;;;;;;;;
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];supplier(uid);defaultCatalog;
+;testCatalog1;testCatalog1;testCatalog1;;true;
+;;;;;;;;;;;;
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];languages(isocode);inclAssurance;inclDuty;inclFreight;inclPacking;active;
+;testCatalog1;Online;de,en;true;true;true;false;true;
+;testCatalog1;Staged;de,en;true;true;true;false;false;
+;;;;;;;;;;;;;;;;;
+INSERT_UPDATE product;code[unique=true];$catalogversion;name[lang=de];name[lang=en];unit(code);$supercategories;description[lang=de];description[lang=en];approvalStatus(code);onlineDate;offlineDate;ean;manufacturerName;deliveryTime;
+;testProduct1;;testProduct1;testProduct1;testUnit1;testCategory1;;;approved;;;testProduct1;PNY Technologies;1;
+;testProduct2;;testProduct2;testProduct2;testUnit1;testCategory2;;;approved;;;testProduct2;PNY Technologies;1;
+;testProduct3;;testProduct3;testProduct3;testUnit1;testCategory1,testCategory2;;;approved;;;testProduct3;PNY Technologies;1;
+;;;;;;;;
+UPDATE product;code[unique=true];$prices
+;testProduct1;123.432 EUR
+;testProduct2;63.2 EUR
+;testProduct3;234 2EUR
+;;;;;;;;
+INSERT_UPDATE category;code[unique=true];$catalogversion;name[lang=de];name[lang=en];$supercategories;order
+;testCategory1;;testCategory1;testCategory1;;0
+;testCategory2;;testCategory2;testCategory2;testCategory1;0
+;;;;;;;;
+INSERT_UPDATE cart;code[unique=true];currency(isocode);calculated;net;user(uid);date[dateformat=dd/MM/yy HH:mm]
+"#% beforeEach: Date date = new Date();String format = ""dd/MM/yyyy HH:mm"";java.text.SimpleDateFormat df = new java.text.SimpleDateFormat(format); line.put(new Integer(6),df.format(date));";
+;anonymousCart;EUR;false;false;anonymous;27.10.2009 15:30
+#% beforeEach:end
+;;;;;;;;
+INSERT_UPDATE PaymentMode;code[unique=true];paymentInfoType(code);active
+#% beforeEach: line.put(Integer.valueOf(2),de.hybris.platform.core.Constants.TYPES.CreditCardPaymentInfo)
+;testPaymentMode1;;true
+#% beforeEach:end
+;;;;;;;;
+INSERT_UPDATE DeliveryMode;code[unique=true];active;net
+;testDeliveryMode1;true;false
+;;;;;;;;

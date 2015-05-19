@@ -1,0 +1,139 @@
+/*
+	Script           :  251
+	Author           :  RR
+	Description      :  Starts a fully automated page adaption. This copies the current document and adapts the copy to the specified size.
+	                    Afterwards it creates previews (image and PDF)
+*/
+
+#include "internal/types.h"
+#include "internal/products.h"
+#include "internal/text.h"
+#include "[soap]/actions/601.crpt"
+
+int kResultBufferLength = 2000;
+float kPointToMillimeter = 0.35277777;
+float kMillimeterToPoint = 2.83464566;
+
+int main ()
+{
+	int errorcode = 0;
+	int itemID1 = 0, itemID2 = 0, itemID3 = 0;
+	char *itemStringID = alloc(256);
+	int imageID = 0, classID = 0, forceDelete = 0, panelStatementID = 0, docID = 0, gridID = 0, gridElementID = 0, pageItemID = 0;
+	char *productNumber = alloc(256), *productName = alloc(256), *masterpage = alloc(256), *gridName = alloc(256), *gridElementName = alloc(256);
+	char *parameter = alloc(kResultBufferLength);
+	char *result = alloc(kResultBufferLength);
+	float width = 0.0;
+	float height = 0.0;
+	Query qu;
+
+	wlog("", "----------------------------------------  start page adaption for jobid %d \n", gJobID);
+	qu = sql::query( soap::connection() );
+	if( qu )
+	{
+		// build query
+		query::send(qu, "getSubProductList1 \n");
+		query::send(qu, "type = \"PageAdaptionProductList\" AND \n");
+		query::send(qu, "jobid = ?");
+		query::input(qu, kInt, gJobID);
+
+		query::output( qu, kInt, &itemID1 );					// ID1
+		query::output( qu, kInt, &itemID2 );					// ID2
+		query::output( qu, kInt, &itemID3 );					// ID3
+		query::output( qu, kInt, &imageID );					// image ID
+		query::output( qu, kInt, &classID );					// class ID
+		query::output( qu, kString, productNumber, 256 );		// Product number
+		query::output( qu, kString, productName, 256 );			// Product name
+		query::output( qu, kInt, &forceDelete );				// force delete
+		query::output( qu, kInt, &panelStatementID );			// panel statement ID der untergeordneten Baumabfrage
+		query::output( qu, kInt, &docID );						// doc ID
+		query::output( qu, kString, masterpage, 256 );			// masterpage
+		query::output( qu, kString, gridName, 256 );			// grid
+		query::output( qu, kString, gridElementName, 256 );		// grid element
+		query::output( qu, kInt, &gridID );						// grid ID
+		query::output( qu, kInt, &gridElementID );				// grid element ID
+		query::output( qu, kInt, &pageItemID );					// layoutTemplateID
+    	query::output( qu, kString, itemStringID, 256 );		// String ID
+
+
+		query::exec (qu);
+
+		while (query::fetch(qu))
+		{
+			if(DEBUG_ENABLED)  wlog("","Got item for adaption with ID1 [%d], ID2 [%d], ID3 [%d], stringID [%s] \n", itemID1, itemID2, itemID3, itemStringID);
+			CREATE_FILL_PAGES = 0;						// disable fill page creation
+
+			// build content
+			processItem( createProduct( itemID1, itemID2, itemID3, itemStringID, productNumber, productName, masterpage, pageItemID, gridID, gridName, gridElementID, gridElementName, 0 ) );
+
+			// query width and height for adaption (requires new custom placeholders)
+			sprintf( parameter, "jobid = %d\nitemstringid = '%s'", gJobID, itemStringID );
+			doCallRequest (result, "GET_adaptionHeight", parameter);
+			height = fval(result);
+			doCallRequest (result, "GET_adaptionWidth", parameter);
+			width = fval(result);
+			if(DEBUG_ENABLED)  wlog("","Got height [%f]mm and width [%f]mm for adaption\n", height, width);
+			height = height * kMillimeterToPoint;
+			width = width * kMillimeterToPoint;
+			if(DEBUG_ENABLED)  wlog("","Translated dimensions to height [%f]pt and width [%f]pt for adaption\n", height, width);
+
+			if(DEBUG_ENABLED)  wlog("","Starting page adaption \n" );
+			// adapt document
+			// adaptDocument( sourceDocumentPath, resultDocumentPath, resultDocumentFilename, width, height );
+			errorcode = document::adapt_self( width, height );
+			if( errorcode != 0 )
+			{
+				wlog("","Error while adapting document. Errorcode [%d], message [%s] \n", errorcode, serror(errorcode) );
+			}
+			if(DEBUG_ENABLED)  wlog("","Finished page adaption \n" );
+
+			// TODO: prevent preview creation for possible blank fill pages (e.g. with a global variable?!)
+			// Workaround for the problem that there might be created empty (filling) pages too: select last page
+
+			// TODO: use page string id (should be PK!) instead of document name (stored in productName) later - after fixing 503.crpt
+			createPreviews( productName, 1, document::pages(gDocument), 1 );
+
+			CREATE_FILL_PAGES = 1;						// enable fill page creation again
+		}
+	}
+
+	// cleanup
+	release( itemStringID );
+	release( productNumber );
+	release( productName );
+	release( masterpage );
+	release( gridName );
+	release( gridElementName );
+	release( parameter );
+	release( result );
+	query::close(qu);
+
+	wlog("", "----------------------------------------  page adaption for jobid %d done \n", gJobID);
+
+	return 0;
+}
+
+
+/*********************************************************************
+ Does a 'call' SOAP request of the specified type and with the specified parameters.
+ The result is stored in the result string
+ result		- The string that contains the result
+ method		- The type/name of the 'call' request
+ parameter	- The parameters for the request
+*********************************************************************/
+int doCallRequest( char * result, char * method, char * parameter )
+{
+	Query qu = sql::query (soap::connection());
+	int state = 0;
+
+	query::set_method (qu, method);
+	query::send (qu, parameter);
+
+	query::output (qu, kString, result, kResultBufferLength);
+
+	query::exec (qu);
+	state = query::fetch (qu);
+	query::close (qu);
+
+	return state;
+}

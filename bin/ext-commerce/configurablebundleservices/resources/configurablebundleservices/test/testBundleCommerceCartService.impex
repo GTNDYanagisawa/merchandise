@@ -1,0 +1,122 @@
+$catalog-id=testCatalog
+$catalog-version=Online
+$catalog-version-staged=Staged
+
+$catalogversion=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+$catalogversion-staged=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version-staged])[unique=true,default=$catalog-id:$catalog-version-staged]
+$ruleType=ruleType(code)[default='ANY']
+
+INSERT_UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];$catalogversion;parentTemplate(id);
+;SmartPhonePackage;;;;
+;SmartPhoneDeviceSelection;;;SmartPhonePackage;
+;SmartPhonePlanSelection;;;SmartPhonePackage;
+;SmartPhoneAddonSelection;;;SmartPhonePackage;
+;IPhonePackage;;;;
+;IPhoneDeviceSelection;;;IPhonePackage;
+;IPhonePlanSelection;;;IPhonePackage;
+;IPhoneAddonSelection;;;IPhonePackage;
+;SmartPhoneValuePackSelection1;;;SmartPhonePackage;
+;SmartPhoneValuePackSelection2;;;SmartPhonePackage;
+;IphoneValuePackSelection1;;;IPhonePackage;
+;PayAsYouGoPackage;;;;
+;PayAsYouGoDeviceSelection;;;PayAsYouGoPackage;
+;PayAsYouGoPlanSelection;;;PayAsYouGoPackage;
+;PayAsYouGoActivationFee;;;PayAsYouGoPackage;
+;PayAsYouGoAddOnSelection;;;PayAsYouGoPackage;
+;PayAsYouGoInternetSelection;;;PayAsYouGoPackage;
+
+INSERT_UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];$catalogversion-staged;parentTemplate(id);
+;SyncPackage;;;;
+;SyncDeviceSelection;;;SyncPackage;
+;SyncPlanSelection;;;SyncPackage;
+;SyncActivationFee;;;SyncPackage;
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];products(code, $catalogversion);$catalogversion
+;SmartPhoneDeviceSelection;;GALAXY_NEXUS,GALAXY_S2,MOTOROLA_RAZR,HTC_INCREDIBLE_S,NO_STOCK_PRODUCT;
+;SmartPhonePlanSelection;;PLAN_STANDARD_1Y,PLAN_STANDARD_2Y,PLAN_STANDARD_3Y,ACTIVATION_FEE,Y_STARTER_100_1Y,Y_STARTER_200_2Y,Y_STARTER_100_2Y;
+;IPhoneDeviceSelection;;APPLE_IPHONE_4S_16GB,APPLE_IPHONE_4S_32GB,NO_STOCK_PRODUCT;
+;IPhonePlanSelection;;PLAN_STANDARD_1Y,PLAN_ADVANCED_1Y,PLAN_STANDARD_3Y,PLAN_ADVANCED_2Y,PLAN_ADVANCED_3Y,ACTIVATION_FEE,Y_STARTER_100_1Y,Y_STARTER_200_2Y,Y_STARTER_100_2Y;
+;SmartPhoneValuePackSelection2;;Y_STARTER_300_2Y
+;IPhoneAddonSelection;;Y_STARTER_100_2Y
+;PayAsYouGoDeviceSelection;;MOTOROLA_RAZR,HTC_INCREDIBLE_S,3417125
+;PayAsYouGoPlanSelection;;Y_STARTER_300_2Y,Y_STARTER_200_1Y
+;PayAsYouGoActivationFee;;ACTIVATION_FEE,SERVICE_FEE_MONTHLY
+;PayAsYouGoAddOnSelection;;MOTOROLA_RAZR,HTC_INCREDIBLE_S,3417130
+;PayAsYouGoInternetSelection;;3417130
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];products(code, $catalogversion-staged);$catalogversion-staged
+;SyncDeviceSelection;;SYNC_PRODUCT
+;SyncPlanSelection;;SYNC_PLAN
+;SyncActivationFee;;SYNC_FEE
+
+INSERT_UPDATE ChangeProductPriceBundleRule;$catalogversion;id[unique=true,forceWrite=true,allownull=true];currency(isocode)[default=USD, unique=true];bundleTemplate(id, version, $catalogversion)[unique=true];ruleType(code)[default=ANY];conditionalProducts(code, $catalogversion);targetProducts(code, $catalogversion);price
+;;price_NON_IPHONE_with_PLAN_STANDARD_1Y;;SmartPhoneDeviceSelection:1.0;ALL;PLAN_STANDARD_1Y;GALAXY_NEXUS,GALAXY_S2;300
+;;price_NON_IPHONE_with_PLAN_STANDARD_2Y;;SmartPhoneDeviceSelection:1.0;ALL;PLAN_STANDARD_2Y;GALAXY_NEXUS,GALAXY_S2;200
+;;price_NON_IPHONE_with_PLAN_STANDARD_3Y;;SmartPhoneDeviceSelection:1.0;ALL;PLAN_STANDARD_3Y;GALAXY_NEXUS,GALAXY_S2;100
+;;price_NON_IPHONE_with_PLAN_STANDARD_3Y_ACTIVATION_FEE;;SmartPhoneDeviceSelection:1.0;ALL;PLAN_STANDARD_3Y,ACTIVATION_FEE;GALAXY_NEXUS,GALAXY_S2;50
+;;price_NON_IPHONE_with_NO_CONDITIONS;;SmartPhoneDeviceSelection:1.0;ALL;;GALAXY_NEXUS,GALAXY_S2;650
+;;price_NON_IPHONE_with_ACTIVATION_FEE;;SmartPhonePlanSelection:1.0;ALL;ACTIVATION_FEE;PLAN_STANDARD_3Y;30
+;;price_NON_IPHONE_with_FANCY_GALAXY_S2;;SmartPhonePlanSelection:1.0;ALL;GALAXY_S2;PLAN_STANDARD_3Y;9
+;;price_IPHONE_with_PLAN_STANDARD_3Y;;IPhoneDeviceSelection:1.0;ANY;PLAN_STANDARD_3Y;APPLE_IPHONE_4S_16GB,APPLE_IPHONE_4S_32GB;275
+;;price_IPHONE_with_PLAN_STANDARD_3Y_ACTIVATION_FEE;;IPhoneDeviceSelection:1.0;ANY;PLAN_STANDARD_3Y,ACTIVATION_FEE;APPLE_IPHONE_4S_16GB,APPLE_IPHONE_4S_32GB;175
+# add a second price entry (currency EUR) for rule price_NON_IPHONE_with_PLAN_STANDARD_1Y
+;;price_NON_IPHONE_with_PLAN_STANDARD_1Y;EUR;SmartPhoneDeviceSelection:1.0;ALL;PLAN_STANDARD_1Y;GALAXY_NEXUS,GALAXY_S2;250
+
+INSERT_UPDATE ChangeProductPriceBundleRule;$catalogversion-staged;id[unique=true,forceWrite=true,allownull=true];currency(isocode)[default=USD, unique=true];bundleTemplate(id, version, $catalogversion-staged)[unique=true];ruleType(code)[default=ANY];conditionalProducts(code, $catalogversion-staged);targetProducts(code, $catalogversion-staged);price
+;;price_SYNC_PRODUCT_with_SYNC_PLAN;;SyncDeviceSelection:1.0;ALL;SYNC_PLAN;SYNC_PRODUCT;59
+;;price_SYNC_PRODUCT_with_SYNC_PLAN_AND_SYNC_FEE;;SyncDeviceSelection:1.0;ANY;SYNC_PLAN,SYNC_FEE;SYNC_PRODUCT;59
+
+INSERT_UPDATE AutoPickBundleSelectionCriteria;id[unique=true];$catalogversion
+;PayAsYouGo_ActivationFee_AutoPickBundleSelection
+
+INSERT_UPDATE AutoPickBundleSelectionCriteria;id[unique=true];$catalogversion-staged
+;SYNC_ActivationFee_AutoPickBundleSelection
+
+INSERT_UPDATE PickNToMBundleSelectionCriteria;id[unique=true];n;m;$catalogversion
+;PayAsYouGo_DeviceSelection_Pick1To2;1;2
+
+INSERT_UPDATE PickNToMBundleSelectionCriteria;id[unique=true];n;m;$catalogversion-staged
+;SYNC_DeviceSelection_Pick1To2;1;2
+
+INSERT_UPDATE PickExactlyNBundleSelectionCriteria;id[unique=true];n;$catalogversion
+;PayAsYouGo_PlanSelection_PickExactly1;1
+
+INSERT_UPDATE PickExactlyNBundleSelectionCriteria;id[unique=true];n;$catalogversion-staged
+;SYNC_PlanSelection_PickExactly1;1
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0];bundleSelectionCriteria(id, $catalogversion);$catalogversion
+;PayAsYouGoActivationFee;;PayAsYouGo_ActivationFee_AutoPickBundleSelection
+;PayAsYouGoDeviceSelection;;PayAsYouGo_DeviceSelection_Pick1To2
+;PayAsYouGoPlanSelection;;PayAsYouGo_PlanSelection_PickExactly1
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0];bundleSelectionCriteria(id, $catalogversion-staged);$catalogversion-staged
+;SyncActivationFee;;SYNC_ActivationFee_AutoPickBundleSelection
+;SyncDeviceSelection;;SYNC_DeviceSelection_Pick1To2
+;SyncPlanSelection;;SYNC_PlanSelection_PickExactly1
+
+# Bundle dependencies
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];requiredBundleTemplates(id,version[default=1.0]);$catalogversion
+;PayAsYouGoAddOnSelection;;PayAsYouGoPlanSelection,PayAsYouGoActivationFee
+;PayAsYouGoInternetSelection;;PayAsYouGoPlanSelection,PayAsYouGoAddOnSelection
+
+INSERT_UPDATE DisableProductBundleRule;id[unique=true];$catalogversion;bundleTemplate(id,version[default=1.0],$catalogversion);conditionalProducts(code,$catalogversion);targetProducts(code,$catalogversion);$ruleType
+;PayAsYouGo_DisableMotorolaWhenHtc;;PayAsYouGoAddOnSelection;HTC_INCREDIBLE_S;MOTOROLA_RAZR
+;PayAsYouGo_DisableHtcWhenMotorola;;PayAsYouGoAddOnSelection;MOTOROLA_RAZR;HTC_INCREDIBLE_S
+;PayAsYouGo_DisableMotorolaWithCheapPlan;;PayAsYouGoAddOnSelection;Y_STARTER_200_1Y;MOTOROLA_RAZR
+;PayAsYouGo_DisableHtcWith3417130AndCheapPlan;;PayAsYouGoAddOnSelection;Y_STARTER_200_1Y,3417130;HTC_INCREDIBLE_S;ALL
+
+INSERT_UPDATE SubscriptionProduct;code[unique=true];$catalogversion;soldIndividually[default=true]
+;Y_STARTER_100_1Y
+;Y_STARTER_100_2Y
+;Y_STARTER_200_1Y
+;Y_STARTER_200_2Y
+;Y_STARTER_300_1Y
+;Y_STARTER_300_2Y
+;PLAN_STANDARD_1Y
+;PLAN_STANDARD_2Y
+;PLAN_STANDARD_3Y
+;PLAN_ADVANCED_1Y
+;PLAN_ADVANCED_2Y
+;PLAN_ADVANCED_3Y
+;ACTIVATION_FEE
+;SERVICE_FEE_MONTHLY

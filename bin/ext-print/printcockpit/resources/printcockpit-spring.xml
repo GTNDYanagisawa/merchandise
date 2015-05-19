@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+           http://www.springframework.org/schema/util 
+		   http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+	<alias alias="printPageLabelProvider" name="defaultPrintPageLabelProvider" />
+	<bean id="defaultPrintPageLabelProvider" class="de.hybris.platform.printcockpit.services.label.impl.PageLabelProvider" scope="tenant">
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias alias="printPlacementLabelProvider" name="defaultPrintPlacementLabelProvider" />
+	<bean id="defaultPrintPlacementLabelProvider" class="de.hybris.platform.printcockpit.services.label.impl.PlacementLabelProvider" scope="tenant" />
+
+	<alias alias="layoutService" name="defaultLayoutService" />
+	<bean id="defaultLayoutService" class="de.hybris.platform.printcockpit.model.layout.impl.LayoutServiceImpl" scope="tenant">
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<alias name="defaultPagePlannerRegistry" alias="pagePlannerRegistry"/>
+	<bean id="defaultPagePlannerRegistry" class ="de.hybris.platform.printcockpit.pagemanagment.impl.DefaultPagePlannerRegistry" scope="tenant">
+		<property name="pagePlanners">
+			<map>
+				<entry>
+					<key>
+						<util:constant static-field="de.hybris.platform.print.enums.GridMode.FIXED"/>
+					</key>
+					<ref bean="fixedPagePlanner"/>	
+				</entry>
+				<entry>
+					<key>
+						<util:constant static-field="de.hybris.platform.print.enums.GridMode.DYNAMIC"/>
+					</key>
+					<ref bean="dynamicPagePlanner"/>
+				</entry>  
+			</map>	
+		</property>
+	</bean>
+	
+	<alias name="defaultFixedPagePlanner" alias="fixedPagePlanner"/>
+	<bean id="defaultFixedPagePlanner" class="de.hybris.platform.printcockpit.pagemanagment.impl.DefaultFixedModePagePlanner" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<alias name="defaultDynamicPagePlanner" alias="dynamicPagePlanner"/>
+	<bean id="defaultDynamicPagePlanner" class="de.hybris.platform.printcockpit.pagemanagment.impl.DefaultDynamicModePagePlanner" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<bean id="pageLoadInterceptor" class="de.hybris.platform.printcockpit.servicelayer.interceptor.impl.PageLoadInterceptor" scope="tenant"/>
+	
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" scope="tenant">
+		<property name="interceptor" ref="pageLoadInterceptor"/>
+		<property name="typeCode" value="Page"/>
+	</bean>
+	
+	<alias name="defaultPagePlanningValidator" alias="pagePlanningValidator"/>
+	<bean id="defaultPagePlanningValidator" class="de.hybris.platform.printcockpit.servicelayer.interceptor.impl.PagePlanningValidator" scope="tenant">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" scope="tenant">
+		<property name="interceptor" ref="pagePlanningValidator"/>
+		<property name="typeCode" value="Page"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" scope="tenant">
+		<property name="interceptor" ref="pagePlanningValidator"/>
+		<property name="typeCode" value="Placement"/>
+	</bean>
+	
+	<bean id="publicationServicelayerInterceptor" class="de.hybris.platform.printcockpit.servicelayer.interceptor.impl.PublicationInterceptor" scope="tenant"/>
+	
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" scope="tenant">
+		<property name="interceptor" ref="publicationServicelayerInterceptor"/>
+		<property name="typeCode" value="Publication"/>
+	</bean>
+	
+</beans>

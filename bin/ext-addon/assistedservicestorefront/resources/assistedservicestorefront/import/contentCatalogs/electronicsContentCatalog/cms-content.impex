@@ -1,0 +1,11 @@
+$contentCatalog=electronicsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$jarResourceCms=jar:de.hybris.platform.assistedservicestorefront.constants.AssistedservicestorefrontConstants&/assistedservicestorefront/import/cockpit/cmscockpit
+
+# CMS Assisted Service Components
+INSERT_UPDATE AssistedServiceComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;AssistedServiceComponent;Assisted Service Component;AssistedServiceComponent
+ 
+# Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;TopHeaderSlot;true;AssistedServiceComponent

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2014 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+	<type name="AbstractOrder" mode="append">
+		<organizer>
+			<editor>
+				<tab name="tab.abstractorder.promotions" mode="append"/>
+				<tab name="payment_and_delivery">
+					<section name="payment" mode="replace"/>
+					<section name="deliveryadministration" mode="replace">
+						<listlayout>
+							<attribute name="deliveryAddress">
+								<referenceeditor autoperform="true">
+									<preset targetattribute="owner" sourceattribute="user"/>
+									<restriction attribute="owner" sourceattribute="user"/>
+								</referenceeditor>
+							</attribute>
+							<attribute name="deliveryMode"/>
+							<attribute name="deliveryStatus"/>
+						</listlayout>
+						<table>
+							<tr>
+								<td width="16px">
+								</td>
+								<td>
+									<action type="item"
+									        classname="de.hybris.platform.hmc.util.action.OrderTotalsCalculationAction"
+									        name="action.ordertotalscalculation" toolbaricon="order_totals"
+									        icon="images/icons/order_totals_main.gif" autosave="true"
+									        showtoolbarlabel="true" hidebutton="true"/>
+								</td>
+							</tr>
+						</table>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+</configuration>

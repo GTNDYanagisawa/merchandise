@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?variable-resolver class="org.zkoss.zkplus.spring.DelegatingVariableResolver" ?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:h="http://www.w3.org/1999/xhtml" 
+		xmlns:zk="http://www.zkoss.org/2005/zk"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd ">
+				
+		<zscript>
+			Object[] typeNameAsArray = new Object[] {wizardBean.getSelectedTypeName()};
+		</zscript>
+		
+		<div style="text-align: left;">
+			<div sclass="wizardPageDescription">
+				<label value="${c:l2('btgcockpit.wizard.segmentRestrictionAction.inverseHandling.description', typeNameAsArray)}"/>
+			</div>
+			<div style="margin: 30px; margin-top: 20px; font-size: 10px;" >
+				<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.componentInverseHandling.decisionLabel')}"/>
+				<div style="margin: 15px;">
+					<radiogroup orient="vertical">
+						<hbox>
+							<radio onCheck='wizardBean.setRestrictionInverted(false);'
+									checked="${!wizardBean.restrictionInverted}" />
+							<label value="${c:l2('btgcockpit.wizard.segmentRestrictionAction.componentInverseHandling.decisionSee', typeNameAsArray)}"/>
+						</hbox>
+						<div height="10px;"/>
+						<hbox>
+							<radio onCheck='wizardBean.setRestrictionInverted(true);'
+									checked="${wizardBean.restrictionInverted}"/>
+							<div>
+								<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.componentInverseHandling.decisionHide1')} "/>
+								<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.inverseHandling.notfulfilled.bold')}" style="font-weight: bold;"/>
+								<label value="${c:l2('btgcockpit.wizard.segmentRestrictionAction.componentInverseHandling.decisionHide2', typeNameAsArray)}"/>
+							</div>
+						</hbox>
+					</radiogroup>
+				</div>
+				
+<!--				<div visible="${wizardBean.defaultPageSelected}">-->
+<!--					<div id="otherUserHandlingCnt" action="onShow: anima.appear(#{self}); onHide: anima.fade(#{self});" -->
+<!--							style="padding-top:20px; margin-top:20px; border-top: 1px solid #ccc;" -->
+<!--							visible="${!wizardBean.restrictionInverted}">-->
+<!--						<div>-->
+<!--							<hbox>-->
+<!--								<checkbox onCheck='wizardBean.setExtInverseHandling(self.isChecked());'-->
+<!--											checked='${wizardBean.extInverseHandling}'/>-->
+<!--								<div>-->
+<!--									<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.inverseHandling.otherItem.first')} "/>-->
+<!--									<label value="${c:l('btgcockpit.wizard.segmentRestrictionAction.inverseHandling.notfulfilled.bold')}" style="font-weight: bold;"/>-->
+<!--									<label value="${c:l2('btgcockpit.wizard.segmentRestrictionAction.pageInverseHandling.otherItem.second', typeNameAsArray)}"/>-->
+<!--								</div>-->
+<!--							</hbox>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--				</div>-->
+			</div>
+			
+		</div>
+</zk>

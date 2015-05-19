@@ -1,0 +1,16 @@
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=testCatalog1:Winter]
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en]
+;testCatalog1;testCatalog1;testCatalog1
+;testCatalog2;testCatalog2;testCatalog2
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode)
+;testCatalog1;Winter;true;EUR;de,en
+;testCatalog1;Summer;true;EUR;de,en;
+;testCatalog2;Winter;true;EUR;de,en
+;testCatalog2;Summer;true;EUR;de,en;;;;;
+INSERT_UPDATE Category;code[unique=true];$catalogversion;name[lang=de];name[lang=en];supercategories;;
+;testCategory0;;testCategory0;testCategory0;
+INSERT_UPDATE Product;code[unique=true];$catalogversion;name[lang=de];name[lang=en];unit(code);$prices;approvalStatus(code);owner(Principal.uid);startLineNumber;supercategories
+;testProduct0;;testProduct0-de;testProduct0-en;pieces;3,95 EUR;approved;admin;0;
+;testProduct1;;testProduct1-de;testProduct1-en;pieces;7,95 EUR, 12,99 USD;approved;admin;0;
+;testProduct2;;Deutche Name;English name;pieces;1,92 EUR, 3,99 USD;approved;admin;0;

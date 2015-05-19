@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+		   http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Public services -->
+
+	<bean id="textService"
+		class="de.hybris.platform.mobileservices.text.impl.DefaultTextService"
+		scope="tenant">
+		<property name="modelService" ref="modelService" />
+		<property name="messageScheduler" ref="messageScheduler" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<bean id="messageHelper"
+		class='de.hybris.platform.mobileservices.text.util.MessageHelper'
+		scope='tenant'>
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<bean id="actionHelper"
+		class='de.hybris.platform.mobileservices.text.impl.ActionHelperImplementation'
+		scope='tenant'>
+		<property name="deeplinkUrlService" ref="deeplinkUrlService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="velocityTemplateHelper" ref="velocityTemplateHelper" />
+		<property name="i18nService" ref="i18nService" />
+		<property name="phoneNumberService" ref="phoneNumberService" />
+	</bean>
+
+	<bean id="velocityTemplateHelper"
+		class="de.hybris.platform.mobileservices.text.util.VelocityTemplateHelper"
+		scope="tenant">
+	</bean>
+
+
+	<!-- Send SMS Filters -->
+	<!-- Logging filter -->
+	<bean id="loggingFilter"
+		class="de.hybris.platform.mobileservices.text.impl.SimpleLoggingMessageFilter"
+		scope="tenant" />
+
+	<!-- deprecated service configuration -->
+	<bean id="smsService"
+		class="de.hybris.platform.mobileservices.facade.impl.DefaultSendSMSService"
+		parent="abstractBusinessService" 
+		scope="tenant">
+		<property name="textService" ref="textService" />
+		<property name="messageHelper" ref="messageHelper" />
+	</bean>
+
+	<!-- Phone number list stuff -->
+
+	<bean id="phoneListService"
+		class="de.hybris.platform.mobileservices.text.lists.impl.DefaultPhoneListService"
+		scope="tenant">
+		<property name="modelService" ref="modelService" />
+		<property name="phoneNumberService" ref="phoneNumberService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+
+	<!-- Phone number stuff -->
+	
+	<bean id="phoneNumberService" 
+		class="de.hybris.platform.mobileservices.text.phonenumber.impl.DefaultPhoneNumberService"
+		scope="tenant">
+		<property name="i18nService" ref="i18nService"/>		
+		<property name="modelService" ref="modelService"/>		
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>		
+	</bean>
+		
+	<bean id="phoneNumberValidator"
+		class="de.hybris.platform.mobileservices.jalo.text.PhoneNumberValidator"
+		scope="tenant">
+		<property name="phoneNumberService" ref="phoneNumberService" />
+	</bean>
+	
+	<bean id="phoneNumberInterceptorMapping" scope="tenant"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="phoneNumberValidator" />
+		<property name="typeCode" value="PhoneNumber" />
+	</bean>
+
+
+	<!--  barcode stuff -->
+
+	<bean id="thumbnailGenerator"
+		class="de.hybris.platform.mobileservices.util.DefaultThumbnailGenerator"
+		scope="tenant">
+	</bean>
+
+	<bean id="code2dService"
+		class="de.hybris.platform.mobileservices.facade.impl.DefaultCode2DService"
+		parent="abstractBusinessService" scope="tenant">
+		<property name="thumbnailGenerator" ref="thumbnailGenerator" />
+	</bean>
+
+	<bean id="barcodeMediaService"
+		class="de.hybris.platform.mobileservices.facade.impl.DefaultBarcodeMediaService"
+		scope="tenant">
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<bean id="detectionService"
+		class="de.hybris.platform.mobileservices.facade.impl.DefaultDetectionService">
+		<property name="deviceResolver">
+			<bean class="org.springframework.mobile.device.LiteDeviceResolver"/>
+		</property>
+	</bean>
+
+	<bean id="mobileSendMessagePerformable" class="de.hybris.platform.mobileservices.text.job.MobileSendMessagePerformable" scope="tenant">
+		<property name="i18nService" ref="i18nService" />
+		<property name="textService" ref="textService" />
+		<property name="actionHelper" ref="actionHelper" />
+	</bean>
+
+	<!-- Jalo spring stuff -->
+	
+	<bean id="mobileservices.manager" class="de.hybris.platform.mobileservices.jalo.MobileManager" scope="tenant">
+		<property name="phoneNumberService" ref="phoneNumberService"/>
+		<property name="smsEngineRegistry" ref="smsEngineRegistry"/>
+	</bean>
+
+</beans>

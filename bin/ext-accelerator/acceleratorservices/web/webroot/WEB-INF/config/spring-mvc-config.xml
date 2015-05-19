@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+	<!--
+		Section for Traditional Spring MVC.
+		Annotation driven controllers, and a list of packages to scan. Can be extended by adding (or removing) packages.
+	-->
+
+	<!-- activates annotation driven binding -->
+	<mvc:annotation-driven ignoreDefaultModelOnRedirect="true" validator="validator"/>
+
+	<!-- Scan for annotation configured controller -->
+	<context:component-scan base-package="de.hybris.platform.acceleratorservices.web" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver"  />
+
+	<!-- register "global" interceptor beans to apply to all registered HandlerMappings -->
+	<mvc:interceptors>
+		<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+			<property name="paramName" value="locale" />
+		</bean>
+	</mvc:interceptors>
+
+	<mvc:resources mapping="/_ui/**" location="/_ui/" />
+	
+	<!-- store preferred language configuration in a cookie -->
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+		<property name="cookieName" value="locale"/>
+	</bean>
+	
+	<!-- Tell Spring MVC how to find its jsp files -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="prefix" value="/WEB-INF/views/"/>
+		<property name="suffix" value=".jsp"/>
+		<property name="redirectHttp10Compatible" value="false"/>
+	</bean>
+
+	<!-- Localization -->
+	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+		<property name="validationMessageSource" ref="messageSource"/>
+	</bean>
+
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>/WEB-INF/messages/hop-mock</value>
+			</list>
+		</property>
+		<property name="useCodeAsDefaultMessage" value="true"/>
+		<property name="defaultEncoding" value="UTF-8"/>
+		<!-- The number of seconds to cache loaded properties files. Set to -1 (never) for production. -->
+		<property name="cacheSeconds" value="0"/>
+		<property name="fallbackToSystemLocale" value="false"/>
+	</bean>
+
+
+
+
+</beans>

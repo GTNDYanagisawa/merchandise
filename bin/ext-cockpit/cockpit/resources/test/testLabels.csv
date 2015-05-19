@@ -1,0 +1,46 @@
+$catalog-id=testCatalog
+$catalog-version=Online
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;
+;de;true;;;;;;
+;en;true;;;;;;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;E
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=de];name[lang=en];active;
+;DE;Deutschland;Germany;true;
+;US;Vereinigte Staaten von Amerika;United States of America;true;
+
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid);
+;customergroup;;
+
+INSERT_UPDATE CockpitUIConfigurationMedia;code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];
+;base_principal;text/xml;TestBasePrincipal.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBasePrincipal.xml;
+
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password;profilePicture(code)
+;ahertz;K2006-C0005;Anja Hertz;Super Anja;en;USD;customergroup;1234;base_principal
+;abrode;K2006-C0006;Arin Brode;Super Arin;en;USD;customergroup;1234;
+
+INSERT_UPDATE Address;owner(Customer.uid)[unique=true];streetname[unique=true];streetnumber[unique=true];postalcode[unique=true];duplicate[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;gender(code);middlename;phone1;title(code);url;company;fax;department
+;ahertz;Zennerstrasse;45;28277;false;Bremen;DE;false;false;false;true;Anja;Hertz;ahertz@na-du.de;FEMALE;;;;;hybris GmbH
+;ahertz;Schiller Allee;8;28277;false;Bremen;DE;true;true;true;false;Anja;Hertz;ahertz@na-du.de;FEMALE;;;;;hybris GmbH
+;ahertz;Stietzbaumplatz;2;81371;false;München;DE;false;false;false;false;Anja;Hertz;;FEMALE;;;;;hybris GmbH
+;abrode;Feldweg;7;18551;false;Sagard;DE;true;false;true;true;Arin;Brode;arin@wow-europe.com;MALE;;;;;hybris GmbH
+
+INSERT_UPDATE Customer;uid[unique=true];defaultPaymentaddress(owner(Customer.uid), streetname, streetnumber, postalcode,duplicate);defaultShipmentAddress(owner(Customer.uid), streetname, streetnumber, postalcode, duplicate)
+;ahertz;ahertz:Schiller Allee:8:28277:false;ahertz:Stietzbaumplatz:2:81371:false
+;abrode;abrode:Feldweg:7:18551:false;abrode:Feldweg:7:18551:false
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog
+;$catalog-id;$catalog-id;$catalog-id;true
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode)
+;$catalog-id;$catalog-version;true;EUR;de,en
+
+INSERT_UPDATE CockpitUIConfigurationMedia;code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];
+;base_principal;text/xml;TestBasePrincipal.xml;jar:de.hybris.platform.cockpit.jalo.CockpitManager&/test/TestBasePrincipal.xml;
+
+INSERT_UPDATE CockpitUIComponentConfiguration;code[unique=true];objectTemplateCode[unique=true];principal(uid)[unique=true];media(code);factoryBean;
+;base;Customer;;base_principal;baseConfigurationFactory;

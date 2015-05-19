@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Ordering three line items for delivery on the same day (a few days
+    after the order date).
+-->
+<!DOCTYPE cXML SYSTEM "http://xml.cXML.org/schemas/cXML/1.2.024/cXML.dtd">
+<cXML payloadID="32232995@ariba.acme.com"
+      timestamp="2000-10-12T18:39:09-08:00" xml:lang="en-US">
+    <Header>
+        <From>
+            <!-- The buying marketplace and member organization. -->
+            <Credential domain="AribaNetworkUserId" type="marketplace">
+                <Identity>bigadmin@marketplace.org</Identity>
+            </Credential>
+            <Credential domain="AribaNetworkUserId">
+                <Identity>sysadmin@ariba.com</Identity>
+            </Credential>
+        </From>
+        <To>
+            <Credential domain="DUNS">
+                <Identity>942888711</Identity>
+            </Credential>
+        </To>
+        <Sender>
+            <!-- This document has passed through Ariba CSN to the
+                 supplier. -->
+            <Credential domain="AribaNetworkUserId">
+                <Identity>sysadmin@ariba.com</Identity>
+                <SharedSecret>VerySecret1234</SharedSecret>
+            </Credential>
+            <UserAgent>Ariba CSN 33</UserAgent>
+        </Sender>
+    </Header>
+    <Request deploymentMode="test">
+        <OrderRequest>
+             <OrderRequestHeader orderID="DO1234" orderDate="2000-10-12T18:41:29-08:00"
+                                 type="new">
+                 <Total>
+                     <Money currency="USD">187.60</Money>
+                 </Total>
+                 <ShipTo>
+                     <Address>
+                         <Name xml:lang="en">Acme</Name>
+                         <PostalAddress name="default">
+                             <DeliverTo>Joe Smith</DeliverTo>
+                             <DeliverTo>Mailstop M-543</DeliverTo>
+                             <Street>123 Anystreet</Street>
+                             <City>Sunnyvale</City>
+                             <State>CA</State>
+                             <PostalCode>90489</PostalCode>
+                             <Country isoCountryCode="US">United States
+                             </Country>
+                         </PostalAddress>
+                     </Address>
+                 </ShipTo>
+                 <BillTo>
+                     <Address>
+                         <Name xml:lang="en">Acme</Name>
+                         <PostalAddress name="default">
+                             <Street>123 Anystreet</Street>
+                             <City>Sunnyvale</City>
+                             <State>CA</State>
+                             <PostalCode>90489</PostalCode>
+                             <Country isoCountryCode="US">United States
+                             </Country>
+                         </PostalAddress>
+                     </Address>
+                 </BillTo>
+                 <Payment>
+                     <PCard number="1234567890123456"
+                            expiration="2001-03-12"/>
+                 </Payment>
+                 <Comments xml:lang="en-US">Anything well formed in XML.
+                 </Comments>
+             </OrderRequestHeader>
+             <ItemOut quantity="10" requestedDeliveryDate="2000-10-18"
+                      lineNumber="1">
+                 <ItemID>
+                     <SupplierPartID>HW1210-3422</SupplierPartID>
+                 </ItemID>
+                 <ItemDetail>
+                    <UnitPrice>
+                        <Money currency="USD">1.34</Money>
+                    </UnitPrice>
+                    <Description xml:lang="en">hello from item 1
+                    </Description>
+                    <UnitOfMeasure>EA</UnitOfMeasure>
+                    <Classification domain="SPSC">12345</Classification>
+                    <ManufacturerPartID>234</ManufacturerPartID>
+                    <ManufacturerName>foobar</ManufacturerName>
+                    <URL>www.foo.com</URL>
+                 </ItemDetail>
+             </ItemOut>
+             <ItemOut quantity="20" requestedDeliveryDate="2000-10-18"
+                      lineNumber="4">
+                 <ItemID>
+                     <SupplierPartID>HW1210-3423</SupplierPartID>
+                 </ItemID>
+                 <ItemDetail>
+                    <UnitPrice>
+                        <Money currency="USD">2.68</Money>
+                    </UnitPrice>
+                    <Description xml:lang="en">hello from item 4
+                    </Description>
+                    <UnitOfMeasure>EA</UnitOfMeasure>
+                    <Classification domain="SPSC">12346</Classification>
+                    <ManufacturerPartID>235</ManufacturerPartID>
+                    <ManufacturerName>foobar</ManufacturerName>
+                    <URL>www.foo.com</URL>
+                 </ItemDetail>
+             </ItemOut>
+             <ItemOut quantity="30" requestedDeliveryDate="2000-10-18"
+                      lineNumber="5">
+                 <ItemID>
+                     <SupplierPartID>HW1210-3424</SupplierPartID>
+                 </ItemID>
+                 <ItemDetail>
+                    <UnitPrice>
+                        <Money currency="USD">4.02</Money>
+                    </UnitPrice>
+                    <Description xml:lang="en">hello from item 5
+                    </Description>
+                    <UnitOfMeasure>EA</UnitOfMeasure>
+                    <Classification domain="SPSC">12347</Classification>
+                    <ManufacturerPartID>236</ManufacturerPartID>
+                    <ManufacturerName>foobar</ManufacturerName>
+                    <URL>www.foo.com</URL>
+                 </ItemDetail>
+             </ItemOut>
+         </OrderRequest>
+    </Request>
+</cXML>

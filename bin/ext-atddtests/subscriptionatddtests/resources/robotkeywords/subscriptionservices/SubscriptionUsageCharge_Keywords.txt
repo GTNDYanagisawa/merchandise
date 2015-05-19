@@ -1,0 +1,41 @@
+*** Settings ***
+Library        	de.hybris.platform.atddimpex.keywords.ImpexKeywordLibrary
+Resource		impex/Impex_Keywords.txt
+Resource        commerce/SubscriptionCommerce_Keywords.txt
+
+*** Keywords ***
+for subscription priceplan "${pricePlanName}" add volume usage charge "${chargeId}" with usage unit "${usageUnit}"
+    [Documentation]    Creates a volume usage charge with the given usage unit for the given subscription price plan
+    @{binding}    create list    chargeId    ${chargeId}    chargeName    ${chargeId}    usageUnit    ${usageUnit}    pricePlanName    ${pricePlanName}
+    ${templateName}=    Set Variable    impex-templates/subscription-usagecharge/volumeusagecharge-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+    
+for subscription priceplan "${pricePlanName}" add per unit usage charge "${chargeId}" with usage unit "${usageUnit}" and usage charge type "${usageChargeType}"
+	[Documentation]    Creates a per unit usage charge with the given usage unit und usage charge type for the given subscription price plan
+ 	@{binding}    create list    chargeId    ${chargeId}    chargeName    ${chargeId}    usageUnit    ${usageUnit}    usageChargeType    ${usageChargeType}    pricePlanName    ${pricePlanName}
+    ${templateName}=    Set Variable    impex-templates/subscription-usagecharge/perunitusagecharge-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+    
+for usage charge "${chargeId}" add tiered charge entry "${chargeEntryId}" with price of "${price}" with start "${tierStart}" and end "${tierEnd}"
+    [Documentation]    Adds a tier usage charge entry for a specified interval to the given usage charge
+    @{binding}    create list    chargeEntryId    ${chargeEntryId}    chargeId    ${chargeId}    price    ${price}    tierStart    ${tierStart}    tierEnd    ${tierEnd}
+    ${templateName}=    Set Variable    impex-templates/subscription-usagecharge/tierusagechargeentry-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+    
+for usage charge "${chargeId}" add overage charge entry "${chargeEntryId}" with price of "${price}"
+    [Documentation]    Creates an overage usage charge beyond normal tier charges
+    @{binding}    create list   chargeEntryId    ${chargeEntryId}    chargeId    ${chargeId}    price    ${price}    
+    ${templateName}=    Set Variable    impex-templates/subscription-usagecharge/overageusagechargeentry-insert.impex.vm
+    ${impEx}=    generate impex from template    ${templateName}    @{binding}
+    import impex "${impEx}" use template "${templateName}"
+
+for product "${productCode}" verify that the XML for volume usage charge "${chargeId}" matches "${expectedXml}"
+	[Documentation]   Verifies that XML for the given volume usage charge matches the expected XML 
+    for product "${productCode}" verify that "product/price[@class='subscriptionPricePlan']/usageCharges/volumeUsageCharge[name/text()='${chargeId}']" evaluates to "${expectedXml}"
+    
+for product "${productCode}" verify that the XML for per unit usage charge "${chargeId}" matches "${expectedXml}"
+	[Documentation]   Verifies that XML for the given per unit usage charge matches the expected XML 
+    for product "${productCode}" verify that "product/price[@class='subscriptionPricePlan']/usageCharges/perUnitUsageCharge[name/text()='${chargeId}']" evaluates to "${expectedXml}"

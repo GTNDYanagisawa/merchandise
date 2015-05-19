@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+
+<!-- This file contains bean definitions related to the NOT SUPPORTED case that for B2B ceredit card payment is used -->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<alias name="sapdefaultAcceleratorB2BApprovalBusinessProcessStrategy" alias="b2bApprovalBusinessProcessStrategy" />
+	<bean id="sapdefaultAcceleratorB2BApprovalBusinessProcessStrategy" class="de.hybris.platform.b2b.strategies.impl.DefaultB2BApprovalBusinessProcessStrategy" parent="defaultB2BApprovalBusinessProcessStrategy" >
+		<property name="processCode" value="sapAccApproval"/>
+		<property name="processName" value="CREATED"/>
+	</bean>
+	
+	<alias name="sapdefaultB2BCreateOrderFromCartStrategy" alias="defaultB2BCreateOrderFromCartStrategy" />
+	<bean id="sapdefaultB2BCreateOrderFromCartStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.DefaultB2BCreateOrderFromCartStrategy"
+	      parent="createOrderFromCartStrategy">
+		<property name="businessProcessStrategies">
+			<list>
+				<ref bean="sapdefaultAcceleratorB2BApprovalBusinessProcessStrategy"/>
+				<ref bean="b2bQuoteBusinessProcessStrategy"/>
+				<ref bean="b2bQuoteApprovalBusinessProcessStrategy"/>
+			</list>
+		</property>
+	</bean>
+		
+	<bean id="sapb2bAccApprovalProcessDefinitionResource" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource" value="classpath:/ysaporderfulfillment/process/sap-accOrderApproval.xml" />
+	</bean>
+
+</beans>

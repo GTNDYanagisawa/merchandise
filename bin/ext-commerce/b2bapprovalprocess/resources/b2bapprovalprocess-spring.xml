@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+        http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+
+	<!-- Signals the current application context to apply dependency injection 
+		to non-managed classes that are instantiated outside of the Spring bean factory 
+		(typically classes annotated with the @Configurable annotation). -->
+	<context:spring-configured/>
+	<!-- Activates various annotations to be detected in bean classes: Spring's 
+		@Required and @Autowired, as well as JSR 250's @PostConstruct, @PreDestroy 
+		and @Resource (if available), JAX-WS's @WebServiceRef (if available), EJB3's 
+		@EJB (if available), and JPA's @PersistenceContext and @PersistenceUnit (if 
+		available). Alternatively, you may choose to activate the individual BeanPostProcessors 
+		for those annotations. -->
+	<context:annotation-config/>
+
+	<context:component-scan base-package="de.hybris.platform.b2b" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver"/>
+	<!-- Enable the @AspectJ support -->
+	<aop:aspectj-autoproxy proxy-target-class="true"
+	                       expose-proxy="true"/>
+
+	<alias alias="b2bOrderThresholdEvaluationStrategy" name="defaultB2BOrderThresholdEvaluationStrategy"/>
+	<alias alias="b2bOrderThresholdTimespanEvaluationStrategy" name="defaultB2BOrderThresholdTimespanEvaluationStrategy"/>
+	<alias alias="b2bBudgetExceededEvaluationStrategy" name="defaultB2BBudgetExceededEvaluationStrategy"/>
+	<alias alias="b2bPermissionService" name="defaultB2BPermissionService"/>
+	<alias alias="b2b2POEPermissionService" name="twoPOEB2BPermissionService"/>
+	<alias alias="b2bApproverService" name="defaultB2BApproverService"/>
+	<alias alias="b2bWorkflowDao" name="defaultB2BWorkflowDao"/>
+	<alias alias="b2bMerchantCheckService" name="defaultB2BMerchantCheckService"/>
+	<alias alias="b2bCreditLimitEvaluationStrategy" name="defaultB2BCreditlimitEvaluationStrategy"/>
+	<alias alias="b2bEmailService" name="defaultB2BEmailService"/>
+	<alias alias="orderInfoContextDtoFactory" name="defaultOrderInfoContextDtoFactory"/>
+	<alias alias="b2bCommentService" name="defaultB2BCommentService"/>
+	<alias alias="b2bWorkflowActionDao" name="defaultB2BWorkflowActionDao" />
+
+	<bean id="defaultB2BEmailService" class="de.hybris.platform.b2b.services.impl.DefaultB2BEmailService" parent="abstractBusinessService">
+		<property name="rendererService" ref="rendererService"/>
+		<property name="orderInfoContextDtoFactory" ref="orderInfoContextDtoFactory"/>
+	</bean>
+
+	<bean id="abstractEvaluationStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.AbstractEvaluationStrategy"
+	      abstract="true" parent="abstractBusinessService">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<bean id="abstractPermissionEvaluationStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.AbstractPermissionEvaluationStrategy"
+	      abstract="true" parent="abstractEvaluationStrategy">
+	</bean>
+
+	<bean id="defaultB2BOrderThresholdEvaluationStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.DefaultB2BOrderThresholdEvaluationStrategy"
+	      parent="abstractPermissionEvaluationStrategy">
+	</bean>
+
+	<bean id="b2b2POEPermissionAEvaluationStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.B2B2POEPermissionEvaluationStrategy"
+	      parent="abstractPermissionEvaluationStrategy">
+		<property name="permissionTypeCode" value="B2B2POEPermissionA"/>
+		<property name="permissionType">
+			<value type="java.lang.Class">de.hybris.platform.b2b.model.B2B2POEPermissionAModel</value>
+		</property>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<bean id="b2b2POEPermissionBEvaluationStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.B2B2POEPermissionEvaluationStrategy"
+	      parent="abstractPermissionEvaluationStrategy">
+		<property name="permissionTypeCode" value="B2B2POEPermissionB"/>
+		<property name="permissionType">
+			<value type="java.lang.Class">de.hybris.platform.b2b.model.B2B2POEPermissionBModel</value>
+		</property>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<bean id="defaultB2BOrderThresholdTimespanEvaluationStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.DefaultB2BOrderThresholdTimespanEvaluationStrategy"
+	      parent="abstractPermissionEvaluationStrategy">
+		<property name="b2bOrderDao" ref="b2bOrderDao"/>
+		<property name="b2bDateUtils" ref="b2bDateUtils"/>
+	</bean>
+	<bean id="defaultB2BBudgetExceededEvaluationStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.DefaultB2BBudgetExceededEvaluationStrategy"
+	      parent="abstractPermissionEvaluationStrategy">
+		<property name="b2bCostCenterService" ref="b2bCostCenterService"/>
+		<property name="b2BBudgetService" ref="b2BBudgetService"/>
+	</bean>
+	<bean id="defaultB2BPermissionService"
+	      class="de.hybris.platform.b2b.services.impl.DefaultB2BPermissionService"
+	      parent="abstractBusinessService">
+		<property name="evaluateStrategies">
+			<set>
+				<ref bean="b2bOrderThresholdEvaluationStrategy"/>
+				<ref bean="b2bOrderThresholdTimespanEvaluationStrategy"/>
+				<ref bean="b2bBudgetExceededEvaluationStrategy"/>
+			</set>
+		</property>
+		<property name="b2bApproverService" ref="b2bApproverService"/>
+		<property name="permissionResultHelper" ref="permissionResultHelper"/>
+		<property name="userService" ref="userService"/>
+		<property name="baseDao" ref="baseDao"/>
+		<property name="permissionTypes">
+			<list>
+				<value>B2BBudgetExceededPermission</value>
+				<value>B2BOrderThresholdPermission</value>
+				<value>B2BOrderThresholdTimespanPermission</value>
+			</list>
+		</property>
+		<property name="b2bCommentService" ref="b2bCommentService"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+	</bean>
+
+	<bean id="twoPOEB2BPermissionService"
+	      class="de.hybris.platform.b2b.services.impl.DefaultB2BPermissionService"
+	      parent="defaultB2BPermissionService">
+		<property name="evaluateStrategies">
+			<set>
+				<ref bean="b2b2POEPermissionAEvaluationStrategy"/>
+				<ref bean="b2b2POEPermissionBEvaluationStrategy"/>
+			</set>
+		</property>
+		<property name="permissionTypes">
+			<list>
+				<value>B2B2POEPermissionA</value>
+				<value>B2B2POEPermissionB</value>
+			</list>
+		</property>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+	</bean>
+
+	<bean id="defaultB2BMerchantCheckService"
+	      class="de.hybris.platform.b2b.services.impl.DefaultB2BMerchantCheckService"
+	      parent="abstractBusinessService">
+		<property name="evaluateStrategies">
+			<set>
+				<ref bean="b2bCreditLimitEvaluationStrategy"/>
+			</set>
+		</property>
+		<property name="userService" ref="userService"/>
+		<property name="merchantCheckTypes">
+			<list>
+				<value>B2BCreditLimit</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="defaultB2BCreditlimitEvaluationStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.DefaultB2BCreditLimitEvaluationStrategy"
+	      parent="abstractEvaluationStrategy">
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="b2bDateUtils" ref="b2bDateUtils"/>
+		<property name="b2bCostCenterService" ref="b2bCostCenterService"/>
+		<property name="b2bCurrencyConversionService" ref="b2bCurrencyConversionService"/>
+		<property name="b2bOrderDao" ref="b2bOrderDao"/>
+	</bean>
+
+	<bean id="defaultB2BApproverService"
+	      class="de.hybris.platform.b2b.services.impl.DefaultB2BApproverService"
+	      parent="abstractBusinessService">
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<bean id="defaultB2BWorkflowActionDao" class="de.hybris.platform.b2b.dao.impl.DefaultB2BWorkflowActionDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="defaultB2BWorkflowDao" class="de.hybris.platform.b2b.dao.impl.DefaultB2BWorkflowDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="abstractB2BApproveOrderDecisionAction"
+	      class="de.hybris.platform.b2b.process.approval.actions.AbstractB2BApproveOrderDecisionAction"
+	      abstract="true" parent="abstractAction"/>
+	<bean id="abstractProceduralB2BOrderApproveAction"
+	      class="de.hybris.platform.b2b.process.approval.actions.AbstractProceduralB2BOrderApproveAction"
+	      abstract="true" parent="abstractAction"/>
+	<bean id="abstractSimpleB2BApproveOrderDecisionAction"
+	      class="de.hybris.platform.b2b.process.approval.actions.AbstractSimpleB2BApproveOrderDecisionAction"
+	      abstract="true" parent="abstractAction"/>
+
+	<!-- SIMPLE APPROVAL PROCESS -->
+	<bean id="simpleApprovalProcess" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource" value="classpath:/process/b2bsimpleorderapproval.xml"/>
+	</bean>
+
+	<!-- APPROVAL PROCESS -->
+	<bean id="approvalProcess" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource" value="classpath:/process/b2borderapproval.xml"/>
+	</bean>
+
+	<!-- 2POEApprovalProcess -->
+	<bean id="twoPairOfEyesApprovalProcess" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource" value="classpath:/process/b2bTwoPairOfEyesApproval.xml"/>
+	</bean>
+
+	<!-- SALES QUOTE PROCESS -->
+	<bean id="salesQuoteProcess"
+	      class="de.hybris.platform.processengine.definition.ProcessDefinitionResource"
+			>
+		<property name="resource" value="classpath:/process/b2bsalesquote.xml"/>
+	</bean>
+
+	<bean id="approvalProcessStartAction"
+	      class="de.hybris.platform.b2b.process.approval.actions.ApprovalProcessStartAction"
+	      parent="abstractSimpleB2BApproveOrderDecisionAction">
+		<property name="eventService" ref="eventService"/>
+	</bean>
+	<bean id="approvalProcessCompleteAction"
+	      class="de.hybris.platform.b2b.process.approval.actions.ApprovalProcessCompleteAction"
+	      parent="abstractSimpleB2BApproveOrderDecisionAction">
+		<property name="eventService" ref="eventService"/>
+	</bean>
+	<bean id="checkForApproval"
+	      class="de.hybris.platform.b2b.process.approval.actions.CheckForApproval"
+	      parent="abstractB2BApproveOrderDecisionAction">
+		<property name="b2bPermissionService" ref="b2bPermissionService"/>
+		<property name="b2bCommentService" ref="b2bCommentService"/>
+	</bean>
+	<bean id="checkFor2POEApproval"
+	      class="de.hybris.platform.b2b.process.approval.actions.CheckForApproval"
+	      parent="checkForApproval">
+		<property name="b2bPermissionService" ref="b2b2POEPermissionService"/>
+	</bean>
+	<bean id="findApprovers"
+	      class="de.hybris.platform.b2b.process.approval.actions.FindApprovers"
+	      parent="abstractSimpleB2BApproveOrderDecisionAction">
+		<property name="b2bPermissionService" ref="b2bPermissionService"/>
+		<property name="permissionResultHelper" ref="permissionResultHelper"/>
+	</bean>
+	<bean id="find2POEApprovers"
+	      class="de.hybris.platform.b2b.process.approval.actions.Find2POEApprovers"
+	      parent="abstractSimpleB2BApproveOrderDecisionAction">
+		<property name="b2bPermissionService" ref="b2b2POEPermissionService"/>
+		<property name="permissionResultHelper" ref="permissionResultHelper"/>
+		<property name="b2bApproverService" ref="b2bApproverService"/>
+		<property name="userService" ref="userService"/>
+		<property name="userGroupIds">
+			<set>
+				<value>2POE_APPROVERS_A</value>
+				<value>2POE_APPROVERS_B</value>
+			</set>
+		</property>
+	</bean>
+	<bean id="startWorkflow"
+	      class="de.hybris.platform.b2b.process.approval.actions.StartWorkflow"
+	      parent="abstractProceduralB2BOrderApproveAction">
+		<property name="b2bWorkflowIntegrationService" ref="b2bWorkflowIntegrationService"/>
+		<property name="b2bEscalationService" ref="b2bEscalationService"/>
+		<property name="permissionResultHelper" ref="permissionResultHelper"/>
+		<property name="workflowProcessingService" ref="workflowProcessingService"/>
+		<property name="workflowService" ref="newestWorkflowService"/>
+		<property name="escalate" value="true"/>
+	</bean>
+	<bean id="start2POEWorkflow"
+	      class="de.hybris.platform.b2b.process.approval.actions.StartWorkflow"
+	      parent="startWorkflow">
+		<property name="escalate" value="false"/>
+	</bean>
+
+	<bean id="checkWorkflowResults"
+	      class="de.hybris.platform.b2b.process.approval.actions.CheckWorkflowResults"
+	      parent="abstractSimpleB2BApproveOrderDecisionAction"/>
+
+	<bean id="informOfOrderApproval"
+	      class="de.hybris.platform.b2b.process.approval.actions.InformOfOrderApproval"
+	      parent="abstractProceduralB2BOrderApproveAction">
+		<property name="fromAddress" value="b2b@hybris.com"/>
+		<property name="b2bEmailService" ref="b2bEmailService"/>
+	</bean>
+
+	<bean id="createOrderHistory"
+	      class="de.hybris.platform.b2b.process.approval.actions.CreateOrderHistory"
+	      parent="abstractProceduralB2BOrderApproveAction"/>
+
+	<bean id="setBookingLineEntries"
+	      class="de.hybris.platform.b2b.process.approval.actions.SetBookingLineEntries"
+	      parent="abstractSimpleB2BApproveOrderDecisionAction"/>
+
+	<bean id="informOfOrderRejection"
+	      class="de.hybris.platform.b2b.process.approval.actions.InformOfOrderRejection"
+	      parent="abstractProceduralB2BOrderApproveAction">
+		<property name="fromAddress" value="b2b@hybris.com"/>
+		<property name="b2bEmailService" ref="b2bEmailService"/>
+
+	</bean>
+	<bean id="informAdmin"
+	      class="de.hybris.platform.b2b.process.approval.actions.InformAdmin"
+	      parent="abstractSimpleB2BApproveOrderDecisionAction">
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+	</bean>
+
+	<bean id="startSalesQuoteWorkflow"
+	      class="de.hybris.platform.b2b.process.salesquote.actions.StartSalesQuoteWorkflow"
+	      parent="abstractProceduralB2BOrderApproveAction">
+		<property name="userService" ref="userService"/>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="b2bApproverService" ref="b2bApproverService"/>
+		<property name="workflowProcessingService" ref="workflowProcessingService"/>
+		<property name="workflowService" ref="newestWorkflowService"/>
+		<property name="b2bWorkflowIntegrationService" ref="b2bWorkflowIntegrationService"/>
+	</bean>
+
+	<bean id="checkSalesQuoteResults"
+	      class="de.hybris.platform.b2b.process.salesquote.actions.CheckSalesQuoteResults"
+	      parent="abstractSimpleB2BApproveOrderDecisionAction"/>
+
+	<bean id="escalationTaskRunner" class="de.hybris.platform.b2b.process.approval.actions.EscalationTaskRunner">
+		<property name="b2bEscalationService" ref="b2bEscalationService"/>
+	</bean>
+
+	<bean id="permissionResultHelper" class="de.hybris.platform.b2b.process.approval.actions.B2BPermissionResultHelperImpl">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<alias alias="placeQuoteOrderStrategy" name="defaultB2BPlaceQuoteOrderStrategy"/>
+	<bean id="defaultB2BPlaceQuoteOrderStrategy" class="de.hybris.platform.b2b.strategies.impl.DefaultB2BPlaceQuoteOrderStrategy" parent="defaultB2BCreateOrderFromCartStrategy">
+	</bean>
+
+	<bean id="performMerchantCheck"
+	      class="de.hybris.platform.b2b.process.approval.actions.PerformMerchantCheck"
+	      parent="abstractSimpleB2BApproveOrderDecisionAction">
+		<property name="b2bMerchantCheckService" ref="b2bMerchantCheckService"/>
+		<property name="userService" ref="userService"/>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="b2bApproverService" ref="b2bApproverService"/>
+		<property name="workflowProcessingService" ref="workflowProcessingService"/>
+		<property name="workflowService" ref="newestWorkflowService"/>
+		<property name="b2bCostCenterService" ref="b2bCostCenterService"/>
+		<property name="b2bWorkflowIntegrationService" ref="b2bWorkflowIntegrationService"/>
+	</bean>
+
+	<bean name="abstractProceduralB2BOrderApproveAuditAction"
+	      class="de.hybris.platform.b2b.process.approval.actions.AbstractProceduralB2BOrderApproveAuditAction"
+	      abstract="true" parent="abstractProceduralB2BOrderApproveAction">
+		<property name="l10NService" ref="l10nService"/>
+		<property name="userService" ref="userService"/>
+		<property name="orderHistoryService" ref="orderHistoryService"/>
+		<property name="i18NService" ref="i18NService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<bean id="checkCreditLimitResults"
+	      class="de.hybris.platform.b2b.process.approval.actions.CheckCreditLimitResults"
+	      parent="abstractSimpleB2BApproveOrderDecisionAction">
+	</bean>
+
+	<bean id="merchantCheckResultHelper" class="de.hybris.platform.b2b.process.approval.actions.B2BMerchantCheckResultHelperImpl">
+	</bean>
+
+	<bean id="B2BCreditLimitModelValidateInterceptor" class="de.hybris.platform.b2b.interceptor.B2BCreditLimitModelValidateInterceptor">
+		<property name="l10NService" ref="l10nService"/>
+	</bean>
+
+	<bean id="B2BCreditLimitModelValidateInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="B2BCreditLimitModelValidateInterceptor"/>
+		<property name="typeCode" value="B2BCreditLimit"/>
+	</bean>
+
+	<bean id="B2BUserGroupModelValidateInterceptor" class="de.hybris.platform.b2b.interceptor.B2BUserGroupModelValidateInterceptor">
+		<property name="l10NService" ref="l10nService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<bean id="B2BUserGroupModelValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="B2BUserGroupModelValidateInterceptor"/>
+		<property name="typeCode" value="B2BUserGroup"/>
+	</bean>
+
+	<bean id="b2bCommentPrepareInterceptor" class="de.hybris.platform.b2b.interceptor.B2BCommentPrepareInterceptor">
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<bean id="B2BCommentInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="b2bCommentPrepareInterceptor"/>
+		<property name="typeCode" value="B2BComment"/>
+	</bean>
+
+	<alias alias="b2bQuoteOrderService" name="defaultB2BSaleQuoteService"/>
+	<bean id="defaultB2BSaleQuoteService" class="de.hybris.platform.b2b.services.impl.DefaultB2BSaleQuoteService">
+		<property name="placeQuoteOrderStrategy" ref="placeQuoteOrderStrategy"/>
+	</bean>
+
+	<bean id="b2bQuoteApprovalBusinessProcessStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.DefaultB2BApprovalBusinessProcessStrategy"
+	      parent="b2bApprovalBusinessProcessStrategy">
+		<property name="processName" value="APPROVED_QUOTE"/>
+	</bean>
+
+	<bean id="defaultOrderInfoContextDtoFactory" class="de.hybris.platform.b2b.mail.impl.DefaultOrderInfoContextDtoFactory">
+		<property name="configurationService" ref="defaultConfigurationService"/>
+		<property name="b2bCurrencyConversionService" ref="b2bCurrencyConversionService"/>
+		<property name="b2BOrderService" ref="b2bOrderService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<bean id="velocityRenderer" class="de.hybris.platform.b2b.mail.impl.VelocityTemplateRenderer">
+		<property name="mediaService" ref="mediaService"/>
+		<property name="encoding" value="UTF-8"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	<!-- b2b depends on cms 2 extension which also defines a keygen by id processCodeGenerator 
+		which causes a wrong keyGenerator instace being injected in B2BApprovalBusinjessProcessStrategy. -->
+	<alias alias="b2bProcessCodeGenerator" name="defaultb2bprocessCodeGenerator"/>
+	<bean id="defaultb2bprocessCodeGenerator"
+	      class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+	      init-method="init">
+		<property name="key" value="B2B_PROCESS"/>
+		<property name="digits" value="8"/>
+		<property name="start" value="00000000"/>
+		<property name="numeric" value="false"/>
+	</bean>
+
+	<alias name="defaultB2BApprovalBusinessProcessStrategy" alias="b2bApprovalBusinessProcessStrategy"/>
+	<bean id="defaultB2BApprovalBusinessProcessStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.DefaultB2BApprovalBusinessProcessStrategy"
+	      parent="abstractBusinessService">
+		<property name="processCode" value="approval"/>
+		<property name="processName" value="CREATED"/>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="processCodeGenerator" ref="b2bProcessCodeGenerator"/>
+		<property name="businessProcessService" ref="businessProcessService"/>
+	</bean>
+
+	<alias name="defaultB2BQuoteBusinessProcessStrategy" alias="b2bQuoteBusinessProcessStrategy"/>
+	<bean id="defaultB2BQuoteBusinessProcessStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.DefaultB2BQuoteBusinessProcessStrategy"
+	      parent="abstractBusinessService">
+		<property name="processCode" value="salesquote"/>
+		<property name="processName" value="PENDING_QUOTE"/>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="processCodeGenerator" ref="b2bProcessCodeGenerator"/>
+		<property name="businessProcessService" ref="businessProcessService"/>
+	</bean>
+
+	<bean id="defaultB2BCreateOrderFromCartStrategy"
+	      class="de.hybris.platform.b2b.strategies.impl.DefaultB2BCreateOrderFromCartStrategy"
+	      parent="createOrderFromCartStrategy">
+		<property name="businessProcessStrategies">
+			<list>
+				<ref bean="b2bApprovalBusinessProcessStrategy"/>
+				<ref bean="b2bQuoteBusinessProcessStrategy"/>
+				<ref bean="b2bQuoteApprovalBusinessProcessStrategy"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="b2bApprovalBusinessProcessCreationPlaceOrderMethodHook"
+		  class="de.hybris.platform.b2b.order.hooks.B2BApprovalBusinessProcessCreationPlaceOrderMethodHook">
+		<property name="businessProcessCreationStrategy" ref="defaultB2BCreateOrderFromCartStrategy"/>
+	</bean>
+
+	<bean id="commercePlaceOrderMethodHooksListMergeDirective" depends-on="commercePlaceOrderMethodHooks" parent="listMergeDirective" >
+		<property name="add" ref="b2bApprovalBusinessProcessCreationPlaceOrderMethodHook"  />
+	</bean>
+
+	<bean id="B2BUnitModelValidateInterceptor" class="de.hybris.platform.b2b.interceptor.B2BUnitModelValidateInterceptor">
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="userService" ref="userService"/>
+		<property name="l10NService" ref="l10nService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<bean id="B2BUnitModelValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="B2BUnitModelValidateInterceptor"/>
+		<property name="typeCode" value="B2BUnit"/>
+	</bean>
+
+	<bean id="dynamicAttributesB2BPermissionResultStatusDisplayByEnum" class="de.hybris.platform.b2b.attributes.DynamicAttributesB2BPermissionResultStatusDisplayByEnum">
+		<property name="enumerationService" ref="enumerationService"/>
+	</bean>
+	<alias alias="dynamicAttributesB2BPermissionResultStatusDisplay" name="dynamicAttributesB2BPermissionResultStatusDisplayByEnum"/>
+
+
+	<bean id="B2BCustomerModelValidateInterceptor" class="de.hybris.platform.b2b.interceptor.B2BCustomerModelValidateInterceptor">
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="userService" ref="userService"/>
+		<property name="l10NService" ref="l10nService"/>
+	</bean>
+
+	<bean id="B2BCustomerModelValidateInterceptorMapping"
+	      class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="B2BCustomerModelValidateInterceptor"/>
+		<property name="typeCode" value="B2BCustomer"/>
+	</bean>
+
+	<alias alias="b2bOrderService" name="defaultB2BOrderService"/>
+	<bean id="defaultB2BOrderService" class="de.hybris.platform.b2b.services.impl.DefaultB2BOrderService" parent="defaultOrderService">
+		<property name="baseDao" ref="baseDao"/>
+		<property name="b2bOrderDao" ref="b2bOrderDao"/>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="b2bCustomerService" ref="b2bCustomerService"/>
+		<property name="i18nService" ref="defaultI18NService"/>
+		<property name="userService" ref="defaultUserService"/>
+		<property name="b2bCreateOrderFromCartStrategy" ref="defaultB2BCreateOrderFromCartStrategy"/>
+		<property name="cartToOrderCronJobModelDao" ref="defaultCartToOrderCronJobModelDao"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+		<property name="workflowProcessingService" ref="workflowProcessingService"/>
+	</bean>
+
+
+	<bean id="b2bPlaceOrderStrategy" class="de.hybris.platform.b2b.strategies.impl.DefaultB2BPlaceOrderStrategy">
+		<property name="i18nService" ref="defaultI18NService"/>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="businessProcessStrategies">
+			<list>
+				<ref bean="b2bApprovalBusinessProcessStrategy"/>
+				<ref bean="b2bQuoteBusinessProcessStrategy"/>
+				<ref bean="b2bQuoteApprovalBusinessProcessStrategy"/>
+			</list>
+		</property>
+		<property name="b2bCustomerService" ref="b2bCustomerService"/>
+	</bean>
+
+	<bean id="abstractWorkflowTemplateStrategy" class="de.hybris.platform.b2b.strategies.impl.AbstractWorkflowTemplateStrategy" abstract="true" parent="abstractBusinessService">
+		<property name="userService" ref="userService"/>
+		<property name="workflowTemplateService" ref="workflowTemplateService"/>
+	</bean>
+
+	<bean id="merchantCheckWorkflowTemplateStrategy" class="de.hybris.platform.b2b.strategies.impl.MerchantCheckWorkflowTemplateStrategy" parent="abstractWorkflowTemplateStrategy" />
+
+	<bean id="orderApprovalWorkflowStrategy" class="de.hybris.platform.b2b.strategies.impl.OrderApprovalWorkflowTemplateStrategy" parent="abstractWorkflowTemplateStrategy"/>
+
+	<bean id="salesQuotesWorkflowTemplateStrategy" class="de.hybris.platform.b2b.strategies.impl.SalesQuotesWorkflowTemplateStrategy" parent="abstractWorkflowTemplateStrategy"/>
+
+	<bean id="abstractWorkflowAutomatedAction" class="de.hybris.platform.b2b.process.approval.actions.AbstractWorkflowAutomatedAction"/>
+
+	<bean id="afterApproveGenericWorkflowDecisionAction" class="de.hybris.platform.b2b.process.approval.actions.AfterApproveGenericWorkflowDecisionAction" parent="abstractWorkflowAutomatedAction"/>
+
+	<bean id="b2BAbstractWorkflowAutomatedAction" class="de.hybris.platform.b2b.process.approval.actions.B2BAbstractWorkflowAutomatedAction" abstract="true" >
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<bean id="afterApproveOrderWorkflowDecisionAction" class="de.hybris.platform.b2b.process.approval.actions.AfterApproveOrderWorkflowDecisionAction" parent="b2BAbstractWorkflowAutomatedAction">
+		<property name="eventService" ref="eventService"/>
+	</bean>
+
+	<bean id="afterRejectOrderWorkflowDecisionAction" class="de.hybris.platform.b2b.process.approval.actions.AfterRejectOrderWorkflowDecisionAction" parent="b2BAbstractWorkflowAutomatedAction">
+		<property name="eventService" ref="eventService"/>
+	</bean>
+
+	<bean id="approveDecisionAutomatedAction" class="de.hybris.platform.b2b.process.approval.actions.ApproveDecisionAutomatedAction" parent="b2BAbstractWorkflowAutomatedAction">
+		<property name="eventService" ref="eventService"/>
+	</bean>
+
+	<bean id="rejectDecisionAutomatedAction" class="de.hybris.platform.b2b.process.approval.actions.RejectDecisionAutomatedAction" parent="b2BAbstractWorkflowAutomatedAction">
+		<property name="eventService" ref="eventService"/>
+	</bean>
+
+	<bean id="b2bAfterWorkflowAction" class="de.hybris.platform.b2b.process.approval.actions.B2BAfterWorkflowAction" parent="b2BAbstractWorkflowAutomatedAction">
+		<property name="businessProcessService" ref="businessProcessService"/>
+		<property name="processParameterHelper" ref="processParameterHelper"/>
+	</bean>
+
+	<bean id="afterRejectGenericWorkflowDecisionAction" class="de.hybris.platform.b2b.process.approval.actions.AfterRejectGenericWorkflowDecisionAction" parent="abstractWorkflowAutomatedAction">
+	</bean>
+
+	<bean id="b2bEscalationService" class="de.hybris.platform.b2b.services.impl.DefaultB2BEscalationService" parent="abstractBusinessService">
+		<property name="escalationTaskRunnerBeanId" value="escalationTaskRunner"/>
+		<property name="permissionResultHelper" ref="permissionResultHelper"/>
+		<property name="configurationService" ref="defaultConfigurationService"/>
+		<property name="userService" ref="userService"/>
+		<property name="b2bWorkflowIntegrationService" ref="b2bWorkflowIntegrationService"/>
+		<property name="b2bPermissionService" ref="b2bPermissionService"/>
+		<property name="b2bApproverService" ref="b2bApproverService"/>
+		<property name="taskService" ref="taskService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<bean id="creditAlertWorkflowTemplateStrategy" class="de.hybris.platform.b2b.strategies.impl.CreditAlertWorkflowTemplateStrategy" parent="abstractWorkflowTemplateStrategy"/>
+
+	<bean id="b2bWorkflowIntegrationService" class="de.hybris.platform.b2b.services.impl.DefaultB2BWorkflowIntegrationService" parent="abstractBusinessService">
+		<property name="baseDao" ref="baseDao"/>
+		<property name="userService" ref="userService"/>
+		<property name="b2bWorkflowDao" ref="b2bWorkflowDao"/>
+		<property name="workflowTemplateService" ref="workflowTemplateService"/>
+		<property name="workflowService" ref="newestWorkflowService"/>
+		<property name="workflowProcessingService" ref="workflowProcessingService"/>
+		<property name="b2bWorkflowActionDao" ref="b2bWorkflowActionDao"/>
+		<property name="workflowActionService" ref="workflowActionService"/>
+	</bean>
+
+</beans>

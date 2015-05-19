@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2000-2013 hybris AG
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of hybris
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with hybris.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<import resource="classpath:/omsats/integration/omsats-export-spring.xml"/>
+	<import resource="classpath:/omsats/integration/omsats-import-spring.xml"/>
+
+	<!-- Populators and Converters -->
+
+	<alias name="defaultAtsLocalQuantitiesConverter" alias="atsLocalQuantitiesConverter"/>
+	<bean id="defaultAtsLocalQuantitiesConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="stockLevels"/>
+		<property name="populators">
+			<list>
+				<ref bean="atsLocalQuantitiesPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultAtsLocalQuantitiesPopulator" alias="atsLocalQuantitiesPopulator"/>
+	<bean id="defaultAtsLocalQuantitiesPopulator" class="de.hybris.platform.integration.oms.ats.stock.populator.AtsLocalQuantitiesPopulator" scope="tenant">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+
+	<!-- Daos and Services -->
+
+	<alias alias="stockLevelCommandConfig" name="defaultStockLevelCommandConfig"/>
+	<bean id="defaultStockLevelCommandConfig" class="de.hybris.platform.integration.commons.hystrix.OndemandHystrixCommandConfiguration" scope="tenant">
+		<property name="groupKey" value="${omsats.stockLevel.groupKey}"/>
+		<property name="threadTimeout" value="${omsats.stockLevel.threadTimeout}"/>
+		<property name="threadPoolSize" value="${omsats.stockLevel.threadPoolSize}"/>
+	</bean>
+
+	<alias alias="omsStockLevelDao" name="defaultOmsStockLevelDao"/>
+	<bean id="defaultOmsStockLevelDao" class="de.hybris.platform.integration.oms.ats.stock.impl.DefaultOmsStockLevelDao" parent="abstractItemDao" scope="tenant">
+		<property name="atsRestClient" ref="omsAtsRestClient"/>
+		<property name="defaultStockLevelDao" ref="defaultStockLevelDao"/>
+		<property name="atsLocalQuantitiesConverter" ref="atsLocalQuantitiesConverter"/>
+		<property name="ondemandPreferenceSelectorService" ref="ondemandPreferenceSelectorService"/>
+		<property name="hystrixCommandConfig" ref="stockLevelCommandConfig"/>
+		<property name="ondemandHystrixCommandFactory" ref="ondemandHystrixCommandFactory"/>
+	</bean>
+
+	<alias alias="omsStockService" name="defaultOmsStockService"/>
+	<bean id="defaultOmsStockService"
+	      class="de.hybris.platform.stock.impl.DefaultStockService"
+	      parent="abstractBusinessService" scope="tenant">
+		<property name="stockLevelStatusStrategy" ref="stockLevelStatusStrategy"/>
+		<property name="productAvailabilityStrategy" ref="omsProductAvailabilityStrategy"/>
+		<property name="stockLevelProductStrategy" ref="stockLevelProductID"/>
+		<property name="stockLevelDao" ref="omsStockLevelDao"/>
+	</bean>
+
+	<alias alias="omsCommerceStockService" name="defaultOmsCommerceStockService"/>
+	<bean id="defaultOmsCommerceStockService"
+	      class="de.hybris.platform.commerceservices.stock.impl.DefaultCommerceStockService" scope="tenant">
+		<property name="commerceStockLevelCalculationStrategy" ref="commerceStockLevelCalculationStrategy"/>
+		<property name="stockService" ref="omsStockService"/>
+		<property name="storePickupDao" ref="storePickupDao"/>
+		<property name="warehouseSelectionStrategy" ref="warehouseSelectionStrategy"/>
+		<property name="stockLevelProductStrategy" ref="stockLevelProductID"/>
+		<property name="stockLevelStatusStrategy" ref="stockLevelStatusStrategy"/>
+	</bean>
+
+	<!-- Strategies -->
+
+	<alias alias="omsProductAvailabilityStrategy" name="defaultOmsProductAvailabilityStrategy"/>
+	<bean id="defaultOmsProductAvailabilityStrategy"
+	      class="de.hybris.platform.stock.strategy.impl.DefaultProductAvailabilityStrategy" scope="tenant">
+		<property name="i18nService" ref="i18nService"/>
+		<property name="bestMatchStrategy" ref="bestMatchStrategy"/>
+		<property name="bundleProvider" ref="basecommerce.resourceBundleProvider"/>
+		<property name="stockLevelDao" ref="omsStockLevelDao"/>
+	</bean>
+
+	<alias name="defaultCartValidationStrategy" alias="cartValidationStrategy"/>
+	<bean id="defaultCartValidationStrategy"
+	      class="de.hybris.platform.integration.oms.ats.strategies.OmsCartValidationStrategy"
+	      scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="productService" ref="productService"/>
+		<property name="commerceStockService" ref="omsCommerceStockService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="userService" ref="userService"/>
+		<property name="warehouseService" ref="warehouseService" />
+		<property name="stockService" ref="stockService" />
+	</bean>
+
+	<alias name="omsFutureStockService" alias="futureStockService" />
+	<bean id="omsFutureStockService"
+		class="de.hybris.platform.integration.oms.ats.futurestock.impl.DefaultOmsFutureStockService" scope="tenant">
+		<property name="inventoryRestClient" ref="omsInventoryRestClient"/>
+		<property name="hystrixCommandConfig" ref="stockLevelCommandConfig"/>
+		<property name="ondemandHystrixCommandFactory" ref="ondemandHystrixCommandFactory"/>
+	</bean>
+
+	<!-- Prototype Beans for Data POJOs -->
+
+	<util:list id="stockLevels"
+	           value-type="de.hybris.platform.ordersplitting.model.StockLevelModel"
+	           scope="prototype"/>
+	           
+</beans>

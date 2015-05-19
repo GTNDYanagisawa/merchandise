@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+		   http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!--
+		A simple HTTP connection gateway implementation This code has been
+		verified with the bulkSMS/vSMS carrier
+	-->
+	<bean id="httpEngine"
+		class="de.hybris.platform.mobileservices.text.engine.impl.HTTPSendSMSEngine"
+		parent="abstractSMSEngine"
+		scope="tenant">
+	</bean>
+
+	<alias alias="bulkSMSEngine" name="httpEngine"/>
+	<alias alias="vSMSEngine" name="httpEngine"/>
+
+	<!-- TODO replace by pure SMPP implementation - this is mblox specific at the moment -->
+	<bean id="smppEngine"
+		class="de.hybris.platform.mobileservices.text.engine.impl.SMPPSMSEngine"
+		parent="abstractSMSEngine"
+		scope="tenant">
+		<property name="messageGateway" ref="incomingSMSMessageGateway" />
+		<property name="phoneNumberService" ref="phoneNumberService" />
+		<property name="vendor" ref="mBloxProviderStrategy" />
+	</bean>
+
+	<bean id="mBloxSmppEngine"
+		class="de.hybris.platform.mobileservices.text.engine.impl.SMPPSMSEngine"
+		parent="abstractSMSEngine"
+		scope="tenant">
+		<property name="messageGateway" ref="incomingSMSMessageGateway" />
+		<property name="phoneNumberService" ref="phoneNumberService" />
+		<property name="vendor" ref="mBloxProviderStrategy" />
+	</bean>
+	
+	<bean id="mBloxProviderStrategy"
+		class="de.hybris.platform.mobileservices.text.engine.impl.MbloxProviderStrategy"
+		scope="tenant">
+	</bean>
+	
+	<bean id="abstractSMSEngine"
+		class="de.hybris.platform.mobileservices.text.engine.impl.AbstractSMSEngine"
+		abstract="true"
+		scope="tenant">
+		<property name="modelService" ref="modelService"/>
+		<property name="phoneNumberService" ref="phoneNumberService"/>
+		<property name="messageScheduler" ref="messageScheduler"/>
+	</bean>
+
+</beans>

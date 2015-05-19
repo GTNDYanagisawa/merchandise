@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<!-- Add accelerator facades specific product options -->
+	<enum class="de.hybris.platform.commercefacades.product.ProductOption">
+		<value>PRICE_RANGE</value>
+		<value>VARIANT_MATRIX</value>
+        <value>VARIANT_MATRIX</value>
+        <value>VARIANT_MATRIX_BASE</value>
+        <value>VARIANT_MATRIX_ALL_OPTIONS</value>
+        <value>VARIANT_MATRIX_URL</value>
+        <value>VARIANT_MATRIX_MEDIA</value>
+        <value>VARIANT_MATRIX_PRICE</value>
+        <value>VARIANT_MATRIX_STOCK</value>
+        <value>URL</value>
+        <value>IMAGES</value>
+	</enum>
+
+    <bean class="de.hybris.platform.commercefacades.order.data.CartModificationData">
+        <property name="statusMessage" type="String"/>
+    </bean>
+
+    <bean class="de.hybris.platform.commercefacades.order.data.CartModificationListData">
+        <property name="cartModifications" type="java.util.List&lt;CartModificationData>"/>
+    </bean>
+
+    <bean class="de.hybris.platform.commercefacades.order.data.OrderEntryData">
+        <property name="entries"
+                  type="java.util.List&lt;de.hybris.platform.commercefacades.order.data.OrderEntryData>"/>
+    </bean>
+
+
+
+    <bean class="de.hybris.platform.b2bacceleratorfacades.product.data.CartEntryData">
+        <!--<description>POJO representation of product quantity for the order forms (SKU-QTY).</description>-->
+        <property name="entryNumber" type="Long"/>
+        <property name="sku" type="String"/>
+        <property name="quantity" type="Long"/>
+    </bean>
+
+    <bean class="de.hybris.platform.b2bacceleratorfacades.product.data.ProductQuantityData">
+		<!--<description>POJO representation of product quantity for the order forms (SKU-QTY).</description>-->
+		<property name="sku" type="String"/>
+		<property name="quantity" type="Integer"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.product.data.ProductData">
+		<property name="multidimensional" type="Boolean"/>
+		<property name="firstVariantUrl" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.b2bacceleratorfacades.company.data.B2BUnitNodeData">
+		<!--<description>POJO representation of search query pagination.</description>-->
+		<property name="id" type="String"/>
+		<property name="name" type="String"/>
+		<property name="parent" type="String"/>
+		<property name="active" type="boolean"/>
+		<property name="children" type="java.util.List&lt;B2BUnitNodeData>"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.company.data.UserData">
+		<!--<description>POJO representation of search query pagination.</description>-->
+		<property name="uid" type="String"/>
+		<property name="normalizedUid" type="String"/>
+		<property name="name" type="String"/>
+		<property name="selected" type="boolean"/>
+		<property name="active" type="boolean"/>
+		<property name="unit" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BUnitData"/>
+		<property name="roles" type="java.util.Collection&lt;String>"/>
+		<property name="displayRoles" type="java.util.Collection&lt;String>"/>
+	</bean>
+	<bean class="de.hybris.platform.commercefacades.user.data.AddressData">
+		<property name="editable" type="boolean"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BBudgetData">
+		<!--<description>POJO representation of search query pagination.</description>-->
+		<property name="budget" type="java.math.BigDecimal"/>
+		<property name="unit" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BUnitData"/>
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="currency" type="de.hybris.platform.commercefacades.storesession.data.CurrencyData"/>
+		<property name="active" type="boolean"/>
+		<property name="costCenters" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BCostCenterData>"/>
+		<property name="costCenterNames" type="java.util.List&lt;String>"/>
+		<property name="startDate" type="java.util.Date"/>
+		<property name="endDate" type="java.util.Date"/>
+		<property name="selected" type="boolean"/>
+		<property name="originalCode" type="String"/>
+	</bean>
+
+
+    <bean class="de.hybris.platform.commercefacades.order.data.CartData" extends="de.hybris.platform.commercefacades.order.data.AbstractOrderData">
+		<property name="costCenter" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BCostCenterData"/>
+		<property name="paymentType" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPaymentTypeData"/>
+		<property name="purchaseOrderNumber" type="String"/>
+		<property name="b2BComment" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BCommentData"/>
+		<property name="b2bCustomerData" type="de.hybris.platform.commercefacades.user.data.CustomerData"/>
+		<property name="quoteAllowed" type="java.lang.Boolean"/>
+	</bean>
+
+
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BCommentData">
+		<property name="comment" type="String"/>
+		<property name="code" type="String"/>
+		<property name="timeStamp" type="java.util.Date"/>
+		<property name="ownerData" type="de.hybris.platform.commercefacades.user.data.PrincipalData"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BCostCenterData">
+		<property name="unit" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BUnitData"/>
+		<property name="code" type="String"/>
+		<property name="originalCode" type="String"/>
+		<property name="name" type="String"/>
+		<property name="currency" type="de.hybris.platform.commercefacades.storesession.data.CurrencyData"/>
+		<property name="active" type="boolean"/>
+		<property name="b2bBudgetData" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BBudgetData>"/>
+		<property name="selected" type="boolean"/>
+	</bean>
+	<bean class="de.hybris.platform.commercefacades.user.data.CustomerData" extends="de.hybris.platform.commercefacades.user.data.PrincipalData">
+		<property name="unit" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BUnitData"/>
+		<property name="email" type="String"/>
+		<property name="contactNumber" type="String"/>
+		<property name="active" type="boolean"/>
+		<property name="approvers" type="java.util.List&lt;de.hybris.platform.commercefacades.user.data.CustomerData>"/>
+		<property name="approverGroups" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BUserGroupData>"/>
+		<property name="permissionGroups" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BUserGroupData>"/>
+		<property name="permissions" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BPermissionData>"/>
+		<property name="roles" type="java.util.Collection&lt;String>"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BDaysOfWeekData">
+		<property name="name" type="String"/>
+		<property name="code" type="String"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BOrderApprovalData">
+		<property name="workflowActionModelCode" type="String"/>
+		<property name="b2bOrderData" type="de.hybris.platform.commercefacades.order.data.OrderData"/>
+		<property name="permissionTypes" type="java.util.List&lt;String>"/>
+		<property name="allDecisions" type="java.util.List&lt;String>"/>
+		<property name="selectedDecision" type="String"/>
+		<property name="approvalComments" type="String"/>
+		<property name="approvalDecisionRequired" type="boolean"/>
+		<property name="orderHistoryEntriesData" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BOrderHistoryEntryData>"/>
+		<property name="quotesApprovalHistoryEntriesData" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BOrderHistoryEntryData>"/>
+		<property name="merchantApprovalHistoryEntriesData" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BOrderHistoryEntryData>"/>
+	</bean>
+	<bean class="de.hybris.platform.commercefacades.order.data.OrderData" extends="de.hybris.platform.commercefacades.order.data.AbstractOrderData">
+		<property name="costCenter" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BCostCenterData"/>
+		<property name="paymentType" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPaymentTypeData"/>
+		<property name="b2BComment" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BCommentData"/>
+		<property name="b2bCustomerData" type="de.hybris.platform.commercefacades.user.data.CustomerData"/>
+		<!--TODO: rename to b2bCommentData -->
+		<property name="b2bCommentData" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BCommentData>"/>
+		<property name="quoteExpirationDate" type="java.util.Date"/>
+		<property name="purchaseOrderNumber" type="String"/>
+		<property name="triggerData" type="de.hybris.platform.b2bacceleratorfacades.order.data.TriggerData"/>
+		<property name="b2bPermissionResult" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BPermissionResultData>"/>
+		<property name="jobCode" type="String"/>
+	</bean>
+	<bean class="de.hybris.platform.commercefacades.order.data.OrderHistoryData">
+		<property name="purchaseOrderNumber" type="String"/>
+		<property name="b2bPermissionResults" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BPermissionResultData>"/>
+		<property name="managers" type="java.util.List&lt;de.hybris.platform.commercefacades.user.data.PrincipalData>"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BOrderHistoryEntryData">
+		<property name="b2bOrderData" type="de.hybris.platform.commercefacades.order.data.OrderData"/>
+		<property name="description" type="String"/>
+		<property name="timeStamp" type="java.util.Date"/>
+		<property name="previousOrderVersionData" type="de.hybris.platform.commercefacades.order.data.OrderData"/>
+		<property name="ownerData" type="de.hybris.platform.commercefacades.user.data.PrincipalData"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPaymentTypeData">
+		<property name="code" type="String"/>
+		<property name="displayName" type="String"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPermissionData">
+		<property name="b2BPermissionTypeData" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPermissionTypeData"/>
+		<property name="code" type="String"/>
+		<property name="normalizedId" type="String"/>
+		<property name="originalCode" type="String"/>
+		<property name="value" type="Double"/>
+		<property name="timeSpan" type="String"/>
+		<property name="selected" type="boolean"/>
+		<property name="active" type="boolean"/>
+		<property name="unit" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BUnitData"/>
+		<property name="currency" type="de.hybris.platform.commercefacades.storesession.data.CurrencyData"/>
+		<property name="periodRange" type="de.hybris.platform.b2b.enums.B2BPeriodRange"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPermissionResultData">
+		<property name="status" type="de.hybris.platform.b2b.enums.PermissionStatus"/>
+		<property name="approver" type="String"/>
+		<property name="permissionToEvaluate" type="String"/>
+		<property name="permissionTypeCode" type="String"/>
+		<property name="approverNotes" type="String"/>
+		<property name="statusDisplay" type="String"/>
+		<property name="permissionTypeData" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPermissionTypeData"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPermissionTypeData">
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BSelectionData">
+		<property name="id" type="String"/>
+		<property name="selected" type="boolean"/>
+		<property name="active" type="boolean"/>
+		<property name="roles" type="java.util.List&lt;String>"/>
+		<property name="displayRoles" type="java.util.List&lt;String>"/>
+		<property name="normalizedCode" type="String"/>
+	
+	</bean>
+
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BUnitData" extends="de.hybris.platform.commercefacades.user.data.CompanyData">
+		<property name="unit" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BUnitData"/>
+		<property name="approvalProcessCode" type="String"/>
+		<property name="approvalProcessName" type="String"/>
+		<property name="active" type="boolean"/>
+		<property name="selected" type="boolean"/>
+		<property name="selectable" type="boolean"/>
+		<property name="reportingOrganization" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BUnitData"/>
+		<property name="approvers" type="java.util.Collection&lt;de.hybris.platform.commercefacades.user.data.CustomerData>"/>
+		<property name="budgets" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BBudgetData>"/>
+		<property name="orders" type="java.util.Collection&lt;de.hybris.platform.commercefacades.order.data.AbstractOrderData>"/>
+		<property name="costCenters" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BCostCenterData>"/>
+		<property name="approverGroups" type="java.util.Collection&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BUserGroupData>"/>
+		<property name="userGroups" type="java.util.Collection&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BUserGroupData>"/>
+		<property name="accountManagerGroups" type="java.util.Collection&lt;de.hybris.platform.commercefacades.user.data.UserGroupData>"/>
+		<property name="children" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BUnitData>"/>
+		<property name="administrators" type="java.util.Collection&lt;de.hybris.platform.commercefacades.user.data.CustomerData>"/>
+		<property name="customers" type="java.util.Collection&lt;de.hybris.platform.commercefacades.user.data.CustomerData>"/>
+		<property name="managers" type="java.util.List&lt;de.hybris.platform.commercefacades.user.data.CustomerData>"/>
+		<property name="accountManagers" type="java.util.List&lt;de.hybris.platform.commercefacades.user.data.PrincipalData>"/>
+		<property name="addresses" type="java.util.List&lt;de.hybris.platform.commercefacades.user.data.AddressData>"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BUserGroupData" extends="de.hybris.platform.commercefacades.user.data.UserGroupData">
+		<property name="roles" type="java.util.List&lt;String>"/>
+		<property name="unit" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BUnitData"/>
+		<property name="permissions" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BPermissionData>"/>
+		<property name="selected" type="boolean"/>
+		<property name="normalizedId" type="String"/>
+		<property name="editable" type="boolean"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.ScheduledCartData" extends="de.hybris.platform.commercefacades.order.data.CartData">
+		<property name="active" type="boolean"/>
+		<property name="triggerData" type="de.hybris.platform.b2bacceleratorfacades.order.data.TriggerData"/>
+		<property name="firstOrderDate" type="java.util.Date"/>
+		<property name="jobCode" type="String"/>
+	</bean>
+	<enum class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BReplenishmentRecurrenceEnum">
+		<value>DAILY</value>
+		<value>WEEKLY</value>
+		<value>MONTHLY</value>
+	</enum>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.TriggerData">
+		<property name="weekInterval" type="Integer"/>
+		<property name="day" type="Integer"/>
+		<property name="daysOfWeek" type="java.util.List&lt;de.hybris.platform.cronjob.enums.DayOfWeek>"/>
+		<property name="relative" type="java.lang.Boolean"/>
+		<property name="activationTime" type="java.util.Date"/>
+		<property name="month" type="Integer"/>
+		<property name="displayTimeTable" type="String"/>
+		<property name="creationTime" type="java.util.Date"/>
+		<property name="hour" type="Integer"/>
+		<property name="minute" type="Integer"/>
+	</bean>
+</beans>

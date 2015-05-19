@@ -1,0 +1,53 @@
+*** Settings ***
+Library         com.hybris.services.entitlements.atdd.keywords.EntitlementsExecuteKeywordLibrary
+Library         com.hybris.services.entitlements.atdd.keywords.EntitlementsDetailsKeywordLibrary
+
+
+*** Keywords ***
+check entitlement with entitlementType "${entitlementType:[^"]+}" for user "${user}" is "${exists_boolean:[^"]+}"
+    [Documentation]    Checks entitlements for user
+    execute entitlement    check    ${entitlementType}     ${user}     ${exists_boolean}
+
+check entitlement with entitlementType "${entitlementType:[^"]+}" and conditions "${condition:[^"]+}" for user "${user}" is "${exists_boolean:[^"]+}"
+    [Documentation]    Checks entitlements with conditions for user
+    ...                "entitlement type" condition with parameters {"key1":"value", "key2":"value"}
+    execute entitlement with condition    check    ${entitlementType}     ${user}     ${condition}    ${exists_boolean}
+
+check entitlement with entitlementType "${entitlementType:[^"]+}" if retrieve details set to "${details_boolean:[^"]+}" for user "${user:[^"]+}" is "${result_boolean:[^"]+}" and has "${grantCount:[^"]+}" grants
+    [Documentation]    Checks entitlements with details for user
+    ...                ${details_boolean} - true/false - must be set to "true" if ${grantCount} needs to be retrieved
+    ...                ${result_boolean} - true (if at least 1 entitlement is existing) / false (if no entitlement is existing for a user with given entitlementType)
+    ...                ${grantCount} - number of granted entitlement that are expected to be retrieved
+    execute entitlement with details    check    ${entitlementType}     ${user}     ${details_boolean}    ${result_boolean}    ${grantCount}
+
+### NEW: for ent with conditions:
+check entitlement with entitlementType "${entitlementType:[^"]+}" and conditions "${condition:[^"]+}" if retrieve details set to "${details_boolean:[^"]+}" for user "${user:[^"]+}" is "${result_boolean:[^"]+}" and has "${grantCount:[^"]+}" grants
+    [Documentation]    Checks entitlements with details for user
+    [Documentation]    ${details_boolean} - true/false - must be set to "true" if ${grantCount} needs to be retrieved
+    execute entitlement with condition and details    check    ${entitlementType}     ${user}     ${condition}    ${result_boolean}    ${details_boolean}    ${grantCount}
+
+check entitlement with id "${entitlementId:[^"]+}" has status "${status:[^"]+}"
+    [Documentation]    Check status of entitlement
+    check status of entitlement     ${entitlementId}    ${status}
+
+check property name "${propertyName:[^"]+}" equals to value "${propertyValue:[^"]+}" for entitlement with id "${entitlementId:[^"]+}"
+    [Documentation]     Set property to entitlement
+    ${result}=    update entitlement property    ${entitlementId}    ${propertyName}    ${propertyValue}
+    [Return]    ${result}
+
+ensure that entitlement with entitlementType "${entitlementType:[^"]+}" and grantSource "${grantSource:[^"]+}", grantSourceId "${grantSourceId:[^"]+}" for user "${user}" is "${exists_boolean:[^"]+}" in DB
+    [Documentation]    Search entitlements by filter
+    check entitlement by filter     ${user}     ${entitlementType}    ${grantSource}    ${grantSourceId}     ${exists_boolean}
+
+ensure there are "${number:[^"]+}" entitlements for user "${userId:[^"]+}"
+    [Documentation]    Check entitlements number for user
+    check entitlements number     ${number}     ${userId}
+
+ensure there are no entitlements for user "${userId:[^"]+}"
+    [Documentation]    Check entitlements number for user
+    check entitlements number     ${0}     ${userId}
+	
+assert in entitlement "${grantId:[^"]+}" for condition type "${conditionType:[^"]+}" the property "${key:[^"]+}" equals to "${value:[^"]+}"
+    [Documentation]    Assert condition's property value
+    assert condition property in entitlement    ${grantId}    ${conditionType}    ${key}    ${value}
+	

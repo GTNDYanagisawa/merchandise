@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <!-- Data source -->
+    <bean id="dataSource" class="de.hybris.platform.spring.DataSourceFactoryBean"/>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <constructor-arg type="javax.sql.DataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- Model persistence layer -->
+    <bean id="defaultPersistenceTypeService"
+          class="de.hybris.platform.servicelayer.internal.model.extractor.impl.DefaultPersistenceTypeService"/>
+
+    <bean id="batchCollectorFactory" class="de.hybris.platform.directpersistence.impl.BatchCollectorFactory">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="oracleBatchSize" value="${direct.persistence.jdbc.oracle.batch.size}"/>
+    </bean>
+
+    <bean id="recordVisitorFactory" class="de.hybris.platform.directpersistence.record.visitor.RecordVisitorFactory" />
+
+    <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager" ref="txManager"/>
+    </bean>
+
+    <alias name="defaultWritePersistenceGateway" alias="writePersistenceGateway"/>
+    <bean id="defaultWritePersistenceGateway"
+          class="de.hybris.platform.directpersistence.impl.DefaultWritePersistenceGateway">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="recordVisitorFactory" ref="recordVisitorFactory"/>
+        <property name="transactionTemplate" ref="transactionTemplate"/>
+        <property name="batchCollectorFactory" ref="batchCollectorFactory"/>
+        <property name="localizationService" ref="localizationService"/>
+    </bean>
+
+    <!-- Transaction support -->
+    <bean id="txManager" class="de.hybris.platform.spring.HybrisTransactionManager"/>
+
+    <!-- Sample: We want to make the foo service object transactional -->
+    <!-- <bean id="fooService" class="x.y.service.DefaultFooService"/> <tx:advice id="txAdvice" transaction-manager="txManager"> <tx:attributes>
+        <tx:method name="get*" read-only="true"/> <tx:method name="*"/> </tx:attributes> </tx:advice> <aop:config> <aop:pointcut id="fooServiceOperation"
+        expression="execution(* x.y.service.FooService.*(..))"/> <aop:advisor advice-ref="txAdvice" pointcut-ref="fooServiceOperation"/> </aop:config> -->
+
+    <bean id="failureInterceptor" class="de.hybris.platform.aop.ConcurrentOperationFailureInterceptor" >
+        <property name="maxRetries" value="5"/>
+        <property name="modelService" ref="modelService" />
+    </bean>
+    <aop:config proxy-target-class="true">
+        <aop:aspect id="failureInterceptorAspect" ref="failureInterceptor">
+            <aop:pointcut id="retryAnnotated"
+                          expression="@annotation(retryConcurrentModification)"/>
+            <aop:around pointcut-ref="retryAnnotated" method="performOperation" arg-names="retryConcurrentModification"/>
+        </aop:aspect>
+    </aop:config>
+
+</beans>

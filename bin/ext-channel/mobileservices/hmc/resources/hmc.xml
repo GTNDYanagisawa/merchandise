@@ -1,0 +1,1299 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+	<!--
+		[y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights
+		reserved. This software is the confidential and proprietary
+		information of hybris ("Confidential Information"). You shall not
+		disclose such Confidential Information and shall use it only in
+		accordance with the terms of the license agreement you entered into
+		with hybris.
+	-->
+<configuration xmlns="hybris.de/schemas/hmc/generic"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="hybris.de/schemas/hmc/generic hmc.xsd">
+
+	<explorertree>
+		<group name="text.group" description="text.group">
+			<typeref type="MobileAggregator" description="text.aggregators" />
+			<typeref type="MobileShortcode" description="text.shortcodes" />
+			<typeref type="MobileReceiveGenericAction" description="text.2wactions" />
+			<typeref type="PhoneNumberList" />
+			<typeref type="PhoneNumber" />
+			<typeref type="MobileMessageContext" />
+			<typeref type="MobileSendMessageCronJob" />
+		</group>
+	</explorertree>
+
+	<type name="MobileMessageContext" mode="append">
+		<organizer mode="append">
+			<search mode="replace" autoperform="true">
+				<condition attribute="incomingMessageId" />
+				<condition attribute="phoneNumber" />
+				<condition attribute="phoneCountryIsoCode" />
+				<condition attribute="shortcode" />
+				<condition attribute="countryIsoCode" />
+				<condition attribute="type" />
+				<condition attribute="status" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="creationtime" width="130" />
+						<attribute name="shortcode" width="100" />
+						<attribute name="phoneNumber" width="100" />
+						<attribute name="type" width="80" />
+						<attribute name="status" width="80" />
+						<attribute name="incomingText" width="160" />
+						<attribute name="outgoingText" />
+					</itemlayout>
+				</listview>
+			</result>
+			<editor mode="append">
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="type" />
+							<attribute name="status" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="text.message.general" mode="append">
+					<section name="text.message.destination">
+						<columnlayout>
+							<row>
+								<attribute name="countryIsoCode" />
+								<attribute name="shortcode" />
+							</row>
+							<row>
+								<void />
+								<attribute name="normalizedShortcode" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="text.message.source">
+						<columnlayout>
+							<row>
+								<attribute name="phoneCountryIsoCode" />
+								<attribute name="phoneNumber" />
+							</row>
+							<row>
+								<attribute name="user" />
+								<attribute name="normalizedPhoneNumber" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="text.message.routing">
+						<columnlayout>
+							<row>
+								<attribute name="matchedShortcode" />
+								<attribute name="matchedActionAssignment" />
+							</row>
+							<row>
+								<attribute name="matchedAction" />
+								<attribute name="usingDefaultAction" />
+							</row>
+							<row>
+								<attribute name="outgoingShortcode" />
+								<void />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="text.message.content" mode="append">
+					<section name="text.message.incoming">
+						<listlayout>
+							<attribute name="incomingText">
+								<textareaeditor rows="2" />
+							</attribute>
+							<action type="item"
+								classname="de.hybris.platform.mobileservices.hmc.action.RemoveMobileMessageAction"
+								name="action.removemobilemessage" toolbaricon="header_delete"
+								icon="images/icons/header_delete.gif" autosave="true"
+								showtoolbarlabel="true" hidebutton="true" />
+							<action type="item"
+								classname="de.hybris.platform.mobileservices.hmc.action.ReSendMobileMessageAction"
+								name="action.resendmobilemessage" autosave="true"
+								showtoolbarlabel="true" hidebutton="true" />
+						</listlayout>
+					</section>
+					<section name="text.message.outgoing">
+						<listlayout>
+							<attribute name="isLink" />
+							<attribute name="outgoingSubject" />
+							<attribute name="outgoingText">
+								<textareaeditor rows="2" />
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="text.message.pricing" mode="append">
+					<section name="text.message.pricing">
+						<columnlayout>
+							<row>
+								<attribute name="price" />
+								<attribute name="priceCurrency" />
+							</row>
+							<row>
+								<attribute name="revenue" />
+								<attribute name="revenueCurrency" />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+				<tab name="text.message.advanced" mode="append">
+					<section name="text.message.errors">
+						<columnlayout>
+							<row>
+								<attribute name="messageError" />
+								<attribute name="messageErrorDescription">
+									<textareaeditor rows="3" />
+								</attribute>
+							</row>
+							<row>
+								<attribute name="aggregatorError" />
+								<attribute name="aggregatorErrorDescription">
+									<textareaeditor rows="3" />
+								</attribute>
+							</row>
+						</columnlayout>
+					</section>
+					<section name="text.message.smpp">
+						<columnlayout>
+							<row>
+								<attribute name="incomingMessageId" />
+								<attribute name="outgoingMessageId" />
+							</row>
+							<row>
+								<attribute name="optOperator" />
+								<attribute name="optTariff" />
+							</row>
+							<row>
+								<attribute name="optSessionId" />
+								<attribute name="failures" />
+							</row>
+							<row>
+								<attribute name="rawMessageDetails">
+									<textareaeditor rows="10" />
+								</attribute>
+								<void />
+							</row>
+						</columnlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="phoneNumber" mode="replace"
+			showempty="false">
+			<itemlayout>
+				<attribute name="type" />
+				<attribute name="status" />
+				<attribute name="shortcode" />
+				<attribute name="phoneNumber" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="MobileAggregator" mode="append">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="code" />
+				<condition attribute="engine" />
+			</search>
+			<result defaultview="tree" mode="replace">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="code" width="150" />
+						<attribute name="engine" width="150" />
+						<attribute name="shortcodes" width="400">
+						</attribute>
+					</itemlayout>
+				</listview>
+				<treeview mode="replace" scrollbar="true">
+					<explorable>
+						<attribute name="shortcodes" suppressroot="true" />
+					</explorable>
+					<itemlayout mode="replace">
+						<attribute name="code" width="150" />
+						<attribute name="engine" width="150" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor mode="append">
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="code" />
+							<attribute name="engine" />
+						</row>
+						<row>
+							<attribute name="available" />
+							<attribute name="state" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="text.shortcodes" mode="append">
+					<section name="text.shortcodes">
+						<listlayout>
+							<attribute name="shortcodes" width="300">
+								<referencecollectioneditor resortable="true"
+									remove="true" create="true" add="true" autosave="true"
+									editable="true" presetattribute="aggregator">
+									<itemlayout>
+										<attribute name="supportedMessageType" />
+										<attribute name="country" />
+										<attribute name="code" />
+										<attribute name="keywordPrefix" />
+										<attribute name="networkType" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<action type="item"
+								classname="de.hybris.platform.mobileservices.hmc.UpdateEnginesAction"
+								name="action.updateengines" autosave="true" showtoolbarlabel="true"
+								hidebutton="true" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="text.aggregator.configuration" mode="append">
+					<section name="text.aggregator.retry">
+						<columnlayout>
+							<row>
+								<attribute name="maxSendingRetries" />
+								<attribute name="sendingRetryInterval" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="text.aggregator.configuration">
+						<listlayout>
+							<attribute name="parameters" width="300">
+								<referencecollectioneditor remove="true"
+									create="true" add="true" autosave="true" editable="true"
+									externalcreate="false" presetattribute="aggregator">
+									<itemlayout>
+										<attribute name="name" />
+										<attribute name="value" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+				<attribute name="engine" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="MobileAggregatorParameter" mode="append">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="aggregator" />
+				<condition attribute="name" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="aggregator" />
+						<attribute name="name" />
+						<attribute name="value" />
+					</itemlayout>
+				</listview>
+				<treeview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="aggregator" />
+						<attribute name="name" />
+						<attribute name="value" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor mode="append">
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="aggregator" />
+							<attribute name="name" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="text.parameter" mode="append">
+					<section name="text.parameter">
+						<listlayout>
+							<attribute name="value" width="300" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="name" mode="replace">
+			<itemlayout>
+				<attribute name="name" />
+				<attribute name="value" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="MobileShortcode" mode="append">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="country" />
+				<condition attribute="code" />
+				<condition attribute="supportedMessageType" />
+			</search>
+
+			<result defaultview="list" mode="replace">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="supportedMessageType" width="150" />
+						<attribute name="country" width="150" />
+						<attribute name="code" width="200" />
+						<attribute name="keywordPrefix" width="150" />
+						<attribute name="aggregator" width="250" />
+						<attribute name="networkType" width="50" />
+					</itemlayout>
+				</listview>
+				<treeview mode="replace" scrollbar="true">
+					<explorable>
+						<attribute name="assignments" suppressroot="true" />
+					</explorable>
+					<itemlayout mode="replace">
+						<attribute name="supportedMessageType" />
+						<attribute name="country" />
+						<attribute name="code" />
+						<attribute name="keywordPrefix" />
+						<attribute name="networkType" />
+					</itemlayout>
+				</treeview>
+
+			</result>
+			<editor mode="append">
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="country" />
+							<attribute name="code" />
+						</row>
+						<row>
+							<attribute name="aggregator" />
+							<attribute name="keywordPrefix" />
+						</row>
+						<row>
+							
+							<attribute name="state" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="text.shortcode" mode="append">
+					<section name="text.shortcodeprefix">
+						<listlayout>
+							<attribute name="supportedMessageType" />
+							<text name="text.networktype" />
+							<attribute name="networkType" />
+							<text name="text.maxsizehelp" />
+							<attribute name="messageMaxSize" />
+						</listlayout>
+					</section>
+					<section name="text.whitelist">
+						<listlayout>
+							<text name="text.whitelist.help" />
+							<attribute name="testingPhoneNumbers" width="200">
+								<referencecollectioneditor resortable="false"
+									remove="true" create="true" add="true" autosave="true"
+									presetattribute="shortcodes">
+									<itemlayout>
+										<attribute name="code" />
+										<attribute name="name" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+					<section name="text.blacklist">
+						<listlayout>
+							<text name="text.blacklist.help" />
+							<attribute name="phoneNumberFilters" width="200">
+								<referencecollectioneditor resortable="false"
+									remove="true" create="true" add="true" autosave="true"
+									presetattribute="shortcodes">
+									<itemlayout>
+										<attribute name="code" />
+										<attribute name="name" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="text.actions">
+					<section name="text.default.action">
+						<columnlayout>
+							<row>
+								<attribute name="defaultAction" />
+								<attribute name="alternativeReplyRoute" />
+							</row>
+						</columnlayout>
+					</section>
+					<section name="text.actions">
+						<listlayout>
+							<attribute name="assignments" width="600">
+								<referencecollectioneditor resortable="false"
+									remove="true" create="true" add="true" autosave="true"
+									editable="true" externalcreate="false" presetattribute="shortcode">
+									<itemlayout>
+										<attribute name="state" width="150" />
+										<attribute name="keyword" width="200" />
+										<attribute name="action" width="250" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="text.billing">
+					<section name="text.cost">
+						<listlayout>
+							<attribute name="revenuePlans" width="500">
+								<referencecollectioneditor resortable="true"
+									remove="true" create="true" add="true" autosave="true"
+									editable="true" externalcreate="false" presetattribute="receivingShortcode">
+									<itemlayout>
+										<attribute name="price" />
+										<attribute name="priceCurrency" />
+										<attribute name="startDate" width="200" />
+										<attribute name="endDate" width="200" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="costPlans" width="500">
+								<referencecollectioneditor resortable="true"
+									remove="true" create="true" add="true" autosave="true"
+									presetattribute="sendingShortcode" editable="true"
+									externalcreate="false">
+									<itemlayout>
+										<attribute name="price" />
+										<attribute name="priceCurrency" />
+										<attribute name="startDate" width="200" />
+										<attribute name="endDate" width="200" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace"
+			showempty="false">
+			<itemlayout>
+				<attribute name="supportedMessageType" />
+				<attribute name="country" />
+				<attribute name="code" />
+				<attribute name="keywordPrefix" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="MobileActionAssignment" mode="append">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="shortcode" />
+				<condition attribute="action" />
+			</search>
+
+			<result defaultview="list" mode="replace">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="shortcode" />
+						<attribute name="keyword" />
+						<attribute name="action" />
+						<attribute name="state" />
+					</itemlayout>
+				</listview>
+				<treeview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="keyword" />
+						<attribute name="action" />
+						<attribute name="state" />
+					</itemlayout>
+				</treeview>
+			</result>
+
+			<editor mode="append">
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="shortcode" />
+							<attribute name="action" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="text.assignment">
+					<section name="text.activation">
+						<listlayout>
+							<attribute name="language" width="100" />
+							<attribute name="state" width="100" />
+							<attribute name="startDate" width="300" />
+							<attribute name="endDate" width="300" />
+						</listlayout>
+					</section>
+					<section name="text.keywords">
+						<listlayout>
+							<attribute name="keyword">
+								<referenceeditor autocomplete="true">
+								</referenceeditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="text.programming">
+					<section name="text.whitelist">
+						<listlayout>
+							<text name="text.whitelist.help" />
+							<attribute name="testingPhoneNumbers" width="200">
+								<referencecollectioneditor resortable="false"
+									remove="true" create="true" add="true" autosave="true"
+									presetattribute="shortcodes">
+									<itemlayout>
+										<attribute name="code" />
+										<attribute name="name" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+					<section name="text.blacklist">
+						<listlayout>
+							<text name="text.blacklist.help" />
+							<attribute name="phoneNumberFilters" width="200">
+								<referencecollectioneditor resortable="true"
+									remove="true" create="true" add="true" autosave="true"
+									presetattribute="assignments">
+									<itemlayout>
+										<attribute name="code" />
+										<attribute name="name" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+
+		<defaultreference mode="replace" showempty="false">
+			<itemlayout>
+				<attribute name="action" />
+				<attribute name="keyword" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+
+	<type name="MobileActionKeyword" mode="append">
+		<organizer mode="append">
+			<search mode="replace" autoperform="true">
+				<condition attribute="keyword" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="keyword" />
+						<attribute name="type" />
+					</itemlayout>
+				</listview>
+				<treeview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="keyword" />
+						<attribute name="type" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor mode="append">
+				<tab name="text.keyword">
+					<section name="text.keyword">
+						<listlayout>
+							<attribute name="type" width="150" />
+							<attribute name="keyword" width="200" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="keyword" mode="replace">
+			<itemlayout>
+				<attribute name="keyword" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="PhoneNumber" mode="append">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="number" />
+				<condition attribute="country" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="country" />
+						<attribute name="number" />
+						<attribute name="format" />
+					</itemlayout>
+				</listview>
+				<treeview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="country" />
+						<attribute name="number" />
+						<attribute name="format" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor mode="append">
+				<tab name="text.phonenumber">
+					<section name="text.phonenumber">
+						<listlayout>
+							<attribute name="format" width="150" />
+							<attribute name="country" width="150" />
+							<attribute name="number" width="200" />
+							<attribute name="lists" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="number" mode="replace">
+			<itemlayout>
+				<attribute name="country" />
+				<attribute name="number" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="UserPhoneNumber" mode="append">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="user" />
+				<condition attribute="type" />
+				<condition attribute="phoneNumber" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="user" />
+						<attribute name="phoneNumber" />
+						<attribute name="type" />
+					</itemlayout>
+				</listview>
+				<treeview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="user" />
+						<attribute name="phoneNumber" />
+						<attribute name="type" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor mode="append">
+				<tab name="text.customerphonenumber">
+					<section name="text.customerphonenumber">
+						<listlayout>
+							<attribute name="user" width="150" />
+							<attribute name="phoneNumber" width="200" />
+							<attribute name="type" width="150" />
+							<attribute name="default" width="150" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="user" />
+				<attribute name="phoneNumber" />
+				<attribute name="type" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="User" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="text.userphone">
+					<section name="text.userPhone">
+						<listlayout>
+							<attribute name="phoneNumbers" width="300">
+								<referencecollectioneditor resortable="true"
+									remove="true" create="true" add="true" autosave="true"
+									editable="true" presetattribute="user">
+									<itemlayout>
+										<attribute name="type" />
+										<attribute name="phoneNumber" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="MobileCostPlan" mode="append">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="receivingShortcode" />
+				<condition attribute="sendingShortcode" />
+				<condition attribute="startDate" />
+				<condition attribute="endDate" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="price" />
+						<attribute name="priceCurrency" />
+						<attribute name="startDate" />
+						<attribute name="endDate" />
+					</itemlayout>
+				</listview>
+				<treeview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="price" />
+						<attribute name="priceCurrency" />
+						<attribute name="startDate" />
+						<attribute name="endDate" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor mode="append">
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="sendingShortcode" />
+							<attribute name="receivingShortcode" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="text.price" position="1">
+					<section name="text.price">
+						<listlayout>
+							<attribute name="price" width="150" />
+							<attribute name="priceCurrency" width="150" />
+							<attribute name="startDate" width="150" />
+							<attribute name="endDate" width="150" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference mode="replace">
+			<itemlayout>
+				<attribute name="price" />
+				<attribute name="priceCurrency" />
+				<attribute name="startDate" />
+				<attribute name="endDate" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="PhoneNumberList" mode="replace">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="code" />
+				<condition attribute="name" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="code" width="180" />
+						<attribute name="name" width="240" />
+						<attribute name="memberSize" width="90" />
+					</itemlayout>
+				</listview>
+				<treeview mode="replace" scrollbar="true">
+					<explorable>
+						<attribute name="numbers" suppressroot="false" />
+					</explorable>
+					<itemlayout mode="replace">
+						<attribute name="code" width="180" />
+						<attribute name="name" width="240" />
+						<attribute name="memberSize" width="90" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor mode="append">
+				<essentials>
+					<columnlayout>
+						<row>
+							<attribute name="code" />
+							<attribute name="name" />
+						</row>
+					</columnlayout>
+				</essentials>
+				<tab name="text.subs.phones" position="0">
+					<section name="text.subs.phones">
+						<listlayout>
+							<attribute name="numbers">
+								<referencecollectioneditor remove="true"
+									create="true" add="true" autosave="true" editable="true"
+									externalcreate="false" maxcount="100">
+									<itemlayout>
+										<attribute name="country" />
+										<attribute name="number" />
+										<attribute name="format" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="text.phonelist.references" position="1">
+					<section name="text.phonelist.shortcodes">
+						<listlayout>
+							<attribute name="blockedShortcodes">
+								<referencecollectioneditor remove="true"
+									create="false" add="true" autosave="true" editable="false">
+									<itemlayout>
+										<attribute name="supportedMessageType" />
+										<attribute name="code" />
+										<attribute name="country" />
+										<attribute name="keywordPrefix" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="testingShortcodes">
+								<referencecollectioneditor remove="true"
+									create="false" add="true" autosave="true" editable="false">
+									<itemlayout>
+										<attribute name="supportedMessageType" />
+										<attribute name="code" />
+										<attribute name="country" />
+										<attribute name="keywordPrefix" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="sendingActions" />
+						</listlayout>
+					</section>
+					<section name="text.phonelist.assignments">
+						<listlayout>
+							<attribute name="blockedAssignments">
+								<referencecollectioneditor remove="true"
+									create="false" add="true" autosave="true" editable="false">
+									<itemlayout>
+										<attribute name="shortcode" />
+										<attribute name="keyword" />
+										<attribute name="action" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+							<attribute name="testingAssignments">
+								<referencecollectioneditor remove="true"
+									create="false" add="true" autosave="true" editable="false">
+									<itemlayout>
+										<attribute name="shortcode" />
+										<attribute name="keyword" />
+										<attribute name="action" />
+									</itemlayout>
+								</referencecollectioneditor>
+							</attribute>
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+				<attribute name="name" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="AbstractMobileSendAction" mode="replace">
+		<organizer mode="replace">
+			<search mode="append" autoperform="true">
+				<condition attribute="code" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="code" width="150" />
+						<attribute name="defaultLanguage" />
+					</itemlayout>
+				</listview>
+				<treeview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="code" width="150" />
+						<attribute name="defaultLanguage" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor mode="replace">
+				<essentials>
+					<listlayout>
+						<attribute name="code" width="150" />
+					</listlayout>
+				</essentials>
+				<tab name="text.defaults" position="1">
+					<section name="text.defaults">
+						<listlayout>
+							<attribute name="defaultLanguage" width="300" />
+						</listlayout>
+					</section>
+				</tab>
+				<tab name="text.lists" position="2">
+					<section name="text.lists">
+						<listlayout>
+							<attribute name="filterLists" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+
+	<type name="MobileReceiveGenericAction" mode="replace">
+		<organizer mode="replace">
+			<search mode="append" autoperform="true">
+				<condition attribute="code" />
+			</search>
+			<result defaultview="list" mode="replace">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="code" width="150" />
+					</itemlayout>
+				</listview>
+				<treeview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="code" width="150" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor mode="replace">
+				<essentials>
+					<listlayout>
+						<attribute name="code" width="150" />
+					</listlayout>
+				</essentials>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+
+
+
+
+	<!-- Configuration for extension mobile -->
+	
+	<type name="Category" mode="append">
+		<organizer>
+			<editor mode="append">
+				<customtab name="tab.category.mobile" id="mobile-barcode"
+					classname="de.hybris.platform.mobileservices.hmc.QRCodeDeeplinkChip"
+					mode="append" position="1" />
+			</editor>
+		</organizer>
+	</type>
+
+
+	<type name="Product" mode="append">
+		<organizer>
+			<editor mode="append">
+				<tabref idref="mobile-barcode" />
+			</editor>
+		</organizer>
+	</type>
+ 	
+	<!-- Actions -->
+
+
+
+	<type name="MobileReceiveAndSendTextAction" mode="append">
+		<organizer mode="append">
+			<search mode="append" autoperform="true">
+				<condition attribute="content" />
+				<condition attribute="subject" />
+			</search>
+			<result defaultview="list" mode="append">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="isLink" width="120" />
+						<attribute name="content" width="200" />
+						<attribute name="subject" width="150" />
+					</itemlayout>
+				</listview>
+				<treeview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="isLink" width="120" />
+						<attribute name="content" width="200" />
+						<attribute name="subject" width="150" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor mode="append">
+				<tab name="text.sms" mode="append">
+					<section name="text.sms">
+						<listlayout>
+							<attribute name="isLink" width="150" />
+							<attribute name="content" width="200" />
+							<attribute name="subject" width="200" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="MobileReceiveAndSubscribeAction" mode="append">
+		<organizer mode="append">
+			<result defaultview="list" mode="append">
+				<listview mode="append" scrollbar="true">
+					<itemlayout mode="append">
+						<attribute name="list" width="200" />
+						<attribute name="remove" width="200" />
+					</itemlayout>
+				</listview>
+				<treeview mode="replace" scrollbar="true">
+					<itemlayout mode="replace">
+						<attribute name="list" width="200" />
+						<attribute name="remove" width="200" />
+					</itemlayout>
+				</treeview>
+			</result>
+			<editor mode="append">
+				<tab name="text.sms" mode="append">
+					<section name="text.subscribe">
+						<listlayout>
+							<attribute name="remove" width="200" />
+							<attribute name="list" width="200" />
+							<attribute name="successMessage" width="200" />
+							<attribute name="defaultErrorMessage" width="400" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+	<type name="MobileReceiveAndSendItemAction" mode="append">
+		<organizer mode="append">
+			<result defaultview="list" mode="append">
+				<listview mode="append">
+					<itemlayout mode="append">
+						<attribute name="content" width="200" mode="append" />
+					</itemlayout>
+				</listview>
+				<treeview mode="append">
+					<itemlayout mode="append">
+						<attribute name="content" width="200" mode="append" />
+					</itemlayout>
+				</treeview>
+
+			</result>
+			<editor mode="append">
+				<tab name="text.sms" mode="append">
+					<section name="text.item">
+						<listlayout>
+							<attribute name="isLink" width="150" />
+							<attribute name="content" width="150" />
+							<attribute name="subject" width="200" />
+						</listlayout>
+					</section>
+					<section name="text.deeplink">
+						<listlayout>
+							<attribute name="deeplinkUrl" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+	</type>
+
+
+
+
+	<type name="MobileSendTextAction" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="text.defaults" mode="delete" />
+				<tab name="text.sms">
+					<section name="text.sms">
+						<listlayout>
+							<attribute name="template" width="300" />
+							<attribute name="defaultLanguage" width="300" mode="replace" />
+						</listlayout>
+					</section>
+				</tab>
+
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="MobileSendLinkAction" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="text.sms">
+					<section name="text.sms">
+						<listlayout>
+							<attribute name="subject" width="200" />
+							<attribute name="link" width="200" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="MobileSendItemLinkAction" mode="append">
+		<organizer mode="append">
+			<editor mode="append">
+				<tab name="text.sms">
+					<section name="text.item">
+						<listlayout>
+							<attribute name="subject" width="200" />
+							<attribute name="defaultItem" width="200" />
+							<attribute name="deeplinkUrl" width="200" />
+						</listlayout>
+					</section>
+				</tab>
+			</editor>
+		</organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+	<type name="MobileSendMessageCronJob" mode="append">
+		<organizer>
+			<editor>
+				<exclude>
+					<exclusion attribute="finishedItems" />
+					<exclusion attribute="pendingItems" />
+				</exclude>
+				<tab name="tab.sync.settings" position="0">
+					<section name="section.sync.settings">
+						<table>
+
+							<tr>
+								<td>
+									<attribute name="template" />
+								</td>
+								<td>
+									<attribute name="subject" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<attribute name="link" />
+								</td>
+								<td>
+									<attribute name="deeplinkUrl" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<attribute name="item">
+										<customeditor
+											classname="de.hybris.platform.hmc.generic.GenericReferenceEditorChip">
+										</customeditor>
+									</attribute>
+								</td>
+								<td>
+									<attribute name="variables" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<attribute name="language" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<attribute name="phoneNumbers">
+										<referencecollectioneditor remove="true"
+											create="true" add="true" autosave="true" editable="true"
+											externalcreate="false" maxcount="100">
+											<itemlayout>
+												<attribute name="country" />
+												<attribute name="number" />
+												<attribute name="format" />
+											</itemlayout>
+										</referencecollectioneditor>
+
+									</attribute>
+								</td>
+								<td>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<attribute name="recipientPhoneNumberLists">
+										<referencecollectioneditor
+											resortable="false" remove="true" create="true" add="true"
+											autosave="true" presetattribute="shortcodes">
+											<itemlayout>
+												<attribute name="code" />
+												<attribute name="name" />
+											</itemlayout>
+										</referencecollectioneditor>
+									</attribute>
+								</td>
+								<td>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<attribute name="recipients" />
+								</td>
+								<td>
+								</td>
+							</tr>
+						</table>
+					</section>
+				</tab>
+				<tab name="tab.cronjob.systemrecovery">
+					<section name="section.cronjob.systemrecovery">
+						<listlayout>
+							<attribute name="changeRecordingEnabled" mode="delete" />
+						</listlayout>
+					</section>
+				</tab>
+
+			</editor>
+		</organizer>
+	</type>
+	<type name="DeeplinkUrl" mode="append">
+		<organizer></organizer>
+		<defaultreference searchattribute="code" mode="replace">
+			<itemlayout>
+				<attribute name="code" mode="replace" />
+			</itemlayout>
+		</defaultreference>
+	</type>
+
+</configuration>
+ 

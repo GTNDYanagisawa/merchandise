@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<web-app id="vjdbc" version="3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" 
+         metadata-complete="true">
+  <absolute-ordering />
+  
+	<display-name>vjdbc</display-name>
+	
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+
+	<filter>
+   		<filter-name>XSSFilter</filter-name>
+		<filter-class>de.hybris.platform.servicelayer.web.XSSFilter</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>XSSFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+<!--
+	Filter that will do initialization work for each web application which include:
+	- Getting the JaloSession from the HttpSession or, if not available, create a new JaloSession 
+ 	- Activate this JaloSession so that calls to JaloSession.getCurrentSession() can be performed.
+ 	- Iterate through all managers and call the doPreRequest(..) method.
+-->
+	<filter>
+		<filter-name>InitFilter</filter-name>
+		<filter-class>de.hybris.platform.virtualjdbc.filter.VjdbcConnectionFilter</filter-class>		
+		<init-param>
+			<param-name>enable.compression</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>tenantIDPattern</param-name>
+			<param-value>;\s*tenant\s*=\s*(\w+)</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>InitFilter</filter-name>
+		<url-pattern>/service</url-pattern>
+	</filter-mapping>
+	
+<!--
+	Enabling a Spring web application context with 'session' and 'request' scope.
+	- The 'contextConfigLocation' param specifies where your configuration files are located.
+	- The HybrisContextLoaderListener extends the usual SpringContextLoaderListener (which loads
+	  the context from specified location) by adding the global application context of
+	  the platform as parent context. With having the global context set as parent you can access
+	  or override beans of the global context and get the 'tenant' scope.
+	- The RequestContextListener is needed for exposing the 'request' scope to the context.
+	  Furthermore it is needed when overriding the 'jalosession' bean for your web application.
+ -->
+	
+	<listener>
+    	<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+	</listener>
+	
+	<servlet>
+		<servlet-name>vjdbcServlet</servlet-name>
+      <servlet-class>de.hybris.platform.virtualjdbc.servlet.VjdbcPlatformServlet</servlet-class>
+   </servlet>
+	
+	<servlet-mapping>
+		<servlet-name>vjdbcServlet</servlet-name>
+		<url-pattern>/service</url-pattern>
+	</servlet-mapping>	
+	
+	
+</web-app> 

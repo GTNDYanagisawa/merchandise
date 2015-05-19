@@ -1,0 +1,37 @@
+# ImpEx for Importing Category Media into Powertools Store
+
+# Macros / Replacement Parameter definitions
+$productCatalog=powertoolsProductCatalog
+$productCatalogName=Powertools Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$thumbnail=thumbnail(code, $catalogVersion)
+$picture=picture(code, $catalogVersion)
+$siteResource=jar:de.hybris.platform.b2bacceleratorsampledata.constants.B2BAcceleratorSampleDataConstants&/b2bacceleratorsampledata/import/productCatalogs/$productCatalog
+
+
+# Import Category Media
+INSERT_UPDATE Media;code[unique=true];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];$catalogVersion
+;/thumbs/CAT953.jpg;CAT953.jpg;$siteResource/images/thumbs/CAT953.jpg;
+;/thumbs/CAT1354.jpg;CAT1354.jpg;$siteResource/images/thumbs/CAT1354.jpg;
+;/thumbs/CAT1356.jpg;CAT1356.jpg;$siteResource/images/thumbs/CAT1356.jpg;
+;/thumbs/CAT1358.jpg;CAT1358.jpg;$siteResource/images/thumbs/CAT1358.jpg;
+;/thumbs/CAT1359.jpg;CAT1359.jpg;$siteResource/images/thumbs/CAT1359.jpg;
+;/thumbs/CAT1360.jpg;CAT1360.jpg;$siteResource/images/thumbs/CAT1360.jpg;
+;/thumbs/CAT1386.jpg;CAT1386.jpg;$siteResource/images/thumbs/CAT1386.jpg;
+;/thumbs/CAT1505.jpg;CAT1505.jpg;$siteResource/images/thumbs/CAT1505.jpg;
+;/thumbs/CAT1595.jpg;CAT1595.jpg;$siteResource/images/thumbs/CAT1595.jpg;
+;/thumbs/CAT1596.jpg;CAT1596.jpg;$siteResource/images/thumbs/CAT1596.jpg;
+;/thumbs/CAT1631.jpg;CAT1631.jpg;$siteResource/images/thumbs/CAT1631.jpg;
+
+UPDATE Category;code[unique=true];$thumbnail;allowedPrincipals(uid)[default='customergroup'];$catalogVersion
+;953;/thumbs/CAT953.jpg
+;1354;/thumbs/CAT1354.jpg
+;1356;/thumbs/CAT1356.jpg
+;1358;/thumbs/CAT1358.jpg
+;1359;/thumbs/CAT1359.jpg
+;1360;/thumbs/CAT1360.jpg
+;1386;/thumbs/CAT1386.jpg
+;1505;/thumbs/CAT1505.jpg
+;1595;/thumbs/CAT1595.jpg
+;1596;/thumbs/CAT1596.jpg
+;1631;/thumbs/CAT1631.jpg

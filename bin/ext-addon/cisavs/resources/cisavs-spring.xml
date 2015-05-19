@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		   http://www.springframework.org/schema/beans/spring-beans.xsd
+		   http://www.springframework.org/schema/util
+		   http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- Converter and populators -->
+	<alias name="defaultCisAvsAddressConverter" alias="cisAvsAddressConverter"/>
+	<bean id="defaultCisAvsAddressConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cisAvsAddress"/>
+		<property name="populators">
+			<list>
+				<ref bean="cisAvsAddressPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisAvsAddressPopulator" alias="cisAvsAddressPopulator"/>
+	<bean id="defaultCisAvsAddressPopulator"
+	      class="de.hybris.platform.integration.cis.avs.populators.CisAvsAddressPopulator">
+	</bean>
+
+	<bean id="cisAvsAddress"
+	      class="com.hybris.cis.api.model.CisAddress"
+	      scope="prototype">
+	</bean>
+
+
+	<alias name="defaultCisAvsResultAddressVerificationResultDataConverter" alias="cisAvsResultAddressVerificationResultDataConverter"/>
+	<bean id="defaultCisAvsResultAddressVerificationResultDataConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="avrData"/>
+		<property name="populators">
+			<list>
+				<ref bean="cisAddressVerificationResultPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisAddressVerificationResultPopulator" alias="cisAddressVerificationResultPopulator"/>
+	<bean id="defaultCisAddressVerificationResultPopulator"
+	      class="de.hybris.platform.integration.cis.avs.populators.CisAddressVerificationResultPopulator">
+		<property name="cisAvsReverseAddressesConverter" ref="cisAvsReverseAddressesConverter"/>
+		<property name="cisAvsFieldErrorConverter" ref="cisAvsFieldErrorConverter"/>
+		<property name="showSuggestedAddressesStrategy" ref="showSuggestedAddressStrategy"/>
+	</bean>
+
+	<bean id="avrData"
+	      class="de.hybris.platform.commerceservices.address.data.AddressVerificationResultData"
+	      scope="prototype">
+	</bean>
+
+	<alias name="defaultCisAvsFieldErrorConverter" alias="cisAvsFieldErrorConverter"/>
+	<bean id="defaultCisAvsFieldErrorConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cisAvsAddressFieldErrors"/>
+		<property name="populators">
+			<list>
+				<ref bean="cisAvsFieldErrorPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisAvsFieldErrorPopulator" alias="cisAvsFieldErrorPopulator"/>
+	<bean id="defaultCisAvsFieldErrorPopulator"
+	      class="de.hybris.platform.integration.cis.avs.populators.CisAvsFieldErrorPopulator">
+	</bean>
+
+	<util:list id="cisAvsAddressFieldErrors"
+	           value-type="de.hybris.platform.commerceservices.address.data.AddressFieldErrorData"
+	           scope="prototype"/>
+
+	<alias name="defaultCisAvsReverseAddressesConverter" alias="cisAvsReverseAddressesConverter"/>
+	<bean id="defaultCisAvsReverseAddressesConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="cisAvsAddressModels"/>
+		<property name="populators">
+			<list>
+				<ref bean="cisAvsReverseAddressesPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisAvsReverseAddressesPopulator" alias="cisAvsReverseAddressesPopulator"/>
+	<bean id="defaultCisAvsReverseAddressesPopulator"
+	      class="de.hybris.platform.integration.cis.avs.populators.CisAvsReverseAddressesPopulator">
+		<property name="cisAvsReverseAddressPopulator" ref="cisAvsReverseAddressPopulator"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="suggestedAddressesAmountStrategy" ref="suggestedAddressesAmountStrategy"/>
+	</bean>
+
+
+	<util:list id="cisAvsAddressModels"
+	           value-type="de.hybris.platform.core.model.user.AddressModel"
+	           scope="prototype"/>
+
+	<alias name="defaultCisAvsReverseAddressPopulator" alias="cisAvsReverseAddressPopulator"/>
+	<bean id="defaultCisAvsReverseAddressPopulator"
+	      class="de.hybris.platform.integration.cis.avs.populators.CisAvsReverseAddressPopulator">
+		<property name="i18nService" ref="commonI18NService"/>
+	</bean>
+
+	<alias name="defaultCisAvsAddressMatchingPopulator" alias="cisAvsAddressMatchingPopulator"/>
+	<bean id="defaultCisAvsAddressMatchingPopulator"
+	      class="de.hybris.platform.integration.cis.avs.populators.CisAvsAddressMatchingPopulator">
+	</bean>
+
+
+	<!-- Hytrix configuration for avs calls-->
+	<alias alias="cisAvsCommandConfig" name="cisAvsCommandConfig"/>
+	<bean id="cisAvsCommandConfig" class="de.hybris.platform.integration.commons.hystrix.OndemandHystrixCommandConfiguration">
+		<property name="groupKey" value="${cisavs.addressVerification.groupKey}"/>
+		<property name="threadTimeout" value="${cisavs.addressVerification.threadTimeout}"/>
+		<property name="threadPoolSize" value="${cisavs.addressVerification.threadPoolSize}"/>
+	</bean>
+
+	<!-- Services and strategies -->
+	<alias alias="addressVerificationService" name="defaultCisAddressVerificationService"/>
+	<bean id="defaultCisAddressVerificationService"
+	      class="de.hybris.platform.integration.cis.avs.impl.DefaultCisAddressVerificationService">
+		<property name="cartService" ref="cartService"/>
+		<property name="cisAvsAddressConverter" ref="cisAvsAddressConverter"/>
+		<property name="cisAvsResultAddressVerificationResultDataConverter" ref="cisAvsResultAddressVerificationResultDataConverter"/>
+		<property name="cisAvsAddressMatchingPopulator" ref="cisAvsAddressMatchingPopulator"/>
+		<property name="avsClient" ref="avsClient"/>
+		<property name="applyVerificationStrategy" ref="applyVerificationStrategy"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="hystrixCommandConfig" ref="cisAvsCommandConfig"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="ondemandHystrixCommandFactory" ref="ondemandHystrixCommandFactory"/>
+	</bean>
+
+	<alias name="defaultCountrySelectorStrategy" alias="applyVerificationStrategy"/>
+	<bean id="defaultCountrySelectorStrategy"
+	      class="de.hybris.platform.integration.cis.avs.impl.CountryPropertyCheckVerificationRequiredStrategy">
+	</bean>
+
+	<alias name="defaultSuggestedAddressesAmountStrategy" alias="suggestedAddressesAmountStrategy"/>
+	<bean id="defaultSuggestedAddressesAmountStrategy"
+	      class="de.hybris.platform.integration.cis.avs.impl.DefaultSuggestedAddressesAmountStrategy">
+	</bean>
+
+	<alias name="defaultShowSuggestedAddressStrategy" alias="showSuggestedAddressStrategy"/>
+	<bean id="defaultShowSuggestedAddressStrategy" class="de.hybris.platform.integration.cis.avs.impl.DefaultShowSuggestedAddressesStrategy"/>
+
+</beans>

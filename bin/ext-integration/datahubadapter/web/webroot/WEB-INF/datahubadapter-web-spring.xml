@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. 
+	This software is the confidential and proprietary information of hybris ("Confidential 
+	Information"). You shall not disclose such Confidential Information and shall 
+	use it only in accordance with the terms of the license agreement you entered 
+	into with hybris. -->
+
+<!-- WARNING: This is the Spring WEB configuration file. If you want to replace 
+	items or managers you have to do this from the extensions core configuration 
+	file (datahubadapter/resources/datahubadapter-spring.xml) -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:security="http://www.springframework.org/schema/security"
+	   xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/security/oauth2 
+    	http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
+
+  <context:annotation-config />
+	<context:component-scan base-package="com.hybris.datahub.core"
+							scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+
+	<import resource="classpath:/datahubadapter-rest-conversion-spring.xml" />
+
+	<!-- View Resolver required for OAuth2 confirmation page -->
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<!-- Registering the hybris "tenant" scope This is the custom hybris scope 
+		that manages the lifetime of a "tenant". If you do not deal with tenants 
+		("multimandantenf??higkeit"), then there is no need to understand what this 
+		is for. -->
+	<!-- Needed by Hybris. -->
+	<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+		<property name="scopes">
+			<map>
+				<entry key="tenant" value="de.hybris.platform.spring.TenantScope" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- Security OAuth2 -->
+	<!-- This is the token endpoint, e.g. used for exhanging an authorization 
+		grant into an access token or for direct token response using the resource 
+		owner password grant. NOTICE: require the HTTPS channel for production! -->
+	<http pattern="/oauth/token" create-session="stateless"
+		authentication-manager-ref="clientAuthenticationManager"
+		entry-point-ref="oauthAuthenticationEntryPoint" xmlns="http://www.springframework.org/schema/security">
+		<intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY" /> <!-- for PRODUCTION requires-channel="https" -->
+		<anonymous enabled="false" />
+		<http-basic entry-point-ref="oauthAuthenticationEntryPoint" />
+		<!-- include this only if you need to authenticate clients via request 
+			parameters -->
+		<custom-filter ref="clientCredentialsTokenEndpointFilter"
+			before="BASIC_AUTH_FILTER" />
+		<access-denied-handler ref="oauthAccessDeniedHandler" />
+	</http>
+
+	<!-- OAuth2 protected resources -->
+	<http pattern="/import/**" entry-point-ref="oauthAuthenticationEntryPoint"
+		access-decision-manager-ref="accessDecisionManager"
+		xmlns="http://www.springframework.org/schema/security">
+		<anonymous username="anonymous" granted-authority="ROLE_ANONYMOUS" />
+		<session-management
+			session-authentication-strategy-ref="fixation" />
+		<intercept-url pattern="/import/**" access="IS_AUTHENTICATED_FULLY" />
+		<!-- <http-basic entry-point-ref="oauthAuthenticationEntryPoint" />-->
+		<!-- include this only if you need to authenticate clients via request 
+			parameters -->
+
+		<port-mappings>
+			<port-mapping
+				http="#{configurationService.configuration.getProperty('tomcat.http.port')}"
+				https="#{configurationService.configuration.getProperty('tomcat.ssl.port')}" />
+		</port-mappings>
+
+		<custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />
+		<custom-filter ref="hybrisUserFilter" after="LAST" />
+		<access-denied-handler ref="oauthAccessDeniedHandler" />
+	</http>
+
+	<bean id="hybrisUserFilter"
+		  class="com.hybris.datahub.core.oauth2.HybrisOauth2UserFilter" />
+
+	<!--
+		<http access-denied-page="/login.jsp?authorization_error=true"
+			disable-url-rewriting="true" xmlns="http://www.springframework.org/schema/security">
+			<intercept-url pattern="/oauth/**" access="ROLE_CUSTOMERGROUP" />
+			<intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />
+
+		<http-basic/>
+			<anonymous />
+		</http>
+	 -->
+
+	<bean id="oauthAuthenticationEntryPoint"
+		class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+		<property name="realmName" value="hybris" />
+	</bean>
+
+	<bean id="oauthAccessDeniedHandler"
+		class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler" />
+
+	<bean id="clientCredentialsTokenEndpointFilter"
+		class="org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter">
+		<property name="authenticationManager" ref="clientAuthenticationManager" />
+	</bean>
+
+	<bean id="accessDecisionManager"
+		class="org.springframework.security.access.vote.AffirmativeBased">
+		<property name="decisionVoters">
+			<list>
+				<bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter" />
+				<bean id="authenticatedVoter"
+					class="org.springframework.security.access.vote.AuthenticatedVoter" />
+			</list>
+		</property>
+	</bean>
+
+
+	<bean id="fixation"
+		class="de.hybris.platform.servicelayer.security.spring.HybrisSessionFixationProtectionStrategy" />
+
+
+	<authentication-manager id="clientAuthenticationManager"
+		xmlns="http://www.springframework.org/schema/security">
+		<authentication-provider user-service-ref="clientDetailsUserService" />
+	</authentication-manager>
+
+	<authentication-manager alias="authenticationManager"
+		xmlns="http://www.springframework.org/schema/security">
+		<security:authentication-provider
+			ref="coreAuthenticationProvider" />
+	</authentication-manager>
+
+	<bean id="coreAuthenticationProvider"
+		class="de.hybris.platform.spring.security.CoreAuthenticationProvider">
+		<property name="userDetailsService" ref="coreUserDetailsService" />
+	</bean>
+
+	<bean id="coreUserDetailsService"
+		class="de.hybris.platform.spring.security.CoreUserDetailsService" />
+
+
+	<bean id="clientDetailsUserService"
+		class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+		<constructor-arg ref="clientDetails" />
+	</bean>
+
+	<bean id="tokenStore"
+		class="org.springframework.security.oauth2.provider.token.InMemoryTokenStore" />
+
+	<bean id="tokenServices"
+		class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
+		<property name="tokenStore" ref="tokenStore" />
+		<property name="supportRefreshToken" value="true" />
+		<property name="refreshTokenValiditySeconds" value="2592000" /> <!-- 60*60*24*30 = 30d -->
+		<property name="accessTokenValiditySeconds" value="43200" /> <!-- 60*60*12 = 12h -->
+	</bean>
+
+
+	<oauth:authorization-server
+		client-details-service-ref="clientDetails" token-services-ref="tokenServices">
+		<oauth:authorization-code />
+		<oauth:implicit />
+		<oauth:refresh-token />
+		<oauth:client-credentials />
+		<oauth:password />
+	</oauth:authorization-server>
+
+	<oauth:resource-server id="resourceServerFilter"
+		resource-id="hybris" token-services-ref="tokenServices" />
+
+	<!-- Each client application, e.g. mobile android client, mobile iOS client, 
+		will need to be created here. Below are just examples. It makes sense to 
+		create client_id's for each separate client app, e.g. your iOS mobile app, 
+		your android mobile app, your external front-end, etc. -->
+	<oauth:client-details-service id="clientDetails">
+		<oauth:client client-id="client-side" resource-ids="hybris"
+			authorized-grant-types="implicit,client_credentials" authorities="ROLE_CLIENT"
+			secret="secret" redirect-uri="http://localhost:8080/oauth2_implicit_callback" />
+		<oauth:client client-id="mobile_android" resource-ids="hybris"
+			authorized-grant-types="authorization_code,refresh_token,password,client_credentials"
+			authorities="ROLE_CLIENT" secret="secret"
+			redirect-uri="http://localhost:8080/oauth2_callback" />	
+		<oauth:client client-id="eic" resource-ids="hybris"
+			authorized-grant-types="implicit,client_credentials,password" authorities="ROLE_CLIENT"
+			secret="secret" redirect-uri="http://localhost:9001/oauth2_implicit_callback" />	
+	</oauth:client-details-service>
+
+
+	<security:global-method-security
+		pre-post-annotations="enabled" proxy-target-class="true"
+		secured-annotations="enabled">
+		<security:expression-handler ref="oauthExpressionHandler" />
+	</security:global-method-security>
+
+	<oauth:expression-handler id="oauthExpressionHandler" />
+
+	<oauth:web-expression-handler id="oauthWebExpressionHandler" />
+
+
+	<!-- Security -->
+	<mvc:default-servlet-handler />
+	
+  <!-- type converters -->
+  <bean
+    class="de.hybris.platform.commercefacades.xstream.conv.TypeConverterMapping">
+    <property name="converter">
+      <bean
+			  class="com.hybris.datahub.core.conv.Oauth2AccessTokenConverter" />
+	</property>
+  </bean>
+
+  <!-- type aliases -->
+  <bean
+    class="de.hybris.platform.commercefacades.xstream.alias.TypeAliasMapping">
+    <property name="alias" value="oauth2Token" />
+    <property name="aliasedClass"
+      value="org.springframework.security.oauth2.common.DefaultOAuth2AccessToken" />
+  </bean>
+</beans>

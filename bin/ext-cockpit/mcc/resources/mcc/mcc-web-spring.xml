@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+
+<!-- 
+  WARNING: This is the Spring WEB configuration file. If you want to replace
+  items or managers you have to do this from the extensions core configuration 
+  file (mcc/resources/mcc-spring.xml) 
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+	
+	<!-- 
+		UICockpitSession represents session in an cockpit application. It manages e.g. the available cockpit perspectives.
+	 -->
+	<bean id="UICockpitSession" class="de.hybris.platform.cockpit.session.impl.UISessionImpl" scope="session">
+		<property name="initialSessionListeners">
+			<list></list>
+		</property>
+		<property name="availablePerspectives">
+			<list>
+				<ref bean="MccPerspective"/>
+			</list>
+		</property>
+		<property name="usingTestIDs" value="false" />
+		<property name="dragOverPerspectivesEnabled" value="true" />
+		<property name="cachePerspectivesEnabled" value="true" />
+		<property name="sendEventsImmediately" value="false" />
+		<property name="requestHandler" ref="RequestHandler" />
+	</bean>
+
+	<!-- 
+		Mcc perspective.
+	 -->
+	 	 
+	<bean id="MccPerspective" scope="session" parent="BasePerspective">
+		<property name="uid" value="mcc.perspective.mcc" />  <!-- unique ID of the perspective -->
+		<property name="label" value="perspective.mcc" />  <!-- localization key for the label of the perspective -->
+		<property name="customCsaURI" value="/mcc/mccCSA.zul" />  <!-- file with optional custom client side actions -->
+		<property name="viewURI" value="/mcc/mccPerspective.zul"/>
+		<property name="cockpitTypeService" ref="cockpitTypeService"/>		
+	</bean>
+	
+	<bean id="RequestHandler" class="de.hybris.platform.cockpit.session.impl.DefaultRequestHandler" scope="session">
+		<property name="requestEventHandlers">
+			<map>
+				<entry key="activation">
+					<bean class="de.hybris.platform.cockpit.session.impl.ActivationEventHandler">
+						<property name="prefix" value="act" />
+					</bean>
+				</entry>
+				<entry key="search">
+					<bean class="de.hybris.platform.cockpit.session.impl.SearchEventHandler">
+						<property name="prefix" value="srch" />
+					</bean>
+				</entry>
+				<entry key="celum">
+					<bean class="de.hybris.platform.cockpit.session.impl.CelumEventHandler" />
+				</entry>
+				<entry key="msg">
+					<bean class="de.hybris.platform.cockpit.session.impl.NotificationEventHandler">
+						<property name="prefix" value="msg" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="LoginForm" class="de.hybris.platform.cockpit.forms.login.LoginForm" scope="session">
+		<property name="viewComponentURI" value="/mcc/loginDialog.zul"/>
+		<property name="exceptionToLabelConverter" ref="authenticationExceptionToLabelConverter"/>
+	</bean>
+	
+	
+	<!-- Browsers -->
+	<bean id="MccLinkBrowser" class="de.hybris.platform.cockpit.widgets.browsers.DefaultWidgetBrowserModel" scope="prototype">
+		<property name="browserCode" value="mcc.browser.links"/>
+		<property name="initiallyOpen" value="true"/>
+		<property name="label" value="mcc.links"/>
+		<property name="extendedLabel" value="mcc.links.ext"/>
+		<property name="viewClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultWidgetContentBrowser"/>
+		<property name="widgetMap">
+			<map>
+				<entry key="platformLinksWidget" value-ref="platformLinksWidgetConfig"/>
+				<entry key="contentLinksWidget" value-ref="contentLinksWidgetConfig"/>
+				<entry key="channelLinksWidget" value-ref="channelLinksWidgetConfig"/>
+				<entry key="commerceLinksWidget" value-ref="commerceLinksWidgetConfig"/>
+			</map>
+		</property>
+	</bean>	
+	
+	<!--platform links widget -->	
+	<bean id="platformLinksWidgetConfig" class="de.hybris.platform.cockpit.widgets.impl.DefaultWidgetConfig" scope="session">
+ 		<property name="widgetTitle" value="mcc.widget.platform.links"/>
+		<property name="widgetRenderer">
+			<bean class="de.hybris.platform.mcc.widgets.renderers.impl.PlatformLinksWidgetRenderer">
+				<property name="linkEntryService">
+					<ref bean="linkEntryService" />
+				</property>
+			</bean>
+		</property>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultWidget"/>		
+		<property name="widgetSclass" value="defaultWidgetFrame"/>
+		<property name="lazyLoadingEnabled" value="true"/>	
+		<property name="focusable" value="true"/>	
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.mcc.widgets.models.impl.MccWidgetModel">
+				<property name="areaCode" value="platform" />
+			</bean>
+		</property>
+	</bean>	
+
+	<!-- content links widget -->	
+	<bean id="contentLinksWidgetConfig" class="de.hybris.platform.cockpit.widgets.impl.DefaultWidgetConfig" scope="session">
+ 		<property name="widgetTitle" value="mcc.widget.content.links"/>
+		<property name="widgetRenderer">
+			<bean class="de.hybris.platform.mcc.widgets.renderers.impl.PlatformLinksWidgetRenderer">
+				<property name="linkEntryService">
+					<ref bean="linkEntryService" />
+				</property>
+			</bean>
+		</property>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultWidget"/>		
+		<property name="widgetSclass" value="defaultWidgetFrame"/>
+		<property name="lazyLoadingEnabled" value="true"/>	
+		<property name="focusable" value="true"/>	
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.mcc.widgets.models.impl.MccWidgetModel">
+				<property name="areaCode" value="content" />
+			</bean>
+		</property>
+	</bean>	
+
+	<!-- channel links widget -->	
+	<bean id="channelLinksWidgetConfig" class="de.hybris.platform.cockpit.widgets.impl.DefaultWidgetConfig" scope="session">
+ 		<property name="widgetTitle" value="mcc.widget.channel.links"/>
+		<property name="widgetRenderer">
+			<bean class="de.hybris.platform.mcc.widgets.renderers.impl.PlatformLinksWidgetRenderer">
+				<property name="linkEntryService">
+					<ref bean="linkEntryService" />
+				</property>
+			</bean>
+		</property>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultWidget"/>		
+		<property name="widgetSclass" value="defaultWidgetFrame"/>
+		<property name="lazyLoadingEnabled" value="true"/>	
+		<property name="focusable" value="true"/>	
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.mcc.widgets.models.impl.MccWidgetModel">
+				<property name="areaCode" value="channel" />
+			</bean>
+		</property>
+	</bean>	
+	
+	<!-- commerce links widget -->	
+	<bean id="commerceLinksWidgetConfig" class="de.hybris.platform.cockpit.widgets.impl.DefaultWidgetConfig" scope="session">
+ 		<property name="widgetTitle" value="mcc.widget.commerce.links"/>
+		<property name="widgetRenderer">
+			<bean class="de.hybris.platform.mcc.widgets.renderers.impl.PlatformLinksWidgetRenderer">
+				<property name="linkEntryService">
+					<ref bean="linkEntryService" />
+				</property>
+			</bean>
+		</property>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultWidget"/>		
+		<property name="widgetSclass" value="defaultWidgetFrame"/>
+		<property name="lazyLoadingEnabled" value="true"/>	
+		<property name="focusable" value="true"/>	
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.mcc.widgets.models.impl.MccWidgetModel">
+				<property name="areaCode" value="commerce" />
+			</bean>
+		</property>
+	</bean>
+	
+	<!-- filter -->	
+	<bean id="mccFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+		<constructor-arg>
+			<list>
+				<ref bean="log4jFilter"/>
+				<ref bean="tenantActivationFilter"/>				
+				<ref bean="sessionFilter"/>
+				<ref bean="mccDataSourceSwitchingFilter"/>
+				<ref bean="mccCatalogVersionActivationFilter"/>
+            <ref bean="mccSecureMediaFilter"/>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	
+	<bean id="mccDataSourceSwitchingFilter" class="de.hybris.platform.servicelayer.web.DataSourceSwitchingFilter">
+	</bean>
+	
+	 <bean id="mccCatalogVersionActivationFilter" class="de.hybris.platform.servicelayer.web.DynamicCatalogVersionActivationFilter" scope="tenant">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="catalogService" ref="catalogService"/>
+		<aop:scoped-proxy/>
+	</bean>
+ 
+   <bean id="mccSecureMediaFilter" class="de.hybris.platform.servicelayer.web.SecureMediaFilter">
+       <property name="mediaPermissionService" ref="mediaPermissionService"/>
+       <property name="modelService" ref="modelService"/>
+       <property name="userService" ref="userService"/>
+       <property name="mediaService" ref="mediaService"/>
+      <!-- <property name="secureMediaToken" value="securemedias"/>  securemedias is default but you may overwrite it -->
+       <aop:scoped-proxy/>
+     </bean>		
+</beans>
+	

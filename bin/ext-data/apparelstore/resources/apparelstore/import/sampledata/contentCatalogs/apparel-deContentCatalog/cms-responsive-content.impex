@@ -1,0 +1,116 @@
+# 
+# ImpEx for Responsive Apparel DE Site CMS Content 
+# 
+$contentCatalog=apparel-deContentCatalog 
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged] 
+ 
+$productCatalog=apparelProductCatalog 
+$productCatalogName=Apparel Product Catalog 
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged] 
+$picture=media(code, $contentCV) ;
+$siteResource=jar:de.hybris.platform.apparelstore.constants.ApparelstoreConstants&/apparelstore/import/sampledata/contentCatalogs/$contentCatalog
+$jarResourceCms=jar:de.hybris.platform.apparelstore.constants.ApparelstoreConstants&/apparelstore/import/sampledata/cockpits/cmscockpit
+
+# Load the storefront context root config param
+$storefrontContextRoot=$config-storefrontContextRoot
+
+##  Remove the language currency component from the search and place a tag in the footer
+# CMS SearchBox Components
+INSERT_UPDATE SearchBoxComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;SearchBox;Search Box;SearchBox
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;SearchBoxSlot;SearchBox
+
+INSERT_UPDATE FooterComponent;$contentCV[unique=true];uid[unique=true];wrapAfter;showLanguageCurrency
+;;FooterComponent;2;true
+
+#################    HOME PAGE START     #################  
+
+###  Home page splash Slot 1  #######
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ApparelDEHompageSplashBannerComponent;ApparelDE Homepage Splash Banner Component;/Collections/Snow/c/snow;ApparelDEHompageSplashBannerComponent
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ApparelDEHompageSaveBannerComponent;Electronics Homepage Discount Banner Component;/Collections/Snow/c/snow;ApparelDEHompageSaveBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section1Slot-ApparelDEHomepage;true;ApparelDEHompageSplashBannerComponent,ApparelDEHompageSaveBannerComponent
+
+###  Home page slot 2A  ####
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ApparelDEHompageWomenStreetBannerComponent;ApparelDE Homepage Women Dress Banner Component;Categories/Streetwear-women/Skirts-and-Dresses-women/c/260700;ApparelDEHompageWomenStreetBannerComponent
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ApparelDEHompageMenStreetBannerComponent;ApparelDE Homepage Men Shirt Banner Component;Categories/Streetwear-men/T-Shirts-men/c/250100;ApparelDEHompageMenStreetBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section2ASlot-ApparelDEHomepage;true;ApparelDEHompageWomenStreetBannerComponent,ApparelDEHompageMenStreetBannerComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='homepage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section2A-ApparelDEHomepage;Section2A;;Section2ASlot-ApparelDEHomepage;;;
+
+#### Home section 2B #######
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ApparelDEHompageStreetYouthBannerComponent;ApparelDE Homepage Youth Shorts Banner Component;Categories/Streetwear-youth/Boardshorts-youth/c/270600;ApparelDEHompageStreetYouthBannerComponent
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ApparelDEHompageBrandsBannerComponent;ApparelDE Homepage Brands Banner Component Child;Brands/c/brands;ApparelDEHompageBrandsBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section2BSlot-Homepage;true;ApparelDEHompageStreetYouthBannerComponent,ApparelDEHompageBrandsBannerComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='homepage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section2B-ApparelDEHomepage;Section2B;;Section2BSlot-Homepage;;;
+
+## Home section 3
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;products(code,$productCV);scroll(code);popup;&componentRef
+;;ApparelDEHomepageProductCarouselComponent;Best Selling Products;29533,45572,M33477_B,300310300,300045375,300022356,300047513;allVisible;false;ApparelDEHomepageProductCarouselComponent
+
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;products(code,$productCV);scroll(code);popup;&componentRef
+;;NewApparelDEHomepageProductCarouselComponent;What's New ApparelDE Homepage Product Carousel;29531,300046592,300015407,300040462,M27160_B,M33477_B,300310300,300044599,300005449,300441142;allVisible;false;NewApparelDEHomepageProductCarouselComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;Section3Slot-Homepage;ApparelDEHomepageProductCarouselComponent,NewApparelDEHomepageProductCarouselComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='homepage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section3Slot-Homepage;Section3;;Section3Slot-Homepage;;;
+
+#### Section 4
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ApparelDEHompageSmDiscountBannerComponent;ApparelDE Homepage Small Discount Banner Component;ApparelDEHompageSmDiscountBannerComponent
+;;ApparelDEHompageShopBannerComponent;ApparelDE Homepage Shop Banner Component;ApparelDEHompageShopBannerComponent
+;;ApparelDEHompageShipmentBannerComponent;ApparelDE Homepage Shipment Banner Component;ApparelDEHompageShipmentBannerComponent
+;;ApparelDEHompageServiceBannerComponent;ApparelDE Homepage Service Banner Component;ApparelDEHompageServiceBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section4Slot-Homepage;true;ApparelDEHompageSmDiscountBannerComponent,ApparelDEHompageShopBannerComponent,ApparelDEHompageShipmentBannerComponent,ApparelDEHompageServiceBannerComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='homepage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section4Slot-Homepage;Section4;;Section4Slot-Homepage;;;
+
+#### Section 5
+## Home section 2C
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ApparelDEHompageFreeDelBannerComponent;ApparelDE Homepage Free Delivery Banner Component;ApparelDEHompageFreeDelBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section5Slot-Homepage;true;ApparelDEHompageFreeDelBannerComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='homepage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section5Slot-Homepage;Section5;;Section5Slot-Homepage;;;
+
+#################    HOME PAGE END     #################
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(uid, $contentCV)
+;;TopContentSlot-cartPage;Top Content Slot for Cart Page;true;CartComponent
+
+INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];masterTemplate(uid,$contentCV);
+;;SnowCategoryPage;ProductGridPageTemplate;
+
+INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];masterTemplate(uid,$contentCV);
+;;StreetCategoryPage;ProductGridPageTemplate;
+
+# Site Logo
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText;folder(qualifier)[default='images']
+;;/images/theme/logo-hybris-responsive.png;logo-hybris-responsive.png;$siteResource/images/theme/logo-hybris-responsive.png;image/png;hybris Accelerator;

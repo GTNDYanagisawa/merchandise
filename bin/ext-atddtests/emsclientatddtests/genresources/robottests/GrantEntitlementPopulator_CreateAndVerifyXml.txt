@@ -1,0 +1,159 @@
+#*** Settings ***
+Resource    EntitlementFacades_Keywords.txt
+Resource    common/EntitlementStartup_Keywords.txt
+Resource    atdd/keywords/entitlements-test/settings_keywords.txt
+Resource    atdd/keywords/entitlements-test/check_entitlements_keywords.txt
+
+Test Setup        import entitlement sampledata
+Test Teardown     reset grants
+
+*** Test Cases ***
+
+Test_Stub
+	[Documentation]    Dumb test case just to work around 'no test cases' ATDD report
+	${var} =           Set Variable    1
+
+
+#Test_GrantEntitlementPopulator_CreateAndVerifyXML_EmptyGrantData
+#    [Documentation]    Verifies addition of one simple grant (without any conditions)
+#    ...                All entitlement details(name/usageUnit) are defined in impex file: testEntitlements.csv
+#    ${userId} =        generate random id
+#    ${entitlement}=    create entitlement with entitlementType "ME1" for user "${userId}"
+#    grant entitlement "${entitlement}"
+#    ensure there are "1" entitlements for user "${userId}"
+#    verify grants of "${userId}" xml are equal to "<entitlements>
+#         <entitlement>
+#            <grantTime/>
+#            <status>ACTIVE</status>
+#            <endTime>Unlimited</endTime>
+#            <id>ME1</id>
+#            <startTime>2014-10-09T12:22:25Z</startTime>
+#            <usageUnit>
+#                <id>minute</id>
+#                <namePlural>Minutes</namePlural>
+#                <name>Minute</name>
+#                <accumulative>false</accumulative>
+#            </usageUnit>
+#            <description>Access to Metered Entitlement 1</description>
+#            <name>Metered Entitlement 1</name>
+#            <quantity>0</quantity>
+#         </entitlement>
+#    </entitlements>"
+#
+#Test_GrantEntitlementPopulator_CreateAndVerifyXML_GrantTime
+#    [Documentation]    Verifies addition of one simple grant with grant time
+#    ...                All entitlement details(name/usageUnit) are defined in impex file: testEntitlements.csv
+#    ${userId} =        generate random id
+#    ${entitlement}=    create entitlement with entitlementType "ME1" for user "${userId}"
+#    assign grant time "2014-01-01T00:00:00Z" to entitlement "${entitlement}"
+#    grant entitlement "${entitlement}"
+#    ensure there are "1" entitlements for user "${userId}"
+#    verify grants of "${userId}" xml are equal to "<entitlements>
+#        <entitlement>
+#            <grantTime>2014-01-01T00:00:00Z</grantTime>
+#            <status>ACTIVE</status>
+#            <endTime>Unlimited</endTime>
+#            <id>ME1</id>
+#            <startTime>2014-10-09T12:22:26Z</startTime>
+#            <usageUnit>
+#                <id>minute</id>
+#                <namePlural>Minutes</namePlural>
+#                <name>Minute</name>
+#                <accumulative>false</accumulative>
+#            </usageUnit>
+#            <description>Access to Metered Entitlement 1</description>
+#            <name>Metered Entitlement 1</name>
+#            <quantity>0</quantity>
+#        </entitlement>
+#    </entitlements>"
+#
+#Test_GrantEntitlementPopulator_CreateAndVerifyXML_StringCondition
+#    [Documentation]    Verifies addition of one simple grant with string condition only
+#    ...                All entitlement details(name/usageUnit) are defined in impex file: testEntitlements.csv
+#    ${userId} =        generate random id
+#    ${stringCondition}    Set Variable    "string" condition with parameters {"string":"stringCondition"}
+#    ${entitlement}=    create entitlement with entitlementType "ME1" for user "${userId}"
+#    add condition "${stringCondition}" to entitlement "${entitlement}"
+#    grant entitlement "${entitlement}"
+#    ensure there are "1" entitlements for user "${userId}"
+#    verify grants of "${userId}" xml are equal to "<entitlements>
+#        <entitlement>
+#            <grantTime/>
+#            <status>ACTIVE</status>
+#            <endTime>Unlimited</endTime>
+#            <id>ME1</id>
+#            <startTime>2014-10-09T12:22:26Z</startTime>
+#            <usageUnit>
+#                <id>minute</id>
+#                <namePlural>Minutes</namePlural>
+#                <name>Minute</name>
+#                <accumulative>false</accumulative>
+#            </usageUnit>
+#            <description>Access to Metered Entitlement 1</description>
+#            <name>Metered Entitlement 1</name>
+#            <quantity>0</quantity>
+#            <conditionString>stringCondition</conditionString>
+#        </entitlement>
+#    </entitlements>"
+#
+#Test_GrantEntitlementPopulator_CreateAndVerifyXML_FullGrantData
+#    [Documentation]    Verifies addition of one full grant (with all conditions)
+#    ...                All entitlement details(name/usageUnit) are defined in impex file: testEntitlements.csv
+#    ${userId} =        generate random id
+#    ${stringCondition}    Set Variable    "string" condition with parameters {"string":"stringCondition"}
+#    ${meteredCondition1} =         Set Variable        "metered" condition with parameters {"maxQuantity": "1", "allowOverage" : "false"}
+#    ${pathCondition}    Set Variable    "path" condition with parameters {"path":"/root"}
+#    ${timeframeCondition}    Set Variable    "timeframe" condition with parameters {"startTime":"2014-01-01T00:00:00Z","endTime":"2015-01-01T00:00:02Z"}
+#    ${geoCondition}    Set Variable    "geo" condition with parameters {"geoPath":"Germany/Bavaria/Munich"}
+#    ${entitlement}=    create entitlement with entitlementType "ME1" for user "${userId}"
+#    add condition "${stringCondition}" to entitlement "${entitlement}"
+#    add condition "${meteredCondition1}" to entitlement "${entitlement}"
+#    add condition "${pathCondition}" to entitlement "${entitlement}"
+#    add condition "${timeframeCondition}" to entitlement "${entitlement}"
+#    add condition "${geoCondition}" to entitlement "${entitlement}"
+#    assign grant time "2014-01-01T00:00:00Z" to entitlement "${entitlement}"
+#    assign grantSourceId "grantSourceId1" to entitlement "${entitlement}"
+#    assign grantSource "grantSource" to entitlement "${entitlement}"
+#    grant entitlement "${entitlement}"
+#    ensure there are "1" entitlements for user "${userId}"
+#    verify grants of "${userId}" xml are equal to "<entitlements>
+#        <entitlement>
+#            <conditionPath>/root</conditionPath>
+#            <grantTime>2014-01-01T00:00:00Z</grantTime>
+#            <status>ACTIVE</status>
+#            <conditionGeo class='list'>
+#                <string>Germany/Bavaria/Munich</string>
+#            </conditionGeo>
+#            <endTime>2015-01-01T00:00:02Z</endTime>
+#            <id>ME1</id>
+#            <startTime>2014-01-01T00:00:00Z</startTime>
+#            <usageUnit>
+#                <id>minute</id>
+#                <namePlural>Minutes</namePlural>
+#                <name>Minute</name>
+#                <accumulative>false</accumulative>
+#            </usageUnit>
+#            <description>Access to Metered Entitlement 1</description>
+#            <name>Metered Entitlement 1</name>
+#            <quantity>1</quantity>
+#            <conditionString>stringCondition</conditionString>
+#        </entitlement>
+#     </entitlements>"
+#
+#Test_Get_Grant_without_entitlements
+#    [Documentation]    Grant without entitlements and check where it is in DB
+#    ${userId} =        generate random id
+#    ${entitlement}=    create entitlement with type "NME1" for user "${userId}" granted at "2014-07-03T13:41:07Z"
+#	ensure there are "1" entitlements for user "${userId}"
+#    verify grants of "${userId}" xml are equal to "<entitlements>
+#         <entitlement>
+#            <grantTime/>
+#            <status>ACTIVE</status>
+#            <endTime>Unlimited</endTime>
+#            <id>ME1</id>
+#            <startTime>2014-07-03T13:41:07Z</startTime>
+#            <description>Access to Metered Entitlement 1</description>
+#            <name>Non-Metered Entitlement 1</name>
+#            <quantity>0</quantity>
+#         </entitlement>
+#    </entitlements>"

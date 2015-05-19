@@ -1,0 +1,73 @@
+INSERT_UPDATE PlaceholderTemplate;code[unique=true];$cometConfig[unique=true];type(code);displayNamePattern;alternativeMediaExpression;previewTemplate;
+;PageDefault;;Page;item.code;
+;ProductDefault;;Product;"name = """"; if (item.name == null) { name = item.code; } else { name = item.name; }";"media.add( item.thumbnail );media.add( item.picture );media.addAll( item.getProperty('normal') );";"<div style=""font-size:0.8em""><img src=""$item.thumbnail.uRL""/><br/>
+<b>$item.name</b><br/>
+</div>
+<div style=""font-size:0.6em"">
+$!item.description 
+$!item.getAttribute( ""remarks"" )<br/>
+</div>";
+;UserDefault;;User;"name = """"; if (item.name == null) { name = item.UID; } else { name = item.name; }";;"<div style=""font-size:0.9em""><b>$!item.defaultPaymentAddress.getAttribute('firstname') $!item.defaultPaymentAddress.getAttribute('lastname')</b><br/></div>
+<div style=""font-size:0.8em"">$!item.defaultPaymentAddress.getAttribute('company') - $!item.defaultPaymentAddress.getAttribute('department')<br/>
+$!item.defaultPaymentAddress.getAttribute('streetname') $!item.defaultPaymentAddress.getAttribute('streetnumber')<br/>
+$!item.defaultPaymentAddress.getAttribute('postalcode') $!item.defaultPaymentAddress.getAttribute('town')</div>
+";
+
+
+# ATTENTION:
+# placeholderIDs in the range 900-989 are considered as masterpage frame placeholders. Use them only in conjunction with page related placeholders
+#
+# Use <ignore> tags for pre- and postProcessingExpressions to not set a script but use the default one.
+# if you dont use the <ignore> tag, an empty script is set
+
+INSERT_UPDATE AttributePlaceholder;qualifier[unique=true];$placeholderTemplate;$cometConfig[unique=true];attributeQualifierPath;placeholderType(code)[default='text'];convert[default=false];placeholderID;loadActionID;syncActionID;storeActionID;valueType(code)[default='automatic'];writable[default=true];syncable[default=true];language(isoCode);preProcessingExpression;postProcessingExpression;
+;Product.code;ProductDefault;;code;;;100;1001;1002;1003;;;;;<ignore>;<ignore>;
+;Product.name;ProductDefault;;name;;;110;1101;1102;1103;;;;;<ignore>;<ignore>;
+;Product.name_en;ProductDefault;;name;;;111;1111;1112;1113;;;;en;<ignore>;<ignore>;
+;Product.description;ProductDefault;;description;;1;120;1201;1202;1203;;false;false;;<ignore>;<ignore>;
+;Product.description_en;ProductDefault;;description;;1;121;1211;1212;1213;;false;false;en;<ignore>;<ignore>;
+;Product.remarks;ProductDefault;;remarks;;;130;1301;1302;1303;;;;;<ignore>;<ignore>;
+;Product.remarks_en;ProductDefault;;remarks;;;131;1311;1312;1313;;;;en;<ignore>;<ignore>;
+;Product.creationtime;ProductDefault;;creationtime;;;140;1401;1402;1403;date;;;;<ignore>;"FormatUtils.getDateTime( rawValue, ""yyMMdd"" );";
+;Product.deliverytime;ProductDefault;;deliveryTime;;;150;1501;1502;1503;number;;;;<ignore>;<ignore>;
+;Product.picture;ProductDefault;;picture;imageframe;false;160;1601;1602;1603;media;;;;<ignore>;<ignore>;
+;Product.unit.name;ProductDefault;;unit.name;;false;210;211;212;213;text;;;;<ignore>;<ignore>;
+
+INSERT_UPDATE ExpressionPlaceholder;qualifier[unique=true];$placeholderTemplate;$cometConfig[unique=true];getExpression;setExpression;placeholderType(code)[default='text'];convert[default=false];placeholderID;loadActionID;syncActionID;storeActionID;valueType(code)[default='automatic'];writable[default=true];syncable[default=true];language;
+;Product.code:name;ProductDefault;;item.composedType.getAttributeDescriptor( 'code' ).name;;;;101;1011;1012;1013;text;
+;Product.code_uppercase;ProductDefault;;item.code.toUpperCase();;;;102;1021;1022;1023;text;
+;Product.name:name;ProductDefault;;item.composedType.getAttributeDescriptor( 'name' ).name;;;;112;1121;1122;1123;text;
+;Product.description:name;ProductDefault;;item.composedType.getAttributeDescriptor( 'description' ).name;;;;122;1221;1222;1223;text;
+;Product.picture:name;ProductDefault;;item.composedType.getAttributeDescriptor( 'picture' ).name;;;;161;1611;1612;1613;
+;Product.position;ProductDefault;;placement.position;;;;170;1701;1702;1703;
+;Product.bestprice;ProductDefault;;"FormatUtils.getPrice( PriceUtils.getPriceContainer( item ).getPrimaryPriceValue() );";;;;180;1801;1802;1803;;false;false;
+;Product.currency;ProductDefault;;de.hybris.platform.jalo.JaloSession.getCurrentSession().getSessionContext().getCurrency().getIsoCode();;;;190;1901;1902;1903;;false;true;;
+;Placement.positionInPreviewPage;ProductDefault;;placement.positionInPreviewPage;;;;;;;;;false;;;
+;User.title;UserDefault;;item.defaultPaymentAddress.title.name;;;;400;4001;4002;4003;
+;User.firstname;UserDefault;;item.defaultPaymentAddress.getAttribute('firstname');item.defaultPaymentAddress.setAttribute('firstname', value);;;410;4101;4102;4103;
+;User.lastname;UserDefault;;item.defaultPaymentAddress.getAttribute('lastname');item.defaultPaymentAddress.setAttribute('lastname', value);;;420;4201;4202;4203;
+;User.department;UserDefault;;item.defaultPaymentAddress.getAttribute('department');item.defaultPaymentAddress.setAttribute('department', value);;;430;4301;4302;4303;
+;User.company;UserDefault;;item.defaultPaymentAddress.getAttribute('company');item.defaultPaymentAddress.setAttribute('company', value);;;440;4401;4402;4403;
+;User.phone1;UserDefault;;item.defaultPaymentAddress.getAttribute('phone1');item.defaultPaymentAddress.setAttribute('phone1', value);;;450;4501;4502;4503;
+;User.fax;UserDefault;;item.defaultPaymentAddress.getAttribute('fax');item.defaultPaymentAddress.setAttribute('fax', value);;;460;4601;4602;4603;
+;User.email;UserDefault;;item.defaultPaymentAddress.getAttribute('email');item.defaultPaymentAddress.setAttribute('email', value);;;470;4701;4702;4703;
+;User.url;UserDefault;;item.defaultPaymentAddress.getAttribute('url');item.defaultPaymentAddress.setAttribute('url', value);;;480;4801;4802;4803;
+;User.postalcode;UserDefault;;item.defaultPaymentAddress.getAttribute('postalcode');item.defaultPaymentAddress.setAttribute('postalcode', value);;;490;4901;4902;4903;
+;User.streetname;UserDefault;;item.defaultPaymentAddress.getAttribute('streetname');item.defaultPaymentAddress.setAttribute('streetname', value);;;500;5001;5002;5003;
+;User.streetnumber;UserDefault;;item.defaultPaymentAddress.getAttribute('streetnumber');item.defaultPaymentAddress.setAttribute('streetnumber', value);;;510;5101;5102;5103;
+;User.town;UserDefault;;item.defaultPaymentAddress.getAttribute('town');item.defaultPaymentAddress.setAttribute('town', value);;;520;5201;5202;5203;
+;User.country;UserDefault;;item.defaultPaymentAddress.country.name;;;;530;5301;5302;5303;
+;User.cellphone;UserDefault;;item.defaultPaymentAddress.getAttribute('cellphone');;;;540;5401;5402;5403;
+;User.jobtitle;UserDefault;;item.defaultPaymentAddress.getAttribute('remarks');;;;550;5501;5502;5503;
+;Page.footer;PageDefault;;item.chapter.footer;;textframe;true;900;9001;9002;9003;
+;Page.header;PageDefault;;item.chapter.header;;textframe;true;910;9101;9102;9103;
+
+# Special placeholder that delivers the placing instructions of a placement
+INSERT_UPDATE ExpressionPlaceholder;qualifier[unique=true];$placeholderTemplate;$cometConfig[unique=true];getExpression;setExpression;placeholderType(code)[default='text'];convert[default=false];placeholderID;loadActionID;syncActionID;storeActionID;valueType(code)[default='automatic'];writable[default=true];syncable[default=true];language;
+;Notes;ProductDefault;;placement.instructionComment;;textframe;;997;9971;9972;9973;;;;;
+
+INSERT_UPDATE CustomPlaceholder;qualifier[unique=true];$placeholderTemplate;$cometConfig[unique=true];placeholderType(code)[default='text'];convert[default=false];placeholderID;loadActionID;syncActionID;storeActionID;valueType(code)[default='automatic'];writable[default=true];syncable[default=true];language(isoCode);
+;Product.crossref_Source;ProductDefault;;crossref;true;998;102;0;0;text;false;false;
+
+INSERT_UPDATE CrossreferenceTargetPlaceholder;qualifier[unique=true];$placeholderTemplate;$cometConfig[unique=true];placeholderType(code)[default='text'];convert[default=false];placeholderID;loadActionID;syncActionID;storeActionID;valueType(code)[default='automatic'];writable[default=true];syncable[default=true];language(isoCode);
+;Product.crossref_Target;ProductDefault;;text;false;999;9991;0;0;text;false;false;

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2013 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+	<!-- The hybris platform provides one single Spring application context for beans located at the jalo layer. Each extension can add 
+		beans to this context by specifying them at this configuration file. You can use and/or redefine beans defined at configuration files 
+		of other extensions as well as adding new one. If you want to locate this file at a different location or want to use several files 
+		for better, structuring, please use the '<yourextension>.application-context' property at your project.properties file. There you can 
+		specify a comma separated list of files where first is tried to find a file per classpath and then per file system. If you want to 
+		configure beans for your web module please have a look at your web/webroot/WEB-INF/<extname>-web-spring.xml. -->
+
+
+	<!-- Module Configuration Accesss for business extension sales transaction ST -->
+	<alias alias="sapPRIModuleConfigurationAccess" name="sapDefaultPRIModuleConfigurationAccess" />
+	<bean id="sapDefaultPRIModuleConfigurationAccess" parent="sapCoreModuleConfigurationAccess">
+		<property name="moduleId" value="sapproductrecommendation" />
+	</bean>
+
+	<bean id="oDataClientService" class="com.sap.hybris.reco.common.util.ODataClientService" />
+	<bean id="hmcConfigurationReader" class="com.sap.hybris.reco.common.util.HMCConfigurationReader">
+	 	<property name="globalConfigurationService"  ref="sapCoreSAPGlobalConfigurationService" />
+	 	<property name="baseStoreConfigurationService"  ref="sapPRIModuleConfigurationAccess" />
+	 </bean>
+	 
+	<!-- Backend Objects (BE) -->
+	<bean id="sapProductRecommendationManagerCEI" class="com.sap.hybris.reco.addon.be.cei.ProductRecommendationManagerCEI"
+		parent="sapCoreBackendObjectJCo" scope="sapSession">
+		<property name="productService" ref="productService"></property>
+		<property name="configuration" ref="hmcConfigurationReader"></property>
+	</bean>
+
+	<!-- Business Objects (BO) -->
+	<alias alias="sapProductRecommendationManager" name="defaultSapProductRecommendationManagerBO" />
+	<bean id="defaultSapProductRecommendationManagerBO" parent="sapCoreBusinessObject"
+		class="com.sap.hybris.reco.addon.bo.impl.ProductRecommendationManagerImpl">
+		<property name="backendType" value="CEI" />
+		<property name="backendObject" ref="sapProductRecommendationManagerCEI" />
+	</bean>
+
+	<alias alias="userIdProvider" name="defaultUserIdProvider" />
+	<bean id="defaultUserIdProvider" class="com.sap.hybris.reco.addon.bo.UserIdProvider" />
+
+	<alias alias="sapProductRecommendationManagerFacade" name="defaultSapProductRecommendationManagerFacade" />
+	<bean id="defaultSapProductRecommendationManagerFacade" class="com.sap.hybris.reco.addon.facade.impl.DefaultProductRecommendationManagerFacade">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+		<property name="referenceDataProductReferenceConverter" ref="referenceDataProductReferenceConverter" />
+		<property name="referenceProductConfiguredPopulator" ref="productConfiguredPopulator" />
+		<property name="userService" ref="userService" />
+		<property name="cartService" ref="cartService" />
+		<property name="userIDProvider" ref="userIdProvider" />
+	</bean>
+
+	<alias alias="sapRecommendationContextProvider" name="defaultSapRecommendationContextProvider" />
+	<bean id="defaultSapRecommendationContextProvider" class="com.sap.hybris.reco.addon.bo.impl.DefaultRecommendationContextProviderImpl"
+		scope="prototype" />
+		
+</beans>

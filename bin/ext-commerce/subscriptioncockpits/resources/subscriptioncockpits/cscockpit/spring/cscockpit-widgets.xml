@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2014 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+	default-autowire="byName">
+
+	<alias alias="csBasketStrategy" name="defaultCsSubscriptionBasketStrategy" />
+	<bean id="defaultCsSubscriptionBasketStrategy"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.controllers.strategies.impl.DefaultSubscriptionBasketStrategy"
+		scope="session" parent="defaultCsBasketStrategy">
+		<property name="cartService" ref="cartService" />
+	</bean>
+
+	<alias alias="csBasketCartWidgetRenderer" name="defaultCsSubscriptionBasketCartWidgetRenderer" />
+	<bean id="defaultCsSubscriptionBasketCartWidgetRenderer" class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.renderers.impl.SubscriptionBasketCartWidgetRenderer"
+		parent="defaultCsBasketCartWidgetRenderer">
+		<property name="subscriptionOrderEntryPopulator" ref="subscriptionOrderEntryPopulator" />
+		<property name="subscriptionCartPopulator" ref="subscriptionCartPopulator" />
+		<property name="subscriptionBasketController" ref="csBasketController" />
+	</bean>
+
+	<alias alias="csBasketController" name="defaultCsSubscriptionBasketController" />
+	<bean id="defaultCsSubscriptionBasketController" class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.controllers.impl.DefaultSubscriptionBasketController"
+		parent="defaultCsBasketController">
+		<property name="subscriptionCartPopulator" ref="subscriptionCartPopulator" />
+		<property name="subscriptionOrderPopulator" ref="subscriptionOrderPopulator" />
+		<property name="subscriptionCommerceCartService" ref="commerceCartService" />
+		<property name="productFacade" ref="productFacade" />
+		<property name="subscriptionXStreamAliasConverter" ref="subscriptionXStreamAliasConverter" />
+		<property name="baseSiteService" ref="baseSiteService"/>
+	</bean>
+
+	<alias alias="csBasketResultWidgetRenderer" name="defaultCsBasketResultWidgetRenderer" />
+	<bean id="defaultCsBasketResultWidgetRenderer" parent="abstractWidgetRenderer"
+		class="de.hybris.platform.cscockpit.widgets.renderers.impl.BasketResultWidgetRenderer">
+		<property name="listConfigurationCode" value="productSearchResult" />
+		<property name="listConfigurationType" value="Product" />
+		<property name="itemAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.BasketAppender" parent="csBaseAppender">
+				<property name="widgetController" ref="csBasketController" />
+			</bean>
+		</property>
+		<property name="callContextController" ref="csCallContextController" />
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ProductSearchProductDetailRenderer">
+				<property name="urlStrategy" ref="csProductUrlStrategy" />
+				<property name="configurationCode" value="productSearchDetails" />
+			</bean>
+		</property>
+		<property name="lazyLoadingEnabled" value="false" />
+		<property name="csPromotionService" ref="csPromotionService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="formatFactory" ref="formatFactory" />
+	</bean>
+
+	<alias alias="csOrderDetailOrderItemsWidgetRenderer" name="defaultCsSubscriptionOrderDetailOrderItemsWidgetRenderer" />
+	<bean id="defaultCsSubscriptionOrderDetailOrderItemsWidgetRenderer"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.renderers.impl.SubscriptionOrderDetailsOrderItemsWidgetRenderer"
+		parent="defaultCsOrderDetailOrderItemsWidgetRenderer">
+		<property name="subscriptionOrderEntryPopulator" ref="subscriptionOrderEntryPopulator" />
+		<property name="subscriptionOrderPopulator" ref="subscriptionOrderPopulator" />
+	</bean>
+
+	<alias alias="csCustomerOrdersStrategy" name="defaultCsSubscriptionCustomerOrdersStrategy" />
+	<bean id="defaultCsSubscriptionCustomerOrdersStrategy"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.controllers.strategies.impl.DefaultSubscriptionCustomerOrdersStrategy"
+		scope="session" parent="defaultCsCustomerOrdersStrategy" />
+
+	<bean id="abstractCsSubscriptionOrderDetailOrderTotalsWidgetRenderer" parent="abstractWidgetRenderer"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.renderers.impl.AbstractSubscriptionOrderDetailsOrderTotalsWidgetRenderer">
+		<property name="subscriptionOrderController" ref="csBasketController" />
+	</bean>
+
+	<alias alias="csOrderDetailOrderTotalsWidgetRenderer" name="defaultCsSubscriptionOrderDetailOrderTotalsWidgetRenderer" />
+	<bean id="defaultCsSubscriptionOrderDetailOrderTotalsWidgetRenderer" parent="abstractCsSubscriptionOrderDetailOrderTotalsWidgetRenderer"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.renderers.impl.SubscriptionOrderDetailsOrderTotalsWidgetRenderer" />
+
+	<alias alias="csBasketTotalsWidgetRenderer" name="defaultCsSubscriptionBasketTotalsWidgetRenderer" />
+	<bean id="defaultCsSubscriptionBasketTotalsWidgetRenderer" parent="abstractCsSubscriptionOrderDetailOrderTotalsWidgetRenderer"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.renderers.impl.SubscriptionBasketTotalsWidgetRenderer" />
+
+	<alias alias="csCheckoutCartWidgetRenderer" name="defaultCsSubscriptionCheckoutCartWidgetRenderer" />
+	<bean id="defaultCsSubscriptionCheckoutCartWidgetRenderer" parent="defaultCsCheckoutCartWidgetRenderer"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.renderers.impl.SubscriptionCheckoutCartWidgetRenderer">
+		<property name="subscriptionOrderEntryPopulator" ref="subscriptionOrderEntryPopulator" />
+	</bean>
+
+	<alias alias="csCustomerOrdersWidgetRenderer" name="defaultCsSubscriptionCustomerOrdersWidgetRenderer" />
+	<bean id="defaultCsSubscriptionCustomerOrdersWidgetRenderer" parent="defaultCsCustomerOrdersWidgetRenderer"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.renderers.impl.SubscriptionCustomerOrdersWidgetRenderer">
+		<property name="listConfigurationCode" value="customerOrderList" />
+		<property name="listConfigurationType" value="AbstractOrder" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="lazyLoadingEnabled" value="false" />
+		<property name="detailRenderer" ref="csOrderEntriesWidgetDetailRenderer" />
+		<property name="orderAppender">
+			<bean class="de.hybris.platform.cscockpit.widgets.controllers.dispatcher.impl.OrderAppender" parent="csBaseAppender" />
+		</property>
+		<property name="widgetHelper" ref="widgetHelper" />
+		<property name="formatFactory" ref="formatFactory" />
+		<property name="subscriptionOrderPopulator" ref="subscriptionOrderPopulator" />
+	</bean>
+
+	<alias alias="csOrderEntriesWidgetDetailRenderer" name="defaultCsSubscriptionOrderEntriesWidgetDetailRenderer" />
+	<bean id="defaultCsSubscriptionOrderEntriesWidgetDetailRenderer" parent="abstractWidgetDetailRenderer"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.renderers.impl.SubscriptionOrderEntriesWidgetDetailRenderer">
+		<property name="subscriptionOrderEntryPopulator" ref="subscriptionOrderEntryPopulator" />
+		<property name="subscriptionOrderPopulator" ref="subscriptionOrderPopulator" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="formatFactory" ref="formatFactory" />
+		<property name="listConfigurationCode" value="customerOrderEntryList" />
+		<property name="listConfigurationType" value="AbstractOrderEntry" />
+	</bean>
+	
+	<alias alias="csCheckoutPaymentWidgetRenderer" name="defaultSubscriptionCsCheckoutPaymentWidgetRenderer"/>
+	<bean id="defaultSubscriptionCsCheckoutPaymentWidgetRenderer" parent="defaultCsCheckoutPaymentWidgetRenderer" class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.renderers.impl.SubscriptionCheckoutPaymentWidgetRenderer"/>
+		
+	<!-- customer subscriptions widget -->
+	<alias alias="csCustomerSubscriptionsWidgetConfig" name="defaultCsCustomerSubscriptionsWidgetConfig"/>
+	<bean id="defaultCsCustomerSubscriptionsWidgetConfig" parent="csBaseWidgetConfig">
+		<property name="widgetTitle" value="cscockpit.widget.customer.subscriptions"/>
+		<property name="widgetRenderer" ref="csCustomerSubscriptionsWidgetRenderer"/>
+		<property name="widgetController" ref="csCustomerController"/>
+		<property name="widgetClass" value="de.hybris.platform.cockpit.widgets.impl.DefaultListboxWidget"/>
+		<property name="widgetModel">
+			<bean class="de.hybris.platform.cscockpit.widgets.models.impl.DefaultMasterDetailListWidgetModel"/>
+		</property>
+		<property name="widgetAdapter">
+			<bean class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.adapters.CustomerSubscriptionsAdapter">
+				<property name="cockpitTypeService" ref="cockpitTypeService"/>
+				<property name="subscriptionFacade" ref="csSubscriptionFacade"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csCustomerSubscriptionsWidgetRenderer" name="defaultCsCustomerSubscriptionsWidgetRenderer"/>
+	<bean id="defaultCsCustomerSubscriptionsWidgetRenderer" parent="abstractWidgetRenderer" class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.renderers.impl.CustomerSubscriptionsWidgetRenderer">
+		<property name="listConfigurationCode" value="subscriptionList"/>
+		<property name="listConfigurationType" value="Subscription"/>
+		<property name="lazyLoadingEnabled" value="false"/>
+		<property name="subscriptionFacade" ref="csSubscriptionFacade"/>
+		<property name="detailRenderer">
+			<bean class="de.hybris.platform.cscockpit.widgets.renderers.details.impl.ConfigurableItemWidgetDetailRenderer" parent="abstractWidgetDetailRenderer">
+				<property name="configurationCode" value="subscriptionInfo"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias alias="csCheckoutController" name="defaultSubscriptionCsCheckoutController" />
+	<bean id="defaultSubscriptionCsCheckoutController" parent="defaultCsCheckoutController"
+		class="de.hybris.platform.subscriptioncockpits.cscockpit.widgets.controllers.impl.DefaultSubscriptionCheckoutController">
+		<property name="subscriptionFacade" ref="csSubscriptionFacade" />
+		<property name="orderConverter" ref="orderConverter" />
+		<property name="callContextController" ref="csCallContextController" />
+	</bean>
+
+</beans>

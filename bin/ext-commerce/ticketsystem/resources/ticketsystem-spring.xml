@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd 
+           http://www.springframework.org/schema/util 
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<import resource="classpath:ticketsystem/ticketsystem-spring-services.xml"/>
+	<import resource="classpath:ticketsystem/ticketsystem-spring-interceptors.xml"/>
+
+	<!--
+		Mappings
+	-->
+	<alias name="defaultTicketStateTransitionMap" alias="ticketStateTransitionMap"/>
+	<util:map id="defaultTicketStateTransitionMap">
+		<entry>
+			<key>
+				<util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.NEW"/>
+			</key>
+			<util:list>
+				<util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.OPEN"/>
+			</util:list>
+		</entry>
+		<entry>
+			<key>
+				<util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.OPEN"/>
+			</key>
+			<util:list>
+				<util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.CLOSED"/>
+			</util:list>
+		</entry>
+		<entry>
+			<key>
+				<util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.CLOSED"/>
+			</key>
+			<util:list>
+				<util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.OPEN"/>
+			</util:list>
+		</entry>
+	</util:map>
+
+	<alias name="defaultRecipientTypeToContextClassMap" alias="recipientTypeToContextClassMap"/>
+	<util:map id="defaultRecipientTypeToContextClassMap">
+		<entry>
+			<key><util:constant static-field="de.hybris.platform.ticket.enums.CsEmailRecipients.CUSTOMER"/></key>
+			<value>de.hybris.platform.ticket.email.context.CustomerTicketContext</value>
+		</entry>
+		<entry>
+			<key><util:constant static-field="de.hybris.platform.ticket.enums.CsEmailRecipients.ASSIGNEDAGENT"/></key>
+			<value>de.hybris.platform.ticket.email.context.AgentTicketContext</value>
+		</entry>
+		<entry>
+			<key><util:constant static-field="de.hybris.platform.ticket.enums.CsEmailRecipients.ASSIGNEDGROUP"/></key>
+			<value>de.hybris.platform.ticket.email.context.AgentGroupTicketContext</value>
+		</entry>
+	</util:map>
+
+	<alias name="defaultValueType2ChangeRecordType" alias="valueType2ChangeRecordType"/>
+	<util:map id="defaultValueType2ChangeRecordType">
+		<entry key="java.lang.String" value="CsTicketChangeEventStringEntry"/>
+		<entry key="CsTicketCategory" value="CsTicketChangeEventCsTicketCategoryEntry"/>
+		<entry key="CsTicketPriority" value="CsTicketChangeEventCsTicketPriorityEntry"/>
+		<entry key="CsTicketState" value="CsTicketChangeEventCsTicketStateEntry"/>
+		<entry key="Employee" value="CsTicketChangeEventEmployeeEntry"/>
+		<entry key="CsAgentGroup" value="CsTicketChangeEventCsAgentGroupEntry"/>
+	</util:map>
+
+	<alias name="defaultEventType2TemplateCode" alias="eventType2TemplateCode"/>
+	<util:map id="defaultEventType2TemplateCode">
+		<entry key="ticketCreationEvent" value="TicketSystem_CreationEventRenderTemplate" />
+	</util:map>
+
+	<alias name="defaultCsTicketCodeGenerator" alias="csTicketCodeGenerator"/>
+	<bean id="defaultCsTicketCodeGenerator"
+		  class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" init-method="init"
+		  scope="tenant">
+		<property name="key" value="csticket_code"/>
+		<property name="digits" value="8"/>
+		<property name="start" value="00000000"/>
+		<property name="numeric" value="true"/>
+	</bean>
+
+	<!--
+		sequence generators
+	-->
+	<alias name="defaultCsTicketEventCodeGenerator" alias="csTicketEventCodeGenerator"/>
+	<bean id="defaultCsTicketEventCodeGenerator"
+		  class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" init-method="init"
+		  scope="tenant">
+		<property name="key" value="csticketevent_code"/>
+		<property name="digits" value="8"/>
+		<property name="start" value="00000000"/>
+		<property name="numeric" value="true"/>
+	</bean>
+
+	<alias name="defaultTicketDao" alias="ticketDao"/>
+	<bean id="defaultTicketDao" class="de.hybris.platform.ticket.dao.impl.DefaultTicketDao" parent="abstractItemDao" scope="tenant"/>
+	
+	<alias name="defaultAgentDao" alias="agentDao" />
+	<bean id="defaultAgentDao" class="de.hybris.platform.ticket.dao.impl.DefaultAgentDao" parent="abstractItemDao" scope="tenant" />
+
+	<alias name="defaultTicketUpdateStrategy" alias="ticketUpdateStrategy"/>
+	<bean id="defaultTicketUpdateStrategy" class="de.hybris.platform.ticket.strategies.impl.DefaultTicketUpdateStrategy"
+		  parent="abstractBusinessService" scope="tenant">
+		<property name="ticketAttributeChangeEventStrategy" ref="ticketAttributeChangeEventStrategy"/>
+		<property name="availableNextStates" ref="ticketStateTransitionMap"/>
+		<property name="ticketEventFactory" ref="ticketEventFactory"/>
+		<property name="ticketChangeEventType" value="ticketChangeEvent"/>
+	</bean>
+	
+	<!--
+		strategies
+	-->
+	<alias name="defaultTicketAttributeChangeEventStrategy" alias="ticketAttributeChangeEventStrategy"/>
+	<bean id="defaultTicketAttributeChangeEventStrategy" class="de.hybris.platform.ticket.strategies.impl.DefaultTicketAttributeChangeEventStrategy"
+		  parent="abstractBusinessService" scope="tenant">
+		<property name="typeService" ref="typeService"/>
+		<property name="valueType2ChangeRecordType" ref="valueType2ChangeRecordType"/>
+		<property name="defaultChangeRecordType" value="CsTicketChangeEventEntry"/>		
+	</bean>
+
+	<alias name="defaultTicketEventStrategy" alias="ticketEventStrategy"/>
+	<bean id="defaultTicketEventStrategy" class="de.hybris.platform.ticket.strategies.impl.DefaultTicketEventStrategy"
+		  parent="abstractBusinessService" scope="tenant">
+		<property name="noteCommentType" value="customerNote"/>
+		<property name="emailCommentType" value="customerEmail"/>
+		<property name="ticketEventFactory" ref="ticketEventFactory"/>
+		<property name="ticketCreatedType" value="ticketCreationEvent"/>
+		<property name="openState">
+			<util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.OPEN"/>
+		</property>
+	</bean>
+	
+	<alias name="defaultTicketRenderStrategy" alias="ticketRenderStrategy"/>
+	<bean id="defaultTicketRenderStrategy" class="de.hybris.platform.ticket.strategies.impl.DefaultTicketRenderStrategy"
+		  parent="abstractBusinessService" scope="tenant">
+		<property name="defaultTemplateCode" value="TicketSystem_DefaultEventRenderTemplate"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="eventType2TemplateCode" ref="eventType2TemplateCode" />
+		<property name="rendererService" ref="rendererService" />
+	</bean>
+
+	<alias name="defaultTicketEventEmailStrategy" alias="ticketEventEmailStrategy"/>
+	<bean id="defaultTicketEventEmailStrategy" class="de.hybris.platform.ticket.strategies.impl.DefaultTicketEventEmailStrategy"
+		  parent="abstractBusinessService" scope="tenant">
+		<property name="flexibleSearch" ref="flexibleSearchService"/>
+		<property name="recipientTypeToContextClassMap" ref="recipientTypeToContextClassMap"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="rendererService" ref="rendererService" />
+		<property name="enumerationService" ref="enumerationService" />
+	</bean>
+
+	<alias name="defaultTicketResolutionStrategy" alias="ticketResolutionStrategy"/>
+	<bean id="defaultTicketResolutionStrategy" class="de.hybris.platform.ticket.strategies.impl.DefaultTicketResolutionStrategy"
+		  parent="abstractBusinessService" scope="tenant">
+		<property name="ticketUpdateStrategy" ref="ticketUpdateStrategy"/>
+		<property name="ticketAttributeChangeEventStrategy" ref="ticketAttributeChangeEventStrategy"/>
+		<property name="defaultResolvedTicketState">
+			<util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.CLOSED"/>
+		</property>
+		<property name="defaultUnresolvedTicketState">
+			<util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.OPEN"/>
+		</property>
+		<property name="ticketEventFactory" ref="ticketEventFactory"/>
+		<property name="resolveEventType" value="ticketResolutionEvent"/>
+		<property name="unresolveEventType" value="customerNote"/>
+	</bean>
+
+	<alias name="defaultTicketEventFactory" alias="ticketEventFactory"/>
+	<bean id="defaultTicketEventFactory" class="de.hybris.platform.ticket.factory.impl.DefaultTicketEventFactoryImpl"
+		  parent="abstractBusinessService" scope="tenant" >
+		<property name="commentService" ref="commentService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+	
+	<bean id="defaultOrderFraudEmployeeNotificationEventListener" class="de.hybris.platform.ticket.event.impl.DefaultOrderFraudEmployeeNotificationEventListener">
+		<property name="ticketBusinessService" ref="ticketBusinessService"/>
+		<property name="userService" ref="userService"/>
+		<property name="tenantService" ref="tenantService" />
+		<property name="clusterService" ref="clusterService" />		
+	</bean>
+
+</beans>

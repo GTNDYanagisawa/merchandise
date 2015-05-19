@@ -1,0 +1,16 @@
+#if( (!$utility.parentIsMain($node)  ||  $node != $node.getParentNode().getChildNodes().get(0))  &&  $node.getParentNode().getNodeName() != "cellNode" )
+$PARAGRAPH_BREAK
+#end
+#if($class=='')
+#set($starttag='<ParaStyle:'+$DefaultParastyleName+'><bnListType:'+$UnorderedList+'>')
+#set($endtag='<bnListType:>')
+#else
+#set($starttag='<ParaStyle:'+$DefaultParastyleName+'><bnListType:'+$UnorderedList+'><ParaStyle:'+$class+'>')
+#set($endtag='<bnListType:>')
+#end
+${utility.initializeParaStyle($node,$starttag)}
+#foreach( $i in [0..$node.getRows()])
+#if($i != $node.getRows())
+$starttag$translator.renderContent($node.getElement($i))$endtag
+#end
+#end

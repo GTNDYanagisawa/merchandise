@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2000-2014 hybris AG All rights reserved. This software is the confidential and proprietary information 
+	of hybris ("Confidential Information"). You shall not disclose such Confidential Information and shall use it only in accordance with 
+	the terms of the license agreement you entered into with hybris. -->
+
+
+<!-- WARNING: This is the Spring WEB configuration file. If you want to replace items or managers you have to do this from the extensions 
+	core configuration file (guestOrderStatusAddon/resources/guestOrderStatusAddon-spring.xml) -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:security="http://www.springframework.org/schema/security" xmlns:aop="http://www.springframework.org/schema/aop"
+
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security-3.1.xsd		
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+	">
+
+	<context:component-scan base-package="de.hybris.platform.secureportaladdon" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+
+    <bean id="listMergeBeanPostProcessor"
+          class="de.hybris.platform.commerceservices.spring.config.ListMergeDirectiveBeanPostProcessor"/>
+
+    <bean id="listMergeDirective" class="de.hybris.platform.commerceservices.spring.config.ListMergeDirective"
+          abstract="true"/>
+    
+    <alias alias="loginAuthenticationSuccessHandler" name="SecurePortalLoginAuthenticationSuccessHandler"/>
+    <bean id="SecurePortalLoginAuthenticationSuccessHandler" class="de.hybris.platform.secureportaladdon.security.SecurePortalAuthenticationSuccessHandler" parent="defaultLoginAuthenticationSuccessHandler"/>
+    
+    <alias alias="userService" name="defaultSecureUserServicce"/>
+    <bean id="defaultSecureUserServicce" class="de.hybris.platform.secureportaladdon.services.impl.SecureUserService" parent="defaultUserService">
+        <property name="cmsSiteService" ref="cmsSiteService" />
+    </bean>
+
+	<!-- Before controller responsible for intercepting request to the storefront and apply the new security rule when a site is secured -->
+	<bean id="securePortalBeforeControllerHandler" class="de.hybris.platform.secureportaladdon.interceptors.SecurePortalBeforeControllerHandler">
+		<property name="unsecuredUris" ref="unsecuredUris" />
+		<property name="controlUris" ref="controlUris" />
+		<property name="cmsSiteService" ref="cmsSiteService" />
+		<property name="userService" ref="userService" />
+		<property name="defaultLoginUri" value="${default.login.uri}" />
+		<property name="httpSessionRequestCache" ref="httpSessionRequestCache" />
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService" />
+		<property name="redirectStrategy" ref="redirectStrategy" />
+	</bean>
+	
+	<bean id="beforeControllerHandlerAdapter" abstract="true" class="de.hybris.platform.addonsupport.interceptors.BeforeControllerHandlerAdapter">
+		<property name="proxyInterfaceName" value="de.hybris.platform.yb2bacceleratorstorefront.interceptors.BeforeControllerHandler"/>
+	</bean>
+
+	<!-- Add our new before controller adaptee to the existing list using a merge -->
+	<bean depends-on="beforeControllerHandlersList" parent="listMergeDirective">
+		<property name="add">
+			<bean parent="beforeControllerHandlerAdapter">
+				<property name="adaptee" ref="securePortalBeforeControllerHandler" />
+			</bean>
+		</property>
+	</bean>
+
+	<!-- Before view responsible for intercepting request to the storefront and apply the new security rule when a site is secured -->
+	<bean id="secureCustomerPortalBeforeViewHandler" class="de.hybris.platform.secureportaladdon.interceptors.SecurePortalBeforeViewHandler">
+		<property name="cmsSiteService" ref="cmsSiteService" />
+		<property name="cmsPageService" ref="cmsPageService" />
+		<property name="pageTitleResolver" ref="pageTitleResolver" />
+		<property name="spViewMap" ref="spViewMap" />
+	</bean>
+
+	<!-- Add our new before view adaptee to the existing list using a merge -->
+	<bean depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add">
+			<bean parent="beforeViewHandlerAdapter">
+				<property name="adaptee" ref="secureCustomerPortalBeforeViewHandler" />
+			</bean>
+		</property>
+	</bean>
+
+	<!--SP Mappings: Map that contains replacement info used in SecureCustomerPortalBeforeViewHandler.java to update the model with SCP 
+		components as well replace the views -->
+	<util:map id="spViewMap" key-type="java.lang.String" value-type="java.lang.Map">
+		<entry key="pages/account/accountLoginPage" value-ref="loginPageMap" />
+		<entry key="pages/password/passwordResetChangePage" value-ref="resetPasswordPageMap" />
+		<entry key="addon:/secureportaladdon/pages/accountRegistration" value-ref="registerPageMap" />
+	</util:map>
+
+
+	<!-- Each page that needs replacement has its own map below -->
+	<util:map id="loginPageMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="viewName" value="/pages/login" />
+		<entry key="cmsPageId" value="SecureCustomerPortalSecuredLoginPage" />
+	</util:map>
+
+	<util:map id="resetPasswordPageMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="viewName" value="/pages/resetPassword" />
+		<entry key="cmsPageId" value="SecureCustomerPortalSecuredResetPasswordPage" />
+	</util:map>
+	
+	<util:map id="registerPageMap" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="viewName" value="/pages/securedAccountRegistration" />
+		<entry key="cmsPageId" value="SecureCustomerPortalSecuredRegisterPage" />
+	</util:map>
+
+	<!-- List of unsecured mappings, i.e. those that the SecurePortalBeforeControllerHandler instance will let through regardless 
+		of authentication -->
+	<util:set id="unsecuredUris" value-type="java.lang.String">
+		<value>/_s/**</value>
+		<value>/register/**</value>
+		<value>/punchout/**</value>
+	</util:set>
+
+	<!-- List of control mappings, i.e. those that do not launch a new page but would only change a value on the server side such as language. -->
+	<util:set id="controlUris" value-type="java.lang.String">
+		<value>/_s/**</value>
+		<value>/punchout/**</value>
+	</util:set>
+
+	<!-- Take the existing exclusions and add this addons' unsecured mappings to it -->
+	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetObject" ref="excludeUrlSet" />
+		<property name="targetMethod" value="addAll" />
+		<property name="arguments" ref="unsecuredUris" />
+	</bean>
+	
+	<!-- AOP for captcha  -->
+	<aop:config proxy-target-class="true" expose-proxy="true">
+           <aop:aspect id="prepB2bRegistrationReCaptchaAspect" ref="reCaptchaAspect">
+           <aop:around method="prepare"
+                     pointcut="execution(* de.hybris.platform.secureportaladdon..controllers..*.showRegistrationPage(..))"/>
+           </aop:aspect>
+           <aop:aspect id="b2bRegistrationReCaptchaAspect" ref="reCaptchaAspect">
+           <aop:around method="advise"
+                     pointcut="execution(* de.hybris.platform.secureportaladdon..controllers..*.submitRegistration(..))"/>
+           </aop:aspect>
+     </aop:config>
+
+	<!-- Hack the list of allowed workflow attachment data in the B2B Admin Cockpit -->
+	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="targetObject" ref="WorkflowAttachmentData" />
+		<property name="targetMethod" value="addAll" />
+		<property name="arguments" ref="b2bRegistrationWorkflowAttachmentData" />
+	</bean>		
+		
+	<bean id="b2bRegistrationWorkflowAttachmentData" class="java.util.LinkedList">
+		<constructor-arg>
+			<list value-type="java.lang.String">
+				<value>de.hybris.platform.secureportaladdon.model.B2BRegistrationModel</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="WorkflowAttachmentData" class="java.util.LinkedList">
+		<constructor-arg>
+			<list value-type="java.lang.String">
+				<value>de.hybris.platform.core.model.product.ProductModel</value>
+				<value>de.hybris.platform.category.model.CategoryModel</value>
+				<value>de.hybris.platform.core.model.order.OrderModel</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+</beans>

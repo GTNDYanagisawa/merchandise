@@ -1,0 +1,706 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype generate="true" code="CockpitSpecialCollectionType"
+			autocreate="true">
+			<value code="quickcollection" />
+			<value code="blacklist" />
+			<value code="clipboard" />
+		</enumtype>
+
+		<!-- reports stuff -->
+		<enumtype code="ReportTimeRange" autocreate="true" generate="true">
+			<value code="LAST7DAYS"/>
+			<value code="LAST4WEEKS"/>
+			<value code="LASTMONTH"/>
+			<value code="LAST52WEEKS"/>
+			<value code="LAST12MONTHS"/>
+			<value code="SPECIFICDAY"/>
+			<value code="USERDEFINED"/>
+		</enumtype>
+
+		<enumtype code="OneDayRange" autocreate="true" generate="true">
+			<value code="TODAY"/>
+			<value code="YESTERDAY"/>
+			<value code="SPECIFICDAY"/>
+		</enumtype>
+
+		<enumtype code="RefreshTimeOption" autocreate="true" generate="true">
+			<value code="FIVESEC"/>
+			<value code="TENSEC"/>
+			<value code="QUATERMIN"/>
+			<value code="HALFMIN"/>
+			<value code="ONEMIN"/>
+			<value code="THREEMIN"/>
+			<value code="FIVEMIN"/>
+			<value code="TENMIN"/>
+			<value code="QUATERHR"/>
+			<value code="HALFHR"/>
+			<value code="NEVER"/>
+		</enumtype>
+
+		<!-- END reports stuff -->
+
+	</enumtypes>
+
+	<relations>
+
+		<relation generate="true" localized="false" code="User2CockpitObjectAbstractCollectionRelation" autocreate="true">
+			<sourceElement type="User" qualifier="user" cardinality="one">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</sourceElement>
+			<targetElement type="CockpitObjectAbstractCollection" qualifier="collections" cardinality="many">
+				<modifiers read="true" write="true" partof="false" optional="true"/>
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="ReadPrincipal2CockpitObjectAbstractCollectionRelation" autocreate="true">
+			<deployment typecode="1710" table="ReadCockpitCollRels"/>
+			<sourceElement type="Principal" qualifier="readPrincipals" cardinality="many">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</sourceElement>
+			<targetElement type="CockpitObjectAbstractCollection" qualifier="readCollections" cardinality="many">
+				<modifiers read="true" write="true" partof="false" optional="true"/>
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="WritePrincipal2CockpitObjectAbstractCollectionRelation" autocreate="true">
+			<deployment typecode="1711" table="WriteCockpitCollRels"/>
+			<sourceElement type="Principal" qualifier="writePrincipals" cardinality="many">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</sourceElement>
+			<targetElement type="CockpitObjectAbstractCollection" qualifier="writeCollections" cardinality="many">
+				<modifiers read="true" write="true" partof="false" optional="true"/>
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="CockpitAbstractCollection2ElementRelation" autocreate="true">
+			<sourceElement type="CockpitObjectAbstractCollection" qualifier="collection" cardinality="one">
+				<modifiers read="true" write="true" initial="true" optional="false"/>
+			</sourceElement>
+			<targetElement type="ObjectCollectionElement" qualifier="elements" collectiontype="list" cardinality="many">
+				<modifiers read="true" write="true" initial="false" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="User2CockpitSavedQueryRelation" autocreate="true">
+			<sourceElement type="User" qualifier="user" cardinality="one">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</sourceElement>
+			<targetElement type="CockpitSavedQuery" qualifier="cockpitSavedQueries" cardinality="many">
+				<modifiers read="true" write="true" partof="false" optional="true"/>
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="User2CockpitFavoriteCategoryRelation" autocreate="true">
+			<sourceElement type="User" qualifier="user" cardinality="one">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</sourceElement>
+			<targetElement type="CockpitFavoriteCategory" qualifier="cockpitFavoriteCategories" cardinality="many">
+				<modifiers read="true" write="true" partof="false" optional="true"/>
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="CockpitSavedQuery2CockpitSavedFacetValueRelation" autocreate="true">
+			<sourceElement type="CockpitSavedQuery" qualifier="cockpitSavedQuery" cardinality="one">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</sourceElement>
+			<targetElement type="CockpitSavedFacetValue" qualifier="cockpitSavedFacetValues" cardinality="many">
+				<modifiers read="true" write="true" partof="true" optional="true"/>
+			</targetElement>
+		</relation>
+		<relation generate="true" localized="false" code="CockpitSavedQuery2CockpitSavedSortCriterionRelation" autocreate="true">
+			<sourceElement type="CockpitSavedQuery" qualifier="cockpitSavedQuery" cardinality="one">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</sourceElement>
+			<targetElement type="CockpitSavedSortCriterion" qualifier="cockpitSavedSortCriteria" cardinality="many">
+				<modifiers read="true" write="true" partof="true" optional="true"/>
+			</targetElement>
+		</relation>
+		<relation generate="true" localized="false" code="CockpitSavedQuery2CockpitSavedParameterValueRelation" autocreate="true">
+			<sourceElement type="CockpitSavedQuery" qualifier="cockpitSavedQuery" cardinality="one">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</sourceElement>
+			<targetElement type="CockpitSavedParameterValue" qualifier="cockpitSavedParameterValues" cardinality="many">
+				<modifiers read="true" write="true" partof="true" optional="true"/>
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="Item2CockpitItemTemplateRelation" autocreate="true">
+			<deployment typecode="1712" table="ItemCockpitTemplRels"/>
+			<sourceElement type="Item" cardinality="many" collectiontype="set" navigable="false">
+				<modifiers read="true" write="true" optional="true"/>
+			</sourceElement>
+			<targetElement type="CockpitItemTemplate" qualifier="assignedCockpitItemTemplates" cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" optional="true"/>
+				<model generate="false"/>
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="CockpitItemTemplate2ComposedTypeRelation" autocreate="true">
+			<sourceElement type="CockpitItemTemplate" qualifier="cockpitItemTemplates" cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" optional="true"/>
+			</sourceElement>
+			<targetElement type="ComposedType" qualifier="relatedType" cardinality="one">
+				<modifiers read="true" write="true" optional="false" initial="true"/>
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="CockpitItemTemplate2ClassificationClassRelation" autocreate="true">
+			<deployment typecode="1713" table="CockpitTemplClassifRels"/>
+			<sourceElement type="CockpitItemTemplate" qualifier="cockpitItemTemplates" cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" optional="true"/>
+			</sourceElement>
+			<targetElement type="ClassificationClass" qualifier="classificationClasses" cardinality="many">
+				<modifiers read="true" write="true" optional="true"/>
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="Principal2CockpitUIComponentConfigurationRelation" autocreate="true">
+			<sourceElement type="Principal" qualifier="principal" cardinality="one">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</sourceElement>
+			<targetElement type="CockpitUIComponentConfiguration" qualifier="cockpitUIConfigurations" cardinality="many">
+				<modifiers read="true" write="true" initial="true" optional="true"/>
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="Principal2CockpitUIComponentReadAccessRelation" autocreate="true">
+			<deployment typecode="1714" table="PrincipCockpitReadRels"/>
+			<sourceElement type="CockpitUIComponentAccessRight" qualifier="readableCockpitUIComponents" cardinality="many">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</sourceElement>
+			<targetElement type="Principal" qualifier="readPrincipals" cardinality="many">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="Principal2CockpitUIComponentWriteAccessRelation" autocreate="true">
+		<deployment typecode="1715" table="PrincipCockpitWriteRels"/>
+			<sourceElement type="CockpitUIComponentAccessRight" qualifier="writableCockpitUIComponents" cardinality="many">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</sourceElement>
+			<targetElement type="Principal" qualifier="writePrincipals" cardinality="many">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="WidgetPreferencesToUserRelation" autocreate="true">
+			<sourceElement qualifier="widgetPreferences"  type="WidgetPreferences" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="ownerUser" type="User" cardinality="one">
+				<modifiers  read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="DynamicWidgetPreferencesToWidgetParameterRelation" autocreate="true">
+			<sourceElement qualifier="widgetPreferences"  type="DynamicWidgetPreferences" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="parameters" type="WidgetParameter" cardinality="many">
+				<modifiers  read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+		
+		<relation generate="true" localized="false" code="CommentToCommentMetadata" autocreate="true">
+   			<sourceElement qualifier="comment"  type="Comment" cardinality="one">
+    			<modifiers read="true" write="false" search="true" optional="false" initial="true"/>
+   			</sourceElement>
+   			<targetElement qualifier="commentMetadata" type="CommentMetadata" cardinality="many">
+    			<modifiers  read="true" write="true" search="true" optional="true" partof="true"/>
+   			</targetElement>
+  		</relation>
+
+		<relation generate="true" localized="false" code="ReadPrincipal2CockpitSavedQueryRelation" autocreate="true">
+			<deployment typecode="1717" table="ReadSavedQueryRels"/>
+			<sourceElement type="Principal" qualifier="readSavedQueryPrincipals" cardinality="many">
+				<modifiers read="true" write="true" initial="false" optional="true"/>
+			</sourceElement>
+			<targetElement type="CockpitSavedQuery" qualifier="readSavedQueries" cardinality="many">
+				<modifiers read="true" write="true" partof="false" optional="true"/>
+			</targetElement>
+		</relation>
+		
+	</relations>
+
+	<itemtypes>
+		<itemtype code="CatalogVersion" autocreate="false" generate="false">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="mnemonic">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" unique="false" optional="true" initial="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype 	code="CockpitItemTemplate"
+					extends="GenericItem"
+					autocreate="true"
+					generate="true"
+					jaloclass="de.hybris.platform.cockpit.jalo.template.CockpitItemTemplate">
+			<deployment table="CockpitItemTemplates" typecode="24242"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" initial="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<persistence type="property"/>
+					<modifiers read="true" write="true"/>
+				</attribute>
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<persistence type="property"/>
+					<modifiers read="true" write="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<!-- abstract superclass for collection items -->
+		<itemtype 	code="ObjectCollectionElement"
+					extends="GenericItem"
+					autocreate="true"
+					generate="true"
+					abstract="true"
+					jaloclass="de.hybris.platform.cockpit.jalo.ObjectCollectionElement" >
+			<deployment table="CockpitCollElements" typecode="1701"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="objectTypeCode">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="false"/>
+				</attribute>
+				<attribute type="java.lang.Integer" qualifier="position">
+					<persistence type="jalo" />
+					<modifiers read="true" write="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- collection element that represents an item -->
+		<itemtype 	code="ObjectCollectionItemReference"
+					extends="ObjectCollectionElement"
+					autocreate="true"
+					generate="true"
+					jaloclass="de.hybris.platform.cockpit.jalo.ObjectCollectionItemReference">
+			<deployment table="CockpitCollItemRefs" typecode="1702"/>
+			<attributes>
+				<attribute type="Item" qualifier="item">
+					<persistence type="property"/>
+					<modifiers initial="true" optional="false" />
+				</attribute>
+			</attributes>
+			<indexes>
+    			<index name="itemIDX" unique="false">
+					<key attribute="item"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="CockpitFavoriteCategory"
+				  autocreate="true"
+				  generate="true"
+				  extends="GenericItem"
+				  jaloclass="de.hybris.platform.cockpit.jalo.CockpitFavoriteCategory">
+				  <deployment table="CockpitFavCategories" typecode="1718"/>
+			  <attributes>
+				<attribute type="java.lang.String" qualifier="qualifier" >
+					<persistence type="property"/>
+					<modifiers unique="true" read="true" write="true" optional="false" initial="true"/>
+				</attribute>
+				<attribute type="localized:java.lang.String" qualifier="label" >
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" />
+				</attribute>
+				<attribute type="localized:java.lang.String" qualifier="description" >
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- abstract collection -->
+		<itemtype 	code="CockpitObjectAbstractCollection"
+					autocreate="true"
+					generate="true"
+					extends="GenericItem"
+					jaloclass="de.hybris.platform.cockpit.jalo.CockpitObjectAbstractCollection">
+			<deployment table="CockpitCollections" typecode="1700"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="qualifier" >
+					<persistence type="property"/>
+					<modifiers unique="false" read="true" write="true" optional="false" initial="true"/>
+				</attribute>
+				<attribute type="localized:java.lang.String" qualifier="label" >
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" />
+				</attribute>
+				<attribute type="localized:java.lang.String" qualifier="description" >
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- collection -->
+		<itemtype 	code="CockpitObjectCollection"
+					autocreate="true"
+					generate="true"
+					extends="CockpitObjectAbstractCollection"
+					jaloclass="de.hybris.platform.cockpit.jalo.CockpitObjectCollection">
+			<attributes>
+			</attributes>
+		</itemtype>
+
+		<!-- special collection -->
+		<itemtype 	code="CockpitObjectSpecialCollection"
+					autocreate="true"
+					generate="true"
+					extends="CockpitObjectAbstractCollection"
+					jaloclass="de.hybris.platform.cockpit.jalo.CockpitObjectSpecialCollection">
+			<attributes>
+				<attribute type="CockpitSpecialCollectionType" qualifier="collectionType" >
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- saved queries -->
+		<itemtype	code="CockpitSavedQuery" autocreate="true" generate="true"
+					extends="GenericItem"
+					jaloclass="de.hybris.platform.cockpit.jalo.CockpitSavedQuery">
+			<deployment table="CockpitSavedQueries" typecode="1703"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="label">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" initial="false"/>
+				</attribute>
+				<attribute type="localized:java.lang.String" qualifier="description">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" initial="false"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="simpleText" >
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" initial="false"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="selectedTypeCode" >
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" initial="false"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="selectedTemplateCode" >
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" initial="false"/>
+				</attribute>
+				<attribute qualifier="code" type="java.lang.String" >
+					<modifiers initial="true" read="true" write="true" optional="false" unique="true"/>
+					<persistence type="property"/>
+					<description>unique identifier of the Cockpit Saved Query; will be generated if not set</description>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="defaultViewMode">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype 	code="CockpitSavedFacetValue" autocreate="true" generate="true"
+					extends="GenericItem"
+					jaloclass="de.hybris.platform.cockpit.jalo.CockpitSavedFacetValue">
+			<deployment table="CockpitSavedFacValues" typecode="1704"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="facetQualifier">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="false" initial="true" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="valueQualifier">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="false" initial="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype 	code="CockpitSavedSortCriterion" autocreate="true" generate="true"
+					extends="GenericItem"
+					jaloclass="de.hybris.platform.cockpit.jalo.CockpitSavedSortCriterion">
+			<deployment table="CockpitSavedSortCrits" typecode="1705"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="criterionQualifier">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="false" initial="true" />
+				</attribute>
+				<attribute type="java.lang.Boolean" qualifier="asc">
+					<persistence type="property"/>
+					<modifiers read="true" write="true"/>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype 	code="CockpitSavedParameterValue" autocreate="true" generate="true"
+					extends="GenericItem"
+					jaloclass="de.hybris.platform.cockpit.jalo.CockpitSavedParameterValue">
+			<deployment table="CockpitSavedParamVals" typecode="1706"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="rawValue">
+					<persistence type="property">
+						<columntype database="sap">
+							<value>nvarchar(5000)</value>
+						</columntype>
+						<columntype database="oracle">
+							<value>varchar2(4000)</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>text</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>nvarchar(max)</value>
+						</columntype>
+						<columntype database="hsqldb">
+							<value>LONGVARCHAR</value>
+						</columntype>					
+					</persistence>
+					<modifiers read="true" write="true" optional="true" initial="false"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="operatorQualifier">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="false" initial="true"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="languageIso">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="true" initial="false"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="parameterQualifier">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" optional="false" initial="true"/>
+				</attribute>
+				<attribute type="java.lang.Boolean" qualifier="caseSensitive">
+					<persistence type="property"/>
+					<modifiers read="true" write="true"/>
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute type="java.lang.Boolean" qualifier="reference">
+					<persistence type="property"/>
+					<modifiers read="true" write="true"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<!--
+		<itemtype code="Product" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="scaledThumbnail" type="Media" autocreate="true">
+					<description>
+						Product Cockpit specific thumbnail
+					</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property"/>
+				</attribute>
+
+			</attributes>
+		</itemtype>
+		 -->
+
+
+		<itemtype code="CockpitUIComponentConfiguration"
+				  jaloclass="de.hybris.platform.cockpit.jalo.CockpitUIComponentConfiguration"
+				  extends="GenericItem"
+				  autocreate="true"
+				  generate="true">
+			<deployment table="CockpitCompConfigs" typecode="1707"/>
+			<attributes>
+				<attribute qualifier="factoryBean" type="java.lang.String">
+					<description>ID of Spring bean that implements de.hybris.platform.cockpit.services.config.UIComponentConfigurationFactory</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" initial="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Code of configuration</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" initial="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="objectTemplateCode" type="java.lang.String">
+					<description>Code of Object Template this UIConfiguration is associated with</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" initial="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="media" type="Media">
+    				<modifiers read="true" write="true" search="true" initial="true" optional="false" />
+    				<persistence type="property" />
+   				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="CockpitUIConfigurationMedia" autocreate="true" generate="true" extends="CatalogUnawareMedia"
+						jaloclass="de.hybris.platform.cockpit.jalo.CockpitUIConfigurationMedia" />
+
+		<itemtype code="CockpitUIScriptConfigMedia" autocreate="true" generate="true" extends="CockpitUIConfigurationMedia"
+						jaloclass="de.hybris.platform.cockpit.jalo.CockpitUIScriptConfigMedia">
+			<attributes>
+  				<attribute qualifier="allowScriptEvaluation" type="java.lang.Boolean">
+  					<persistence type="property"/>
+  					<modifiers optional="false" initial="false" read="true" write="true"/>
+  					<defaultvalue>Boolean.FALSE</defaultvalue>
+  				</attribute>
+  			</attributes>
+		</itemtype>
+
+
+		<itemtype code="CockpitUIComponentAccessRight"
+				  jaloclass="de.hybris.platform.cockpit.jalo.CockpitUIComponentAccessRight"
+				  extends="GenericItem"
+				  autocreate="true"
+				  generate="true">
+			<deployment table="CockpitCompAccessRights" typecode="1708"/>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Code of component</description>
+					<persistence type="property"/>
+					<modifiers read="true" write="true" initial="true" optional="false"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!--                        Widget preferences section                                -->
+
+		<itemtype code="WidgetPreferences" abstract="true" autocreate="true" generate="true" jaloclass="de.hybris.platform.cockpit.jalo.WidgetPreferences" extends="GenericItem">
+			<deployment table="WidgetPreferences" typecode="2071"/>
+			<attributes>
+				<attribute type="localized:java.lang.String" qualifier="title">
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="DynamicWidgetPreferences" abstract="true" autocreate="true" generate="true" jaloclass="de.hybris.platform.cockpit.jalo.DynamicWidgetPreferences" extends="WidgetPreferences">
+		</itemtype>
+
+		<itemtype code="WidgetParameter" autocreate="true" generate="true" jaloclass="de.hybris.platform.cockpit.jalo.WidgetParameter" extends="GenericItem">
+			<deployment table="WidgetParameter" typecode="2072"/>
+			<attributes>
+				<attribute type="java.lang.String" qualifier="name">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute type="Type" qualifier="type">
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="description">
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="defaultValueExpression">
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="targetType">
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				<attribute type="java.lang.Object" qualifier="value">
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!--                        Widget preferences section end                            -->
+
+		<!-- reports stuff -->
+
+
+		<itemtype code="JasperMedia" autocreate="true" generate="true" extends="Media" jaloclass="de.hybris.platform.cockpit.reports.jalo.JasperMedia">
+			<attributes>
+				<attribute qualifier="title" type="localized:java.lang.String">
+					<modifiers optional="true"/>
+                	<persistence type="property"/>
+             	</attribute>
+             	<attribute qualifier="reportDescription" type="localized:java.lang.String">
+					<modifiers optional="true"/>
+                	<persistence type="property"/>
+             	</attribute>
+             	<attribute qualifier="icon" type="Media">
+					<modifiers optional="true"/>
+                	<persistence type="property"/>
+             	</attribute>
+              	<attribute qualifier="catalogVersion" type="CatalogVersion" redeclare="true">
+             		<persistence type="property"/>
+             		<modifiers optional="true"/>
+             	</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CompiledJasperMedia" autocreate="true" generate="true" extends="JasperMedia" jaloclass="de.hybris.platform.cockpit.reports.jalo.CompiledJasperMedia">
+			<attributes>
+		     	<attribute qualifier="compiledReport" type="Media">
+					<modifiers optional="true"/>
+                	<persistence type="property"/>
+             	</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="JasperWidgetPreferences" autocreate="true" generate="true" extends="DynamicWidgetPreferences" jaloclass="de.hybris.platform.cockpit.reports.jalo.JasperWidgetPreferences">
+			<attributes>
+				<attribute qualifier="report" type="JasperMedia">
+					<modifiers optional="false"/>
+                	<persistence type="property"/>
+             	</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="CommentMetadata" autocreate="true" generate="true" jaloclass="de.hybris.platform.cockpit.jalo.CommentMetadata">
+			<deployment table="CommentMetadatas" typecode="1716"/>
+			<attributes>
+				<attribute type="java.lang.Integer" qualifier="x">
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="java.lang.Integer" qualifier="y">
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="java.lang.Integer" qualifier="pageIndex">
+					<persistence type="property"/>
+				</attribute>
+				<attribute type="Item" qualifier="item">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="CommentUserSetting" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="workStatus" type="java.lang.Boolean">
+					<modifiers read="true" write="true"	optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="hidden" type="java.lang.Boolean">
+					<modifiers read="true" write="true"	optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- END reports stuff -->
+	</itemtypes>
+</items>

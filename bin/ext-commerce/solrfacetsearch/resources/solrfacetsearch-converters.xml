@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+
+	<!-- CONVERTERS START -->
+	
+	<alias name="defaultSolrServerConfigConverter" alias="solrServerConfigConverter"/>
+	<bean id="defaultSolrServerConfigConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="solrConfig"/>
+		<property name="populators">
+			<list>
+				<ref bean="solrServerConfigPopulator"/>
+			</list>
+		</property>	
+	</bean>
+	
+	<alias name="defaultClusterConfigConverter" alias="clusterConfigConverter"/>
+	<bean id="defaultClusterConfigConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="clusterConfig"/>
+		<property name="populators">
+			<list>
+				<ref bean="clusterConfigPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultEndpointUrlConverter" alias="endpointUrlConverter"/>
+	<bean id="defaultEndpointUrlConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="endpointURL"/>
+		<property name="populators">
+			<list>
+				<ref bean="endpointUrlPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultSearchConfigConverter" alias="solrSearchConfigConverter"/>
+	
+	<bean id="defaultSearchConfigConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="searchConfig"/>
+		<property name="populators">
+			<list>
+				<ref bean="searchConfigPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultIndexedTypeFlexibleSearchQueryConverter" alias="indexedTypeFlexibleSearchQueryConverter"/>
+	<bean id="defaultIndexedTypeFlexibleSearchQueryConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="indexedTypeFlexibleSearchQuery"/>
+		<property name="populators">
+			<list>
+				<ref bean="indexedTypeFlexibleSearchQueryPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultIndexedPropertyConverter" alias="indexedPropertyConverter"/>
+	<bean id="defaultIndexedPropertyConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="indexedProperty"/>
+		<property name="populators">
+			<list>
+				<ref bean="indexedPropertyPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultSolrValueRangeConverter" alias="solrValueRangeConverter"/>
+	<bean id="defaultSolrValueRangeConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="solrValueRange"/>
+		<property name="populators">
+			<list>
+				<ref bean="solrValueRangePopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultSolrValueRangeSetConverter" alias="solrValueRangeSetConverter"/>
+	<bean id="defaultSolrValueRangeSetConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="solrValueRangeSet"/>
+		<property name="populators">
+			<list>
+				<ref bean="solrValueRangeSetPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultSolrIndexedTypeConverter" alias="solrIndexedTypeConverter"/>
+	<bean id="defaultSolrIndexedTypeConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="solrIndexedType"/>
+		<property name="populators">
+			<list>
+				<ref bean="solrIndexedTypePopulator"/>
+				<ref bean="indexedTypeFlexibleSearchQueriesPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultSolrIndexConfigConverter" alias="solrIndexConfigConverter"/>
+	<bean id="defaultSolrIndexConfigConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="solrIndexConfig"/>
+		<property name="populators">
+			<list>
+				<ref bean="solrIndexConfigPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultSolrFacetSearchConfigConverter" alias="solrFacetSearchConfigConverter"/>
+	<bean id="defaultSolrFacetSearchConfigConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="facetSearchConfig"/>
+		<property name="populators">
+			<list>
+				<ref bean="solrFacetSearchConfigPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+
+	<!-- CONVERTERS END -->
+	
+	
+	<!-- POPULATORS START -->
+
+	<alias name="defaultSolrServerConfigPopulator" alias="solrServerConfigPopulator"/>
+	<bean id="defaultSolrServerConfigPopulator" class="de.hybris.platform.solrfacetsearch.converters.populator.DefaultSolrServerConfigPopulator">
+		<property name="clusterConfigConverter" ref="clusterConfigConverter"/>
+	</bean>
+		
+	<alias name="defaultClusterConfigPopulator" alias="clusterConfigPopulator"/>
+	<bean id="defaultClusterConfigPopulator" class="de.hybris.platform.solrfacetsearch.converters.populator.DefaultClusterConfigPopulator">
+		<property name="endpointUrlConverter" ref="endpointUrlConverter"/>
+	</bean>
+		
+	<alias name="defaultEndpointUrlPopulator" alias="endpointUrlPopulator"/>
+	<bean id="defaultEndpointUrlPopulator" class="de.hybris.platform.solrfacetsearch.converters.populator.DefaultEndpointUrlPopulator"/>
+	
+	<alias name="defaultSearchConfigPopulator" alias="searchConfigPopulator"/>
+	<bean id="defaultSearchConfigPopulator" class="de.hybris.platform.solrfacetsearch.converters.populator.DefaultSearchConfigPopulator">
+		<property name="indexedPropertyConverter" ref="indexedPropertyConverter"/>
+	</bean>	
+	
+	<alias name="defaultIndexedTypeFlexibleSearchQueriesPopulator" alias="indexedTypeFlexibleSearchQueriesPopulator"/>
+	<bean id="defaultIndexedTypeFlexibleSearchQueriesPopulator" class="de.hybris.platform.solrfacetsearch.converters.populator.DefaultIndexedTypeFlexibleSearchQueriesPopulator">
+		<property name="indexedTypeFlexibleSearchQueryConverter" ref="indexedTypeFlexibleSearchQueryConverter"/>
+		<property name="userService" ref="userService"></property>
+	</bean>
+	
+	<alias name="defaultIndexedPropertyPopulator" alias="indexedPropertyPopulator"/>
+	<bean id="defaultIndexedPropertyPopulator" class="de.hybris.platform.solrfacetsearch.converters.populator.DefaultIndexedPropertyPopulator">
+		<property name="valueRangeSetConverter" ref="solrValueRangeSetConverter"/>
+		<property name="defaultFieldValueProvider" value="modelPropertyFieldValueProvider"/>
+	</bean>
+	
+	<alias name="defaultIndexedTypeFlexibleSearchQueryPopulator" alias="indexedTypeFlexibleSearchQueryPopulator"/>
+	<bean id="defaultIndexedTypeFlexibleSearchQueryPopulator" class="de.hybris.platform.solrfacetsearch.converters.populator.DefaultIndexedTypeFlexibleSearchQueryPopulator" />
+	
+	<alias name="defaultSolrValueRangeSetPopulator" alias="solrValueRangeSetPopulator"/>
+	<bean id="defaultSolrValueRangeSetPopulator" class="de.hybris.platform.solrfacetsearch.converters.populator.DefaultValueRangeSetPopulator">
+		<property name="valueRangeConverter" ref="solrValueRangeConverter"/>
+	</bean>
+	
+	<alias name="defaultSolrValueRangePopulator" alias="solrValueRangePopulator"/>
+	<bean id="defaultSolrValueRangePopulator" class="de.hybris.platform.solrfacetsearch.converters.populator.DefaultValueRangePopulator">
+	</bean>
+	
+	<alias name="defaultSolrIndexedTypePopulator" alias="solrIndexedTypePopulator"/>
+	<bean id="defaultSolrIndexedTypePopulator" class="de.hybris.platform.solrfacetsearch.converters.populator.DefaultIndexedTypePopulator">
+		<property name="indexedPropertyConverter" ref="indexedPropertyConverter"></property>
+		<property name="defaultIdentityProvider" value="itemIdentityProvider"/>
+		<property name="defaultModelLoader" value="defaultModelLoader"/>
+	</bean>
+	
+	<alias name="defaultSolrIndexConfigPopulator" alias="solrIndexConfigPopulator"/>
+	<bean id="defaultSolrIndexConfigPopulator" class="de.hybris.platform.solrfacetsearch.converters.populator.DefaultIndexConfigPopulator">
+		<property name="indexedTypeConverter" ref="solrIndexedTypeConverter"></property>
+		<property name="solrServerConfigConverter" ref="solrServerConfigConverter"></property>
+	</bean>
+	
+	<alias name="defaultFacetSearchConfigPopulator" alias="solrFacetSearchConfigPopulator"/>
+	<bean id="defaultFacetSearchConfigPopulator" class="de.hybris.platform.solrfacetsearch.converters.populator.DefaultFacetSearchConfigPopulator">
+		<property name="indexConfigConverter" ref="solrIndexConfigConverter"></property>
+		<property name="solrSearchConfigConverter" ref="solrSearchConfigConverter"></property>
+		<property name="solrServerConfigConverter" ref="solrServerConfigConverter"></property>
+	</bean>
+	
+	<!-- POPULATORS END -->
+	
+	<!-- DATA BEANS START -->
+	
+	<bean id="endpointURL" class="de.hybris.platform.solrfacetsearch.config.EndpointURL" scope="prototype"/>
+	<bean id="solrConfig" class="de.hybris.platform.solrfacetsearch.config.SolrConfig" scope="prototype"/>
+	<bean id="clusterConfig" class="de.hybris.platform.solrfacetsearch.config.ClusterConfig" scope="prototype"/>
+	<bean id="indexedProperty" class="de.hybris.platform.solrfacetsearch.config.IndexedProperty" scope="prototype"/>
+	<bean id="indexedTypeFlexibleSearchQuery" class="de.hybris.platform.solrfacetsearch.config.IndexedTypeFlexibleSearchQuery" scope="prototype"/>
+	<bean id="searchConfig" class="de.hybris.platform.solrfacetsearch.config.SearchConfig" scope="prototype"/>
+	<bean id="solrValueRange" class="de.hybris.platform.solrfacetsearch.config.ValueRange" scope="prototype"/>
+	<bean id="solrValueRangeSet" class="de.hybris.platform.solrfacetsearch.config.ValueRangeSet" scope="prototype"/>
+	<bean id="solrIndexedType" class="de.hybris.platform.solrfacetsearch.config.IndexedType" scope="prototype"/>
+	<bean id="solrIndexConfig" class="de.hybris.platform.solrfacetsearch.config.IndexConfig" scope="prototype"/>
+	<bean id="facetSearchConfig" class="de.hybris.platform.solrfacetsearch.config.FacetSearchConfig" scope="prototype"/>
+	
+	<!-- DATA BEANS END -->
+
+</beans>

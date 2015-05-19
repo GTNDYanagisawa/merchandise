@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+    <widget-extension widgetId="backofficeMainSlot">
+        <widget id="ybackoffice-perspective" widgetDefinitionId="ybackofficepackage.widgets.ybackofficewidget"
+            template="false" slotId="perspectives" title="Hello ybackoffice">
+            <setting key="perspectiveImageUrl" value="/cng/images/perspective.png"
+                type="String" />
+        </widget>
+    </widget-extension>
+
+    <widget-connection sourceWidgetId="ybackoffice-explorer-tree" outputId="nodeSelected" targetWidgetId="ybackoffice-tree-node-adapter" inputId="input"/>
+    <widget-connection sourceWidgetId="ybackoffice-tree-node-adapter" outputId="true" targetWidgetId="ybackoffice-typecode-extractor" inputId="genericInput"/>
+    <widget-connection sourceWidgetId="ybackoffice-tree-node-adapter" outputId="true" targetWidgetId="ybackoffice-search-enabler" inputId="genericInput"/>
+    <widget-connection sourceWidgetId="ybackoffice-tree-node-adapter" outputId="false" targetWidgetId="ybackoffice-search-disabler" inputId="genericInput"/>
+    <widget-connection sourceWidgetId="ybackoffice-typecode-extractor" outputId="genericOutput" targetWidgetId="ybackoffice-search-logic" inputId="type"/>
+    <widget-connection sourceWidgetId="ybackoffice-search-enabler" outputId="genericOutput" targetWidgetId="ybackoffice-text-search" inputId="enabled"/>
+    <widget-connection sourceWidgetId="ybackoffice-search-disabler" outputId="genericOutput" targetWidgetId="ybackoffice-text-search" inputId="enabled"/>
+    <widget-connection sourceWidgetId="ybackoffice-text-search" outputId="query" targetWidgetId="ybackoffice-search-logic" inputId="searchtext"/>
+    <widget-connection sourceWidgetId="ybackoffice-search-logic" outputId="pageable" targetWidgetId="ybackoffice-simple-list" inputId="pageable"/>
+
+</widgets>
